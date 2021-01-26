@@ -136,7 +136,6 @@ add_legacy_tests(
   igraph_full
   igraph_grg_game
   igraph_lcf
-  igraph_preference_game
   igraph_ring
   igraph_small
   igraph_star
@@ -149,6 +148,7 @@ add_legacy_tests(
   erdos_renyi_game
   full
   igraph_barabasi_aging_game
+  igraph_callaway_traits_game
   igraph_correlated_game
   igraph_extended_chordal_ring
   igraph_from_prufer
@@ -158,7 +158,8 @@ add_legacy_tests(
   igraph_lattice
   igraph_linegraph
   igraph_kautz
-  igraph_realize_degree_sequence  
+  igraph_preference_game
+  igraph_realize_degree_sequence
   tree
   tree_game
   ring
@@ -192,7 +193,7 @@ add_legacy_tests(
   igraph_similarity
   igraph_simplify
   igraph_topological_sorting
-  igraph_transitivity  
+  igraph_transitivity
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -214,7 +215,7 @@ add_legacy_tests(
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_is_tree
-  igraph_local_transitivity  
+  igraph_local_transitivity
   igraph_transitive_closure_dag
   harmonic_centrality
   random_spanning_tree
@@ -244,14 +245,17 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_layout_grid
-  igraph_layout_kamada_kawai_3d_bug_1462
   igraph_layout_lgl
   igraph_layout_mds
   igraph_layout_merge2
   igraph_layout_merge3
-  igraph_layout_reingold_tilford_bug_879
   igraph_layout_reingold_tilford_extended
   igraph_layout_sugiyama
+)
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  igraph_layout_kamada_kawai_3d_bug_1462
+  igraph_layout_reingold_tilford_bug_879
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -362,6 +366,7 @@ add_legacy_tests(
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
+  igraph_rewire_directed_edges
 )
 
 # conversion.at
@@ -423,20 +428,23 @@ add_legacy_tests(
   igraph_community_leading_eigenvector
   igraph_community_leiden
   igraph_community_multilevel
-  igraph_community_optimal_modularity  
+  igraph_community_optimal_modularity
   walktrap
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  bug-1149658
   community_leiden
   community_label_propagation
-  igraph_community_infomap  
-  igraph_community_leading_eigenvector2  
+  igraph_community_infomap
+  igraph_community_leading_eigenvector2
   igraph_modularity
   levc-stress
   spinglass
+)
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  bug-1149658
 )
 
 # use a higher test timeout for the Infomap algorithm
@@ -482,9 +490,12 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  cattributes5
+)
+add_legacy_tests(
+  FOLDER tests/regression NAMES
   cattr_bool_bug
   cattr_bool_bug2
-  cattributes5
 )
 
 # arpack.at
@@ -535,7 +546,7 @@ add_legacy_tests(
   igraph_minimum_size_separators
 )
 add_legacy_tests(
-  FOLDER tests/unit NAMES
+  FOLDER tests/regression NAMES
   bug-1033045
 )
 
@@ -551,9 +562,13 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_deterministic_optimal_imitation
-  igraph_moran_process
   igraph_roulette_wheel_imitation
   igraph_stochastic_imitation
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_moran_process
 )
 
 # mt.at -- only if we have pthreads
@@ -630,6 +645,19 @@ add_legacy_tests(
   igraph_is_bigraphical
 )
 
+# handlers
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  fatal_handler
+)
+
+# error output
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  error_macros
+)
 # regression and fuzzing tests
 
 add_legacy_tests(

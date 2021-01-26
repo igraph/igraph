@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
+
 #include "test_utilities.inc"
 
 int main() {
@@ -26,29 +26,29 @@ int main() {
     long int n_vertices = 4;
 
     /*    Undirected, should be a full graph    */
-    assert(igraph_full_citation(&g, n_vertices, 0 /*undirected*/) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_full_citation(&g, n_vertices, 0 /*undirected*/) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 4, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3, -1);
-    assert(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
 
     /*    Directed, only edges from i->j if i > j    */
-    assert(igraph_full_citation(&g, n_vertices, 1 /*directed*/) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_full_citation(&g, n_vertices, 1 /*directed*/) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 4, IGRAPH_DIRECTED, 1, 0, 2, 0, 3, 0, 2, 1, 3, 1, 3, 2, -1);
-    assert(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
 
     /*    Directed, 1 vertex, should be edgeless    */
-    assert(igraph_full_citation(&g, 1 /*n_vertices*/, 1 /*directed*/) == IGRAPH_SUCCESS);
-    assert(igraph_ecount(&g) == 0);
+    IGRAPH_ASSERT(igraph_full_citation(&g, 1 /*n_vertices*/, 1 /*directed*/) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 0);
     igraph_destroy(&g);
 
     /*    Directed, 0 vertices, empty graph    */
-    assert(igraph_full_citation(&g, 0 /*n_vertices*/, 1 /*directed*/) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&g) == 0);
+    IGRAPH_ASSERT(igraph_full_citation(&g, 0 /*n_vertices*/, 1 /*directed*/) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

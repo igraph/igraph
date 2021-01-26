@@ -30,10 +30,13 @@ project(
   LANGUAGES C CXX
 )
 
+# Set a default build type if none was specified
+include(BuildType)
+
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Expose the BUILD_SHARED_LIBS option in the ccmake UI
@@ -89,7 +92,7 @@ if(IGRAPH_ENABLE_CODE_COVERAGE)
 	# problems with them. Yes, the exclusion is correct, it refers to a nonexistent
 	# directory that somehow gets into the coverage resolts. /Applications is for
 	# macOS -- it excludes files from the macOS SDK.
-	EXCLUDE "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
+	EXCLUDE "io/*.l" "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
   )
 endif()
 

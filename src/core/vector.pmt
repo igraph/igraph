@@ -966,80 +966,105 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 
 #ifndef NOTORDERED
 
+/* We will use x != x for NaN checks below and Clang does not like it unless
+ * we disable a warning */
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-compare"
+#endif
+
 /**
  * \ingroup vector
  * \function igraph_vector_max
- * \brief Gives the maximum element of the vector.
+ * \brief Largest element of a vector.
  *
  * </para><para>
  * If the size of the vector is zero, an arbitrary number is
  * returned.
  * \param v The vector object.
- * \return The maximum element.
+ * \return The maximum element of \p v, or NaN if any element is NaN.
  *
- * Time complexity: O(n),
- * n is the size of the vector.
+ * Time complexity: O(n), the number of elements.
  */
-
 BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     BASE max;
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     max = *(v->stor_begin);
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+    if (igraph_is_nan(max)) { return max; }; /* Result is NaN */
+#endif
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
         if ((*ptr) > max) {
             max = *ptr;
         }
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(*ptr))
+            return *ptr; /* Result is NaN */
+#endif
         ptr++;
     }
     return max;
 }
 
+
 /**
  * \ingroup vector
  * \function igraph_vector_which_max
- * \brief Gives the position of the maximum element of the vector.
+ * \brief Gives the index of the maximum element of the vector.
  *
  * </para><para>
- * If the size of the vector is zero, -1 is
- * returned.
+ * If the size of the vector is zero, -1 is returned. If the largest
+ * element is not unique, then the index of the first is returned.
+ * If the vector contains NaN values, the index of the first NaN value
+ * is returned.
  * \param v The vector object.
- * \return The position of the first maximum element.
+ * \return The index of the first maximum element.
  *
- * Time complexity: O(n),
- * n is the size of the vector.
+ * Time complexity: O(n), n is the size of the vector.
  */
-
 long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
-    long int which = -1;
     if (!FUNCTION(igraph_vector, empty)(v)) {
         BASE max;
         BASE *ptr;
-        long int pos;
+        BASE *which;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
-        max = *(v->stor_begin); which = 0;
-        ptr = v->stor_begin + 1; pos = 1;
+        ptr = v->stor_begin;
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+#endif
+        which = ptr;
+        max = *which;
+        ptr++;
         while (ptr < v->end) {
             if ((*ptr) > max) {
-                max = *ptr;
-                which = pos;
+                which = ptr;
+                max = *which;
             }
-            ptr++; pos++;
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+            else if (igraph_is_nan(*ptr)) {
+                return ptr - v->stor_begin; /* Result is NaN */
+            }
+#endif
+            ptr++;
         }
+        return which - v->stor_begin;
     }
-    return which;
+    return -1;
 }
 
 /**
+ * \ingroup vector
  * \function igraph_vector_min
  * \brief Smallest element of a vector.
  *
  * The vector must be non-empty.
  * \param v The input vector.
- * \return The smallest element of \p v.
+ * \return The smallest element of \p v, or nan if any element is nan.
  *
  * Time complexity: O(n), the number of elements.
  */
@@ -1050,49 +1075,71 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     min = *(v->stor_begin);
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+    if (igraph_is_nan(min)) { return min; }; /* Result is NaN */
+#endif
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
         if ((*ptr) < min) {
             min = *ptr;
         }
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(*ptr)) {
+            return *ptr; /* Result is NaN */
+        }
+#endif
         ptr++;
     }
     return min;
 }
 
 /**
+ * \ingroup vector
  * \function igraph_vector_which_min
  * \brief Index of the smallest element.
  *
- * The vector must be non-empty.
- * If the smallest element is not unique, then the index of the first
- * is returned.
+ * </para><para>
+ * The vector must be non-empty. If the smallest element is not unique,
+ * then the index of the first is returned. If the vector contains NaN
+ * values, the index of the first NaN value is returned.
  * \param v The input vector.
  * \return Index of the smallest element.
  *
  * Time complexity: O(n), the number of elements.
  */
-
 long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
-    long int which = -1;
     if (!FUNCTION(igraph_vector, empty)(v)) {
         BASE min;
         BASE *ptr;
-        long int pos;
+        BASE *which;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
-        min = *(v->stor_begin); which = 0;
-        ptr = v->stor_begin + 1; pos = 1;
+        ptr = v->stor_begin;
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+#endif
+        which = ptr;
+        min = *which;
         while (ptr < v->end) {
             if ((*ptr) < min) {
-                min = *ptr;
-                which = pos;
+                which = ptr;
+                min = *which;
             }
-            ptr++; pos++;
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+            else if (igraph_is_nan(*ptr)) {
+                return ptr - v->stor_begin; /* Result is NaN */
+            }
+#endif
+            ptr++;
         }
+        return which - v->stor_begin;
     }
-    return which;
+    return -1;
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif
 

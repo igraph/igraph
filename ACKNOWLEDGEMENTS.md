@@ -3,9 +3,9 @@
 [igraph](https://igraph.org) includes or links to code from the following sources.
 
 
-#### [bliss 0.73](http://www.tcs.hut.fi/Software/bliss/)
+#### [bliss 0.74](https://users.aalto.fi/~tjunttil/bliss/)
 
-Copyright (c) 2003-2015 Tommi Junttila.
+Copyright (c) 2003-2021 Tommi Junttila.
 
 License: [GNU LGPLv3][lgpl3]
 

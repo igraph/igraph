@@ -1,20 +1,19 @@
-#include <cstdlib>
-//#include <stdio.h>
-#include <climits>
-#include "defs.hh"
 #include "heap.hh"
 
-/* use 'and' instead of '&&' */
+#include <new>
+#include <cassert>
+
+/* Allow using 'and' instead of '&&' with MSVC */
 #if _MSC_VER
 #include <ciso646>
 #endif
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -30,19 +29,24 @@
 
 namespace bliss {
 
+Heap::Heap() {
+  array = nullptr;
+  n = 0;
+  N = 0;
+}
+
 Heap::~Heap()
 {
-  if(array)
-    {
-      free(array);
-      array = 0;
-      n = 0;
-      N = 0;
-    }
+  delete[] array;
+  array = nullptr;
+  n = 0;
+  N = 0;
 }
 
 void Heap::upheap(unsigned int index)
 {
+  assert(n >= 1);
+  assert(index >= 1 and index <= n);
   const unsigned int v = array[index];
   array[0] = 0;
   while(array[index/2] > v)
@@ -61,9 +65,9 @@ void Heap::downheap(unsigned int index)
     {
       unsigned int new_index = index + index;
       if((new_index < n) and (array[new_index] > array[new_index+1]))
-	new_index++;
+        new_index++;
       if(v <= array[new_index])
-	break;
+        break;
       array[index] = array[new_index];
       index = new_index;
     }
@@ -72,11 +76,11 @@ void Heap::downheap(unsigned int index)
 
 void Heap::init(const unsigned int size)
 {
+  assert(size > 0);
   if(size > N)
     {
-      if(array)
-	free(array);
-      array = (unsigned int*)malloc((size + 1) * sizeof(unsigned int));
+      delete[] array;
+      array = new unsigned int[size + 1];
       N = size;
     }
   n = 0;
@@ -84,12 +88,20 @@ void Heap::init(const unsigned int size)
 
 void Heap::insert(const unsigned int v)
 {
+  assert(n < N);
   array[++n] = v;
   upheap(n);
 }
 
+unsigned int Heap::smallest() const
+{
+  assert(n >= 1 and n <= N);
+  return array[1];
+}
+
 unsigned int Heap::remove()
 {
+  assert(n >= 1 and n <= N);
   const unsigned int v = array[1];
   array[1] = array[n--];
   downheap(1);

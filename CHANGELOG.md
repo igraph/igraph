@@ -35,6 +35,7 @@
 
  - igraph now uses a CMake-based build sysyem.
  - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549)
+ - Bliss has been updated to version 0.75. Bliss functions are now interruptible.
  - Community detection:
    * `igraph_community_multilevel()`: added resolution parameter.
    * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.

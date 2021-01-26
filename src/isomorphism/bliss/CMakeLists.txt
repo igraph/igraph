@@ -3,9 +3,9 @@ add_library(
   bliss
   OBJECT
   EXCLUDE_FROM_ALL
-  bliss_heap.cc
   defs.cc
   graph.cc
+  heap.cc
   orbit.cc
   partition.cc
   uintseqhash.cc
@@ -33,6 +33,12 @@ if(NOT GMP_IS_VENDORED)
     PUBLIC
     ${GMP_LIBRARY}
   )
+endif()
+
+if (WIN32)
+  # Since these are included as object files, they should call the
+  # function as is (without declspec)
+  target_compile_definitions(bliss PRIVATE IGRAPH_STATIC)
 endif()
 
 use_all_warnings(bliss)

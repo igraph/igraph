@@ -2,7 +2,7 @@
 #define BLISS_GRAPH_HH
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
 
   This file is part of bliss.
@@ -30,89 +30,17 @@ namespace bliss {
 }
 
 // #include <cstdio>
+#include <functional>
 #include <vector>
+#include "stats.hh"
 #include "kstack.hh"
 #include "kqueue.hh"
 #include "heap.hh"
 #include "orbit.hh"
 #include "partition.hh"
-#include "bignum.hh"
 #include "uintseqhash.hh"
 
 namespace bliss {
-
-/**
- * \brief Statistics returned by the bliss search algorithm.
- */
-class Stats
-{
-  friend class AbstractGraph;
-public:
-  /** \internal The size of the automorphism group. */
-  BigNum group_size;
-private:
-  /** \internal An approximation (due to possible overflows) of
-   * the size of the automorphism group. */
-  long double group_size_approx;
-  /** \internal The number of nodes in the search tree. */
-  long unsigned int nof_nodes;
-  /** \internal The number of leaf nodes in the search tree. */
-  long unsigned int nof_leaf_nodes;
-  /** \internal The number of bad nodes in the search tree. */
-  long unsigned int nof_bad_nodes;
-  /** \internal The number of canonical representative updates. */
-  long unsigned int nof_canupdates;
-  /** \internal The number of generator permutations. */
-  long unsigned int nof_generators;
-  /** \internal The maximal depth of the search tree. */
-  unsigned long int max_level;
-  /** */
-  void reset()
-  {
-    group_size.assign(1);
-    group_size_approx = 1.0;
-    nof_nodes = 0;
-    nof_leaf_nodes = 0;
-    nof_bad_nodes = 0;
-    nof_canupdates = 0;
-    nof_generators = 0;
-    max_level = 0;
-  }
-public:
-  Stats() { reset(); }
-  /** Print the statistics. */
-  /*
-  size_t print(FILE* const fp) const
-  {
-    size_t r = 0;
-    r += fprintf(fp, "Nodes:          %lu\n", nof_nodes);
-    r += fprintf(fp, "Leaf nodes:     %lu\n", nof_leaf_nodes);
-    r += fprintf(fp, "Bad nodes:      %lu\n", nof_bad_nodes);
-    r += fprintf(fp, "Canrep updates: %lu\n", nof_canupdates);
-    r += fprintf(fp, "Generators:     %lu\n", nof_generators);
-    r += fprintf(fp, "Max level:      %lu\n", max_level);
-    r += fprintf(fp, "|Aut|:          ")+group_size.print(fp)+fprintf(fp, "\n");
-    fflush(fp);
-    return r;
-  }
-  */
-  /** An approximation (due to possible overflows/rounding errors) of
-   * the size of the automorphism group. */
-  long double get_group_size_approx() const {return group_size_approx;}
-  /** The number of nodes in the search tree. */
-  long unsigned int get_nof_nodes() const {return nof_nodes;}
-  /** The number of leaf nodes in the search tree. */
-  long unsigned int get_nof_leaf_nodes() const {return nof_leaf_nodes;}
-  /** The number of bad nodes in the search tree. */
-  long unsigned int get_nof_bad_nodes() const {return nof_bad_nodes;}
-  /** The number of canonical representative updates. */
-  long unsigned int get_nof_canupdates() const {return nof_canupdates;}
-  /** The number of generator permutations. */
-  long unsigned int get_nof_generators() const {return nof_generators;}
-  /** The maximal depth of the search tree. */
-  unsigned long int get_max_level() const {return max_level;}
-};
-
 
 
 
@@ -129,6 +57,7 @@ public:
   AbstractGraph();
   virtual ~AbstractGraph();
 
+#if 0
   /**
    * Set the verbose output level for the algorithms.
    * \param level  the level of verbose output, 0 means no verbose output
@@ -140,6 +69,7 @@ public:
    * \param fp  the file stream; if null, no verbose output is written
    */
   void set_verbose_file(FILE * const fp);
+#endif
 
   /**
    * Add a new vertex with color \a color in the graph and return its index.
@@ -163,7 +93,7 @@ public:
    * Check whether \a perm is an automorphism of this graph.
    * Unoptimized, mainly for debugging purposes.
    */
-  virtual bool is_automorphism(const std::vector<unsigned int>& perm) const;
+  virtual bool is_automorphism(const std::vector<unsigned int>& perm) const = 0;
 
 
   /** Activate/deactivate failure recording.
@@ -202,25 +132,31 @@ public:
 
   /**
    * Find a set of generators for the automorphism group of the graph.
-   * The function \a hook (if non-null) is called each time a new generator
+   * The function \a report (if non-null) is called each time a new generator
    * for the automorphism group is found.
-   * The first argument \a user_param for the hook is the
-   * \a hook_user_param given below,
-   * the second argument \a n is the length of the automorphism (equal to
-   * get_nof_vertices()) and
-   * the third argument \a aut is the automorphism
+   * The first argument \a n for the function
+   * is the length of the automorphism (equal to get_nof_vertices()), and
+   * the second argument \a aut is the automorphism
    * (a bijection on {0,...,get_nof_vertices()-1}).
    * The memory for the automorphism \a aut will be invalidated immediately
-   * after the return from the hook function;
+   * after the return from the \a report function;
    * if you want to use the automorphism later, you have to take a copy of it.
-   * Do not call any member functions in the hook.
+   * Do not call any member functions from the \a report function.
+   *
    * The search statistics are copied in \a stats.
+   *
+   * If the \a terminate function argument is given,
+   * it is called in each search tree node: if the function returns true,
+   * then the search is terminated and thus not all the automorphisms
+   * may have been generated.
+   * The \a terminate function may be used to limit the time spent in bliss
+   * in case the graph is too difficult under the available time constraints.
+   * If used, keep the function simple to evaluate so that
+   * it does not consume too much time.
    */
   void find_automorphisms(Stats& stats,
-			  void (*hook)(void* user_param,
-				       unsigned int n,
-				       const unsigned int* aut),
-			  void* hook_user_param);
+                          const std::function<void(unsigned int n, const unsigned int* aut)>& report = nullptr,
+                          const std::function<bool()>& terminate = nullptr);
 
   /**
    * Otherwise the same as find_automorphisms() except that
@@ -236,38 +172,20 @@ public:
    * Note that the computed canonical version may depend on the applied version
    * of bliss as well as on some other options (for instance, the splitting
    * heuristic selected with bliss::Graph::set_splitting_heuristic()).
+   *
+   * If the \a terminate function argument is given,
+   * it is called in each search tree node: if the function returns true,
+   * then the search is terminated and thus (i) not all the automorphisms
+   * may have been generated and (ii) the returned labeling may not
+   * be canonical.
+   * The \a terminate function may be used to limit the time spent in bliss
+   * in case the graph is too difficult under the available time constraints.
+   * If used, keep the function simple to evaluate so that
+   * it does not consume too much time.
    */
   const unsigned int* canonical_form(Stats& stats,
-				     void (*hook)(void* user_param,
-						  unsigned int n,
-						  const unsigned int* aut),
-				     void* hook_user_param);
-
-#if 0
-  /**
-   * Write the graph to a file in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
-   * for the definition of the file format.
-   * Note that in the DIMACS file the vertices are numbered from 1 to N while
-   * in this C++ API they are from 0 to N-1.
-   * Thus the vertex n in the file corresponds to the vertex n-1 in the API.
-   * \param fp  the file stream where the graph is written
-   */
-  virtual void write_dimacs(FILE * const fp) = 0;
-
-  /**
-   * Write the graph to a file in the graphviz dotty format.
-   * \param fp  the file stream where the graph is written
-   */
-  virtual void write_dot(FILE * const fp) = 0;
-
-  /**
-   * Write the graph in a file in the graphviz dotty format.
-   * Do nothing if the file cannot be written.
-   * \param file_name  the name of the file to which the graph is written
-   */
-  virtual void write_dot(const char * const file_name) = 0;
-#endif
+                                     const std::function<void(unsigned int n, const unsigned int* aut)>& report = nullptr,
+                                     const std::function<bool()>& terminate = nullptr);
 
   /**
    * Get a hash value for the graph.
@@ -295,10 +213,10 @@ public:
 protected:
   /** \internal
    * How much verbose output is produced (0 means none) */
-  unsigned int verbose_level;
+  /* unsigned int verbose_level; */
   /** \internal
    * The output stream for verbose output. */
-  // FILE *verbstr;
+  /* FILE *verbstr; */
 protected:
 
   /** \internal
@@ -339,8 +257,8 @@ protected:
    * May modify refine_equal_to_first and refine_cmp_to_best.
    * May also update eqref_hash and failure_recording_fp_deviation. */
   void cert_add(const unsigned int v1,
-		const unsigned int v2,
-		const unsigned int v3);
+                const unsigned int v2,
+                const unsigned int v3);
 
   /** \internal
    * Add a redundant triple (v1,v2,v3) in the certificate.
@@ -348,8 +266,8 @@ protected:
    * May modify refine_equal_to_first and refine_cmp_to_best.
    * May also update eqref_hash and failure_recording_fp_deviation. */
   void cert_add_redundant(const unsigned int x,
-			  const unsigned int y,
-			  const unsigned int z);
+                          const unsigned int y,
+                          const unsigned int z);
 
   /**\internal
    * Is the long prune method in use?
@@ -400,7 +318,7 @@ protected:
   void refine_to_equitable();
   void refine_to_equitable(Partition::Cell * const unit_cell);
   void refine_to_equitable(Partition::Cell * const unit_cell1,
-			   Partition::Cell * const unit_cell2);
+                           Partition::Cell * const unit_cell2);
 
 
   /** \internal
@@ -436,13 +354,13 @@ protected:
 
   void update_labeling(unsigned int * const lab);
   void update_labeling_and_its_inverse(unsigned int * const lab,
-				       unsigned int * const lab_inv);
+                                       unsigned int * const lab_inv);
   void update_orbit_information(Orbit &o, const unsigned int *perm);
 
   void reset_permutation(unsigned int *perm);
 
   /* Mainly for debugging purposes */
-  virtual bool is_automorphism(unsigned int* const perm);
+  virtual bool is_automorphism(unsigned int* const perm) const = 0;
 
   std::vector<unsigned int> certificate_current_path;
   std::vector<unsigned int> certificate_first_path;
@@ -456,12 +374,25 @@ protected:
   virtual Partition::Cell* find_next_cell_to_be_splitted(Partition::Cell *cell) = 0;
 
 
-  void search(const bool canonical, Stats &stats);
+  /** \struct PathInfo
+   *
+   * A structure for holding first, current, and best path information.
+   */
+  typedef struct {
+    unsigned int splitting_element;
+    unsigned int certificate_index;
+    unsigned int subcertificate_length;
+    UintSeqHash eqref_hash;
+  } PathInfo;
+
+  void search(const bool canonical, Stats &stats,
+              const std::function<void(unsigned int n, const unsigned int* aut)>& report_function = nullptr,
+              const std::function<bool()>& terminate = nullptr);
 
 
   void (*report_hook)(void *user_param,
-		      unsigned int n,
-		      const unsigned int *aut);
+                      unsigned int n,
+                      const unsigned int *aut);
   void *report_user_param;
 
 
@@ -471,10 +402,10 @@ protected:
    *
    */
 
-  /** The currently traversed component */
+  /* The currently traversed component */
   unsigned int cr_level;
 
-  /** \internal
+  /** @internal @class CR_CEP
    * The "Component End Point" data structure
    */
   class CR_CEP {
@@ -509,9 +440,9 @@ protected:
    */
   virtual bool nucr_find_first_component(const unsigned int level) = 0;
   virtual bool nucr_find_first_component(const unsigned int level,
-					 std::vector<unsigned int>& component,
-					 unsigned int& component_elements,
-					 Partition::Cell*& sh_return) = 0;
+                                         std::vector<unsigned int>& component,
+                                         unsigned int& component_elements,
+                                         Partition::Cell*& sh_return) = 0;
   /** \internal
    * The non-uniformity component found by nucr_find_first_component()
    * is stored here.
@@ -521,6 +452,8 @@ protected:
    * The number of vertices in the component \a cr_component
    */
   unsigned int cr_component_elements;
+
+
 
 
 
@@ -593,7 +526,7 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int vertex_color_invariant(const Graph* const g,
-					     const unsigned int v);
+                                             const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns the degree of the vertex.
@@ -601,18 +534,18 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int degree_invariant(const Graph* const g,
-				       const unsigned int v);
+                                       const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns 1 if there is an edge from the vertex to itself, 0 if not.
    * Time complexity: O(k), where k is the number of edges leaving the vertex.
    */
   static unsigned int selfloop_invariant(const Graph* const g,
-					 const unsigned int v);
+                                         const unsigned int v);
 
 
   bool refine_according_to_invariant(unsigned int (*inv)(const Graph* const g,
-							 const unsigned int v));
+                                                         const unsigned int v));
 
   /*
    * Routines needed when refining the partition p into equitable
@@ -640,14 +573,15 @@ protected:
 
   void initialize_certificate();
 
-  bool is_automorphism(unsigned int* const perm);
+  bool is_automorphism(unsigned int* const perm) const;
 
 
   bool nucr_find_first_component(const unsigned int level);
   bool nucr_find_first_component(const unsigned int level,
-				 std::vector<unsigned int>& component,
-				 unsigned int& component_elements,
-				 Partition::Cell*& sh_return);
+                                 std::vector<unsigned int>& component,
+                                 unsigned int& component_elements,
+                                 Partition::Cell*& sh_return);
+
 
 
 
@@ -661,41 +595,6 @@ public:
    * Destroy the graph.
    */
   ~Graph();
-
-#if 0
-  /**
-   * Read the graph from the file \a fp in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
-   * for the definition of the file format.
-   * Note that in the DIMACS file the vertices are numbered from 1 to N while
-   * in this C++ API they are from 0 to N-1.
-   * Thus the vertex n in the file corresponds to the vertex n-1 in the API.
-   *
-   * \param fp      the file stream for the graph file
-   * \param errstr  if non-null, the possible error messages are printed
-   *                in this file stream
-   * \return        a new Graph object or 0 if reading failed for some
-   *                reason
-   */
-  static Graph* read_dimacs(FILE* const fp, FILE* const errstr = stderr);
-
-  /**
-   * Write the graph to a file in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
-   * for the definition of the file format.
-   */
-  void write_dimacs(FILE* const fp);
-
-  /**
-   * \copydoc AbstractGraph::write_dot(FILE * const fp)
-   */
-  void write_dot(FILE* const fp);
-
-  /**
-   * \copydoc AbstractGraph::write_dot(const char * const file_name)
-   */
-  void write_dot(const char* const file_name);
-#endif
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
@@ -825,7 +724,7 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int vertex_color_invariant(const Digraph* const g,
-					     const unsigned int v);
+                                             const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns the indegree of the vertex.
@@ -833,7 +732,7 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int indegree_invariant(const Digraph* const g,
-					 const unsigned int v);
+                                         const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns the outdegree of the vertex.
@@ -841,21 +740,21 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int outdegree_invariant(const Digraph* const g,
-					  const unsigned int v);
+                                          const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns 1 if there is an edge from the vertex to itself, 0 if not.
    * Time complexity: O(k), where k is the number of edges leaving the vertex.
    */
   static unsigned int selfloop_invariant(const Digraph* const g,
-					 const unsigned int v);
+                                         const unsigned int v);
 
   /** \internal
    * Refine the partition \a p according to
    * the partition independent invariant \a inv.
    */
   bool refine_according_to_invariant(unsigned int (*inv)(const Digraph* const g,
-							 const unsigned int v));
+                                                         const unsigned int v));
 
   /*
    * Routines needed when refining the partition p into equitable
@@ -883,15 +782,15 @@ protected:
 
   void initialize_certificate();
 
-  bool is_automorphism(unsigned int* const perm);
+  bool is_automorphism(unsigned int* const perm) const;
 
   void sort_edges();
 
   bool nucr_find_first_component(const unsigned int level);
   bool nucr_find_first_component(const unsigned int level,
-				 std::vector<unsigned int>& component,
-				 unsigned int& component_elements,
-				 Partition::Cell*& sh_return);
+                                 std::vector<unsigned int>& component,
+                                 unsigned int& component_elements,
+                                 Partition::Cell*& sh_return);
 
 public:
   /**
@@ -904,38 +803,6 @@ public:
    */
   ~Digraph();
 
-#if 0
-  /**
-   * Read the graph from the file \a fp in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
-   * for the definition of the file format.
-   * Note that in the DIMACS file the vertices are numbered from 1 to N while
-   * in this C++ API they are from 0 to N-1.
-   * Thus the vertex n in the file corresponds to the vertex n-1 in the API.
-   * \param fp      the file stream for the graph file
-   * \param errstr  if non-null, the possible error messages are printed
-   *                in this file stream
-   * \return        a new Digraph object or 0 if reading failed for some
-   *                reason
-   */
-  static Digraph* read_dimacs(FILE* const fp, FILE* const errstr = stderr);
-
-  /**
-   * \copydoc AbstractGraph::write_dimacs(FILE * const fp)
-   */
-  void write_dimacs(FILE* const fp);
-
-
-  /**
-   * \copydoc AbstractGraph::write_dot(FILE *fp)
-   */
-  void write_dot(FILE * const fp);
-
-  /**
-   * \copydoc AbstractGraph::write_dot(const char * const file_name)
-   */
-  void write_dot(const char * const file_name);
-#endif
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
@@ -1000,6 +867,6 @@ public:
 
 
 
-}
+} // namespace bliss
 
-#endif
+#endif // BLISS_GRAPH_HH

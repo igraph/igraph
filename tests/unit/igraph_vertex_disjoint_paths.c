@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -33,7 +32,7 @@ int main() {
 
     igraph_destroy(&g);
 
-    assert(value == 3);
+    IGRAPH_ASSERT(value == 3);
 
     VERIFY_FINALLY_STACK();
     return 0;

@@ -32,8 +32,9 @@ if (WIN32)
   target_compile_definitions(plfit PRIVATE IGRAPH_STATIC)
 endif()
 
+use_all_warnings(plfit)
+
 if (MSVC)
   target_compile_options(plfit PRIVATE /wd4100) # disable unreferenced parameter warning
 endif()
 
-use_all_warnings(plfit)

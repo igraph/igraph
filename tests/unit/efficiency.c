@@ -1,6 +1,5 @@
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -20,7 +19,7 @@ int main() {
                  4,9, 5,3, 5,10, 6,7, 8,2, 8,3, 8,4, 8,9, 9,3, 9,4, 11,9, 11,3,
                  -1);
 
-    assert(igraph_ecount(&graph) == N_EDGES);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == N_EDGES);
 
     igraph_vector_view(&weights, weights_array, N_EDGES);
 

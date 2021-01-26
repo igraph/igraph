@@ -170,16 +170,16 @@ int igraph_errorvf(const char *reason, const char *file, int line,
 }
 
 #ifndef USING_R
-void igraph_error_handler_abort (const char *reason, const char *file,
-                                 int line, int igraph_errno) {
-    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
-            igraph_strerror(igraph_errno));
+void igraph_error_handler_abort(const char *reason, const char *file,
+                                int line, int igraph_errno) {
+    fprintf(stderr, "Error at %s:%i : %s - %s.\n",
+            file, line, reason, igraph_strerror(igraph_errno));
     igraph_abort();
 }
 #endif
 
-void igraph_error_handler_ignore (const char *reason, const char *file,
-                                  int line, int igraph_errno) {
+void igraph_error_handler_ignore(const char *reason, const char *file,
+                                 int line, int igraph_errno) {
     IGRAPH_UNUSED(reason);
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
@@ -189,17 +189,16 @@ void igraph_error_handler_ignore (const char *reason, const char *file,
 }
 
 #ifndef USING_R
-void igraph_error_handler_printignore (const char *reason, const char *file,
-                                       int line, int igraph_errno) {
+void igraph_error_handler_printignore(const char *reason, const char *file,
+                                      int line, int igraph_errno) {
     IGRAPH_FINALLY_FREE();
-    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
-            igraph_strerror(igraph_errno));
+    fprintf(stderr, "Error at %s:%i : %s - %s.\n",
+            file, line, reason, igraph_strerror(igraph_errno));
 }
 #endif
 
-igraph_error_handler_t *
-igraph_set_error_handler (igraph_error_handler_t * new_handler) {
-    igraph_error_handler_t * previous_handler = igraph_i_error_handler;
+igraph_error_handler_t *igraph_set_error_handler(igraph_error_handler_t *new_handler) {
+    igraph_error_handler_t *previous_handler = igraph_i_error_handler;
     igraph_i_error_handler = new_handler;
     return previous_handler;
 }
@@ -263,8 +262,8 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
  *        but this is currently not used in igraph.
  */
 
-void igraph_warning_handler_ignore (const char *reason, const char *file,
-                                    int line, int igraph_errno) {
+void igraph_warning_handler_ignore(const char *reason, const char *file,
+                                   int line, int igraph_errno) {
     IGRAPH_UNUSED(reason);
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
@@ -287,10 +286,10 @@ void igraph_warning_handler_ignore (const char *reason, const char *file,
  *        but this is currently not used in igraph.
  */
 
-void igraph_warning_handler_print (const char *reason, const char *file,
-                                   int line, int igraph_errno) {
+void igraph_warning_handler_print(const char *reason, const char *file,
+                                  int line, int igraph_errno) {
     IGRAPH_UNUSED(igraph_errno);
-    fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);
+    fprintf(stderr, "Warning at %s:%i : %s\n", file, line, reason);
 }
 #endif
 
@@ -317,9 +316,8 @@ int igraph_warningf(const char *reason, const char *file, int line,
                           igraph_errno);
 }
 
-igraph_warning_handler_t *
-igraph_set_warning_handler (igraph_warning_handler_t * new_handler) {
-    igraph_warning_handler_t * previous_handler = igraph_i_warning_handler;
+igraph_warning_handler_t *igraph_set_warning_handler(igraph_warning_handler_t *new_handler) {
+    igraph_warning_handler_t *previous_handler = igraph_i_warning_handler;
     igraph_i_warning_handler = new_handler;
     return previous_handler;
 }
@@ -329,8 +327,8 @@ igraph_set_warning_handler (igraph_warning_handler_t * new_handler) {
 
 static IGRAPH_THREAD_LOCAL igraph_fatal_handler_t *igraph_i_fatal_handler = NULL;
 
-igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t * new_handler) {
-    igraph_fatal_handler_t * previous_handler = igraph_i_fatal_handler;
+igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t *new_handler) {
+    igraph_fatal_handler_t *previous_handler = igraph_i_fatal_handler;
     igraph_i_fatal_handler = new_handler;
     return previous_handler;
 }

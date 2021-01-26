@@ -1,36 +1,34 @@
-This file lists changes that were made to the original Bliss package (version 0.73) to integrate it into igraph.
+This file lists changes that were made to the original Bliss package (version 0.75) to integrate it into igraph.
 
-Remove `Makefile`, `Doxyfile`
+Exclude `CMakeLists.txt`, `Doxyfile`, `Makefile-manual`, `readme.txt`. Make sure not to accidentally overwrite igraph's own `bliss/CMakeLists.txt`.
 
-Removed `bliss.cc`, `bliss_C.cc`, `bliss_C.h`
+Removed `bliss.cc`, `bliss_C.cc`, `bliss_C.h`.
 
-Remove references to `Timer` class in `graph.cc`
+Remove `timer.hh`. Remove references to `timer.hh` and `Timer` class in `graph.cc`.
 
-Remove `timer.cc` and `timer.hh`
+Replace `#pragma once` by traditional header guards in all headers.
 
-Add to `defs.hh`:
+### In `bignum.hh`:
 
-    #include "config.h"
+Replace `#include <gmp.h>` by `#include "internal/gmp_internal.h"`.
 
-    #if HAVE_GMP == 1
-    #  define BLISS_USE_GMP
-    #endif
+At the beginning, add `#define BLISS_USE_GMP`. Verify that this macro is only used in this file.
 
-In `bignum.hh`:
+### In `defs.cc` and `defs.hh`:
 
-Move `#if defined(BLISS_USE_GMP) ...` below `#include "defs.h"`
+Remove the `...` argument from `fatal_error` for simplicity, and make the function simply invoke `IGRAPH_FATAL`.
 
-Add:
+### In `graph.cc`:
 
-    #include "igraph_memory.h"
-    #include "igraph_error.h"
+Define `_INTERNAL_ERROR` in terms of `IGRAPH_FATAL`.
 
-Also add, for the `tostring` method without GMP:
+### MSVC compatibility
 
-    #include <cmath>
-    #include <cstring>
-    #include <sstream>
+Bliss uses `and`, `or`, etc. instead of `&&`, `||`, etc. These are not supported by MSVC by default. Bliss 0.74 uses the `/permissive` option to enable support in MSVC, but this option is only supported wit VS2019. Instead, in igraph we add the following where relevant:
 
-Add `tostring` member function to `BigNum` class for both cases (with or without GMP).
-
-In `graph.cc`, add IGRAPH_THREAD_LOCAL to the `PathInfo` global variable on line 612.
+```
+/* Allow using 'and' instead of '&&' with MSVC */
+#if _MSC_VER
+#include <ciso646>
+#endif
+```

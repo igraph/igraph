@@ -20,9 +20,12 @@
 #include "bliss/graph.hh"
 
 #include "igraph_topology.h"
-
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
+#include "igraph_interrupt.h"
+#include "igraph_memory.h"
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
 
 #include "core/exceptions.h"
 
@@ -33,27 +36,38 @@ using namespace std;
  * \section about_bliss
  *
  * <para>
- * BLISS is a successor of the famous NAUTY algorithm and
+ * Bliss is a successor of the famous NAUTY algorithm and
  * implementation. While using the same ideas in general, with better
- * heuristics and data structures BLISS outperforms NAUTY on most
+ * heuristics and data structures Bliss outperforms NAUTY on most
  * graphs.
  * </para>
  *
  * <para>
- * BLISS was developed and implemented by Tommi Junttila and Petteri Kaski at
+ * Bliss was developed and implemented by Tommi Junttila and Petteri Kaski at
  * Helsinki University of Technology, Finland. For more information,
- * see the BLISS homepage at http://www.tcs.hut.fi/Software/bliss/ and the publication
- * Tommi Junttila, Petteri Kaski: "Engineering an Efficient Canonical Labeling
- * Tool for Large and Sparse Graphs" at https://doi.org/10.1137/1.9781611972870.13
+ * see the Bliss homepage at https://users.aalto.fi/~tjunttil/bliss/ and the following
+ * publication:
  * </para>
  *
  * <para>
- * BLISS works with both directed graphs and undirected graphs. It supports graphs with
+ * Tommi Junttila and Petteri Kaski: "Engineering an Efficient Canonical Labeling
+ * Tool for Large and Sparse Graphs" In ALENEX 2007, pages 135–149, 2007
+ * https://doi.org/10.1137/1.9781611972870.13
+ * </para>
+ *
+ * <para>
+ * Tommi Junttila and Petteri Kaski: "Conflict Propagation and Component Recursion
+ * for Canonical Labeling" in TAPAS 2011, pages 151–162, 2011.
+ * https://doi.org/10.1007/978-3-642-19754-3_16
+ * </para>
+ *
+ * <para>
+ * Bliss works with both directed graphs and undirected graphs. It supports graphs with
  * self-loops, but not graphs with multi-edges.
  * </para>
  *
  * <para>
- * BLISS version 0.73 is included in igraph.
+ * Bliss version 0.75 is included in igraph.
  * </para>
  */
 
@@ -71,7 +85,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
         g = new Graph(nof_vertices);
     }
 
-    g->set_verbose_level(0);
+    /* g->set_verbose_level(0); */
 
     for (unsigned int i = 0; i < nof_edges; i++) {
         g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
@@ -130,37 +144,83 @@ inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors)
 }
 
 
-inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
+inline int bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
     if (info) {
+        size_t group_size_strlen;
+
         info->max_level      = stats.get_max_level();
         info->nof_nodes      = stats.get_nof_nodes();
         info->nof_leaf_nodes = stats.get_nof_leaf_nodes();
         info->nof_bad_nodes  = stats.get_nof_bad_nodes();
         info->nof_canupdates = stats.get_nof_canupdates();
         info->nof_generators = stats.get_nof_generators();
-        stats.group_size.tostring(&info->group_size);
+
+        mpz_t group_size;
+        mpz_init(group_size);
+        stats.get_group_size().get(group_size);
+        group_size_strlen = mpz_sizeinbase(group_size, /* base */ 10) + 2;
+        info->group_size = igraph_Calloc(group_size_strlen, char);
+        if (! info->group_size) {
+            IGRAPH_ERROR("Insufficient memory to retrieve automotphism group size.", IGRAPH_ENOMEM);
+        }
+        mpz_get_str(info->group_size, /* base */ 10, group_size);
+        mpz_clear(group_size);
     }
+
+    return IGRAPH_SUCCESS;
 }
 
 
-// this is the callback function used with AbstractGraph::find_automorphisms()
-// it collects the group generators into a pointer vector
-static void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
-    igraph_vector_ptr_t *gen = static_cast<igraph_vector_ptr_t *>(generators);
-    igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
-    igraph_vector_init(newvector, n);
-    copy(aut, aut + n, newvector->stor_begin); // takes care of unsigned int -> double conversion
-    igraph_vector_ptr_push_back(gen, newvector);
-}
+// This is the callback function that can tell Bliss to terminate early.
+struct AbortChecker {
+    bool aborted;
+
+    AbortChecker() : aborted(false) { }
+    bool operator()() {
+        if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+            aborted = true;
+            return true;
+        }
+        return false;
+    }
+};
+
+
+// This is the callback function used with AbstractGraph::find_automorphisms().
+// It collects the automorphism group generators into a pointer vector.
+class AutCollector {
+    igraph_vector_ptr_t *generators;
+
+public:
+    AutCollector(igraph_vector_ptr_t *generators_) : generators(generators_) { }
+
+    void operator ()(unsigned int n, const unsigned int *aut) {
+        int err;
+        igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
+        if (! newvector) {
+            throw bad_alloc();
+        }
+        err = igraph_vector_init(newvector, n);
+        if (err) {
+            throw bad_alloc();
+        }
+        copy(aut, aut + n, newvector->stor_begin); // takes care of unsigned int -> double conversion
+        err = igraph_vector_ptr_push_back(generators, newvector);
+        if (err) {
+            throw bad_alloc();
+        }
+    }
+};
 
 } // end unnamed namespace
 
+
 /**
  * \function igraph_canonical_permutation
- * Canonical permutation using BLISS
+ * Canonical permutation using Bliss
  *
  * This function computes the canonical permutation which transforms
- * the graph into a canonical form by using the BLISS algorithm.
+ * the graph into a canonical form by using the Bliss algorithm.
  *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
@@ -170,9 +230,9 @@ static void collect_generators(void *generators, unsigned int n, const unsigned 
  *    permutation takes vertex 0 to the first element of the vector,
  *    vertex 1 to the second, etc. The vector will be resized as
  *    needed.
- * \param sh The splitting heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
- * \param info If not \c NULL then information on BLISS internals is
+ * \param info If not \c NULL then information on Bliss internals is
  *    stored here. See \ref igraph_bliss_info_t.
  * \return Error code.
  *
@@ -189,13 +249,18 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
+        AbortChecker checker;
+        const unsigned int *cl = g->canonical_form(stats, /* report */ nullptr, /* terminate */ checker);
+        if (checker.aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
+
         IGRAPH_CHECK(igraph_vector_resize(labeling, N));
         for (unsigned int i = 0; i < N; i++) {
             VECTOR(*labeling)[i] = cl[i];
         }
 
-        bliss_info_to_igraph(info, stats);
+        IGRAPH_CHECK(bliss_info_to_igraph(info, stats));
 
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
@@ -206,9 +271,9 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
 
 /**
  * \function igraph_automorphisms
- * Number of automorphisms using BLISS
+ * Number of automorphisms using Bliss
  *
- * The number of automorphisms of a graph is computed using BLISS. The
+ * The number of automorphisms of a graph is computed using Bliss. The
  * result is returned as part of the \p info structure, in tag \c
  * group_size. It is returned as a string, as it can be very high even
  * for relatively small graphs. If the GNU MP library is used then
@@ -219,7 +284,7 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
  *   null pointer is the graph is not colored.
- * \param sh The splitting heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info The result is stored here, in particular in the \c
  *    group_size tag of \p info.
@@ -237,9 +302,13 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        g->find_automorphisms(stats, NULL, NULL);
+        AbortChecker checker;
+        g->find_automorphisms(stats, /* report */ nullptr, /* terminate */ checker);
+        if (checker.aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
 
-        bliss_info_to_igraph(info, stats);
+        IGRAPH_CHECK(bliss_info_to_igraph(info, stats));
 
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
@@ -249,10 +318,10 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
 
 /**
  * \function igraph_automorphism_group
- * Automorphism group generators using BLISS
+ * Automorphism group generators using Bliss
  *
  * The generators of the automorphism group of a graph are computed
- * using BLISS. The generator set may not be minimal and may depend on
+ * using Bliss. The generator set may not be minimal and may depend on
  * the splitting heuristics.
  *
  * \param graph The input graph. Multiple edges between the same nodes
@@ -262,9 +331,9 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
  * \param generators Must be an initialized pointer vector. It will
  *    contain pointers to \ref igraph_vector_t objects
  *    representing generators of the automorphism group.
- * \param sh The splitting heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
- * \param info If not \c NULL then information on BLISS internals is
+ * \param info If not \c NULL then information on Bliss internals is
  *    stored here. See \ref igraph_bliss_info_t.
  * \return Error code.
  *
@@ -282,9 +351,13 @@ int igraph_automorphism_group(
 
         Stats stats;
         igraph_vector_ptr_resize(generators, 0);
-        g->find_automorphisms(stats, collect_generators, generators);
-
-        bliss_info_to_igraph(info, stats);
+        AutCollector collector(generators);
+        AbortChecker checker;
+        g->find_automorphisms(stats, collector, checker);
+        if (checker.aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
+        IGRAPH_CHECK(bliss_info_to_igraph(info, stats));
 
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
@@ -319,13 +392,13 @@ int igraph_automorphism_group(
 
 /**
  * \function igraph_isomorphic_bliss
- * Graph isomorphism via BLISS
+ * Graph isomorphism via Bliss
  *
- * This function uses the BLISS graph isomorphism algorithm, a
- * successor of the famous NAUTY algorithm and implementation. BLISS
- * is open source and licensed according to the GNU GPL. See
- * http://www.tcs.hut.fi/Software/bliss/index.html for
- * details. Currently the 0.73 version of BLISS is included in igraph.
+ * This function uses the Bliss graph isomorphism algorithm, a
+ * successor of the famous NAUTY algorithm and implementation. Bliss
+ * is open source and licensed according to the GNU LGPL. See
+ * https://users.aalto.fi/~tjunttil/bliss/ for
+ * details. Currently the 0.75 version of Bliss is included in igraph.
  *
  * </para><para>
  *

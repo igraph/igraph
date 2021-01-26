@@ -22,7 +22,8 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
+
+#include "test_utilities.inc"
 
 int main() {
     igraph_t g;
@@ -193,7 +194,7 @@ int main() {
     igraph_matrix_destroy(&pmat);
     igraph_vector_bool_destroy(&bs);
 
-    assert(IGRAPH_FINALLY_STACK_EMPTY);
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

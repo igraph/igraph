@@ -19,7 +19,6 @@
   02110-1301 USA
 */
 
-#include <assert.h>
 #include <igraph.h>
 #include <math.h>
 #include <stdio.h>

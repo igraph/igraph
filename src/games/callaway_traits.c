@@ -58,11 +58,11 @@
  * Time complexity: O(|V|e*log(|V|)), |V| is the number of vertices, e
  * is \p edges_per_step.
  */
-int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
-                                 igraph_integer_t types, igraph_integer_t edges_per_step,
-                                 igraph_vector_t *type_dist,
-                                 igraph_matrix_t *pref_matrix,
-                                 igraph_bool_t directed) {
+int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
+                                igraph_integer_t types, igraph_integer_t edges_per_step,
+                                igraph_vector_t *type_dist,
+                                igraph_matrix_t *pref_matrix,
+                                igraph_bool_t directed) {
     long int i, j;
     igraph_vector_t edges;
     igraph_vector_t cumdist;
@@ -112,6 +112,10 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
         VECTOR(cumdist)[i + 1] = VECTOR(cumdist)[i] + VECTOR(*type_dist)[i];
     }
     maxcum = igraph_vector_tail(&cumdist);
+
+    if (maxcum <= 0) {
+        IGRAPH_ERROR("The vertex type distribution vector must contain at least one positive value.", IGRAPH_EINVAL);
+    }
 
     RNG_BEGIN();
 

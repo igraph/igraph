@@ -1,11 +1,11 @@
 #include "uintseqhash.hh"
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -107,7 +107,7 @@ void UintSeqHash::update(unsigned int i)
       const unsigned int b = h & 0x80000000;
       h = h << 1;
       if(b != 0)
-	h++;
+        h++;
       i = i >> 8;
 #endif
     }

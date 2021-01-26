@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -34,14 +33,14 @@ int main() {
 
     /* a graph is always same as itself */
     err = igraph_is_same_graph(&g1, &g1, &res);
-    assert(!err);
-    assert(res);
+    IGRAPH_ASSERT(!err);
+    IGRAPH_ASSERT(res);
 
     /* undirected graphs should be the same no matter
      * the direction of the edges (one is swapped in g2 */
     err = igraph_is_same_graph(&g1, &g2, &res);
-    assert(!err);
-    assert(res);    
+    IGRAPH_ASSERT(!err);
+    IGRAPH_ASSERT(res);    
 
     /* end of undirected */
     igraph_destroy(&g1);
@@ -56,8 +55,8 @@ int main() {
     /* directed graphs should not be the same if an
      * edge has the opposite direction */
     err = igraph_is_same_graph(&g1, &g2, &res);
-    assert(!err);
-    assert(!res);
+    IGRAPH_ASSERT(!err);
+    IGRAPH_ASSERT(!res);
 
     igraph_destroy(&g2);
 
@@ -65,8 +64,8 @@ int main() {
     igraph_small(&g2, 4, 1,
                  1, 2, 0, 1, 2, 3, 3, 0, -1);
     err = igraph_is_same_graph(&g1, &g2, &res);
-    assert(!err);
-    assert(res);
+    IGRAPH_ASSERT(!err);
+    IGRAPH_ASSERT(res);
 
     /* end of directed */
     igraph_destroy(&g1);
@@ -78,8 +77,8 @@ int main() {
     igraph_small(&g2, 4, 1,
                  0, 1, 1, 2, 2, 3, 3, 0, -1);
     err = igraph_is_same_graph(&g1, &g2, &res);
-    assert(!err);
-    assert(!res);
+    IGRAPH_ASSERT(!err);
+    IGRAPH_ASSERT(!res);
 
     /* end of undirected vs directed */
     igraph_destroy(&g1);

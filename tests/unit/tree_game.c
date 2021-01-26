@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -29,59 +28,59 @@ int main() {
 
     /* Undirected */
 
-    assert(igraph_tree_game(&graph, 123, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
-    assert(igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT) == IGRAPH_SUCCESS);
-    assert(is_tree);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 123, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(is_tree);
     igraph_destroy(&graph);
 
-    assert(igraph_tree_game(&graph, 123, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
-    assert(igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT) == IGRAPH_SUCCESS);
-    assert(is_tree);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 123, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(is_tree);
     igraph_destroy(&graph);
 
     /* Directed out-tree */
 
-    assert(igraph_tree_game(&graph, 123, IGRAPH_DIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
-    assert(igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT) == IGRAPH_SUCCESS);
-    assert(is_tree);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 123, IGRAPH_DIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(is_tree);
     igraph_destroy(&graph);
 
     /* IGRAPH_RANDOM_TREE_PRUFER does not currently support directed graphs */
 
     /* Null graph */
 
-    assert(igraph_tree_game(&graph, 0, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&graph) == 0);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 0, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 0);
     igraph_destroy(&graph);
 
-    assert(igraph_tree_game(&graph, 0, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&graph) == 0);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 0, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 0);
     igraph_destroy(&graph);
 
     /* Singleton graph */
 
-    assert(igraph_tree_game(&graph, 1, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&graph) == 1);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 1, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 1);
     igraph_destroy(&graph);
 
-    assert(igraph_tree_game(&graph, 1, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&graph) == 1);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 1, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 1);
     igraph_destroy(&graph);
 
     /* P_2 */
 
-    assert(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&graph) == 2);
-    assert(igraph_ecount(&graph) == 1);
-    assert(igraph_are_connected(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
-    assert(are_connected);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 2);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == 1);
+    IGRAPH_ASSERT(igraph_are_connected(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(are_connected);
     igraph_destroy(&graph);
 
-    assert(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
-    assert(igraph_vcount(&graph) == 2);
-    assert(igraph_ecount(&graph) == 1);
-    assert(igraph_are_connected(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
-    assert(are_connected);
+    IGRAPH_ASSERT(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 2);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == 1);
+    IGRAPH_ASSERT(igraph_are_connected(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(are_connected);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

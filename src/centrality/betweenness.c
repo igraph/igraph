@@ -50,8 +50,8 @@
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. Supply a null pointer here
- *        for unweighted betweenness.
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -105,6 +105,8 @@ static int igraph_i_betweenness_cutoff_weighted(
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
             IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (igraph_is_nan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
         } else if (minweight <= eps) {
             IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
@@ -280,8 +282,8 @@ static int igraph_i_betweenness_cutoff_weighted(
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. Supply a null pointer here
- *        for unweighted betweenness.
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated, and
  *        there will be no upper limit on path lengths.
@@ -522,8 +524,8 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
  *        If negative, the exact betweenness will be calculated, and
  *        there will be no upper limit on path lengths.
  * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. Supply a null pointer here
- *        for unweighted betweenness.
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -578,6 +580,8 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
             IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (igraph_is_nan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
         } else if (minweight <= eps) {
             IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
@@ -742,8 +746,8 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted edge
- *        betweenness. Supply a null pointer here for the unweighted
- *        version.
+ *        betweenness. No edge weight may be NaN. Supply a null
+ *        pointer here for the unweighted version.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -782,8 +786,8 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted
- *        betweenness. Supply a null pointer here for unweighted
- *        betweenness.
+ *        betweenness. No edge weight may be NaN. Supply a null
+ *        pointer here for unweighted betweenness.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated (no
  *        upper limit on path lengths).
@@ -991,9 +995,9 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated (no
  *        upper limit on path lengths).
- * \param weights An optional weight vector for weighted
- *        betweenness. Supply a null pointer here for unweighted
- *        betweenness.
+ * \param weights An optional weight vector for weighted betweenness.
+ *        No edge weight may be NaN. Supply a null pointer here for
+ *        unweighted betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.

@@ -18,7 +18,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -57,8 +56,8 @@ int main() {
                                IGRAPH_SPINCOMM_IMP_ORIG,
                                /*gamma_minus =*/ 0);
 
-    assert(igraph_vector_size(&membership) == igraph_vcount(&g));
-    assert(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
+    IGRAPH_ASSERT(igraph_vector_size(&membership) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
 
     /* The following depend on the random seed, however, for this graph,
        the result is almost always the same (i.e. two clusters). */
@@ -82,8 +81,8 @@ int main() {
                                IGRAPH_SPINCOMM_IMP_ORIG,
                                /*gamma_minus =*/ 0);
 
-    assert(igraph_vector_size(&membership) == igraph_vcount(&g));
-    assert(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
+    IGRAPH_ASSERT(igraph_vector_size(&membership) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
 
     /* The following depend on the random seed, however, for this graph,
        the result is almost always the same (i.e. two clusters). */
@@ -107,8 +106,8 @@ int main() {
                                IGRAPH_SPINCOMM_IMP_NEG,
                                /*gamma_minus =*/ 0);
 
-    assert(igraph_vector_size(&membership) == igraph_vcount(&g));
-    assert(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
+    IGRAPH_ASSERT(igraph_vector_size(&membership) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
 
     /* The following depend on the random seed, however, for this graph,
        the result is almost always the same (i.e. two clusters). */

@@ -130,7 +130,7 @@ int igraph_lastcit_game(igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes * edges_per_node));
 
     /* The first node */
-    igraph_psumtree_update(&sumtree, 0, VECTOR(*preference)[agebins]);
+    IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, VECTOR(*preference)[agebins]));
     index[0] = 0;
     index[1] = 0;
 
@@ -146,11 +146,11 @@ int igraph_lastcit_game(igraph_t *graph,
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, to);
             lastcit[to] = i + 1;
-            igraph_psumtree_update(&sumtree, to, VECTOR(*preference)[0]);
+            IGRAPH_CHECK(igraph_psumtree_update(&sumtree, to, VECTOR(*preference)[0]));
         }
 
         /* Add the node itself */
-        igraph_psumtree_update(&sumtree, i, VECTOR(*preference)[agebins]);
+        IGRAPH_CHECK(igraph_psumtree_update(&sumtree, i, VECTOR(*preference)[agebins]));
         index[i + 1] = index[i] + edges_per_node;
 
         /* Update the preference of some vertices if they got to another bin.
@@ -161,7 +161,7 @@ int igraph_lastcit_game(igraph_t *graph,
             for (j = 2 * m; j < 2 * n; j += 2) {
                 long int cnode = (long int) VECTOR(edges)[j + 1];
                 if (lastcit[cnode] == shnode + 1) {
-                    igraph_psumtree_update(&sumtree, cnode, VECTOR(*preference)[k]);
+                    IGRAPH_CHECK(igraph_psumtree_update(&sumtree, cnode, VECTOR(*preference)[k]));
                 }
             }
         }
@@ -390,7 +390,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         if ( MATRIX(*pref, i, type) < 0) {
             IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
         }
-        igraph_psumtree_update(&sumtrees[i], 0, MATRIX(*pref, i, type));
+        IGRAPH_CHECK(igraph_psumtree_update(&sumtrees[i], 0, MATRIX(*pref, i, type)));
         VECTOR(sums)[i] = MATRIX(*pref, i, type);
     }
 
@@ -411,7 +411,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
             if ( MATRIX(*pref, j, type) < 0) {
                 IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
             }
-            igraph_psumtree_update(&sumtrees[j], i, MATRIX(*pref, j,  type));
+            IGRAPH_CHECK(igraph_psumtree_update(&sumtrees[j], i, MATRIX(*pref, j,  type)));
             VECTOR(sums)[j] += MATRIX(*pref, j, type);
         }
     }

@@ -1,6 +1,5 @@
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -13,7 +12,7 @@ int main() {
     igraph_empty(&g, 0, 0);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     igraph_destroy(&g);
 
@@ -22,8 +21,8 @@ int main() {
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(res);
-    assert(root == 0);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 0);
 
     igraph_destroy(&g);
 
@@ -32,7 +31,7 @@ int main() {
                  0, 1, 1, 2, 2, 3, 3, 0, -1);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     igraph_destroy(&g);
 
@@ -41,7 +40,7 @@ int main() {
                  0, 1, 1, 2, 0, 2, 3, 4, -1);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     igraph_destroy(&g);
 
@@ -51,8 +50,8 @@ int main() {
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(res);
-    assert(root == 0);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 0);
 
     igraph_destroy(&g);
 
@@ -62,16 +61,16 @@ int main() {
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_OUT);
-    assert(res);
-    assert(root == 0);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 0);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(res);
-    assert(root == 0);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 0);
 
     igraph_destroy(&g);
 
@@ -81,16 +80,16 @@ int main() {
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
-    assert(res);
-    assert(root == 3);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 3);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_OUT);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(res);
-    assert(root == 0);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 0);
 
     igraph_destroy(&g);
 
@@ -100,14 +99,14 @@ int main() {
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(res);
-    assert(root == 0);
+    IGRAPH_ASSERT(res);
+    IGRAPH_ASSERT(root == 0);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_OUT);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     igraph_destroy(&g);
 
@@ -119,7 +118,7 @@ int main() {
                  0, 3, 0, 4, 1, 3, 1, 4, -1);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
-    assert(! res);
+    IGRAPH_ASSERT(! res);
 
     igraph_destroy(&g);
 
