@@ -46,10 +46,10 @@ static void igraph_i_citing_cited_type_game_free (
  * network and it cites a number of other vertices (as specified by
  * the \p edges_per_step argument). The cited vertices are selected
  * based on the last time they were cited. Time is measured by the
- * addition of vertices and it is binned into \p pagebins bins.
+ * addition of vertices and it is binned into \p agebins bins.
  * So if the current time step is \c t and the last citation to a
  * given \c i vertex was made in time step \c t0, then \c
- * (t-t0)/binwidth is calculated where binwidth is \c nodes/pagebins+1,
+ * (t-t0)/binwidth is calculated where binwidth is \c nodes/agebins+1,
  * in the last expression '/' denotes integer division, so the
  * fraction part is omitted.
  *
@@ -69,9 +69,9 @@ static void igraph_i_citing_cited_type_game_free (
  * \param node The number of vertices in the network.
  * \param edges_per_node The number of edges to add in each time
  *     step.
- * \param pagebins The number of age bins to use.
+ * \param agebins The number of age bins to use.
  * \param preference Pointer to an initialized vector of length
- *     \c pagebins+1. This contains the `attractivity' of the various
+ *     \c agebins+1. This contains the `attractivity' of the various
  *     age bins, the last element is the attractivity of the vertices
  *     which were never cited, and it should be greater than zero.
  *     It is a good idea to have all positive values in this vector.
@@ -83,11 +83,11 @@ static void igraph_i_citing_cited_type_game_free (
  * \sa \ref igraph_barabasi_aging_game().
  *
  * Time complexity: O(|V|*a+|E|*log|V|), |V| is the number of vertices,
- * |E| is the total number of edges, a is the \p pagebins parameter.
+ * |E| is the total number of edges, a is the \p agebins parameter.
  */
 int igraph_lastcit_game(igraph_t *graph,
                         igraph_integer_t nodes, igraph_integer_t edges_per_node,
-                        igraph_integer_t pagebins,
+                        igraph_integer_t agebins,
                         const igraph_vector_t *preference,
                         igraph_bool_t directed) {
 
@@ -97,27 +97,33 @@ int igraph_lastcit_game(igraph_t *graph,
     long int i, j, k;
     long int *lastcit;
     long int *index;
-    long int agebins = pagebins;
     long int binwidth;
 
     if (agebins != igraph_vector_size(preference) - 1) {
-        IGRAPH_ERROR("`preference' vector should be of length `agebins' plus one",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The `preference' vector should be of length `agebins' plus one."
+                     "Number of agebins is %d, preference vector is of length %d",
+                     IGRAPH_EINVAL,
+                     agebins, igraph_vector_size(preference));
     }
     if (nodes < 0 ) {
-        IGRAPH_ERROR("nodes should be non-negative",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of nodes should be non-negative, recieved %d.",
+                     IGRAPH_EINVAL,
+                     nodes);
     }
     if (agebins < 1 ) {
-        IGRAPH_ERROR("pagebins should be at least 1",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of age bins should be at least 1, recieved %d.",
+                     IGRAPH_EINVAL,
+                     agebins);
     }
     if (VECTOR(*preference)[agebins] <= 0) {
-        IGRAPH_ERROR("the last element of the `preference' vector needs to be positive",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The last element of the `preference' vector needs to be positive, but is %f.",
+                     IGRAPH_EINVAL,
+                     VECTOR(*preference)[agebins]);
     }
     if (igraph_vector_min(preference) < 0) {
-        IGRAPH_ERROR("The preference vector must contain only non-negative values.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The preference vector must contain only non-negative values, but found %f",
+                     IGRAPH_EINVAL,
+                     igraph_vector_min(preference));
     }
 
     if (nodes == 0) {
