@@ -3,6 +3,11 @@ directed: false
 vcount: 0
 edges: {
 }
+No edges:
+directed: false
+vcount: 5
+edges: {
+}
 Prefer old vertices to make a star of triple edges:
 directed: true
 vcount: 5

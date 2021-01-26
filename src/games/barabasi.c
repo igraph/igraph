@@ -557,7 +557,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  * The probability that a node gains a new edge is
  * given by its (in-)degree (k) and age (l). This probability has a
  * degree dependent component multiplied by an age dependent
- * component. The degree dependent part is \p deg_coef times k to the
+ * component. The degree dependent part is: \p deg_coef times k to the
  * power of \p pa_exp plus \p zero_deg_appeal; and the age dependent
  * part is \p age_coef times l to the power of \p aging_exp plus \p
  * zero_age_appeal.
@@ -705,7 +705,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
             long int age = (i - n) / aging_bin;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, n,
-                (deg_coef * pow(VECTOR(degree)[n], pa_exp) * zero_deg_appeal) *
+                (deg_coef * pow(VECTOR(degree)[n], pa_exp) + zero_deg_appeal) *
                 (age_coef * pow(age + 1, aging_exp) + zero_age_appeal)
             ));
         }
