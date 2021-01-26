@@ -556,7 +556,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  * a node is added, and then edges from the new node are added.
  * The probability that a node gains a new edge is
  * given by its (in-)degree (k) and age (l). This probability has a
- * degree dependent component multiplied by an age dependent
+ * degree dependent component added to an age dependent
  * component. The degree dependent part is: \p deg_coef times k to the
  * power of \p pa_exp plus \p zero_deg_appeal; and the age dependent
  * part is \p age_coef times l to the power of \p aging_exp plus \p
@@ -564,7 +564,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  *
  * </para><para>
  * The age is based on the number of vertices in the
- * network and the \p aging_bin argument: vertices grew one unit older
+ * network and the \p aging_bin argument: vertices grow one unit older
  * after each \p aging_bin vertices added to the network.
  * \param graph Pointer to an uninitialized graph object.
  * \param nodes The number of vertices in the graph.
@@ -612,7 +612,6 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                                igraph_bool_t directed) {
     long int no_of_nodes = nodes;
     long int no_of_neighbors = m;
-    long int binwidth = nodes / aging_bin + 1;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j, k;
@@ -621,22 +620,48 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     igraph_vector_t degree;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of nodes must be non-negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The out degree sequence is defined, but its length is not zero or equal to number of nodes. "
+                      "It's length is %ld. The number of nodes is %ld.",
+                       IGRAPH_EINVAL,
+                       igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("No out degree sequence is specified, and number of edges per time step is %d, which should be non-negative.",
+                      IGRAPH_EINVAL,
+                      m);
     }
     if (aging_bin <= 0) {
-        IGRAPH_ERROR("Invalid aging bin", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Aging bin is %ld, but should be positive.",
+                     IGRAPH_EINVAL,
+                     (long int)aging_bin);
     }
-    if (deg_coef < 0) {
-        IGRAPH_ERROR("Degree coefficient must be non-negative", IGRAPH_EINVAL);
+     if (deg_coef < 0) {
+        IGRAPH_ERRORF("Degree coefficient must be non-negative, but is %f.",
+                     IGRAPH_EINVAL,
+                     deg_coef);
     }
     if (age_coef < 0) {
-        IGRAPH_ERROR("Age coefficient must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Age coefficient must be non-negative, but is %f.",
+                     IGRAPH_EINVAL,
+                     deg_coef);
+    }
+
+    if (zero_deg_appeal < 0) {
+        IGRAPH_ERRORF("Zero degree appeal must be non-negative, but is %f.",
+                     IGRAPH_EINVAL,
+                     zero_deg_appeal);
+    }
+    if (zero_age_appeal < 0) {
+        IGRAPH_ERRORF("Zero age appeal must be non-negative, but is %f.",
+                     IGRAPH_EINVAL,
+                     zero_age_appeal);
+    }
+    if (age_coef == 0 && deg_coef == 0) {
+        IGRAPH_ERROR("Either the age coefficient or the degree coefficient must be positive, but they are both 0.",
+                     IGRAPH_EINVAL);
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
@@ -657,7 +682,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     RNG_BEGIN();
 
     /* first node */
-    IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_deg_appeal * (1 + zero_age_appeal)));
+    IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_deg_appeal + (1 + zero_age_appeal)));
 
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
@@ -667,12 +692,8 @@ int igraph_barabasi_aging_game(igraph_t *graph,
             no_of_neighbors = (long int) VECTOR(*outseq)[i];
         }
         sum = igraph_psumtree_sum(&sumtree);
-        printf("sum: %f\n", sum);
-        float test = RNG_UNIF(0, sum);
-        printf("rnd: %f\n", test);
         for (j = 0; j < no_of_neighbors; j++) {
-            igraph_psumtree_search(&sumtree, &to, test);
-            printf("To: %ld\n", to);
+            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
@@ -680,10 +701,10 @@ int igraph_barabasi_aging_game(igraph_t *graph,
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
             long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            long int age = (i - n) / binwidth;
+            long int age = (i - n) / aging_bin;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, n,
-                (deg_coef * pow(VECTOR(degree)[n], pa_exp) + zero_deg_appeal) *
+                (deg_coef * pow(VECTOR(degree)[n], pa_exp) + zero_deg_appeal) +
                 (age_coef * pow(age + 1, aging_exp) + zero_age_appeal)
             ));
         }
@@ -691,37 +712,35 @@ int igraph_barabasi_aging_game(igraph_t *graph,
             VECTOR(degree)[i] += no_of_neighbors;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, i,
-                (zero_age_appeal + 1) * (deg_coef * pow(VECTOR(degree)[i], pa_exp) + zero_deg_appeal)
+                (zero_age_appeal + 1) + (deg_coef * pow(VECTOR(degree)[i], pa_exp) + zero_deg_appeal)
             ));
         } else {
             IGRAPH_CHECK(igraph_psumtree_update(
-                &sumtree, i, (1 + zero_age_appeal) * zero_deg_appeal
+                &sumtree, i, (1 + zero_age_appeal) + zero_deg_appeal
             ));
         }
 
         /* aging */
-        for (k = 1; i - binwidth * k + 1 >= 1; k++) {
-            long int shnode = i - binwidth * k;
+        for (k = 1; i - aging_bin * k + 1 >= 1; k++) {
+            long int shnode = i - aging_bin * k;
             long int deg = (long int) VECTOR(degree)[shnode];
-            long int age = (i - shnode) / binwidth;
+            long int age = (i - shnode) / aging_bin;
             /* igraph_real_t old=igraph_psumtree_get(&sumtree, shnode); */
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, shnode,
-                (deg_coef * pow(deg, pa_exp) + zero_deg_appeal) *
+                (deg_coef * pow(deg, pa_exp) + zero_deg_appeal) +
                 (age_coef * pow(age + 2, aging_exp) + zero_age_appeal)
                 ));
         }
     }
 
     RNG_END();
-    igraph_vector_print(&degree);
-    igraph_vector_print(&edges);
 
-    //igraph_vector_destroy(&degree);
+    igraph_vector_destroy(&degree);
     igraph_psumtree_destroy(&sumtree);
     IGRAPH_FINALLY_CLEAN(2);
 
-    //IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
