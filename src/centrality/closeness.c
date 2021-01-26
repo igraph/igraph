@@ -208,12 +208,12 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
             mindist = -igraph_2wheap_delete_max(&Q);
 
-            VECTOR(*res)[i] += (mindist - 1.0);
-            nodes_reached++;
-
-            if (cutoff >= 0 && mindist > cutoff + 1.0) {
+            if (cutoff >= 0 && (mindist - 1.0) > cutoff) {
                 continue;    /* NOT break!!! */
             }
+
+            VECTOR(*res)[i] += (mindist - 1.0);
+            nodes_reached++;
 
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
@@ -457,10 +457,11 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     for (IGRAPH_VIT_RESET(vit), i = 0;
          !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), i++) {
+        nodes_reached = 0;
+
         igraph_dqueue_clear(&q);
         IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(vit)));
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-        nodes_reached = 1;
         VECTOR(already_counted)[(long int)IGRAPH_VIT_GET(vit)] = i + 1;
 
         IGRAPH_PROGRESS("Closeness: ", 100.0 * i / nodes_to_calc, NULL);
@@ -470,11 +471,12 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             long int act = (long int) igraph_dqueue_pop(&q);
             actdist = (long int) igraph_dqueue_pop(&q);
 
-            VECTOR(*res)[i] += actdist;
-
             if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */
             }
+
+            VECTOR(*res)[i] += actdist;
+            nodes_reached++;
 
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
@@ -484,7 +486,6 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                     continue;
                 }
                 VECTOR(already_counted)[neighbor] = i + 1;
-                nodes_reached++;
                 IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                 IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
             }
@@ -579,12 +580,13 @@ int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector
             long int act = (long int) igraph_dqueue_pop(&q);
             actdist = (long int) igraph_dqueue_pop(&q);
 
-            if (source != act) {
-                VECTOR(*res)[i] += 1.0/actdist;
+            if (cutoff >= 0 && actdist > cutoff) {
+                continue;    /* NOT break!!! */
             }
 
-            if (cutoff >= 0 && actdist >= cutoff) {
-                continue;    /* NOT break!!! */
+            /* Exclude self-distance, which is zero. */
+            if (source != act) {
+                VECTOR(*res)[i] += 1.0/actdist;
             }
 
             /* check the neighbors */
@@ -690,13 +692,13 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
 
             mindist = -igraph_2wheap_delete_max(&Q);
 
+            if (cutoff >= 0 && (mindist - 1.0) > cutoff) {
+                continue;    /* NOT break!!! */
+            }
+
             /* Exclude self-distance, which is zero. */
             if (source != minnei) {
                 VECTOR(*res)[i] += 1.0 / (mindist - 1.0);
-            }
-
-            if (cutoff >= 0 && mindist >= cutoff + 1.0) {
-                continue;    /* NOT break!!! */
             }
 
             for (j = 0; j < nlen; j++) {
