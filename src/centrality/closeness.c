@@ -572,7 +572,7 @@ int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
         VECTOR(already_counted)[source] = i + 1;
 
-        IGRAPH_PROGRESS("Harmonic centrality: ", 100.0 * i / no_of_nodes, NULL);
+        IGRAPH_PROGRESS("Harmonic centrality: ", 100.0 * i / nodes_to_calc, NULL);
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
