@@ -647,15 +647,15 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
     igraph_real_t mindist = 0;
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
-            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
         } else if (igraph_is_nan(minweight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
