@@ -28,3 +28,125 @@ Directed graph test below for OUT
 
 Directed graph test below for IN
 ( 0.0128205 0.0158730 0.0158730 0.00980392 0.0188679 0.00751880 0.0263158 0.00751880 )
+
+
+Unweighted undirected with cutoff
+
+Range-limited closeness with cutoff -1
+Closeness: ( 0.500000 0.750000 0.750000 0.500000 )
+Reachable: ( 3 3 3 3 )
+All reachable: true
+
+Range-limited closeness with cutoff 0
+Closeness: ( NaN NaN NaN NaN )
+Reachable: ( 0 0 0 0 )
+All reachable: false
+
+Range-limited closeness with cutoff 1
+Closeness: ( 1.00000 1.00000 1.00000 1.00000 )
+Reachable: ( 1 2 2 1 )
+All reachable: false
+
+Range-limited closeness with cutoff 2.9
+Closeness: ( 0.666667 0.750000 0.750000 0.666667 )
+Reachable: ( 2 3 3 2 )
+All reachable: false
+
+Range-limited closeness with cutoff 3
+Closeness: ( 0.500000 0.750000 0.750000 0.500000 )
+Reachable: ( 3 3 3 3 )
+All reachable: true
+
+Range-limited closeness with cutoff 3.1
+Closeness: ( 0.500000 0.750000 0.750000 0.500000 )
+Reachable: ( 3 3 3 3 )
+All reachable: true
+
+
+Unweighted directed with cutoff
+
+Range-limited directed closeness with cutoff -1
+Closeness: ( 0.500000 0.666667 1.00000 NaN )
+Reachable: ( 3 2 1 0 )
+All reachable: false
+
+Range-limited directed closeness with cutoff 0
+Closeness: ( NaN NaN NaN NaN )
+Reachable: ( 0 0 0 0 )
+All reachable: false
+
+Range-limited directed closeness with cutoff 1
+Closeness: ( 1.00000 1.00000 1.00000 NaN )
+Reachable: ( 1 1 1 0 )
+All reachable: false
+
+Range-limited directed closeness with cutoff 2.9
+Closeness: ( 0.666667 0.666667 1.00000 NaN )
+Reachable: ( 2 2 1 0 )
+All reachable: false
+
+Range-limited directed closeness with cutoff 3
+Closeness: ( 0.500000 0.666667 1.00000 NaN )
+Reachable: ( 3 2 1 0 )
+All reachable: false
+
+Range-limited directed closeness with cutoff 3.1
+Closeness: ( 0.500000 0.666667 1.00000 NaN )
+Reachable: ( 3 2 1 0 )
+All reachable: false
+
+
+Weighted undirected with cutoff
+
+Range-limited weighted closeness with cutoff -1
+Closeness: ( 0.300000 0.375000 0.375000 0.214286 )
+Reachable: ( 3 3 3 3 )
+All reachable: true
+
+Range-limited weighted closeness with cutoff 0
+Closeness: ( NaN NaN NaN NaN )
+Reachable: ( 0 0 0 0 )
+All reachable: false
+
+Range-limited weighted closeness with cutoff 1
+Closeness: ( 1.00000 1.00000 NaN NaN )
+Reachable: ( 1 1 0 0 )
+All reachable: false
+
+Range-limited weighted closeness with cutoff 2.9
+Closeness: ( 1.00000 0.666667 0.500000 NaN )
+Reachable: ( 1 2 1 0 )
+All reachable: false
+
+Range-limited weighted closeness with cutoff 3
+Closeness: ( 0.500000 0.666667 0.375000 0.333333 )
+Reachable: ( 2 2 3 1 )
+All reachable: false
+
+Range-limited weighted closeness with cutoff 5
+Closeness: ( 0.500000 0.375000 0.375000 0.250000 )
+Reachable: ( 2 3 3 2 )
+All reachable: false
+
+Range-limited weighted closeness with cutoff 6
+Closeness: ( 0.300000 0.375000 0.375000 0.214286 )
+Reachable: ( 3 3 3 3 )
+All reachable: true
+
+
+Edgeless graphs
+
+Edgeless graph with 0 vertices
+Closeness: ( )
+Reachable: ( )
+All reachable: true
+
+Edgeless graph with 1 vertices
+Closeness: ( NaN )
+Reachable: ( 0 )
+All reachable: true
+
+Edgeless graph with 2 vertices
+Closeness: ( NaN NaN )
+Reachable: ( 0 0 )
+All reachable: false
