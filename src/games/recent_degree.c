@@ -27,6 +27,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_psumtree.h"
 #include "igraph_random.h"
+#include "igraph_interface.h"
 
 /**
  * \function igraph_recent_degree_game
@@ -81,13 +82,27 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     igraph_dqueue_t history;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of vertices cannot be negative, got %ld.", IGRAPH_EINVAL, n);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("If out degree sequence is specified its length should equal the number of nodes. "
+                      "Length: %ld, number of nodes: %ld.", IGRAPH_EINVAL, igraph_vector_size(outseq), n);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Out degree cannot be negative if degree sequence is not specified, got %ld\n.",
+                       IGRAPH_EINVAL, m);
+    }
+    if (time_window < 0) {
+        IGRAPH_ERRORF("Time window cannot be negative, got %ld.", IGRAPH_EINVAL, time_window);
+    }
+
+    if (zero_appeal < 0) {
+        IGRAPH_ERRORF("The zero appeal cannot be negative, got %f.", IGRAPH_EINVAL, zero_appeal);
+    }
+
+    if (n == 0) {
+        igraph_empty(graph, 0, 0);
+        return IGRAPH_SUCCESS;
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
