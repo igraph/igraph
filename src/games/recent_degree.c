@@ -97,7 +97,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (zero_appeal < 0) {
-        IGRAPH_ERRORF("The zero appeal cannot be negative, got %f.", IGRAPH_EINVAL, zero_appeal);
+        IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
     if (n == 0) {
