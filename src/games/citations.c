@@ -101,27 +101,27 @@ int igraph_lastcit_game(igraph_t *graph,
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERRORF("The `preference' vector should be of length `agebins' plus one."
-                     "Number of agebins is %d, preference vector is of length %d",
+                     "Number of agebins is %"IGRAPH_PRId", preference vector is of length %"IGRAPH_PRId"",
                      IGRAPH_EINVAL,
                      agebins, igraph_vector_size(preference));
     }
     if (nodes < 0 ) {
-        IGRAPH_ERRORF("Number of nodes should be non-negative, received %d.",
+        IGRAPH_ERRORF("Number of nodes should be non-negative, received %"IGRAPH_PRId".",
                      IGRAPH_EINVAL,
                      nodes);
     }
     if (agebins < 1 ) {
-        IGRAPH_ERRORF("Number of age bins should be at least 1, received %d.",
+        IGRAPH_ERRORF("Number of age bins should be at least 1, received %"IGRAPH_PRId".",
                      IGRAPH_EINVAL,
                      agebins);
     }
     if (VECTOR(*preference)[agebins] <= 0) {
-        IGRAPH_ERRORF("The last element of the `preference' vector needs to be positive, but is %f.",
+        IGRAPH_ERRORF("The last element of the `preference' vector needs to be positive, but is %g.",
                      IGRAPH_EINVAL,
                      VECTOR(*preference)[agebins]);
     }
     if (igraph_vector_min(preference) < 0) {
-        IGRAPH_ERRORF("The preference vector must contain only non-negative values, but found %f",
+        IGRAPH_ERRORF("The preference vector must contain only non-negative values, but found %g.",
                      IGRAPH_EINVAL,
                      igraph_vector_min(preference));
     }

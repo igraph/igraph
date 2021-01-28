@@ -513,16 +513,16 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
                      IGRAPH_EINVAL);
     }
 
-    igraph_adjlist_init(us, &adj_us, mode);
+    IGRAPH_CHECK(igraph_adjlist_init(us, &adj_us, mode));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_us);
-    igraph_adjlist_simplify(&adj_us);
-    igraph_inclist_init(them, &incs_them, mode);
+    IGRAPH_CHECK(igraph_adjlist_simplify(&adj_us));
+    IGRAPH_CHECK(igraph_inclist_init(them, &incs_them, mode));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs_them);
 
-    igraph_vector_int_init(&neis, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_int_init(&neis, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
 
-    igraph_vector_resize(res, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
     igraph_vector_null(res);
 
     for (node = 0; node < no_of_nodes; node++) {
