@@ -242,10 +242,10 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         IGRAPH_ERRORF("Out degree sequence is specified, but it length (%ld) does not equal the number of nodes (%ld).", IGRAPH_EINVAL, igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERRORF("Out degree cannot be negative, but found %lld.", IGRAPH_EINVAL, (long long) m);
+        IGRAPH_ERRORF("Out degree cannot be negative, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bin <= 0) {
-        IGRAPH_ERRORF("Aging bin should be positive, but found %lld.", IGRAPH_EINVAL, (long long) aging_bin);
+        IGRAPH_ERRORF("Aging bin should be positive, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bin);
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
