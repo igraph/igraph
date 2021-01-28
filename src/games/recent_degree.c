@@ -101,7 +101,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (n == 0) {
-        igraph_empty(graph, 0, 0);
+        igraph_empty(graph, 0, directed);
         return IGRAPH_SUCCESS;
     }
 
