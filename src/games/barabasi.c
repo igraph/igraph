@@ -629,14 +629,15 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                        igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERRORF("No out degree sequence is specified, and number of edges per time step is %d, which should be non-negative.",
+        IGRAPH_ERRORF("No out degree sequence is specified, and number of edges "
+                      "per time step is %" IGRAPH_PRId ", which should be non-negative.",
                       IGRAPH_EINVAL,
                       m);
     }
     if (aging_bin <= 0) {
-        IGRAPH_ERRORF("Aging bin is %ld, but should be positive.",
+        IGRAPH_ERRORF("Aging bin is %" IGRAPH_PRId ", but should be positive.",
                      IGRAPH_EINVAL,
-                     (long int)aging_bin);
+                     aging_bin);
     }
      if (deg_coef < 0) {
         IGRAPH_ERRORF("Degree coefficient must be non-negative, but is %g.",
