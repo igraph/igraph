@@ -250,8 +250,8 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     long int i, j, type;
 
     if (igraph_vector_size(types) != nodes) {
-        IGRAPH_ERRORF("Size of types is %ld, number of nodes is %lld, but they should be equal.", IGRAPH_EINVAL,
-        igraph_vector_size(types), (long long) nodes);
+        IGRAPH_ERRORF("Size of types is %ld, number of nodes is %" IGRAPH_PRId ", but they should be equal.", IGRAPH_EINVAL,
+        igraph_vector_size(types), nodes);
     }
 
    if (igraph_vector_min(types) < 0) {
