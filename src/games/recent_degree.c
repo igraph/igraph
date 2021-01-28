@@ -27,6 +27,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_psumtree.h"
 #include "igraph_random.h"
+#include "igraph_interface.h"
 
 /**
  * \function igraph_recent_degree_game
@@ -222,7 +223,6 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
     long int no_of_nodes = nodes;
     long int no_of_neighbors = m;
-    long int binwidth = nodes / aging_bin + 1;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j, k;
@@ -231,17 +231,21 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_vector_t degree;
     igraph_dqueue_t history;
 
+    if (no_of_nodes == 0) {
+        igraph_empty(graph, 0, directed);
+        return IGRAPH_SUCCESS;
+    }
     if (no_of_nodes < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of nodes should not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Out degree sequence is specified, but it length (%ld) does not equal the number of nodes (%ld).", IGRAPH_EINVAL, igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Out degree cannot be negative, but found %lld.", IGRAPH_EINVAL, (long long) m);
     }
     if (aging_bin <= 0) {
-        IGRAPH_ERROR("Invalid aging bin", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Aging bin should be positive, but found %lld.", IGRAPH_EINVAL, (long long) aging_bin);
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
@@ -278,7 +282,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
         if (i >= time_window) {
             while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
-                long int age = (i - j) / binwidth;
+                long int age = (i - j) / aging_bin;
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(
                     &sumtree, j,
@@ -300,7 +304,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
             long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            long int age = (i - n) / binwidth;
+            long int age = (i - n) / aging_bin;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, n,
                 (pow(VECTOR(degree)[n], pa_exp) + zero_appeal) * pow(age + 1, aging_exp)
@@ -317,10 +321,10 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         }
 
         /* aging */
-        for (k = 1; i - binwidth * k + 1 >= 1; k++) {
-            long int shnode = i - binwidth * k;
+        for (k = 1; i - aging_bin * k + 1 >= 1; k++) {
+            long int shnode = i - aging_bin * k;
             long int deg = (long int) VECTOR(degree)[shnode];
-            long int age = (i - shnode) / binwidth;
+            long int age = (i - shnode) / aging_bin;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, shnode,
                 (pow(deg, pa_exp) + zero_appeal) * pow(age + 2, aging_exp)
