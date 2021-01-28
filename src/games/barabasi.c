@@ -639,23 +639,23 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                      (long int)aging_bin);
     }
      if (deg_coef < 0) {
-        IGRAPH_ERRORF("Degree coefficient must be non-negative, but is %f.",
+        IGRAPH_ERRORF("Degree coefficient must be non-negative, but is %g.",
                      IGRAPH_EINVAL,
                      deg_coef);
     }
     if (age_coef < 0) {
-        IGRAPH_ERRORF("Age coefficient must be non-negative, but is %f.",
+        IGRAPH_ERRORF("Age coefficient must be non-negative, but is %g.",
                      IGRAPH_EINVAL,
                      deg_coef);
     }
 
     if (zero_deg_appeal < 0) {
-        IGRAPH_ERRORF("Zero degree appeal must be non-negative, but is %f.",
+        IGRAPH_ERRORF("Zero degree appeal must be non-negative, but is %g.",
                      IGRAPH_EINVAL,
                      zero_deg_appeal);
     }
     if (zero_age_appeal < 0) {
-        IGRAPH_ERRORF("Zero age appeal must be non-negative, but is %f.",
+        IGRAPH_ERRORF("Zero age appeal must be non-negative, but is %g.",
                      IGRAPH_EINVAL,
                      zero_age_appeal);
     }
