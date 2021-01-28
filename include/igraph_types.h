@@ -38,6 +38,11 @@ __BEGIN_DECLS
 #include <stdio.h>
 
 typedef int    igraph_integer_t;
+
+/* printf format specifier for igraph_integer_t, for internal use only.
+   Presently, igraph_integer_t is always int so this is unconditionally "d". */
+#define IGRAPH_PRId "d"
+
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 
