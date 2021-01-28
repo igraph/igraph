@@ -155,6 +155,7 @@ add_legacy_tests(
   igraph_full_citation
   igraph_growing_random_game
   igraph_k_regular_game
+  igraph_lastcit_game
   igraph_lattice
   igraph_linegraph
   igraph_kautz

@@ -38,9 +38,11 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
+                             igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
                              const igraph_vs_t vids, igraph_neimode_t mode,
                              const igraph_vector_t *weights, igraph_bool_t normalized);
 DECLDIR int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                                    igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
                                     const igraph_vs_t vids, igraph_neimode_t mode,
                                     const igraph_vector_t *weights,
                                     igraph_bool_t normalized,

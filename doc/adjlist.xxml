@@ -9,7 +9,7 @@
 
 <!-- doxrox-include about_adjlists -->
 
-<section id="adjacenct-vertices"><title>Adjacent vertices</title>
+<section id="adjacent-vertices"><title>Adjacent vertices</title>
 <!-- doxrox-include igraph_adjlist_init -->
 <!-- doxrox-include igraph_adjlist_init_empty -->
 <!-- doxrox-include igraph_adjlist_init_complementer -->
