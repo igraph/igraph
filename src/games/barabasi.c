@@ -661,7 +661,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     }
 
     if (no_of_nodes == 0) {
-         igraph_empty(graph, 0, 0);
+         igraph_empty(graph, 0, directed);
          return IGRAPH_SUCCESS;
     }
 
