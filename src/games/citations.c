@@ -255,7 +255,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
    if (igraph_vector_min(types) < 0) {
-        IGRAPH_ERRORF("Types should be non-negative, but found %f.", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Types should be non-negative, but found %g.", IGRAPH_EINVAL,
         igraph_vector_min(types));
     }
 
@@ -281,7 +281,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     }
     nnval = VECTOR(*pref)[type];
     if (nnval < 0) {
-        IGRAPH_ERRORF("Preferences should be non-negative, but found %f.", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Preferences should be non-negative, but found %g.", IGRAPH_EINVAL,
                       igraph_vector_min(pref));
     }
     sum = VECTOR(cumsum)[1] = nnval;
@@ -305,7 +305,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         }
         nnval = VECTOR(*pref)[type];
         if (nnval < 0) {
-            IGRAPH_ERRORF("Preferences should be non-negative, but found %f.", IGRAPH_EINVAL,
+            IGRAPH_ERRORF("Preferences should be non-negative, but found %g.", IGRAPH_EINVAL,
                           igraph_vector_min(pref));
         }
         sum += nnval;
