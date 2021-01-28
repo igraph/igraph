@@ -623,13 +623,13 @@ int igraph_barabasi_aging_game(igraph_t *graph,
         IGRAPH_ERRORF("Number of nodes must be non-negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERRORF("The out degree sequence is defined, but its length is not zero or equal to number of nodes. "
+        IGRAPH_ERRORF("The out-degree sequence is defined, but its length is not zero or equal to number of nodes. "
                       "It's length is %ld. The number of nodes is %ld.",
                        IGRAPH_EINVAL,
                        igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERRORF("No out degree sequence is specified, and number of edges "
+        IGRAPH_ERRORF("No out-degree sequence is specified, and number of edges "
                       "per time step is %" IGRAPH_PRId ", which should be non-negative.",
                       IGRAPH_EINVAL,
                       m);
