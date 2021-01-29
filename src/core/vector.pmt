@@ -2446,6 +2446,7 @@ int FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
  *
  * Handy if you want to have both the smallest and largest element of
  * a vector. The vector is only traversed once. The vector must by non-empty.
+ * If a vector contains any NaN, both \c min and \c max will be NaN.
  * \param v The input vector. It must contain at least one element.
  * \param min Pointer to a base type variable, the minimum is stored
  *     here.
@@ -2458,27 +2459,42 @@ int FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
 
 int FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
                                     BASE *min, BASE *max) {
-    long int n = FUNCTION(igraph_vector, size)(v);
-    long int i;
-    *min = *max = VECTOR(*v)[0];
-    for (i = 1; i < n; i++) {
-        BASE tmp = VECTOR(*v)[i];
-        if (tmp > *max) {
-            *max = tmp;
-        } else if (tmp < *min) {
-            *min = tmp;
+    BASE* ptr;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    *min = *max = *(v->stor_begin);
+    #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        if (igraph_is_nan(*min)) { return IGRAPH_SUCCESS; }; /* Result is NaN */
+    #endif
+    ptr = v->stor_begin + 1;
+    while (ptr < v->end) {
+        if (*ptr > *max) {
+            *max = *ptr;
+        } else if (*ptr < *min) {
+            *min = *ptr;
         }
+        #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(*ptr)) { /* Result is NaN */
+            *min = *max = *ptr;
+            return IGRAPH_SUCCESS;
+        };
+        #endif
+        ptr++;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_vector_which_minmax
  * \brief Index of the minimum and maximum elements
  *
+ * </para><para>
  * Handy if you need the indices of the smallest and largest
  * elements. The vector is traversed only once. The vector must to
- * non-empty.
+ * non-empty. If the minimum or maximum is not unique, the index
+ * of respectively the first minimum or the first maximum is returned.
+ * If a vector contains any NaN, both \c which_min and \c which_max
+ * will point to the first NaN value.
  * \param v The input vector. It must contain at least one element.
  * \param which_min The index of the minimum element will be stored
  *   here.
@@ -2491,23 +2507,35 @@ int FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
 
 int FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
         long int *which_min, long int *which_max) {
-
-    long int n = FUNCTION(igraph_vector, size)(v);
-    long int i;
-    BASE min, max;
-    *which_min = *which_max = 0;
-    min = max = VECTOR(*v)[0];
-    for (i = 1; i < n; i++) {
-        BASE tmp = VECTOR(*v)[i];
-        if (tmp > max) {
-            max = tmp;
-            *which_max = i;
-        } else if (tmp < min) {
-            min = tmp;
-            *which_min = i;
+    BASE *min, *max;
+    BASE *ptr;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    ptr = v->stor_begin;
+    min = max = ptr;
+    #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        if (igraph_is_nan(*ptr)) {  /* Result is NaN */
+            *which_min = *which_max = 0;
+            return IGRAPH_SUCCESS;
         }
+    #endif
+    while (ptr < v->end) {
+        if (*ptr > *max) {
+            max = ptr;
+        } else if (*ptr < *min) {
+            min = ptr;
+        }
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(*ptr)) {  /* Result is NaN */
+            *which_min = *which_max  = ptr - v->stor_begin;
+            return IGRAPH_SUCCESS;
+        }
+#endif
+        ptr++;
     }
-    return 0;
+    *which_min = min - v->stor_begin;
+    *which_max = max - v->stor_begin;
+    return IGRAPH_SUCCESS;
 }
 
 #endif

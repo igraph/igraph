@@ -133,21 +133,66 @@ int main() {
         printf(" %li", (long int)VECTOR(v)[i]);
     }
     printf("\n");
-    IGRAPH_ASSERT(igraph_vector_max(&v) == 100);
-    IGRAPH_ASSERT(igraph_vector_which_max(&v) == 0);
-    IGRAPH_ASSERT(igraph_vector_min(&v) == 91);
-    IGRAPH_ASSERT(igraph_vector_which_min(&v) == 9);
+    igraph_real_t min, max, min2, max2;
+    long int which_min, which_max, which_min2, which_max2;
+
+    min = igraph_vector_min(&v);
+    which_min = igraph_vector_which_min(&v);
+
+    IGRAPH_ASSERT(min == 91);
+    IGRAPH_ASSERT(which_min == 9);
+    IGRAPH_ASSERT(min == VECTOR(v)[which_min]);
+
+    max = igraph_vector_max(&v);
+    which_max = igraph_vector_which_max(&v);
+
+    IGRAPH_ASSERT(max == 100);
+    IGRAPH_ASSERT(which_max == 0);
+    IGRAPH_ASSERT(max == VECTOR(v)[which_max]);
+
+    igraph_vector_minmax(&v, &min2, &max2);
+    igraph_vector_which_minmax(&v, &which_min2, &which_max2);
+
+    IGRAPH_ASSERT(min == min2);
+    IGRAPH_ASSERT(max == max2);
+    IGRAPH_ASSERT(which_min == which_min2);
+    IGRAPH_ASSERT(which_max == which_max2);
+    IGRAPH_ASSERT(min2 == VECTOR(v)[which_min2]);
+    IGRAPH_ASSERT(max2 == VECTOR(v)[which_max2]);
 
     printf("Test NaN values\n");
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, 1);
-    IGRAPH_ASSERT(igraph_is_nan(igraph_vector_max(&v)));
+
+    min = igraph_vector_min(&v);
+    which_min = igraph_vector_which_min(&v);
+
+    IGRAPH_ASSERT(igraph_is_nan(min));
     /* Index should be to first NaN value */
-    IGRAPH_ASSERT(igraph_vector_which_max(&v) == 10);
-    IGRAPH_ASSERT(igraph_is_nan(igraph_vector_min(&v)));
+    IGRAPH_ASSERT(which_min == 10);
+    IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_min]));
+
+    max = igraph_vector_max(&v);
+    which_max = igraph_vector_which_max(&v);
+
+    IGRAPH_ASSERT(igraph_is_nan(max));
     /* Index should be to first NaN value */
-    IGRAPH_ASSERT(igraph_vector_which_min(&v) == 10);
+    IGRAPH_ASSERT(which_max == 10);
+    /* In case of NaN it should hold that which_max == which_min */
+    IGRAPH_ASSERT(which_max == which_min);
+
+    igraph_vector_minmax(&v, &min2, &max2);
+    igraph_vector_which_minmax(&v, &which_min2, &which_max2);
+
+    IGRAPH_ASSERT(igraph_is_nan(min2));
+    IGRAPH_ASSERT(igraph_is_nan(max2));
+    IGRAPH_ASSERT(which_min == which_min2);
+    IGRAPH_ASSERT(which_max == which_max2);
+    /* In case of NaN it should hold that which_max == which_min */
+    IGRAPH_ASSERT(which_min2 == which_max2);
+    IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_min2]));
+    IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_max2]));
 
     printf("Test igraph_vector_init_copy\n");
     igraph_vector_destroy(&v);
