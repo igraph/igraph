@@ -1321,14 +1321,25 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
 
+    if (reset && igraph_vector_size(reset) != no_of_nodes) {
+        IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
+    }
+
     if (no_of_edges == 0) {
-        /* special case: empty graph */
+        /* Special case: graph with no edges. Result is the same as the personalization vector. */
         if (value) {
             *value = 1.0;
         }
         if (vector) {
             IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
-            igraph_vector_fill(vector, 1.0 / no_of_nodes);
+            if (reset && no_of_nodes > 0) {
+                for (i=0; i < no_of_nodes; ++i) {
+                    VECTOR(*vector)[i] = VECTOR(*reset)[i];
+                }
+                igraph_vector_scale(vector, igraph_vector_sum(vector));
+            } else {
+                igraph_vector_fill(vector, 1.0 / no_of_nodes);
+            }
         }
         return IGRAPH_SUCCESS;
     }
@@ -1345,27 +1356,31 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "PageRank scores.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid length of weights vector when calculating PageRank scores.", IGRAPH_EINVAL);
         }
 
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
         if (min == 0 && max == 0) {
-            /* special case: all weights are zeros */
+            /* Special case: all weights are zeros. Result is the same as the personalization vector. */
             if (value) {
                 *value = 1.0;
             }
             if (vector) {
                 IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
-                igraph_vector_fill(vector, 1.0 / no_of_nodes);
+                if (reset) {
+                    for (i=0; i < no_of_nodes; ++i) {
+                        VECTOR(*vector)[i] = VECTOR(*reset)[i];
+                    }
+                    igraph_vector_scale(vector, igraph_vector_sum(vector));
+                } else {
+                    igraph_vector_fill(vector, 1.0 / no_of_nodes);
+                }
             }
             return IGRAPH_SUCCESS;
         }
-    }
-
-    if (reset && igraph_vector_size(reset) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid length of reset vector when calculating "
-                     "personalized PageRank scores.", IGRAPH_EINVAL);
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
