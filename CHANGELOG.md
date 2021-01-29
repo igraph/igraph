@@ -50,6 +50,7 @@
    * The `nobigint` argument has been removed from `igraph_betweenness()`, `igraph_betweenness_estimate()` and `igraph_centralization_betweenness()`, as it is not longer needed. The current implementation is more accurate than the old one using big integers.
    * `igraph_closeness()` now considers only reachable vertices during the calculation (i.e. the closeness is calculated per-component in the undirected case) (PR #1630).
    * `igraph_closeness()` gained two additional output parameters, `reachable_count` and `all_reachable`, returning the number of reached vertices from each vertex, as well as whether all vertices were reachable. This allows for computing various generalizations of closeness for disconnected graphs (PR #1630).
+   * `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` no longer support the `IGRAPH_PAGERANK_ALGO_POWER` method. Their `options` argument now has type `igraph_arpack_options_t *` instead of `void *`.
  - Shortest paths (PR #1344):
    * `igraph_average_path_length()` now returns the number of disconnected vertex pairs in the new `unconn_pairs` output argument.
    * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
@@ -75,6 +76,7 @@
    * `igraph_adjacent()`.
    * `igraph_es_adj()`.
    * `igraph_subgraph()`.
+ - `igraph_pagerank_old()`, deprecated in 0.7, has been removed.
 
 ### Fixed
 
@@ -88,7 +90,7 @@
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
  - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
- - Weighted betweenness, closeness and shortest path calculations now check if any weights are NaN.
+ - Weighted betweenness, closeness and shortest path calculations, as well as random walk functions now check if any weights are NaN.
  - Compatibility with the PGI compiler.
 
 ### Other
