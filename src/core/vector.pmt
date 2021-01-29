@@ -773,6 +773,9 @@ int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
  * \function igraph_vector_sort
  * \brief Sorts the elements of the vector into ascending order.
  *
+ * </para><para>
+ * If the vector contains any NaN values, the resulting ordering of
+ * NaN values is undefined and may appear anywhere in the vector.
  * \param v Pointer to an initialized vector object.
  *
  * Time complexity:
@@ -791,6 +794,9 @@ void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v) {
  * \function igraph_vector_reverse_sort
  * \brief Sorts the elements of the vector into descending order.
  *
+ * </para><para>
+ * If the vector contains any NaN values, the resulting ordering of
+ * NaN values is undefined and may appear anywhere in the vector.
  * \param v Pointer to an initialized vector object.
  *
  * Time complexity:
@@ -842,7 +848,8 @@ int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2
  * indices inds such that v[ inds[i] ], with i increasing from 0, is
  * an ordered array (either ascending or descending, depending on
  * \v order). The order of indices for identical elements is not
- * defined.
+ * defined. If the vector contains any NaN values, the ordering of
+ * NaN values is undefined.
  *
  * \param v the array to be sorted
  * \param inds the output array of indices. this must be initialized,
@@ -1060,7 +1067,7 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
  *
  * The vector must be non-empty.
  * \param v The input vector.
- * \return The smallest element of \p v, or nan if any element is nan.
+ * \return The smallest element of \p v, or NaN if any element is NaN.
  *
  * Time complexity: O(n), the number of elements.
  */
@@ -1488,7 +1495,8 @@ void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
  * \param low The lower limit of the interval (inclusive).
  * \param high The higher limit of the interval (inclusive).
  * \return True (positive integer) if all vector elements are in the
- *   interval, false (zero) otherwise.
+ *   interval, false (zero) otherwise. If any element is NaN, it will
+ *   return \c 0 (=false).
  *
  * Time complexity: O(n), the number
  * of elements in the vector.
@@ -1501,7 +1509,7 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
-        if (*ptr < low || *ptr > high) {
+        if (!(*ptr >= low && *ptr <= high)) {
             return 0;
         }
     }
@@ -1596,7 +1604,8 @@ FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
  * \param rhs The second vector.
  * \return Positive integer (=true) if the elements in the \p lhs are all
  *    less than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match.
+ *    (=false) if the lengths of the vectors don't match. If any element
+ *    is NaN, it will return \c 0 (=false).
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -1633,7 +1642,8 @@ igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
  * \param rhs The second vector.
  * \return Positive integer (=true) if the elements in the \p lhs are all
  *    greater than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match.
+ *    (=false) if the lengths of the vectors don't match. If any element
+ *    is NaN, it will return \c 0 (=false).
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -1672,7 +1682,7 @@ igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
  * \return Positive integer (=true) if the elements in the \p lhs are all
  *    less than or equal to the corresponding elements in \p
  *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
- *    match.
+ *    match. If any element is NaN, it will return \c 0 (=false).
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -1711,7 +1721,7 @@ FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
  * \return Positive integer (=true) if the elements in the \p lhs are all
  *    greater than or equal to the corresponding elements in \p
  *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
- *    match.
+ *    match.  If any element is NaN, it will return \c 0 (=false).
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -1757,7 +1767,8 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  * It is assumed that the vector is sorted. If the specified element
  * (\p what) is not in the vector, then the
  * position of where it should be inserted (to keep the vector sorted)
- * is returned.
+ * is returned. If the vector contains any NaN values, the returned
+ * value is undefined and \p pos may point to any position.
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to a \type long int. This is set to the
@@ -1790,7 +1801,9 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  * It is assumed that the indicated slice of the vector, from \p start to \p end,
  * is sorted. If the specified element (\p what) is not in the slice of the
  * vector, then the position of where it should be inserted (to keep the vector
- * sorted) is returned.
+ * sorted) is returned. If the indicated slice contains any NaN values, the
+ * returned value is undefined and \c pos may point to any position within
+ * the slice.
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to a \type long int. This is set to the position of an
@@ -2088,7 +2101,8 @@ int FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *v,
  *
  * The element with the largest absolute value in \p m1 - \p m2 is
  * returned. Both vectors must be non-empty, but they not need to have
- * the same length, the extra elements in the longer vector are ignored.
+ * the same length, the extra elements in the longer vector are ignored. If
+ * any value is NaN in the shorter vector, the result will be NaN.
  * \param m1 The first vector.
  * \param m2 The second vector.
  * \return The maximum absolute difference of \p m1 and \p m2.
@@ -2111,6 +2125,11 @@ igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *
         if (d > diff) {
             diff = d;
         }
+    #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(d)) { /* Result is NaN */
+            return d;
+        };
+    #endif
     }
 
     return diff;
