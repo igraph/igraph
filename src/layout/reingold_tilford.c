@@ -808,14 +808,16 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
 
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
-    igraph_real_t ratio = 2 * M_PI * (no_of_nodes - 1.0) / no_of_nodes;
+    igraph_real_t ratio;
     igraph_real_t minx, maxx;
 
     IGRAPH_CHECK(igraph_layout_reingold_tilford(graph, res, mode, roots, rootlevel));
 
     if (no_of_nodes == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
+
+    ratio = 2 * M_PI * (no_of_nodes - 1.0) / no_of_nodes;
 
     minx = maxx = MATRIX(*res, 0, 0);
     for (i = 1; i < no_of_nodes; i++) {
@@ -836,5 +838,5 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         MATRIX(*res, i, 1) = r * sin(phi);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
