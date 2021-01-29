@@ -32,6 +32,8 @@ int main() {
     int i;
     igraph_real_t *ptr;
     long int pos;
+    igraph_real_t min, max, min2, max2;
+    long int which_min, which_max, which_min2, which_max2;
 
     printf("Initialise empty vector\n");
     igraph_vector_init(&v, 0);
@@ -133,8 +135,6 @@ int main() {
         printf(" %li", (long int)VECTOR(v)[i]);
     }
     printf("\n");
-    igraph_real_t min, max, min2, max2;
-    long int which_min, which_max, which_min2, which_max2;
 
     min = igraph_vector_min(&v);
     which_min = igraph_vector_which_min(&v);
@@ -164,6 +164,8 @@ int main() {
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, 1);
+
+    IGRAPH_ASSERT(igraph_vector_is_any_nan(&v));
 
     min = igraph_vector_min(&v);
     which_min = igraph_vector_which_min(&v);
@@ -261,6 +263,7 @@ int main() {
     }
     IGRAPH_ASSERT(!igraph_vector_binsearch(&v, 10, 0));
     IGRAPH_ASSERT(!igraph_vector_binsearch(&v, -1, 0));
+
     for (i = 0; i < igraph_vector_size(&v); i++) {
         VECTOR(v)[i] = 2 * i;
     }
