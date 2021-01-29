@@ -1028,22 +1028,18 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
  */
 long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
     if (!FUNCTION(igraph_vector, empty)(v)) {
-        BASE max;
+        BASE *max;
         BASE *ptr;
-        BASE *which;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
-        ptr = v->stor_begin;
+        max = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
 #endif
-        which = ptr;
-        max = *which;
         ptr++;
         while (ptr < v->end) {
-            if ((*ptr) > max) {
-                which = ptr;
-                max = *which;
+            if (*ptr > *max) {
+                max = ptr;
             }
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
             else if (igraph_is_nan(*ptr)) {
@@ -1052,7 +1048,7 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
 #endif
             ptr++;
         }
-        return which - v->stor_begin;
+        return max - v->stor_begin;
     }
     return -1;
 }
@@ -1109,21 +1105,18 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
  */
 long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
     if (!FUNCTION(igraph_vector, empty)(v)) {
-        BASE min;
+        BASE *min;
         BASE *ptr;
-        BASE *which;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
-        ptr = v->stor_begin;
+        min = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
 #endif
-        which = ptr;
-        min = *which;
+        ptr++;
         while (ptr < v->end) {
-            if ((*ptr) < min) {
-                which = ptr;
-                min = *which;
+            if (*ptr < *min) {
+                min = ptr;
             }
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
             else if (igraph_is_nan(*ptr)) {
@@ -1132,7 +1125,7 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
 #endif
             ptr++;
         }
-        return which - v->stor_begin;
+        return min - v->stor_begin;
     }
     return -1;
 }
