@@ -38,13 +38,13 @@
 #include <math.h>
 #include <string.h>    /* memset */
 
-int igraph_personalized_pagerank_arpack(const igraph_t *graph,
-                                        igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights,
-                                        igraph_arpack_options_t *options);
+static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
+                                                 igraph_vector_t *vector,
+                                                 igraph_real_t *value, const igraph_vs_t vids,
+                                                 igraph_bool_t directed, igraph_real_t damping,
+                                                 igraph_vector_t *reset,
+                                                 const igraph_vector_t *weights,
+                                                 igraph_arpack_options_t *options);
 
 static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
     /* Many of the centrality measures correspond to the eigenvector of some
@@ -133,13 +133,13 @@ static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
-        igraph_real_t *value, igraph_bool_t scale,
-        const igraph_vector_t *weights,
-        igraph_arpack_options_t *options) {
+static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
+                                                      igraph_real_t *value, igraph_bool_t scale,
+                                                      const igraph_vector_t *weights,
+                                                      igraph_arpack_options_t *options) {
 
     igraph_vector_t values;
     igraph_matrix_t vectors;
@@ -286,7 +286,8 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     igraph_matrix_destroy(&vectors);
     igraph_vector_destroy(&values);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 /* int igraph_i_evcent_dir(igraph_real_t *to, const igraph_real_t *from, */
@@ -301,10 +302,10 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
 /*   return 0; */
 /* } */
 
-int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
-        igraph_real_t *value, igraph_bool_t scale,
-        const igraph_vector_t *weights,
-        igraph_arpack_options_t *options) {
+static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
+                                                    igraph_real_t *value, igraph_bool_t scale,
+                                                    const igraph_vector_t *weights,
+                                                    igraph_arpack_options_t *options) {
 
     igraph_matrix_t values;
     igraph_matrix_t vectors;
@@ -560,10 +561,10 @@ int igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_arpack_options_t *options) {
 
     if (directed && igraph_is_directed(graph)) {
-        return igraph_eigenvector_centrality_directed(graph, vector, value,
+        return igraph_i_eigenvector_centrality_directed(graph, vector, value,
                 scale, weights, options);
     } else {
-        return igraph_eigenvector_centrality_undirected(graph, vector, value,
+        return igraph_i_eigenvector_centrality_undirected(graph, vector, value,
                 scale, weights, options);
     }
 }
@@ -1286,7 +1287,7 @@ int igraph_personalized_pagerank(const igraph_t *graph,
 
     if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
         igraph_arpack_options_t *o = (igraph_arpack_options_t*) options;
-        return igraph_personalized_pagerank_arpack(graph, vector, value, vids,
+        return igraph_i_personalized_pagerank_arpack(graph, vector, value, vids,
                 directed, damping, reset,
                 weights, o);
     } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
@@ -1303,12 +1304,12 @@ int igraph_personalized_pagerank(const igraph_t *graph,
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights,
-                                        igraph_arpack_options_t *options) {
+static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
+                                                 igraph_real_t *value, const igraph_vs_t vids,
+                                                 igraph_bool_t directed, igraph_real_t damping,
+                                                 igraph_vector_t *reset,
+                                                 const igraph_vector_t *weights,
+                                                 igraph_arpack_options_t *options) {
     igraph_matrix_t values;
     igraph_matrix_t vectors;
     igraph_neimode_t dirmode;
@@ -1524,5 +1525,6 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
     igraph_matrix_destroy(&vectors);
     igraph_matrix_destroy(&values);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
