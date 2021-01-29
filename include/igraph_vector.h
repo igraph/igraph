@@ -174,7 +174,8 @@ DECLDIR int igraph_vector_order1_int(const igraph_vector_t* v,
 DECLDIR int igraph_vector_order2(igraph_vector_t *v);
 DECLDIR int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
                        long int nodes);
-
+DECLDIR int igraph_vector_is_nan(const igraph_vector_t *v,
+                                 igraph_vector_bool_t *is_nan);
 DECLDIR igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v);
 
 __END_DECLS
