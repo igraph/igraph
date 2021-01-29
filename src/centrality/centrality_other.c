@@ -1328,7 +1328,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
             *value = 1.0;
         }
         if (vector) {
-            igraph_vector_resize(vector, no_of_nodes);
+            IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
             igraph_vector_fill(vector, 1.0 / no_of_nodes);
         }
         return IGRAPH_SUCCESS;
@@ -1357,7 +1357,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
                 *value = 1.0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
                 igraph_vector_fill(vector, 1.0 / no_of_nodes);
             }
             return IGRAPH_SUCCESS;
