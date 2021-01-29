@@ -35,25 +35,35 @@ using namespace std;
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights) {
+int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
+                                          igraph_real_t *value, const igraph_vs_t vids,
+                                          igraph_bool_t directed, igraph_real_t damping,
+                                          const igraph_vector_t *reset,
+                                          const igraph_vector_t *weights) {
     long int i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
     igraph_vit_t vit;
-    double* u = 0;
-    double* v = 0;
-    const prpack_result* res;
+    double *u = nullptr;
+    double *v = nullptr;
+    const prpack_result *res;
 
     if (reset) {
-        /* Normalize reset vector so the sum is 1 */
-        double reset_sum = igraph_vector_sum(reset);
-        if (igraph_vector_min(reset) < 0) {
-            IGRAPH_ERROR("the reset vector must not contain negative elements", IGRAPH_EINVAL);
+        if (igraph_vector_size(reset) != no_of_nodes) {
+            IGRAPH_ERROR("Invalid length of reset vector when calculating "
+                         "personalized PageRank scores.", IGRAPH_EINVAL);
         }
+
+        /* Normalize reset vector so the sum is 1 */
+        double reset_min = igraph_vector_min(reset);
+        if (reset_min < 0) {
+            IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
+        }
+        if (igraph_is_nan(reset_min)) {
+            IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
+
+        double reset_sum = igraph_vector_sum(reset);
         if (reset_sum == 0) {
-            IGRAPH_ERROR("the sum of the elements in the reset vector must not be zero", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
         }
 
         // Construct the personalization vector
@@ -69,9 +79,7 @@ int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *
     res = solver.solve(damping, 1e-10, u, v, "");
 
     // Delete the personalization vector
-    if (v) {
-        delete[] v;
-    }
+    delete [] v;
 
     // Check whether the solver converged
     // TODO: this is commented out because some of the solvers do not implement it yet
