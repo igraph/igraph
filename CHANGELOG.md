@@ -90,6 +90,8 @@
  - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (PR #1598).
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
+ - `igraph_(personalized_)pagerank()`: the `IGRAPH_PAGERANK_ALGO_ARPACK` method now handles self-loops correctly.
+ - `igraph_personalized_pagerank()`: the result retuned for edgeless graphs with a non-uniform personalization vector and the `IGRAPH_PAGERANK_ALGO_ARPACK` was incorrect.
  - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
  - Weighted betweenness, closeness, PageRank and shortest path calculations, as well as random walk functions now check if any weights are NaN.
  - Compatibility with the PGI compiler.
