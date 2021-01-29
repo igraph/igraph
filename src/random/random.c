@@ -1115,7 +1115,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
             while (1) {
                 X = Nreal * (-Vprime + 1.0);
                 S = floor(X);
-                // if (S==0) { S=1; }
+                /* if (S==0) { S=1; } */
                 if (S < qu1) {
                     break;
                 }
@@ -1533,56 +1533,6 @@ int imin2(int x, int y) {
     return (x < y) ? x : y;
 }
 
-#if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
-    /* isfinite is defined in <math.h> according to C99 */
-    #define R_FINITE(x)    isfinite(x)
-#elif HAVE_WORKING_FINITE || HAVE_FINITE
-    /* include header needed to define finite() */
-    #ifdef HAVE_IEEE754_H
-        #include <ieee754.h>         /* newer Linuxen */
-    #else
-        #ifdef HAVE_IEEEFP_H
-            #include <ieeefp.h>         /* others [Solaris], .. */
-        #endif
-    #endif
-    #define R_FINITE(x)    finite(x)
-#else
-    #define R_FINITE(x)    R_finite(x)
-#endif
-
-#if defined(_MSC_VER)
-#include <float.h>   /* needed later down below by _finite() */
-#endif
-
-int R_finite(double x) {
-#if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
-    return isfinite(x);
-#elif HAVE_WORKING_FINITE || HAVE_FINITE
-    return finite(x);
-#else
-    /* neither finite nor isfinite work. Do we really need the AIX exception? */
-# ifdef _AIX
-#  include <fp.h>
-    return FINITE(x);
-# elif defined(_MSC_VER)
-    return _finite(x);
-#else
-    return (!isnan(x) & (x != 1 / 0.0) & (x != -1.0 / 0.0));
-# endif
-#endif
-}
-
-int R_isnancpp(double x) {
-    return (isnan(x) != 0);
-}
-
-#ifdef __cplusplus
-    int R_isnancpp(double); /* in arithmetic.c */
-    #define ISNAN(x)     R_isnancpp(x)
-#else
-    #define ISNAN(x)     (isnan(x)!=0)
-#endif
-
 double igraph_norm_rand(igraph_rng_t *rng) {
 
     double u1;
@@ -1761,7 +1711,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu) {
     double pois = -1.;
     int k, kflag, big_mu, new_big_mu = FALSE;
 
-    if (!R_FINITE(mu)) {
+    if (!igraph_finite(mu)) {
         ML_ERR_return_NAN;
     }
 
@@ -1949,7 +1899,7 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 #undef a7
 
 double igraph_rgeom(igraph_rng_t *rng, double p) {
-    if (ISNAN(p) || p <= 0 || p > 1) {
+    if (igraph_is_nan(p) || p <= 0 || p > 1) {
         ML_ERR_return_NAN;
     }
 
@@ -1974,7 +1924,7 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;
     int i, ix, k, n;
 
-    if (!R_FINITE(nin)) {
+    if (!igraph_finite(nin)) {
         ML_ERR_return_NAN;
     }
     n = floor(nin + 0.5);
@@ -1982,7 +1932,7 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
         ML_ERR_return_NAN;
     }
 
-    if (!R_FINITE(pp) ||
+    if (!igraph_finite(pp) ||
         /* n=0, p=0, p=1 are not errors <TSL>*/
         n < 0 || pp < 0. || pp > 1.) {
         ML_ERR_return_NAN;
@@ -2185,10 +2135,10 @@ double igraph_dnorm(double x, double mu, double sigma, int give_log) {
         return x + mu + sigma;
     }
 #endif
-    if (!R_FINITE(sigma)) {
+    if (!igraph_finite(sigma)) {
         return R_D__0;
     }
-    if (!R_FINITE(x) && mu == x) {
+    if (!igraph_finite(x) && mu == x) {
         return ML_NAN;    /* x-mu is NaN */
     }
     if (sigma <= 0) {
@@ -2200,7 +2150,7 @@ double igraph_dnorm(double x, double mu, double sigma, int give_log) {
     }
     x = (x - mu) / sigma;
 
-    if (!R_FINITE(x)) {
+    if (!igraph_finite(x)) {
         return R_D__0;
     }
     return (give_log ?
@@ -2293,7 +2243,7 @@ double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
 
     double e, p, q, r, t, u, v, w, x, ret_val;
 
-    if (!R_FINITE(a) || !R_FINITE(scale) || a < 0.0 || scale <= 0.0) {
+    if (!igraph_finite(a) || !igraph_finite(scale) || a < 0.0 || scale <= 0.0) {
         if (scale == 0.) {
             return 0.;
         }

@@ -35,18 +35,12 @@
 #endif
 
 int igraph_finite(double x) {
-#if HAVE_DECL_ISFINITE
+#if HAVE_ISFINITE
     return isfinite(x);
-#elif HAVE_FINITE == 1
+#elif HAVE_FINITE
     return finite(x);
 #else
-    /* neither finite nor isfinite work. Do we really need the AIX exception? */
-# ifdef _AIX
-#  include <fp.h>
-    return FINITE(x);
-# else
     return (!isnan(x) & (x != IGRAPH_POSINFINITY) & (x != IGRAPH_NEGINFINITY));
-# endif
 #endif
 }
 

@@ -70,6 +70,8 @@ endif()
 # First we check for some functions and symbols
 check_symbol_exists(expm1 math.h HAVE_EXPM1)
 check_symbol_exists(fmin math.h HAVE_FMIN)
+check_symbol_exists(finite math.h HAVE_FINITE)
+check_symbol_exists(isfinite math.h HAVE_ISFINITE)
 check_symbol_exists(log2 math.h HAVE_LOG2)
 check_symbol_exists(log1p math.h HAVE_LOG1P)
 check_symbol_exists(rint math.h HAVE_RINT)
