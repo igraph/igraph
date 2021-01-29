@@ -80,6 +80,22 @@ void print_matrix_round(const igraph_matrix_t *m) {
 }
 
 
+/* Print an adjacency list. Use brackets around each vector and also use
+ * brackets around the entire adjacency list to make it clear when the list
+ * is empty.
+ */
+void print_adjlist(const igraph_adjlist_t *adjlist) {
+    long vcount = igraph_adjlist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_adjlist_get(adjlist, i));
+    }
+    printf("}\n");
+}
+
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph) {
     long ecount = igraph_ecount(graph);

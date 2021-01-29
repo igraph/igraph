@@ -51,7 +51,7 @@ int test_simple_trees() {
 
     /* Undirected */
     igraph_tree(&g, 42, 3, IGRAPH_TREE_UNDIRECTED);
-    igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_ALL, /*duplicate=*/ 1);
     igraph_isomorphic(&g, &g2, &iso);
     if (!iso) {
@@ -64,10 +64,132 @@ int test_simple_trees() {
     return 0;
 }
 
+int test_loop_elimination_for_undirected_graph() {
+    igraph_t g;
+    igraph_adjlist_t adjlist;
+
+    printf("Testing loop edge elimination in undirected graph\n\n");
+
+    igraph_small(
+        &g, 5, /* directed = */ 0,
+        0, 1, 0, 3,
+        1, 2,
+        2, 2, 2, 3,
+        3, 0, 3, 4,
+        4, 4, 4, 4,
+        -1
+    );
+
+    /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
+     * make no difference */
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    printf("Loops eliminated: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    printf("Loops listed once: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("Loops listed twice: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_destroy(&g);
+
+    printf("============================================================\n\n");
+
+    return 0;
+}
+
+int test_loop_elimination_for_directed_graph() {
+    igraph_t g;
+    igraph_adjlist_t adjlist;
+
+    printf("Testing loop edge elimination in directed graph\n\n");
+
+    igraph_small(
+        &g, 5, /* directed = */ 1,
+        0, 1, 0, 3,
+        1, 2,
+        2, 2, 2, 3,
+        3, 0, 3, 4,
+        4, 4, 4, 4,
+        -1
+    );
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    printf("In-edges, loops eliminated: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    printf("In-edges, loops listed once: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    printf("Out-edges, loops eliminated: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    printf("Out-edges, loops listed once: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("Out-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    printf("In- and out-edges, loops eliminated: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    printf("In- and out-edges, loops listed once: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_adjlist_init(&g, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("In- and out-edges, loops listed twice: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+    igraph_adjlist_destroy(&adjlist);
+
+    igraph_destroy(&g);
+
+    printf("============================================================\n\n");
+
+    return 0;
+}
+
 int main() {
     int retval;
 
     RUN_TEST(test_simple_trees);
-
+    RUN_TEST(test_loop_elimination_for_undirected_graph);
+    RUN_TEST(test_loop_elimination_for_directed_graph);
     return 0;
 }

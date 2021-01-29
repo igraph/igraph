@@ -32,6 +32,24 @@
 #include <stdio.h>
 
 /**
+ * Helper function that simplifies a sorted adjacency vector by removing
+ * duplicate elements and optionally self-loops.
+ */
+static int igraph_i_simplify_sorted_adjacency_vector_in_place(
+    igraph_vector_t *v, igraph_integer_t index, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_multiple_t multiple
+);
+
+/**
+ * Helper function that simplifies a sorted adjacency vector by removing
+ * duplicate elements and optionally self-loops; integer variant.
+ */
+static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+    igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_multiple_t multiple
+);
+
+/**
  * \section about_adjlists
  * <para>Sometimes it is easier to work with a graph which is in
  * adjacency list format: a list of vectors; each vector contains the
@@ -134,6 +152,7 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     for (i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
+        
         IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, mode));
 
         n = igraph_vector_size(&tmp);
@@ -141,6 +160,10 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         for (j = 0; j < n; j++) {
             VECTOR(al->adjs[i])[j] = VECTOR(tmp)[j];
         }
+
+        IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+            &al->adjs[i], i, mode, loops, multiple
+        ));
     }
 
     igraph_vector_destroy(&tmp);
@@ -674,10 +697,6 @@ void igraph_inclist_clear(igraph_inclist_t *il) {
     }
 }
 
-/**
- * Helper function that simplifies a sorted adjacency vector by removing
- * duplicate elements and optionally self-loops.
- */
 static int igraph_i_simplify_sorted_adjacency_vector_in_place(
     igraph_vector_t *v, igraph_integer_t index, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_multiple_t multiple
@@ -696,18 +715,43 @@ static int igraph_i_simplify_sorted_adjacency_vector_in_place(
         return IGRAPH_SUCCESS;        
     }
 
-    if (multiple == IGRAPH_MULTIPLE && loops != IGRAPH_NO_LOOPS) {
-        /* TODO; we don't use this combination yet */
-        return IGRAPH_UNIMPLEMENTED;
-    } else {
-        /* We need to get rid of loops and multiple edges completely */
-        for (i = 0; i < n; i++) {
-            if (VECTOR(*v)[i] != index &&
-                (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i])) {
-                VECTOR(*v)[p] = VECTOR(*v)[i];
-                p++;
+    if (loops == IGRAPH_NO_LOOPS) {
+        if (multiple == IGRAPH_NO_MULTIPLE) {
+            /* We need to get rid of loops and multiple edges completely */
+            for (i = 0; i < n; i++) {
+                if (VECTOR(*v)[i] != index &&
+                    (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i])) {
+                    VECTOR(*v)[p] = VECTOR(*v)[i];
+                    p++;
+                }
+            }
+        } else {
+            /* We need to get rid of loops but keep multiple edges */
+            for (i = 0; i < n; i++) {
+                if (VECTOR(*v)[i] != index) {
+                    VECTOR(*v)[p] = VECTOR(*v)[i];
+                    p++;
+                }
             }
         }
+    } else if (multiple == IGRAPH_MULTIPLE && loops == IGRAPH_LOOPS_ONCE) {
+        /* We need to keep one edge from each loop edge and we don't need to
+         * touch multiple edges. Note that we can get here only if
+         * mode == IGRAPH_ALL; if mode was IGRAPH_IN or IGRAPH_OUT, we would
+         * have bailed out earlier */
+        for (i = 0; i < n; i++) {
+            VECTOR(*v)[p] = VECTOR(*v)[i];
+            if (VECTOR(*v)[i] == index) {
+                /* this was a loop edge so if the next element is the same, we
+                 * need to skip that */
+                if (i < n-1 && VECTOR(*v)[i + 1] == index) {
+                    i++;
+                }
+            }
+        }
+    } else {
+        /* TODO; we don't use this combination yet */
+        return IGRAPH_UNIMPLEMENTED;
     }
 
     /* always succeeds since we are never growing the vector */
@@ -715,6 +759,71 @@ static int igraph_i_simplify_sorted_adjacency_vector_in_place(
 
     return IGRAPH_SUCCESS;
 }
+
+static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+    igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_multiple_t multiple
+) {
+    long int i, p = 0;
+    long int n = igraph_vector_int_size(v);
+
+    if (
+        multiple == IGRAPH_MULTIPLE &&
+        (
+            loops == IGRAPH_LOOPS_TWICE ||
+            (loops == IGRAPH_LOOPS_ONCE && (mode == IGRAPH_IN || mode == IGRAPH_OUT))
+        )
+    ) {
+        /* nothing to simplify */
+        return IGRAPH_SUCCESS;        
+    }
+
+    if (loops == IGRAPH_NO_LOOPS) {
+        if (multiple == IGRAPH_NO_MULTIPLE) {
+            /* We need to get rid of loops and multiple edges completely */
+            for (i = 0; i < n; i++) {
+                if (VECTOR(*v)[i] != index &&
+                    (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i])) {
+                    VECTOR(*v)[p] = VECTOR(*v)[i];
+                    p++;
+                }
+            }
+        } else {
+            /* We need to get rid of loops but keep multiple edges */
+            for (i = 0; i < n; i++) {
+                if (VECTOR(*v)[i] != index) {
+                    VECTOR(*v)[p] = VECTOR(*v)[i];
+                    p++;
+                }
+            }
+        }
+    } else if (multiple == IGRAPH_MULTIPLE && loops == IGRAPH_LOOPS_ONCE) {
+        /* We need to keep one edge from each loop edge and we don't need to
+         * touch multiple edges. Note that we can get here only if
+         * mode == IGRAPH_ALL; if mode was IGRAPH_IN or IGRAPH_OUT, we would
+         * have bailed out earlier */
+        for (i = 0; i < n; i++) {
+            VECTOR(*v)[p] = VECTOR(*v)[i];
+            if (VECTOR(*v)[i] == index) {
+                /* this was a loop edge so if the next element is the same, we
+                 * need to skip that */
+                if (i < n-1 && VECTOR(*v)[i + 1] == index) {
+                    i++;
+                }
+            }
+            p++;
+        }
+    } else {
+        /* TODO; we don't use this combination yet */
+        return IGRAPH_UNIMPLEMENTED;
+    }
+
+    /* always succeeds since we are never growing the vector */
+    igraph_vector_int_resize(v, p);
+
+    return IGRAPH_SUCCESS;
+}
+
 
 /**
  * \function igraph_lazy_adjlist_init
