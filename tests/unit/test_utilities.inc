@@ -304,4 +304,16 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
         return 100; \
     }
 
+/* Run a test in a separate function; return the return value of the function
+ * if it is nonzero. Also verify the FINALLY stack and bail out if it is not
+ * empty. Needs an integer variable named 'retval' in the local context. */
+#define RUN_TEST(func) \
+    { \
+        retval = func(); \
+        if (retval) { \
+            return retval; \
+        } \
+        VERIFY_FINALLY_STACK(); \
+    }
+
 #endif /* TEST_UTILITIES_INC */
