@@ -1286,10 +1286,9 @@ int igraph_personalized_pagerank(const igraph_t *graph,
                                  igraph_arpack_options_t *options) {
 
     if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
-        igraph_arpack_options_t *o = (igraph_arpack_options_t*) options;
         return igraph_i_personalized_pagerank_arpack(graph, vector, value, vids,
                 directed, damping, reset,
-                weights, o);
+                weights, options);
     } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
         return igraph_i_personalized_pagerank_prpack(graph, vector, value, vids,
                 directed, damping, reset,
