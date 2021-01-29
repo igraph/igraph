@@ -1417,9 +1417,9 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
         data.reset = reset ? &normalized_reset : NULL;
 
         IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
-                                   directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
+                                   directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS));
         IGRAPH_CHECK(igraph_degree(graph, &indegree, igraph_vss_all(),
-                                   directed ? IGRAPH_IN : IGRAPH_ALL, /*loops=*/ 0));
+                                   directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS));
         /* Set up an appropriate starting vector. We start from the in-degrees
          * plus some small random noise to avoid convergence problems */
         for (i = 0; i < options->n; i++) {
