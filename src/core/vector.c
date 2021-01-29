@@ -469,7 +469,7 @@ int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
  * </para><para>
  * \param v The \type igraph_vector_t object to check.
  * \param is_nan The resulting boolean vector indicating for each element
- *               whether is is NaN or not.
+ *               whether it is NaN or not.
  * \return Error code,
  *         \c IGRAPH_ENOMEM if there is not enough
  *         memory. Note that this function \em never returns an error
