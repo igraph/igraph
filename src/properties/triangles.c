@@ -106,9 +106,8 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         VECTOR(rank)[ (long int) VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-    IGRAPH_CHECK(igraph_adjlist_simplify(&allneis));
 
     neis = igraph_Calloc(no_of_nodes, long int);
     if (neis == 0) {
@@ -199,8 +198,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
@@ -351,7 +349,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*   nodes_to_calc=IGRAPH_VIT_SIZE(vit); */
 
 /*   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, */
-/*                    IGRAPH_SIMPLIFY)); */
+/*                    IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE)); */
 /*   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist); */
 
 /*   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc)); */
@@ -647,9 +645,8 @@ int igraph_transitivity_undirected(const igraph_t *graph,
         VECTOR(rank)[ (long int) VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-    IGRAPH_CHECK(igraph_adjlist_simplify(&allneis));
 
     neis = igraph_Calloc(no_of_nodes, long int);
     if (neis == 0) {
@@ -752,7 +749,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL,
                                  IGRAPH_LOOPS, weights));
 
-    igraph_lazy_inclist_init(graph, &incident, IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &incident, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &incident);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
@@ -848,7 +845,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
         VECTOR(rank)[ (long int)VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &incident, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incident, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incident);
 
     IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));

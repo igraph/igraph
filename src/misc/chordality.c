@@ -96,7 +96,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_long_init(&prev, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &prev);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_vector_resize(alpha, no_of_nodes));
@@ -333,7 +333,7 @@ int igraph_is_chordal(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &f);
     IGRAPH_CHECK(igraph_vector_long_init(&index, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_long_init(&mark, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &mark);

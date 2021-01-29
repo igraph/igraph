@@ -130,7 +130,10 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(
+        graph, &inclist, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
+    ));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     all_to = igraph_vs_is_all(&to);
@@ -372,7 +375,10 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(
+        graph, &inclist, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
+    ));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
@@ -757,7 +763,10 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
     /* lazy adjacency edge list to query neighbours efficiently */
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(
+        graph, &inclist, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
+    ));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     /* Mark the vertices we need to reach */

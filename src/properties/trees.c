@@ -276,7 +276,11 @@ int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(
+        graph, &al, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
+        IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     /* The main algorithm:

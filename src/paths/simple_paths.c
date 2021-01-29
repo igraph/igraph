@@ -99,8 +99,9 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &stack);
     IGRAPH_CHECK(igraph_vector_int_init(&dist, 100));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &dist);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
-                                          /*simplify=*/ 1));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(
+        graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);

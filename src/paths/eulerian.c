@@ -381,7 +381,7 @@ static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vecto
 
     IGRAPH_CHECK(igraph_stack_push(&tracker, start_of_path));
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
     curr = start_of_path;
@@ -490,7 +490,7 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
 
     IGRAPH_CHECK(igraph_stack_push(&tracker, start_of_path));
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
     IGRAPH_VECTOR_INIT_FINALLY(&remaining_out_edges, 0);

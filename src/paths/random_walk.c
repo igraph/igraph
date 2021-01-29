@@ -80,8 +80,11 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
         IGRAPH_ERROR("Invalid number of steps", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode,
-                                          IGRAPH_DONT_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(
+        graph, &adj, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
+        IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
     IGRAPH_CHECK(igraph_vector_resize(walk, steps));
@@ -204,7 +207,10 @@ int igraph_random_edge_walk(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_resize(edgewalk, steps));
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &il, mode));
+    IGRAPH_CHECK(igraph_inclist_init(
+        graph, &il, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
+    ));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
     IGRAPH_VECTOR_INIT_FINALLY(&weight_temp, 0);

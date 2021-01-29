@@ -152,10 +152,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
      * For the unweighted case, the adjacency list is enough. For the
      * weighted case, we need the incidence list */
     if (weights) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &il);
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
     }
 

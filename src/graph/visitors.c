@@ -149,7 +149,11 @@ int igraph_bfs(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(
+        graph, &adjlist, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
+        IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     /* Mark the vertices that are not in the restricted set, as already
@@ -447,7 +451,11 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
     IGRAPH_CHECK(igraph_stack_init(&stack, 100));
     IGRAPH_FINALLY(igraph_stack_destroy, &stack);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(
+        graph, &adjlist, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
+        IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);

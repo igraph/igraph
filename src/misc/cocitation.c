@@ -340,7 +340,7 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit2));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit2);
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, mode, IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
 
     IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(vit), IGRAPH_VIT_SIZE(vit)));
@@ -449,7 +449,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
     }
     IGRAPH_CHECK(igraph_vector_resize(res, k / 2));
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, mode, IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
 
     if (loops) {

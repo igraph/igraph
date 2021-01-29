@@ -36,9 +36,9 @@ __BEGIN_DECLS
 
 typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
 
-typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1 } igraph_i_loops_t;
+typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_ONCE = 1, IGRAPH_LOOPS_TWICE = 2 } igraph_loops_t;
 
-typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_i_multiple_t;
+typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_multiple_t;
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 

@@ -226,17 +226,13 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes);
     IGRAPH_CHECK(igraph_stack_init(&path, 0));
     IGRAPH_FINALLY(igraph_stack_destroy, &path);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj1);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj1);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj2);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj2);
     IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);
@@ -1100,17 +1096,13 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes2);
     IGRAPH_CHECK(igraph_stack_init(&path, 0));
     IGRAPH_FINALLY(igraph_stack_destroy, &path);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj1);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj1);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj2);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj2);
     IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);

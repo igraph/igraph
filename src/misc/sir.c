@@ -145,7 +145,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
     IGRAPH_CHECK(igraph_vector_int_init(&status, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &status);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_psumtree_init(&tree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &tree);

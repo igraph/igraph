@@ -110,7 +110,7 @@ static int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
 
     graph->nbVertices = no_of_nodes;
 
-    IGRAPH_CHECK(igraph_adjlist_init(igraph, &graph->succ, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_adjlist_init(igraph, &graph->succ, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &graph->succ);
     IGRAPH_CHECK(igraph_matrix_char_init(&graph->isEdge, no_of_nodes, no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_char_destroy, &graph->isEdge);

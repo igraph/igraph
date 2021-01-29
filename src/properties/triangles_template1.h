@@ -44,7 +44,7 @@ IGRAPH_FINALLY(igraph_free, neis);
 
 IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
 
-igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_SIMPLIFY);
+IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
 IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
 for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {

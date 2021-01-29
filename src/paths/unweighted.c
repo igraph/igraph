@@ -103,7 +103,11 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
     no_of_from = IGRAPH_VIT_SIZE(fromvit);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(
+        graph, &adjlist, mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
+        IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     already_counted = igraph_Calloc(no_of_nodes, long int);
