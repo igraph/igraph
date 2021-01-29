@@ -21,6 +21,7 @@
    * The macro `IGRAPH_FATAL()` and the functions `igraph_fatal()` and `igraph_fatalf()` raise a fatal error. These are for internal use.
    * `IGRAPH_ASSERT()` is a replacement for the `assert()` macro. It is for internal use.
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
+ - The new `IGRAPH_WARNINGF`, `IGRAPH_ERRORF` and `IGRAPH_FATALF` macros provide warning/error reporting with `printf`-like syntax (PR #1627).
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
  - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
  - Harmonic centrality (PR #1583):
@@ -30,6 +31,7 @@
    * `igraph_closeness_cutoff()`.
    * `igraph_betweenness_cutoff()`.
    * `igraph_edge_betweenness_cutoff()`.
+ - `igraph_vector_is_any_nan()` checks if any elements of an `igraph_vector_t` is NaN.
 
 ### Changed
 
@@ -46,6 +48,8 @@
  - Centralities:
    * `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
    * The `nobigint` argument has been removed from `igraph_betweenness()`, `igraph_betweenness_estimate()` and `igraph_centralization_betweenness()`, as it is not longer needed. The current implementation is more accurate than the old one using big integers.
+   * `igraph_closeness()` now considers only reachable vertices during the calculation (i.e. the closeness is calculated per-component in the undirected case) (PR #1630).
+   * `igraph_closeness()` gained two additional output parameters, `reachable_count` and `all_reachable`, returning the number of reached vertices from each vertex, as well as whether all vertices were reachable. This allows for computing various generalizations of closeness for disconnected graphs (PR #1630).
  - Shortest paths (PR #1344):
    * `igraph_average_path_length()` now returns the number of disconnected vertex pairs in the new `unconn_pairs` output argument.
    * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
@@ -55,6 +59,7 @@
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
  - `igraph_to_directed()`: added RANDOM and ACYCLIC mode (PR #1511).
  - `igraph_topological_sorting()` now issues an error if the input graph is not acyclic. Previously it issued a warning.
+ - `igraph_vector_(which_)(min|max)()` now handles NaN elements.
 
 ### Deprecated
 
@@ -74,11 +79,16 @@
 ### Fixed
 
  - Betweenness calculations are no longer at risk from integer overflow.
+ - The actual cutoff distance used in closeness calculation was one smaller than the `cutoff` parameter. This is corrected (PR #1630).
  - `igraph_layout_gem()` was not interruptible; now it is.
+ - `igraph_barabasi_aging_game()` now checks its parameters more carefully.
  - `igraph_callaway_traits_game()` now checks its parameters.
- - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (#1598).
- - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - `igraph_lastcit_game()` checks its parameters more carefully, and no longer crashes with zero vertices (PR #1625).
+ - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (PR #1598).
+ - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
+ - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - Weighted betweenness, closeness and shortest path calculations now check if any weights are NaN.
  - Compatibility with the PGI compiler.
 
 ### Other
