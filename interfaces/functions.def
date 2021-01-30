@@ -490,6 +490,7 @@ igraph_shortest_paths_bellman_ford:
         DEPS: from ON graph, to ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
 
+
 igraph_shortest_paths_johnson:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, EDGEWEIGHTS weights

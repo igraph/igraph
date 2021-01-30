@@ -184,6 +184,7 @@ add_examples(
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_shortest_paths
   igraph_get_shortest_paths_dijkstra
+  igraph_get_shortest_paths_bellman_ford
   igraph_girth
   igraph_has_multiple
   igraph_is_loop
