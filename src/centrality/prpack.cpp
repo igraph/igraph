@@ -73,6 +73,11 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
             for (i = 0; i < no_of_nodes; i++) {
                 v[i] = VECTOR(*reset)[i] / reset_sum;
             }
+
+            // u is the distribution used when restarting the walk due to being stuck in a sink
+            // v is the distribution used when restarting due to damping
+            // Here we use the same distribution for both
+            u = v;
         }
 
         // Construct and run the solver
