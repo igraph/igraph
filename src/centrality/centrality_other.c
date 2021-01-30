@@ -1351,7 +1351,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
                 for (i=0; i < no_of_nodes; ++i) {
                     VECTOR(*vector)[i] = VECTOR(*reset)[i];
                 }
-                igraph_vector_scale(vector, igraph_vector_sum(vector));
+                igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
             } else {
                 igraph_vector_fill(vector, 1.0 / no_of_nodes);
             }
@@ -1389,7 +1389,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
                     for (i=0; i < no_of_nodes; ++i) {
                         VECTOR(*vector)[i] = VECTOR(*reset)[i];
                     }
-                    igraph_vector_scale(vector, igraph_vector_sum(vector));
+                    igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
                 } else {
                     igraph_vector_fill(vector, 1.0 / no_of_nodes);
                 }
