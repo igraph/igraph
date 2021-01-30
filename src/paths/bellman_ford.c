@@ -29,6 +29,11 @@
 #include "igraph_memory.h"
 #include "igraph_stack.h"
 
+#include "core/indheap.h"
+#include "core/interruption.h"
+
+#include <string.h>
+
 /**
  * \function igraph_shortest_paths_bellman_ford
  * Weighted shortest paths from some sources allowing negative weights.
