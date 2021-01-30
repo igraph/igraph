@@ -1105,7 +1105,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
- *    A commonly used value is 0.85.
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param weights Optional edge weights. May be a \c NULL pointer,
  *    meaning unweighted edges, or a vector of non-negative values
  *    of the same length as the number of edges.
@@ -1266,7 +1266,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
- *    A commonly used value is 0.85.
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset The probability distribution over the vertices used when
  *    resetting the random walk. It is either a \c NULL pointer (denoting
  *    a uniform choice that results in the original PageRank measure)
@@ -1299,6 +1299,10 @@ int igraph_personalized_pagerank(const igraph_t *graph,
                                  const igraph_vector_t *reset,
                                  const igraph_vector_t *weights,
                                  igraph_arpack_options_t *options) {
+
+    if (damping < 0.0 || damping > 1.0) {
+        IGRAPH_ERROR("The PageRank damping factor must be in the range [0,1].", IGRAPH_EINVAL);
+    }
 
     if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
         return igraph_i_personalized_pagerank_arpack(graph, vector, value, vids,
