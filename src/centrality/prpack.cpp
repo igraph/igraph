@@ -50,8 +50,7 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
     IGRAPH_HANDLE_EXCEPTIONS(
         if (reset) {
             if (igraph_vector_size(reset) != no_of_nodes) {
-                IGRAPH_ERROR("Invalid length of reset vector when calculating "
-                             "personalized PageRank scores.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
             }
 
             /* Normalize reset vector so the sum is 1 */
