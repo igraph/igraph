@@ -169,6 +169,8 @@ int main() {
             free(VECTOR(evecs)[i]);
     }
 
+    igraph_vector_ptr_destroy(&vecs);
+    igraph_vector_ptr_destroy(&evecs);
     igraph_vector_long_destroy(&pred);
     igraph_vector_long_destroy(&inbound);
 

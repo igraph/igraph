@@ -349,6 +349,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     if (parents == 0) {
         IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
     }
+    IGRAPH_FINALLY(igraph_free, parents);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     igraph_vector_fill(&dist, my_infinity);
@@ -482,12 +483,12 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         igraph_vit_destroy(&tovit);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    free(parents);
+    igraph_free(parents);
     igraph_dqueue_destroy(&Q);
     igraph_vector_destroy(&clean_vertices);
     igraph_vector_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
