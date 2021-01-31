@@ -169,6 +169,13 @@ int main() {
             free(VECTOR(evecs)[i]);
     }
 
+    igraph_vector_long_destroy(&pred);
+    igraph_vector_long_destroy(&inbound);
+
+    igraph_vs_destroy(&vs);
+    igraph_destroy(&g);
+
+
     printf("\n");
 
     /***************************************/
