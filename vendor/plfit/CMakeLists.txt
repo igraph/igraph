@@ -27,11 +27,9 @@ if (BUILD_SHARED_LIBS)
   set_property(TARGET plfit PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if (WIN32)
-  # Since these are included as object files, they should call the
-  # function as is (without declspec)
-  target_compile_definitions(plfit PRIVATE IGRAPH_STATIC)
-endif()
+# Since these are included as object files, they should call the
+# function as is (without declspec)
+target_compile_definitions(plfit PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(plfit)
 

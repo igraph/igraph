@@ -20,11 +20,9 @@ if (BUILD_SHARED_LIBS)
   set_property(TARGET cliquer PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if (WIN32)
-  # Since these are included as object files, they should call the
-  # function as is (without declspec)
-  target_compile_definitions(cliquer PRIVATE IGRAPH_STATIC)
-endif()
+# Since these are included as object files, they should call the
+# function as is (without declspec)
+target_compile_definitions(cliquer PRIVATE IGRAPH_STATIC)
 
 # TODO(ntamas): make sure that this works for Cliquer
 # use_all_warnings(cliquer)
