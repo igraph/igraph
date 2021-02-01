@@ -97,7 +97,7 @@ DECLDIR int igraph_personalized_pagerank(const igraph_t *graph,
         igraph_pagerank_algo_t algo, igraph_vector_t *vector,
         igraph_real_t *value, const igraph_vs_t vids,
         igraph_bool_t directed, igraph_real_t damping,
-        igraph_vector_t *reset,
+        const igraph_vector_t *reset,
         const igraph_vector_t *weights, igraph_arpack_options_t *options);
 DECLDIR int igraph_personalized_pagerank_vs(const igraph_t *graph,
         igraph_pagerank_algo_t algo,
