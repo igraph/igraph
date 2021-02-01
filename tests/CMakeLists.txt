@@ -582,7 +582,7 @@ if(CMAKE_USE_PTHREADS_INIT)
 
   # tls2 should be added only if we use vendored ARPACK because a non-vendored
   # ARPACK is not guaranteed to be thread-safe
-  if(ARPACK_IS_VENDORED)
+  if(ARPACK_IS_VENDORED AND BUILD_INTERNAL_TESTS)
     add_legacy_tests(
       FOLDER tests/unit NAMES tls2
       LIBRARIES Threads::Threads
