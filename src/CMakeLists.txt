@@ -372,12 +372,12 @@ target_link_libraries(
 if (WIN32)
   # Define symbols to enable compilation of CSXSparse on Windows
   target_compile_definitions(igraph PRIVATE NCOMPLEX)
-  if (NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode on Windows
-    target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
-  else()
-    target_compile_definitions(igraph PRIVATE IGRAPH_EXPORTS)
-  endif()
+endif()
+
+if (NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
+else()
+  target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()
 
 if(MSVC)
@@ -429,6 +429,13 @@ if(NOT IGRAPH_USE_INTERNAL_ARPACK)
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
 endif()
 configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
+
+include(GenerateExportHeader)
+generate_export_header(igraph
+  EXPORT_MACRO_NAME DECLDIR
+  STATIC_DEFINE IGRAPH_STATIC
+  EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/igraph_export.h
+)
 
 # Define how to install the library
 include(GNUInstallDirs)

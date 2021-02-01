@@ -12,6 +12,7 @@ target_include_directories(
   cliquer
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_BINARY_DIR}/include
   ${CMAKE_BINARY_DIR}/src
 )
 
