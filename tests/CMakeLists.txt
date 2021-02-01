@@ -5,7 +5,7 @@ include(test_helpers)
 add_custom_target(build_tests)
 add_custom_target(
   check
-  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C ${CMAKE_BUILD_TYPE}
+  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C $<CONFIG>
   COMMENT "Executing unit tests..."
 )
 add_dependencies(check build_tests)
