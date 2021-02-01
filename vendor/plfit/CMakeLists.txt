@@ -20,6 +20,7 @@ target_include_directories(
   plfit
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_BINARY_DIR}/include
 )
 
 if (BUILD_SHARED_LIBS)

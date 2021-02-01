@@ -33,6 +33,10 @@ project(
 # Set a default build type if none was specified
 include(BuildType)
 
+# Set default symbol visibility to hidden
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
