@@ -774,7 +774,7 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                         p++;
                     }
                     /* skip over all the items corresponding to the loop edges */
-                    while (VECTOR(*v)[i] == index && i < n) {
+                    while (i < n && VECTOR(*v)[i] == index) {
                         i++;
                     }
                     i--; /* because the for loop also increases i by 1 */

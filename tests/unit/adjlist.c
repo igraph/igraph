@@ -30,9 +30,7 @@ int test_simple_trees() {
     igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_OUT, /*duplicate=*/ 0);
     igraph_isomorphic(&g, &g2, &iso);
-    if (!iso) {
-        return 1;
-    }
+    IGRAPH_ASSERT(iso);
     igraph_adjlist_destroy(&adjlist);
     igraph_destroy(&g2);
     igraph_destroy(&g);
@@ -42,9 +40,7 @@ int test_simple_trees() {
     igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_IN, /*duplicate=*/ 0);
     igraph_isomorphic(&g, &g2, &iso);
-    if (!iso) {
-        return 1;
-    }
+    IGRAPH_ASSERT(iso);
     igraph_adjlist_destroy(&adjlist);
     igraph_destroy(&g2);
     igraph_destroy(&g);
@@ -54,9 +50,7 @@ int test_simple_trees() {
     igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_ALL, /*duplicate=*/ 1);
     igraph_isomorphic(&g, &g2, &iso);
-    if (!iso) {
-        return 1;
-    }
+    IGRAPH_ASSERT(iso);
     igraph_adjlist_destroy(&adjlist);
     igraph_destroy(&g2);
     igraph_destroy(&g);
