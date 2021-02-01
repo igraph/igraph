@@ -40,10 +40,11 @@ endif()
 # Define symbols to enable compilation of CSXSparse on Windows using MSVC
 if (WIN32)
   target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
-  # Since these are included as object files, they should call the
-  # function as is (without declspec)
-  target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 endif()
+
+# Since these are included as object files, they should call the
+# function as is (without declspec)
+target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(cxsparse_vendored)
 
