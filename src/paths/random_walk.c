@@ -93,10 +93,10 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
 
     VECTOR(*walk)[0] = start;
     for (i = 1; i < steps; i++) {
-        igraph_vector_t *neis;
+        igraph_vector_int_t *neis;
         igraph_integer_t nn;
         neis = igraph_lazy_adjlist_get(&adj, start);
-        nn = igraph_vector_size(neis);
+        nn = igraph_vector_int_size(neis);
 
         if (IGRAPH_UNLIKELY(nn == 0)) {
             igraph_vector_resize(walk, i);

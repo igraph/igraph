@@ -108,10 +108,11 @@ DECLDIR int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 typedef struct igraph_lazy_adjlist_t {
     const igraph_t *graph;
     igraph_integer_t length;
-    igraph_vector_t **adjs;
+    igraph_vector_int_t **adjs;
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_multiple_t multiple;
+    igraph_vector_t dummy;
 } igraph_lazy_adjlist_t;
 
 DECLDIR int igraph_lazy_adjlist_init(const igraph_t *graph,
@@ -141,14 +142,15 @@ DECLDIR void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 #define igraph_lazy_adjlist_get(al,no) \
     ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
      (igraph_i_lazy_adjlist_get_real(al, no)))
-DECLDIR igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
+DECLDIR igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
         igraph_integer_t no);
 
 typedef struct igraph_lazy_inclist_t {
     const igraph_t *graph;
     igraph_integer_t length;
-    igraph_vector_t **incs;
+    igraph_vector_int_t **incs;
     igraph_neimode_t mode;
+    igraph_vector_t dummy;
 } igraph_lazy_inclist_t;
 
 DECLDIR int igraph_lazy_inclist_init(const igraph_t *graph,
@@ -177,7 +179,7 @@ DECLDIR void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 #define igraph_lazy_inclist_get(al,no) \
     ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
      (igraph_i_lazy_inclist_get_real(al, no)))
-DECLDIR igraph_vector_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
+DECLDIR igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
         igraph_integer_t no);
 
 __END_DECLS

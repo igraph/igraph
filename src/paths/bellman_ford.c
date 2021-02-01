@@ -144,7 +144,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
         }
 
         while (!igraph_dqueue_empty(&Q)) {
-            igraph_vector_t *neis;
+            igraph_vector_int_t *neis;
             long int nlen;
 
             j = (long int) igraph_dqueue_pop(&Q);
@@ -161,7 +161,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
             }
 
             neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) j);
-            nlen = igraph_vector_size(neis);
+            nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
                 long int nei = (long int) VECTOR(*neis)[k];

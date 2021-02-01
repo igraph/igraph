@@ -223,9 +223,9 @@ int igraph_bfs(const igraph_t *graph,
             long int actvect = (long int) igraph_dqueue_pop(&Q);
             long int actdist = (long int) igraph_dqueue_pop(&Q);
             long int succ_vec;
-            igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                     (igraph_integer_t) actvect);
-            long int i, n = igraph_vector_size(neis);
+            long int i, n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -535,9 +535,9 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
         while (!igraph_stack_empty(&stack)) {
             long int actvect = (long int) igraph_stack_top(&stack);
-            igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                    (igraph_integer_t) actvect);
-            long int n = igraph_vector_size(neis);
+            igraph_vector_int_t *neis =
+                igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actvect);
+            long int n = igraph_vector_int_size(neis);
             long int *ptr = igraph_vector_long_e_ptr(&nptr, actvect);
 
             /* Search for a neighbor that was not yet visited */

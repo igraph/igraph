@@ -212,7 +212,7 @@ static int igraph_i_average_path_length_dijkstra(
         while (!igraph_2wheap_empty(&Q)) {
             long int minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
-            igraph_vector_t *neis;
+            igraph_vector_int_t *neis;
             long int nlen;
 
             if (minnei != source) {
@@ -226,7 +226,7 @@ static int igraph_i_average_path_length_dijkstra(
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
-            nlen = igraph_vector_size(neis);
+            nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
@@ -581,7 +581,7 @@ static int igraph_i_local_efficiency_dijkstra(
         while (!igraph_2wheap_empty(Q)) {
             long int minnei = igraph_2wheap_max_index(Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(Q);
-            igraph_vector_t *neis;
+            igraph_vector_int_t *neis;
             long int nlen;
 
             if (minnei != source && VECTOR(*nei_mask)[minnei]) {
@@ -595,7 +595,7 @@ static int igraph_i_local_efficiency_dijkstra(
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
-            nlen = igraph_vector_size(neis);
+            nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_real_t altdist, curdist;
                 igraph_bool_t active, has;

@@ -116,8 +116,8 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     while (!igraph_vector_int_empty(&stack)) {
         int act = igraph_vector_int_tail(&stack);
         int curdist = igraph_vector_int_tail(&dist);
-        igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        int n = igraph_vector_size(neis);
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
+        int n = igraph_vector_int_size(neis);
         int *ptr = igraph_vector_int_e_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;

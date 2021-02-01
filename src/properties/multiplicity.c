@@ -183,9 +183,9 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
         long int e = IGRAPH_EIT_GET(eit);
         long int from = IGRAPH_FROM(graph, e);
         long int to = IGRAPH_TO(graph, e);
-        igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist,
-                                (igraph_integer_t) from);
-        long int j, n = igraph_vector_size(neis);
+        igraph_vector_int_t *neis =
+            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+        long int j, n = igraph_vector_int_size(neis);
         VECTOR(*res)[i] = 0;
         for (j = 0; j < n; j++) {
             long int e2 = (long int) VECTOR(*neis)[j];
@@ -244,9 +244,9 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
         long int e = IGRAPH_EIT_GET(eit);
         long int from = IGRAPH_FROM(graph, e);
         long int to = IGRAPH_TO(graph, e);
-        igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist,
-                                (igraph_integer_t) from);
-        long int j, n = igraph_vector_size(neis);
+        igraph_vector_int_t *neis =
+            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+        long int j, n = igraph_vector_int_size(neis);
         VECTOR(*res)[i] = 0;
         for (j = 0; j < n; j++) {
             long int e2 = (long int) VECTOR(*neis)[j];
@@ -326,12 +326,12 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
         /* Check whether there is a to->from edge, search for from in the
            out-list of to. We don't search an empty vector, because
            vector_binsearch seems to have a bug with this. */
-        igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                 (igraph_integer_t) to);
-        if (igraph_vector_empty(neis)) {
+        if (igraph_vector_int_empty(neis)) {
             VECTOR(*res)[i] = 0;
         } else {
-            VECTOR(*res)[i] = igraph_vector_binsearch2(neis, from);
+            VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
         }
     }
 

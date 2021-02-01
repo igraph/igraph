@@ -206,8 +206,8 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t minnei = (igraph_integer_t) igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
-            igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            long int nlen = igraph_vector_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
+            long int nlen = igraph_vector_int_size(neis);
 
             mindist = -igraph_2wheap_delete_max(&Q);
 
@@ -701,8 +701,8 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t minnei = (igraph_integer_t) igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
-            igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            long int nlen = igraph_vector_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
+            long int nlen = igraph_vector_int_size(neis);
 
             mindist = -igraph_2wheap_delete_max(&Q);
 

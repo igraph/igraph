@@ -25,7 +25,7 @@
 long int no_of_nodes = igraph_vcount(graph);
 igraph_vit_t vit;
 long int nodes_to_calc;
-igraph_vector_t *neis1, *neis2;
+igraph_vector_int_t *neis1, *neis2;
 igraph_real_t triangles;
 long int i, j, k;
 long int neilen1, neilen2;
@@ -53,7 +53,7 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     IGRAPH_ALLOW_INTERRUPTION();
 
     neis1 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);
-    neilen1 = igraph_vector_size(neis1);
+    neilen1 = igraph_vector_int_size(neis1);
     for (j = 0; j < neilen1; j++) {
         neis[ (long int)VECTOR(*neis1)[j] ] = i + 1;
     }
@@ -62,7 +62,7 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     for (j = 0; j < neilen1; j++) {
         long int v = (long int) VECTOR(*neis1)[j];
         neis2 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
-        neilen2 = igraph_vector_size(neis2);
+        neilen2 = igraph_vector_int_size(neis2);
         for (k = 0; k < neilen2; k++) {
             long int v2 = (long int) VECTOR(*neis2)[k];
             if (neis[v2] == i + 1) {
