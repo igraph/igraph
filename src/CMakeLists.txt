@@ -295,7 +295,6 @@ set_target_properties(igraph PROPERTIES SOVERSION 0)
 target_compile_definitions(
   igraph
   PRIVATE
-  $<TARGET_PROPERTY:prpack,INTERFACE_COMPILE_DEFINITIONS>
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
 
