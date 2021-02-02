@@ -433,7 +433,6 @@ configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @O
 
 include(GenerateExportHeader)
 generate_export_header(igraph
-  EXPORT_MACRO_NAME DECLDIR
   STATIC_DEFINE IGRAPH_STATIC
   EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/igraph_export.h
 )

@@ -34,19 +34,19 @@
 
 __BEGIN_DECLS
 
-DECLDIR int igraph_is_separator(const igraph_t *graph,
-                                const igraph_vs_t candidate,
-                                igraph_bool_t *res);
+IGRAPH_EXPORT int igraph_is_separator(const igraph_t *graph,
+                                      const igraph_vs_t candidate,
+                                      igraph_bool_t *res);
 
-DECLDIR int igraph_all_minimal_st_separators(const igraph_t *graph,
-        igraph_vector_ptr_t *separators);
+IGRAPH_EXPORT int igraph_all_minimal_st_separators(const igraph_t *graph,
+                                                   igraph_vector_ptr_t *separators);
 
-DECLDIR int igraph_is_minimal_separator(const igraph_t *graph,
-                                        const igraph_vs_t candidate,
-                                        igraph_bool_t *res);
+IGRAPH_EXPORT int igraph_is_minimal_separator(const igraph_t *graph,
+                                              const igraph_vs_t candidate,
+                                              igraph_bool_t *res);
 
-DECLDIR int igraph_minimum_size_separators(const igraph_t *graph,
-        igraph_vector_ptr_t *separators);
+IGRAPH_EXPORT int igraph_minimum_size_separators(const igraph_t *graph,
+                                                 igraph_vector_ptr_t *separators);
 
 __END_DECLS
 

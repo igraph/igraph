@@ -38,7 +38,7 @@ typedef enum {
     IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS = 0
 } igraph_coloring_greedy_t;
 
-DECLDIR int igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic);
+IGRAPH_EXPORT int igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic);
 
 __END_DECLS
 

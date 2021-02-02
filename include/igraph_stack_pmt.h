@@ -34,14 +34,14 @@ typedef struct TYPE(igraph_stack) {
     BASE* end;
 } TYPE(igraph_stack);
 
-DECLDIR int FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, long int size);
-DECLDIR void FUNCTION(igraph_stack, destroy)(TYPE(igraph_stack)* s);
-DECLDIR int FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, long int size);
-DECLDIR igraph_bool_t FUNCTION(igraph_stack, empty)(TYPE(igraph_stack)* s);
-DECLDIR long int FUNCTION(igraph_stack, size)(const TYPE(igraph_stack)* s);
-DECLDIR void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s);
-DECLDIR int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem);
-DECLDIR BASE FUNCTION(igraph_stack, pop)(TYPE(igraph_stack)* s);
-DECLDIR BASE FUNCTION(igraph_stack, top)(const TYPE(igraph_stack)* s);
-DECLDIR int FUNCTION(igraph_stack, print)(const TYPE(igraph_stack)* s);
-DECLDIR int FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack)* s, FILE *file);
+IGRAPH_EXPORT int FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, long int size);
+IGRAPH_EXPORT void FUNCTION(igraph_stack, destroy)(TYPE(igraph_stack)* s);
+IGRAPH_EXPORT int FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, long int size);
+IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_stack, empty)(TYPE(igraph_stack)* s);
+IGRAPH_EXPORT long int FUNCTION(igraph_stack, size)(const TYPE(igraph_stack)* s);
+IGRAPH_EXPORT void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s);
+IGRAPH_EXPORT int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem);
+IGRAPH_EXPORT BASE FUNCTION(igraph_stack, pop)(TYPE(igraph_stack)* s);
+IGRAPH_EXPORT BASE FUNCTION(igraph_stack, top)(const TYPE(igraph_stack)* s);
+IGRAPH_EXPORT int FUNCTION(igraph_stack, print)(const TYPE(igraph_stack)* s);
+IGRAPH_EXPORT int FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack)* s, FILE *file);

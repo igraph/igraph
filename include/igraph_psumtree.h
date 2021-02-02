@@ -35,16 +35,16 @@ typedef struct {
     long int offset;
 } igraph_psumtree_t;
 
-DECLDIR int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
-DECLDIR void igraph_psumtree_reset(igraph_psumtree_t *t);
-DECLDIR void igraph_psumtree_destroy(igraph_psumtree_t *t);
-DECLDIR igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
-DECLDIR long int igraph_psumtree_size(const igraph_psumtree_t *t);
-DECLDIR int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
-                                   igraph_real_t elem);
-DECLDIR int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
-                                   igraph_real_t new_value);
-DECLDIR igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
+IGRAPH_EXPORT int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
+IGRAPH_EXPORT void igraph_psumtree_reset(igraph_psumtree_t *t);
+IGRAPH_EXPORT void igraph_psumtree_destroy(igraph_psumtree_t *t);
+IGRAPH_EXPORT igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
+IGRAPH_EXPORT long int igraph_psumtree_size(const igraph_psumtree_t *t);
+IGRAPH_EXPORT int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+                                         igraph_real_t elem);
+IGRAPH_EXPORT int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
+                                         igraph_real_t new_value);
+IGRAPH_EXPORT igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
 
 __END_DECLS
 
