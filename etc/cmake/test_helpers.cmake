@@ -13,8 +13,8 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
-  if (WIN32 AND NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode on Windows
+  if (NOT BUILD_SHARED_LIBS)
+    # Add a compiler definition required to compile igraph in static mode
     target_compile_definitions(${TARGET_NAME} PRIVATE IGRAPH_STATIC)
   endif()
 

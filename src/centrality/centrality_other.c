@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -1057,34 +1057,42 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
  *
+ * The PageRank centrality of a vertex is the fraction of time a
+ * random walker traversing the graph would spend on that vertex.
+ * The walker follows the out-edges with probabilities proportional
+ * to their weights. Additionally, in each step, it restarts the walk
+ * from a random vertex with probability <code>1 - damping</code>.
+ * If the random walker gets stuck in a sink vertex, it will also restart
+ * from a random vertex.
+ *
+ * </para><para>
+ * The PageRank centrality is mainly useful for directed graphs. In undirected
+ * graphs it converges to trivial values proportional to degrees as the damping
+ * factor approaches 1.
+ *
+ * </para><para>
  * Starting from version 0.9, igraph has two PageRank implementations,
  * and the user can choose between them. The first implementation is
- * \c IGRAPH_PAGERANK_ALGO_ARPACKK, based on the ARPACK library. This
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK, based on the ARPACK library. This
  * was the default before igraph version 0.7. The second and recommended
  * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
  * PRPACK package, see https://github.com/dgleich/prpack .
  *
  * </para><para>
- * Please note that the PageRank of a given vertex depends on the PageRank
+ * Note that the PageRank of a given vertex depends on the PageRank
  * of all other vertices, so even if you want to calculate the PageRank for
  * only some of the vertices, all of them must be calculated. Requesting
  * the PageRank for only some of the vertices does not result in any
  * performance increase at all.
- * </para>
  *
- * <para>
- * For the explanation of the PageRank algorithm, see the following
- * webpage:
- * http://infolab.stanford.edu/~backrub/google.html , or the
- * following reference:
- * </para>
+ * </para><para>
+ * References:
  *
- * <para>
+ * </para><para>
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
  * Brisbane, Australia, April 1998.
- * </para>
- * <para>
+ *
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
@@ -1096,27 +1104,27 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \param vids The vertex ids for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper)
- * \param weights Optional edge weights, it is either a null pointer,
- *    then the edges are not weighted, or a vector of the same length
- *    as the number of edges.
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
+ * \param weights Optional edge weights. May be a \c NULL pointer,
+ *    meaning unweighted edges, or a vector of non-negative values
+ *    of the same length as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
  *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
  *    (LM) parameters and it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in
- *         \p vids.
+ *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
+ *         \c IGRAPH_EINVVID, invalid vertex id in \p vids.
  *
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
  * \sa \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
- * for the personalized PageRank measure, \ref igraph_arpack_rssolve() and
- * \ref igraph_arpack_rnsolve() for the underlying machinery.
+ * for the personalized PageRank measure. See \ref igraph_arpack_rssolve() and
+ * \ref igraph_arpack_rnsolve() for the underlying machinery used by
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK.
  *
  * \example examples/simple/igraph_pagerank.c
  */
@@ -1135,9 +1143,12 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * \function igraph_personalized_pagerank_vs
  * \brief Calculates the personalized Google PageRank for the specified vertices.
  *
- * The personalized PageRank is similar to the original PageRank measure, but the
- * random walk is reset in every step with probability 1-damping to a non-uniform
- * distribution (instead of the uniform distribution in the original PageRank measure.
+ * The personalized PageRank is similar to the original PageRank measure, but
+ * when the random walk is restarted, a new starting vertex is chosen according to
+ * a specified distribution.
+ * This distribution is used both when restarting randomly with probability
+ * <code>1 - damping</code>, and when the walker is forced to restart due to being
+ * stuck in a sink vertex (a vertex with no outgoing edges).
  *
  * </para><para>
  * This simplified interface takes a vertex sequence and resets the random walk to
@@ -1147,7 +1158,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * generates a vertex sequence containing only a single vertex.
  *
  * </para><para>
- * Please note that the personalized PageRank of a given vertex depends on the
+ * Note that the personalized PageRank of a given vertex depends on the
  * personalized PageRank of all other vertices, so even if you want to calculate
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
@@ -1166,7 +1177,8 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * \param vids The vertex ids for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper)
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset_vids IDs of the vertices used when resetting the random walk.
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
@@ -1186,9 +1198,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
- * \sa \ref igraph_pagerank() for the non-personalized implementation,
- * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
- * the underlying machinery.
+ * \sa \ref igraph_pagerank() for the non-personalized implementation.
  */
 
 int igraph_personalized_pagerank_vs(const igraph_t *graph,
@@ -1227,12 +1237,16 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \function igraph_personalized_pagerank
  * \brief Calculates the personalized Google PageRank for the specified vertices.
  *
- * The personalized PageRank is similar to the original PageRank measure, but the
- * random walk is reset in every step with probability 1-damping to a non-uniform
- * distribution (instead of the uniform distribution in the original PageRank measure.
+ * The personalized PageRank is similar to the original PageRank measure, but
+ * when the random walk is restarted, a new starting vertex is chosen non-uniformly,
+ * according to the distribution specified in \p reset
+ * (instead of the uniform distribution in the original PageRank measure).
+ * The \p reset distribution is used both when restarting randomly with probability
+ * <code>1 - damping</code>, and when the walker is forced to restart due to being
+ * stuck in a sink vertex (a vertex with no outgoing edges).
  *
  * </para><para>
- * Please note that the personalized PageRank of a given vertex depends on the
+ * Note that the personalized PageRank of a given vertex depends on the
  * personalized PageRank of all other vertices, so even if you want to calculate
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
@@ -1251,14 +1265,15 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \param vids The vertex ids for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper)
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset The probability distribution over the vertices used when
- *    resetting the random walk. It is either a null pointer (denoting
+ *    resetting the random walk. It is either a \c NULL pointer (denoting
  *    a uniform choice that results in the original PageRank measure)
  *    or a vector of the same length as the number of vertices.
- * \param weights Optional edge weights, it is either a null pointer,
- *    then the edges are not weighted, or a vector of the same length
- *    as the number of edges.
+ * \param weights Optional edge weights. May be a \c NULL pointer,
+ *    meaning unweighted edges, or a vector of non-negative values
+ *    of the same length as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
  *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
@@ -1274,8 +1289,8 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * the number of edges.
  *
  * \sa \ref igraph_pagerank() for the non-personalized implementation,
- * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
- * the underlying machinery.
+ * \ref igraph_personalized_pagerank_vs() for a personalized implementation
+ * with resetting to specific vertices.
  */
 int igraph_personalized_pagerank(const igraph_t *graph,
                                  igraph_pagerank_algo_t algo, igraph_vector_t *vector,
@@ -1284,6 +1299,10 @@ int igraph_personalized_pagerank(const igraph_t *graph,
                                  const igraph_vector_t *reset,
                                  const igraph_vector_t *weights,
                                  igraph_arpack_options_t *options) {
+
+    if (damping < 0.0 || damping > 1.0) {
+        IGRAPH_ERROR("The PageRank damping factor must be in the range [0,1].", IGRAPH_EINVAL);
+    }
 
     if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
         return igraph_i_personalized_pagerank_arpack(graph, vector, value, vids,
@@ -1336,7 +1355,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
                 for (i=0; i < no_of_nodes; ++i) {
                     VECTOR(*vector)[i] = VECTOR(*reset)[i];
                 }
-                igraph_vector_scale(vector, igraph_vector_sum(vector));
+                igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
             } else {
                 igraph_vector_fill(vector, 1.0 / no_of_nodes);
             }
@@ -1374,7 +1393,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
                     for (i=0; i < no_of_nodes; ++i) {
                         VECTOR(*vector)[i] = VECTOR(*reset)[i];
                     }
-                    igraph_vector_scale(vector, igraph_vector_sum(vector));
+                    igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
                 } else {
                     igraph_vector_fill(vector, 1.0 / no_of_nodes);
                 }

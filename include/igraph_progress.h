@@ -147,12 +147,12 @@ typedef int igraph_progress_handler_t(const char *message, igraph_real_t percent
 
 extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
-DECLDIR igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
+IGRAPH_EXPORT igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
-DECLDIR int igraph_progress(const char *message, igraph_real_t percent, void *data);
+IGRAPH_EXPORT int igraph_progress(const char *message, igraph_real_t percent, void *data);
 
-DECLDIR int igraph_progressf(const char *message, igraph_real_t percent, void *data,
-                             ...);
+IGRAPH_EXPORT int igraph_progressf(const char *message, igraph_real_t percent, void *data,
+                                   ...);
 
 /**
  * \define IGRAPH_PROGRESS

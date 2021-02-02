@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_error.h"
@@ -50,8 +46,7 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
     IGRAPH_HANDLE_EXCEPTIONS(
         if (reset) {
             if (igraph_vector_size(reset) != no_of_nodes) {
-                IGRAPH_ERROR("Invalid length of reset vector when calculating "
-                             "personalized PageRank scores.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
             }
 
             /* Normalize reset vector so the sum is 1 */
@@ -73,6 +68,11 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
             for (i = 0; i < no_of_nodes; i++) {
                 v[i] = VECTOR(*reset)[i] / reset_sum;
             }
+
+            // u is the distribution used when restarting the walk due to being stuck in a sink
+            // v is the distribution used when restarting due to damping
+            // Here we use the same distribution for both
+            u = v;
         }
 
         // Construct and run the solver
