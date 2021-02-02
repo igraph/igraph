@@ -37,10 +37,10 @@ if (BUILD_SHARED_LIBS)
   set_property(TARGET cxsparse_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# Define symbols to enable compilation of CSXSparse on Windows using MSVC
-if (WIN32)
-  target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
-endif()
+# Disable complex number support for CXSparse because:
+#   - It is necessary to compile with MSVC
+#   - igraph does not need complex number support from CXSparse on any platform
+target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
 
 # Since these are included as object files, they should call the
 # function as is (without declspec)
