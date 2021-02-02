@@ -434,7 +434,8 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
     igraph_vector_t c1, c2;
 
     if (igraph_vector_size(comm1) != igraph_vector_size(comm2)) {
-        IGRAPH_ERROR("community membership vectors have different lengths", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Community membership vectors have different lengths: %ld and %ld.",
+                      IGRAPH_EINVAL, igraph_vector_size(comm1), igraph_vector_size(comm2));
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
