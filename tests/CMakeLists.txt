@@ -181,7 +181,6 @@ add_examples(
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_shortest_paths
   igraph_get_shortest_paths_dijkstra
-  igraph_get_shortest_paths_bellman_ford
   igraph_girth
   igraph_has_multiple
   igraph_is_loop
@@ -216,6 +215,7 @@ add_legacy_tests(
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_is_tree
+  igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
   igraph_transitive_closure_dag
   harmonic_centrality

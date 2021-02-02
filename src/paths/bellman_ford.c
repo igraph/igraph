@@ -289,7 +289,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
  * edge weights.
  *
- * \example examples/simple/igraph_get_shortest_paths_bellman_ford.c
+ * \test tests/unit/igraph_get_shortest_paths_bellman_ford.c
  */
 
 int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
