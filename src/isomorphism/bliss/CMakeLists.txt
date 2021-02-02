@@ -18,6 +18,7 @@ target_include_directories(
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/vendor
+  ${CMAKE_BINARY_DIR}/include
   ${CMAKE_BINARY_DIR}/src
   $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
 )
@@ -35,11 +36,9 @@ if(NOT GMP_IS_VENDORED)
   )
 endif()
 
-if (WIN32)
-  # Since these are included as object files, they should call the
-  # function as is (without declspec)
-  target_compile_definitions(bliss PRIVATE IGRAPH_STATIC)
-endif()
+# Since these are included as object files, they should call the
+# function as is (without visibility specification)
+target_compile_definitions(bliss PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(bliss)
 

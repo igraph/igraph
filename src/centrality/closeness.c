@@ -822,7 +822,7 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
  *
  * </para><para>
  * M. Marchiori and V. Latora, Harmony in the small-world, Physica A 285, pp. 539-546 (2000).
- * https://doi.org/10.1016/S0378-4371(00)00311-3
+ * https://doi.org/10.1016/S0378-4371%2800%2900311-3
  *
  * </para><para>
  * Y. Rochat, Closeness Centrality Extended to Unconnected Graphs: the Harmonic Centrality Index, ASNA 2009.

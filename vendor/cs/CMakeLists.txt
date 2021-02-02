@@ -28,6 +28,7 @@ target_include_directories(
   cxsparse_vendored
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_BINARY_DIR}/include
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -36,13 +37,14 @@ if (BUILD_SHARED_LIBS)
   set_property(TARGET cxsparse_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# Define symbols to enable compilation of CSXSparse on Windows using MSVC
-if (WIN32)
-  target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
-  # Since these are included as object files, they should call the
-  # function as is (without declspec)
-  target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
-endif()
+# Disable complex number support for CXSparse because:
+#   - It is necessary to compile with MSVC
+#   - igraph does not need complex number support from CXSparse on any platform
+target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
+
+# Since these are included as object files, they should call the
+# function as is (without a visibility specification)
+target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(cxsparse_vendored)
 
