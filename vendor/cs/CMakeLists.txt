@@ -43,7 +43,7 @@ endif()
 target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
 
 # Since these are included as object files, they should call the
-# function as is (without declspec)
+# function as is (without a visibility specification)
 target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(cxsparse_vendored)

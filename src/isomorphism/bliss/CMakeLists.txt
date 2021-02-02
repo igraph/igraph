@@ -37,7 +37,7 @@ if(NOT GMP_IS_VENDORED)
 endif()
 
 # Since these are included as object files, they should call the
-# function as is (without declspec)
+# function as is (without visibility specification)
 target_compile_definitions(bliss PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(bliss)
