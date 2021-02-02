@@ -439,6 +439,7 @@ add_legacy_tests(
   community_label_propagation
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_compare_communities
   igraph_modularity
   levc-stress
   spinglass
