@@ -94,7 +94,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
 }
 
 
-static void bliss_free_graph(AbstractGraph *g) {
+void bliss_free_graph(AbstractGraph *g) {
     delete g;
 }
 
