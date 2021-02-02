@@ -28,7 +28,7 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 # Since these are included as object files, they should call the
-# function as is (without declspec)
+# function as is (without visibility specification)
 target_compile_definitions(plfit PRIVATE IGRAPH_STATIC)
 
 use_all_warnings(plfit)
