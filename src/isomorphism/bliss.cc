@@ -90,6 +90,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
     for (unsigned int i = 0; i < nof_edges; i++) {
         g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
     }
+
     return g;
 }
 
@@ -109,7 +110,7 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
         case IGRAPH_BLISS_FM:   gsh = Digraph::shs_fm;  break;
         case IGRAPH_BLISS_FLM:  gsh = Digraph::shs_flm; break;
         case IGRAPH_BLISS_FSM:  gsh = Digraph::shs_fsm; break;
-        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        default: IGRAPH_ERROR("Invalid splitting heuristic.", IGRAPH_EINVAL);
         }
         static_cast<Digraph *>(g)->set_splitting_heuristic(gsh);
     } else {
@@ -121,7 +122,7 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
         case IGRAPH_BLISS_FM:   gsh = Graph::shs_fm;  break;
         case IGRAPH_BLISS_FLM:  gsh = Graph::shs_flm; break;
         case IGRAPH_BLISS_FSM:  gsh = Graph::shs_fsm; break;
-        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        default: IGRAPH_ERROR("Invalid splitting heuristic.", IGRAPH_EINVAL);
         }
         static_cast<Graph *>(g)->set_splitting_heuristic(gsh);
     }
@@ -135,7 +136,7 @@ inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors)
     }
     const int n = g->get_nof_vertices();
     if (n != igraph_vector_int_size(colors)) {
-        IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex color vector length.", IGRAPH_EINVAL);
     }
     for (int i = 0; i < n; ++i) {
         g->change_color(i, VECTOR(*colors)[i]);
@@ -313,6 +314,7 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
     );
+
     return IGRAPH_SUCCESS;
 }
 
@@ -371,7 +373,7 @@ int igraph_automorphism_group(
 
 /*
    IGraph library.
-   Copyright (C) 2006-2020 The igraph development team
+   Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -384,10 +386,7 @@ int igraph_automorphism_group(
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 /**
@@ -457,11 +456,11 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
     directed = igraph_is_directed(graph1);
     if (igraph_is_directed(graph2) != directed) {
-        IGRAPH_ERROR("Cannot compare directed and undirected graphs",
+        IGRAPH_ERROR("Cannot compare directed and undirected graphs.",
                      IGRAPH_EINVAL);
     }
     if ((colors1 == NULL || colors2 == NULL) && colors1 != colors2) {
-        IGRAPH_WARNING("Only one of the graphs is vertex colored, colors will be ignored");
+        IGRAPH_WARNING("Only one of the graphs is vertex colored, colors will be ignored.");
         colors1 = NULL; colors2 = NULL;
     }
 
