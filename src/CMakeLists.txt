@@ -295,7 +295,6 @@ set_target_properties(igraph PROPERTIES SOVERSION 0)
 target_compile_definitions(
   igraph
   PRIVATE
-  $<TARGET_PROPERTY:prpack,COMPILE_DEFINITIONS>
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
 
@@ -369,15 +368,17 @@ target_link_libraries(
   bliss cliquer plfit prpack
 )
 
-if (WIN32)
-  # Define symbols to enable compilation of CSXSparse on Windows
-  target_compile_definitions(igraph PRIVATE NCOMPLEX)
-  if (NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode on Windows
-    target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
-  else()
-    target_compile_definitions(igraph PRIVATE IGRAPH_EXPORTS)
-  endif()
+# Disable complex number support for CXSparse because:
+#   - It is necessary to compile with MSVC
+#   - igraph does not need complex number support from CXSparse on any platform
+# This is needed here (in addition to the cxsparse_vendored target) because
+# igraph may be compiled with an external CXSparse.
+target_compile_definitions(igraph PRIVATE NCOMPLEX)
+
+if (NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
+else()
+  target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()
 
 if(MSVC)
@@ -429,6 +430,12 @@ if(NOT IGRAPH_USE_INTERNAL_ARPACK)
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
 endif()
 configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
+
+include(GenerateExportHeader)
+generate_export_header(igraph
+  STATIC_DEFINE IGRAPH_STATIC
+  EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/igraph_export.h
+)
 
 # Define how to install the library
 include(GNUInstallDirs)

@@ -39,8 +39,8 @@ __BEGIN_DECLS
 /* #  define Free igraph_Free */
 /* #endif */
 
-DECLDIR void igraph_free(void *p);
-DECLDIR void *igraph_malloc(size_t n);
+IGRAPH_EXPORT void igraph_free(void *p);
+IGRAPH_EXPORT void *igraph_malloc(size_t n);
 
 __END_DECLS
 
