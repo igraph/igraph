@@ -142,8 +142,7 @@ IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 #define igraph_lazy_adjlist_get(al,no) \
     ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
      (igraph_i_lazy_adjlist_get_real(al, no)))
-IGRAPH_EXPORT igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
-                                                              igraph_integer_t no);
+IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no);
 
 typedef struct igraph_lazy_inclist_t {
     const igraph_t *graph;
@@ -179,8 +178,7 @@ IGRAPH_EXPORT void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 #define igraph_lazy_inclist_get(al,no) \
     ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
      (igraph_i_lazy_inclist_get_real(al, no)))
-IGRAPH_EXPORT igraph_vector_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
-                                                              igraph_integer_t no);
+IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al, igraph_integer_t no);
 
 __END_DECLS
 
