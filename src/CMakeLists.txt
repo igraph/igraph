@@ -368,10 +368,12 @@ target_link_libraries(
   bliss cliquer plfit prpack
 )
 
-if (WIN32)
-  # Define symbols to enable compilation of CSXSparse on Windows
-  target_compile_definitions(igraph PRIVATE NCOMPLEX)
-endif()
+# Disable complex number support for CXSparse because:
+#   - It is necessary to compile with MSVC
+#   - igraph does not need complex number support from CXSparse on any platform
+# This is needed here (in addition to the cxsparse_vendored target) because
+# igraph may be compiled with an external CXSparse.
+target_compile_definitions(igraph PRIVATE NCOMPLEX)
 
 if (NOT BUILD_SHARED_LIBS)
   target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
