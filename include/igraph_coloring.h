@@ -21,6 +21,7 @@
 #ifndef IGRAPH_COLORING_H
 #define IGRAPH_COLORING_H
 
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 
 __BEGIN_DECLS

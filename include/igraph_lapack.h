@@ -24,9 +24,9 @@
 #ifndef IGRAPH_LAPACK_H
 #define IGRAPH_LAPACK_H
 
+#include "igraph_decls.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
-#include "igraph_decls.h"
 
 __BEGIN_DECLS
 
