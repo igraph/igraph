@@ -23,17 +23,16 @@ target_include_directories(
   prpack
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_BINARY_DIR}/include
 )
 
 if (BUILD_SHARED_LIBS)
   set_property(TARGET prpack PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if (WIN32)
-  # Since these are included as object files, they should call the
-  # function as is (without declspec)
-  target_compile_definitions(prpack PRIVATE IGRAPH_STATIC)
-endif()
+# Since these are included as object files, they should call the
+# function as is (without visibility specification)
+target_compile_definitions(prpack PRIVATE IGRAPH_STATIC)
 
 # Turn on all warnings for GCC, clang and MSVC
 # TODO(ntamas): it does not work yet, gcc errors out with:

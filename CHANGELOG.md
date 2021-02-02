@@ -58,9 +58,9 @@
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
- - `igraph_to_directed()`: added RANDOM and ACYCLIC mode (PR #1511).
+ - `igraph_to_directed()`: added RANDOM and ACYCLIC modes (PR #1511).
  - `igraph_topological_sorting()` now issues an error if the input graph is not acyclic. Previously it issued a warning.
- - `igraph_vector_(which_)(min|max)()` now handles NaN elements.
+ - `igraph_vector_(which_)(min|max|minmax)()` now handles NaN elements.
 
 ### Deprecated
 
@@ -85,13 +85,16 @@
  - `igraph_layout_gem()` was not interruptible; now it is.
  - `igraph_barabasi_aging_game()` now checks its parameters more carefully.
  - `igraph_callaway_traits_game()` now checks its parameters.
- - `igraph_personalized_pagerank()` now checks its parameters more carefully, and no longer modifies its `reset` argument.
  - `igraph_lastcit_game()` checks its parameters more carefully, and no longer crashes with zero vertices (PR #1625).
  - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (PR #1598).
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
- - `igraph_(personalized_)pagerank()`: the `IGRAPH_PAGERANK_ALGO_ARPACK` method now handles self-loops correctly.
- - `igraph_personalized_pagerank()`: the result retuned for edgeless graphs with a non-uniform personalization vector and the `IGRAPH_PAGERANK_ALGO_ARPACK` was incorrect.
+ - PageRank (PR #1640):
+   * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
+   * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.
+   * `igraph_(personalized_)pagerank(_vs)`: the `IGRAPH_PAGERANK_ALGO_ARPACK` method now handles self-loops correctly.
+   * `igraph_personalized_pagerank(_vs)()`: the result retuned for edgeless or all-zero-weight graphs with the `IGRAPH_PAGERANK_ALGO_ARPACK` ignored the personalization vector. This is now corrected.
+   * `igraph_personalized_pagerank(_vs)()` with a non-uniform personalization vector, a disconnected graph and the `IGRAPH_PAGERANK_ALGO_PRPACK` method would return results that were inconsistent with `IGRAPH_PAGERANK_ALGO_ARPACK`. This happened because PRPACK always used a uniform reset distribution when the random walk got stuck in a sink vertex. Now it uses the user-specified reset distribution for this case as well.
  - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
  - Weighted betweenness, closeness, PageRank and shortest path calculations, as well as random walk functions now check if any weights are NaN.
  - Compatibility with the PGI compiler.

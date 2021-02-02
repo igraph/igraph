@@ -5,7 +5,7 @@ include(test_helpers)
 add_custom_target(build_tests)
 add_custom_target(
   check
-  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C ${CMAKE_BUILD_TYPE}
+  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C $<CONFIG>
   COMMENT "Executing unit tests..."
 )
 add_dependencies(check build_tests)
@@ -25,7 +25,7 @@ if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
 endif()
 
 set(BUILD_INTERNAL_TESTS YES)
-if (WIN32 AND BUILD_SHARED_LIBS)
+if (BUILD_SHARED_LIBS)
   set(BUILD_INTERNAL_TESTS NO)
 endif()
 
@@ -147,6 +147,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   erdos_renyi_game
   full
+  igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_correlated_game
   igraph_extended_chordal_ring
@@ -214,9 +215,11 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_is_bipartite
   igraph_is_tree
   igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
+  igraph_pagerank
   igraph_transitive_closure_dag
   harmonic_centrality
   random_spanning_tree
@@ -439,7 +442,9 @@ add_legacy_tests(
   community_label_propagation
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_compare_communities
   igraph_modularity
+  igraph_split_join_distance
   levc-stress
   spinglass
 )
@@ -581,7 +586,7 @@ if(CMAKE_USE_PTHREADS_INIT)
 
   # tls2 should be added only if we use vendored ARPACK because a non-vendored
   # ARPACK is not guaranteed to be thread-safe
-  if(ARPACK_IS_VENDORED)
+  if(ARPACK_IS_VENDORED AND BUILD_INTERNAL_TESTS)
     add_legacy_tests(
       FOLDER tests/unit NAMES tls2
       LIBRARIES Threads::Threads

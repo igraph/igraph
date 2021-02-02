@@ -42,6 +42,7 @@ set(
   nongraph.xxml
   operators.xxml
   progress.xxml
+  psumtree.xxml
   random.xxml
   scg.xxml
   separators.xxml

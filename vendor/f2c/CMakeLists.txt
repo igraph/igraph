@@ -63,6 +63,7 @@ target_include_directories(
   f2c_vendored
   PUBLIC
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_BINARY_DIR}/include
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src
   PRIVATE
