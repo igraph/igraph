@@ -230,7 +230,8 @@ int igraph_reindex_membership(igraph_vector_t *membership,
         long int c = (long int)VECTOR(*membership)[i];
 
         if (c >= n) {
-            IGRAPH_ERROR("Cluster out of range", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
+            "Found member of cluster %ld, but only %ld vertices.", IGRAPH_EINVAL, c, n);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
@@ -463,13 +464,22 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
  */
 static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
         const igraph_vector_t* v2, double* h1, double* h2, double* mut_inf) {
-    long int i, n = igraph_vector_size(v1);
-    long int k1 = (long int)igraph_vector_max(v1) + 1;
-    long int k2 = (long int)igraph_vector_max(v2) + 1;
+    long int i, n;
+    long int k1;
+    long int k2;
     double *p1, *p2;
     igraph_spmatrix_t m;
     igraph_spmatrix_iter_t mit;
 
+    n = igraph_vector_size(v1);
+    if (n == 0) {
+        *h1 = 0;
+        *h2 = 0;
+        *mut_inf = 0;
+        return IGRAPH_SUCCESS;
+    }
+    k1 = (long int)igraph_vector_max(v1) + 1;
+    k2 = (long int)igraph_vector_max(v2) + 1;
     p1 = igraph_Calloc(k1, double);
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
@@ -599,10 +609,17 @@ static int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igra
  */
 static int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
                               igraph_spmatrix_t *m) {
-    long int k1 = (long int)igraph_vector_max(v1) + 1;
-    long int k2 = (long int)igraph_vector_max(v2) + 1;
-    long int i, n = igraph_vector_size(v1);
+    long int k1;
+    long int k2;
+    long int i, n;
 
+    n = igraph_vector_size(v1);
+    if (n == 0 ) {
+        IGRAPH_CHECK(igraph_spmatrix_resize(m, 0, 0));
+        return IGRAPH_SUCCESS;
+    }
+    k1 = (long int)igraph_vector_max(v1) + 1;
+    k2 = (long int)igraph_vector_max(v2) + 1;
     IGRAPH_CHECK(igraph_spmatrix_resize(m, k1, k2));
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_spmatrix_add_e(m,
@@ -635,6 +652,11 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_
     igraph_spmatrix_t m;
     igraph_spmatrix_iter_t mit;
 
+    if (n == 0) {
+        *distance12 = 0;
+        *distance21 = 0;
+        return IGRAPH_SUCCESS;
+    }
     /* Calculate the confusion matrix */
     IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
     IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
@@ -702,6 +724,11 @@ static int igraph_i_compare_communities_rand(
     long int i, nrow, ncol;
     double rand, n;
     double frac_pairs_in_1, frac_pairs_in_2;
+
+    if (igraph_vector_size(v1) <= 1) {
+        IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
+        "Found memberschip vector of size %ld", IGRAPH_EINVAL, igraph_vector_size(v1));
+    }
 
     /* Calculate the confusion matrix */
     IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
