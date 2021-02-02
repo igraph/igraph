@@ -15,7 +15,7 @@ Split-join result: 0
 Two equal, differenly labeled partitions:
 VI result: 0
 Rand result: 1
-Adjusted Rand result: -nan
+Adjusted Rand result: NaN
 NMI result: 1
 Split-join result: 0
 

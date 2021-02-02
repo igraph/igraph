@@ -35,7 +35,8 @@ void compare_and_print(igraph_vector_t *comm1, igraph_vector_t *comm2, igraph_co
     if (e == IGRAPH_EINVAL) {
         printf("failed as expected\n");
     } else {
-        printf("%g\n", result);
+        print_real(stdout, result, "%g");
+        printf("\n");
     }
 }
 
