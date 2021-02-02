@@ -727,7 +727,7 @@ static int igraph_i_compare_communities_rand(
 
     if (igraph_vector_size(v1) <= 1) {
         IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
-        "Found memberschip vector of size %ld", IGRAPH_EINVAL, igraph_vector_size(v1));
+        "Found membership vector of size %ld", IGRAPH_EINVAL, igraph_vector_size(v1));
     }
 
     /* Calculate the confusion matrix */
