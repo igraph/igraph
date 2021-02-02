@@ -147,6 +147,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   erdos_renyi_game
   full
+  igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_correlated_game
   igraph_extended_chordal_ring
@@ -214,6 +215,7 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
   igraph_pagerank
