@@ -106,7 +106,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     long int components = no_of_nodes - steps;
     long int i, found = 0;
     igraph_vector_t tmp;
-    igraph_vector_t already_merged;
+    igraph_vector_bool_t already_merged;
 
     if (steps > igraph_matrix_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
@@ -131,7 +131,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         igraph_vector_null(csize);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&already_merged, steps + no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&already_merged, steps + no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
 
     for (i = steps - 1; i >= 0; i--) {
@@ -201,7 +201,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     }
 
     igraph_vector_destroy(&tmp);
-    igraph_vector_destroy(&already_merged);
+    igraph_vector_bool_destroy(&already_merged);
     IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
