@@ -24,6 +24,7 @@
 #ifndef IGRAPH_COHESIVE_BLOCKS_H
 #define IGRAPH_COHESIVE_BLOCKS_H
 
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"

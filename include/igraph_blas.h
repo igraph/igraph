@@ -24,10 +24,10 @@
 #ifndef IGRAPH_BLAS_H
 #define IGRAPH_BLAS_H
 
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
-#include "igraph_decls.h"
 
 __BEGIN_DECLS
 

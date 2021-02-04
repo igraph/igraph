@@ -24,9 +24,9 @@
 #ifndef IGRAPH_OPERATORS_H
 #define IGRAPH_OPERATORS_H
 
+#include "igraph_decls.h"
 #include "igraph_attributes.h"
 #include "igraph_constants.h"
-#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_ptr.h"

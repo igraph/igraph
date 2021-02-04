@@ -21,14 +21,13 @@
 
 */
 
-#include "igraph_arpack.h"
-#include "igraph_lapack.h"
-#include "igraph_sparsemat.h"
-
 #ifndef IGRAPH_EIGEN_H
 #define IGRAPH_EIGEN_H
 
 #include "igraph_decls.h"
+#include "igraph_arpack.h"
+#include "igraph_lapack.h"
+#include "igraph_sparsemat.h"
 
 __BEGIN_DECLS
 

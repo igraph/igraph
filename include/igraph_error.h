@@ -24,9 +24,9 @@
 #ifndef IGRAPH_ERROR_H
 #define IGRAPH_ERROR_H
 
-#include <stdarg.h>
-
 #include "igraph_decls.h"
+
+#include <stdarg.h>
 
 __BEGIN_DECLS
 
