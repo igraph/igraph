@@ -70,7 +70,7 @@ add_legacy_tests(
   vector_ptr
 )
 
-if (BUILD_INTERNAL_TESTS)
+if (BUILD_INTERNAL_TESTS OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
   add_legacy_tests(
     FOLDER tests/unit NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
