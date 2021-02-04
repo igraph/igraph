@@ -385,6 +385,7 @@ add_legacy_tests(
   adjlist
   igraph_to_directed
   igraph_to_prufer
+  inclist
 )
 
 # flow.at

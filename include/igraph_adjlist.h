@@ -83,6 +83,7 @@ IGRAPH_EXPORT int igraph_inclist_init(const igraph_t *graph,
                                       igraph_neimode_t mode,
                                       igraph_loops_t loops);
 IGRAPH_EXPORT int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
+IGRAPH_EXPORT igraph_integer_t igraph_inclist_size(const igraph_inclist_t *al);
 IGRAPH_EXPORT void igraph_inclist_destroy(igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_inclist_clear(igraph_inclist_t *il);
 IGRAPH_EXPORT int igraph_inclist_remove_duplicate(const igraph_t *graph,
@@ -150,6 +151,7 @@ typedef struct igraph_lazy_inclist_t {
     igraph_vector_int_t **incs;
     igraph_neimode_t mode;
     igraph_vector_t dummy;
+    igraph_loops_t loops;
 } igraph_lazy_inclist_t;
 
 IGRAPH_EXPORT int igraph_lazy_inclist_init(const igraph_t *graph,

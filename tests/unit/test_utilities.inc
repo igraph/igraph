@@ -110,6 +110,21 @@ void print_graph(const igraph_t *graph) {
     printf("}\n");
 }
 
+/* Print an incidence list. Use brackets around each vector and also use
+ * brackets around the entire incidence list to make it clear when the list
+ * is empty.
+ */
+void print_inclist(const igraph_inclist_t *adjlist) {
+    long vcount = igraph_inclist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_inclist_get(adjlist, i));
+    }
+    printf("}\n");
+}
 
 /* Edge comparisong function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {

@@ -169,11 +169,12 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
 int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                        igraph_es_t es) {
     igraph_eit_t eit;
-    long int i;
+    long int i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
@@ -185,8 +186,15 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
         long int to = IGRAPH_TO(graph, e);
         igraph_vector_int_t *neis =
             igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
-        long int j, n = igraph_vector_int_size(neis);
+
+        if (neis == 0) {
+            /* Most likely out of memory */
+            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM);
+        }
+
         VECTOR(*res)[i] = 0;
+
+        n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             long int e2 = (long int) VECTOR(*neis)[j];
             long int to2 = IGRAPH_OTHER(graph, e2, from);
@@ -229,8 +237,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  */
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
     igraph_eit_t eit;
-    long int i;
-    igraph_bool_t directed = igraph_is_directed(graph);
+    long int i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -246,18 +253,21 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
         long int to = IGRAPH_TO(graph, e);
         igraph_vector_int_t *neis =
             igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
-        long int j, n = igraph_vector_int_size(neis);
+        
+        if (neis == 0) {
+            /* Most likely out of memory */
+            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM);
+        }
+
         VECTOR(*res)[i] = 0;
+        
+        n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             long int e2 = (long int) VECTOR(*neis)[j];
             long int to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to) {
                 VECTOR(*res)[i] += 1;
             }
-        }
-        /* for loop edges, divide the result by two */
-        if (!directed && to == from) {
-            VECTOR(*res)[i] /= 2;
         }
     }
 

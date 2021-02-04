@@ -33,11 +33,19 @@
 
 /**
  * Helper function that simplifies a sorted adjacency vector by removing
- * duplicate elements and optionally self-loops; integer variant.
+ * duplicate elements and optionally self-loops.
  */
 static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_multiple_t multiple
+);
+
+/**
+ * Helper function that removes loops from an incidence vector (either both
+ * occurrences or only one of them).
+ */
+static int igraph_i_remove_loops_from_incidence_vector_in_place(
+    igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
 );
 
 /**
@@ -312,10 +320,10 @@ void igraph_adjlist_clear(igraph_adjlist_t *al) {
 
 /**
  * \function igraph_adjlist_size
- * \brief Number of vertices in an adjacency list.
+ * \brief Returns the number of vertices in an adjacency list.
  *
  * \param al The adjacency list.
- * \return The number of elements.
+ * \return The number of vertices in the adjacency list.
  *
  * Time complexity: O(1).
  */
@@ -488,11 +496,78 @@ int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igr
 
 }
 
-int igraph_inclist_remove_duplicate(const igraph_t *graph,
-                                    igraph_inclist_t *al) {
+static int igraph_i_remove_loops_from_incidence_vector_in_place(
+    igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
+) {
+    long int i, length, eid, write_ptr;
+    igraph_vector_int_t *seen_loops = 0;
 
-    long int i, j, l, n, p;
-    igraph_vector_int_t* v;
+    /* In this function we make use of the fact that we are dealing with
+     * _incidence_ lists, and the only way for an edge ID to appear twice
+     * within an incidence list is if the edge is a loop edge; otherwise each
+     * element will be unique.
+     * 
+     * Note that incidence vectors are not sorted by edge ID, so we need to
+     * look up the edges in the graph to decide whether they are loops or not.
+     * 
+     * Also, it may be tempting to introduce a boolean in case of IGRAPH_LOOPS_ONCE,
+     * and flip it every time we see a loop to get rid of half of the occurrences,
+     * but the problem is that even if the same loop edge ID appears twice in
+     * the input list, they are not guaranteed to be next to each other; it
+     * may be the case that there are multiple loop edges, each edge appears
+     * twice, and we want to keep exactly one of them for each ID. That's why
+     * we have a "seen_loops" vector.
+     */
+
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        /* Loop edges appear twice by default, nothing to do. */
+        return IGRAPH_SUCCESS;
+    }
+
+    length = igraph_vector_int_size(v);
+    if (length == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    if (loops == IGRAPH_LOOPS_ONCE) {
+        /* We need a helper vector */
+        seen_loops = igraph_Calloc(1, igraph_vector_int_t);
+        IGRAPH_FINALLY(igraph_free, seen_loops);
+        IGRAPH_CHECK(igraph_vector_int_init(seen_loops, 0));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, seen_loops);
+    } else if (loops != IGRAPH_NO_LOOPS) {
+        IGRAPH_ERROR("Invalid value for 'loops' argument", IGRAPH_EINVAL);
+    }
+
+    for (i = 0, write_ptr = 0; i < length; i++) {
+        eid = VECTOR(*v)[i];
+        if (IGRAPH_FROM(graph, eid) == IGRAPH_TO(graph, eid)) {
+            /* Loop edge */
+            if (seen_loops && !igraph_vector_int_contains(seen_loops, eid)) {
+                VECTOR(*v)[write_ptr++] = eid;
+                IGRAPH_CHECK(igraph_vector_int_push_back(seen_loops, eid));
+            }
+        } else {
+            /* Not a loop edge */
+            VECTOR(*v)[write_ptr++] = eid;
+        }
+    }
+
+    /* Always succeeds since we never grow the vector */
+    igraph_vector_int_resize(v, write_ptr);
+
+    /* Destroy the helper vector */
+    if (seen_loops) {
+        igraph_vector_int_destroy(seen_loops);
+        igraph_Free(seen_loops);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+    
+    return IGRAPH_SUCCESS;
+}
+
+int igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il) {
+    long int i, n;
 
     IGRAPH_WARNING(
         "igraph_inclist_remove_duplicate() is deprecated; use the constructor "
@@ -502,22 +577,13 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph,
 
     IGRAPH_UNUSED(graph);
 
-    n = al->length;
+    n = il->length;
     for (i = 0; i < n; i++) {
-        v = &al->incs[i];
-        l = igraph_vector_int_size(v);
-        if (l > 0) {
-            p = 1;
-            for (j = 1; j < l; j++) {
-                long int e = (long int) VECTOR(*v)[j];
-                /* Non-loop edges and one end of loop edges are fine. */
-                /* We assume that the vector is sorted and we also keep it sorted */
-                if (VECTOR(*v)[j - 1] != e) {
-                    VECTOR(*v)[p++] = e;
-                }
-            }
-            igraph_vector_int_resize(v, p);
-        }
+        IGRAPH_CHECK(
+            igraph_i_remove_loops_from_incidence_vector_in_place(
+                &il->incs[i], graph, IGRAPH_LOOPS_ONCE
+            )
+        );
     }
 
     return 0;
@@ -607,12 +673,22 @@ int igraph_inclist_init(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
     for (i = 0; i < il->length; i++) {
         int j, n;
+
         IGRAPH_ALLOW_INTERRUPTION();
+
         IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));
+
         n = igraph_vector_size(&tmp);
         IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], n));
+
         for (j = 0; j < n; j++) {
             VECTOR(il->incs[i])[j] = VECTOR(tmp)[j];
+        }
+
+        if (loops != IGRAPH_LOOPS_TWICE) {
+            IGRAPH_CHECK(
+                igraph_i_remove_loops_from_incidence_vector_in_place(&il->incs[i], graph, loops)
+            );
         }
     }
 
@@ -678,6 +754,7 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
  * \brief Removes all edges from an incidence list.
  *
  * \param il The incidence list.
+ * 
  * Time complexity: depends on memory management, typically O(n), where n is
  * the total number of elements in the incidence list.
  */
@@ -686,6 +763,19 @@ void igraph_inclist_clear(igraph_inclist_t *il) {
     for (i = 0; i < il->length; i++) {
         igraph_vector_int_clear(&il->incs[i]);
     }
+}
+
+/**
+ * \function igraph_inclist_size
+ * \brief Returns the number of vertices in an incidence list.
+ *
+ * \param il The incidence list.
+ * \return The number of vertices in the incidence list.
+ *
+ * Time complexity: O(1).
+ */
+igraph_integer_t igraph_inclist_size(const igraph_inclist_t *il) {
+    return il->length;
 }
 
 static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
@@ -979,8 +1069,9 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
-    il->mode = mode;
     il->graph = graph;
+    il->loops = loops;
+    il->mode = mode;
 
     il->length = igraph_vcount(graph);
     il->incs = igraph_Calloc(il->length, igraph_vector_int_t*);
@@ -1062,6 +1153,15 @@ igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
 
         for (i = 0; i < n; i++) {
             VECTOR(*il->incs[no])[i] = VECTOR(il->dummy)[i];
+        }
+
+        if (il->loops != IGRAPH_LOOPS_TWICE) {
+            ret = igraph_i_remove_loops_from_incidence_vector_in_place(il->incs[no], il->graph, il->loops);
+            if (ret != 0) {
+                igraph_vector_int_destroy(il->incs[no]);
+                igraph_Free(il->incs[no]);
+                return 0;
+            }
         }
     }
 
