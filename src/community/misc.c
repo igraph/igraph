@@ -106,10 +106,21 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     long int components = no_of_nodes - steps;
     long int i, found = 0;
     igraph_vector_t tmp;
+    igraph_vector_t already_merged;
 
     if (steps > igraph_matrix_nrow(merges)) {
-        IGRAPH_ERROR("`steps' to big or `merges' matrix too short", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
+                      IGRAPH_PRId "steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
     }
+
+    if (igraph_matrix_ncol(merges) != 2) {
+        IGRAPH_ERRORF("The merges matrix should have two columns, but has %ld.",
+                      IGRAPH_EINVAL, igraph_matrix_ncol(merges));
+    }
+    if (steps < 0) {
+        IGRAPH_ERRORF("Number of steps should be non-negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
+    }
+
 
     if (membership) {
         IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
@@ -120,11 +131,23 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         igraph_vector_null(csize);
     }
 
+    IGRAPH_VECTOR_INIT_FINALLY(&already_merged, steps + no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
 
     for (i = steps - 1; i >= 0; i--) {
         long int c1 = (long int) MATRIX(*merges, i, 0);
         long int c2 = (long int) MATRIX(*merges, i, 1);
+
+        if (VECTOR(already_merged)[c1] == 0) {
+                VECTOR(already_merged)[c1] = 1;
+        } else {
+            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c1);
+        }
+        if (VECTOR(already_merged)[c2] == 0) {
+                VECTOR(already_merged)[c2] = 1;
+        } else {
+            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c2);
+        }
 
         /* new component? */
         if (VECTOR(tmp)[i] == 0) {
@@ -178,7 +201,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     }
 
     igraph_vector_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_destroy(&already_merged);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
 }
