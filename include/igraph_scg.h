@@ -24,6 +24,7 @@
 #ifndef IGRAPH_SCG_H
 #define IGRAPH_SCG_H
 
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"

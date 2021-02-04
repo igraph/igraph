@@ -24,6 +24,7 @@
 #ifndef IGRAPH_SPARSEMAT_H
 #define IGRAPH_SPARSEMAT_H
 
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
