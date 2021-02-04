@@ -24,11 +24,6 @@ if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
 endif()
 
-set(BUILD_INTERNAL_TESTS YES)
-if (BUILD_SHARED_LIBS)
-  set(BUILD_INTERNAL_TESTS NO)
-endif()
-
 # version.at
 add_examples(
   FOLDER examples/simple NAMES
@@ -70,7 +65,7 @@ add_legacy_tests(
   vector_ptr
 )
 
-if (BUILD_INTERNAL_TESTS OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
+if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
   add_legacy_tests(
     FOLDER tests/unit NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
@@ -581,7 +576,7 @@ if(CMAKE_USE_PTHREADS_INIT)
 
   # tls2 should be added only if we use vendored ARPACK because a non-vendored
   # ARPACK is not guaranteed to be thread-safe
-  if(ARPACK_IS_VENDORED AND BUILD_INTERNAL_TESTS)
+  if(ARPACK_IS_VENDORED AND NOT BUILD_SHARED_LIBS)
     add_legacy_tests(
       FOLDER tests/unit NAMES tls2
       LIBRARIES Threads::Threads
