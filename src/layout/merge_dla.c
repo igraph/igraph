@@ -29,19 +29,7 @@
 #include "core/interruption.h"
 #include "core/math.h"
 #include "layout/merge_grid.h"
-
-/* not 'static', used in tests */
-int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                              long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
-                              igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
-                              igraph_real_t killr);
-
-/* TODO: not 'static' because used in tests */
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
-                              igraph_real_t *y, igraph_real_t *r);
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
-                              igraph_real_t *y, igraph_real_t *z,
-                              igraph_real_t *r);
+#include "layout/layout_internal.h"
 
 /**
  * \function igraph_layout_merge_dla

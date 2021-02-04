@@ -39,6 +39,7 @@
 #include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
+#include "flow/flow_internal.h"
 
 typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
                                         const igraph_marked_queue_t *S,
@@ -137,12 +138,12 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
     return 0;
 }
 
-int igraph_i_residual_graph(const igraph_t *graph,
-                            const igraph_vector_t *capacity,
-                            igraph_t *residual,
-                            igraph_vector_t *residual_capacity,
-                            const igraph_vector_t *flow,
-                            igraph_vector_t *tmp) {
+static int igraph_i_residual_graph(const igraph_t *graph,
+                                   const igraph_vector_t *capacity,
+                                   igraph_t *residual,
+                                   igraph_vector_t *residual_capacity,
+                                   const igraph_vector_t *flow,
+                                   igraph_vector_t *tmp) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -206,11 +207,11 @@ int igraph_residual_graph(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_reverse_residual_graph(const igraph_t *graph,
-                                    const igraph_vector_t *capacity,
-                                    igraph_t *residual,
-                                    const igraph_vector_t *flow,
-                                    igraph_vector_t *tmp) {
+static int igraph_i_reverse_residual_graph(const igraph_t *graph,
+                                           const igraph_vector_t *capacity,
+                                           igraph_t *residual,
+                                           const igraph_vector_t *flow,
+                                           igraph_vector_t *tmp) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);

@@ -36,6 +36,18 @@
 
 __BEGIN_DECLS
 
+/**
+ * \section about_layouts
+ *
+ * <para>Layout generator functions (or at least most of them) try to place the
+ * vertices and edges of a graph on a 2D plane or in 3D space in a way
+ * which visually pleases the human eye.</para>
+ *
+ * <para>They take a graph object and a number of parameters as arguments
+ * and return an \type igraph_matrix_t, in which each row gives the
+ * coordinates of a vertex.</para>
+ */
+
 /* -------------------------------------------------- */
 /* Layouts                                            */
 /* -------------------------------------------------- */
@@ -65,9 +77,6 @@ IGRAPH_EXPORT int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matri
                                              const igraph_vector_t *minx, const igraph_vector_t *maxx,
                                              const igraph_vector_t *miny, const igraph_vector_t *maxy);
 
-IGRAPH_EXPORT int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
-                                        igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
-                                        igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
 IGRAPH_EXPORT int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                                     igraph_integer_t maxiter, igraph_real_t maxdelta,
                                     igraph_real_t area, igraph_real_t coolexp,

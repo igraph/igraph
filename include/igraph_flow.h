@@ -122,18 +122,7 @@ IGRAPH_EXPORT int igraph_residual_graph(const igraph_t *graph,
                                         igraph_t *residual,
                                         igraph_vector_t *residual_capacity,
                                         const igraph_vector_t *flow);
-int igraph_i_residual_graph(const igraph_t *graph,
-                            const igraph_vector_t *capacity,
-                            igraph_t *residual,
-                            igraph_vector_t *residual_capacity,
-                            const igraph_vector_t *flow,
-                            igraph_vector_t *tmp);
 
-int igraph_i_reverse_residual_graph(const igraph_t *graph,
-                                    const igraph_vector_t *capacity,
-                                    igraph_t *residual,
-                                    const igraph_vector_t *flow,
-                                    igraph_vector_t *tmp);
 IGRAPH_EXPORT int igraph_reverse_residual_graph(const igraph_t *graph,
                                                 const igraph_vector_t *capacity,
                                                 igraph_t *residual,

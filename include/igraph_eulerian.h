@@ -24,6 +24,7 @@
 #ifndef IGRAPH_EULERIAN_H
 #define IGRAPH_EULERIAN_H
 
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 
 __BEGIN_DECLS

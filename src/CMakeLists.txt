@@ -187,7 +187,6 @@ add_library(
   layout/graphopt.c
   layout/grid.c
   layout/kamada_kawai.c
-  layout/layout_other.c
   layout/lgl.c
   layout/mds.c
   layout/merge_dla.c
