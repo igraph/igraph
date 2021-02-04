@@ -37,20 +37,21 @@ typedef struct igraph_i_layout_mergegrid_t {
     igraph_real_t miny, maxy, deltay;
 } igraph_i_layout_mergegrid_t;
 
-int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
-                                   igraph_real_t minx, igraph_real_t maxx, long int stepsx,
-                                   igraph_real_t miny, igraph_real_t maxy, long int stepsy);
-void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid);
+IGRAPH_PRIVATE_EXPORT int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+                                                         igraph_real_t minx, igraph_real_t maxx, long int stepsx,
+                                                         igraph_real_t miny, igraph_real_t maxy, long int stepsy);
 
-int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
-                                       igraph_real_t x, igraph_real_t y, igraph_real_t r,
-                                       long int id);
+IGRAPH_PRIVATE_EXPORT void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid);
+
+IGRAPH_PRIVATE_EXPORT int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+                                                             igraph_real_t x, igraph_real_t y, igraph_real_t r,
+                                                             long int id);
 
 long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y);
 
 long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
-        igraph_real_t x, igraph_real_t y, igraph_real_t r);
+                                              igraph_real_t x, igraph_real_t y, igraph_real_t r);
 
 __END_DECLS
 

@@ -85,9 +85,9 @@ IGRAPH_EXPORT int igraph_bfs(const igraph_t *graph,
                              igraph_vector_t *dist, igraph_bfshandler_t *callback,
                              void *extra);
 
-int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                 igraph_vector_t *vids, igraph_vector_t *layers,
-                 igraph_vector_t *parents);
+IGRAPH_PRIVATE_EXPORT int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+                                       igraph_vector_t *vids, igraph_vector_t *layers,
+                                       igraph_vector_t *parents);
 
 /**
  * \function igraph_dfshandler_t

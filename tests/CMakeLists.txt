@@ -75,17 +75,18 @@ if (BUILD_INTERNAL_TESTS)
     FOLDER tests/unit NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
   )
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    2wheap
-    cutheap
-    d_indheap
-    hashtable
-    marked_queue
-    set
-    trie
-  )
 endif()
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  2wheap
+  cutheap
+  d_indheap
+  hashtable
+  marked_queue
+  set
+  trie
+)
 
 # basic.at
 add_examples(
@@ -196,12 +197,11 @@ add_examples(
   igraph_topological_sorting
   igraph_transitivity
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    igraph_rewire # Uses internal igraph_i_rewire
-  )
-endif()
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_rewire # Uses internal igraph_i_rewire
+)
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -260,26 +260,24 @@ add_legacy_tests(
   igraph_layout_kamada_kawai_3d_bug_1462
   igraph_layout_reingold_tilford_bug_879
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    igraph_i_layout_sphere
-    igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
-    igraph_layout_merge # Uses igraph_i_layout_merge functions
-  )
-endif()
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_i_layout_sphere
+  igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
+  igraph_layout_merge # Uses igraph_i_layout_merge functions
+)
 
 # visitors.at
 add_examples(
   FOLDER examples/simple NAMES
   igraph_bfs2
 )
-if (BUILD_INTERNAL_TESTS)
-  add_examples(
-    FOLDER examples/simple NAMES
-    igraph_bfs # Uses igraph_i_bfs
-  )
-endif()
+
+add_examples(
+  FOLDER examples/simple NAMES
+  igraph_bfs # Uses igraph_i_bfs
+)
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -409,12 +407,10 @@ add_legacy_tests(
   igraph_st_mincut
 )
 
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
-  )
-endif()
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
+)
 
 add_legacy_tests(
   FOLDER tests/unit NAMES

@@ -27,14 +27,14 @@
 
 __BEGIN_DECLS
 
-int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
-                               const igraph_marked_queue_t *S,
-                               const igraph_estack_t *T,
-                               long int source,
-                               long int target,
-                               long int *v,
-                               igraph_vector_t *Isv,
-                               void *arg);
+IGRAPH_PRIVATE_EXPORT int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
+                                                     const igraph_marked_queue_t *S,
+                                                     const igraph_estack_t *T,
+                                                     long int source,
+                                                     long int target,
+                                                     long int *v,
+                                                     igraph_vector_t *Isv,
+                                                     void *arg);
 
 __END_DECLS
 
