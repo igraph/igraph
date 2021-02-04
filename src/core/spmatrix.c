@@ -615,7 +615,9 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     return 0;
 }
 
-int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
+/* Unused local functions---temporarily disabled */
+#if 0
+static int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
     long int ei, n;
 
     IGRAPH_ASSERT(m != NULL);
@@ -628,7 +630,7 @@ int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
     return 0;
 }
 
-int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
+static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
@@ -659,6 +661,7 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }
+#endif
 
 /**
  * \function igraph_spmatrix_clear_col
@@ -859,8 +862,11 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
     return res;
 }
 
-int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
-        igraph_vector_t *res, long int col) {
+
+/* Unused function, temporarily disabled */
+/*
+static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
+                                                     igraph_vector_t *res, long int col) {
     long int i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (long int) (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
@@ -872,6 +878,7 @@ int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
         }
     return 0;
 }
+*/
 
 
 /**
