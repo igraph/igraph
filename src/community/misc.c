@@ -139,12 +139,12 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         long int c2 = (long int) MATRIX(*merges, i, 1);
 
         if (VECTOR(already_merged)[c1] == 0) {
-                VECTOR(already_merged)[c1] = 1;
+            VECTOR(already_merged)[c1] = 1;
         } else {
             IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c1);
         }
         if (VECTOR(already_merged)[c2] == 0) {
-                VECTOR(already_merged)[c2] = 1;
+            VECTOR(already_merged)[c2] = 1;
         } else {
             IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c2);
         }

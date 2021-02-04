@@ -1007,13 +1007,13 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     long int components, i;
 
     if (no_of_nodes > 0) {
-            components = (long int) igraph_vector_max(membership) + 1;
+        components = (long int) igraph_vector_max(membership) + 1;
     } else {
         components = 0;
     }
     if (components > no_of_nodes) {
         IGRAPH_ERRORF("Invalid membership vector, number of components is %ld, but should "
-         "not be greather than number of nodes, which is %ld.", IGRAPH_EINVAL, components, no_of_nodes);
+         "not be greater than the number of nodes, which is %ld.", IGRAPH_EINVAL, components, no_of_nodes);
     }
     if (steps >= components) {
         IGRAPH_ERRORF("Number of steps should be smaller than number of components. "
