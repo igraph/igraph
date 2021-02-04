@@ -33,7 +33,7 @@ int main() {
     igraph_attribute_combination_t comb;
 
     /* turn on attribute handling */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_attribute_combination(&comb,
                                  "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,

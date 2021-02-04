@@ -31,7 +31,7 @@ int main() {
     igraph_bool_t typev[] = { 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 };
 
     /* turn on attribute handling */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_ring(&graph, 10, IGRAPH_UNDIRECTED, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_vector_bool_view(&type, typev, sizeof(typev) / sizeof(igraph_bool_t));
