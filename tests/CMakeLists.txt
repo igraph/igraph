@@ -597,6 +597,10 @@ add_examples(
   igraph_scg_semiprojectors2
   igraph_scg_semiprojectors3
   scg
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   scg2
   scg3
 )

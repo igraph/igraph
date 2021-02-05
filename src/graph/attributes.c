@@ -255,7 +255,7 @@ int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
 }
 
 /**
- * \function igraph_i_set_attribute_table
+ * \function igraph_set_attribute_table
  * \brief Attach an attribute table.
  *
  * This function attaches attribute handling code to the igraph library.
@@ -272,10 +272,16 @@ int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
  */
 
 igraph_attribute_table_t *
-igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
+igraph_set_attribute_table(const igraph_attribute_table_t * table) {
     igraph_attribute_table_t *old = igraph_i_attribute_table;
     igraph_i_attribute_table = (igraph_attribute_table_t*) table;
     return old;
+}
+
+igraph_attribute_table_t *
+igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
+    IGRAPH_WARNING("igraph_i_set_attribute_table is deprecated, use igraph_set_attribute_table.");
+    return igraph_set_attribute_table(table);
 }
 
 igraph_bool_t igraph_has_attribute_table() {

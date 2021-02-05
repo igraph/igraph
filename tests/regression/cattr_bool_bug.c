@@ -43,7 +43,7 @@ int main() {
         return 1;
     }
 
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
     if ((result = igraph_read_graph_graphml(&graph, ifile, 0))) {
