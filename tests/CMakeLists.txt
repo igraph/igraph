@@ -434,6 +434,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector2
   igraph_compare_communities
   igraph_modularity
+  igraph_modularity_matrix
   igraph_split_join_distance
   levc-stress
   spinglass
