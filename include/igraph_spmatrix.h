@@ -89,11 +89,6 @@ IGRAPH_EXPORT int igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vec
 IGRAPH_EXPORT int igraph_spmatrix_print(const igraph_spmatrix_t *matrix);
 IGRAPH_EXPORT int igraph_spmatrix_fprint(const igraph_spmatrix_t *matrix, FILE* file);
 
-IGRAPH_EXPORT int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
-                                                            igraph_vector_t *res, long int col);
-IGRAPH_EXPORT int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row);
-IGRAPH_EXPORT int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
-
 
 typedef struct s_spmatrix_iter {
     const igraph_spmatrix_t *m; /* pointer to the matrix we are iterating over */

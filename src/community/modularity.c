@@ -29,7 +29,7 @@
 
 /**
  * \function igraph_modularity
- * \brief Calculate the modularity of a graph with respect to some clusters or vertex types
+ * \brief Calculate the modularity of a graph with respect to some clusters or vertex types.
  *
  * The modularity of a graph with respect to some clustering of the vertices
  * (or assignment of vertex types)
@@ -48,7 +48,7 @@
  * </para><para>
  * The resolution parameter \c gamma allows weighting the random null model, which
  * might be useful when finding partitions with a high modularity. Maximizing modularity
- * with higher values of the resolution parameter typically result in more, smaller clusters
+ * with higher values of the resolution parameter typically results in more, smaller clusters
  * when finding partitions with a high modularity. Lower values typically results in
  * fewer, larger clusters. The original definition of modularity is retrieved
  * when setting <code>gamma=1</code>.
@@ -72,8 +72,8 @@
  *
  * </para><para>
  * Note that the modularity is not well-defined for graphs with no edges.
- * igraph assumes that the modularity of graphs with no edges is \c NaN; see
- * the discussion in https://github.com/igraph/igraph/issues/1539 for
+ * igraph returns \c NaN for graphs with no edges; see
+ * https://github.com/igraph/igraph/issues/1539 for
  * a detailed discussion.
  *
  * </para><para>

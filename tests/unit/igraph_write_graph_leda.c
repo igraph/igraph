@@ -33,7 +33,7 @@ int main() {
     const char* strings[] = {"foo", "bar", "baz", "spam", "eggs", "bacon"};
 
     /* Setting up attribute handler */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* Saving directed graph, no attributes */
     igraph_ring(&g, 5, /* directed = */ 1,

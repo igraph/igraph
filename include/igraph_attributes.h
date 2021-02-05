@@ -72,7 +72,7 @@ __BEGIN_DECLS
  * a graph. See the documentation of this type for details.</para>
  *
  * <para>By default there is no attribute interface attached to \a igraph,
- * to attach one, call \ref igraph_i_set_attribute_table with your new
+ * to attach one, call \ref igraph_set_attribute_table with your new
  * table. </para>
  *
  */
@@ -294,7 +294,8 @@ typedef struct igraph_attribute_table_t {
                               igraph_vector_bool_t *value);
 } igraph_attribute_table_t;
 
-IGRAPH_EXPORT igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
+IGRAPH_EXPORT igraph_attribute_table_t * igraph_set_attribute_table(const igraph_attribute_table_t * table);
 
 IGRAPH_EXPORT igraph_bool_t igraph_has_attribute_table(void);
 

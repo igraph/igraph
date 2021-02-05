@@ -91,7 +91,7 @@ int main() {
     FILE *input;
 
     /* turn on attribute handling */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* first file, without marginals */
 

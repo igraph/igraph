@@ -13,7 +13,7 @@
 <title>The Attribute Handler Interface</title>
 <!-- doxrox-include about_attribute_table -->
 <!-- doxrox-include igraph_attribute_table_t -->
-<!-- doxrox-include igraph_i_set_attribute_table -->
+<!-- doxrox-include igraph_set_attribute_table -->
 <!-- doxrox-include igraph_attribute_type_t -->
 </section>
 
