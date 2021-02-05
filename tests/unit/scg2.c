@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "../../tests/unit/test_utilities.inc"
+#include "test_utilities.inc"
 
 int main() {
 
@@ -34,6 +34,7 @@ int main() {
     igraph_sparsemat_t scg_sparsemat;
     igraph_matrix_t L, R;
     igraph_sparsemat_t Lsparse, Rsparse;
+    igraph_vector_t p;
     igraph_vector_t groups;
     igraph_vector_complex_t eval;
     igraph_matrix_complex_t evec;
@@ -44,23 +45,49 @@ int main() {
     igraph_matrix_init(&L, 0, 0);
     igraph_matrix_init(&R, 0, 0);
     igraph_matrix_init(&scg_matrix, 0, 0);
+    igraph_vector_init(&p, 0);
     igraph_vector_init(&groups, 0);
     igraph_vector_complex_init(&eval, 0);
     igraph_matrix_complex_init(&evec, 0, 0);
 
-#define CALLLAP() do {                           \
+#define CALLSTO() do {                           \
+        igraph_vector_resize(&p, 0);                     \
         igraph_vector_resize(&groups, 0);                    \
         igraph_vector_complex_resize(&eval, 0);              \
         igraph_matrix_complex_resize(&evec, 0, 0);               \
-        igraph_scg_laplacian(&g, /*matrix=*/ 0, /*sparsemat=*/ 0, &ev,   \
-                             /* intervals= */ 2, /* intervals_vector= */ 0, \
-                             /* algorithm= */ IGRAPH_SCG_EXACT,     \
-                             IGRAPH_SCG_NORM_ROW,               \
-                             IGRAPH_SCG_DIRECTION_DEFAULT, &eval, &evec,    \
-                             &groups, /* use_arpack= */ 0,          \
-                             /* maxiter= */ 0, &scg_graph, &scg_matrix, \
-                             &scg_sparsemat, &L, &R,            \
-                             &Lsparse, &Rsparse);               \
+        igraph_scg_stochastic(&g, /*matrix=*/ 0, /*sparsemat=*/ 0, &ev,  \
+                              /* intervals= */ 2, /* intervals_vector= */ 0, \
+                              /* algorithm= */ IGRAPH_SCG_EXACT,         \
+                              IGRAPH_SCG_NORM_ROW, &eval, &evec,         \
+                              &groups, &p, /* use_arpack= */ 0,      \
+                              /* maxiter= */ 0, &scg_graph, &scg_matrix,     \
+                              &scg_sparsemat, &L, &R,            \
+                              &Lsparse, &Rsparse);               \
+    } while (0)
+
+#define FIXSMALL(eps) do { \
+    long int i, j, ncol, nrow; \
+    ncol = igraph_vector_complex_size(&eval); \
+    for (i = 0; i < ncol; i++) { \
+        if (fabs((double)IGRAPH_REAL(VECTOR(eval)[i])) < eps) { \
+            IGRAPH_REAL(VECTOR(eval)[i]) = 0; \
+        } \
+        if (fabs((double)IGRAPH_IMAG(VECTOR(eval)[i])) < eps) { \
+            IGRAPH_IMAG(VECTOR(eval)[i]) = 0; \
+        } \
+    } \
+    nrow = igraph_matrix_complex_nrow(&evec); \
+    ncol = igraph_matrix_complex_ncol(&evec); \
+    for (i = 0; i < nrow; i++) { \
+        for (j = 0; j < ncol; j++) { \
+            if (fabs((double)IGRAPH_REAL(MATRIX(evec, i, j))) < eps) { \
+                IGRAPH_REAL(MATRIX(evec, i, j)) = 0; \
+            } \
+            if (fabs((double)IGRAPH_IMAG(MATRIX(evec, i, j))) < eps) { \
+                IGRAPH_IMAG(MATRIX(evec, i, j)) = 0; \
+            } \
+        } \
+    } \
     } while (0)
 
 #define PRINTRES()                      \
@@ -82,7 +109,8 @@ int main() {
     } while (0)
 
     VECTOR(ev)[0] = 1;
-    CALLLAP();
+    CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -90,7 +118,8 @@ int main() {
     igraph_sparsemat_destroy(&Rsparse);
 
     VECTOR(ev)[0] = 3;
-    CALLLAP();
+    CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -100,7 +129,8 @@ int main() {
     igraph_vector_resize(&ev, 2);
     VECTOR(ev)[0] = 1;
     VECTOR(ev)[1] = 3;
-    CALLLAP();
+    CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -110,6 +140,7 @@ int main() {
     igraph_matrix_complex_destroy(&evec);
     igraph_vector_complex_destroy(&eval);
     igraph_vector_destroy(&groups);
+    igraph_vector_destroy(&p);
     igraph_matrix_destroy(&scg_matrix);
     igraph_matrix_destroy(&L);
     igraph_matrix_destroy(&R);
@@ -118,6 +149,7 @@ int main() {
 
     /* -------------------------------------------------------------------- */
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
-
