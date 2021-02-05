@@ -63,7 +63,6 @@ IGRAPH_EXPORT igraph_vs_t igraph_vss_all(void);
 
 IGRAPH_EXPORT int igraph_vs_adj(igraph_vs_t *vs,
                                 igraph_integer_t vid, igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_vs_t igraph_vss_adj(igraph_integer_t vid, igraph_neimode_t mode);
 
 IGRAPH_EXPORT int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
                                    igraph_neimode_t mode);
