@@ -755,8 +755,9 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
         mode = IGRAPH_ALL;
     }
 
-    /* Calculate needed space first & allocate it*/
-
+    /* Calculate needed space first & allocate it */
+    /* Note that 'mode' is treated as a bit field here; it's okay because
+     * IGRAPH_ALL = IGRAPH_IN | IGRAPH_OUT, bit-wise */
     if (mode & IGRAPH_OUT) {
         length += (VECTOR(graph->os)[node + 1] - VECTOR(graph->os)[node]);
     }
@@ -766,6 +767,17 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
 
     IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
+    /* The loops below produce an ordering what is consistent with the
+     * ordering returned by igraph_neighbors(), and this should be preserved.
+     * We are dealing with two sorted lists; one for the successors and one
+     * for the predecessors. If we have requested only one of them, we have
+     * an easy job. If we have requested both, we need to merge the two lists
+     * to ensure that the output is sorted by the vertex IDs of the "other"
+     * endpoint of the affected edges. We don't need to merge if the graph
+     * is undirected, because in that case the data structure guarantees that
+     * the "out-edges" contain only (u, v) pairs where u <= v and the
+     * "in-edges" contains the rest, so the result is sorted even without
+     * merging. */
     if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
         /* graph is undirected or we did not ask for both directions in a
          * directed graph; this is the easy case */
@@ -1656,19 +1668,20 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
     long int node = pnode;
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
+        IGRAPH_ERROR("cannot get incident edges", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("cannot get incident edges", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    /* Calculate needed space first & allocate it*/
-
+    /* Calculate needed space first & allocate it */
+    /* Note that 'mode' is treated as a bit field here; it's okay because
+     * IGRAPH_ALL = IGRAPH_IN | IGRAPH_OUT, bit-wise */
     if (mode & IGRAPH_OUT) {
         length += (VECTOR(graph->os)[node + 1] - VECTOR(graph->os)[node]);
     }
@@ -1678,9 +1691,15 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
 
     IGRAPH_CHECK(igraph_vector_resize(eids, length));
 
+    /* The loops below produce an ordering what is consistent with the
+     * ordering returned by igraph_neighbors(), and this should be preserved.
+     * We are dealing with two sorted lists; one for the successors and one
+     * for the predecessors. If we have requested only one of them, we have
+     * an easy job. If we have requested both, we need to merge the two lists
+     * to ensure that the output is sorted by the vertex IDs of the "other"
+     * endpoint of the affected edges */
     if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
-        /* graph is undirected or we did not ask for both directions in a
-         * directed graph; this is the easy case */
+        /* We did not ask for both directions; this is the easy case */
         if (mode & IGRAPH_OUT) {
             j = (long int) VECTOR(graph->os)[node + 1];
             for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
