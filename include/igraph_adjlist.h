@@ -123,6 +123,7 @@ IGRAPH_EXPORT int igraph_lazy_adjlist_init(const igraph_t *graph,
                                            igraph_multiple_t multiple);
 IGRAPH_EXPORT void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
+IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);
 
 /**
  * \define igraph_lazy_adjlist_get
@@ -160,6 +161,7 @@ IGRAPH_EXPORT int igraph_lazy_inclist_init(const igraph_t *graph,
                                            igraph_loops_t loops);
 IGRAPH_EXPORT void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);
 IGRAPH_EXPORT void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
+IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il);
 
 /**
  * \define igraph_lazy_inclist_get

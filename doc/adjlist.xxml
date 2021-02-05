@@ -33,6 +33,7 @@
 <!-- doxrox-include igraph_lazy_adjlist_init -->
 <!-- doxrox-include igraph_lazy_adjlist_destroy -->
 <!-- doxrox-include igraph_lazy_adjlist_get -->
+<!-- doxrox-include igraph_lazy_adjlist_size -->
 <!-- doxrox-include igraph_lazy_adjlist_clear -->
 </section>
 
@@ -40,6 +41,7 @@
 <!-- doxrox-include igraph_lazy_inclist_init -->
 <!-- doxrox-include igraph_lazy_inclist_destroy -->
 <!-- doxrox-include igraph_lazy_inclist_get -->
+<!-- doxrox-include igraph_lazy_inclist_size -->
 <!-- doxrox-include igraph_lazy_inclist_clear -->
 </section>
 

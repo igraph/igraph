@@ -331,10 +331,6 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
     return al->length;
 }
 
-/* igraph_vector_int_t *igraph_adjlist_get(igraph_adjlist_t *al, igraph_integer_t no) { */
-/*   return &al->adjs[(long int)no]; */
-/* } */
-
 /**
  * \function igraph_adjlist_sort
  * \brief Sorts each vector in an adjacency list.
@@ -974,6 +970,19 @@ void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al) {
     }
 }
 
+/**
+ * \function igraph_lazy_adjlist_size
+ * \brief Returns the number of vertices in a lazy adjacency list.
+ *
+ * \param al The lazy adjacency list.
+ * \return The number of vertices in the lazy adjacency list.
+ *
+ * Time complexity: O(1).
+ */
+igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al) {
+    return al->length;
+}
+
 igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
         igraph_integer_t pno) {
     igraph_integer_t no = pno;
@@ -1121,6 +1130,19 @@ void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il) {
             igraph_Free(il->incs[i]);
         }
     }
+}
+
+/**
+ * \function igraph_lazy_inclist_size
+ * \brief Returns the number of vertices in a lazy incidence list.
+ *
+ * \param il The lazy incidence list.
+ * \return The number of vertices in the lazy incidence list.
+ *
+ * Time complexity: O(1).
+ */
+igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il) {
+    return il->length;
 }
 
 igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,

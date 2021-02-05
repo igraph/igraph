@@ -28,11 +28,18 @@
     igraph_inclist_destroy(&inclist); \
 }
 
+#define TEST_LAZY_INCLIST(label, mode, loops) { \
+    igraph_lazy_inclist_init(&g, &lazy_inclist, mode, loops); \
+    printf(label ": "); \
+    print_lazy_inclist(&lazy_inclist); \
+    printf("\n"); \
+    igraph_lazy_inclist_destroy(&lazy_inclist); \
+}
+
 int test_loop_elimination_for_undirected_graph() {
     igraph_t g;
     igraph_inclist_t inclist;
-
-    printf("Testing loop edge elimination in undirected graph\n\n");
+    igraph_lazy_inclist_t lazy_inclist;
 
     igraph_small(
         &g, 5, /* directed = */ 0,
@@ -52,15 +59,27 @@ int test_loop_elimination_for_undirected_graph() {
         -1
     );
 
+    printf("Testing loop edge elimination in undirected graph\n\n");
+
     /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
      * make no difference */
     TEST_INCLIST("Loops eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS);
     TEST_INCLIST("Loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE);
     TEST_INCLIST("Loops listed twice", IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
 
-    igraph_destroy(&g);
+    printf("============================================================\n\n");
+
+    printf("Testing lazy loop edge elimination in undirected graph\n\n");
+
+    /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
+     * make no difference */
+    TEST_LAZY_INCLIST("Loops eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS);
+    TEST_LAZY_INCLIST("Loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE);
+    TEST_LAZY_INCLIST("Loops listed twice", IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
 
     printf("============================================================\n\n");
+
+    igraph_destroy(&g);
 
     return 0;
 }
@@ -68,8 +87,7 @@ int test_loop_elimination_for_undirected_graph() {
 int test_loop_elimination_for_directed_graph() {
     igraph_t g;
     igraph_inclist_t inclist;
-
-    printf("Testing loop edge elimination in directed graph\n\n");
+    igraph_lazy_inclist_t lazy_inclist;
 
     igraph_small(
         &g, 5, /* directed = */ 1,
@@ -89,6 +107,8 @@ int test_loop_elimination_for_directed_graph() {
         -1
     );
 
+    printf("Testing loop edge elimination in directed graph\n\n");
+
     TEST_INCLIST("In-edges, loops eliminated", IGRAPH_IN, IGRAPH_NO_LOOPS);
     TEST_INCLIST("In-edges, loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE);
     TEST_INCLIST("In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
@@ -103,9 +123,27 @@ int test_loop_elimination_for_directed_graph() {
     TEST_INCLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
     TEST_INCLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
 
-    igraph_destroy(&g);
+    printf("============================================================\n\n");
+
+    printf("Testing lazy loop edge elimination in directed graph\n\n");
+
+    TEST_LAZY_INCLIST("In-edges, loops eliminated", IGRAPH_IN, IGRAPH_NO_LOOPS);
+    TEST_LAZY_INCLIST("In-edges, loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE);
+    TEST_LAZY_INCLIST("In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
+        IGRAPH_IN, IGRAPH_LOOPS_TWICE);
+
+    TEST_LAZY_INCLIST("Out-edges, loops eliminated", IGRAPH_OUT, IGRAPH_NO_LOOPS);
+    TEST_LAZY_INCLIST("Out-edges, loops listed once", IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
+    TEST_LAZY_INCLIST("Out-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
+        IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
+
+    TEST_LAZY_INCLIST("In- and out-edges, loops eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS);
+    TEST_LAZY_INCLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    TEST_LAZY_INCLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
 
     printf("============================================================\n\n");
+
+    igraph_destroy(&g);
 
     return 0;
 }

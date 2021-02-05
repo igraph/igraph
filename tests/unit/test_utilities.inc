@@ -114,14 +114,46 @@ void print_graph(const igraph_t *graph) {
  * brackets around the entire incidence list to make it clear when the list
  * is empty.
  */
-void print_inclist(const igraph_inclist_t *adjlist) {
-    long vcount = igraph_inclist_size(adjlist);
+void print_inclist(const igraph_inclist_t *inclist) {
+    long vcount = igraph_inclist_size(inclist);
     long i;
 
     printf("{\n");
     for (i = 0; i < vcount; ++i) {
         printf("  %ld: ", i);
-        print_vector_int(igraph_inclist_get(adjlist, i));
+        print_vector_int(igraph_inclist_get(inclist, i));
+    }
+    printf("}\n");
+}
+
+/* Print a lazy adjacency list. Use brackets around each vector and also use
+ * brackets around the entire lazy adjacency list to make it clear when the list
+ * is empty.
+ */
+void print_lazy_adjlist(igraph_lazy_adjlist_t *adjlist) {
+    long vcount = igraph_lazy_adjlist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_lazy_adjlist_get(adjlist, i));
+    }
+    printf("}\n");
+}
+
+/* Print a lazy incidence list. Use brackets around each vector and also use
+ * brackets around the entire incidence list to make it clear when the list
+ * is empty.
+ */
+void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
+    long vcount = igraph_lazy_inclist_size(inclist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_lazy_inclist_get(inclist, i));
     }
     printf("}\n");
 }

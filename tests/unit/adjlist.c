@@ -66,11 +66,18 @@ int test_simple_trees() {
     igraph_adjlist_destroy(&adjlist); \
 }
 
+#define TEST_LAZY_ADJLIST(label, mode, loops, multiple) { \
+    igraph_lazy_adjlist_init(&g, &lazy_adjlist, mode, loops, multiple); \
+    printf(label ": "); \
+    print_lazy_adjlist(&lazy_adjlist); \
+    printf("\n"); \
+    igraph_lazy_adjlist_destroy(&lazy_adjlist); \
+}
+
 int test_loop_elimination_for_undirected_graph() {
     igraph_t g;
     igraph_adjlist_t adjlist;
-
-    printf("Testing loop edge elimination in undirected graph\n\n");
+    igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
         &g, 5, /* directed = */ 0,
@@ -82,15 +89,27 @@ int test_loop_elimination_for_undirected_graph() {
         -1
     );
 
+    printf("Testing loop edge elimination in undirected graph\n\n");
+
     /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
      * make no difference */
     TEST_ADJLIST("Loops eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
     TEST_ADJLIST("Loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     TEST_ADJLIST("Loops listed twice", IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
-    igraph_destroy(&g);
+    printf("============================================================\n\n");
+
+    printf("Testing lazy loop edge elimination in undirected graph\n\n");
+
+    /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
+     * make no difference */
+    TEST_LAZY_ADJLIST("Loops eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("Loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("Loops listed twice", IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
     printf("============================================================\n\n");
+
+    igraph_destroy(&g);
 
     return 0;
 }
@@ -98,8 +117,7 @@ int test_loop_elimination_for_undirected_graph() {
 int test_loop_elimination_for_directed_graph() {
     igraph_t g;
     igraph_adjlist_t adjlist;
-
-    printf("Testing loop edge elimination in directed graph\n\n");
+    igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
         &g, 5, /* directed = */ 1,
@@ -110,6 +128,8 @@ int test_loop_elimination_for_directed_graph() {
         4, 4, 4, 4,
         -1
     );
+
+    printf("Testing loop edge elimination in directed graph\n\n");
 
     TEST_ADJLIST("In-edges, loops eliminated", IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
     TEST_ADJLIST("In-edges, loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
@@ -125,9 +145,27 @@ int test_loop_elimination_for_directed_graph() {
     TEST_ADJLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     TEST_ADJLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
-    igraph_destroy(&g);
+    printf("============================================================\n\n");
+
+    printf("Testing lazy loop edge elimination in directed graph\n\n");
+
+    TEST_LAZY_ADJLIST("In-edges, loops eliminated", IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("In-edges, loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
+        IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+
+    TEST_LAZY_ADJLIST("Out-edges, loops eliminated", IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("Out-edges, loops listed once", IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("Out-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
+        IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+
+    TEST_LAZY_ADJLIST("In- and out-edges, loops eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    TEST_LAZY_ADJLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
     printf("============================================================\n\n");
+
+    igraph_destroy(&g);
 
     return 0;
 }
@@ -135,8 +173,7 @@ int test_loop_elimination_for_directed_graph() {
 int test_multiedge_elimination_for_undirected_graph() {
     igraph_t g;
     igraph_adjlist_t adjlist;
-
-    printf("Testing multiple edge elimination in undirected graph\n\n");
+    igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
         &g, 5, /* directed = */ 0,
@@ -151,15 +188,27 @@ int test_multiedge_elimination_for_undirected_graph() {
         -1
     );
 
+    printf("Testing multiple edge elimination in undirected graph\n\n");
+
     /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
      * make no difference */
     TEST_ADJLIST("Loops also eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     TEST_ADJLIST("Loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
     TEST_ADJLIST("Loops listed twice", IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
 
-    igraph_destroy(&g);
+    printf("============================================================\n\n");
+
+    printf("Testing lazy multiple edge elimination in undirected graph\n\n");
+
+    /* We are testing IGRAPH_ALL, IGRAPH_IN and IGRAPH_OUT below; it should
+     * make no difference */
+    TEST_LAZY_ADJLIST("Loops also eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("Loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("Loops listed twice", IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
 
     printf("============================================================\n\n");
+
+    igraph_destroy(&g);
 
     return 0;
 }
@@ -167,8 +216,7 @@ int test_multiedge_elimination_for_undirected_graph() {
 int test_multiedge_elimination_for_directed_graph() {
     igraph_t g;
     igraph_adjlist_t adjlist;
-
-    printf("Testing multiple edge elimination in directed graph\n\n");
+    igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
         &g, 5, /* directed = */ 1,
@@ -182,6 +230,8 @@ int test_multiedge_elimination_for_directed_graph() {
         8, 0,
         -1
     );
+
+    printf("Testing multiple edge elimination in directed graph\n\n");
 
     TEST_ADJLIST("In-edges, loops also eliminated", IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     TEST_ADJLIST("In-edges, loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
@@ -197,9 +247,27 @@ int test_multiedge_elimination_for_directed_graph() {
     TEST_ADJLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
     TEST_ADJLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
 
-    igraph_destroy(&g);
-
     printf("============================================================\n\n");
+
+    printf("Testing lazy multiple edge elimination in directed graph\n\n");
+
+    TEST_LAZY_ADJLIST("In-edges, loops also eliminated", IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("In-edges, loops listed once", IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
+        IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
+
+    TEST_LAZY_ADJLIST("Out-edges, loops also eliminated", IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("Out-edges, loops listed once", IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("Out-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given",
+        IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
+
+    TEST_LAZY_ADJLIST("In- and out-edges, loops also eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
+ 
+    printf("============================================================\n\n");
+
+    igraph_destroy(&g);
 
     return 0;
 }
@@ -208,6 +276,7 @@ int main() {
     int retval;
 
     RUN_TEST(test_simple_trees);
+
     RUN_TEST(test_loop_elimination_for_undirected_graph);
     RUN_TEST(test_loop_elimination_for_directed_graph);
     RUN_TEST(test_multiedge_elimination_for_undirected_graph);
