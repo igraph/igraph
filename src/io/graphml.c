@@ -21,21 +21,23 @@
 
 */
 
-#include <locale.h>
 #include "igraph_foreign.h"
-#include "config.h"
-#include <math.h>               /* isnan */
-#include "core/math.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
-#include <ctype.h>      /* isspace */
-#include <string.h>
-#include <stdarg.h>         /* va_start & co */
-
+#include "core/math.h"
 #include "core/trie.h"
+#include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp */
+
+#include "config.h"
+
+#include <ctype.h>   /* isspace */
+#include <locale.h>
+#include <math.h>    /* isnan */
+#include <string.h>
+#include <stdarg.h>  /* va_start & co */
 
 #define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 

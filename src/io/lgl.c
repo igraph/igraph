@@ -20,10 +20,6 @@
 
 */
 
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_attributes.h"
@@ -31,7 +27,13 @@
 #include "igraph_memory.h"
 #include "igraph_version.h"
 
+#include "graph/attributes.h"
+
 #include "lgl-header.h"
+
+#include <ctype.h>
+#include <string.h>
+#include <time.h>
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);

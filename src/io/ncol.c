@@ -25,6 +25,8 @@
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 
+#include "graph/attributes.h"
+
 #include "ncol-header.h"
 
 int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,

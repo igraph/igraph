@@ -22,6 +22,7 @@
 */
 
 #include "igraph_bipartite.h"
+
 #include "igraph_attributes.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -29,6 +30,8 @@
 #include "igraph_dqueue.h"
 #include "igraph_random.h"
 #include "igraph_nongraph.h"
+
+#include "graph/attributes.h"
 
 /**
  * \section about_bipartite Bipartite networks in igraph

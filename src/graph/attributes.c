@@ -25,6 +25,8 @@
 #include "igraph_memory.h"
 #include "config.h"
 
+#include "graph/attributes.h"
+
 #include <string.h>
 #include <stdarg.h>
 
