@@ -23,13 +23,14 @@
 */
 
 #include "igraph_transitivity.h"
+
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_memory.h"
-#include "core/interruption.h"
-#include "igraph_centrality.h"
 #include "igraph_motifs.h"
 #include "igraph_structural.h"
+
+#include "core/interruption.h"
 
 /**
  * \function igraph_transitivity_avglocal_undirected

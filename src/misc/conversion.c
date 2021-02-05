@@ -34,8 +34,6 @@
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
 
-#include "config.h"
-
 /**
  * \ingroup conversion
  * \function igraph_get_adjacency

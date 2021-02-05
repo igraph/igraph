@@ -23,7 +23,6 @@
 
 #include "igraph_games.h"
 
-#include "igraph_attributes.h"
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"

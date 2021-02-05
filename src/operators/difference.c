@@ -23,7 +23,6 @@
 #include "igraph_operators.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_attributes.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 

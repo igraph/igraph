@@ -22,12 +22,14 @@
 */
 
 #include "igraph_epidemics.h"
+
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
+
 #include "core/interruption.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {

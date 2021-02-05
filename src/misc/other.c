@@ -24,10 +24,11 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 #include "igraph_types.h"
+
 #include "core/interruption.h"
-#include "config.h"
 #include "plfit/error.h"
 #include "plfit/plfit.h"
+
 #include <math.h>
 
 /**

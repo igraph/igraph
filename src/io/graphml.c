@@ -33,7 +33,6 @@
 
 #include "config.h"
 
-#include <ctype.h>   /* isspace */
 #include <locale.h>
 #include <math.h>    /* isnan */
 #include <string.h>

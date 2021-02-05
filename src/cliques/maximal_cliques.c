@@ -22,14 +22,15 @@
 */
 
 #include "igraph_cliques.h"
-#include "igraph_constants.h"
-#include "igraph_interface.h"
-#include "igraph_community.h"
+
 #include "igraph_adjlist.h"
-#include "core/interruption.h"
+#include "igraph_constants.h"
+#include "igraph_community.h"
+#include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
-#include "core/math.h"
+
+#include "core/interruption.h"
 
 #define CONCAT2x(a,b) a ## b
 #define CONCAT2(a,b) CONCAT2x(a,b)

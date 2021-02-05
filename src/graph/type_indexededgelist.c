@@ -27,8 +27,6 @@
 
 #include "graph/attributes.h"
 
-#include "config.h"
-
 /* Internal functions */
 
 static int igraph_i_create_start(

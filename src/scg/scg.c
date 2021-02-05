@@ -76,6 +76,7 @@
  */
 
 #include "igraph_scg.h"
+
 #include "igraph_eigen.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"

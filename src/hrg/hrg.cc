@@ -22,11 +22,8 @@
 */
 
 #include "igraph_interface.h"
-#include "igraph_community.h"
 #include "igraph_memory.h"
-#include "igraph_constructors.h"
 #include "igraph_attributes.h"
-#include "igraph_foreign.h"
 #include "igraph_hrg.h"
 #include "igraph_random.h"
 

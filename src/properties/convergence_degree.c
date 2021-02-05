@@ -21,8 +21,6 @@
 
 */
 
-#include <string.h>
-
 #include "igraph_centrality.h"
 
 #include "igraph_adjlist.h"
@@ -31,6 +29,8 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+
+#include <string.h>
 
 /*
  * \example examples/simple/graph_convergence_degree.c

@@ -4,7 +4,6 @@
 
 /* #include <stdio.h> */
 #include <stdlib.h>
-#include <math.h>
 #include <limits.h>     /* INT_MAX */
 #include <float.h>      /* DBL_MAX */
 #include <time.h>
