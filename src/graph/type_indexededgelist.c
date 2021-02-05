@@ -751,7 +751,7 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
         IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
     }
 
-    if (! graph->directed) {
+    if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
@@ -767,7 +767,8 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
     IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
     if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
-
+        /* graph is undirected or we did not ask for both directions in a
+         * directed graph; this is the easy case */
         if (mode & IGRAPH_OUT) {
             j = (long int) VECTOR(graph->os)[node + 1];
             for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
@@ -1662,7 +1663,7 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
         IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
     }
 
-    if (! graph->directed) {
+    if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
@@ -1677,16 +1678,52 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
 
     IGRAPH_CHECK(igraph_vector_resize(eids, length));
 
-    if (mode & IGRAPH_OUT) {
-        j = (long int) VECTOR(graph->os)[node + 1];
-        for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
-            VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i];
+    if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
+        /* graph is undirected or we did not ask for both directions in a
+         * directed graph; this is the easy case */
+        if (mode & IGRAPH_OUT) {
+            j = (long int) VECTOR(graph->os)[node + 1];
+            for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
+                VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i];
+            }
         }
-    }
-    if (mode & IGRAPH_IN) {
-        j = (long int) VECTOR(graph->is)[node + 1];
-        for (i = (long int) VECTOR(graph->is)[node]; i < j; i++) {
-            VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i];
+        if (mode & IGRAPH_IN) {
+            j = (long int) VECTOR(graph->is)[node + 1];
+            for (i = (long int) VECTOR(graph->is)[node]; i < j; i++) {
+                VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i];
+            }
+        }
+    } else {
+        /* both in- and out- neighbors in a directed graph,
+           we need to merge the two 'vectors' */
+        long int j1 = (long int) VECTOR(graph->os)[node + 1];
+        long int j2 = (long int) VECTOR(graph->is)[node + 1];
+        long int i1 = (long int) VECTOR(graph->os)[node];
+        long int i2 = (long int) VECTOR(graph->is)[node];
+        long int eid1, eid2;
+        long int n1, n2;
+        
+        while (i1 < j1 && i2 < j2) {
+            eid1 = (long int) VECTOR(graph->oi)[i1];
+            eid2 = (long int) VECTOR(graph->ii)[i2];
+            n1 = (long int) VECTOR(graph->to)[eid1];
+            n2 = (long int) VECTOR(graph->from)[eid2];
+            if (n1 < n2) {
+                VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i1++];
+            } else if (n1 > n2) {
+                VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i2++];
+            } else {
+                VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i1++];
+                VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i2++];
+            }
+        }
+
+        while (i1 < j1) {
+            VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i1++];
+        }
+
+        while (i2 < j2) {
+            VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i2++];
         }
     }
 
