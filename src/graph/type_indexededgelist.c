@@ -785,15 +785,18 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
     } else {
         /* both in- and out- neighbors in a directed graph,
            we need to merge the two 'vectors' */
-        long int jj1 = (long int) VECTOR(graph->os)[node + 1];
+        long int j1 = (long int) VECTOR(graph->os)[node + 1];
         long int j2 = (long int) VECTOR(graph->is)[node + 1];
         long int i1 = (long int) VECTOR(graph->os)[node];
         long int i2 = (long int) VECTOR(graph->is)[node];
-        while (i1 < jj1 && i2 < j2) {
-            long int n1 = (long int) VECTOR(graph->to)[
-                   (long int)VECTOR(graph->oi)[i1] ];
-            long int n2 = (long int) VECTOR(graph->from)[
-                   (long int)VECTOR(graph->ii)[i2] ];
+        long int eid1, eid2;
+        long int n1, n2;
+        
+        while (i1 < j1 && i2 < j2) {
+            eid1 = (long int) VECTOR(graph->oi)[i1];
+            eid2 = (long int) VECTOR(graph->ii)[i2];
+            n1 = (long int) VECTOR(graph->to)[eid1];
+            n2 = (long int) VECTOR(graph->from)[eid2];
             if (n1 < n2) {
                 VECTOR(*neis)[idx++] = n1;
                 i1++;
@@ -807,17 +810,15 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
                 i2++;
             }
         }
-        while (i1 < jj1) {
-            long int n1 = (long int) VECTOR(graph->to)[
-                   (long int)VECTOR(graph->oi)[i1] ];
-            VECTOR(*neis)[idx++] = n1;
-            i1++;
+
+        while (i1 < j1) {
+            eid1 = (long int) VECTOR(graph->oi)[i1++];
+            VECTOR(*neis)[idx++] = (long int) VECTOR(graph->to)[eid1];
         }
+
         while (i2 < j2) {
-            long int n2 = (long int) VECTOR(graph->from)[
-                   (long int)VECTOR(graph->ii)[i2] ];
-            VECTOR(*neis)[idx++] = n2;
-            i2++;
+            eid2 = (long int) VECTOR(graph->ii)[i2++];
+            VECTOR(*neis)[idx++] = (long int) VECTOR(graph->from)[eid2];
         }
     }
 
