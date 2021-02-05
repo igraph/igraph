@@ -294,7 +294,7 @@ typedef struct igraph_attribute_table_t {
                               igraph_vector_bool_t *value);
 } igraph_attribute_table_t;
 
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
 IGRAPH_EXPORT igraph_attribute_table_t * igraph_set_attribute_table(const igraph_attribute_table_t * table);
 
 IGRAPH_EXPORT igraph_bool_t igraph_has_attribute_table(void);

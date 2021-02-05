@@ -263,7 +263,7 @@ IGRAPH_EXPORT int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 
 IGRAPH_EXPORT int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
                                         int *p, int *i, double *x, int nz);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
+IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
                                                             int *p, int *i, double *x, int nz);
 
 IGRAPH_EXPORT int igraph_sparsemat_sort(const igraph_sparsemat_t *A,

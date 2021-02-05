@@ -52,13 +52,13 @@ IGRAPH_EXPORT int igraph_is_bigraphical(const igraph_vector_t *degrees1,
 
 /* Legacy functions (deprecated): */
 
-IGRAPH_EXPORT int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
-                                            const igraph_vector_t *in_degrees,
-                                            igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+                                                              const igraph_vector_t *in_degrees,
+                                                              igraph_bool_t *res);
 
-IGRAPH_EXPORT int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
-                                                      const igraph_vector_t *in_degrees,
-                                                      igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+                                                                        const igraph_vector_t *in_degrees,
+                                                                        igraph_bool_t *res);
 
 __END_DECLS
 
