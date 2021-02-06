@@ -22,13 +22,13 @@
 */
 
 #include "igraph_motifs.h"
+
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_nongraph.h"
 #include "igraph_stack.h"
-#include "config.h"
 
 #include "core/interruption.h"
 #include "isomorphism/isoclasses.h"

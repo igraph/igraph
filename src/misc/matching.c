@@ -21,14 +21,15 @@
 
 */
 
+#include "igraph_matching.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_matching.h"
 #include "igraph_structural.h"
-#include "config.h"
+
 #include <math.h>
 
 /* #define MATCHING_DEBUG */

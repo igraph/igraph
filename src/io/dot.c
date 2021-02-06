@@ -20,9 +20,6 @@
 
 */
 
-#include <ctype.h>
-#include <string.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_attributes.h"
@@ -31,7 +28,11 @@
 #include "igraph_memory.h"
 #include "igraph_version.h"
 
+#include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp */
+
+#include <ctype.h>
+#include <string.h>
 
 #define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE); } while (0)
 

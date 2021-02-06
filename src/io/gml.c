@@ -20,10 +20,6 @@
 
 */
 
-#include <ctype.h>
-#include <time.h>
-#include <string.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_attributes.h"
@@ -32,7 +28,12 @@
 #include "igraph_version.h"
 
 #include "core/trie.h"
+#include "graph/attributes.h"
 #include "io/gml-header.h"
+
+#include <ctype.h>
+#include <time.h>
+#include <string.h>
 
 int igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
                                  void* scanner);

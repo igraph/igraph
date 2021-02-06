@@ -19,6 +19,7 @@
 */
 
 #include "igraph_centrality.h"
+
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
@@ -28,12 +29,13 @@
 #include "igraph_topology.h"
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"
-#include "config.h"
 
 #include "centrality/prpack_internal.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
 #include "core/math.h"
+
+#include "config.h"
 
 #include <math.h>
 #include <string.h>    /* memset */

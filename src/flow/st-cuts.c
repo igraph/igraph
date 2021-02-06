@@ -27,18 +27,17 @@
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
 #include "igraph_components.h"
-#include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_stack.h"
-#include "igraph_structural.h"
 #include "igraph_visitor.h"
 
 #include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
+#include "graph/attributes.h"
 #include "flow/flow_internal.h"
 
 typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,

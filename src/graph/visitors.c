@@ -27,7 +27,6 @@
 #include "igraph_interface.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
-#include "config.h"
 
 /**
  * \function igraph_bfs

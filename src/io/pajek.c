@@ -20,19 +20,19 @@
 
 */
 
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_attributes.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_version.h"
+
+#include "graph/attributes.h"
 
 #include "pajek-header.h"
+
+#include <ctype.h>
+#include <string.h>
 
 int igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
                                   void* scanner);

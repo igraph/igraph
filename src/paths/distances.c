@@ -23,13 +23,15 @@
 */
 
 #include "igraph_paths.h"
+
 #include "igraph_datatype.h"
 #include "igraph_dqueue.h"
 #include "igraph_iterators.h"
-#include "core/interruption.h"
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
+
+#include "core/interruption.h"
 
 static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,

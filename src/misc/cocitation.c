@@ -25,9 +25,10 @@
 #include "igraph_cocitation.h"
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
-#include "core/interruption.h"
 #include "igraph_interface.h"
-#include "config.h"
+
+#include "core/interruption.h"
+
 #include <math.h>
 
 int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,

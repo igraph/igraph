@@ -24,9 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_random.h"
 
 /**

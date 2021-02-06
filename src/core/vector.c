@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_complex.h"
-#include "config.h"
+
 #include <float.h>
 
 #define BASE_IGRAPH_REAL

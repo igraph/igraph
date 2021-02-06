@@ -36,12 +36,13 @@
 #include "igraph_operators.h"
 #include "igraph_structural.h"
 #include "igraph_topology.h"
-#include "config.h"
 
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
 #include "core/math.h"
+
+#include "config.h"
 
 /*
  * Some general remarks about the functions in this file.

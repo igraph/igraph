@@ -185,19 +185,19 @@ IGRAPH_EXPORT int igraph_centralization_eigenvector_centrality_tmax(
 
 /* Deprecated functions: */
 
-IGRAPH_EXPORT int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_vs_t vids, igraph_neimode_t mode,
-                                            igraph_real_t cutoff,
-                                            const igraph_vector_t *weights,
-                                            igraph_bool_t normalized);
+IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
+                                                              const igraph_vs_t vids, igraph_neimode_t mode,
+                                                              igraph_real_t cutoff,
+                                                              const igraph_vector_t *weights,
+                                                              igraph_bool_t normalized);
 
-IGRAPH_EXPORT int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
-                                              const igraph_vs_t vids, igraph_bool_t directed,
-                                              igraph_real_t cutoff, const igraph_vector_t *weights);
+IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
+                                                                const igraph_vs_t vids, igraph_bool_t directed,
+                                                                igraph_real_t cutoff, const igraph_vector_t *weights);
 
-IGRAPH_EXPORT int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                                                   igraph_bool_t directed, igraph_real_t cutoff,
-                                                   const igraph_vector_t *weights);
+IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+                                                                     igraph_bool_t directed, igraph_real_t cutoff,
+                                                                     const igraph_vector_t *weights);
 
 __END_DECLS
 

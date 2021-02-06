@@ -25,7 +25,6 @@
 #include "igraph_strvector.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
