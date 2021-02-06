@@ -53,7 +53,8 @@
  *        \cli IGRAPH_GET_ADJACENCY_LOWER
  *          the lower left triangle of the matrix is used.
  *        \cli IGRAPH_GET_ADJACENCY_BOTH
- *          the whole matrix is used, a symmetric matrix is returned.
+ *          the whole matrix is used, a symmetric matrix is returned
+ *          if the graph is undirected.
  *        \endclist
  * \param type eids Logical, if true, then the edges ids plus one
  *        are stored in the adjacency matrix, instead of the number of
