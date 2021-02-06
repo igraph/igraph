@@ -143,7 +143,8 @@ IGRAPH_EXPORT int igraph_modularity(const igraph_t *graph,
 IGRAPH_EXPORT int igraph_modularity_matrix(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            const igraph_real_t resolution,
-                                           igraph_matrix_t *modmat);
+                                           igraph_matrix_t *modmat,
+                                           igraph_bool_t directed);
 
 IGRAPH_EXPORT int igraph_reindex_membership(igraph_vector_t *membership,
                                             igraph_vector_t *new_to_old,
