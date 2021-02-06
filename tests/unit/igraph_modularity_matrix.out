@@ -38,3 +38,10 @@ Triangle with weights -1, 0, 1 will cause divisions by zero:
 [ -Inf NaN Inf
   NaN NaN NaN
   Inf NaN -Inf ]
+Comparison with modularity:
+[ -0.700000 0.860000 1.30000 0.00000 -0.560000
+  -0.700000 -0.140000 2.30000 0.00000 -0.560000
+  0.00000 0.00000 0.00000 0.00000 0.00000
+  -0.933333 -0.186667 -0.933333 0.00000 3.25333
+  3.83333 -0.233333 -1.16667 0.00000 -0.933333 ]
+Modularity: 0.349333, modularity via matrix: 0.349333

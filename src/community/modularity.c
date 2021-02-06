@@ -226,28 +226,27 @@ static int igraph_i_modularity_matrix_get_adjacency(
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_null(res);
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
 
     if (weights) {
-        while (!IGRAPH_EIT_END(edgeit)) {
+        for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, edge, &from, &to);
+            from = IGRAPH_FROM(graph, edge);
+            to = IGRAPH_TO(graph, edge);
             MATRIX(*res, from, to) += VECTOR(*weights)[edge];
             if (!directed) {
                 MATRIX(*res, to, from) += VECTOR(*weights)[edge];
             }
-        IGRAPH_EIT_NEXT(edgeit);
         }
     } else {
-        while (!IGRAPH_EIT_END(edgeit)) {
+        for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
             igraph_edge(graph, edge, &from, &to);
             MATRIX(*res, from, to) += 1;
             if (!directed) {
                 MATRIX(*res, to, from) += 1;
             }
-        IGRAPH_EIT_NEXT(edgeit);
         }
     }
 
@@ -266,10 +265,20 @@ static int igraph_i_modularity_matrix_get_adjacency(
  * <code>B_ij = A_ij - gamma * k_i * k_j / (2m)</code>
  *
  * </para><para>
- * where \c A_ij is the adjacency matrix, \c gamma is the resolution parameter,
- * \c k_i is the degree of vertex \c i, and \c m is the number of edges in the graph.
- * When there are no edges, or the weights add up to zero, the result is undefined.
+ * for undirected graphs, where \c A_ij is the adjacency matrix, \c gamma is the
+ * resolution parameter, \c k_i is the degree of vertex \c i, and \c m is the
+ * number of edges in the graph. When there are no edges, or the weights add up
+ * to zero, the result is undefined.
  *
+ * </para><para>
+ * For directed graphs the modularity matrix is changed to
+ *
+ * </para><para>
+ * <code>B_ij = A_ij - gamma * k^out_i * k^in_j / (2m)</code>
+ * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the
+ * in-degree of node \c j.
+ *
+ * </para><para>
  * Note that self-loops in undirected graphs are multiplied by 2 in this
  * implementation. If weights are specified, the weighted counterparts are used.
  *
@@ -312,7 +321,7 @@ int igraph_modularity_matrix(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_i_modularity_matrix_get_adjacency(graph, modmat, weights, directed));
 
-   if (directed) {
+    if (directed) {
         IGRAPH_VECTOR_INIT_FINALLY(&in_deg, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&out_deg, no_of_nodes);
         if (!weights) {
