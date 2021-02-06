@@ -104,14 +104,16 @@ static int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
     long int no_of_nodes = igraph_vcount(igraph);
     igraph_vector_int_t *neis;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&graph->nbSucc, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(igraph, &graph->nbSucc, igraph_vss_all(),
-                               IGRAPH_OUT, IGRAPH_LOOPS));
-
     graph->nbVertices = no_of_nodes;
 
     IGRAPH_CHECK(igraph_adjlist_init(igraph, &graph->succ, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &graph->succ);
+
+    IGRAPH_VECTOR_INIT_FINALLY(&graph->nbSucc, no_of_nodes);
+    for (i=0; i < no_of_nodes; ++i) {
+        VECTOR(graph->nbSucc)[i] = igraph_vector_int_size(igraph_adjlist_get(&graph->succ, i));
+    }
+
     IGRAPH_CHECK(igraph_matrix_char_init(&graph->isEdge, no_of_nodes, no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_char_destroy, &graph->isEdge);
 
@@ -121,8 +123,7 @@ static int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
         for (j = 0; j < n; j++) {
             int v = (int)VECTOR(*neis)[j];
             if (MATRIX(graph->isEdge, i, v)) {
-                IGRAPH_ERROR("LAD functions only work on simple graphs, "
-                             "simplify your graph", IGRAPH_EINVAL);
+                IGRAPH_ERROR("LAD functions do not support graphs with multi-edges.", IGRAPH_EINVAL);
             }
             MATRIX(graph->isEdge, i, v) = 1;
         }
@@ -1491,7 +1492,7 @@ cleanup:
  * </para>
  *
  * <para>
- * LAD works with both directed and undirected graphs. Only simple graphs are supported.
+ * LAD works with both directed and undirected graphs. Graphs with multi-edges are not supported.
  * </para>
  */
 
