@@ -721,11 +721,9 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
-        }
+    if (igraph_vector_min(weights) < 0) {
+        IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+    }
     /* If res isn't excist then create one, in order for the algorithm to work. */
     if (!res){
         res = igraph_Calloc(1, igraph_vector_ptr_t);
@@ -982,8 +980,11 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         /* clear the paths vector */
         igraph_vector_ptr_clear(res);
         igraph_vector_ptr_set_item_destructor(res,
-                                              (igraph_finally_func_t*)igraph_vector_destroy);
-
+                                            (igraph_finally_func_t*)igraph_vector_destroy);
+        path = igraph_Calloc(1, igraph_vector_t);
+        if (path == 0)
+            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths_dijkstra",
+                        IGRAPH_ENOMEM);
         /* by definition, the shortest path leading to the starting vertex
         * consists of the vertex itself only */
         IGRAPH_FINALLY(igraph_free, path);
@@ -1050,7 +1051,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 printf("  Considering parent: %ld\n", parent_node);
                 printf("  Paths to parent start at index %ld in res\n", parent_path_idx);
                 */
-                assert(parent_path_idx >= 0);
+                IGRAPH_ASSERT(parent_path_idx >= 0);
                 for (; parent_path_idx < path_count; parent_path_idx++) {
                     parent_path = (igraph_vector_t*)VECTOR(*res)[parent_path_idx];
                     if (igraph_vector_tail(parent_path) != parent_node) {
@@ -1140,7 +1141,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_ptr_destroy_all(&parents);
     igraph_vector_ptr_destroy_all(&parents_edge);
     if (free_res){
-        igraph_vector_ptr_destroy(res);
+        igraph_vector_ptr_destroy_all(res);
         IGRAPH_FINALLY_CLEAN(6);
     }
     else{

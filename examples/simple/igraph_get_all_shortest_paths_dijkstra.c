@@ -147,12 +147,7 @@ int main() {
         VECTOR(res_e)[i] = 0;
     }
 
-    igraph_vector_ptr_destroy(&res);
-    igraph_vector_ptr_destroy(&res_e);
     /* Same ring, but with weights */
-
-    igraph_vector_ptr_init(&res, 5);
-    igraph_vector_ptr_init(&res_e, 5);
 
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
     igraph_get_all_shortest_paths_dijkstra(&g, /*res=*/ &res, /*res_e=*/ NULL,
@@ -180,13 +175,7 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_vector_ptr_destroy(&res);
-    igraph_vector_ptr_destroy(&res_e);
-
     /* More complicated example */
-
-    igraph_vector_ptr_init(&res, 5);
-    igraph_vector_ptr_init(&res_e, 5);
 
     igraph_small(&g, 10, IGRAPH_DIRECTED,
                  0, 1, 0, 2, 0, 3,    1, 2, 1, 4, 1, 5,
@@ -214,6 +203,9 @@ int main() {
         free(VECTOR(res)[i]);
         VECTOR(res)[i] = 0;
     }
+
+    igraph_vs_destroy(&vs);
+    igraph_destroy(&g);
 
     igraph_vector_ptr_sort(&res_e, vector_tail_cmp);
 
