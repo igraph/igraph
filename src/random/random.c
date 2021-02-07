@@ -22,12 +22,15 @@
 */
 
 #include "igraph_random.h"
+
 #include "igraph_nongraph.h"
 #include "igraph_error.h"
-#include "core/math.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_memory.h"
+
+#include "core/math.h"
+
 #include "config.h"
 #include <math.h>
 #include <string.h>

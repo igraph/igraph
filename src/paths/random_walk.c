@@ -22,6 +22,7 @@
 */
 
 #include "igraph_paths.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"

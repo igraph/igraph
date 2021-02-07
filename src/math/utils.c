@@ -21,12 +21,14 @@
 
 */
 
+#include "igraph_types.h"
+
+#include "core/math.h"
+
+#include "config.h"
+
 #include <math.h>
 #include <float.h>
-#include <stdarg.h>
-#include "config.h"
-#include "core/math.h"
-#include "igraph_types.h"
 
 #ifdef _MSC_VER
 #  ifndef isinf

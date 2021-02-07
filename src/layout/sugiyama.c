@@ -33,10 +33,11 @@
 #include "igraph_memory.h"
 #include "igraph_structural.h"
 #include "igraph_types.h"
-#include "config.h"
 
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
+
+#include "config.h"
 
 #include <limits.h>
 

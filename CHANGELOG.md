@@ -21,7 +21,7 @@
    * The macro `IGRAPH_FATAL()` and the functions `igraph_fatal()` and `igraph_fatalf()` raise a fatal error. These are for internal use.
    * `IGRAPH_ASSERT()` is a replacement for the `assert()` macro. It is for internal use.
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
- - The new `IGRAPH_WARNINGF`, `IGRAPH_ERRORF` and `IGRAPH_FATALF` macros provide warning/error reporting with `printf`-like syntax (PR #1627).
+ - The new `IGRAPH_WARNINGF`, `IGRAPH_ERRORF` and `IGRAPH_FATALF` macros provide warning/error reporting with `printf`-like syntax. (PR #1627, thanks to Daniel Noom!)
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
  - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
  - Harmonic centrality (PR #1583):
@@ -37,7 +37,7 @@
 
  - igraph now uses a CMake-based build sysyem.
  - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549)
- - Bliss has been updated to version 0.75. Bliss functions are now interruptible.
+ - Bliss has been updated to version 0.75. Bliss functions are now interruptible. Thanks to Tommi Junttila for making this possible!
  - Community detection:
    * `igraph_community_multilevel()`: added resolution parameter.
    * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
@@ -61,6 +61,8 @@
  - `igraph_to_directed()`: added RANDOM and ACYCLIC modes (PR #1511).
  - `igraph_topological_sorting()` now issues an error if the input graph is not acyclic. Previously it issued a warning.
  - `igraph_vector_(which_)(min|max|minmax)()` now handles NaN elements.
+ - `igraph_i_set_attribute_table()` is renamed to `igraph_set_attribute_table()`.
+ - `igraph_i_sparsemat_view()` is renamed to `igraph_sparsemat_view()`.
 
 ### Deprecated
 
@@ -89,6 +91,7 @@
  - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (PR #1598).
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
+ - `igraph_incident()` now returns edges in the same order as `igraph_neighbors()`.
  - PageRank (PR #1640):
    * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
    * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.
@@ -108,6 +111,11 @@
  - igraph's source files have been re-organized for better maintainability.
  - igraph can now be built with an external CXSparse library.
  - The references to igraph source files in error and warning messages are now always relative to igraph's base directory.
+ - When igraph is built as a shared library, only public symbols are exported even on Linux and macOS.
+
+### Acknowledgments
+
+ - Thanks to Daniel Noom for significantly expanding igraph's test coverage and exposing several issues in the process!
 
 ## [0.8.5] - 2020-12-07
 

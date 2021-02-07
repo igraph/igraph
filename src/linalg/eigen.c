@@ -22,10 +22,12 @@
 */
 
 #include "igraph_eigen.h"
+
 #include "igraph_qsort.h"
 #include "igraph_blas.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
+
 #include <string.h>
 #include <math.h>
 #include <float.h>

@@ -2,11 +2,12 @@
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "igraph_constants.h"
-#include "config.h"
 
 #include "core/interruption.h"
 #include "cliques/cliquer_internal.h"
 #include "cliques/cliquer/cliquer.h"
+
+#include "config.h"
 
 /* Call this to allow for interruption in Cliquer callback functions */
 #define CLIQUER_ALLOW_INTERRUPTION() \

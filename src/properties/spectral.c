@@ -24,7 +24,7 @@
 
 #include "igraph_structural.h"
 #include "igraph_interface.h"
-#include "config.h"
+
 #include <math.h>
 
 static int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
