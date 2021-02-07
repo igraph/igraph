@@ -26,7 +26,6 @@
 #include "core/math.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
-#include "config.h"
 
 #include <string.h>
 

@@ -118,10 +118,9 @@ int igraph_modularity(const igraph_t *graph,
                       igraph_real_t *modularity) {
 
     igraph_vector_t e, k_out, k_in;
-    long int types = (long int) igraph_vector_max(membership) + 1;
+    long int types;
     long int no_of_edges = igraph_ecount(graph);
     long int i;
-    igraph_integer_t from, to;
     igraph_real_t m;
     long int c1, c2;
     /* Only consider the graph as directed if it actually is directed */
@@ -146,7 +145,10 @@ int igraph_modularity(const igraph_t *graph,
     }
 
     /* At this point, the 'membership' vector does not have length zero,
-       thus it is safe to call igraph_vector_min(). */
+       thus it is safe to call igraph_vector_max() and min(). */
+
+    types = (long int) igraph_vector_max(membership) + 1;
+
     if (igraph_vector_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
     }
@@ -165,9 +167,8 @@ int igraph_modularity(const igraph_t *graph,
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
             }
-            igraph_edge(graph, (igraph_integer_t) i, &from, &to);
-            c1 = (long int) VECTOR(*membership)[from];
-            c2 = (long int) VECTOR(*membership)[to];
+            c1 = (long int) VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = (long int) VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 VECTOR(e)[c1] += directed_multiplier * w;
             }
@@ -178,9 +179,8 @@ int igraph_modularity(const igraph_t *graph,
     } else {
         m = no_of_edges;
         for (i = 0; i < no_of_edges; i++) {
-            igraph_edge(graph, (igraph_integer_t) i, &from, &to);
-            c1 = (long int) VECTOR(*membership)[from];
-            c2 = (long int) VECTOR(*membership)[to];
+            c1 = (long int) VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = (long int) VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 VECTOR(e)[c1] += directed_multiplier;
             }

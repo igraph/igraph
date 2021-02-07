@@ -21,11 +21,9 @@
 
 */
 
-#include "config.h"
-#include <limits.h>
+#include "igraph_components.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -35,6 +33,8 @@
 #include "igraph_vector.h"
 
 #include "core/interruption.h"
+
+#include <limits.h>
 
 static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
                                   igraph_vector_t *csize, igraph_integer_t *no);

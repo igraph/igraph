@@ -19,10 +19,10 @@
   02110-1301 USA
 */
 
+#include "igraph_microscopic_update.h"
+
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
-#include "igraph_microscopic_update.h"
-#include "igraph_nongraph.h"
 #include "igraph_random.h"
 #include "igraph_error.h"
 

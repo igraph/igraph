@@ -22,14 +22,14 @@
 
 */
 
-#include "config.h"
+#include "internal/glpk_support.h"
 
 #ifdef HAVE_GLPK
 
-#include "igraph_types.h"
 #include "igraph_error.h"
+
 #include "core/interruption.h"
-#include <glpk.h>
+
 #include <stdio.h>
 
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {

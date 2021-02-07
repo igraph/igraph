@@ -24,7 +24,6 @@
 #include "igraph_nongraph.h"
 #include "core/interruption.h"
 #include "igraph_statusbar.h"
-#include "config.h"
 
 #include <math.h>
 

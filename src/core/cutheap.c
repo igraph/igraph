@@ -21,7 +21,6 @@
 */
 
 #include "igraph_types.h"
-#include "config.h"
 
 #include "core/cutheap.h"
 

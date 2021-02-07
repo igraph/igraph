@@ -22,6 +22,7 @@
 */
 
 #include "igraph_conversion.h"
+
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
@@ -29,9 +30,9 @@
 #include "igraph_structural.h"
 #include "igraph_sparsemat.h"
 #include "igraph_random.h"
-#include "config.h"
 
 #include "core/fixed_vectorlist.h"
+#include "graph/attributes.h"
 
 /**
  * \ingroup conversion

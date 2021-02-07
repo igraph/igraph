@@ -21,8 +21,6 @@
 
 */
 
-#include <limits.h>
-
 #include "igraph_structural.h"
 
 #include "igraph_adjlist.h"
@@ -31,6 +29,8 @@
 #include "igraph_interface.h"
 
 #include "core/interruption.h"
+
+#include <limits.h>
 
 /**
  * \function igraph_girth

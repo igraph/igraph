@@ -20,8 +20,6 @@
 
 */
 
-#include <string.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_constructors.h"
@@ -29,6 +27,8 @@
 #include "igraph_iterators.h"
 
 #include "core/interruption.h"
+
+#include <string.h>
 
 /**
  * \function igraph_read_graph_dimacs

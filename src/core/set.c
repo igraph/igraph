@@ -24,7 +24,6 @@
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include "core/set.h"
 
