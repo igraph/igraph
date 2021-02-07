@@ -983,11 +983,13 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         /* If res isn't excist then create one, in order for the algorithm to work. */
         if (!res){
             res = igraph_Calloc(1, igraph_vector_ptr_t);
+            if (res == 0) {
+                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+            }
             IGRAPH_CHECK(igraph_vector_ptr_init(res, 0));
-            IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, res);
             igraph_vector_ptr_set_item_destructor(res, (igraph_finally_func_t*)igraph_vector_destroy);
             free_res = 1;
-            VECTOR(*res)[0] = path;
+            IGRAPH_CHECK(igraph_vector_ptr_push_back(res, path));
         }
         else{
             igraph_vector_ptr_clear(res);
@@ -1147,7 +1149,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_ptr_destroy_all(&parents);
     igraph_vector_ptr_destroy_all(&parents_edge);
     if (free_res){
-        igraph_vector_ptr_destroy_all(res);
+        igraph_free(res);
         IGRAPH_FINALLY_CLEAN(6);
     }
     else{
