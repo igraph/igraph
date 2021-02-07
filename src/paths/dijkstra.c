@@ -724,13 +724,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_min(weights) < 0) {
         IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
     }
-    /* If res isn't excist then create one, in order for the algorithm to work. */
-    if (!res){
-        res = igraph_Calloc(1, igraph_vector_ptr_t);
-        IGRAPH_CHECK(igraph_vector_ptr_init(res, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, res);
-        free_res = 1;
-    }
 
     /* parents stores a vector for each vertex, listing the parent vertices
      * of each vertex in the traversal */
@@ -909,7 +902,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         }
     }
 
-    if ((res && (!free_res)) || res_e) {
+    if (res || res_e) {
         igraph_vector_t *path, *paths_index, *parent_vec, *parent_edge_vec;
         igraph_stack_t stack;
         long int j, node;
@@ -977,19 +970,31 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         n = igraph_vector_size(&order);
         igraph_vector_null(paths_index);
 
-        /* clear the paths vector */
-        igraph_vector_ptr_clear(res);
-        igraph_vector_ptr_set_item_destructor(res,
-                                            (igraph_finally_func_t*)igraph_vector_destroy);
+        /* by definition, the shortest path leading to the starting vertex
+        * consists of the vertex itself only */
         path = igraph_Calloc(1, igraph_vector_t);
         if (path == 0)
             IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths_dijkstra",
                         IGRAPH_ENOMEM);
-        /* by definition, the shortest path leading to the starting vertex
-        * consists of the vertex itself only */
         IGRAPH_FINALLY(igraph_free, path);
         IGRAPH_CHECK(igraph_vector_init(path, 1));
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(res, path));
+
+        /* clear the paths vector */
+        /* If res isn't excist then create one, in order for the algorithm to work. */
+        if (!res){
+            res = igraph_Calloc(1, igraph_vector_ptr_t);
+            IGRAPH_CHECK(igraph_vector_ptr_init(res, 0));
+            IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, res);
+            free_res = 1;
+            VECTOR(*res)[0] = path; 
+        }
+        else{
+            igraph_vector_ptr_clear(res);
+            igraph_vector_ptr_set_item_destructor(res,
+                                            (igraph_finally_func_t*)igraph_vector_destroy);
+            IGRAPH_CHECK(igraph_vector_ptr_push_back(res, path));
+        }
+        
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to res */
         VECTOR(*path)[0] = from;
         if (res_e){
