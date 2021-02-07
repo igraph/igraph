@@ -66,6 +66,7 @@ IGRAPH_EXPORT int igraph_get_shortest_path(const igraph_t *graph,
 
 IGRAPH_EXPORT int igraph_get_all_shortest_paths(const igraph_t *graph,
                                                 igraph_vector_ptr_t *res,
+                                                igraph_vector_ptr_t *res_e,
                                                 igraph_vector_t *nrgeo,
                                                 igraph_integer_t from, const igraph_vs_t to,
                                                 igraph_neimode_t mode);
