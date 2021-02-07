@@ -1467,9 +1467,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
         }
 
         IGRAPH_CHECK(igraph_adjlist_init(
-            graph, &adjlist, dirmode,
-            dirmode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
-            IGRAPH_MULTIPLE
+            graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
         ));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
@@ -1493,10 +1491,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
         data.tmp = &tmp;
         data.reset = reset ? &normalized_reset : NULL;
 
-        IGRAPH_CHECK(igraph_inclist_init(
-            graph, &inclist, dirmode,
-            dirmode == IGRAPH_ALL ? IGRAPH_LOOPS_ONCE : IGRAPH_LOOPS_TWICE
-        ));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         /* Weighted degree */

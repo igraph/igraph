@@ -182,10 +182,7 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(
-        graph, &inclist, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
@@ -452,11 +449,7 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(
-        graph, &allneis, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
-        IGRAPH_MULTIPLE
-    ));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
@@ -564,11 +557,7 @@ int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector
     IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(
-        graph, &allneis, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
-        IGRAPH_MULTIPLE
-    ));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
@@ -678,10 +667,7 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(
-        graph, &inclist, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);

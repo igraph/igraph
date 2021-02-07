@@ -115,7 +115,7 @@ static int igraph_i_betweenness_cutoff_weighted(
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
@@ -588,7 +588,7 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
         }
     }
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);

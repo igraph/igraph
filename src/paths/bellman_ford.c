@@ -110,10 +110,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_DQUEUE_INIT_FINALLY(&Q, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&clean_vertices, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&num_queued, no_of_nodes);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(
-        graph, &inclist, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     all_to = igraph_vs_is_all(&to);

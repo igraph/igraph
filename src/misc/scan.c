@@ -133,10 +133,7 @@ static int igraph_i_local_scan_1_directed(const igraph_t *graph,
 
     igraph_vector_int_t neis;
 
-    IGRAPH_CHECK(igraph_inclist_init(
-        graph, &incs, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
     igraph_vector_int_init(&neis, no_of_nodes);
@@ -520,10 +517,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
         us, &adj_us, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_us);
-    IGRAPH_CHECK(igraph_inclist_init(
-        them, &incs_them, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_inclist_init(them, &incs_them, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs_them);
 
     IGRAPH_CHECK(igraph_vector_int_init(&neis, no_of_nodes));
@@ -638,10 +632,7 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
     IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
-    IGRAPH_CHECK(igraph_inclist_init(
-        graph, &incs, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
@@ -746,15 +737,9 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
     IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
-    IGRAPH_CHECK(igraph_inclist_init(
-        us, &incs_us, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_inclist_init(us, &incs_us, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs_us);
-    IGRAPH_CHECK(igraph_inclist_init(
-        them, &incs_them, mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE
-    ));
+    IGRAPH_CHECK(igraph_inclist_init(them, &incs_them, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs_them);
     IGRAPH_CHECK(igraph_stack_int_init(&ST, 100));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &ST);

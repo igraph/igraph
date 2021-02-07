@@ -199,11 +199,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
     } else {
         igraph_adjlist_t adjlist;
         igraph_vector_t ecc;
-        IGRAPH_CHECK(igraph_adjlist_init(
-            graph, &adjlist, mode,
-            mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE,
-            IGRAPH_MULTIPLE
-        ));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc, igraph_vss_all(),
