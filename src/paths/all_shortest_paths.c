@@ -48,12 +48,18 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
  * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices.
  *
  * \param graph The graph object.
- * \param res Pointer to an initialized pointer vector, the result
- *   will be stored here in igraph_vector_t objects. Each vector
- *   object contains the vertices along a shortest path from \p from
- *   to another vertex. The vectors are ordered according to their
- *   target vertex: first the shortest paths to vertex 0, then to
- *   vertex 1, etc. No data is included for unreachable vertices.
+ * \param res Pointer to an initialized pointer vector or NULL
+ *   If not NULL Each vector object contains the vertices along a 
+ *   shortest path from \p from to another vertex. The vectors are
+ *   ordered according to their target vertex: first the shortest 
+ *   paths to vertex 0, then to vertex 1, etc. No data is included 
+ *   for unreachable vertices.
+ * \param res_e Pointer to an initialized pointer vector or NULL. If 
+ *   not null the Each vector object contains the edges along a 
+ *   shortest path from \p from  to another vertex. The vectors are 
+ *   ordered according to their target vertex: first the shortest 
+ *   paths to vertex 0, then to vertex 1, etc. No data is included for
+ *   unreachable vertices.
  * \param nrgeo Pointer to an initialized igraph_vector_t object or
  *   NULL. If not NULL the number of shortest paths from \p from are
  *   stored here for every vertex in the graph. Note that the values
@@ -91,8 +97,10 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
  * Time complexity: O(|V|+|E|) for most graphs, O(|V|^2) in the worst
  * case.
  */
+
 int igraph_get_all_shortest_paths(const igraph_t *graph,
                                   igraph_vector_ptr_t *res,
+                                  igraph_vector_ptr_t *res_e,
                                   igraph_vector_t *nrgeo,
                                   igraph_integer_t from, const igraph_vs_t to,
                                   igraph_neimode_t mode) {
@@ -100,12 +108,14 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     long int no_of_nodes = igraph_vcount(graph);
     long int *geodist;
     igraph_vector_ptr_t paths;
+    igraph_vector_ptr_t path_edge;
     igraph_dqueue_t q;
     igraph_vector_t *vptr;
+    igraph_vector_t *vptr_e;
     igraph_vector_t neis;
     igraph_vector_t ptrlist;
     igraph_vector_t ptrhead;
-    long int n, j, i;
+    long int n, j, i, t;
     long int to_reach, reached = 0, maxdist = 0;
 
     igraph_vit_t vit;
@@ -124,6 +134,9 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     /* paths will store the shortest paths during the search */
     IGRAPH_CHECK(igraph_vector_ptr_init(&paths, 0));
     IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &paths);
+    /* paths will store the shortest paths during the search */
+    IGRAPH_CHECK(igraph_vector_ptr_init(&path_edge, 0));
+    IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &path_edge);
     /* neis is a temporary vector holding the neighbors of the
      * node being examined */
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -175,6 +188,10 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
     IGRAPH_CHECK(igraph_vector_init(vptr, 1));
     VECTOR(*vptr)[0] = from;
+    vptr_e = igraph_Calloc(1, igraph_vector_t);
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
+    IGRAPH_CHECK(igraph_vector_init(vptr_e, 1));
+    VECTOR(*vptr_e)[0] = -1;
     geodist[(long int)from] = 1;
     VECTOR(ptrhead)[(long int)from] = 1;
     IGRAPH_CHECK(igraph_vector_push_back(&ptrlist, 0));
@@ -206,11 +223,11 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             }
         }
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actnode,
+        IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode,
                                       mode));
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            long int neighbor = (long int) VECTOR(neis)[j];
+            long int neighbor = (long int) IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);
             long int fatherptr;
 
             if (geodist[neighbor] > 0 &&
@@ -248,7 +265,18 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_copy(vptr, VECTOR(paths)[fatherptr - 1]));
                 IGRAPH_CHECK(igraph_vector_reserve(vptr, actdist + 2));
                 IGRAPH_CHECK(igraph_vector_push_back(vptr, neighbor));
-
+                vptr_e = igraph_Calloc(1, igraph_vector_t);
+                IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
+                /* If the previous vertex was the source then there is no edge to add*/
+                if (actnode != from){
+                    IGRAPH_CHECK(igraph_vector_copy(vptr_e, VECTOR(path_edge)[fatherptr - 1]));
+                    IGRAPH_CHECK(igraph_vector_reserve(vptr_e, actdist + 2));
+                    IGRAPH_CHECK(igraph_vector_push_back(vptr_e, VECTOR(neis)[j]));
+                }
+                else{
+                    IGRAPH_CHECK(igraph_vector_init(vptr_e, 1));
+                    VECTOR(*vptr_e)[0] = VECTOR(neis)[j];
+                }
                 IGRAPH_CHECK(igraph_vector_push_back(&ptrlist,
                                                      VECTOR(ptrhead)[neighbor]));
                 VECTOR(ptrhead)[neighbor] = igraph_vector_size(&ptrlist);
@@ -278,9 +306,14 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             }
         }
     }
-
-    IGRAPH_CHECK(igraph_vector_ptr_resize(res, n));
+    if (res){
+        IGRAPH_CHECK(igraph_vector_ptr_resize(res, n));    
+    }
+    if (res_e){
+        IGRAPH_CHECK(igraph_vector_ptr_resize(res_e, n));
+    }
     j = 0;
+    t=0;
     for (i = 0; i < no_of_nodes; i++) {
         long int fatherptr = (long int) VECTOR(ptrhead)[i];
 
@@ -290,7 +323,21 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
         if (geodist[i] > 0) {
             /* yes, copy them to the result vector */
             while (fatherptr != 0) {
-                VECTOR(*res)[j++] = VECTOR(paths)[fatherptr - 1];
+                if (res){
+                    VECTOR(*res)[j++] = VECTOR(paths)[fatherptr - 1];
+                } 
+                if (res_e){
+                    VECTOR(*res_e)[t++] = VECTOR(path_edge)[fatherptr - 1];
+                }
+                /* If dont return the vertex or the edge path then release*/
+                if (!res){
+                    igraph_vector_destroy(VECTOR(paths)[fatherptr - 1]);
+                    igraph_Free(VECTOR(paths)[fatherptr - 1]);
+                }
+                if (!res_e){
+                    igraph_vector_destroy(VECTOR(path_edge)[fatherptr - 1]);
+                    igraph_Free(VECTOR(path_edge)[fatherptr - 1]);
+                }
                 fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
             }
         } else {
@@ -298,6 +345,8 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             while (fatherptr != 0) {
                 igraph_vector_destroy(VECTOR(paths)[fatherptr - 1]);
                 igraph_Free(VECTOR(paths)[fatherptr - 1]);
+                igraph_vector_destroy(VECTOR(path_edge)[fatherptr - 1]);
+                igraph_Free(VECTOR(path_edge)[fatherptr - 1]);
                 fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
             }
         }
@@ -308,8 +357,8 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     igraph_vector_destroy(&ptrhead);
     igraph_vector_destroy(&neis);
     igraph_vector_ptr_destroy(&paths);
+    igraph_vector_ptr_destroy(&path_edge);
     igraph_vit_destroy(&vit);
-    IGRAPH_FINALLY_CLEAN(6);
-
+    IGRAPH_FINALLY_CLEAN(7);
     return 0;
 }
