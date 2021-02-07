@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2008-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_structural.h"
@@ -28,7 +24,7 @@
 
 /**
  * \function igraph_maximum_cardinality_search
- * Maximum cardinality search
+ * \brief Maximum cardinality search.
  *
  * This function implements the maximum cardinality search algorithm
  * discussed in
@@ -37,8 +33,7 @@
  * hypergraphs, and selectively reduce acyclic hypergraphs.
  * SIAM Journal of Computation 13, 566--579, 1984.
  *
- * \param graph The input graph, which should be undirected and simple.
- *   of the edges is ignored.
+ * \param graph The input graph, which should be undirected.
  * \param alpha Pointer to an initialized vector, the result is stored here.
  *   It will be resized, as needed. Upon return it contains
  *   the rank of the each vertex.
@@ -62,7 +57,6 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     igraph_vector_long_t head, next, prev; /* doubly linked list with head */
     long int i;
     igraph_adjlist_t adjlist;
-    igraph_bool_t simple;
 
     /***************/
     /* local j, v; */
@@ -71,12 +65,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     long int j, v;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Maximum cardinality search works on undirected graphs only", IGRAPH_EINVAL);
-    }
-
-    igraph_is_simple(graph, &simple);
-    if (!simple) {
-        IGRAPH_ERROR("Maximum cardinality search works on simple graphs only", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Maximum cardinality search works on undirected graphs only.", IGRAPH_EINVAL);
     }
 
     if (no_of_nodes == 0) {
@@ -96,7 +85,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_long_init(&prev, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &prev);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_vector_resize(alpha, no_of_nodes));
@@ -230,15 +219,15 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     igraph_vector_long_destroy(&size);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_is_chordal
- * Decides whether a graph is chordal
+ * \brief Decides whether a graph is chordal.
  *
  * A graph is chordal if each of its cycles of four or more nodes
- * has a chord, which is an edge joining two nodes that are not
+ * has a chord, i.e. an edge joining two nodes that are not
  * adjacent in the cycle. An equivalent definition is that any
  * chordless cycles have at most three nodes.
  *
@@ -246,20 +235,20 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  * calculated by taking simply the inverse. If neither are given,
  * then \ref igraph_maximum_cardinality_search() is called to calculate
  * them.
- * \param graph The input graph, it might be directed, but edge
- *    direction is ignored.
+ *
+ * \param graph The input graph, it must be undirected.
  * \param alpha Either an alpha vector coming from
  *    \ref igraph_maximum_cardinality_search() (on the same graph), or a
- *    null pointer.
+ *    \c NULL pointer.
  * \param alpham1 Either an inverse alpha vector coming from \ref
- *    igraph_maximum_cardinality_search() (on the same graph) or a null
+ *    igraph_maximum_cardinality_search() (on the same graph) or a \c NULL
  *    pointer.
  * \param chordal Pointer to a boolean, the result is stored here.
- * \param fill_in Pointer to an initialized vector, or a null
- *    pointer. If not a null pointer, then the fill-in of the graph is
+ * \param fill_in Pointer to an initialized vector, or a \c NULL
+ *    pointer. If not a \c NULL pointer, then the fill-in of the graph is
  *    stored here. The fill-in is the set of edges that are needed to
  *    make the graph chordal. The vector is resized as needed.
- * \param newgraph Pointer to an uninitialized graph, or a null
+ * \param newgraph Pointer to an uninitialized graph, or a \c NULL
  *   pointer. If not a null pointer, then a new triangulated graph is
  *   created here. This essentially means adding the fill-in edges to
  *   the original graph.
@@ -295,7 +284,7 @@ int igraph_is_chordal(const igraph_t *graph,
 
     if (!chordal && !calc_edges) {
         /* Nothing to calculate */
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (!alpha && !alpham1) {
@@ -333,7 +322,7 @@ int igraph_is_chordal(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &f);
     IGRAPH_CHECK(igraph_vector_long_init(&index, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_long_init(&mark, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &mark);
@@ -467,5 +456,5 @@ int igraph_is_chordal(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
