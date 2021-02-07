@@ -1152,7 +1152,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (free_res){
         igraph_vector_ptr_destroy_all(res);
         IGRAPH_FINALLY_CLEAN(6);
-        igraph_vector_ptr_destroy(res);
+        igraph_free(res);
     }
     else{
         IGRAPH_FINALLY_CLEAN(5);
