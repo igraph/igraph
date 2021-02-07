@@ -274,8 +274,8 @@ static int igraph_i_modularity_matrix_get_adjacency(
  * For directed graphs the modularity matrix is changed to
  *
  * </para><para>
- * <code>B_ij = A_ij - gamma * k^out_i * k^in_j / (2m)</code>
- * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the
+ * <code>B_ij = A_ij - gamma * k^out_i * k^in_j / m</code>
+ * where <code>k^out_i</code> is the out-degree of node \c i and <code>k^in_j</code> is the
  * in-degree of node \c j.
  *
  * </para><para>
@@ -309,11 +309,11 @@ int igraph_modularity_matrix(const igraph_t *graph,
     long int i, j;
     igraph_real_t scaling_factor;
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (resolution < 0.0) {
-        IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -339,8 +339,8 @@ int igraph_modularity_matrix(const igraph_t *graph,
         scaling_factor = resolution / sw;
         igraph_vector_scale(&out_deg, scaling_factor);
 
-        for (i = 0; i < no_of_nodes; i++) {
-            for (j = 0; j < no_of_nodes; j++) {
+        for (j = 0; j < no_of_nodes; j++) {
+            for (i = 0; i < no_of_nodes; i++) {
                 MATRIX(*modmat, i, j) -= VECTOR(out_deg)[i] * VECTOR(in_deg)[j];
             }
         }
@@ -372,5 +372,5 @@ int igraph_modularity_matrix(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
