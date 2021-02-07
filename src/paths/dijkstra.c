@@ -1098,9 +1098,10 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 }
             }
         }
-
-        /* remove the destructor from the path vector */
-        igraph_vector_ptr_set_item_destructor(res, 0);
+        if (!free_res){
+            /* remove the destructor from the path vector */
+            igraph_vector_ptr_set_item_destructor(res, 0);
+        }
 
         /* free those paths from the result vector which we won't need */
         n = igraph_vector_ptr_size(res);
@@ -1113,8 +1114,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 /* we need this path, keep it */
                 if (!free_res){
                     VECTOR(*res)[j] = path;
-                } else{
-                    igraph_vector_destroy(path); free(path);
                 }
                 if (res_e){
                     path = (igraph_vector_t*)VECTOR(*res_e)[i];
@@ -1123,7 +1122,9 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 j++;
             } else {
                 /* we don't need this path, free it */
-                igraph_vector_destroy(path); free(path);
+                if (!free_res){
+                    igraph_vector_destroy(path); free(path);
+                }
                 if (res_e){
                     path = (igraph_vector_t*)VECTOR(*res_e)[i];
                     igraph_vector_destroy(path); free(path);
@@ -1149,7 +1150,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_ptr_destroy_all(&parents);
     igraph_vector_ptr_destroy_all(&parents_edge);
     if (free_res){
-        igraph_free(res);
+        igraph_vector_ptr_destroy_all(res);
         IGRAPH_FINALLY_CLEAN(6);
     }
     else{
