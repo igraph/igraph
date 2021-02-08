@@ -566,8 +566,8 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il)
 
     IGRAPH_WARNING(
         "igraph_inclist_remove_duplicate() is deprecated; use the constructor "
-        "arguments of igraph_adjlist_init() to specify whether you want loop "
-        "edges to appear once or twice in the adjacency list."
+        "arguments of igraph_inclist_init() to specify whether you want loop "
+        "edges to appear once or twice in the incidence list."
     );
 
     IGRAPH_UNUSED(graph);
