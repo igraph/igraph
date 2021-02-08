@@ -93,6 +93,7 @@
  * edges.
  *
  * \example examples/simple/igraph_bfs.c
+ * \example examples/simple/igraph_bfs_callback.c
  */
 int igraph_bfs(const igraph_t *graph,
                igraph_integer_t root, const igraph_vector_t *roots,

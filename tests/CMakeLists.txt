@@ -267,10 +267,12 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_bfs
+  igraph_bfs_callback
   igraph_bfs_simple
 )
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bfs
   bfs_simple
   igraph_random_walk
 )

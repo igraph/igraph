@@ -34,47 +34,23 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
 }
 
 int main() {
-
     igraph_t graph, ring;
-    igraph_vector_t order, rank, father, pred, succ, dist;
 
     /* Create a disjoint union of two rings */
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);
     igraph_destroy(&ring);
 
-    /* Initialize the vectors where the result will be stored. Any of these
-     * can be omitted and replaced with a null pointer when calling
-     * igraph_bfs() */
-    igraph_vector_init(&order, 0);
-    igraph_vector_init(&rank, 0);
-    igraph_vector_init(&father, 0);
-    igraph_vector_init(&pred, 0);
-    igraph_vector_init(&succ, 0);
-    igraph_vector_init(&dist, 0);
-
     /* Now call the BFS function */
+    printf("(");
     igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
-               &order, &rank, &father, &pred, &succ, &dist,
-               /*callback=*/ 0, /*extra=*/ 0);
-
-    /* Print the results */
-    igraph_vector_print(&order);
-    igraph_vector_print(&rank);
-    igraph_vector_print(&father);
-    igraph_vector_print(&pred);
-    igraph_vector_print(&succ);
-    igraph_vector_print(&dist);
+               /*order=*/ 0, /*rank=*/ 0, /*father=*/ 0, /*pred=*/ 0,
+               /*succ=*/ 0, /*dist=*/ 0,
+               /*callback=*/ bfs_callback, /*extra=*/ 0);
+    printf(" )\n");
 
     /* Cleam up after ourselves */
-    igraph_vector_destroy(&order);
-    igraph_vector_destroy(&rank);
-    igraph_vector_destroy(&father);
-    igraph_vector_destroy(&pred);
-    igraph_vector_destroy(&succ);
-    igraph_vector_destroy(&dist);
-
     igraph_destroy(&graph);
 
     return 0;
