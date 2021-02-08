@@ -23,7 +23,6 @@
 */
 
 #include <igraph.h>
-
 #include <stdlib.h>
 
 /* Compares two paths based on their last elements. If they are equal, proceeds
@@ -31,9 +30,9 @@
  * of the vectors is a suffix of the other, the shorter vector gets ordered
  * first.
  */
-int vector_tail_cmp(const void* path1, const void* path2) {
-    const igraph_vector_t* vec1 = *(const igraph_vector_t**)path1;
-    const igraph_vector_t* vec2 = *(const igraph_vector_t**)path2;
+int vector_tail_cmp(const void *path1, const void *path2) {
+    const igraph_vector_t *vec1 = *(const igraph_vector_t**)path1;
+    const igraph_vector_t *vec2 = *(const igraph_vector_t**)path2;
     size_t length1 = igraph_vector_size(vec1);
     size_t length2 = igraph_vector_size(vec2);
     int diff;
@@ -56,9 +55,9 @@ int vector_tail_cmp(const void* path1, const void* path2) {
     }
 }
 
-void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
-                 igraph_vector_ptr_t* paths,
-                 igraph_vector_t* nrgeo) {
+void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
+                 const igraph_vector_ptr_t *paths,
+                 const igraph_vector_t *nrgeo) {
     long int i, n;
     igraph_vector_t nrgeo2, *path;
     igraph_vit_t vit;
@@ -66,8 +65,7 @@ void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
     n = igraph_vcount(graph);
     igraph_vector_init(&nrgeo2, n);
     if (igraph_vector_size(nrgeo) != n) {
-        printf("nrgeo vector length must be %ld, was %ld", n,
-               igraph_vector_size(nrgeo));
+        printf("nrgeo vector length must be %ld, was %ld", n, igraph_vector_size(nrgeo));
         return;
     }
 
@@ -103,6 +101,7 @@ int main() {
     igraph_t g;
     igraph_vector_ptr_t res;
     long int i;
+
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_real_t dim[] = { 4, 4 };
@@ -119,30 +118,34 @@ int main() {
     igraph_vector_ptr_init(&res, 5);
     igraph_vs_vector_small(&vs, 1, 3, 4, 5, 2, 1,  -1);
 
-    igraph_get_all_shortest_paths_dijkstra(&g, /*res=*/ &res,
-                                           /*nrgeo=*/ &nrgeo, /*from=*/ 0, /*to=*/ vs,
-                                           /*weights=*/ 0, /*mode=*/ IGRAPH_OUT);
+    igraph_get_all_shortest_paths_dijkstra(
+                &g,
+                /*res=*/ &res, /*nrgeo=*/ &nrgeo,
+                /*from=*/ 0, /*to=*/ vs,
+                /*weights=*/ NULL, /*mode=*/ IGRAPH_OUT);
     check_nrgeo(&g, vs, &res, &nrgeo);
 
     for (i = 0; i < igraph_vector_ptr_size(&res); i++) {
         igraph_vector_print(VECTOR(res)[i]);
         igraph_vector_destroy(VECTOR(res)[i]);
-        free(VECTOR(res)[i]);
+        igraph_free(VECTOR(res)[i]);
         VECTOR(res)[i] = 0;
     }
 
     /* Same ring, but with weights */
 
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
-    igraph_get_all_shortest_paths_dijkstra(&g, /*res=*/ &res,
-                                           /*nrgeo=*/ &nrgeo, /*from=*/ 0, /*to=*/ vs,
-                                           /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
+    igraph_get_all_shortest_paths_dijkstra(
+                &g,
+                /*res=*/ &res, /*nrgeo=*/ &nrgeo,
+                /*from=*/ 0, /*to=*/ vs,
+                /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
     check_nrgeo(&g, vs, &res, &nrgeo);
 
     for (i = 0; i < igraph_vector_ptr_size(&res); i++) {
         igraph_vector_print(VECTOR(res)[i]);
         igraph_vector_destroy(VECTOR(res)[i]);
-        free(VECTOR(res)[i]);
+        igraph_free(VECTOR(res)[i]);
         VECTOR(res)[i] = 0;
     }
 
@@ -151,7 +154,7 @@ int main() {
     /* More complicated example */
 
     igraph_small(&g, 10, IGRAPH_DIRECTED,
-                 0, 1, 0, 2, 0, 3,    1, 2, 1, 4, 1, 5,
+                 0, 1, 0, 2, 0, 3,   1, 2, 1, 4, 1, 5,
                  2, 3, 2, 6,         3, 2, 3, 6,
                  4, 5, 4, 7,         5, 6, 5, 8, 5, 9,
                  7, 5, 7, 8,         8, 9,
@@ -160,9 +163,11 @@ int main() {
                  -1);
 
     igraph_vector_view(&weights_vec, weights2, sizeof(weights2) / sizeof(igraph_real_t));
-    igraph_get_all_shortest_paths_dijkstra(&g, /*res=*/ &res,
-                                           /*nrgeo=*/ &nrgeo, /*from=*/ 0, /*to=*/ vs,
-                                           /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
+    igraph_get_all_shortest_paths_dijkstra(
+                &g,
+                /*res=*/ &res, /*nrgeo=*/ &nrgeo,
+                /*from=*/ 0, /*to=*/ vs,
+                /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
 
     check_nrgeo(&g, vs, &res, &nrgeo);
 
@@ -173,7 +178,7 @@ int main() {
     for (i = 0; i < igraph_vector_ptr_size(&res); i++) {
         igraph_vector_print(VECTOR(res)[i]);
         igraph_vector_destroy(VECTOR(res)[i]);
-        free(VECTOR(res)[i]);
+        igraph_free(VECTOR(res)[i]);
         VECTOR(res)[i] = 0;
     }
 
@@ -188,9 +193,11 @@ int main() {
     igraph_vector_fill(&weights_vec, 1);
     VECTOR(weights_vec)[2] = 100;
     VECTOR(weights_vec)[8] = 100; /* 1-->2, 4-->8 */
-    igraph_get_all_shortest_paths_dijkstra(&g, /*res=*/ 0,
-                                           /*nrgeo=*/ &nrgeo, /*from=*/ 0, /*to=*/ vs,
-                                           /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
+    igraph_get_all_shortest_paths_dijkstra(
+                &g,
+                /*res=*/ 0, /*nrgeo=*/ &nrgeo,
+                /*from=*/ 0, /*to=*/ vs,
+                /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
     igraph_vector_destroy(&weights_vec);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);

@@ -416,14 +416,14 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     directed = directed && igraph_is_directed(graph);
     if (directed) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_in);
         elist_out_p = &elist_out;
         elist_in_p = &elist_in;
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
         elist_out_p = elist_in_p = &elist_out;
     }

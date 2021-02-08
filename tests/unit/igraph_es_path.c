@@ -46,9 +46,7 @@ int main() {
         IGRAPH_EIT_NEXT(eit);
         size--;
     }
-    if (size != 0) {
-        return 1;
-    }
+    IGRAPH_ASSERT(size == 0);
 
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);

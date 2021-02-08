@@ -96,15 +96,9 @@ int main() {
 
     /* empty undirected graph */
     igraph_empty(&g, 0, 0);
-    if (igraph_gomory_hu_tree(&g, &tree, &flow, &capacity)) {
-        return 1;
-    }
-    if (igraph_vcount(&tree) != 0) {
-        return 1;
-    }
-    if (igraph_vector_size(&flow) != 0) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, &flow, &capacity) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&tree) == 0);
+    IGRAPH_ASSERT(igraph_vector_size(&flow) == 0);
     igraph_destroy(&tree);
     igraph_destroy(&g);
 
@@ -120,26 +114,18 @@ int main() {
     VECTOR(capacity)[6] = 1;
     VECTOR(capacity)[7] = 6;
     VECTOR(capacity)[8] = 2;
-    if (igraph_gomory_hu_tree(&g, &tree, &flow, &capacity)) {
-        return 2;
-    }
-    if (validate_tree(&g, &tree, &flow, &capacity)) {
-        return 2;
-    }
+    IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, &flow, &capacity) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(validate_tree(&g, &tree, &flow, &capacity) == IGRAPH_SUCCESS);
     igraph_destroy(&tree);
     /* Make sure we don't blow up without an outgoing flow vector */
-    if (igraph_gomory_hu_tree(&g, &tree, 0, &capacity)) {
-        return 2;
-    }
+    IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, 0, &capacity) == IGRAPH_SUCCESS);
     igraph_destroy(&tree);
     igraph_destroy(&g);
 
     /* simple directed graph - should throw an error */
     igraph_small(&g, 6, 1, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 4, 3, 4, 3, 5, 4, 5, -1);
     igraph_set_error_handler(igraph_error_handler_ignore);
-    if (!igraph_gomory_hu_tree(&g, &tree, &flow, &capacity)) {
-        return 3;
-    }
+    IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, &flow, &capacity) == IGRAPH_EINVAL);
     igraph_set_error_handler(igraph_error_handler_abort);
     igraph_destroy(&g);
 

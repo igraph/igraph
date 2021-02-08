@@ -477,9 +477,9 @@ int igraph_dominator_tree(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &ancestor);
     IGRAPH_CHECK(igraph_vector_long_init_seq(&label, 0, no_of_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &label);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &succ);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &pred, invmode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &pred, invmode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &pred);
     IGRAPH_CHECK(igraph_i_dbucket_init(&bucket, no_of_nodes));
     IGRAPH_FINALLY(igraph_i_dbucket_destroy, &bucket);

@@ -267,16 +267,12 @@ add_legacy_tests(
 # visitors.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_bfs2
+  igraph_bfs
+  igraph_bfs_simple
 )
-
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_bfs # Uses igraph_i_bfs
-)
-
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bfs_simple
   igraph_random_walk
 )
 
@@ -376,8 +372,10 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  adjlist
   igraph_to_directed
   igraph_to_prufer
+  inclist
 )
 
 # flow.at
@@ -435,6 +433,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector2
   igraph_compare_communities
   igraph_modularity
+  igraph_modularity_matrix
   igraph_split_join_distance
   levc-stress
   spinglass

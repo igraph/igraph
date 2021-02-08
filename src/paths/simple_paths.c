@@ -101,8 +101,9 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &stack);
     IGRAPH_CHECK(igraph_vector_int_init(&dist, 100));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &dist);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
-                                          /*simplify=*/ 1));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(
+        graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
@@ -117,8 +118,8 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     while (!igraph_vector_int_empty(&stack)) {
         int act = igraph_vector_int_tail(&stack);
         int curdist = igraph_vector_int_tail(&dist);
-        igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        int n = igraph_vector_size(neis);
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
+        int n = igraph_vector_int_size(neis);
         int *ptr = igraph_vector_int_e_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;

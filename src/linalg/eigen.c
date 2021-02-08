@@ -1441,7 +1441,7 @@ static int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
     options->n = n;
     options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigen_adjacency_arpack_sym_cb,
