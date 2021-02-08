@@ -121,11 +121,7 @@ int main() {
 
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-<<<<<<< HEAD
                 /*res=*/ &res, /*res_e=*/ &res_e,  /*nrgeo=*/ &nrgeo,
-=======
-                /*res=*/ &res, /*res_e=*/ NULL, /*nrgeo=*/ &nrgeo,
->>>>>>> be69d23a552e85d78eca570584960a61fe66685e
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ NULL, /*mode=*/ IGRAPH_OUT);
     check_nrgeo(&g, vs, &res, &nrgeo);
@@ -137,17 +133,6 @@ int main() {
         VECTOR(res)[i] = 0;
     }
 
-<<<<<<< HEAD
-=======
-    /* check the get_all_shortest_path without the res */
-
-    igraph_get_all_shortest_paths_dijkstra(
-                &g,
-                /*res=*/ NULL, /*res_e=*/ &res_e, /*nrgeo=*/ &nrgeo,
-                /*from=*/ 0, /*to=*/ vs,
-                /*weights=*/ 0, /*mode=*/ IGRAPH_OUT);
-
->>>>>>> be69d23a552e85d78eca570584960a61fe66685e
     for (i = 0; i < igraph_vector_ptr_size(&res_e); i++) {
         igraph_vector_print(VECTOR(res_e)[i]);
         igraph_vector_destroy(VECTOR(res_e)[i]);
@@ -202,11 +187,7 @@ int main() {
     igraph_vector_view(&weights_vec, weights2, sizeof(weights2) / sizeof(igraph_real_t));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-<<<<<<< HEAD
                 /*res=*/ &res, /*res_e=*/ &res_e, /*nrgeo=*/ &nrgeo,
-=======
-                /*res=*/ &res, /*res_e=*/ NULL, /*nrgeo=*/ &nrgeo,
->>>>>>> be69d23a552e85d78eca570584960a61fe66685e
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
 
@@ -245,11 +226,7 @@ int main() {
     VECTOR(weights_vec)[8] = 100; /* 1-->2, 4-->8 */
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-<<<<<<< HEAD
                 /*res=*/ 0, /*res_e=*/ 0, /*nrgeo=*/ &nrgeo,
-=======
-                /*res=*/ 0, /*res_e=*/ NULL, /*nrgeo=*/ &nrgeo,
->>>>>>> be69d23a552e85d78eca570584960a61fe66685e
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
     igraph_vector_destroy(&weights_vec);
