@@ -1542,7 +1542,7 @@ cleanup:
  */
 
 int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
-                             igraph_vector_ptr_t *domains,
+                             const igraph_vector_ptr_t *domains,
                              igraph_bool_t *iso, igraph_vector_t *map,
                              igraph_vector_ptr_t *maps,
                              igraph_bool_t induced, int time_limit) {
