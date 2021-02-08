@@ -140,7 +140,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     }
 
     /* Create an adjacency list representation for efficiency. */
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     /* Create storage space for counting distinct labels and dominant ones */
