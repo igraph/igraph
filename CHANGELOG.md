@@ -35,7 +35,8 @@
  - `igraph_inclist_size()` returns the number of vertices in an incidence list.
  - `igraph_lazy_adjlist_size()` returns the number of vertices in a lazy adjacency list.
  - `igraph_lazy_inclist_size()` returns the number of vertices in a lazy incidence list.
- 
+ - `igraph_bfs_simple()` now provides a simpler interface to the breadth-first search functionality.
+
 ### Changed
 
  - igraph now uses a CMake-based build sysyem.
