@@ -32,7 +32,9 @@
 /**
  * \ingroup communities
  * \function igraph_community_fluid_communities
- * \brief Community detection algorithm based on the simple idea of
+ * \brief Community detection based on fluids interacting on the graph.
+ *
+ * The algorithm is based on the simple idea of
  * several fluids interacting in a non-homogeneous environment
  * (the graph topology), expanding and contracting based on their
  * interaction and density.
