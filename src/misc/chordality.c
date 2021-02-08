@@ -33,7 +33,7 @@
  * hypergraphs, and selectively reduce acyclic hypergraphs.
  * SIAM Journal of Computation 13, 566--579, 1984.
  *
- * \param graph The input graph, which should be undirected.
+ * \param graph The input graph. Edge directions will be ignored.
  * \param alpha Pointer to an initialized vector, the result is stored here.
  *   It will be resized, as needed. Upon return it contains
  *   the rank of the each vertex.
@@ -63,10 +63,6 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     /***************/
 
     long int j, v;
-
-    if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Maximum cardinality search works on undirected graphs only.", IGRAPH_EINVAL);
-    }
 
     if (no_of_nodes == 0) {
         igraph_vector_clear(alpha);
@@ -236,7 +232,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  * then \ref igraph_maximum_cardinality_search() is called to calculate
  * them.
  *
- * \param graph The input graph, it must be undirected.
+ * \param graph The input graph. Edge directions will be ignored.
  * \param alpha Either an alpha vector coming from
  *    \ref igraph_maximum_cardinality_search() (on the same graph), or a
  *    \c NULL pointer.
