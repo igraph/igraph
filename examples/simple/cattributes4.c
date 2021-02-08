@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2010-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,11 +21,6 @@
 */
 
 #include <igraph.h>
-
-int mf(const igraph_strvector_t *input, char *output) {
-    /* TODO */
-    return 0;
-}
 
 int main() {
 
