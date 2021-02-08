@@ -130,7 +130,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     all_to = igraph_vs_is_all(&to);
@@ -166,7 +166,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
         while (!igraph_2wheap_empty(&Q)) {
             long int minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
-            igraph_vector_t *neis;
+            igraph_vector_int_t *neis;
             long int nlen;
 
             if (all_to) {
@@ -184,7 +184,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
-            nlen = igraph_vector_size(neis);
+            nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
@@ -372,7 +372,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
@@ -406,7 +406,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         long int nlen, minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
-        igraph_vector_t *neis;
+        igraph_vector_int_t *neis;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -417,7 +417,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
-        nlen = igraph_vector_size(neis);
+        nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             long int edge = (long int) VECTOR(*neis)[i];
             long int tto = IGRAPH_OTHER(graph, edge, minnei);
@@ -772,7 +772,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
     /* lazy adjacency edge list to query neighbours efficiently */
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     /* Mark the vertices we need to reach */
@@ -795,7 +795,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         long int nlen, minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
-        igraph_vector_t *neis;
+        igraph_vector_int_t *neis;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -814,7 +814,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
-        nlen = igraph_vector_size(neis);
+        nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             long int edge = (long int) VECTOR(*neis)[i];
             long int tto = IGRAPH_OTHER(graph, edge, minnei);

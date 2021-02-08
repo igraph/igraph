@@ -32,12 +32,20 @@
    * `igraph_betweenness_cutoff()`.
    * `igraph_edge_betweenness_cutoff()`.
  - `igraph_vector_is_any_nan()` checks if any elements of an `igraph_vector_t` is NaN.
+ - `igraph_inclist_size()` returns the number of vertices in an incidence list.
+ - `igraph_lazy_adjlist_size()` returns the number of vertices in a lazy adjacency list.
+ - `igraph_lazy_inclist_size()` returns the number of vertices in a lazy incidence list.
+ - `igraph_bfs_simple()` now provides a simpler interface to the breadth-first search functionality.
 
 ### Changed
 
  - igraph now uses a CMake-based build sysyem.
  - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549)
  - Bliss has been updated to version 0.75. Bliss functions are now interruptible. Thanks to Tommi Junttila for making this possible!
+ - Adjacency and incidence lists:
+   * `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now requires the caller to specify what to do with loop and multiple edges
+   * `igraph_inclist_init()` and `igraph_lazy_inclist_init()` now requires the caller to specify what to do with loop edges
+   * Adjacency and incidence lists now use `igraph_vector_int_t` consistently.
  - Community detection:
    * `igraph_community_multilevel()`: added resolution parameter.
    * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
@@ -69,6 +77,7 @@
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
  - `igraph_closeness_estimate()` is deprecated in favour of the newly added `igraph_closeness_cutoff()`.
  - `igraph_betweenness_estimate()` and `igraph_edge_betweenness_estimate()` are deprecated in favour of the newly added `igraph_betweenness_cutoff()` and `igraph_edge_betweenness_cutoff()`.
+ - `igraph_adjlist_remove_duplicate()` and `igraph_inclist_remove_duplicate()` are now deprecated in favour of the new constructor arguments in `igraph_adjlist_init()` and `igraph_inclist_init()`
 
 ### Removed
 

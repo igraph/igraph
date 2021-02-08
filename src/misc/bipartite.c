@@ -102,7 +102,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -179,7 +179,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_index, no_of_nodes);
     IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     /* we won't need the 'mult' vector if 'multiplicity' is NULL, but MSVC will

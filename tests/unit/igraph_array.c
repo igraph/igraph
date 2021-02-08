@@ -49,15 +49,9 @@ int main() {
 
     igraph_array3_init(&a, 5, 4, 3);
     print_array(&a);
-    if (igraph_array3_n(&a, 1) != 5) {
-        return 1;
-    }
-    if (igraph_array3_n(&a, 2) != 4) {
-        return 1;
-    }
-    if (igraph_array3_n(&a, 3) != 3) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_array3_n(&a, 1) == 5);
+    IGRAPH_ASSERT(igraph_array3_n(&a, 2) == 4);
+    IGRAPH_ASSERT(igraph_array3_n(&a, 3) == 3);
     igraph_array3_destroy(&a);
 
     igraph_array3_init(&a, 5, 4, 3);

@@ -41,6 +41,11 @@
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
  * vertex ids.
+ * 
+ * </para><para>
+ * Consider using \ref igraph_bfs_simple instead if you set most of the output
+ * arguments provided by this function to a null pointer.
+ *
  * \param graph The input graph.
  * \param root The id of the root vertex. It is ignored if the \c
  *        roots argument is not a null pointer.
@@ -88,9 +93,8 @@
  * edges.
  *
  * \example examples/simple/igraph_bfs.c
- * \example examples/simple/igraph_bfs2.c
+ * \example examples/simple/igraph_bfs_callback.c
  */
-
 int igraph_bfs(const igraph_t *graph,
                igraph_integer_t root, const igraph_vector_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
@@ -148,7 +152,7 @@ int igraph_bfs(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     /* Mark the vertices that are not in the restricted set, as already
@@ -218,9 +222,9 @@ int igraph_bfs(const igraph_t *graph,
             long int actvect = (long int) igraph_dqueue_pop(&Q);
             long int actdist = (long int) igraph_dqueue_pop(&Q);
             long int succ_vec;
-            igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                     (igraph_integer_t) actvect);
-            long int i, n = igraph_vector_size(neis);
+            long int i, n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -282,20 +286,50 @@ int igraph_bfs(const igraph_t *graph,
 }
 
 /**
- * \function igraph_i_bfs
- * \ingroup internal
+ * \function igraph_bfs_simple
+ * Breadth-first search, single-source version
  *
- * Added in version 0.2.
+ * An alternative breadth-first search implementation to cater for the
+ * simpler use-cases when only a single breadth-first search has to be conducted
+ * from a source node and most of the output arguments from \ref igraph_bfs
+ * are not needed. It is allowed to supply null pointers as
+ * the output arguments the user is not interested in, in this case they will
+ * be ignored.
+ * 
+ * \param graph The input graph.
+ * \param vid The id of the root vertex.
+ * \param mode For directed graphs, it defines which edges to follow.
+ *        \c IGRAPH_OUT means following the direction of the edges,
+ *        \c IGRAPH_IN means the opposite, and
+ *        \c IGRAPH_ALL ignores the direction of the edges.
+ *        This parameter is ignored for undirected graphs.
+ * \param vids If not a null pointer, then an initialized vector must be passed
+ *        here. The ids of the vertices visited during the traversal will be
+ *        stored here, in the same order as they were visited.
+ * \param layers If not a null pointer, then an initialized vector must be
+ *        passed here. The i-th element of the vector will contain the index
+ *        into \c vids where the vertices that are at distance i from the root
+ *        are stored. In other words, if you are interested in the vertices that
+ *        are at distance i from the root, you need to look in the \c vids
+ *        vector from \c layers[i] to \c layers[i+1].
+ * \param parents If not a null pointer, then an initialized vector must be
+ *        passed here. The vector will be resized so its length is equal to the
+ *        number of nodes, and it will contain the index of the parent node for
+ *        each \em visited node. The values in the vector are undefined for
+ *        vertices that were \em not visited.
+ * \return Error code.
  *
- * TODO
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ *
+ * \example examples/simple/igraph_bfs_simple.c
  */
-
-int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                 igraph_vector_t *vids, igraph_vector_t *layers,
-                 igraph_vector_t *parents) {
+int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+                      igraph_vector_t *vids, igraph_vector_t *layers,
+                      igraph_vector_t *parents) {
 
     igraph_dqueue_t q;
-    long int vidspos = 0;
+    long int num_visited = 0;
     igraph_vector_t neis;
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
@@ -322,16 +356,29 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
     IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
 
     /* results */
-    IGRAPH_CHECK(igraph_vector_resize(vids, no_of_nodes));
-    igraph_vector_clear(layers);
-    IGRAPH_CHECK(igraph_vector_resize(parents, no_of_nodes));
+    if (vids) {
+        igraph_vector_clear(vids);
+    }
+    if (layers) {
+        igraph_vector_clear(layers);
+    }
+    if (parents) {
+        IGRAPH_CHECK(igraph_vector_resize(parents, no_of_nodes));
+    }
 
     /* ok start with vid */
     IGRAPH_CHECK(igraph_dqueue_push(&q, vid));
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-    IGRAPH_CHECK(igraph_vector_push_back(layers, vidspos));
-    VECTOR(*vids)[vidspos++] = vid;
-    VECTOR(*parents)[(long int)vid] = vid;
+    if (layers) {
+        IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+    }
+    if (vids) {
+        IGRAPH_CHECK(igraph_vector_push_back(vids, vid));
+    }
+    if (parents) {
+        VECTOR(*parents)[(long int)vid] = vid;
+    }
+    num_visited++;
     added[(long int)vid] = 1;
 
     while (!igraph_dqueue_empty(&q)) {
@@ -343,18 +390,26 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
             long int neighbor = (long int) VECTOR(neis)[i];
             if (added[neighbor] == 0) {
                 added[neighbor] = 1;
-                VECTOR(*parents)[neighbor] = actvect;
+                if (parents) {
+                    VECTOR(*parents)[neighbor] = actvect;
+                }
                 IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                 IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
-                if (lastlayer != actdist + 1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(layers, vidspos));
+                if (layers && lastlayer != actdist + 1) {
+                    IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
                 }
-                VECTOR(*vids)[vidspos++] = neighbor;
+                if (vids) {
+                    IGRAPH_CHECK(igraph_vector_push_back(vids, neighbor));
+                }
+                num_visited++;
                 lastlayer = actdist + 1;
             }
         } /* for i in neis */
     } /* while ! dqueue_empty */
-    IGRAPH_CHECK(igraph_vector_push_back(layers, vidspos));
+
+    if (layers) {
+        IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+    }
 
     igraph_vector_destroy(&neis);
     igraph_dqueue_destroy(&q);
@@ -378,6 +433,7 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
  * vertex ids.
+ * 
  * \param graph The input graph.
  * \param root The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
@@ -446,7 +502,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
     IGRAPH_CHECK(igraph_stack_init(&stack, 100));
     IGRAPH_FINALLY(igraph_stack_destroy, &stack);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
@@ -526,9 +582,9 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
         while (!igraph_stack_empty(&stack)) {
             long int actvect = (long int) igraph_stack_top(&stack);
-            igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                    (igraph_integer_t) actvect);
-            long int n = igraph_vector_size(neis);
+            igraph_vector_int_t *neis =
+                igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actvect);
+            long int n = igraph_vector_int_size(neis);
             long int *ptr = igraph_vector_long_e_ptr(&nptr, actvect);
 
             /* Search for a neighbor that was not yet visited */

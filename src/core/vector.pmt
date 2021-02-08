@@ -472,7 +472,7 @@ igraph_bool_t FUNCTION(igraph_vector, empty)     (const TYPE(igraph_vector)* v) 
 /**
  * \ingroup vector
  * \function igraph_vector_size
- * \brief Gives the size (=length) of the vector.
+ * \brief Returns the size (=length) of the vector.
  *
  * \param v The vector object
  * \return The size of the vector.

@@ -819,7 +819,9 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = 0;
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(
+        graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
     clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
@@ -896,7 +898,9 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = 0;
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(
+        graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
     clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
@@ -1134,9 +1138,10 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
     }
 
     /* Construct an adjacency list representation */
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adj_list, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(
+        graph, &adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_list);
-    IGRAPH_CHECK(igraph_adjlist_simplify(&adj_list));
     igraph_adjlist_sort(&adj_list);
 
     /* Initialize stack */
@@ -1350,7 +1355,9 @@ static int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
     if (complementer) {
         IGRAPH_CHECK(igraph_adjlist_init_complementer(graph, &clqdata.adj_list, IGRAPH_ALL, 0));
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(
+            graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
+        ));
     }
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 

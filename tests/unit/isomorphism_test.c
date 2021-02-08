@@ -207,6 +207,8 @@ void test_bug_995() {
 
 int main() {
 
+    srand(293847); /* rand() is used in random_permutation() */
+
     test3();
     test4();
     test_bliss();

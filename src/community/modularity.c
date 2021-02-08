@@ -216,6 +216,45 @@ int igraph_modularity(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+static int igraph_i_modularity_matrix_get_adjacency(
+           const igraph_t *graph, igraph_matrix_t *res,
+           const igraph_vector_t *weights, igraph_bool_t directed) {
+    /* Specifically used to handle weights and/or ignore direction */
+    igraph_eit_t edgeit;
+    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t from, to;
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+    igraph_matrix_null(res);
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &edgeit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
+
+    if (weights) {
+        for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
+            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
+            from = IGRAPH_FROM(graph, edge);
+            to = IGRAPH_TO(graph, edge);
+            MATRIX(*res, from, to) += VECTOR(*weights)[edge];
+            if (!directed) {
+                MATRIX(*res, to, from) += VECTOR(*weights)[edge];
+            }
+        }
+    } else {
+        for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
+            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_edge(graph, edge, &from, &to);
+            MATRIX(*res, from, to) += 1;
+            if (!directed) {
+                MATRIX(*res, to, from) += 1;
+            }
+        }
+    }
+
+    igraph_eit_destroy(&edgeit);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_modularity_matrix
  * \brief Calculate the modularity matrix
@@ -226,10 +265,21 @@ int igraph_modularity(const igraph_t *graph,
  * <code>B_ij = A_ij - gamma * k_i * k_j / (2m)</code>
  *
  * </para><para>
- * where \c A_ij is the adjacency matrix, \c gamma is the resolution parameter,
- * \c k_i is the degree of vertex \c i, and \c m is the number of edges in the graph.
+ * for undirected graphs, where \c A_ij is the adjacency matrix, \c gamma is the
+ * resolution parameter, \c k_i is the degree of vertex \c i, and \c m is the
+ * number of edges in the graph. When there are no edges, or the weights add up
+ * to zero, the result is undefined.
  *
- * Note that self-loops are multiplied by 2 in this
+ * </para><para>
+ * For directed graphs the modularity matrix is changed to
+ *
+ * </para><para>
+ * <code>B_ij = A_ij - gamma * k^out_i * k^in_j / m</code>
+ * where <code>k^out_i</code> is the out-degree of node \c i and <code>k^in_j</code> is the
+ * in-degree of node \c j.
+ *
+ * </para><para>
+ * Note that self-loops in undirected graphs are multiplied by 2 in this
  * implementation. If weights are specified, the weighted counterparts are used.
  *
  * \param graph      The input graph.
@@ -240,50 +290,87 @@ int igraph_modularity(const igraph_t *graph,
  *                   higher values favor more, smaller communities.
  * \param modmat     Pointer to an initialized matrix in which the modularity
  *                   matrix is stored.
+ * \param directed   For directed graphs: if the edges should be treated as
+ *                   undirected.
+ *                   For undirected graphs this is ignored.
  *
  * \sa \ref igraph_modularity()
  */
 int igraph_modularity_matrix(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              const igraph_real_t resolution,
-                             igraph_matrix_t *modmat) {
+                             igraph_matrix_t *modmat,
+                             igraph_bool_t directed) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
     igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
-    igraph_vector_t deg;
+    igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
     long int i, j;
-
+    igraph_real_t scaling_factor;
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (resolution < 0.0) {
-        IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-    if (!weights) {
-        IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
-                                   IGRAPH_LOOPS));
-    } else {
-        IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
-                                     IGRAPH_LOOPS, weights));
+    if (!igraph_is_directed(graph)) {
+        directed = 0;
     }
-    IGRAPH_CHECK(igraph_get_adjacency(graph, modmat, IGRAPH_GET_ADJACENCY_BOTH,
-                                      /*eids=*/ 0));
+    IGRAPH_CHECK(igraph_i_modularity_matrix_get_adjacency(graph, modmat, weights, directed));
 
-    for (i = 0; i < no_of_nodes; i++) {
-        MATRIX(*modmat, i, i) *= 2;
-    }
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
-            MATRIX(*modmat, i, j) -= resolution * VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
+    if (directed) {
+        IGRAPH_VECTOR_INIT_FINALLY(&in_deg, no_of_nodes);
+        IGRAPH_VECTOR_INIT_FINALLY(&out_deg, no_of_nodes);
+        if (!weights) {
+            IGRAPH_CHECK(igraph_degree(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
+                                       IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_degree(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
+                                       IGRAPH_LOOPS));
+        } else {
+            IGRAPH_CHECK(igraph_strength(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
+                                         IGRAPH_LOOPS, weights));
+            IGRAPH_CHECK(igraph_strength(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
+                                         IGRAPH_LOOPS, weights));
         }
+        /* Scaling one degree factor so every element gets scaled. */
+        scaling_factor = resolution / sw;
+        igraph_vector_scale(&out_deg, scaling_factor);
+
+        for (j = 0; j < no_of_nodes; j++) {
+            for (i = 0; i < no_of_nodes; i++) {
+                MATRIX(*modmat, i, j) -= VECTOR(out_deg)[i] * VECTOR(in_deg)[j];
+            }
+        }
+        igraph_vector_destroy(&in_deg);
+        igraph_vector_destroy(&out_deg);
+        IGRAPH_FINALLY_CLEAN(2);
+    } else {
+        IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+        if (!weights) {
+            IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
+                                       IGRAPH_LOOPS));
+        } else {
+            IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
+                                         IGRAPH_LOOPS, weights));
+        }
+
+        /* Scaling one degree factor so every element gets scaled. */
+        igraph_vector_copy(&deg_unscaled, &deg);
+        IGRAPH_FINALLY(igraph_vector_destroy, &deg_unscaled);
+        scaling_factor = resolution / 2.0 / sw;
+        igraph_vector_scale(&deg, scaling_factor);
+        for (i = 0; i < no_of_nodes; i++) {
+            for (j = 0; j < no_of_nodes; j++) {
+                MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg_unscaled)[j];
+            }
+        }
+        igraph_vector_destroy(&deg);
+        igraph_vector_destroy(&deg_unscaled);
+        IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_vector_destroy(&deg);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return 0;
+    return IGRAPH_SUCCESS;
 }

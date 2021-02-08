@@ -55,7 +55,7 @@ static int igraph_i_layout_reingold_tilford_unreachable(
     IGRAPH_VECTOR_INIT_FINALLY(&visited, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     /* start from real_root and go BFS */
@@ -145,7 +145,7 @@ static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     vdata = igraph_Calloc(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
