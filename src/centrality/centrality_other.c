@@ -212,7 +212,7 @@ static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igr
 
         igraph_adjlist_t adjlist;
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
@@ -230,7 +230,7 @@ static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igr
         data.inclist = &inclist;
         data.weights = weights;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
@@ -402,7 +402,7 @@ static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igrap
     if (!weights) {
         igraph_adjlist_t adjlist;
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality,
@@ -419,7 +419,7 @@ static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igrap
         data.inclist = &inclist;
         data.weights = weights;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
@@ -733,14 +733,14 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     }
 
     if (weights == 0) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &myinadjlist);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &myininclist);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &myoutinclist);
     }
 
@@ -1466,7 +1466,9 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
             }
         }
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
+        IGRAPH_CHECK(igraph_adjlist_init(
+            graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
@@ -1489,7 +1491,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
         data.tmp = &tmp;
         data.reset = reset ? &normalized_reset : NULL;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         /* Weighted degree */

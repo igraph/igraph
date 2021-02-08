@@ -616,10 +616,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     igraph_vector_null(&idx);
     IGRAPH_VECTOR_INIT_FINALLY(&idx2, no_of_nodes);
     if (!weights) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
         IGRAPH_VECTOR_INIT_FINALLY(&strength, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(),

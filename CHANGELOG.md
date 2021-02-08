@@ -32,7 +32,10 @@
    * `igraph_betweenness_cutoff()`.
    * `igraph_edge_betweenness_cutoff()`.
  - `igraph_vector_is_any_nan()` checks if any elements of an `igraph_vector_t` is NaN.
-
+ - `igraph_inclist_size()` returns the number of vertices in an incidence list.
+ - `igraph_lazy_adjlist_size()` returns the number of vertices in a lazy adjacency list.
+ - `igraph_lazy_inclist_size()` returns the number of vertices in a lazy incidence list.
+ 
 ### Changed
 
  - igraph now uses a CMake-based build sysyem.

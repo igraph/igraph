@@ -64,7 +64,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
         /* As well as the sorted adjacency list, we maintain an unordered
          * list of edges for picking a random edge in constant time.
          */
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
         IGRAPH_VECTOR_INIT_FINALLY(&alledges, no_of_edges * 2);
         igraph_get_edgelist(graph, &alledges, /*bycol=*/ 0);

@@ -37,7 +37,8 @@ typedef struct igraph_adjlist_t {
 } igraph_adjlist_t;
 
 IGRAPH_EXPORT int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
-                                      igraph_neimode_t mode);
+                                      igraph_neimode_t mode, igraph_loops_t loops,
+                                      igraph_multiple_t multiple);
 IGRAPH_EXPORT int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
 IGRAPH_EXPORT igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al);
 IGRAPH_EXPORT int igraph_adjlist_init_complementer(const igraph_t *graph,
@@ -55,8 +56,6 @@ IGRAPH_EXPORT int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfil
 IGRAPH_EXPORT igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed);
 IGRAPH_EXPORT int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed);
 
-/* igraph_vector_int_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
-/*                 igraph_integer_t no); */
 /**
  * \define igraph_adjlist_get
  * \brief Query a vector in an adjacency list.
@@ -81,8 +80,10 @@ typedef struct igraph_inclist_t {
 
 IGRAPH_EXPORT int igraph_inclist_init(const igraph_t *graph,
                                       igraph_inclist_t *il,
-                                      igraph_neimode_t mode);
+                                      igraph_neimode_t mode,
+                                      igraph_loops_t loops);
 IGRAPH_EXPORT int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
+IGRAPH_EXPORT igraph_integer_t igraph_inclist_size(const igraph_inclist_t *al);
 IGRAPH_EXPORT void igraph_inclist_destroy(igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_inclist_clear(igraph_inclist_t *il);
 IGRAPH_EXPORT int igraph_inclist_remove_duplicate(const igraph_t *graph,
@@ -108,19 +109,22 @@ IGRAPH_EXPORT int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfil
 typedef struct igraph_lazy_adjlist_t {
     const igraph_t *graph;
     igraph_integer_t length;
-    igraph_vector_t **adjs;
+    igraph_vector_int_t **adjs;
     igraph_neimode_t mode;
-    igraph_lazy_adlist_simplify_t simplify;
+    igraph_loops_t loops;
+    igraph_multiple_t multiple;
+    igraph_vector_t dummy;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT int igraph_lazy_adjlist_init(const igraph_t *graph,
                                            igraph_lazy_adjlist_t *al,
                                            igraph_neimode_t mode,
-                                           igraph_lazy_adlist_simplify_t simplify);
+                                           igraph_loops_t loops,
+                                           igraph_multiple_t multiple);
 IGRAPH_EXPORT void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
-/* igraph_vector_t *igraph_lazy_adjlist_get(igraph_lazy_adjlist_t *al, */
-/*                     igraph_integer_t no); */
+IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);
+
 /**
  * \define igraph_lazy_adjlist_get
  * \brief Query neighbor vertices.
@@ -139,22 +143,25 @@ IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
  */
 #define igraph_lazy_adjlist_get(al,no) \
     ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
-     (igraph_lazy_adjlist_get_real(al, no)))
-IGRAPH_EXPORT igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
-                                                            igraph_integer_t no);
+     (igraph_i_lazy_adjlist_get_real(al, no)))
+IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no);
 
 typedef struct igraph_lazy_inclist_t {
     const igraph_t *graph;
     igraph_integer_t length;
-    igraph_vector_t **incs;
+    igraph_vector_int_t **incs;
     igraph_neimode_t mode;
+    igraph_vector_t dummy;
+    igraph_loops_t loops;
 } igraph_lazy_inclist_t;
 
 IGRAPH_EXPORT int igraph_lazy_inclist_init(const igraph_t *graph,
                                            igraph_lazy_inclist_t *il,
-                                           igraph_neimode_t mode);
+                                           igraph_neimode_t mode,
+                                           igraph_loops_t loops);
 IGRAPH_EXPORT void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);
 IGRAPH_EXPORT void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
+IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il);
 
 /**
  * \define igraph_lazy_inclist_get
@@ -174,9 +181,8 @@ IGRAPH_EXPORT void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
  */
 #define igraph_lazy_inclist_get(al,no) \
     ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
-     (igraph_lazy_inclist_get_real(al, no)))
-IGRAPH_EXPORT igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
-                                                            igraph_integer_t no);
+     (igraph_i_lazy_inclist_get_real(al, no)))
+IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al, igraph_integer_t no);
 
 __END_DECLS
 

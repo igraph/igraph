@@ -471,7 +471,7 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_init(&components, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &components);
     IGRAPH_CHECK(igraph_vector_reserve(&components, no_of_nodes * 2));
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);

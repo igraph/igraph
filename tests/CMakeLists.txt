@@ -375,8 +375,10 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  adjlist
   igraph_to_directed
   igraph_to_prufer
+  inclist
 )
 
 # flow.at

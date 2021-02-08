@@ -80,6 +80,22 @@ void print_matrix_round(const igraph_matrix_t *m) {
 }
 
 
+/* Print an adjacency list. Use brackets around each vector and also use
+ * brackets around the entire adjacency list to make it clear when the list
+ * is empty.
+ */
+void print_adjlist(const igraph_adjlist_t *adjlist) {
+    long vcount = igraph_adjlist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_adjlist_get(adjlist, i));
+    }
+    printf("}\n");
+}
+
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph) {
     long ecount = igraph_ecount(graph);
@@ -94,6 +110,53 @@ void print_graph(const igraph_t *graph) {
     printf("}\n");
 }
 
+/* Print an incidence list. Use brackets around each vector and also use
+ * brackets around the entire incidence list to make it clear when the list
+ * is empty.
+ */
+void print_inclist(const igraph_inclist_t *inclist) {
+    long vcount = igraph_inclist_size(inclist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_inclist_get(inclist, i));
+    }
+    printf("}\n");
+}
+
+/* Print a lazy adjacency list. Use brackets around each vector and also use
+ * brackets around the entire lazy adjacency list to make it clear when the list
+ * is empty.
+ */
+void print_lazy_adjlist(igraph_lazy_adjlist_t *adjlist) {
+    long vcount = igraph_lazy_adjlist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_lazy_adjlist_get(adjlist, i));
+    }
+    printf("}\n");
+}
+
+/* Print a lazy incidence list. Use brackets around each vector and also use
+ * brackets around the entire incidence list to make it clear when the list
+ * is empty.
+ */
+void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
+    long vcount = igraph_lazy_inclist_size(inclist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_lazy_inclist_get(inclist, i));
+    }
+    printf("}\n");
+}
 
 /* Edge comparisong function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {
@@ -302,6 +365,18 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
           "Finally stack is not empty. " \
           "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n"); \
         return 100; \
+    }
+
+/* Run a test in a separate function; return the return value of the function
+ * if it is nonzero. Also verify the FINALLY stack and bail out if it is not
+ * empty. Needs an integer variable named 'retval' in the local context. */
+#define RUN_TEST(func) \
+    { \
+        retval = func(); \
+        if (retval) { \
+            return retval; \
+        } \
+        VERIFY_FINALLY_STACK(); \
     }
 
 #endif /* TEST_UTILITIES_INC */

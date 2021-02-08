@@ -78,14 +78,13 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     long int mincirc = LONG_MAX, minvertex = 0;
     long int node;
     igraph_bool_t triangle = 0;
-    igraph_vector_t *neis;
+    igraph_vector_int_t *neis;
     igraph_vector_long_t level;
     long int stoplevel = no_of_nodes + 1;
     igraph_bool_t anycircle = 0;
     long int t1 = 0, t2 = 0;
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL,
-                                          IGRAPH_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
     IGRAPH_CHECK(igraph_vector_long_init(&level, no_of_nodes));
@@ -121,7 +120,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
             }
 
             neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
-            n = igraph_vector_size(neis);
+            n = igraph_vector_int_size(neis);
             for (i = 0; i < n; i++) {
                 long int nei = (long int) VECTOR(*neis)[i];
                 long int neilevel = VECTOR(level)[nei];
@@ -176,7 +175,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
             while (FATHER(t1) == 0 || FATHER(t2) == 0) {
                 long int actnode = (long int) igraph_dqueue_pop(&q);
                 neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
-                n = igraph_vector_size(neis);
+                n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {
                     long int nei = (long int) VECTOR(*neis)[i];
                     if (FATHER(nei) == 0) {

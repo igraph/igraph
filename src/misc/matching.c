@@ -586,7 +586,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&tight_phantom_edges,
                                            (igraph_integer_t) no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &tight_phantom_edges);
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_VECTOR_INIT_FINALLY(&smaller_set, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&larger_set, 0);

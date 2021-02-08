@@ -148,7 +148,7 @@ int igraph_bfs(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     /* Mark the vertices that are not in the restricted set, as already
@@ -218,9 +218,9 @@ int igraph_bfs(const igraph_t *graph,
             long int actvect = (long int) igraph_dqueue_pop(&Q);
             long int actdist = (long int) igraph_dqueue_pop(&Q);
             long int succ_vec;
-            igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                     (igraph_integer_t) actvect);
-            long int i, n = igraph_vector_size(neis);
+            long int i, n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -446,7 +446,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
     IGRAPH_CHECK(igraph_stack_init(&stack, 100));
     IGRAPH_FINALLY(igraph_stack_destroy, &stack);
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
@@ -526,9 +526,9 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
         while (!igraph_stack_empty(&stack)) {
             long int actvect = (long int) igraph_stack_top(&stack);
-            igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                    (igraph_integer_t) actvect);
-            long int n = igraph_vector_size(neis);
+            igraph_vector_int_t *neis =
+                igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actvect);
+            long int n = igraph_vector_int_size(neis);
             long int *ptr = igraph_vector_long_e_ptr(&nptr, actvect);
 
             /* Search for a neighbor that was not yet visited */
