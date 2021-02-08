@@ -359,6 +359,18 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     igraph_matrix_complex_destroy(&copy);
 }
 
+void matrix_init_int_row_major(igraph_matrix_t *mat, int ncol, int nrow, int* elem) {
+    int c, r;
+    int i_elem = 0;
+    igraph_matrix_init(mat, ncol, nrow);
+    for (r = 0; r < nrow; r++) {
+        for (c = 0; c < ncol; c++) {
+            MATRIX(*mat, r, c) = elem[i_elem];
+            i_elem++;
+        }
+    }
+}
+
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \

@@ -984,9 +984,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
  * It takes \c membership
  * and performs \c steps merges, according to the supplied
  * \c merges matrix.
- * \param merges The matrix defining the merges to make.
- *     This is usually from the output of the leading eigenvector community
- *     structure detection routines.
+ * \param merges The two-column matrix containing the merge
+ *    operations. See \ref igraph_community_walktrap() for the
+ *    detailed syntax. This is usually from the output of the
+ *    leading eigenvector community structure detection routines.
  * \param steps The number of steps to make according to \c merges.
  * \param membership Initially the starting membership vector,
  *     on output the resulting membership vector, after performing \c steps merges.
@@ -1005,17 +1006,19 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     igraph_vector_t fake_memb;
     long int components, i;
 
-    if (igraph_matrix_nrow(merges) < steps) {
-        IGRAPH_ERROR("`steps' to big or `merges' matrix too short", IGRAPH_EINVAL);
+    if (no_of_nodes > 0) {
+        components = (long int) igraph_vector_max(membership) + 1;
+    } else {
+        components = 0;
     }
-
-    components = (long int) igraph_vector_max(membership) + 1;
     if (components > no_of_nodes) {
-        IGRAPH_ERROR("Invalid membership vector, too many components", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Invalid membership vector, number of components is %ld, but should "
+         "not be greater than the number of nodes, which is %ld.", IGRAPH_EINVAL, components, no_of_nodes);
     }
     if (steps >= components) {
-        IGRAPH_ERROR("Cannot make `steps' steps from supplied membership vector",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of steps should be smaller than number of components. "
+                     "Found %" IGRAPH_PRId " steps, %ld components.",
+                     IGRAPH_EINVAL, steps, components);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&fake_memb, components);
@@ -1023,13 +1026,13 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     /* Check membership vector */
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*membership)[i] < 0) {
-            IGRAPH_ERROR("Invalid membership vector, negative id", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Invalid membership vector, negative id found: %g.", IGRAPH_EINVAL, VECTOR(*membership)[i]);
         }
         VECTOR(fake_memb)[ (long int) VECTOR(*membership)[i] ] += 1;
     }
     for (i = 0; i < components; i++) {
         if (VECTOR(fake_memb)[i] == 0) {
-            IGRAPH_ERROR("Invalid membership vector, empty cluster", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Invalid membership vector, empty cluster found, with index %ld.", IGRAPH_EINVAL, i);
         }
     }
 

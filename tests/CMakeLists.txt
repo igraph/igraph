@@ -433,6 +433,7 @@ add_legacy_tests(
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
+  igraph_le_community_to_membership
   igraph_modularity
   igraph_modularity_matrix
   igraph_split_join_distance
