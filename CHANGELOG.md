@@ -51,7 +51,7 @@
    * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
  - Modularity:
    * `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
-   * `igraph_modularity()` now supports computing the directed version of modularity.
+   * `igraph_modularity()` and `igraph_modularity_matrix()` now support the directed version of modularity.
    * `igraph_modularity()` returns NaN for graphs with no edges to indicate that the modularity is not well-defined for such graphs.
  - Centralities:
    * `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
@@ -103,6 +103,7 @@
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
  - `igraph_incident()` now returns edges in the same order as `igraph_neighbors()`.
+ - `igraph_modularity_matrix()` returned incorrect results for weighted graphs. This is now fixed. (PR #1649, thanks to Daniel Noom!)
  - PageRank (PR #1640):
    * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
    * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.
