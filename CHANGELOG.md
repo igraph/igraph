@@ -64,7 +64,7 @@
    * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
    * `igraph_average_path_length()`  and `igraph_diameter()` now return `IGRAPH_INFINITY` when `unconn=FALSE` and the graph is not connected. Previously they returned the number of vertices.
  - `igraph_subisomorphic_lad()` now supports graphs with self-loops.
- - `igraph_is_chordal()` and `igraph_maximum_cardinality_search()` now support non-simple graphs.
+ - `igraph_is_chordal()` and `igraph_maximum_cardinality_search()` now support non-simple graphs and directed graphs.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
