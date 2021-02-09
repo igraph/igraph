@@ -63,34 +63,36 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
         IGRAPH_CHECK(igraph_vector_int_init(&vipiv, m < n ? m : n));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
         myipiv = &vipiv;
+    } else {
+        IGRAPH_CHECK(igraph_vector_int_resize(ipiv, m < n ? m : n));
     }
 
     igraphdgetrf_(&m, &n, VECTOR(a->data), &lda, VECTOR(*myipiv), info);
 
     if (*info > 0) {
-        IGRAPH_WARNING("LU: factor is exactly singular");
+        IGRAPH_WARNING("LU: factor is exactly singular.");
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows.", IGRAPH_ELAPACK);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of columns", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of columns.", IGRAPH_ELAPACK);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid info argument", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
             break;
         }
     }

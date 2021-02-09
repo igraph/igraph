@@ -511,6 +511,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_arpack_rnsolve
   igraph_lapack_dgehrd
+  igraph_lapack_dgetrf
 )
 
 # bipartite.at
