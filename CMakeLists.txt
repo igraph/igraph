@@ -6,6 +6,11 @@ cmake_minimum_required(VERSION 3.16)
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
 
+# Set a default build type if none was specified
+# This must precede the project() line, which would set the CMAKE_BUILD_TYPE
+# to 'Debug' with single-config generators on Windows.
+include(BuildType)
+
 # Prevent in-source builds
 include(PreventInSourceBuilds)
 
@@ -29,9 +34,6 @@ project(
   HOMEPAGE_URL https://igraph.org
   LANGUAGES C CXX
 )
-
-# Set a default build type if none was specified
-include(BuildType)
 
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
