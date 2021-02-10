@@ -24,9 +24,9 @@
 #ifndef IGRAPH_ERROR_H
 #define IGRAPH_ERROR_H
 
-#include <stdarg.h>
-
 #include "igraph_decls.h"
+
+#include <stdarg.h>
 
 __BEGIN_DECLS
 
@@ -233,7 +233,7 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
  * program.
  */
 
-DECLDIR igraph_error_handler_t igraph_error_handler_abort;
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
@@ -243,7 +243,7 @@ DECLDIR igraph_error_handler_t igraph_error_handler_abort;
  * with the error code.
  */
 
-DECLDIR igraph_error_handler_t igraph_error_handler_ignore;
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_ignore;
 
 /**
  * \var igraph_error_handler_printignore
@@ -253,7 +253,7 @@ DECLDIR igraph_error_handler_t igraph_error_handler_ignore;
  * standard error and returns with the error code.
  */
 
-DECLDIR igraph_error_handler_t igraph_error_handler_printignore;
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  * \function igraph_set_error_handler
@@ -268,7 +268,7 @@ DECLDIR igraph_error_handler_t igraph_error_handler_printignore;
  *   more.
  */
 
-DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
+IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 /**
  * \typedef igraph_error_type_t
@@ -441,7 +441,7 @@ typedef enum {
  * \param igraph_errno The \a igraph error code.
  */
 
-#define IGRAPH_ERROR(reason,igraph_errno) \
+#define IGRAPH_ERROR(reason, igraph_errno) \
     do { \
         igraph_error (reason, IGRAPH_FILE_BASENAME, __LINE__, igraph_errno) ; \
         return igraph_errno ; \
@@ -466,8 +466,38 @@ typedef enum {
  * \sa igraph_errorf().
  */
 
-DECLDIR int igraph_error(const char *reason, const char *file, int line,
-                         int igraph_errno);
+IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
+                               int igraph_errno);
+
+/**
+ * \define IGRAPH_ERRORF
+ * \brief Trigger an error, with printf-like error output.
+ *
+ * \a igraph functions can use this macro when they notice an error and
+ * want to pass on extra information to the user about what went wrong.
+ * It calls \ref igraph_errorf() with the proper parameters and if that
+ * returns the macro returns the "calling" function as well, with the
+ * error code. If for some (suspicious) reason you want to call the
+ * error handler without returning from the current function, call
+ * \ref igraph_errorf() directly.
+ * \param reason Textual description of the error, a template string
+ *   with the same syntax as the standard printf C library function.
+ *   This should be something more descriptive than the text associated
+ *   with the error code. E.g. if the error code is \c IGRAPH_EINVAL,
+ *   its associated text (see  \ref igraph_strerror()) is "Invalid
+ *   value" and this string should explain which parameter was invalid
+ *   and maybe what was expected and what was recieved.
+ * \param igraph_errno The \a igraph error code.
+ * \param ... The additional arguments to be substituted into the
+ *   template string.
+ */
+
+#define IGRAPH_ERRORF(reason, igraph_errno, ...) \
+    do { \
+        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      igraph_errno, __VA_ARGS__) ; \
+        return igraph_errno; \
+    } while (0)
 
 /**
  * \function igraph_errorf
@@ -484,11 +514,11 @@ DECLDIR int igraph_error(const char *reason, const char *file, int line,
  * \sa igraph_error().
  */
 
-DECLDIR int igraph_errorf(const char *reason, const char *file, int line,
-                          int igraph_errno, ...);
+IGRAPH_EXPORT int igraph_errorf(const char *reason, const char *file, int line,
+                                int igraph_errno, ...);
 
-DECLDIR int igraph_errorvf(const char *reason, const char *file, int line,
-                           int igraph_errno, va_list ap);
+IGRAPH_EXPORT int igraph_errorvf(const char *reason, const char *file, int line,
+                                 int igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror
@@ -501,7 +531,7 @@ DECLDIR int igraph_errorvf(const char *reason, const char *file, int line,
  * \return pointer to the textual description of the error code.
  */
 
-DECLDIR const char* igraph_strerror(const int igraph_errno);
+IGRAPH_EXPORT const char* igraph_strerror(const int igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -521,7 +551,7 @@ struct igraph_i_protectedPtr {
 
 typedef void igraph_finally_func_t (void*);
 
-DECLDIR void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
+IGRAPH_EXPORT void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
 
 /**
  * \function IGRAPH_FINALLY_CLEAN
@@ -534,7 +564,7 @@ DECLDIR void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
  *   stack.
  */
 
-DECLDIR void IGRAPH_FINALLY_CLEAN(int num);
+IGRAPH_EXPORT void IGRAPH_FINALLY_CLEAN(int num);
 
 /**
  * \function IGRAPH_FINALLY_FREE
@@ -548,7 +578,7 @@ DECLDIR void IGRAPH_FINALLY_CLEAN(int num);
  * as well.
  */
 
-DECLDIR void IGRAPH_FINALLY_FREE(void);
+IGRAPH_EXPORT void IGRAPH_FINALLY_FREE(void);
 
 /**
  * \function IGRAPH_FINALLY_STACK_SIZE
@@ -565,7 +595,7 @@ DECLDIR void IGRAPH_FINALLY_FREE(void);
  * write your own test cases and examine \ref IGRAPH_FINALLY_STACK_SIZE
  * before and after your test cases - the numbers should be equal.
  */
-DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
+IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 
 /**
  * \define IGRAPH_FINALLY_STACK_EMPTY
@@ -589,7 +619,7 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * prevent memory leaks.
  */
 
-#define IGRAPH_FINALLY(func,ptr) \
+#define IGRAPH_FINALLY(func, ptr) \
     do { \
         /* the following branch makes the compiler check the compatibility of \
          * func and ptr to detect cases when we are accidentally invoking an \
@@ -702,10 +732,10 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
  * \return The current warning handler function.
  */
 
-DECLDIR igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
+IGRAPH_EXPORT igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
-DECLDIR extern igraph_warning_handler_t igraph_warning_handler_ignore;
-DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
+IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_ignore;
+IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
@@ -722,8 +752,30 @@ DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-DECLDIR int igraph_warning(const char *reason, const char *file, int line,
-                           int igraph_errno);
+IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
+                                 int igraph_errno);
+
+/**
+ * \define IGRAPH_WARNINGF
+ * \brief Trigger a warning, with printf-like warning output.
+ *
+ * \a igraph functions can use this macro when they notice a warning and
+ * want to pass on extra information to the user about what went wrong.
+ * It calls \ref igraph_warningf() with the proper parameters and no
+ * error code.
+ * \param reason Textual description of the warning, a template string
+ *        with the same syntax as the standard printf C library function.
+ * \param ... The additional arguments to be substituted into the
+ *        template string.
+ */
+
+#define IGRAPH_WARNINGF(reason, ...) \
+    do { \
+        igraph_warningf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                        -1, __VA_ARGS__); \
+    } while (0)
+
+
 
 /**
  * \function igraph_warningf
@@ -744,8 +796,8 @@ DECLDIR int igraph_warning(const char *reason, const char *file, int line,
  * \return The supplied error code.
  */
 
-DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
-                            int igraph_errno, ...);
+IGRAPH_EXPORT int igraph_warningf(const char *reason, const char *file, int line,
+                                  int igraph_errno, ...);
 
 /**
  * \define IGRAPH_WARNING
@@ -819,7 +871,7 @@ typedef void igraph_fatal_handler_t (const char *reason, const char *file, int l
  * \return The current fatal error handler function.
  */
 
-DECLDIR igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t* new_handler);
+IGRAPH_EXPORT igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t* new_handler);
 
 /**
  * \var igraph_fatal_handler_abort
@@ -828,7 +880,7 @@ DECLDIR igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t*
  * The default fatal error handler, prints an error message and aborts the program.
  */
 
-DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
+IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
 
 /**
  * \function igraph_fatal
@@ -842,7 +894,7 @@ DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
  * \param line The number of line in the source file which triggered the error.
  */
 
-DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
 
 /**
  * \function igraph_fatalf
@@ -858,7 +910,26 @@ DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, 
  * \param ... The additional arguments to be substituted into the template string.
  */
 
-DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+
+/**
+ * \define IGRAPH_FATALF
+ * \brief Trigger a fatal error, with printf-like error output.
+ *
+ * \a igraph functions can use this macro when a fatal error occurs and
+ * want to pass on extra information to the user about what went wrong.
+ * It calls \ref igraph_fatalf() with the proper parameters.
+ * \param reason Textual description of the error, a template string
+ *        with the same syntax as the standard printf C library function.
+ * \param ... The additional arguments to be substituted into the
+ *        template string.
+ */
+
+#define IGRAPH_FATALF(reason, ...) \
+    do { \
+        igraph_fatalf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      __VA_ARGS__); \
+    } while (0)
 
 /**
  * \define IGRAPH_FATAL

@@ -21,7 +21,6 @@
 
 */
 
-#include "igraph_interface.h"
 #include "igraph_games.h"
 
 #include "igraph_adjlist.h"

@@ -73,9 +73,6 @@ AbstractGraph::AbstractGraph()
   verbose_level = 0;
   verbstr = stdout;
   */
-
-  report_hook = 0;
-  report_user_param = 0;
 }
 
 
@@ -88,9 +85,6 @@ AbstractGraph::~AbstractGraph()
   delete[] best_path_labeling; best_path_labeling = nullptr;
   delete[] best_path_labeling_inv; best_path_labeling_inv = nullptr;
   delete[] best_path_automorphism; best_path_automorphism = nullptr;
-
-  report_hook = 0;
-  report_user_param = 0;
 }
 
 
@@ -625,7 +619,8 @@ public:
 void
 AbstractGraph::search(const bool canonical,
                       Stats& stats,
-                      bool (*terminate)(const Stats&))
+                      const std::function<void(unsigned int n, const unsigned int* aut)>& report,
+                      const std::function<bool()>& terminate)
 {
   const unsigned int N = get_nof_vertices();
 
@@ -825,7 +820,7 @@ AbstractGraph::search(const bool canonical,
    */
   while(!search_stack.empty())
     {
-      if(terminate and terminate(stats)) {
+      if(terminate and terminate()) {
         break;
       }
       TreeNode&          current_node  = search_stack.back();
@@ -1630,10 +1625,8 @@ AbstractGraph::search(const bool canonical,
           {
             /* Some orbits were merged */
             /* Report automorphism */
-            if(report_hook)
-              (*report_hook)(report_user_param,
-                             get_nof_vertices(),
-                             best_path_automorphism);
+            if(report)
+              report(get_nof_vertices(), best_path_automorphism);
             /* Update statistics */
             stats.nof_generators++;
           }
@@ -1720,11 +1713,8 @@ AbstractGraph::search(const bool canonical,
       }
 
       /* Report automorphism by calling the user defined hook function */
-      if(report_hook)
-        (*report_hook)(report_user_param,
-                       get_nof_vertices(),
-                       first_path_automorphism);
-
+      if(report)
+        report(get_nof_vertices(), first_path_automorphism);
       /* Update statistics */
       stats.nof_generators++;
       continue;
@@ -1748,16 +1738,10 @@ AbstractGraph::search(const bool canonical,
 
 void
 AbstractGraph::find_automorphisms(Stats& stats,
-                                  void (*hook)(void *user_param,
-                                               unsigned int n,
-                                               const unsigned int *aut),
-                                  void *user_param,
-                                  bool (*terminate)(const Stats&))
+                                  const std::function<void(unsigned int n, const unsigned int* aut)>& report,
+                                  const std::function<bool()>& terminate)
 {
-  report_hook = hook;
-  report_user_param = user_param;
-
-  search(false, stats, terminate);
+  search(false, stats, report, terminate);
 
   delete[] first_path_labeling; first_path_labeling = nullptr;
   delete[] best_path_labeling; best_path_labeling = nullptr;
@@ -1766,16 +1750,10 @@ AbstractGraph::find_automorphisms(Stats& stats,
 
 const unsigned int *
 AbstractGraph::canonical_form(Stats& stats,
-                              void (*hook)(void *user_param,
-                                           unsigned int n,
-                                           const unsigned int *aut),
-                              void *user_param,
-                              bool (*terminate)(const Stats&))
+                              const std::function<void(unsigned int n, const unsigned int* aut)>& report,
+                              const std::function<bool()>& terminate)
 {
-  report_hook = hook;
-  report_user_param = user_param;
-
-  search(true, stats, terminate);
+  search(true, stats, report, terminate);
 
   return best_path_labeling;
 }
@@ -2453,7 +2431,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
-      Partition::Cell* neighbour_cell =	p.get_cell(p.elements[start]);
+      Partition::Cell* neighbour_cell = p.get_cell(p.elements[start]);
 
 #if defined(BLISS_CONSISTENCY_CHECKS)
       assert(neighbour_cell->first == start);
@@ -2585,7 +2563,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
-      Partition::Cell* neighbour_cell =	p.get_cell(p.elements[start]);
+      Partition::Cell* neighbour_cell = p.get_cell(p.elements[start]);
 
 #if defined(BLISS_CONSISTENCY_CHECKS)
       assert(neighbour_cell->first == start);
@@ -4200,7 +4178,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
-      Partition::Cell* neighbour_cell =	p.get_cell(p.elements[start]);
+      Partition::Cell* neighbour_cell = p.get_cell(p.elements[start]);
 
 #if defined(BLISS_CONSISTENCY_CHECKS)
       if(neighbour_cell->is_unit()) {

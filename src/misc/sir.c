@@ -22,12 +22,14 @@
 */
 
 #include "igraph_epidemics.h"
+
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
+
 #include "core/interruption.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
@@ -145,7 +147,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
     IGRAPH_CHECK(igraph_vector_int_init(&status, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &status);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_psumtree_init(&tree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &tree);
@@ -191,12 +193,12 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
         }
 
         /* Rates */
-        igraph_psumtree_update(&tree, infected, gamma);
+        IGRAPH_CHECK(igraph_psumtree_update(&tree, infected, gamma));
         neis = igraph_adjlist_get(&adjlist, infected);
         neilen = igraph_vector_int_size(neis);
         for (i = 0; i < neilen; i++) {
             int nei = VECTOR(*neis)[i];
-            igraph_psumtree_update(&tree, nei, beta);
+            IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, beta));
         }
 
         while (ni > 0) {
@@ -217,24 +219,24 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
             if (VECTOR(status)[vchange] == S_I) {
                 VECTOR(status)[vchange] = S_R;
                 ni--; nr++;
-                igraph_psumtree_update(&tree, vchange, 0.0);
+                IGRAPH_CHECK(igraph_psumtree_update(&tree, vchange, 0.0));
                 for (i = 0; i < neilen; i++) {
                     int nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
-                        igraph_psumtree_update(&tree, nei, rate - beta);
+                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate - beta));
                     }
                 }
 
             } else { /* S_S */
                 VECTOR(status)[vchange] = S_I;
                 ns--; ni++;
-                igraph_psumtree_update(&tree, vchange, gamma);
+                IGRAPH_CHECK(igraph_psumtree_update(&tree, vchange, gamma));
                 for (i = 0; i < neilen; i++) {
                     int nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
-                        igraph_psumtree_update(&tree, nei, rate + beta);
+                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate + beta));
                     }
                 }
             }

@@ -20,16 +20,12 @@
 
 */
 
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
-#include "igraph_version.h"
+
+#include "graph/attributes.h"
 
 #include "lgl-header.h"
 

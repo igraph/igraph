@@ -19,6 +19,7 @@
 */
 
 #include "igraph_centrality.h"
+
 #include "igraph_interface.h"
 #include "igraph_vector.h"
 
@@ -425,7 +426,7 @@ int igraph_centralization_closeness(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
     }
 
-    IGRAPH_CHECK(igraph_closeness(graph, scores, igraph_vss_all(), mode,
+    IGRAPH_CHECK(igraph_closeness(graph, scores, NULL, NULL, igraph_vss_all(), mode,
                                   /*weights=*/ 0, /*normalize=*/ 1));
 
     IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode,

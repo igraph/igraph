@@ -22,14 +22,15 @@
 */
 
 #include "igraph_community.h"
+
 #include "igraph_memory.h"
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
-#include "core/interruption.h"
 #include "igraph_structural.h"
 #include "igraph_vector_ptr.h"
-#include "config.h"
+
+#include "core/interruption.h"
 
 /* #define IGRAPH_FASTCOMM_DEBUG */
 
@@ -571,7 +572,7 @@ static int igraph_i_fastgreedy_community_update_dq(
 
 /**
  * \function igraph_community_fastgreedy
- * \brief Finding community structure by greedy optimization of modularity
+ * \brief Finding community structure by greedy optimization of modularity.
  *
  * This function implements the fast greedy modularity optimization
  * algorithm for finding community structure, see
@@ -590,16 +591,16 @@ static int igraph_i_fastgreedy_community_update_dq(
  * \param weights Potentially a numeric vector containing edge
  *    weights. Supply a null pointer here for unweighted graphs. The
  *    weights are expected to be non-negative.
- * \param merges Pointer to an initialized matrix or NULL, the result of the
+ * \param merges Pointer to an initialized matrix or \c NULL, the result of the
  *    computation is stored here. The matrix has two columns and each
  *    merge corresponds to one merge, the ids of the two merged
  *    components are stored. The component ids are numbered from zero and
  *    the first \c n components are the individual vertices, \c n is
  *    the number of vertices in the graph. Component \c n is created
- *    in the first merge, component \c n+1 in the second merge, etc.
- *    The matrix will be resized as needed. If this argument is NULL
+ *    in the first merge, component <code>n+1</code> in the second merge, etc.
+ *    The matrix will be resized as needed. If this argument is \c NULL
  *    then it is ignored completely.
- * \param modularity Pointer to an initialized vector or NULL pointer,
+ * \param modularity Pointer to an initialized vector or \c NULL pointer,
  *    in the former case the modularity scores along the stages of the
  *    computation are recorded here. The vector will be resized as
  *    needed.

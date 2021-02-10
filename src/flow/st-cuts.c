@@ -27,18 +27,18 @@
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
 #include "igraph_components.h"
-#include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_stack.h"
-#include "igraph_structural.h"
 #include "igraph_visitor.h"
 
 #include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
+#include "graph/attributes.h"
+#include "flow/flow_internal.h"
 
 typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
                                         const igraph_marked_queue_t *S,
@@ -137,12 +137,12 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
     return 0;
 }
 
-int igraph_i_residual_graph(const igraph_t *graph,
-                            const igraph_vector_t *capacity,
-                            igraph_t *residual,
-                            igraph_vector_t *residual_capacity,
-                            const igraph_vector_t *flow,
-                            igraph_vector_t *tmp) {
+static int igraph_i_residual_graph(const igraph_t *graph,
+                                   const igraph_vector_t *capacity,
+                                   igraph_t *residual,
+                                   igraph_vector_t *residual_capacity,
+                                   const igraph_vector_t *flow,
+                                   igraph_vector_t *tmp) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -206,11 +206,11 @@ int igraph_residual_graph(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_reverse_residual_graph(const igraph_t *graph,
-                                    const igraph_vector_t *capacity,
-                                    igraph_t *residual,
-                                    const igraph_vector_t *flow,
-                                    igraph_vector_t *tmp) {
+static int igraph_i_reverse_residual_graph(const igraph_t *graph,
+                                           const igraph_vector_t *capacity,
+                                           igraph_t *residual,
+                                           const igraph_vector_t *flow,
+                                           igraph_vector_t *tmp) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -477,9 +477,9 @@ int igraph_dominator_tree(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &ancestor);
     IGRAPH_CHECK(igraph_vector_long_init_seq(&label, 0, no_of_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &label);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &succ);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &pred, invmode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &pred, invmode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &pred);
     IGRAPH_CHECK(igraph_i_dbucket_init(&bucket, no_of_nodes));
     IGRAPH_FINALLY(igraph_i_dbucket_destroy, &bucket);

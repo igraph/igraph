@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_error.h"
@@ -26,6 +22,7 @@
 #include "centrality/prpack_internal.h"
 #include "centrality/prpack/prpack_igraph_graph.h"
 #include "centrality/prpack/prpack_solver.h"
+#include "core/exceptions.h"
 
 using namespace prpack;
 using namespace std;
@@ -35,43 +32,57 @@ using namespace std;
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights) {
+int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
+                                          igraph_real_t *value, const igraph_vs_t vids,
+                                          igraph_bool_t directed, igraph_real_t damping,
+                                          const igraph_vector_t *reset,
+                                          const igraph_vector_t *weights) {
     long int i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
     igraph_vit_t vit;
-    double* u = 0;
-    double* v = 0;
-    const prpack_result* res;
+    double *u = nullptr;
+    double *v = nullptr;
+    const prpack_result *res;
 
-    if (reset) {
-        /* Normalize reset vector so the sum is 1 */
-        double reset_sum = igraph_vector_sum(reset);
-        if (igraph_vector_min(reset) < 0) {
-            IGRAPH_ERROR("the reset vector must not contain negative elements", IGRAPH_EINVAL);
+    IGRAPH_HANDLE_EXCEPTIONS(
+        if (reset) {
+            if (igraph_vector_size(reset) != no_of_nodes) {
+                IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
+            }
+
+            /* Normalize reset vector so the sum is 1 */
+            double reset_min = igraph_vector_min(reset);
+            if (reset_min < 0) {
+                IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
+            }
+            if (igraph_is_nan(reset_min)) {
+                IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+
+            double reset_sum = igraph_vector_sum(reset);
+            if (reset_sum == 0) {
+                IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
+            }
+
+            // Construct the personalization vector
+            v = new double[no_of_nodes];
+            for (i = 0; i < no_of_nodes; i++) {
+                v[i] = VECTOR(*reset)[i] / reset_sum;
+            }
+
+            // u is the distribution used when restarting the walk due to being stuck in a sink
+            // v is the distribution used when restarting due to damping
+            // Here we use the same distribution for both
+            u = v;
         }
-        if (reset_sum == 0) {
-            IGRAPH_ERROR("the sum of the elements in the reset vector must not be zero", IGRAPH_EINVAL);
-        }
 
-        // Construct the personalization vector
-        v = new double[no_of_nodes];
-        for (i = 0; i < no_of_nodes; i++) {
-            v[i] = VECTOR(*reset)[i] / reset_sum;
-        }
-    }
+        // Construct and run the solver
+        prpack_igraph_graph prpack_graph(graph, weights, directed);
+        prpack_solver solver(&prpack_graph, false);
+        res = solver.solve(damping, 1e-10, u, v, "");
 
-    // Construct and run the solver
-    prpack_igraph_graph prpack_graph(graph, weights, directed);
-    prpack_solver solver(&prpack_graph, false);
-    res = solver.solve(damping, 1e-10, u, v, "");
-
-    // Delete the personalization vector
-    if (v) {
-        delete[] v;
-    }
+        // Delete the personalization vector
+        delete [] v;
+    );
 
     // Check whether the solver converged
     // TODO: this is commented out because some of the solvers do not implement it yet

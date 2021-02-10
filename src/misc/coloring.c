@@ -43,7 +43,7 @@ static int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vect
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     /* find maximum degree and a corresponding vertex */

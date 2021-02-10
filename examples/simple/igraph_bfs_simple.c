@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2009-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,36 +21,37 @@
 */
 
 #include <igraph.h>
-#include <math.h>
 
-#include "test_utilities.inc"
+void vector_print(igraph_vector_t *v) {
+    long int i;
+    for (i = 0; i < igraph_vector_size(v); i++) {
+        printf(" %li", (long int) VECTOR(*v)[i]);
+    }
+    printf("\n");
+}
 
 int main() {
 
     igraph_t g;
-    FILE *f;
-    igraph_matrix_t coords;
-	igraph_vector_t roots;
-    long int i, n;
+    igraph_vector_t vids, layers, parents;
 
-    f = fopen("igraph_layout_reingold_tilford_bug_879.in", "r");
-    igraph_read_graph_edgelist(&g, f, 0, 0);
-    igraph_matrix_init(&coords, 0, 0);
-	igraph_vector_init(&roots, 0);
-	igraph_vector_push_back(&roots, 0);
+    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 0);
 
-    igraph_layout_reingold_tilford(&g, &coords, IGRAPH_OUT, &roots, 0);
+    igraph_vector_init(&vids, 0);
+    igraph_vector_init(&layers, 0);
+    igraph_vector_init(&parents, 0);
 
-    n = igraph_vcount(&g);
-    for (i = 0; i < n; i++) {
-      printf("%6.3f %6.3f\n", MATRIX(coords, i, 0), MATRIX(coords, i, 1));
-    }
+    igraph_bfs_simple(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
 
-    igraph_matrix_destroy(&coords);
-    igraph_vector_destroy(&roots);
+    vector_print(&vids);
+    vector_print(&layers);
+    vector_print(&parents);
+    
     igraph_destroy(&g);
 
-    VERIFY_FINALLY_STACK();
+    igraph_vector_destroy(&vids);
+    igraph_vector_destroy(&layers);
+    igraph_vector_destroy(&parents);
 
     return 0;
 }

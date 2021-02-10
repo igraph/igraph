@@ -22,13 +22,15 @@
 */
 
 #include "igraph_bipartite.h"
-#include "igraph_attributes.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_random.h"
 #include "igraph_nongraph.h"
+
+#include "graph/attributes.h"
 
 /**
  * \section about_bipartite Bipartite networks in igraph
@@ -100,7 +102,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -177,7 +179,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_index, no_of_nodes);
     IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     /* we won't need the 'mult' vector if 'multiplicity' is NULL, but MSVC will
@@ -802,7 +804,7 @@ int igraph_get_incidence(const igraph_t *graph,
  *
  * \param graph The input graph.
  * \param res Pointer to a boolean, the result is stored here.
- * \param type Pointer to an initialized boolean vector, or a null
+ * \param types Pointer to an initialized boolean vector, or a null
  *   pointer. If not a null pointer and a mapping was found, then it
  *   is stored here. If not a null pointer, but no mapping was found,
  *   the contents of this vector is invalid.
@@ -814,7 +816,7 @@ int igraph_get_incidence(const igraph_t *graph,
 
 int igraph_is_bipartite(const igraph_t *graph,
                         igraph_bool_t *res,
-                        igraph_vector_bool_t *type) {
+                        igraph_vector_bool_t *types) {
 
     /* We basically do a breadth first search and label the
        vertices along the way. We stop as soon as we can find a
@@ -876,10 +878,10 @@ int igraph_is_bipartite(const igraph_t *graph,
         *res = bi;
     }
 
-    if (type && bi) {
-        IGRAPH_CHECK(igraph_vector_bool_resize(type, no_of_nodes));
+    if (types && bi) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(*type)[i] = VECTOR(seen)[i] - 1;
+            VECTOR(*types)[i] = VECTOR(seen)[i] - 1;
         }
     }
 
@@ -1130,18 +1132,16 @@ int igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
                           igraph_integer_t n1, igraph_integer_t n2,
                           igraph_real_t p, igraph_integer_t m,
                           igraph_bool_t directed, igraph_neimode_t mode) {
-    int retval = 0;
 
     if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for bipartite game.", IGRAPH_EINVAL);
     }
 
     if (type == IGRAPH_ERDOS_RENYI_GNP) {
-        retval = igraph_bipartite_game_gnp(graph, types, n1, n2, p, directed, mode);
+        return igraph_bipartite_game_gnp(graph, types, n1, n2, p, directed, mode);
     } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
-        retval = igraph_bipartite_game_gnm(graph, types, n1, n2, m, directed, mode);
+        return igraph_bipartite_game_gnm(graph, types, n1, n2, m, directed, mode);
     } else {
-        IGRAPH_ERROR("Invalid type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid bipartite game type.", IGRAPH_EINVAL);
     }
-    return retval;
 }

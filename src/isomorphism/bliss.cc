@@ -23,10 +23,11 @@
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"
+#include "igraph_memory.h"
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
 
 #include "core/exceptions.h"
-
-#include "config.h"
 
 using namespace bliss;
 using namespace std;
@@ -66,21 +67,11 @@ using namespace std;
  * </para>
  *
  * <para>
- * Bliss version 0.74 is included in igraph.
+ * Bliss version 0.75 is included in igraph.
  * </para>
  */
 
 namespace { // unnamed namespace
-
-IGRAPH_THREAD_LOCAL bool search_aborted;
-
-bool check_abort(const Stats &) {
-    if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
-        search_aborted = true;
-        return true;
-    }
-    return false;
-}
 
 inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
     unsigned int nof_vertices = (unsigned int)igraph_vcount(graph);
@@ -99,11 +90,12 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
     for (unsigned int i = 0; i < nof_edges; i++) {
         g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
     }
+
     return g;
 }
 
 
-static void bliss_free_graph(AbstractGraph *g) {
+void bliss_free_graph(AbstractGraph *g) {
     delete g;
 }
 
@@ -118,7 +110,7 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
         case IGRAPH_BLISS_FM:   gsh = Digraph::shs_fm;  break;
         case IGRAPH_BLISS_FLM:  gsh = Digraph::shs_flm; break;
         case IGRAPH_BLISS_FSM:  gsh = Digraph::shs_fsm; break;
-        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        default: IGRAPH_ERROR("Invalid splitting heuristic.", IGRAPH_EINVAL);
         }
         static_cast<Digraph *>(g)->set_splitting_heuristic(gsh);
     } else {
@@ -130,7 +122,7 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
         case IGRAPH_BLISS_FM:   gsh = Graph::shs_fm;  break;
         case IGRAPH_BLISS_FLM:  gsh = Graph::shs_flm; break;
         case IGRAPH_BLISS_FSM:  gsh = Graph::shs_fsm; break;
-        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        default: IGRAPH_ERROR("Invalid splitting heuristic.", IGRAPH_EINVAL);
         }
         static_cast<Graph *>(g)->set_splitting_heuristic(gsh);
     }
@@ -144,7 +136,7 @@ inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors)
     }
     const int n = g->get_nof_vertices();
     if (n != igraph_vector_int_size(colors)) {
-        IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex color vector length.", IGRAPH_EINVAL);
     }
     for (int i = 0; i < n; ++i) {
         g->change_color(i, VECTOR(*colors)[i]);
@@ -153,30 +145,76 @@ inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors)
 }
 
 
-inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
+inline int bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
     if (info) {
+        size_t group_size_strlen;
+
         info->max_level      = stats.get_max_level();
         info->nof_nodes      = stats.get_nof_nodes();
         info->nof_leaf_nodes = stats.get_nof_leaf_nodes();
         info->nof_bad_nodes  = stats.get_nof_bad_nodes();
         info->nof_canupdates = stats.get_nof_canupdates();
         info->nof_generators = stats.get_nof_generators();
-        stats.get_group_size_igraph(&info->group_size);
+
+        mpz_t group_size;
+        mpz_init(group_size);
+        stats.get_group_size().get(group_size);
+        group_size_strlen = mpz_sizeinbase(group_size, /* base */ 10) + 2;
+        info->group_size = igraph_Calloc(group_size_strlen, char);
+        if (! info->group_size) {
+            IGRAPH_ERROR("Insufficient memory to retrieve automotphism group size.", IGRAPH_ENOMEM);
+        }
+        mpz_get_str(info->group_size, /* base */ 10, group_size);
+        mpz_clear(group_size);
     }
+
+    return IGRAPH_SUCCESS;
 }
 
 
-// this is the callback function used with AbstractGraph::find_automorphisms()
-// it collects the group generators into a pointer vector
-static void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
-    igraph_vector_ptr_t *gen = static_cast<igraph_vector_ptr_t *>(generators);
-    igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
-    igraph_vector_init(newvector, n);
-    copy(aut, aut + n, newvector->stor_begin); // takes care of unsigned int -> double conversion
-    igraph_vector_ptr_push_back(gen, newvector);
-}
+// This is the callback function that can tell Bliss to terminate early.
+struct AbortChecker {
+    bool aborted;
+
+    AbortChecker() : aborted(false) { }
+    bool operator()() {
+        if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+            aborted = true;
+            return true;
+        }
+        return false;
+    }
+};
+
+
+// This is the callback function used with AbstractGraph::find_automorphisms().
+// It collects the automorphism group generators into a pointer vector.
+class AutCollector {
+    igraph_vector_ptr_t *generators;
+
+public:
+    AutCollector(igraph_vector_ptr_t *generators_) : generators(generators_) { }
+
+    void operator ()(unsigned int n, const unsigned int *aut) {
+        int err;
+        igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
+        if (! newvector) {
+            throw bad_alloc();
+        }
+        err = igraph_vector_init(newvector, n);
+        if (err) {
+            throw bad_alloc();
+        }
+        copy(aut, aut + n, newvector->stor_begin); // takes care of unsigned int -> double conversion
+        err = igraph_vector_ptr_push_back(generators, newvector);
+        if (err) {
+            throw bad_alloc();
+        }
+    }
+};
 
 } // end unnamed namespace
+
 
 /**
  * \function igraph_canonical_permutation
@@ -212,9 +250,9 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        search_aborted = false;
-        const unsigned int *cl = g->canonical_form(stats, NULL, NULL, &check_abort);
-        if (search_aborted) {
+        AbortChecker checker;
+        const unsigned int *cl = g->canonical_form(stats, /* report */ nullptr, /* terminate */ checker);
+        if (checker.aborted) {
             return IGRAPH_INTERRUPTED;
         }
 
@@ -223,7 +261,7 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
             VECTOR(*labeling)[i] = cl[i];
         }
 
-        bliss_info_to_igraph(info, stats);
+        IGRAPH_CHECK(bliss_info_to_igraph(info, stats));
 
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
@@ -265,17 +303,18 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        search_aborted = false;
-        g->find_automorphisms(stats, NULL, NULL, &check_abort);
-        if (search_aborted) {
+        AbortChecker checker;
+        g->find_automorphisms(stats, /* report */ nullptr, /* terminate */ checker);
+        if (checker.aborted) {
             return IGRAPH_INTERRUPTED;
         }
 
-        bliss_info_to_igraph(info, stats);
+        IGRAPH_CHECK(bliss_info_to_igraph(info, stats));
 
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
     );
+
     return IGRAPH_SUCCESS;
 }
 
@@ -314,12 +353,13 @@ int igraph_automorphism_group(
 
         Stats stats;
         igraph_vector_ptr_resize(generators, 0);
-        search_aborted = false;
-        g->find_automorphisms(stats, collect_generators, generators, &check_abort);
-        if (search_aborted) {
+        AutCollector collector(generators);
+        AbortChecker checker;
+        g->find_automorphisms(stats, collector, checker);
+        if (checker.aborted) {
             return IGRAPH_INTERRUPTED;
         }
-        bliss_info_to_igraph(info, stats);
+        IGRAPH_CHECK(bliss_info_to_igraph(info, stats));
 
         delete g;
         IGRAPH_FINALLY_CLEAN(1);
@@ -333,7 +373,7 @@ int igraph_automorphism_group(
 
 /*
    IGraph library.
-   Copyright (C) 2006-2020 The igraph development team
+   Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -346,10 +386,7 @@ int igraph_automorphism_group(
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 /**
@@ -360,7 +397,7 @@ int igraph_automorphism_group(
  * successor of the famous NAUTY algorithm and implementation. Bliss
  * is open source and licensed according to the GNU LGPL. See
  * https://users.aalto.fi/~tjunttil/bliss/ for
- * details. Currently the 0.74 version of Bliss is included in igraph.
+ * details. Currently the 0.75 version of Bliss is included in igraph.
  *
  * </para><para>
  *
@@ -419,11 +456,11 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
     directed = igraph_is_directed(graph1);
     if (igraph_is_directed(graph2) != directed) {
-        IGRAPH_ERROR("Cannot compare directed and undirected graphs",
+        IGRAPH_ERROR("Cannot compare directed and undirected graphs.",
                      IGRAPH_EINVAL);
     }
     if ((colors1 == NULL || colors2 == NULL) && colors1 != colors2) {
-        IGRAPH_WARNING("Only one of the graphs is vertex colored, colors will be ignored");
+        IGRAPH_WARNING("Only one of the graphs is vertex colored, colors will be ignored.");
         colors1 = NULL; colors2 = NULL;
     }
 

@@ -35,7 +35,7 @@ void print_vector_format(const igraph_vector_t *v, FILE *f, const char *format) 
 
 /* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
 void print_vector(const igraph_vector_t *v) {
-    print_vector_format(v, stdout, "%#g");
+    print_vector_format(v, stdout, "%g");
 }
 
 /* Round elements of a vector to integers and print them. */
@@ -70,15 +70,31 @@ void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) 
 }
 
 void print_matrix(const igraph_matrix_t *m) {
-    print_matrix_format(m, stdout, "%#g");
+    print_matrix_format(m, stdout, "%8g");
 }
 
 /* Round elements of a matrix to integers and print them. */
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m) {
-    print_matrix_format(m, stdout, "%.f");
+    print_matrix_format(m, stdout, "%4.f");
 }
 
+
+/* Print an adjacency list. Use brackets around each vector and also use
+ * brackets around the entire adjacency list to make it clear when the list
+ * is empty.
+ */
+void print_adjlist(const igraph_adjlist_t *adjlist) {
+    long vcount = igraph_adjlist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_adjlist_get(adjlist, i));
+    }
+    printf("}\n");
+}
 
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph) {
@@ -94,6 +110,53 @@ void print_graph(const igraph_t *graph) {
     printf("}\n");
 }
 
+/* Print an incidence list. Use brackets around each vector and also use
+ * brackets around the entire incidence list to make it clear when the list
+ * is empty.
+ */
+void print_inclist(const igraph_inclist_t *inclist) {
+    long vcount = igraph_inclist_size(inclist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_inclist_get(inclist, i));
+    }
+    printf("}\n");
+}
+
+/* Print a lazy adjacency list. Use brackets around each vector and also use
+ * brackets around the entire lazy adjacency list to make it clear when the list
+ * is empty.
+ */
+void print_lazy_adjlist(igraph_lazy_adjlist_t *adjlist) {
+    long vcount = igraph_lazy_adjlist_size(adjlist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_lazy_adjlist_get(adjlist, i));
+    }
+    printf("}\n");
+}
+
+/* Print a lazy incidence list. Use brackets around each vector and also use
+ * brackets around the entire incidence list to make it clear when the list
+ * is empty.
+ */
+void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
+    long vcount = igraph_lazy_inclist_size(inclist);
+    long i;
+
+    printf("{\n");
+    for (i = 0; i < vcount; ++i) {
+        printf("  %ld: ", i);
+        print_vector_int(igraph_lazy_inclist_get(inclist, i));
+    }
+    printf("}\n");
+}
 
 /* Edge comparisong function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {
@@ -296,12 +359,36 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     igraph_matrix_complex_destroy(&copy);
 }
 
+void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* elem) {
+    int c, r;
+    int i_elem = 0;
+    igraph_matrix_init(mat, nrow, ncol);
+    for (r = 0; r < nrow; r++) {
+        for (c = 0; c < ncol; c++) {
+            MATRIX(*mat, r, c) = elem[i_elem];
+            i_elem++;
+        }
+    }
+}
+
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \
           "Finally stack is not empty. " \
           "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n"); \
         return 100; \
+    }
+
+/* Run a test in a separate function; return the return value of the function
+ * if it is nonzero. Also verify the FINALLY stack and bail out if it is not
+ * empty. Needs an integer variable named 'retval' in the local context. */
+#define RUN_TEST(func) \
+    { \
+        retval = func(); \
+        if (retval) { \
+            return retval; \
+        } \
+        VERIFY_FINALLY_STACK(); \
     }
 
 #endif /* TEST_UTILITIES_INC */

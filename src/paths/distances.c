@@ -23,13 +23,15 @@
 */
 
 #include "igraph_paths.h"
+
 #include "igraph_datatype.h"
 #include "igraph_dqueue.h"
 #include "igraph_iterators.h"
-#include "core/interruption.h"
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
+
+#include "core/interruption.h"
 
 static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
@@ -197,7 +199,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
     } else {
         igraph_adjlist_t adjlist;
         igraph_vector_t ecc;
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc, igraph_vss_all(),

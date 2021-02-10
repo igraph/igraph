@@ -27,7 +27,7 @@
 
 /**
  * \function igraph_lapack_dgetrf
- * LU factorization of a general M-by-N matrix
+ * \brief LU factorization of a general M-by-N matrix.
  *
  * The factorization has the form
  *      A = P * L * U
@@ -39,10 +39,11 @@
  *      A = P * L * U; the unit diagonal elements of L are not
  *      stored.
  * \param ipiv An integer vector, the pivot indices are stored here,
- *      unless it is a null pointer. Row i of the matrix was
- *      interchanged with row ipiv[i].
- * \param info LAPACK error code. Zero on successful exit. If positive
- *      and i, then U(i,i) is exactly zero. The factorization has been
+ *      unless it is a null pointer. Row \c i of the matrix was
+ *      interchanged with row <code>ipiv[i]</code>.
+ * \param info LAPACK error code. Zero on successful exit. If its value is
+ *      a positive number i, it indicates that U(i,i) is exactly zero. 
+ *      The factorization has been
  *      completed, but the factor U is exactly singular, and division
  *      by zero will occur if it is used to solve a system of
  *      equations. If LAPACK returns an error, i.e. a negative info
@@ -63,34 +64,36 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
         IGRAPH_CHECK(igraph_vector_int_init(&vipiv, m < n ? m : n));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
         myipiv = &vipiv;
+    } else {
+        IGRAPH_CHECK(igraph_vector_int_resize(ipiv, m < n ? m : n));
     }
 
     igraphdgetrf_(&m, &n, VECTOR(a->data), &lda, VECTOR(*myipiv), info);
 
     if (*info > 0) {
-        IGRAPH_WARNING("LU: factor is exactly singular");
+        IGRAPH_WARNING("LU: factor is exactly singular.");
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows.", IGRAPH_ELAPACK);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of columns", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of columns.", IGRAPH_ELAPACK);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid info argument", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
             break;
         }
     }

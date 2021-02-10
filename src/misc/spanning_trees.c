@@ -459,7 +459,7 @@ int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res, igr
         IGRAPH_ERROR("Invalid vertex id given for random spanning tree", IGRAPH_EINVVID);
     }
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, vcount));

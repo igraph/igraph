@@ -22,8 +22,6 @@
 */
 
 #include "igraph_types.h"
-#include "igraph_memory.h"
-#include "config.h"
 
 #include "core/grid.h"
 

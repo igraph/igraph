@@ -37,7 +37,7 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     // We need attributes
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_full(&full, 10, /*directed=*/ 0, /*loops=*/ 0);
     igraph_tree(&tree, 15, /*children=*/ 2, /*type=*/ IGRAPH_TREE_UNDIRECTED);

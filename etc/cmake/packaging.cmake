@@ -4,14 +4,27 @@ set(CPACK_PACKAGE_VENDOR "The igraph development team")
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 
-# Alias "dist" to "package_source"
-add_custom_target(dist
-  COMMAND "${CMAKE_COMMAND}"
-    --build "${CMAKE_BINARY_DIR}"
-    --target package_source
-  VERBATIM
-  USES_TERMINAL
-)
+if(TARGET html)
+  # Alias "dist" to "package_source"
+  add_custom_target(dist
+    COMMAND "${CMAKE_COMMAND}"
+      --build "${CMAKE_BINARY_DIR}"
+      --target package_source
+    VERBATIM
+    USES_TERMINAL
+  )
+
+  # We want to include the HTML docs in the source package so add a dependency
+  add_dependencies(dist html)
+else()
+  add_custom_target(dist
+    COMMAND "${CMAKE_COMMAND}" -E false
+    COMMENT
+      "Cannot build source tarball since the HTML documentation was not built."
+    VERBATIM
+    USES_TERMINAL
+  )
+endif()
 
 #############################################################################
 ## Configuration of the source package
@@ -30,7 +43,6 @@ set(
     "${CMAKE_SOURCE_DIR}/examples;/examples"
     "${CMAKE_SOURCE_DIR}/include;/include"
     "${CMAKE_SOURCE_DIR}/msvc/include;/msvc/include"
-    "${CMAKE_BINARY_DIR}/src/io/parsers/;/src/io/parsers"
     "${CMAKE_SOURCE_DIR}/src;/src"
     "${CMAKE_SOURCE_DIR}/tests;/tests"
     "${CMAKE_SOURCE_DIR}/vendor;/vendor"
@@ -41,20 +53,14 @@ set(
 # whitelist files to be copied; we use CPACK_INSTALL_SCRIPT for that.
 set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/etc/cmake/cpack_install_script.cmake")
 
-# Ignore the build and all hidden folders. Also ignore obsolete autoconf-related
-# stuff. The latter won't be needed once we fully transitioned to CMake.
+# Ignore the build and all hidden folders
 set(
     CPACK_SOURCE_IGNORE_FILES
     "\\\\..*/"
-    "\.l$"
-    "\.y$"
+    "\\\\.l$"
+    "\\\\.y$"
     "${CMAKE_SOURCE_DIR}/build"
     "${CMAKE_SOURCE_DIR}/optional/simpleraytracer"
-    "Makefile.am"
-    "Makefile.in"
-    "configure.ac"
-    "atlocal.in"
-    "\.at$"
 )
 
 #############################################################################

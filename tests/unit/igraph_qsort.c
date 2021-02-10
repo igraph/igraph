@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int comp(const void *a, const void *b) {
     igraph_real_t *aa = (igraph_real_t *) a;
     igraph_real_t *bb = (igraph_real_t *) b;
@@ -53,6 +55,8 @@ int main() {
     igraph_vector_print(&v);
 
     igraph_vector_destroy(&v);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -76,6 +76,7 @@
  */
 
 #include "igraph_scg.h"
+
 #include "igraph_eigen.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
@@ -1722,8 +1723,6 @@ int igraph_scg_adjacency(const igraph_t *graph,
  *
  * \sa \ref igraph_scg_grouping(), \ref igraph_scg_semiprojectors(),
  * \ref igraph_scg_adjacency() and \ref igraph_scg_laplacian().
- *
- * \example examples/simple/scg2.c
  */
 
 int igraph_scg_stochastic(const igraph_t *graph,
@@ -2080,8 +2079,6 @@ int igraph_scg_stochastic(const igraph_t *graph,
  *
  * \sa \ref igraph_scg_grouping(), \ref igraph_scg_semiprojectors(),
  * \ref igraph_scg_stochastic() and \ref igraph_scg_adjacency().
- *
- * \example examples/simple/scg3.c
  */
 
 int igraph_scg_laplacian(const igraph_t *graph,

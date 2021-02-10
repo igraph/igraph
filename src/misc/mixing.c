@@ -22,6 +22,7 @@
 */
 
 #include "igraph_mixing.h"
+
 #include "igraph_interface.h"
 
 /**

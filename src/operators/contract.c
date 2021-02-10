@@ -26,6 +26,8 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
+#include "graph/attributes.h"
+
 static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
     long int i, n = igraph_vector_ptr_size(p);
     for (i = 0; i < n; i++) {

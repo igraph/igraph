@@ -9,6 +9,7 @@
 
 <section id="breadth-first-search"><title>Breadth-first search</title>
 <!-- doxrox-include igraph_bfs -->
+<!-- doxrox-include igraph_bfs_simple -->
 <!-- doxrox-include igraph_bfshandler_t -->
 </section>
 
