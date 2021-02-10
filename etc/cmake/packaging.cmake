@@ -4,14 +4,27 @@ set(CPACK_PACKAGE_VENDOR "The igraph development team")
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 
-# Alias "dist" to "package_source"
-add_custom_target(dist
-  COMMAND "${CMAKE_COMMAND}"
-    --build "${CMAKE_BINARY_DIR}"
-    --target package_source
-  VERBATIM
-  USES_TERMINAL
-)
+if(TARGET html)
+  # Alias "dist" to "package_source"
+  add_custom_target(dist
+    COMMAND "${CMAKE_COMMAND}"
+      --build "${CMAKE_BINARY_DIR}"
+      --target package_source
+    VERBATIM
+    USES_TERMINAL
+  )
+
+  # We want to include the HTML docs in the source package so add a dependency
+  add_dependencies(dist html)
+else()
+  add_custom_target(dist
+    COMMAND "${CMAKE_COMMAND}" -E false
+    COMMENT
+      "Cannot build source tarball since the HTML documentation was not built."
+    VERBATIM
+    USES_TERMINAL
+  )
+endif()
 
 #############################################################################
 ## Configuration of the source package
