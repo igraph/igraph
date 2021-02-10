@@ -108,7 +108,7 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
 
 /**
  * \function igraph_lapack_dgetrs
- * Solve general system of linear equations using LU factorization
+ * \brief Solve general system of linear equations using LU factorization.
  *
  * This function calls LAPACK to solve a system of linear equations
  *      A * X = B  or  A' * X = B
@@ -117,9 +117,11 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  * \param transpose Logical scalar, whether to transpose the input
  *      matrix.
  * \param a A matrix containing the L and U factors from the
- *      factorization A = P*L*U.
+ *      factorization A = P*L*U. L is expected to be unitriangular,
+ *      diagonal entries are those of U.
  * \param ipiv An integer vector, the pivot indices from \ref
- *      igraph_lapack_dgetrf must be given here.
+ *      igraph_lapack_dgetrf must be given here. Row \c i of A was
+ *      interchanged with row <code>ipiv[i]</code>.
  * \param b The right hand side matrix must be given here.
  * \return Error code.
  *
@@ -136,46 +138,52 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
     int info;
 
     if (n != igraph_matrix_ncol(a)) {
-        IGRAPH_ERROR("Cannot LU solve matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
     }
     if (n != igraph_matrix_nrow(b)) {
-        IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-
+    if (igraph_vector_int_size(ipiv) > 0 &&
+            (igraph_vector_int_max(ipiv) > n || igraph_vector_int_min(ipiv) < 1)) {
+        IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
+    }
+    if (igraph_vector_int_size(ipiv) != n) {
+        IGRAPH_ERROR("Pivot vector not equal to number of matrix rows.", IGRAPH_EINVAL);
+    }
     igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(*ipiv),
                   VECTOR(b->data), &ldb, &info);
 
     if (info < 0) {
         switch (info) {
         case -1:
-            IGRAPH_ERROR("Invalid transpose argument", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid transpose argument.", IGRAPH_ELAPACK);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of rows/columns", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_ELAPACK);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid number of RHS vectors", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_ELAPACK);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LU matrix", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LU matrix.", IGRAPH_ELAPACK);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid LDA parameter", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid pivot vector", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
             break;
         case -7:
-            IGRAPH_ERROR("Invalid RHS matrix", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_ELAPACK);
             break;
         case -8:
-            IGRAPH_ERROR("Invalid LDB parameter", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_ELAPACK);
             break;
         case -9:
-            IGRAPH_ERROR("Invalid info argument", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
             break;
         }
     }

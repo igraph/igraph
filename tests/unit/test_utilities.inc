@@ -371,6 +371,18 @@ void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* el
     }
 }
 
+void matrix_init_real_row_major(igraph_matrix_t *mat, int nrow, int ncol, igraph_real_t* elem) {
+    int c, r;
+    int i_elem = 0;
+    igraph_matrix_init(mat, nrow, ncol);
+    for (r = 0; r < nrow; r++) {
+        for (c = 0; c < ncol; c++) {
+            MATRIX(*mat, r, c) = elem[i_elem];
+            i_elem++;
+        }
+    }
+}
+
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \
