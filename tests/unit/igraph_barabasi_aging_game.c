@@ -68,7 +68,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 3,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 1,
-        /*pa_exp*/ 0.0, /*aging_exp*/ 10, /*aging_bin*/ 1,
+        /*pa_exp*/ 0.0, /*aging_exp*/ 10, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 1.0, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.0,
         /*age_coef */ 1, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
@@ -78,7 +78,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 0.0, /*aging_exp*/ -10, /*aging_bin*/ 1,
+        /*pa_exp*/ 0.0, /*aging_exp*/ -10, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 0.1, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.1,
         /*age_coef */ 1, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
@@ -89,7 +89,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ &outseq, /*outpref*/ 0,
-        /*pa_exp*/ 0.1, /*aging_exp*/ -10, /*aging_bin*/ 1,
+        /*pa_exp*/ 0.1, /*aging_exp*/ -10, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 0.1, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.1,
         /*age_coef */ 10, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
@@ -100,7 +100,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 10.0, /*aging_exp*/ 0.0, /*aging_bin*/ 1,
+        /*pa_exp*/ 10.0, /*aging_exp*/ 0.0, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 0.0, /*zero_age_appeal*/ 1.0, /*deg_coef*/ 1.0,
         /*age_coef */ 0.0, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
@@ -112,7 +112,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 1,
+        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 1.0, /*zero_age_appeal*/ 1.0, /*deg_coef*/ 1.0,
         /*age_coef */ -1.0, /*directed*/ 1) == IGRAPH_EINVAL);
 
@@ -120,7 +120,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 1,
+        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 1.0, /*zero_age_appeal*/ 1.0, /*deg_coef*/ -1.0,
         /*age_coef */ 0.0, /*directed*/ 1) == IGRAPH_EINVAL);
 
@@ -128,7 +128,7 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 1,
+        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ -1.0, /*zero_age_appeal*/ 1.0, /*deg_coef*/ 1.0,
         /*age_coef */ 0.0, /*directed*/ 1) == IGRAPH_EINVAL);
 
@@ -136,11 +136,10 @@ int main() {
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 1,
+        /*pa_exp*/ 1.0, /*aging_exp*/ 0.0, /*aging_bin*/ 6,
         /*zero_deg_appeal*/ 1.0, /*zero_age_appeal*/ -1.0, /*deg_coef*/ 1.0,
         /*age_coef */ 0.0, /*directed*/ 1) == IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();
     return 0;
-
 }
