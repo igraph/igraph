@@ -90,6 +90,7 @@ int main() {
     IGRAPH_ASSERT(igraph_es_path(&es, &v, /*directed*/1) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_eit_create(&g, es, &eit) == IGRAPH_EINVAL);
     igraph_vector_destroy(&v);
+    igraph_es_destroy(&es);
 
     printf("es_path with negative entry should fail.\n");
     igraph_vector_init_int(&v, 3, -4, 3, 2);
