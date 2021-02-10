@@ -1103,7 +1103,8 @@ int igraph_es_fromto(igraph_es_t *es,
  * \brief Edge selector, a sequence of edge ids.
  *
  * All edge ids between <code>from</code> and <code>to</code> will be
- * included in the edge selection.
+ * included in the edge selection. This includes <code>from</code> and
+ * excludes <code>to</code>.
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param from The first edge id to be included.
@@ -1249,9 +1250,23 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
 }
 
 /**
- * \example examples/simple/igraph_es_path.c
+ * \function igraph_es_path
+ * \brief Edge selector, edge ids on a path.
+ *
+ * This function takes a vector of vertices and creates a selector of
+ * edges between those vertices. Vector {0, 3, 4, 7} will select edges
+ * (0 -> 3), (3 -> 4), (4 -> 7). If these edges don't exist then trying
+ * to create an iterator using this selector will fail.
+ *
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param v Pointer to a vector of vertex id's along the path.
+ * \param directed If edge directions should be taken into account. This
+ *                 will be ignored if the graph to select from is undirected.
+ * \return Error code.
+ * \sa \ref igraph_es_destroy()
+ *
+ * Time complexity: O(n), the number of vertices.
  */
-
 int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v,
                    igraph_bool_t directed) {
     es->type = IGRAPH_ES_PATH;
@@ -1388,6 +1403,21 @@ int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     return 0;
 }
 
+/**
+ * \function igraph_es_as_vector
+ * \brief Transform edge selector into vector.
+ *
+ * </para><para>
+ * Call this function on an edge selector to transform it into a vector.
+ * This is only implemented for sequence and vector selectors. If the
+ * edges do not exist in the graph, this will result in an error.
+ *
+ * \param graph Pointer to a graph to check if the edges in the selector exist.
+ * \param es An edge selector object.
+ * \param v Pointer to initialized vector. The result will be stored here.
+ *
+ * Time complexity: O(n), the number of edges in the selector.
+ */
 int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
                         igraph_vector_t *v) {
     igraph_eit_t eit;
@@ -1702,7 +1732,7 @@ static int igraph_i_eit_path(const igraph_t *graph,
     long int i, len;
 
     if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_EINVVID);
     }
 
     if (n <= 1) {
@@ -1717,7 +1747,7 @@ static int igraph_i_eit_path(const igraph_t *graph,
     eit->end = len;
     eit->vec = igraph_Calloc(1, igraph_vector_t);
     if (eit->vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
 
@@ -1784,7 +1814,7 @@ int igraph_eit_create(const igraph_t *graph,
         eit->start = 0;
         eit->vec = igraph_Calloc(1, igraph_vector_t);
         if (eit->vec == 0) {
-            IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) eit->vec);
         IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, 0);
@@ -1805,7 +1835,7 @@ int igraph_eit_create(const igraph_t *graph,
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
         if (eit->pos >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_ES_VECTOR:
@@ -1816,7 +1846,7 @@ int igraph_eit_create(const igraph_t *graph,
         eit->vec = es.data.vecptr;
         eit->end = igraph_vector_size(eit->vec);
         if (!igraph_vector_isininterval(eit->vec, 0, igraph_ecount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_ES_SEQ:
@@ -1824,6 +1854,15 @@ int igraph_eit_create(const igraph_t *graph,
         eit->pos = es.data.seq.from;
         eit->start = es.data.seq.from;
         eit->end = es.data.seq.to;
+        if (eit->start < 0) {
+            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+        }
+        if (eit->end < 0) {
+            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+        }
+        if (eit->start >= igraph_ecount(graph)) {
+            IGRAPH_ERROR("Cannot create iterator, starting edge greater than number of edges.", IGRAPH_EINVAL);
+        }
         break;
     case IGRAPH_ES_PAIRS:
         IGRAPH_CHECK(igraph_i_eit_pairs(graph, es, eit));
@@ -1835,7 +1874,7 @@ int igraph_eit_create(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_eit_path(graph, es, eit));
         break;
     default:
-        IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create iterator, invalid selector.", IGRAPH_EINVAL);
         break;
     }
     return 0;
