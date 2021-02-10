@@ -234,7 +234,7 @@ int main() {
     igraph_matrix_destroy(&m1);
     igraph_matrix_destroy(&m2);
 
-	VERIFY_FINALLY_STACK();
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

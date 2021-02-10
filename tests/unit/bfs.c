@@ -131,5 +131,7 @@ int main() {
     igraph_vector_destroy(&restricted);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

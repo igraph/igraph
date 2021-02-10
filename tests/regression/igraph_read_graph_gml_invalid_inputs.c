@@ -37,7 +37,7 @@ int test_file(const char* fname) {
     retval = igraph_read_graph_gml(&g, ifile);
     if (!retval) {
         /* input was accepted, this is a bug; attempt to clean up after
-		 * ourselves nevertheless */
+         * ourselves nevertheless */
         igraph_destroy(&g);
         fclose(ifile);
         return 2;

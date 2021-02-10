@@ -19,6 +19,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g;
     igraph_bool_t simple;
@@ -192,6 +194,8 @@ int main() {
     IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

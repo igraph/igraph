@@ -93,5 +93,7 @@ int main() {
     igraph_matrix_destroy(&merges);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

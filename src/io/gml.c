@@ -87,7 +87,7 @@ static int igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_rea
     }
 
     *result = value;
-	return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {

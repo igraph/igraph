@@ -55,7 +55,7 @@ int main() {
     if (!igraph_is_nan(modularity)) {
         return 1;
     }
-	/* Should not crash if we omit 'modularity' */
+    /* Should not crash if we omit 'modularity' */
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, /* modularity = */ 0);
     igraph_destroy(&graph);
     igraph_vector_destroy(&membership);

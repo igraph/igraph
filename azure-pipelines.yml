@@ -13,7 +13,8 @@ jobs:
 
       - template: .azure/build.yml
         parameters:
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-g -Og" -DCMAKE_CXX_FLAGS="-g -Og'
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og'
 
   - job: linux_static_external
     steps:
@@ -76,34 +77,17 @@ jobs:
     pool:
        vmImage: windows-2019
 
-    variables:
-      CMAKE_GENERATOR: Visual Studio 16 2019
-
     steps:
-      - script: choco install winflexbison3
-        displayName: Install dependencies
-
-      - template: .azure/build.yml
-        parameters:
-          extra_ctest_args: -C Debug
-          use_ccache: false
+      - template: .azure/build-win.yml
 
   - job: windows_shared
     pool:
        vmImage: windows-2019
 
-    variables:
-      CMAKE_GENERATOR: Visual Studio 16 2019
-
     steps:
-      - script: choco install winflexbison3
-        displayName: Install dependencies
-
-      - template: .azure/build.yml
+      - template: .azure/build-win.yml
         parameters:
           build_shared: true
-          extra_ctest_args: -C Debug
-          use_ccache: false
 
   - job: documentation
     steps:
