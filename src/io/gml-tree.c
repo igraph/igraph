@@ -22,12 +22,10 @@
 
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include "io/gml-tree.h"
 
 #include <string.h>
-#include <stdio.h>
 
 int igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
                                  const char *name, int namelen,

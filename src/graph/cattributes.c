@@ -26,7 +26,6 @@
 #include "core/math.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
-#include "config.h"
 
 #include <string.h>
 
@@ -2621,7 +2620,7 @@ const igraph_attribute_table_t igraph_cattribute_table = {
  * handler is by default not attached (the default is no attribute
  * handler), so we first need to attach it:
  * <programlisting>
- * igraph_i_set_attribute_table(&amp;igraph_cattribute_table);
+ * igraph_set_attribute_table(&amp;igraph_cattribute_table);
  * </programlisting>
  * </para>
  * <para>Now the attribute functions are available. Please note that

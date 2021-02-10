@@ -20,13 +20,15 @@
 
 */
 
-#include <string.h>
-
 #include "igraph_foreign.h"
 
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
+
+#include "graph/attributes.h"
+
+#include <string.h>
 
 #define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE); } while (0)
 

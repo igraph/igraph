@@ -1,0 +1,13 @@
+No vertices:
+0, 0
+Comparing 5 separate vertices and one 5-element cluster:
+0, 4
+Comparing ((6, 1), (2,4), (3,5,0)) with ((2), (6,0,3), (4,5), (1)):
+3, 2
+Comparing ((0,1), (), 2) with ((0), (), (1,2))
+1, 1
+
+Expected to fail nicely:
+
+Differently sized clusterings
+Member index too high

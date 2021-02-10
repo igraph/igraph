@@ -24,17 +24,18 @@
 #ifndef IGRAPH_COHESIVE_BLOCKS_H
 #define IGRAPH_COHESIVE_BLOCKS_H
 
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
-DECLDIR int igraph_cohesive_blocks(const igraph_t *graph,
-                           igraph_vector_ptr_t *blocks,
-                           igraph_vector_t *cohesion,
-                           igraph_vector_t *parent,
-                           igraph_t *block_tree);
+IGRAPH_EXPORT int igraph_cohesive_blocks(const igraph_t *graph,
+                                         igraph_vector_ptr_t *blocks,
+                                         igraph_vector_t *cohesion,
+                                         igraph_vector_t *parent,
+                                         igraph_t *block_tree);
 
 __END_DECLS
 

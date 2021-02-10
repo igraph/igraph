@@ -169,12 +169,13 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
 int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                        igraph_es_t es) {
     igraph_eit_t eit;
-    long int i;
+    long int i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT));
+
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
@@ -183,10 +184,17 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
         long int e = IGRAPH_EIT_GET(eit);
         long int from = IGRAPH_FROM(graph, e);
         long int to = IGRAPH_TO(graph, e);
-        igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist,
-                                (igraph_integer_t) from);
-        long int j, n = igraph_vector_size(neis);
+        igraph_vector_int_t *neis =
+            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+
+        if (neis == 0) {
+            /* Most likely out of memory */
+            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM);
+        }
+
         VECTOR(*res)[i] = 0;
+
+        n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             long int e2 = (long int) VECTOR(*neis)[j];
             long int to2 = IGRAPH_OTHER(graph, e2, from);
@@ -229,13 +237,12 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  */
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
     igraph_eit_t eit;
-    long int i;
-    igraph_bool_t directed = igraph_is_directed(graph);
+    long int i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
@@ -244,20 +251,23 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
         long int e = IGRAPH_EIT_GET(eit);
         long int from = IGRAPH_FROM(graph, e);
         long int to = IGRAPH_TO(graph, e);
-        igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist,
-                                (igraph_integer_t) from);
-        long int j, n = igraph_vector_size(neis);
+        igraph_vector_int_t *neis =
+            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+        
+        if (neis == 0) {
+            /* Most likely out of memory */
+            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM);
+        }
+
         VECTOR(*res)[i] = 0;
+        
+        n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             long int e2 = (long int) VECTOR(*neis)[j];
             long int to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to) {
                 VECTOR(*res)[i] += 1;
             }
-        }
-        /* for loop edges, divide the result by two */
-        if (!directed && to == from) {
-            VECTOR(*res)[i] /= 2;
         }
     }
 
@@ -315,7 +325,7 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
         return 0;
     }
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_DONT_SIMPLIFY));
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     for (i = 0; ! IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
@@ -326,12 +336,12 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
         /* Check whether there is a to->from edge, search for from in the
            out-list of to. We don't search an empty vector, because
            vector_binsearch seems to have a bug with this. */
-        igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                 (igraph_integer_t) to);
-        if (igraph_vector_empty(neis)) {
+        if (igraph_vector_int_empty(neis)) {
             VECTOR(*res)[i] = 0;
         } else {
-            VECTOR(*res)[i] = igraph_vector_binsearch2(neis, from);
+            VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
         }
     }
 

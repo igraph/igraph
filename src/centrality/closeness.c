@@ -19,6 +19,7 @@
 */
 
 #include "igraph_centrality.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
@@ -181,7 +182,7 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
@@ -203,8 +204,8 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t minnei = (igraph_integer_t) igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
-            igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            long int nlen = igraph_vector_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
+            long int nlen = igraph_vector_int_size(neis);
 
             mindist = -igraph_2wheap_delete_max(&Q);
 
@@ -448,7 +449,7 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
@@ -556,7 +557,7 @@ int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector
     IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
@@ -666,7 +667,7 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
@@ -687,8 +688,8 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t minnei = (igraph_integer_t) igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
-            igraph_vector_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            long int nlen = igraph_vector_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
+            long int nlen = igraph_vector_int_size(neis);
 
             mindist = -igraph_2wheap_delete_max(&Q);
 
@@ -822,7 +823,7 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
  *
  * </para><para>
  * M. Marchiori and V. Latora, Harmony in the small-world, Physica A 285, pp. 539-546 (2000).
- * https://doi.org/10.1016/S0378-4371(00)00311-3
+ * https://doi.org/10.1016/S0378-4371%2800%2900311-3
  *
  * </para><para>
  * Y. Rochat, Closeness Centrality Extended to Unconnected Graphs: the Harmonic Centrality Index, ASNA 2009.

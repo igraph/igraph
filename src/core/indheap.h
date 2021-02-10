@@ -23,16 +23,7 @@
 #ifndef IGRAPH_CORE_INDHEAP_H
 #define IGRAPH_CORE_INDHEAP_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
-#else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -102,16 +93,16 @@ typedef struct s_indheap_d {
 
 #define IGRAPH_D_INDHEAP_NULL { 0,0,0,0,0,0 }
 
-int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int size);
-void igraph_d_indheap_destroy        (igraph_d_indheap_t* h);
-igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h);
-int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
-                                     long int idx, long int idx2);
-igraph_real_t igraph_d_indheap_max       (igraph_d_indheap_t* h);
-igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h);
-long int igraph_d_indheap_size      (igraph_d_indheap_t* h);
-int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size);
-void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *idx2);
+IGRAPH_PRIVATE_EXPORT int igraph_d_indheap_init(igraph_d_indheap_t *h, long int size);
+IGRAPH_PRIVATE_EXPORT void igraph_d_indheap_destroy(igraph_d_indheap_t *h);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_d_indheap_empty(igraph_d_indheap_t *h);
+IGRAPH_PRIVATE_EXPORT int igraph_d_indheap_push(igraph_d_indheap_t *h, igraph_real_t elem,
+                                                long int idx, long int idx2);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_d_indheap_max(igraph_d_indheap_t *h);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t *h);
+IGRAPH_PRIVATE_EXPORT long int igraph_d_indheap_size(igraph_d_indheap_t *h);
+IGRAPH_PRIVATE_EXPORT int igraph_d_indheap_reserve(igraph_d_indheap_t *h, long int size);
+IGRAPH_PRIVATE_EXPORT void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *idx2);
 
 void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head);
 void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, long int elem);
@@ -134,24 +125,24 @@ typedef struct igraph_2wheap_t {
     igraph_vector_long_t index2;
 } igraph_2wheap_t;
 
-int igraph_2wheap_init(igraph_2wheap_t *h, long int size);
-void igraph_2wheap_destroy(igraph_2wheap_t *h);
-int igraph_2wheap_clear(igraph_2wheap_t *h);
-int igraph_2wheap_push_with_index(igraph_2wheap_t *h,
-                                  long int idx, igraph_real_t elem);
-igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h);
-long int igraph_2wheap_size(const igraph_2wheap_t *h);
-long int igraph_2wheap_max_size(const igraph_2wheap_t *h);
-igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h);
-long int igraph_2wheap_max_index(const igraph_2wheap_t *h);
-igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h);
-igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, long int idx);
-igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, long int idx);
-igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx);
-igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h);
-igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx);
-int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem);
-int igraph_2wheap_check(igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT int igraph_2wheap_init(igraph_2wheap_t *h, long int size);
+IGRAPH_PRIVATE_EXPORT void igraph_2wheap_destroy(igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT int igraph_2wheap_clear(igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT int igraph_2wheap_push_with_index(igraph_2wheap_t *h,
+                                                        long int idx, igraph_real_t elem);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT long int igraph_2wheap_size(const igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT long int igraph_2wheap_max_size(const igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT long int igraph_2wheap_max_index(const igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, long int idx);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, long int idx);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx);
+IGRAPH_PRIVATE_EXPORT int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem);
+IGRAPH_PRIVATE_EXPORT int igraph_2wheap_check(igraph_2wheap_t *h);
 
 __END_DECLS
 

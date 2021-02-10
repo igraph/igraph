@@ -43,17 +43,13 @@ int main() {
 
         printf("Paths for cutoff %li:\n", i);
         igraph_vector_int_print(&res);
-        igraph_vector_int_clear(&res);
     }
 
     igraph_vector_int_init(&res_all, 0);
 
     igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, IGRAPH_ALL);
 
-    if (igraph_vector_int_all_e(&res, &res_all)) {
-        printf("Paths of all lengths does not equal result for maximum cutoff.");
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_vector_int_all_e(&res, &res_all) && "Paths of all lengths does not equal result for maximum cutoff.");
 
     igraph_vector_int_destroy(&res_all);
     igraph_vector_int_destroy(&res);

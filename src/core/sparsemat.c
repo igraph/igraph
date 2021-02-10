@@ -21,8 +21,6 @@
 
 */
 
-#include "config.h"
-
 #include <cs.h>
 
 #include "igraph_sparsemat.h"
@@ -2942,8 +2940,8 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
-                            int *p, int *i, double *x, int nz) {
+int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
+                          int *p, int *i, double *x, int nz) {
 
     A->cs = cs_calloc(1, sizeof(cs_di));
     A->cs->nzmax = nzmax;
@@ -2955,6 +2953,12 @@ int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
     A->cs->nz = nz;
 
     return 0;
+}
+
+int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
+                            int *p, int *i, double *x, int nz) {
+    IGRAPH_WARNING("igraph_i_sparsemat_view() is deprecated, use igraph_sparsemat_view()");
+    return igraph_sparsemat_view(A, nzmax, m, n, p, i, x, nz);
 }
 
 int igraph_sparsemat_sort(const igraph_sparsemat_t *A,

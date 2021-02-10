@@ -24,9 +24,9 @@
 #ifndef IGRAPH_ERROR_H
 #define IGRAPH_ERROR_H
 
-#include <stdarg.h>
-
 #include "igraph_decls.h"
+
+#include <stdarg.h>
 
 __BEGIN_DECLS
 
@@ -233,7 +233,7 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
  * program.
  */
 
-DECLDIR igraph_error_handler_t igraph_error_handler_abort;
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
@@ -243,7 +243,7 @@ DECLDIR igraph_error_handler_t igraph_error_handler_abort;
  * with the error code.
  */
 
-DECLDIR igraph_error_handler_t igraph_error_handler_ignore;
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_ignore;
 
 /**
  * \var igraph_error_handler_printignore
@@ -253,7 +253,7 @@ DECLDIR igraph_error_handler_t igraph_error_handler_ignore;
  * standard error and returns with the error code.
  */
 
-DECLDIR igraph_error_handler_t igraph_error_handler_printignore;
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  * \function igraph_set_error_handler
@@ -268,7 +268,7 @@ DECLDIR igraph_error_handler_t igraph_error_handler_printignore;
  *   more.
  */
 
-DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
+IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 /**
  * \typedef igraph_error_type_t
@@ -466,8 +466,8 @@ typedef enum {
  * \sa igraph_errorf().
  */
 
-DECLDIR int igraph_error(const char *reason, const char *file, int line,
-                         int igraph_errno);
+IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
+                               int igraph_errno);
 
 /**
  * \define IGRAPH_ERRORF
@@ -514,11 +514,11 @@ DECLDIR int igraph_error(const char *reason, const char *file, int line,
  * \sa igraph_error().
  */
 
-DECLDIR int igraph_errorf(const char *reason, const char *file, int line,
-                          int igraph_errno, ...);
+IGRAPH_EXPORT int igraph_errorf(const char *reason, const char *file, int line,
+                                int igraph_errno, ...);
 
-DECLDIR int igraph_errorvf(const char *reason, const char *file, int line,
-                           int igraph_errno, va_list ap);
+IGRAPH_EXPORT int igraph_errorvf(const char *reason, const char *file, int line,
+                                 int igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror
@@ -531,7 +531,7 @@ DECLDIR int igraph_errorvf(const char *reason, const char *file, int line,
  * \return pointer to the textual description of the error code.
  */
 
-DECLDIR const char* igraph_strerror(const int igraph_errno);
+IGRAPH_EXPORT const char* igraph_strerror(const int igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -551,7 +551,7 @@ struct igraph_i_protectedPtr {
 
 typedef void igraph_finally_func_t (void*);
 
-DECLDIR void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
+IGRAPH_EXPORT void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
 
 /**
  * \function IGRAPH_FINALLY_CLEAN
@@ -564,7 +564,7 @@ DECLDIR void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
  *   stack.
  */
 
-DECLDIR void IGRAPH_FINALLY_CLEAN(int num);
+IGRAPH_EXPORT void IGRAPH_FINALLY_CLEAN(int num);
 
 /**
  * \function IGRAPH_FINALLY_FREE
@@ -578,7 +578,7 @@ DECLDIR void IGRAPH_FINALLY_CLEAN(int num);
  * as well.
  */
 
-DECLDIR void IGRAPH_FINALLY_FREE(void);
+IGRAPH_EXPORT void IGRAPH_FINALLY_FREE(void);
 
 /**
  * \function IGRAPH_FINALLY_STACK_SIZE
@@ -595,7 +595,7 @@ DECLDIR void IGRAPH_FINALLY_FREE(void);
  * write your own test cases and examine \ref IGRAPH_FINALLY_STACK_SIZE
  * before and after your test cases - the numbers should be equal.
  */
-DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
+IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 
 /**
  * \define IGRAPH_FINALLY_STACK_EMPTY
@@ -732,10 +732,10 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
  * \return The current warning handler function.
  */
 
-DECLDIR igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
+IGRAPH_EXPORT igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
-DECLDIR extern igraph_warning_handler_t igraph_warning_handler_ignore;
-DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
+IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_ignore;
+IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
@@ -752,8 +752,8 @@ DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-DECLDIR int igraph_warning(const char *reason, const char *file, int line,
-                           int igraph_errno);
+IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
+                                 int igraph_errno);
 
 /**
  * \define IGRAPH_WARNINGF
@@ -796,8 +796,8 @@ DECLDIR int igraph_warning(const char *reason, const char *file, int line,
  * \return The supplied error code.
  */
 
-DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
-                            int igraph_errno, ...);
+IGRAPH_EXPORT int igraph_warningf(const char *reason, const char *file, int line,
+                                  int igraph_errno, ...);
 
 /**
  * \define IGRAPH_WARNING
@@ -871,7 +871,7 @@ typedef void igraph_fatal_handler_t (const char *reason, const char *file, int l
  * \return The current fatal error handler function.
  */
 
-DECLDIR igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t* new_handler);
+IGRAPH_EXPORT igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t* new_handler);
 
 /**
  * \var igraph_fatal_handler_abort
@@ -880,7 +880,7 @@ DECLDIR igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t*
  * The default fatal error handler, prints an error message and aborts the program.
  */
 
-DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
+IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
 
 /**
  * \function igraph_fatal
@@ -894,7 +894,7 @@ DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
  * \param line The number of line in the source file which triggered the error.
  */
 
-DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
 
 /**
  * \function igraph_fatalf
@@ -910,7 +910,7 @@ DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, 
  * \param ... The additional arguments to be substituted into the template string.
  */
 
-DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
 
 /**
  * \define IGRAPH_FATALF

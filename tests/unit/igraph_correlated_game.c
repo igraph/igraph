@@ -33,6 +33,8 @@ int main() {
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_correlated_game(&g1, &g2, .9, .3, /* permutation=*/ 0);
 
+    IGRAPH_ASSERT(igraph_vcount(&g1) == igraph_vcount(&g2));
+
     igraph_destroy(&g2);
     igraph_destroy(&g1);
 

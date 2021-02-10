@@ -24,13 +24,14 @@
 #ifndef IGRAPH_EULERIAN_H
 #define IGRAPH_EULERIAN_H
 
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
-DECLDIR int igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
-DECLDIR int igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
-DECLDIR int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
+IGRAPH_EXPORT int igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
+IGRAPH_EXPORT int igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
+IGRAPH_EXPORT int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
 
 __END_DECLS
 

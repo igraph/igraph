@@ -31,14 +31,14 @@ int main() {
     igraph_t g;
     FILE *f;
     igraph_matrix_t coords;
-	igraph_vector_t roots;
+    igraph_vector_t roots;
     long int i, n;
 
     f = fopen("igraph_layout_reingold_tilford_bug_879.in", "r");
     igraph_read_graph_edgelist(&g, f, 0, 0);
     igraph_matrix_init(&coords, 0, 0);
-	igraph_vector_init(&roots, 0);
-	igraph_vector_push_back(&roots, 0);
+    igraph_vector_init(&roots, 0);
+    igraph_vector_push_back(&roots, 0);
 
     igraph_layout_reingold_tilford(&g, &coords, IGRAPH_OUT, &roots, 0);
 

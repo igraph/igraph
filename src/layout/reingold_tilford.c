@@ -55,7 +55,7 @@ static int igraph_i_layout_reingold_tilford_unreachable(
     IGRAPH_VECTOR_INIT_FINALLY(&visited, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     /* start from real_root and go BFS */
@@ -145,7 +145,7 @@ static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     vdata = igraph_Calloc(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
@@ -808,14 +808,16 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
 
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
-    igraph_real_t ratio = 2 * M_PI * (no_of_nodes - 1.0) / no_of_nodes;
+    igraph_real_t ratio;
     igraph_real_t minx, maxx;
 
     IGRAPH_CHECK(igraph_layout_reingold_tilford(graph, res, mode, roots, rootlevel));
 
     if (no_of_nodes == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
+
+    ratio = 2 * M_PI * (no_of_nodes - 1.0) / no_of_nodes;
 
     minx = maxx = MATRIX(*res, 0, 0);
     for (i = 1; i < no_of_nodes; i++) {
@@ -836,5 +838,5 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         MATRIX(*res, i, 1) = r * sin(phi);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

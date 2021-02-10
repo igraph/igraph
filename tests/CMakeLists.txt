@@ -5,7 +5,7 @@ include(test_helpers)
 add_custom_target(build_tests)
 add_custom_target(
   check
-  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C ${CMAKE_BUILD_TYPE}
+  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C $<CONFIG>
   COMMENT "Executing unit tests..."
 )
 add_dependencies(check build_tests)
@@ -24,19 +24,14 @@ if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
 endif()
 
-set(BUILD_INTERNAL_TESTS YES)
-if (WIN32 AND BUILD_SHARED_LIBS)
-  set(BUILD_INTERNAL_TESTS NO)
-endif()
-
 # version.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_version
 )
 
 # types.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   dqueue
   igraph_sparsemat
@@ -70,25 +65,26 @@ add_legacy_tests(
   vector_ptr
 )
 
-if (BUILD_INTERNAL_TESTS)
+if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
   add_legacy_tests(
     FOLDER tests/unit NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
   )
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    2wheap
-    cutheap
-    d_indheap
-    hashtable
-    marked_queue
-    set
-    trie
-  )
 endif()
 
-# basic.at
 add_legacy_tests(
+  FOLDER tests/unit NAMES
+  2wheap
+  cutheap
+  d_indheap
+  hashtable
+  marked_queue
+  set
+  trie
+)
+
+# basic.at
+add_examples(
   FOLDER examples/simple NAMES
   igraph_add_edges
   igraph_add_vertices
@@ -109,7 +105,7 @@ add_legacy_tests(
 )
 
 # iterators.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
 #  igraph_es_fromto
@@ -124,7 +120,7 @@ add_legacy_tests(
 )
 
 # structure_generators.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_adjacency
   igraph_atlas
@@ -148,6 +144,7 @@ add_legacy_tests(
   erdos_renyi_game
   full
   igraph_barabasi_aging_game
+  igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_correlated_game
   igraph_extended_chordal_ring
@@ -168,7 +165,7 @@ add_legacy_tests(
 )
 
 # structural_properties.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   assortativity
   bellman_ford
@@ -196,12 +193,11 @@ add_legacy_tests(
   igraph_topological_sorting
   igraph_transitivity
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    igraph_rewire # Uses internal igraph_i_rewire
-  )
-endif()
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_rewire # Uses internal igraph_i_rewire
+)
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -215,8 +211,10 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_pagerank
   igraph_transitive_closure_dag
   harmonic_centrality
   random_spanning_tree
@@ -225,7 +223,7 @@ add_legacy_tests(
 )
 
 # components.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_biconnected_components
   igraph_decompose
@@ -238,7 +236,7 @@ add_legacy_tests(
 )
 
 # layout.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_layout_reingold_tilford
 )
@@ -258,34 +256,30 @@ add_legacy_tests(
   igraph_layout_kamada_kawai_3d_bug_1462
   igraph_layout_reingold_tilford_bug_879
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    igraph_i_layout_sphere
-    igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
-    igraph_layout_merge # Uses igraph_i_layout_merge functions
-  )
-endif()
-
-# visitors.at
-add_legacy_tests(
-  FOLDER examples/simple NAMES
-  igraph_bfs2
-)
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER examples/simple NAMES
-    igraph_bfs # Uses igraph_i_bfs
-  )
-endif()
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_i_layout_sphere
+  igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
+  igraph_layout_merge # Uses igraph_i_layout_merge functions
+)
+
+# visitors.at
+add_examples(
+  FOLDER examples/simple NAMES
+  igraph_bfs
+  igraph_bfs_callback
+  igraph_bfs_simple
+)
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  bfs
+  bfs_simple
   igraph_random_walk
 )
 
 # topology.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_isomorphic_vf2
   igraph_subisomorphic_lad
@@ -302,13 +296,13 @@ add_legacy_tests(
 )
 
 # coloring.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_coloring
 )
 
 # motifs.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_motifs_randesu
 )
@@ -319,7 +313,7 @@ add_legacy_tests(
 )
 
 # foreign.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   dot
   foreign
@@ -345,14 +339,14 @@ add_legacy_tests(
 )
 
 # other.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_convex_hull
   igraph_power_law_fit
 )
 
 # operators.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
@@ -371,7 +365,7 @@ add_legacy_tests(
 )
 
 # conversion.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   adjlist
   igraph_laplacian
@@ -380,12 +374,14 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  adjlist
   igraph_to_directed
   igraph_to_prufer
+  inclist
 )
 
 # flow.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   dominator_tree
   even_tarjan
@@ -407,12 +403,10 @@ add_legacy_tests(
   igraph_st_mincut
 )
 
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER tests/unit NAMES
-    igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
-  )
-endif()
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
+)
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -420,7 +414,7 @@ add_legacy_tests(
 )
 
 # community.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
@@ -439,7 +433,11 @@ add_legacy_tests(
   community_label_propagation
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_compare_communities
+  igraph_le_community_to_membership
   igraph_modularity
+  igraph_modularity_matrix
+  igraph_split_join_distance
   levc-stress
   spinglass
 )
@@ -449,10 +447,10 @@ add_legacy_tests(
 )
 
 # use a higher test timeout for the Infomap algorithm
-set_tests_properties(igraph_community_infomap PROPERTIES TIMEOUT 120)
+set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 120)
 
 # cliques.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_cliques
   igraph_independent_sets
@@ -481,7 +479,7 @@ add_legacy_tests(
 )
 
 # attributes.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   cattributes
   cattributes2
@@ -500,7 +498,7 @@ add_legacy_tests(
 )
 
 # arpack.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   blas
   eigenvector_centrality
@@ -517,14 +515,14 @@ add_legacy_tests(
 )
 
 # bipartite.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
 )
 
 # centralization.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   centralization
 )
@@ -538,7 +536,7 @@ add_legacy_tests(
 )
 
 # separators.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   cohesive_blocks
   igraph_is_minimal_separator
@@ -560,7 +558,7 @@ add_legacy_tests(
 )
 
 # microscopic.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_deterministic_optimal_imitation
   igraph_roulette_wheel_imitation
@@ -581,7 +579,7 @@ if(CMAKE_USE_PTHREADS_INIT)
 
   # tls2 should be added only if we use vendored ARPACK because a non-vendored
   # ARPACK is not guaranteed to be thread-safe
-  if(ARPACK_IS_VENDORED)
+  if(ARPACK_IS_VENDORED AND NOT BUILD_SHARED_LIBS)
     add_legacy_tests(
       FOLDER tests/unit NAMES tls2
       LIBRARIES Threads::Threads
@@ -590,7 +588,7 @@ if(CMAKE_USE_PTHREADS_INIT)
 endif()
 
 # scg.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_scg_grouping
   igraph_scg_grouping2
@@ -600,12 +598,16 @@ add_legacy_tests(
   igraph_scg_semiprojectors2
   igraph_scg_semiprojectors3
   scg
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   scg2
   scg3
 )
 
 # random.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_fisher_yates_shuffle
   igraph_random_sample
@@ -627,7 +629,7 @@ add_legacy_tests(
 )
 
 # matching.at
-add_legacy_tests(
+add_examples(
   FOLDER examples/simple NAMES
   igraph_maximum_bipartite_matching
 )

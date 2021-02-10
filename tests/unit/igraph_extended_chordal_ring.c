@@ -34,7 +34,7 @@ int main() {
     IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(same);
 
-    /*     Use negative matrix value for same specification    */	
+    /*     Use negative matrix value for same specification    */
     igraph_matrix_set(&W, 0, 0, -3);
     IGRAPH_ASSERT(igraph_extended_chordal_ring(&g_rev, /* nodes */ 5, &W, 1 /*directed*/) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_is_same_graph(&g_rev, &g_test, &same) == IGRAPH_SUCCESS);

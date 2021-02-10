@@ -25,11 +25,11 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_progress.h"
-#include "core/interruption.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 #include "igraph_dqueue.h"
-#include "config.h"
+
+#include "core/interruption.h"
 
 typedef struct igraph_i_forest_fire_data_t {
     igraph_vector_t *inneis;
