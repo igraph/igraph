@@ -27,21 +27,21 @@ int main() {
 
     printf("No vertices:\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/0, /*edges per step(m)*/ 1, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 1, /*aging_exp*/ 1, /*aging_bin*/ 1, /*time_window*/ 1, /*zero appeal*/ 1,
+                  /*outpref?*/ 0, /*pa_exp*/ 1, /*aging_exp*/ 1, /*aging_bins*/ 1, /*time_window*/ 1, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("No edges:\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/5, /*edges per step(m)*/ 0, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 1, /*aging_exp*/ 1, /*aging_bin*/ 1, /*time_window*/ 1, /*zero appeal*/ 1,
+                  /*outpref?*/ 0, /*pa_exp*/ 1, /*aging_exp*/ 1, /*aging_bins*/ 6, /*time_window*/ 1, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Prefer more edges to make a star of double edges:\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/5, /*edges per step(m)*/ 2, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 20, /*aging_exp*/ 0, /*aging_bin*/ 100, /*time_window*/ 100, /*zero appeal*/ 0.001,
+                  /*outpref?*/ 0, /*pa_exp*/ 20, /*aging_exp*/ 0, /*aging_bins*/ 1, /*time_window*/ 100, /*zero appeal*/ 0.001,
                   /*directed?*/ 0) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
@@ -49,14 +49,14 @@ int main() {
     printf("Prefer older edges to make a star:\n");
     igraph_vector_init_int(&outseq, 7, 1, 2, 1, 2, 1, 2, 1);
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/7, /*edges per step(m)*/ 0, &outseq,
-                  /*outpref?*/ 0, /*pa_exp*/ 0, /*aging_exp*/ 20, /*aging_bin*/ 1, /*time_window*/ 100, /*zero appeal*/ 1,
+                  /*outpref?*/ 0, /*pa_exp*/ 0, /*aging_exp*/ 20, /*aging_bins*/ 8, /*time_window*/ 100, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Checking if adding one edge per step makes a tree.\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/10, /*edges per step(m)*/ 1, /*outseq*/ NULL,
-                  /*outpref?*/ 1, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bin*/ 3, /*time_window*/ 4, /*zero appeal*/ 1,
+                  /*outpref?*/ 1, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bins*/ 5, /*time_window*/ 4, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_SUCCESS);
     igraph_is_tree(&g, &tree, NULL, IGRAPH_ALL);
     IGRAPH_ASSERT(tree);
@@ -68,22 +68,22 @@ int main() {
     printf("Checking if these errors are properly handled:\n");
     printf("Negative number of vertices.\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/-20, /*edges per step(m)*/ 1, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bin*/ 3, /*time_window*/ 4, /*zero appeal*/ 1,
+                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bins*/ 3, /*time_window*/ 4, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_EINVAL);
 
     printf("Negative number of edges.\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/20, /*edges per step(m)*/ -1, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bin*/ 3, /*time_window*/ 4, /*zero appeal*/ 1,
+                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bins*/ 10, /*time_window*/ 4, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_EINVAL);
 
     printf("Negative aging bin.\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/20, /*edges per step(m)*/ 1, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bin*/ -3, /*time_window*/ 4, /*zero appeal*/ 1,
+                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bins*/ -3, /*time_window*/ 4, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_EINVAL);
 
     printf("Negative zero appeal.\n");
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/20, /*edges per step(m)*/ 1, /*outseq*/ NULL,
-                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bin*/ 3, /*time_window*/ 4, /*zero appeal*/ -1,
+                  /*outpref?*/ 0, /*pa_exp*/ 2, /*aging_exp*/ 2, /*aging_bins*/ 10, /*time_window*/ 4, /*zero appeal*/ -1,
                   /*directed?*/ 0) == IGRAPH_EINVAL);
 
 

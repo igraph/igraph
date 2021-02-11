@@ -195,9 +195,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
  * \param pa_exp The exponent for the preferential attachment.
  * \param aging_exp The exponent for the aging, normally it is
  *        negative: old vertices gain edges with less probability.
- * \param aging_bin Integer constant, gives the scale of the aging.
- *        The age of the vertices is incremented by one after every \p
- *        aging_bin vertex added.
+ * \param aging_bins Integer constant, The number of age bins to use.
  * \param time_window The time window to use to count the number of
  *        incident edges for the vertices.
  * \param zero_appeal The degree dependent part of the attractiveness
@@ -206,7 +204,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
  *        graph.
  * \return Error code.
  *
- * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
+ * Time complexity: O((|V|+|V|/aging_bins)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
 int igraph_recent_degree_aging_game(igraph_t *graph,
@@ -216,13 +214,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_bool_t outpref,
                                     igraph_real_t pa_exp,
                                     igraph_real_t aging_exp,
-                                    igraph_integer_t aging_bin,
+                                    igraph_integer_t aging_bins,
                                     igraph_integer_t time_window,
                                     igraph_real_t zero_appeal,
                                     igraph_bool_t directed) {
 
     long int no_of_nodes = nodes;
     long int no_of_neighbors = m;
+    long int binwidth;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j, k;
@@ -244,8 +243,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
         IGRAPH_ERRORF("Out-degree cannot be negative, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
-    if (aging_bin <= 0) {
-        IGRAPH_ERRORF("Aging bin should be positive, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bin);
+    if (aging_bins <= 0) {
+        IGRAPH_ERRORF("Aging bins should be positive, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
@@ -257,6 +256,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
             no_of_edges += VECTOR(*outseq)[i];
         }
     }
+
+    binwidth = nodes / aging_bins + 1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
@@ -282,7 +283,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
         if (i >= time_window) {
             while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
-                long int age = (i - j) / aging_bin;
+                long int age = (i - j) / binwidth;
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(
                     &sumtree, j,
@@ -304,7 +305,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
             long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            long int age = (i - n) / aging_bin;
+            long int age = (i - n) / binwidth;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, n,
                 (pow(VECTOR(degree)[n], pa_exp) + zero_appeal) * pow(age + 1, aging_exp)
@@ -321,10 +322,10 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         }
 
         /* aging */
-        for (k = 1; i - aging_bin * k + 1 >= 1; k++) {
-            long int shnode = i - aging_bin * k;
+        for (k = 1; i - binwidth * k + 1 >= 1; k++) {
+            long int shnode = i - binwidth * k;
             long int deg = (long int) VECTOR(degree)[shnode];
-            long int age = (i - shnode) / aging_bin;
+            long int age = (i - shnode) / binwidth;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, shnode,
                 (pow(deg, pa_exp) + zero_appeal) * pow(age + 2, aging_exp)
