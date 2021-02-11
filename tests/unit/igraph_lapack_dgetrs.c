@@ -78,13 +78,16 @@ int main() {
         check_and_destroy(&a, &b, &ipiv, 0, IGRAPH_NONSQUARE);
     }
     {
-        printf("Checking singular matrix:\n");
+        printf("Checking singular matrix, this gives random output, so we just check for memory problems.\n\n");
         double a_elements[] = {6, 8, 7, 0, 1, 2, 0.5, 0.5, 0};
         int b_elements[] = {1, 1, 1};
         matrix_init_real_row_major(&a, 3, 3, a_elements);
         matrix_init_int_row_major(&b, 3, 1, b_elements);
         igraph_vector_int_init_int(&ipiv, 3, 1, 2, 3);
-        check_and_destroy(&a, &b, &ipiv, 0, IGRAPH_SUCCESS);
+        IGRAPH_ASSERT(igraph_lapack_dgetrs(0, &a, &ipiv, &b) == IGRAPH_SUCCESS);
+        igraph_vector_int_destroy(&ipiv);
+        igraph_matrix_destroy(&a);
+        igraph_matrix_destroy(&b);
     }
     {
         printf("Checking wrong size of B matrix, should fail:\n");

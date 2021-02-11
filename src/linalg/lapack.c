@@ -118,11 +118,13 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  *      matrix.
  * \param a A matrix containing the L and U factors from the
  *      factorization A = P*L*U. L is expected to be unitriangular,
- *      diagonal entries are those of U.
+ *      diagonal entries are those of U. If A is singular, no warning or
+ *      error wil be given and random output will be returned.
  * \param ipiv An integer vector, the pivot indices from \ref
  *      igraph_lapack_dgetrf must be given here. Row \c i of A was
  *      interchanged with row <code>ipiv[i]</code>.
- * \param b The right hand side matrix must be given here.
+ * \param b The right hand side matrix must be given here. The solution
+            will also be placed here.
  * \return Error code.
  *
  * Time complexity: TODO.
