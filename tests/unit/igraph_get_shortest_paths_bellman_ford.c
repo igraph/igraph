@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   (C) 2006-2021 The igraph development team  Gabor Csardi <csardi.gabor@gmail.com>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,14 +23,6 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 #include <stdlib.h>
-
-void print_vector_li(igraph_vector_t *v) {
-    long int i, l = igraph_vector_size(v);
-    for (i = 0; i < l; i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
-    }
-    printf("\n");
-}
 
 int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
                 const igraph_vector_ptr_t *evecs, int error_code) {
@@ -145,7 +136,7 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-            print_vector_li(VECTOR(vecs)[i]);
+            print_vector_round(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(vecs)[i]);
             free(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(evecs)[i]);
@@ -192,7 +183,7 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-            print_vector_li(VECTOR(vecs)[i]);
+            print_vector_round(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(vecs)[i]);
             free(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(evecs)[i]);
