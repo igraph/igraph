@@ -154,5 +154,7 @@ int main() {
     RUN_TEST(test_loop_elimination_for_undirected_graph);
     RUN_TEST(test_loop_elimination_for_directed_graph);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

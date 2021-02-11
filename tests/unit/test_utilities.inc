@@ -35,7 +35,7 @@ void print_vector_format(const igraph_vector_t *v, FILE *f, const char *format) 
 
 /* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
 void print_vector(const igraph_vector_t *v) {
-    print_vector_format(v, stdout, "%#g");
+    print_vector_format(v, stdout, "%g");
 }
 
 /* Round elements of a vector to integers and print them. */
@@ -70,13 +70,13 @@ void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) 
 }
 
 void print_matrix(const igraph_matrix_t *m) {
-    print_matrix_format(m, stdout, "%#g");
+    print_matrix_format(m, stdout, "%8g");
 }
 
 /* Round elements of a matrix to integers and print them. */
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m) {
-    print_matrix_format(m, stdout, "%.f");
+    print_matrix_format(m, stdout, "%4.f");
 }
 
 
@@ -357,6 +357,18 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     }
 
     igraph_matrix_complex_destroy(&copy);
+}
+
+void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* elem) {
+    int c, r;
+    int i_elem = 0;
+    igraph_matrix_init(mat, nrow, ncol);
+    for (r = 0; r < nrow; r++) {
+        for (c = 0; c < ncol; c++) {
+            MATRIX(*mat, r, c) = elem[i_elem];
+            i_elem++;
+        }
+    }
 }
 
 #define VERIFY_FINALLY_STACK() \

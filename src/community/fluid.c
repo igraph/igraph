@@ -32,7 +32,9 @@
 /**
  * \ingroup communities
  * \function igraph_community_fluid_communities
- * \brief Community detection algorithm based on the simple idea of
+ * \brief Community detection based on fluids interacting on the graph.
+ *
+ * The algorithm is based on the simple idea of
  * several fluids interacting in a non-homogeneous environment
  * (the graph topology), expanding and contracting based on their
  * interaction and density.
@@ -87,22 +89,22 @@ int igraph_community_fluid_communities(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
     if ((long int) no_of_communities < 1) {
-        IGRAPH_ERROR("'no_of_communities' must be greater than 0.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of requested communities must be greater than zero.", IGRAPH_EINVAL);
     }
     if ((long int) no_of_communities > no_of_nodes) {
-        IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in "
-                     "the graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of requested communities must not be greater than the number of nodes.",
+                     IGRAPH_EINVAL);
     }
     igraph_is_simple(graph, &res);
     if (!res) {
-        IGRAPH_ERROR("Only simple graphs are supported.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Fluid community detection supports only simple graphs.", IGRAPH_EINVAL);
     }
     igraph_is_connected(graph, &res, IGRAPH_WEAK);
     if (!res) {
-        IGRAPH_ERROR("Disconnected graphs are not supported.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Fluid community detection supports only connected graphs.", IGRAPH_EINVAL);
     }
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Edge directions are ignored.");
+        IGRAPH_WARNING("Edge directions are ignored by fluid community detection.");
     }
 
     /* Internal variables initialization */
