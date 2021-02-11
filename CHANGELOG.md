@@ -40,18 +40,18 @@
 ### Changed
 
  - igraph now uses a CMake-based build sysyem.
- - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549)
+ - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549).
  - Bliss has been updated to version 0.75. Bliss functions are now interruptible. Thanks to Tommi Junttila for making this possible!
  - Adjacency and incidence lists:
-   * `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now requires the caller to specify what to do with loop and multiple edges
-   * `igraph_inclist_init()` and `igraph_lazy_inclist_init()` now requires the caller to specify what to do with loop edges
+   * `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now require the caller to specify what to do with loop and multiple edges.
+   * `igraph_inclist_init()` and `igraph_lazy_inclist_init()` now require the caller to specify what to do with loop edges.
    * Adjacency and incidence lists now use `igraph_vector_int_t` consistently.
  - Community detection:
    * `igraph_community_multilevel()`: added resolution parameter.
    * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
  - Modularity:
    * `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
-   * `igraph_modularity()` now supports computing the directed version of modularity.
+   * `igraph_modularity()` and `igraph_modularity_matrix()` now support the directed version of modularity.
    * `igraph_modularity()` returns NaN for graphs with no edges to indicate that the modularity is not well-defined for such graphs.
  - Centralities:
    * `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
@@ -63,6 +63,8 @@
    * `igraph_average_path_length()` now returns the number of disconnected vertex pairs in the new `unconn_pairs` output argument.
    * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
    * `igraph_average_path_length()`  and `igraph_diameter()` now return `IGRAPH_INFINITY` when `unconn=FALSE` and the graph is not connected. Previously they returned the number of vertices.
+ - `igraph_subisomorphic_lad()` now supports graphs with self-loops.
+ - `igraph_is_chordal()` and `igraph_maximum_cardinality_search()` now support non-simple graphs and directed graphs.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
@@ -77,7 +79,7 @@
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
  - `igraph_closeness_estimate()` is deprecated in favour of the newly added `igraph_closeness_cutoff()`.
  - `igraph_betweenness_estimate()` and `igraph_edge_betweenness_estimate()` are deprecated in favour of the newly added `igraph_betweenness_cutoff()` and `igraph_edge_betweenness_cutoff()`.
- - `igraph_adjlist_remove_duplicate()` and `igraph_inclist_remove_duplicate()` are now deprecated in favour of the new constructor arguments in `igraph_adjlist_init()` and `igraph_inclist_init()`
+ - `igraph_adjlist_remove_duplicate()` and `igraph_inclist_remove_duplicate()` are now deprecated in favour of the new constructor arguments in `igraph_adjlist_init()` and `igraph_inclist_init()`.
 
 ### Removed
 
@@ -101,6 +103,7 @@
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
  - `igraph_incident()` now returns edges in the same order as `igraph_neighbors()`.
+ - `igraph_modularity_matrix()` returned incorrect results for weighted graphs. This is now fixed. (PR #1649, thanks to Daniel Noom!)
  - PageRank (PR #1640):
    * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
    * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.

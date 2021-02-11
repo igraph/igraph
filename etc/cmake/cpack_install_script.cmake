@@ -49,10 +49,24 @@ if(CPACK_SOURCE_INSTALLED_DIRECTORIES)
         "${SOURCE_DIR}/INSTALL"
         "${SOURCE_DIR}/NEWS"
         "${SOURCE_DIR}/ONEWS"
-        "${SOURCE_DIR}/src/config.h.in"
         "${SOURCE_DIR}/igraph.pc.in"
         "${IGRAPH_VERSION_FILE}"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
     )
+    file(
+        INSTALL
+        "${SOURCE_DIR}/src/config.h.in"
+        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/src"
+    )
+    file(
+		INSTALL
+		"${CPACK_PACKAGE_DIRECTORY}/src/io/parsers"
+		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/src/io"
+	)
+    file(
+		INSTALL
+		"${CPACK_PACKAGE_DIRECTORY}/doc/html"
+		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/doc"
+	)
 endif()
 

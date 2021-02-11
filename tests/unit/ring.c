@@ -172,7 +172,7 @@ int main() {
         i++;
     }
 
-	VERIFY_FINALLY_STACK();
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

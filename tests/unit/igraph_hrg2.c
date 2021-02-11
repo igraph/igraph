@@ -83,7 +83,7 @@ int main() {
         if (VECTOR(parents)[i] < -1 || VECTOR(parents)[i] >= igraph_vcount(&karate) + igraph_vector_size(&weights)) {
             printf("Invalid parents vector:\n");
             igraph_vector_print(&parents);
-			abort();
+            abort();
         }
     }
 

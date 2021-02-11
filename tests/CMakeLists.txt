@@ -116,7 +116,9 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  edge_selectors
   igraph_es_path
+  vertex_selectors
 )
 
 # structure_generators.at
@@ -143,6 +145,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   erdos_renyi_game
   full
+  igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_correlated_game
@@ -268,10 +271,12 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_bfs
+  igraph_bfs_callback
   igraph_bfs_simple
 )
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bfs
   bfs_simple
   igraph_random_walk
 )
@@ -432,6 +437,7 @@ add_legacy_tests(
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
+  igraph_le_community_to_membership
   igraph_modularity
   igraph_modularity_matrix
   igraph_split_join_distance
@@ -509,6 +515,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_arpack_rnsolve
   igraph_lapack_dgehrd
+  igraph_lapack_dgetrf
 )
 
 # bipartite.at
