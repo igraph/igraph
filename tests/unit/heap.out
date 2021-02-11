@@ -1,0 +1,8 @@
+Test igraph_heap_init, igraph_heap_destroy
+Test igraph_heap_reserve
+Test igraph_heap_init_array
+Test igraph_heap_size, igraph_heap_empty
+Test igraph_heap_push, igraph_heap_top
+( -9.999 0 6 235 235 235 235 235 2000 2000 2000 2000 2000 )
+Test igraph_heap_delete_top
+( 2000 235 10 6 4 1 0.1 0 -1 -2 -9 -9.999 -1000 )
