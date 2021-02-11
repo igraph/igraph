@@ -1,16 +1,44 @@
-#include <igraph.h>
+/* -*- mode: C -*-  */
+/*
+   IGraph library.
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard st, Cambridge MA, 02139 USA
 
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
+*/
+
+#include <igraph.h>
+#include "test_utilities.inc"
 #include <stdlib.h>
 
+void print_vector_li(igraph_vector_t *v) {
+    long int i, l = igraph_vector_size(v);
+    for (i = 0; i < l; i++) {
+        printf(" %li", (long int) VECTOR(*v)[i]);
+    }
+    printf("\n");
+}
 
 int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
                 const igraph_vector_ptr_t *evecs, int error_code) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
     long int i, n = igraph_vector_ptr_size(vecs);
-    if (igraph_vector_ptr_size(evecs) != n) {
-        exit(error_code + 1);
-    }
+    IGRAPH_ASSERT(igraph_vector_ptr_size(evecs) == n);
 
     for (i = 0; i < n; i++) {
         igraph_vector_t *vvec = VECTOR(*vecs)[i];
@@ -19,18 +47,15 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
         if (igraph_vector_size(vvec) == 0 && n2 == 0) {
             continue;
         }
-        if (igraph_vector_size(vvec) != n2 + 1) {
-            exit(error_code + 2);
-        }
+        IGRAPH_ASSERT(igraph_vector_size(vvec) == n2 + 1);
+
         for (j = 0; j < n2; j++) {
             long int edge = VECTOR(*evec)[j];
             long int from = VECTOR(*vvec)[j];
             long int to = VECTOR(*vvec)[j + 1];
             if (directed) {
-                if (from != IGRAPH_FROM(graph, edge) ||
-                    to   != IGRAPH_TO  (graph, edge)) {
-                    exit(error_code);
-                }
+                IGRAPH_ASSERT(from == IGRAPH_FROM(graph, edge) &&
+                    to   == IGRAPH_TO  (graph, edge));
             } else {
                 long int from2 = IGRAPH_FROM(graph, edge);
                 long int to2 = IGRAPH_TO(graph, edge);
@@ -38,9 +63,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
                 long int max1 = from < to ? to : from;
                 long int min2 = from2 < to2 ? from2 : to2;
                 long int max2 = from2 < to2 ? to2 : from2;
-                if (min1 != min2 || max1 != max2) {
-                    exit(error_code + 3);
-                }
+                IGRAPH_ASSERT(min1 == min2 && max1 == max2);
             }
         }
     }
@@ -52,27 +75,20 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
                        const igraph_vector_long_t* inbound, int start, int error_code) {
     long int i, n = igraph_vcount(graph);
 
-    if (igraph_vector_long_size(pred) != n ||
-        igraph_vector_long_size(inbound) != n) {
-        exit(error_code);
-    }
+    IGRAPH_ASSERT(igraph_vector_long_size(pred) == n &&
+        igraph_vector_long_size(inbound) == n);
 
-    if (VECTOR(*pred)[start] != start || VECTOR(*inbound)[start] != -1) {
-        exit(error_code + 1);
-    }
+    IGRAPH_ASSERT(VECTOR(*pred)[start] == start && VECTOR(*inbound)[start] == -1);
 
     for (i = 0; i < n; i++) {
         if (VECTOR(*pred)[i] == -1) {
-            if (VECTOR(*inbound)[i] != -1) {
-                exit(error_code + 2);
-            }
+            IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
+
         } else if (VECTOR(*pred)[i] == i) {
-            if (i != start) {
-                exit(error_code + 3);
-            }
-            if (VECTOR(*inbound)[i] != -1) {
-                exit(error_code + 4);
-            }
+            IGRAPH_ASSERT(i == start);
+
+            IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
+
         } else {
             long int eid = VECTOR(*inbound)[i];
             long int u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
@@ -81,11 +97,8 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
                 u = v;
                 v = dummy;
             }
-            if (v != i) {
-                exit(error_code + 5);
-            } else if (u != VECTOR(*pred)[i]) {
-                exit(error_code + 6);
-            }
+            IGRAPH_ASSERT(v == i);
+            IGRAPH_ASSERT(u == VECTOR(*pred)[i]);
         }
     }
 
@@ -132,12 +145,21 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-            print_vector(VECTOR(vecs)[i]);
+            print_vector_li(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(vecs)[i]);
             free(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(evecs)[i]);
             free(VECTOR(evecs)[i]);
     }
+
+    igraph_vector_ptr_destroy(&vecs);
+    igraph_vector_ptr_destroy(&evecs);
+    igraph_vector_long_destroy(&pred);
+    igraph_vector_long_destroy(&inbound);
+
+    igraph_vs_destroy(&vs);
+    igraph_destroy(&g);
+
 
     printf("\n");
 
@@ -170,7 +192,7 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-            print_vector(VECTOR(vecs)[i]);
+            print_vector_li(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(vecs)[i]);
             free(VECTOR(vecs)[i]);
             igraph_vector_destroy(VECTOR(evecs)[i]);
@@ -199,9 +221,6 @@ int main() {
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-            return 1;
-    }
-
+    VERIFY_FINALLY_STACK();
     return 0;
 }

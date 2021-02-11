@@ -29,6 +29,11 @@
 #include "igraph_memory.h"
 #include "igraph_stack.h"
 
+#include "core/indheap.h"
+#include "core/interruption.h"
+
+#include <string.h>
+
 /**
  * \function igraph_shortest_paths_bellman_ford
  * Weighted shortest paths from some sources allowing negative weights.
@@ -284,7 +289,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
  * edge weights.
  *
- * \example examples/simple/igraph_get_shortest_paths_bellman_ford.c
+ * \test tests/unit/igraph_get_shortest_paths_bellman_ford.c
  */
 
 int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
@@ -478,12 +483,12 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         igraph_vit_destroy(&tovit);
         IGRAPH_FINALLY_CLEAN(1);
     }
-
+    igraph_free(parents);
     igraph_dqueue_destroy(&Q);
     igraph_vector_destroy(&clean_vertices);
     igraph_vector_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
