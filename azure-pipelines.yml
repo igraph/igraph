@@ -91,6 +91,9 @@ jobs:
 
   - job: documentation
     steps:
+      - script: sudo apt-get update
+        displayName: Update package registry
+
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
         displayName: Install dependencies
 
