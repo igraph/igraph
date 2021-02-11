@@ -485,47 +485,46 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
         IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
     }
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     } else if (newn < 0) {
-        IGRAPH_ERROR("Starting graph has too many vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting graph has too many vertices.", IGRAPH_EINVAL);
     }
     if (start_from && start_nodes == 0) {
-        IGRAPH_ERROR("Cannot start from an empty graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot start from an empty graph.", IGRAPH_EINVAL);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 &&
         igraph_vector_size(outseq) != newn) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid out-degree sequence length.", IGRAPH_EINVAL);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of edges added per step must not be negative.", IGRAPH_EINVAL);
     }
     if (outseq && igraph_vector_min(outseq) < 0) {
-        IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Negative out-degree in sequence.", IGRAPH_EINVAL);
     }
     if (!outpref && A <= 0) {
-        IGRAPH_ERROR("Constant attractiveness (A) must be positive",
+        IGRAPH_ERROR("Constant attractiveness (A) must be positive.",
                      IGRAPH_EINVAL);
     }
     if (outpref && A < 0) {
-        IGRAPH_ERROR("Constant attractiveness (A) must be non-negative",
+        IGRAPH_ERROR("Constant attractiveness (A) must be non-negative.",
                      IGRAPH_EINVAL);
     }
     if (algo == IGRAPH_BARABASI_BAG) {
         if (power != 1) {
-            IGRAPH_ERROR("Power must be one for 'bag' algorithm", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Power must be one for 'bag' algorithm.", IGRAPH_EINVAL);
         }
         if (A != 1) {
-            IGRAPH_ERROR("Constant attractiveness (A) must be one for bag algorithm",
+            IGRAPH_ERROR("Constant attractiveness (A) must be one for bag algorithm.",
                          IGRAPH_EINVAL);
         }
     }
     if (start_from && directed != igraph_is_directed(start_from)) {
-        IGRAPH_WARNING("Directedness of the start graph and the output graph"
-                       " mismatch");
+        IGRAPH_WARNING("Directedness of the start graph and the output graph mismatch.");
     }
     if (start_from && !igraph_is_directed(start_from) && !outpref) {
-        IGRAPH_ERROR("`outpref' must be true if starting from an undirected "
-                     "graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`outpref' must be true if starting from an undirected graph.",
+                     IGRAPH_EINVAL);
     }
 
     if (n == 0) {
