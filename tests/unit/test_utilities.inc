@@ -371,6 +371,18 @@ void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* el
     }
 }
 
+void matrix_init_real_row_major(igraph_matrix_t *mat, int nrow, int ncol, igraph_real_t* elem) {
+    int c, r;
+    int i_elem = 0;
+    igraph_matrix_init(mat, nrow, ncol);
+    for (r = 0; r < nrow; r++) {
+        for (c = 0; c < ncol; c++) {
+            MATRIX(*mat, r, c) = elem[i_elem];
+            i_elem++;
+        }
+    }
+}
+
 void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff) {
     int i;
     for (i = 0; i < igraph_matrix_nrow(mat) * igraph_matrix_ncol(mat); i++) {

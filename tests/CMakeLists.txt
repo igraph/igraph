@@ -516,6 +516,7 @@ add_legacy_tests(
   igraph_arpack_rnsolve
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
+  igraph_lapack_dgetrs
 )
 
 # bipartite.at
