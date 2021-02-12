@@ -379,6 +379,12 @@ void matrix_init_real_row_major(igraph_matrix_t *mat, int nrow, int ncol, igraph
         for (c = 0; c < ncol; c++) {
             MATRIX(*mat, r, c) = elem[i_elem];
             i_elem++;
+
+void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff) {
+    int i;
+    for (i = 0; i < igraph_matrix_nrow(mat) * igraph_matrix_ncol(mat); i++) {
+        if (fabs(VECTOR(mat->data)[i]) < cutoff) {
+            VECTOR(mat->data)[i] = 0;
         }
     }
 }

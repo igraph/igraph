@@ -101,12 +101,19 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     glp_prob *ip;
     glp_iocp parm;
 
-    if (weights != 0) {
+    if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Invalid length of weight vector", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
         }
-        if (igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Negative weights are not allowed in weight vector", IGRAPH_EINVAL);
+        if (no_of_edges > 0) {
+            /* Must not call vector_min on empty vector */
+            igraph_real_t minweight = igraph_vector_min(weights);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Negative weights are not allowed in weight vector.", IGRAPH_EINVAL);
+            }
+            if (igraph_is_nan(minweight)) {
+                IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
+            }
         }
     }
 

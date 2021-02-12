@@ -35,6 +35,7 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
+#include "properties/properties_internal.h"
 
 /**
  * \section about_local_scan
@@ -76,11 +77,6 @@ int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
     }
     return 0;
 }
-
-/* From triangles.c */
-/* TODO add to private header */
-int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
-                                const igraph_vector_int_t *rank);
 
 /* This removes loop, multiple edges and edges that point
    "backwards" according to the rank vector. It works on

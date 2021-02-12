@@ -145,6 +145,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   erdos_renyi_game
   full
+  igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_correlated_game
@@ -250,6 +251,7 @@ add_legacy_tests(
   igraph_layout_merge2
   igraph_layout_merge3
   igraph_layout_reingold_tilford_extended
+  igraph_layout_star
   igraph_layout_sugiyama
 )
 add_legacy_tests(

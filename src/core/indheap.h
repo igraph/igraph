@@ -62,10 +62,6 @@ long int igraph_indheap_size      (igraph_indheap_t* h);
 int igraph_indheap_reserve        (igraph_indheap_t* h, long int size);
 long int igraph_indheap_max_index(igraph_indheap_t *h);
 
-void igraph_indheap_i_build(igraph_indheap_t* h, long int head);
-void igraph_indheap_i_shift_up(igraph_indheap_t* h, long int elem);
-void igraph_indheap_i_sink(igraph_indheap_t* h, long int head);
-void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Doubly indexed heap                                */
@@ -103,11 +99,6 @@ IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap
 IGRAPH_PRIVATE_EXPORT long int igraph_d_indheap_size(igraph_d_indheap_t *h);
 IGRAPH_PRIVATE_EXPORT int igraph_d_indheap_reserve(igraph_d_indheap_t *h, long int size);
 IGRAPH_PRIVATE_EXPORT void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *idx2);
-
-void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head);
-void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, long int elem);
-void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head);
-void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Two-way indexed heap                               */

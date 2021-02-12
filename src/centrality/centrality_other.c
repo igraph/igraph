@@ -170,6 +170,7 @@ static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igr
             IGRAPH_ERROR("Invalid length of weights vector when calculating "
                          "eigenvector centrality", IGRAPH_EINVAL);
         }
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
@@ -355,6 +356,7 @@ static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igrap
             IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
         }
 
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
 
         if (min < 0.0) {
@@ -695,6 +697,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
             IGRAPH_ERROR("Invalid length of weights vector when calculating "
                          "hub or authority scores", IGRAPH_EINVAL);
         }
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
@@ -1380,6 +1383,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
             IGRAPH_ERROR("Invalid length of weights vector when calculating PageRank scores.", IGRAPH_EINVAL);
         }
 
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
         if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
