@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_callaway_traits_game
- * \brief Simulate a growing network with vertex types.
+ * \brief Simulates a growing network with vertex types.
  *
  * </para><para>
  * The different types of vertices prefer to connect other types of

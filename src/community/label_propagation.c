@@ -24,15 +24,13 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_random.h"
 
 /**
  * \ingroup communities
  * \function igraph_community_label_propagation
- * \brief Community detection based on label propagation
+ * \brief Community detection based on label propagation.
  *
  * This function implements the community detection method described in:
  * Raghavan, U.N. and Albert, R. and Kumara, S.: Near linear time algorithm
@@ -43,11 +41,11 @@
  *
  * </para><para>
  * Weights are taken into account as follows: when the new label of node
- * i is determined, the algorithm iterates over all edges incident on
- * node i and calculate the total weight of edges leading to other
- * nodes with label 0, 1, 2, ..., k-1 (where k is the number of possible
- * labels). The new label of node i will then be the label whose edges
- * (among the ones incident on node i) have the highest total weight.
+ * \c i is determined, the algorithm iterates over all edges incident on
+ * node \c i and calculate the total weight of edges leading to other
+ * nodes with label 0, 1, 2, ..., \c k - 1 (where \c k is the number of possible
+ * labels). The new label of node \c i will then be the label whose edges
+ * (among the ones incident on node \c i) have the highest total weight.
  *
  * \param graph The input graph, should be undirected to make sense.
  * \param membership The membership vector, the result is returned here.
@@ -61,7 +59,8 @@
  * \param fixed Boolean vector denoting which labels are fixed. Of course
  *   this makes sense only if you provided an initial state, otherwise
  *   this element will be ignored. Also note that vertices without labels
- *   cannot be fixed.
+ *   cannot be fixed. If they are, this vector will be modified to
+ *   make it consistent with \p initial.
  * \param modularity If not a null pointer, then it must be a pointer
  *   to a real number. The modularity score of the detected community
  *   structure is stored here.
@@ -137,10 +136,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
         i = (long int) igraph_vector_max(membership);
         if (i > no_of_nodes) {
-            IGRAPH_ERROR("elements of the initial labeling vector must be between 0 and |V|-1", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1", IGRAPH_EINVAL);
         }
         if (i <= 0) {
-            IGRAPH_ERROR("at least one vertex must be labeled in the initial labeling", IGRAPH_EINVAL);
+            IGRAPH_ERROR("At least one vertex must be labeled in the initial labeling", IGRAPH_EINVAL);
         }
     } else {
         for (i = 0; i < no_of_nodes; i++) {
@@ -152,10 +151,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
      * For the unweighted case, the adjacency list is enough. For the
      * weighted case, we need the incidence list */
     if (weights) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &il);
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
     }
 

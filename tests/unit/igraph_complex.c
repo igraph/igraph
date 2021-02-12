@@ -43,222 +43,146 @@ int main() {
 
     /* polar, mod, arg */
     c = igraph_complex_polar(igraph_complex_mod(a), igraph_complex_arg(a));
-    if (!igraph_complex_eq_tol(a, c, 1e-14)) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(a, c, 1e-14));
 
     /* add */
     c = igraph_complex_add(a, b);
-    if (IGRAPH_REAL(c) != ARE + BRE || IGRAPH_IMAG(c) != AIM + BIM) {
-        return 2;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == ARE + BRE && IGRAPH_IMAG(c) == AIM + BIM);
 
     /* sub */
     c = igraph_complex_sub(a, b);
-    if (IGRAPH_REAL(c) != ARE - BRE || IGRAPH_IMAG(c) != AIM - BIM) {
-        return 3;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == ARE - BRE && IGRAPH_IMAG(c) == AIM - BIM);
 
     /* mul */
     c = igraph_complex_mul(a, b);
-    if (IGRAPH_REAL(c) != ARE * BRE - AIM * BIM ||
-        IGRAPH_IMAG(c) != ARE * BIM + AIM * BRE) {
-        return 4;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == ARE * BRE - AIM * BIM);
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == ARE * BIM + AIM * BRE);
 
     /* div */
     c = igraph_complex_div(a, b);
     c = igraph_complex_mul(c, b);
-    if (!igraph_complex_eq_tol(a, c, 1e-14)) {
-        return 5;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(a, c, 1e-14));
 
     /* add_real */
     c = igraph_complex_add_real(a, IGRAPH_REAL(b));
-    if (IGRAPH_REAL(c) != IGRAPH_REAL(a) + IGRAPH_REAL(b)) {
-        return 6;
-    }
-    if (IGRAPH_IMAG(c) != IGRAPH_IMAG(a)) {
-        return 7;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == IGRAPH_REAL(a) + IGRAPH_REAL(b));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == IGRAPH_IMAG(a));
 
     /* add_imag */
     c = igraph_complex_add_imag(a, IGRAPH_IMAG(b));
-    if (IGRAPH_REAL(c) != IGRAPH_REAL(a)) {
-        return 8;
-    }
-    if (IGRAPH_IMAG(c) != IGRAPH_IMAG(a) + IGRAPH_IMAG(b)) {
-        return 9;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == IGRAPH_REAL(a));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == IGRAPH_IMAG(a) + IGRAPH_IMAG(b));
 
     /* sub_real */
     c = igraph_complex_sub_real(a, IGRAPH_REAL(b));
-    if (IGRAPH_REAL(c) != IGRAPH_REAL(a) - IGRAPH_REAL(b)) {
-        return 10;
-    }
-    if (IGRAPH_IMAG(c) != IGRAPH_IMAG(a)) {
-        return 11;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == IGRAPH_REAL(a) - IGRAPH_REAL(b));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == IGRAPH_IMAG(a));
 
     /* sub_imag */
     c = igraph_complex_sub_imag(a, IGRAPH_IMAG(b));
-    if (IGRAPH_REAL(c) != IGRAPH_REAL(a)) {
-        return 12;
-    }
-    if (IGRAPH_IMAG(c) != IGRAPH_IMAG(a) - IGRAPH_IMAG(b)) {
-        return 13;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == IGRAPH_REAL(a));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == IGRAPH_IMAG(a) - IGRAPH_IMAG(b));
 
     /* mul_real */
     c = igraph_complex_mul_real(a, IGRAPH_REAL(b));
-    if (IGRAPH_REAL(c) != IGRAPH_REAL(a) * IGRAPH_REAL(b)) {
-        return 14;
-    }
-    if (IGRAPH_IMAG(c) != IGRAPH_IMAG(a) * IGRAPH_REAL(b)) {
-        return 15;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == IGRAPH_REAL(a) * IGRAPH_REAL(b));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == IGRAPH_IMAG(a) * IGRAPH_REAL(b));
 
     /* mul_imag */
     c = igraph_complex_mul_imag(a, IGRAPH_REAL(b));
-    if (IGRAPH_REAL(c) != - IGRAPH_IMAG(a) * IGRAPH_REAL(b)) {
-        return 14;
-    }
-    if (IGRAPH_IMAG(c) != IGRAPH_REAL(a) * IGRAPH_REAL(b)) {
-        return 15;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == - IGRAPH_IMAG(a) * IGRAPH_REAL(b));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == IGRAPH_REAL(a) * IGRAPH_REAL(b));
 
     /* div_real */
     c = igraph_complex_div_real(a, IGRAPH_REAL(b));
-    if (fabs(IGRAPH_REAL(c) - IGRAPH_REAL(a) / IGRAPH_REAL(b)) > 1e-15) {
-        return 16;
-    }
-    if (fabs(IGRAPH_IMAG(c) - IGRAPH_IMAG(a) / IGRAPH_REAL(b)) > 1e-15) {
-        return 17;
-    }
+    IGRAPH_ASSERT(fabs(IGRAPH_REAL(c) - IGRAPH_REAL(a) / IGRAPH_REAL(b)) < 1e-15);
+    IGRAPH_ASSERT(fabs(IGRAPH_IMAG(c) - IGRAPH_IMAG(a) / IGRAPH_REAL(b)) < 1e-15);
 
     /* div_imag */
     c = igraph_complex_div_imag(a, IGRAPH_IMAG(b));
-    if (IGRAPH_REAL(c) != IGRAPH_IMAG(a) / IGRAPH_IMAG(b)) {
-        return 18;
-    }
-    if (IGRAPH_IMAG(c) != - IGRAPH_REAL(a) / IGRAPH_IMAG(b)) {
-        return 19;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == IGRAPH_IMAG(a) / IGRAPH_IMAG(b));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == - IGRAPH_REAL(a) / IGRAPH_IMAG(b));
 
     /* conj */
     c = igraph_complex_conj(a);
-    if (IGRAPH_REAL(c) != ARE || IGRAPH_IMAG(c) != -AIM) {
-        return 20;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == ARE && IGRAPH_IMAG(c) == -AIM);
 
     /* neg */
     c = igraph_complex_neg(a);
-    if (IGRAPH_REAL(c) != - IGRAPH_REAL(a) ||
-        IGRAPH_IMAG(c) != - IGRAPH_IMAG(a)) {
-        return 21;
-    }
+    IGRAPH_ASSERT(IGRAPH_REAL(c) == - IGRAPH_REAL(a));
+    IGRAPH_ASSERT(IGRAPH_IMAG(c) == - IGRAPH_IMAG(a));
 
     /* inv */
     c = igraph_complex_inv(a);
     d = igraph_complex(1.0, 0.0);
     e = igraph_complex_div(d, a);
-    if (!igraph_complex_eq_tol(c, e, 1e-14)) {
-        return 22;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, e, 1e-14));
 
     /* abs */
-    if (igraph_complex_abs(a) != igraph_complex_mod(a)) {
-        return 23;
-    }
+    IGRAPH_ASSERT(igraph_complex_abs(a) == igraph_complex_mod(a));
 
     /* logabs */
 
     /* sqrt */
     c = igraph_complex_sqrt(a);
     d = igraph_complex_mul(c, c);
-    if (!igraph_complex_eq_tol(a, d, 1e-14)) {
-        return 24;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(a, d, 1e-14));
 
     /* sqrt_real */
     c = igraph_complex_sqrt(igraph_complex(-1.0, 0.0));
     d = igraph_complex_sqrt_real(-1.0);
-    if (!igraph_complex_eq_tol(c, d, 1e-14)) {
-        return 25;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, d, 1e-14));
 
     /* exp */
     c = igraph_complex_exp(igraph_complex(0.0, M_PI));
-    if (!igraph_complex_eq_tol(c, igraph_complex(-1.0, 0.0), 1e-14)) {
-        return 26;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, igraph_complex(-1.0, 0.0), 1e-14));
 
     /* pow */
     c = igraph_complex_pow(igraph_complex(M_E, 0.0), igraph_complex(0.0, M_PI));
-    if (!igraph_complex_eq_tol(c, igraph_complex(-1.0, 0.0), 1e-14)) {
-        return 27;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, igraph_complex(-1.0, 0.0), 1e-14));
 
     /* pow_real */
     c = igraph_complex_pow_real(a, 2.0);
     d = igraph_complex_mul(a, a);
-    if (!igraph_complex_eq_tol(c, d, 1e-12)) {
-        return 28;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, d, 1e-12));
 
     /* log */
     c = igraph_complex_exp(igraph_complex_log(a));
-    if (!igraph_complex_eq_tol(a, c, 1e-14)) {
-        return 29;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(a, c, 1e-14));
 
     /* log10 */
     c = igraph_complex_pow(igraph_complex(10.0, 0), igraph_complex_log10(a));
-    if (!igraph_complex_eq_tol(a, c, 1e-14)) {
-        return 30;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(a, c, 1e-14));
 
     /* log_b */
     c = igraph_complex_pow(b, igraph_complex_log_b(a, b));
-    if (!igraph_complex_eq_tol(a, c, 1e-14)) {
-        return 31;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(a, c, 1e-14));
 
     /* sin, cos */
     c = igraph_complex_sin(a);
     d = igraph_complex_cos(a);
     e = igraph_complex_add(igraph_complex_mul(c, c), igraph_complex_mul(d, d));
-    if (!igraph_complex_eq_tol(e, igraph_complex(1.0, 0.0), 1e-11)) {
-        return 32;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(e, igraph_complex(1.0, 0.0), 1e-11));
 
     /* tan */
     c = igraph_complex_tan(a);
     d = igraph_complex_div(igraph_complex_sin(a), igraph_complex_cos(a));
-    if (!igraph_complex_eq_tol(c, d, 1e-14)) {
-        return 33;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, d, 1e-14));
 
     /* sec */
     c = igraph_complex_sec(a);
     d = igraph_complex_inv(igraph_complex_cos(a));
-    if (!igraph_complex_eq_tol(c, d, 1e-14)) {
-        return 34;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, d, 1e-14));
 
     /* csc */
     c = igraph_complex_csc(a);
     d = igraph_complex_inv(igraph_complex_sin(a));
-    if (!igraph_complex_eq_tol(c, d, 1e-14)) {
-        return 35;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(c, d, 1e-14));
 
     /* cot */
     c = igraph_complex_tan(a);
     d = igraph_complex_div(igraph_complex_sin(a), igraph_complex_cos(a));
-    if (!igraph_complex_eq_tol(d, c, 1e-14)) {
-        return 36;
-    }
+    IGRAPH_ASSERT(igraph_complex_eq_tol(d, c, 1e-14));
 
     VERIFY_FINALLY_STACK();
     return 0;

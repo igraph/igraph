@@ -24,9 +24,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
@@ -140,7 +138,7 @@ void igraph_vector_ptr_destroy(igraph_vector_ptr_t* v) {
     }
 }
 
-void igraph_i_vector_ptr_call_item_destructor_all(igraph_vector_ptr_t* v) {
+static void igraph_i_vector_ptr_call_item_destructor_all(igraph_vector_ptr_t* v) {
     void **ptr;
 
     if (v->item_destructor != 0) {

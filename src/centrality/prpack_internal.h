@@ -24,16 +24,7 @@
 #ifndef IGRAPH_PRPACK
 #define IGRAPH_PRPACK
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
-#else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
@@ -42,11 +33,11 @@
 
 __BEGIN_DECLS
 
-int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights);
+int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
+                                          igraph_real_t *value, const igraph_vs_t vids,
+                                          igraph_bool_t directed, igraph_real_t damping,
+                                          const igraph_vector_t *reset,
+                                          const igraph_vector_t *weights);
 
 __END_DECLS
 

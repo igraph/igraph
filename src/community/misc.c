@@ -37,10 +37,11 @@
 #include "igraph_conversion.h"
 #include "igraph_centrality.h"
 #include "igraph_structural.h"
-#include "config.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+
+#include "config.h"
 
 #include <string.h>
 #include <math.h>
@@ -106,10 +107,21 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     long int components = no_of_nodes - steps;
     long int i, found = 0;
     igraph_vector_t tmp;
+    igraph_vector_bool_t already_merged;
 
     if (steps > igraph_matrix_nrow(merges)) {
-        IGRAPH_ERROR("`steps' to big or `merges' matrix too short", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
+                      IGRAPH_PRId "steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
     }
+
+    if (igraph_matrix_ncol(merges) != 2) {
+        IGRAPH_ERRORF("The merges matrix should have two columns, but has %ld.",
+                      IGRAPH_EINVAL, igraph_matrix_ncol(merges));
+    }
+    if (steps < 0) {
+        IGRAPH_ERRORF("Number of steps should be non-negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
+    }
+
 
     if (membership) {
         IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
@@ -120,11 +132,23 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         igraph_vector_null(csize);
     }
 
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&already_merged, steps + no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
 
     for (i = steps - 1; i >= 0; i--) {
         long int c1 = (long int) MATRIX(*merges, i, 0);
         long int c2 = (long int) MATRIX(*merges, i, 1);
+
+        if (VECTOR(already_merged)[c1] == 0) {
+            VECTOR(already_merged)[c1] = 1;
+        } else {
+            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c1);
+        }
+        if (VECTOR(already_merged)[c2] == 0) {
+            VECTOR(already_merged)[c2] = 1;
+        } else {
+            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c2);
+        }
 
         /* new component? */
         if (VECTOR(tmp)[i] == 0) {
@@ -178,7 +202,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     }
 
     igraph_vector_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_bool_destroy(&already_merged);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
 }
@@ -230,7 +255,8 @@ int igraph_reindex_membership(igraph_vector_t *membership,
         long int c = (long int)VECTOR(*membership)[i];
 
         if (c >= n) {
-            IGRAPH_ERROR("Cluster out of range", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
+            "Found member of cluster %ld, but only %ld vertices.", IGRAPH_EINVAL, c, n);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
@@ -433,7 +459,8 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
     igraph_vector_t c1, c2;
 
     if (igraph_vector_size(comm1) != igraph_vector_size(comm2)) {
-        IGRAPH_ERROR("community membership vectors have different lengths", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Community membership vectors have different lengths: %ld and %ld.",
+                      IGRAPH_EINVAL, igraph_vector_size(comm1), igraph_vector_size(comm2));
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
@@ -463,13 +490,22 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
  */
 static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
         const igraph_vector_t* v2, double* h1, double* h2, double* mut_inf) {
-    long int i, n = igraph_vector_size(v1);
-    long int k1 = (long int)igraph_vector_max(v1) + 1;
-    long int k2 = (long int)igraph_vector_max(v2) + 1;
+    long int i, n;
+    long int k1;
+    long int k2;
     double *p1, *p2;
     igraph_spmatrix_t m;
     igraph_spmatrix_iter_t mit;
 
+    n = igraph_vector_size(v1);
+    if (n == 0) {
+        *h1 = 0;
+        *h2 = 0;
+        *mut_inf = 0;
+        return IGRAPH_SUCCESS;
+    }
+    k1 = (long int)igraph_vector_max(v1) + 1;
+    k2 = (long int)igraph_vector_max(v2) + 1;
     p1 = igraph_Calloc(k1, double);
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
@@ -599,10 +635,17 @@ static int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igra
  */
 static int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
                               igraph_spmatrix_t *m) {
-    long int k1 = (long int)igraph_vector_max(v1) + 1;
-    long int k2 = (long int)igraph_vector_max(v2) + 1;
-    long int i, n = igraph_vector_size(v1);
+    long int k1;
+    long int k2;
+    long int i, n;
 
+    n = igraph_vector_size(v1);
+    if (n == 0 ) {
+        IGRAPH_CHECK(igraph_spmatrix_resize(m, 0, 0));
+        return IGRAPH_SUCCESS;
+    }
+    k1 = (long int)igraph_vector_max(v1) + 1;
+    k2 = (long int)igraph_vector_max(v2) + 1;
     IGRAPH_CHECK(igraph_spmatrix_resize(m, k1, k2));
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_spmatrix_add_e(m,
@@ -635,6 +678,11 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_
     igraph_spmatrix_t m;
     igraph_spmatrix_iter_t mit;
 
+    if (n == 0) {
+        *distance12 = 0;
+        *distance21 = 0;
+        return IGRAPH_SUCCESS;
+    }
     /* Calculate the confusion matrix */
     IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
     IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
@@ -702,6 +750,11 @@ static int igraph_i_compare_communities_rand(
     long int i, nrow, ncol;
     double rand, n;
     double frac_pairs_in_1, frac_pairs_in_2;
+
+    if (igraph_vector_size(v1) <= 1) {
+        IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
+        "Found membership vector of size %ld", IGRAPH_EINVAL, igraph_vector_size(v1));
+    }
 
     /* Calculate the confusion matrix */
     IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));

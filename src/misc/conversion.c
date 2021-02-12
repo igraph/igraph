@@ -22,6 +22,7 @@
 */
 
 #include "igraph_conversion.h"
+
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
@@ -29,9 +30,9 @@
 #include "igraph_structural.h"
 #include "igraph_sparsemat.h"
 #include "igraph_random.h"
-#include "config.h"
 
 #include "core/fixed_vectorlist.h"
+#include "graph/attributes.h"
 
 /**
  * \ingroup conversion
@@ -53,7 +54,8 @@
  *        \cli IGRAPH_GET_ADJACENCY_LOWER
  *          the lower left triangle of the matrix is used.
  *        \cli IGRAPH_GET_ADJACENCY_BOTH
- *          the whole matrix is used, a symmetric matrix is returned.
+ *          the whole matrix is used, a symmetric matrix is returned
+ *          if the graph is undirected.
  *        \endclist
  * \param type eids Logical, if true, then the edges ids plus one
  *        are stored in the adjacency matrix, instead of the number of

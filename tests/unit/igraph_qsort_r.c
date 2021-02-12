@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int comp(void *extra, const void *a, const void *b) {
     igraph_vector_t *v = (igraph_vector_t*) extra;
     int *aa = (int*) a;
@@ -63,6 +65,8 @@ int main() {
 
     igraph_vector_int_destroy(&idx);
     igraph_vector_destroy(&v);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -13,7 +13,8 @@ jobs:
 
       - template: .azure/build.yml
         parameters:
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-g -Og" -DCMAKE_CXX_FLAGS="-g -Og'
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og'
 
   - job: linux_static_external
     steps:
@@ -56,7 +57,7 @@ jobs:
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
           sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'
           mkdir build && cd build
-          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_ENABLE_TLS=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
           alpine cmake --build . --target build_tests
           alpine ctest -j `nproc` --output-on-failure
 
@@ -76,37 +77,23 @@ jobs:
     pool:
        vmImage: windows-2019
 
-    variables:
-      CMAKE_GENERATOR: Visual Studio 16 2019
-
     steps:
-      - script: choco install winflexbison3
-        displayName: Install dependencies
-
-      - template: .azure/build.yml
-        parameters:
-          extra_ctest_args: -C Debug
-          use_ccache: false
+      - template: .azure/build-win.yml
 
   - job: windows_shared
     pool:
        vmImage: windows-2019
 
-    variables:
-      CMAKE_GENERATOR: Visual Studio 16 2019
-
     steps:
-      - script: choco install winflexbison3
-        displayName: Install dependencies
-
-      - template: .azure/build.yml
+      - template: .azure/build-win.yml
         parameters:
           build_shared: true
-          extra_ctest_args: -C Debug
-          use_ccache: false
 
   - job: documentation
     steps:
+      - script: sudo apt-get update
+        displayName: Update package registry
+
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
         displayName: Install dependencies
 

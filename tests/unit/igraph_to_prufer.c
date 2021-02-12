@@ -143,6 +143,8 @@ int test_from_random_prufer_back_to_prufer(int tree_size) {
     return success;
 }
 
+#undef RUN_TEST   /* from test_utilities.inc */
+
 int test_num = 0;
 #define RUN_TEST(TEST) \
     test_num++; \

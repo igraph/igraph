@@ -21,8 +21,6 @@
 
 */
 
-#include <string.h>
-
 #include "igraph_centrality.h"
 
 #include "igraph_adjlist.h"
@@ -31,6 +29,8 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+
+#include <string.h>
 
 /*
  * \example examples/simple/graph_convergence_degree.c
@@ -82,7 +82,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
     for (k = 0; k < (directed ? 2 : 1); k++) {
         igraph_neimode_t neimode = (k == 0) ? IGRAPH_OUT : IGRAPH_IN;
         igraph_real_t *vec;
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, neimode));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, neimode, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
         vec = (k == 0) ? VECTOR(*ins_p) : VECTOR(*outs_p);
         for (i = 0; i < no_of_nodes; i++) {

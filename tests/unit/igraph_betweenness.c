@@ -105,9 +105,7 @@ int main() {
             /* weights=   */ &weights,
             /* cutoff=    */ 3);
 
-    if (!igraph_vector_all_e(&bet, &bet2)) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
 
     igraph_vector_destroy(&bet);
     igraph_vector_destroy(&bet2);
@@ -130,9 +128,7 @@ int main() {
     igraph_vector_view(&bet2, nontriv_res,
                        sizeof(nontriv_res) / sizeof(igraph_real_t));
 
-    if (!igraph_vector_all_e(&bet, &bet2)) {
-        return 2;
-    }
+    IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
@@ -205,7 +201,7 @@ int main() {
     igraph_vector_init(&weights, igraph_ecount(&g));
     igraph_vector_fill(&weights, 1);
 
-    for (cutoff = -1.0; cutoff < 5.0; cutoff++)
+    for (cutoff = -1.0; cutoff < 5.0; cutoff += 1)
     {
         printf("Cutoff %.0f\n", cutoff);
         printf("Unweighted\n");
@@ -223,9 +219,7 @@ int main() {
         igraph_vector_print(&bet2);
         printf("\n");
 
-        if (!igraph_vector_all_e(&bet, &bet2)) {
-            return 3;
-        }        
+        IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
     }
 
     igraph_vector_destroy(&bet);
@@ -248,7 +242,7 @@ int main() {
     VECTOR(weights)[2] = 0.99;
     VECTOR(weights)[3] = 2;
 
-    for (cutoff = -1.0; cutoff < 5.0; cutoff++)
+    for (cutoff = -1.0; cutoff < 5.0; cutoff += 1)
     {
         printf("Cutoff %.0f\n", cutoff);
         printf("Unweighted\n");

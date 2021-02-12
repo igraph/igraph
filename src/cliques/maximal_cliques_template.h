@@ -277,12 +277,12 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_vector_destroy(&coreness);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL);
+    igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    igraph_adjlist_simplify(&adjlist);
-    igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL);
+    igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fulladjlist);
-    igraph_adjlist_simplify(&fulladjlist);
+
     igraph_vector_int_init(&PX, 20);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &PX);
     igraph_vector_int_init(&R,  20);

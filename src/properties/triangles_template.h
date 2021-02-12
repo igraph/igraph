@@ -59,7 +59,7 @@ for (i = 0; i < no_of_nodes; i++) {
     VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
 }
 
-IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
 IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
 

@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +21,8 @@
 */
 
 #include <igraph.h>
+
+#include "test_utilities.inc"
 
 igraph_bool_t bfs_callback(const igraph_t *graph,
                            igraph_integer_t vid,
@@ -58,12 +59,12 @@ int main() {
                &order, &rank, &father, &pred, &succ, &dist,
                /*callback=*/ 0, /*extra=*/ 0);
 
-    igraph_vector_print(&order);
-    igraph_vector_print(&rank);
-    igraph_vector_print(&father);
-    igraph_vector_print(&pred);
-    igraph_vector_print(&succ);
-    igraph_vector_print(&dist);
+    print_vector_round(&order);
+    print_vector_round(&rank);
+    print_vector_round(&father);
+    print_vector_round(&pred);
+    print_vector_round(&succ);
+    print_vector_round(&dist);
 
     igraph_vector_destroy(&order);
     igraph_vector_destroy(&rank);
@@ -74,17 +75,19 @@ int main() {
 
     /* Test the callback */
 
+    printf("(");
     igraph_bfs(&graph, /*root=*/ 0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
-    printf("\n");
+    printf(" )\n");
 
     /* Test different roots */
 
+    printf("(");
     igraph_bfs(&graph, /*root=*/ 2, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
-    printf("\n");
+    printf(" )\n");
 
     /* Test restricted */
 
@@ -92,22 +95,25 @@ int main() {
     for (i = 5; i < igraph_vcount(&graph); i++) {
         igraph_vector_push_back(&restricted, i);
     }
+    printf("(");
     igraph_bfs(&graph, /*root=*/ 5, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
-    printf("\n");
+    printf(" )\n");
 
     /* Root not in restricted set */
 
+    printf("(");
     igraph_bfs(&graph, /*root=*/ 4, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
-    printf("\n");
+    printf(" )\n");
 
+    printf("(");
     igraph_bfs(&graph, /*root=*/ 3, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 0, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
-    printf("\n");
+    printf(" )\n");
 
     /* Multiple root vertices */
 
@@ -115,14 +121,17 @@ int main() {
     VECTOR(roots)[0] = 3;
     VECTOR(roots)[1] = 4;
     VECTOR(roots)[2] = 6;
+    printf("(");
     igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 0, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
-    printf("\n");
+    printf(" )\n");
 
     igraph_vector_destroy(&roots);
     igraph_vector_destroy(&restricted);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

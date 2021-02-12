@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 */
 
 #include "igraph_centrality.h"
+
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
@@ -28,23 +29,24 @@
 #include "igraph_topology.h"
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"
-#include "config.h"
 
 #include "centrality/prpack_internal.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
 #include "core/math.h"
 
+#include "config.h"
+
 #include <math.h>
 #include <string.h>    /* memset */
 
-int igraph_personalized_pagerank_arpack(const igraph_t *graph,
-                                        igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights,
-                                        igraph_arpack_options_t *options);
+static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
+                                                 igraph_vector_t *vector,
+                                                 igraph_real_t *value, const igraph_vs_t vids,
+                                                 igraph_bool_t directed, igraph_real_t damping,
+                                                 const igraph_vector_t *reset,
+                                                 const igraph_vector_t *weights,
+                                                 igraph_arpack_options_t *options);
 
 static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
     /* Many of the centrality measures correspond to the eigenvector of some
@@ -133,13 +135,13 @@ static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
-        igraph_real_t *value, igraph_bool_t scale,
-        const igraph_vector_t *weights,
-        igraph_arpack_options_t *options) {
+static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
+                                                      igraph_real_t *value, igraph_bool_t scale,
+                                                      const igraph_vector_t *weights,
+                                                      igraph_arpack_options_t *options) {
 
     igraph_vector_t values;
     igraph_matrix_t vectors;
@@ -168,6 +170,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
             IGRAPH_ERROR("Invalid length of weights vector when calculating "
                          "eigenvector centrality", IGRAPH_EINVAL);
         }
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
@@ -210,7 +213,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
 
         igraph_adjlist_t adjlist;
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
@@ -228,7 +231,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
         data.inclist = &inclist;
         data.weights = weights;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
@@ -286,7 +289,8 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     igraph_matrix_destroy(&vectors);
     igraph_vector_destroy(&values);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 /* int igraph_i_evcent_dir(igraph_real_t *to, const igraph_real_t *from, */
@@ -301,10 +305,10 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
 /*   return 0; */
 /* } */
 
-int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
-        igraph_real_t *value, igraph_bool_t scale,
-        const igraph_vector_t *weights,
-        igraph_arpack_options_t *options) {
+static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
+                                                    igraph_real_t *value, igraph_bool_t scale,
+                                                    const igraph_vector_t *weights,
+                                                    igraph_arpack_options_t *options) {
 
     igraph_matrix_t values;
     igraph_matrix_t vectors;
@@ -352,6 +356,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
             IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
         }
 
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
 
         if (min < 0.0) {
@@ -399,7 +404,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     if (!weights) {
         igraph_adjlist_t adjlist;
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality,
@@ -416,7 +421,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
         data.inclist = &inclist;
         data.weights = weights;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
@@ -560,10 +565,10 @@ int igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_arpack_options_t *options) {
 
     if (directed && igraph_is_directed(graph)) {
-        return igraph_eigenvector_centrality_directed(graph, vector, value,
+        return igraph_i_eigenvector_centrality_directed(graph, vector, value,
                 scale, weights, options);
     } else {
-        return igraph_eigenvector_centrality_undirected(graph, vector, value,
+        return igraph_i_eigenvector_centrality_undirected(graph, vector, value,
                 scale, weights, options);
     }
 }
@@ -692,6 +697,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
             IGRAPH_ERROR("Invalid length of weights vector when calculating "
                          "hub or authority scores", IGRAPH_EINVAL);
         }
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
@@ -730,14 +736,14 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     }
 
     if (weights == 0) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &myinadjlist);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &myininclist);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &myoutinclist);
     }
 
@@ -1056,34 +1062,42 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
  *
+ * The PageRank centrality of a vertex is the fraction of time a
+ * random walker traversing the graph would spend on that vertex.
+ * The walker follows the out-edges with probabilities proportional
+ * to their weights. Additionally, in each step, it restarts the walk
+ * from a random vertex with probability <code>1 - damping</code>.
+ * If the random walker gets stuck in a sink vertex, it will also restart
+ * from a random vertex.
+ *
+ * </para><para>
+ * The PageRank centrality is mainly useful for directed graphs. In undirected
+ * graphs it converges to trivial values proportional to degrees as the damping
+ * factor approaches 1.
+ *
+ * </para><para>
  * Starting from version 0.9, igraph has two PageRank implementations,
  * and the user can choose between them. The first implementation is
- * \c IGRAPH_PAGERANK_ALGO_ARPACKK, based on the ARPACK library. This
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK, based on the ARPACK library. This
  * was the default before igraph version 0.7. The second and recommended
  * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
  * PRPACK package, see https://github.com/dgleich/prpack .
  *
  * </para><para>
- * Please note that the PageRank of a given vertex depends on the PageRank
+ * Note that the PageRank of a given vertex depends on the PageRank
  * of all other vertices, so even if you want to calculate the PageRank for
  * only some of the vertices, all of them must be calculated. Requesting
  * the PageRank for only some of the vertices does not result in any
  * performance increase at all.
- * </para>
  *
- * <para>
- * For the explanation of the PageRank algorithm, see the following
- * webpage:
- * http://infolab.stanford.edu/~backrub/google.html , or the
- * following reference:
- * </para>
+ * </para><para>
+ * References:
  *
- * <para>
+ * </para><para>
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
  * Brisbane, Australia, April 1998.
- * </para>
- * <para>
+ *
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
@@ -1095,27 +1109,27 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \param vids The vertex ids for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper)
- * \param weights Optional edge weights, it is either a null pointer,
- *    then the edges are not weighted, or a vector of the same length
- *    as the number of edges.
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
+ * \param weights Optional edge weights. May be a \c NULL pointer,
+ *    meaning unweighted edges, or a vector of non-negative values
+ *    of the same length as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
  *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
  *    (LM) parameters and it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in
- *         \p vids.
+ *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
+ *         \c IGRAPH_EINVVID, invalid vertex id in \p vids.
  *
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
  * \sa \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
- * for the personalized PageRank measure, \ref igraph_arpack_rssolve() and
- * \ref igraph_arpack_rnsolve() for the underlying machinery.
+ * for the personalized PageRank measure. See \ref igraph_arpack_rssolve() and
+ * \ref igraph_arpack_rnsolve() for the underlying machinery used by
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK.
  *
  * \example examples/simple/igraph_pagerank.c
  */
@@ -1126,7 +1140,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
                     igraph_bool_t directed, igraph_real_t damping,
                     const igraph_vector_t *weights, igraph_arpack_options_t *options) {
     return igraph_personalized_pagerank(graph, algo, vector, value, vids,
-                                        directed, damping, 0, weights,
+                                        directed, damping, NULL, weights,
                                         options);
 }
 
@@ -1134,9 +1148,12 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * \function igraph_personalized_pagerank_vs
  * \brief Calculates the personalized Google PageRank for the specified vertices.
  *
- * The personalized PageRank is similar to the original PageRank measure, but the
- * random walk is reset in every step with probability 1-damping to a non-uniform
- * distribution (instead of the uniform distribution in the original PageRank measure.
+ * The personalized PageRank is similar to the original PageRank measure, but
+ * when the random walk is restarted, a new starting vertex is chosen according to
+ * a specified distribution.
+ * This distribution is used both when restarting randomly with probability
+ * <code>1 - damping</code>, and when the walker is forced to restart due to being
+ * stuck in a sink vertex (a vertex with no outgoing edges).
  *
  * </para><para>
  * This simplified interface takes a vertex sequence and resets the random walk to
@@ -1146,7 +1163,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * generates a vertex sequence containing only a single vertex.
  *
  * </para><para>
- * Please note that the personalized PageRank of a given vertex depends on the
+ * Note that the personalized PageRank of a given vertex depends on the
  * personalized PageRank of all other vertices, so even if you want to calculate
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
@@ -1165,7 +1182,8 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * \param vids The vertex ids for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper)
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset_vids IDs of the vertices used when resetting the random walk.
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
@@ -1185,9 +1203,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
- * \sa \ref igraph_pagerank() for the non-personalized implementation,
- * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
- * the underlying machinery.
+ * \sa \ref igraph_pagerank() for the non-personalized implementation.
  */
 
 int igraph_personalized_pagerank_vs(const igraph_t *graph,
@@ -1226,12 +1242,16 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \function igraph_personalized_pagerank
  * \brief Calculates the personalized Google PageRank for the specified vertices.
  *
- * The personalized PageRank is similar to the original PageRank measure, but the
- * random walk is reset in every step with probability 1-damping to a non-uniform
- * distribution (instead of the uniform distribution in the original PageRank measure.
+ * The personalized PageRank is similar to the original PageRank measure, but
+ * when the random walk is restarted, a new starting vertex is chosen non-uniformly,
+ * according to the distribution specified in \p reset
+ * (instead of the uniform distribution in the original PageRank measure).
+ * The \p reset distribution is used both when restarting randomly with probability
+ * <code>1 - damping</code>, and when the walker is forced to restart due to being
+ * stuck in a sink vertex (a vertex with no outgoing edges).
  *
  * </para><para>
- * Please note that the personalized PageRank of a given vertex depends on the
+ * Note that the personalized PageRank of a given vertex depends on the
  * personalized PageRank of all other vertices, so even if you want to calculate
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
@@ -1250,14 +1270,15 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \param vids The vertex ids for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper)
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset The probability distribution over the vertices used when
- *    resetting the random walk. It is either a null pointer (denoting
+ *    resetting the random walk. It is either a \c NULL pointer (denoting
  *    a uniform choice that results in the original PageRank measure)
  *    or a vector of the same length as the number of vertices.
- * \param weights Optional edge weights, it is either a null pointer,
- *    then the edges are not weighted, or a vector of the same length
- *    as the number of edges.
+ * \param weights Optional edge weights. May be a \c NULL pointer,
+ *    meaning unweighted edges, or a vector of non-negative values
+ *    of the same length as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
  *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
@@ -1273,24 +1294,27 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * the number of edges.
  *
  * \sa \ref igraph_pagerank() for the non-personalized implementation,
- * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
- * the underlying machinery.
+ * \ref igraph_personalized_pagerank_vs() for a personalized implementation
+ * with resetting to specific vertices.
  */
 int igraph_personalized_pagerank(const igraph_t *graph,
                                  igraph_pagerank_algo_t algo, igraph_vector_t *vector,
                                  igraph_real_t *value, const igraph_vs_t vids,
                                  igraph_bool_t directed, igraph_real_t damping,
-                                 igraph_vector_t *reset,
+                                 const igraph_vector_t *reset,
                                  const igraph_vector_t *weights,
                                  igraph_arpack_options_t *options) {
 
+    if (damping < 0.0 || damping > 1.0) {
+        IGRAPH_ERROR("The PageRank damping factor must be in the range [0,1].", IGRAPH_EINVAL);
+    }
+
     if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
-        igraph_arpack_options_t *o = (igraph_arpack_options_t*) options;
-        return igraph_personalized_pagerank_arpack(graph, vector, value, vids,
+        return igraph_i_personalized_pagerank_arpack(graph, vector, value, vids,
                 directed, damping, reset,
-                weights, o);
+                weights, options);
     } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
-        return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
+        return igraph_i_personalized_pagerank_prpack(graph, vector, value, vids,
                 directed, damping, reset,
                 weights);
     }
@@ -1303,31 +1327,43 @@ int igraph_personalized_pagerank(const igraph_t *graph,
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
-                                        igraph_real_t *value, const igraph_vs_t vids,
-                                        igraph_bool_t directed, igraph_real_t damping,
-                                        igraph_vector_t *reset,
-                                        const igraph_vector_t *weights,
-                                        igraph_arpack_options_t *options) {
+static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
+                                                 igraph_real_t *value, const igraph_vs_t vids,
+                                                 igraph_bool_t directed, igraph_real_t damping,
+                                                 const igraph_vector_t *reset,
+                                                 const igraph_vector_t *weights,
+                                                 igraph_arpack_options_t *options) {
     igraph_matrix_t values;
     igraph_matrix_t vectors;
     igraph_neimode_t dirmode;
     igraph_vector_t outdegree;
     igraph_vector_t indegree;
     igraph_vector_t tmp;
+    igraph_vector_t normalized_reset;
 
     long int i;
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
 
+    if (reset && igraph_vector_size(reset) != no_of_nodes) {
+        IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
+    }
+
     if (no_of_edges == 0) {
-        /* special case: empty graph */
+        /* Special case: graph with no edges. Result is the same as the personalization vector. */
         if (value) {
             *value = 1.0;
         }
         if (vector) {
-            igraph_vector_resize(vector, no_of_nodes);
-            igraph_vector_fill(vector, 1.0 / no_of_nodes);
+            IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
+            if (reset && no_of_nodes > 0) {
+                for (i=0; i < no_of_nodes; ++i) {
+                    VECTOR(*vector)[i] = VECTOR(*reset)[i];
+                }
+                igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
+            } else {
+                igraph_vector_fill(vector, 1.0 / no_of_nodes);
+            }
         }
         return IGRAPH_SUCCESS;
     }
@@ -1344,27 +1380,32 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "PageRank scores", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid length of weights vector when calculating PageRank scores.", IGRAPH_EINVAL);
         }
 
+        /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
         if (min == 0 && max == 0) {
-            /* special case: all weights are zeros */
+            /* Special case: all weights are zeros. Result is the same as the personalization vector. */
             if (value) {
                 *value = 1.0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
-                igraph_vector_fill(vector, 1.0 / no_of_nodes);
+                IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
+                if (reset) {
+                    for (i=0; i < no_of_nodes; ++i) {
+                        VECTOR(*vector)[i] = VECTOR(*reset)[i];
+                    }
+                    igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
+                } else {
+                    igraph_vector_fill(vector, 1.0 / no_of_nodes);
+                }
             }
             return IGRAPH_SUCCESS;
         }
-    }
-
-    if (reset && igraph_vector_size(reset) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid length of reset vector when calculating "
-                     "personalized PageRank scores", IGRAPH_EINVAL);
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
@@ -1384,15 +1425,23 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
 
     if (reset) {
         /* Normalize reset vector so the sum is 1 */
-        double reset_sum;
-        if (igraph_vector_min(reset) < 0) {
-            IGRAPH_ERROR("the reset vector must not contain negative elements", IGRAPH_EINVAL);
+        double reset_sum, reset_min;
+        reset_min = igraph_vector_min(reset);
+        if (reset_min < 0) {
+            IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
+        }
+        if (igraph_is_nan(reset_min)) {
+            IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         reset_sum = igraph_vector_sum(reset);
         if (reset_sum == 0) {
-            IGRAPH_ERROR("the sum of the elements in the reset vector must not be zero", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
         }
-        igraph_vector_scale(reset, 1.0 / reset_sum);
+
+        IGRAPH_CHECK(igraph_vector_copy(&normalized_reset, reset));
+        IGRAPH_FINALLY(igraph_vector_destroy, &normalized_reset);
+
+        igraph_vector_scale(&normalized_reset, 1.0 / reset_sum);
     }
 
     if (!weights) {
@@ -1405,12 +1454,12 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
         data.damping = damping;
         data.outdegree = &outdegree;
         data.tmp = &tmp;
-        data.reset = reset;
+        data.reset = reset ? &normalized_reset : NULL;
 
         IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
-                                   directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
+                                   directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS));
         IGRAPH_CHECK(igraph_degree(graph, &indegree, igraph_vss_all(),
-                                   directed ? IGRAPH_IN : IGRAPH_ALL, /*loops=*/ 0));
+                                   directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS));
         /* Set up an appropriate starting vector. We start from the in-degrees
          * plus some small random noise to avoid convergence problems */
         for (i = 0; i < options->n; i++) {
@@ -1421,7 +1470,9 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
             }
         }
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
+        IGRAPH_CHECK(igraph_adjlist_init(
+            graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
@@ -1442,9 +1493,9 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
         data.damping = damping;
         data.outdegree = &outdegree;
         data.tmp = &tmp;
-        data.reset = reset;
+        data.reset = reset ? &normalized_reset : NULL;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         /* Weighted degree */
@@ -1453,7 +1504,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
             long int to = IGRAPH_TO(graph, i);
             igraph_real_t weight = VECTOR(*weights)[i];
             if (weight < 0 && !negative_weight_warned) {
-                IGRAPH_WARNING("replacing negative weights with zeros");
+                IGRAPH_WARNING("Replacing negative weights with zeros during PageRank calculation.");
                 weight = 0;
                 negative_weight_warned = 1;
             }
@@ -1482,6 +1533,11 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
     }
 
     RNG_END();
+
+    if (reset) {
+        igraph_vector_destroy(&normalized_reset);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     igraph_vector_destroy(&tmp);
     igraph_vector_destroy(&outdegree);
@@ -1524,5 +1580,6 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
     igraph_matrix_destroy(&vectors);
     igraph_matrix_destroy(&values);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }

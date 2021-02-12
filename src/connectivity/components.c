@@ -21,11 +21,9 @@
 
 */
 
-#include "config.h"
-#include <limits.h>
+#include "igraph_components.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -35,6 +33,8 @@
 #include "igraph_vector.h"
 
 #include "core/interruption.h"
+
+#include <limits.h>
 
 static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
                                   igraph_vector_t *csize, igraph_integer_t *no);
@@ -199,7 +199,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
         igraph_vector_clear(csize);
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     num_seen = 0;
@@ -247,7 +247,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     /* OK, we've the 'out' values for the nodes, let's use them in
@@ -666,7 +666,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     igraph_vector_null(&out);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     /* number of components seen */
@@ -732,7 +732,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     /* OK, we've the 'out' values for the nodes, let's use them in
@@ -956,7 +956,7 @@ int igraph_biconnected_components(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edgestack, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edgestack, 100));
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     IGRAPH_CHECK(igraph_vector_long_init(&vertex_added, no_of_nodes));
@@ -1223,7 +1223,7 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
 
     n = igraph_vcount(graph);
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
