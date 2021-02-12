@@ -384,14 +384,14 @@ igraph_are_connected:
 
 igraph_diameter:
         PARAMS: GRAPH graph, OUT REALPTR res, OUT INTEGERPTR from, \
-                OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True, \
+                OUT INTEGERPTR to, OUT VECTOR_OR_0 path_vertex, OUT VECTOR_OR_0 path_edge, BOOLEAN directed=True, \
                 BOOLEAN unconnected=True
         IGNORE: RR, RC, RNamespace
 
 igraph_diameter_dijkstra:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 OUT REALPTR res, OUT INTEGERPTR from, \
-                OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True, \
+                OUT INTEGERPTR to,  OUT VECTOR_OR_0 path_vertex, OUT VECTOR_OR_0 path_edge, BOOLEAN directed=True, \
                 BOOLEAN unconnected=True
         DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace

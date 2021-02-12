@@ -174,7 +174,6 @@ add_examples(
   dijkstra
   igraph_average_path_length
   igraph_cocitation
-  igraph_diameter
   igraph_eccentricity
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
@@ -211,6 +210,7 @@ add_legacy_tests(
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
+  igraph_diameter
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
