@@ -1012,13 +1012,12 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
         components = 0;
     }
     if (components > no_of_nodes) {
-        IGRAPH_ERRORF("Invalid membership vector, number of components is %ld, but should "
-         "not be greater than the number of nodes, which is %ld.", IGRAPH_EINVAL, components, no_of_nodes);
+        IGRAPH_ERRORF("Invalid membership vector: number of components (%ld) must "
+         "not be greater than the number of nodes (%ld).", IGRAPH_EINVAL, components, no_of_nodes);
     }
     if (steps >= components) {
-        IGRAPH_ERRORF("Number of steps should be smaller than number of components. "
-                     "Found %" IGRAPH_PRId " steps, %ld components.",
-                     IGRAPH_EINVAL, steps, components);
+        IGRAPH_ERRORF("Number of steps (%" IGRAPH_PRId ") must be smaller than number of components (%ld).",
+                      IGRAPH_EINVAL, steps, components);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&fake_memb, components);
@@ -1026,13 +1025,16 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     /* Check membership vector */
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*membership)[i] < 0) {
-            IGRAPH_ERRORF("Invalid membership vector, negative id found: %g.", IGRAPH_EINVAL, VECTOR(*membership)[i]);
+            IGRAPH_ERRORF("Invalid membership vector, negative ID found: %g.", IGRAPH_EINVAL, VECTOR(*membership)[i]);
         }
         VECTOR(fake_memb)[ (long int) VECTOR(*membership)[i] ] += 1;
     }
     for (i = 0; i < components; i++) {
         if (VECTOR(fake_memb)[i] == 0) {
-            IGRAPH_ERRORF("Invalid membership vector, empty cluster found, with index %ld.", IGRAPH_EINVAL, i);
+            /* Ideally the empty cluster's index would be reported.
+               However, doing so would be confusing as some high-level interfaces
+               use 1-based indexing, some 0-based. */
+            IGRAPH_ERROR("Invalid membership vector, empty cluster found.", IGRAPH_EINVAL);
         }
     }
 
