@@ -131,7 +131,7 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  */
 
 int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-                         igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
+                         const igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
     char trans = transpose ? 'T' : 'N';
     int n = (int) igraph_matrix_nrow(a);
     int nrhs = (int) igraph_matrix_ncol(b);
