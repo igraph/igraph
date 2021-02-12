@@ -26,7 +26,7 @@
 
 /**
  * \function igraph_lcf_vector
- * \brief Create a graph from LCF notation
+ * \brief Creates a graph from LCF notation.
  *
  * This function is essentially the same as \ref igraph_lcf(), only
  * the way for giving the arguments is different. See \ref
@@ -88,7 +88,7 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_lcf
- * \brief Create a graph from LCF notation
+ * \brief Creates a graph from LCF notation.
  *
  * </para><para>
  * LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation for

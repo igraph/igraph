@@ -251,6 +251,7 @@ add_legacy_tests(
   igraph_layout_merge2
   igraph_layout_merge3
   igraph_layout_reingold_tilford_extended
+  igraph_layout_star
   igraph_layout_sugiyama
 )
 add_legacy_tests(
@@ -516,6 +517,7 @@ add_legacy_tests(
   igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
+  igraph_lapack_dgetrs
 )
 
 # bipartite.at

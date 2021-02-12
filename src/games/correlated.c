@@ -30,7 +30,7 @@
 
 /**
  * \function igraph_correlated_game
- * Generate pairs of correlated random graphs
+ * \brief Generates a random graph correlated to an existing graph.
  *
  * Sample a new graph by perturbing the adjacency matrix of a
  * given graph and shuffling its vertices.
@@ -248,7 +248,7 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 
 /**
  * \function igraph_correlated_pair_game
- * Generate pairs of correlated random graphs
+ * \brief Generates pairs of correlated random graphs.
  *
  * Sample two random graphs, with given correlation.
  *
