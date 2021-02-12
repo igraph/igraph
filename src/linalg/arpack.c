@@ -1375,25 +1375,12 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(vectors, nodes, nev * 2));
-    for (i = nev; i < igraph_matrix_nrow(values); i++) {
+    for (i = no_evs -1; i >= nev; i--) {
         IGRAPH_CHECK(igraph_matrix_remove_row(values, i));
     }
 
     /* Calculate where to start copying */
-    for (i = 0, j = 0, wh = 0; i < nev; i++) {
-        if (MATRIX(*values, i, 1) == 0) { /* TODO: == 0.0 ???? */
-            /* real */
-            j++;
-        } else {
-            /* complex */
-            if (wh == 0) {
-                j += 2;
-                wh = 1 - wh;
-            }
-        }
-    }
-    j--;
-
+    j = no_evs - 1;
     /* if (j>=origcol) { */
     /*   IGRAPH_WARNING("Too few columns in `vectors', ARPACK results are likely wrong"); */
     /* } */
@@ -1417,9 +1404,11 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
                 /* Separate copy required, otherwise 'from' and 'to' might
                    overlap */
                 memcpy( &MATRIX(*vectors, 0, k), &MATRIX(*vectors, 0, j), colsize);
+                //printf("mcpy k %ld, j %ld \n", k, j);
                 memcpy( &MATRIX(*vectors, 0, k - 1), &MATRIX(*vectors, 0, j - 1), colsize);
             }
-            if (i > 1 && MATRIX(*values, i, 1) != -MATRIX(*values, i - 1, 1)) {
+            if (i == 0 || MATRIX(*values, i, 1) != -MATRIX(*values, i - 1, 1)) {
+            //if (i > 0 && MATRIX(*values, i, 1) != -MATRIX(*values, i - 1, 1)) {
                 /* The next one is not a conjugate of this one */
                 j -= 2;
             } else {
