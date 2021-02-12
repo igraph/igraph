@@ -1,8 +1,14 @@
-Test igraph_heap_init, igraph_heap_destroy
-Test igraph_heap_reserve
-Test igraph_heap_init_array
-Test igraph_heap_size, igraph_heap_empty
-Test igraph_heap_push, igraph_heap_top
-( -9.999 0 6 235 235 235 235 235 2000 2000 2000 2000 2000 )
-Test igraph_heap_delete_top
-( 2000 235 10 6 4 1 0.1 0 -1 -2 -9 -9.999 -1000 )
+Create empty max heap & destroy
+Create empty max heap but allocate size for some elements
+Create empty min heap & destroy
+Create empty min heap but allocate size for some elements
+Test max heap_reserve, heap_size and heap_empty
+Test min heap_reserve, heap_size and heap_empty
+Test max heap_init array and delete_top
+2000 235 10 6 4 1 0.5 0 -1 -2 -9 -9.999 -1000 
+Test min heap init_array and delete_top
+-1000 -9.999 -9 -2 -1 0 0.5 1 4 6 10 235 2000 
+Test max heap top and push
+-9.999 0 6 235 235 235 235 235 2000 2000 2000 2000 2000 
+Test min heap top and push
+-9.999 -9.999 -9.999 -9.999 -9.999 -1000 -1000 -1000 -1000 -1000 -1000 -1000 -1000 
