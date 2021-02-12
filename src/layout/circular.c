@@ -72,9 +72,9 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
 
 /**
  * \function igraph_layout_star
- * \brief Generate a star-like layout
+ * \brief Generates a star-like layout.
  *
- * \param graph The input graph. Its edges are ignored in this function.
+ * \param graph The input graph. Its edges are ignored by this function.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
  * \param center The id of the vertex to put in the center.
