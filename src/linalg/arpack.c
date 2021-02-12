@@ -1383,7 +1383,7 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
         IGRAPH_CHECK(igraph_matrix_remove_row(values, i));
     }
 
-    igraph_matrix_init(&new_vectors, nodes, nev * 2);
+    IGRAPH_CHECK(igraph_matrix_init(&new_vectors, nodes, nev * 2));
     IGRAPH_FINALLY(igraph_matrix_destroy, &new_vectors);
 
     new_vector_pos = 0;
