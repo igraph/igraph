@@ -34,14 +34,15 @@ __BEGIN_DECLS
 
 IGRAPH_EXPORT int igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,
-                                  igraph_vector_t *path,
+                                  igraph_vector_t *path_vertex, igraph_vector_t *path_edge,
                                   igraph_bool_t directed, igraph_bool_t unconn);
 IGRAPH_EXPORT int igraph_diameter_dijkstra(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            igraph_real_t *pres,
                                            igraph_integer_t *pfrom,
                                            igraph_integer_t *pto,
-                                           igraph_vector_t *path,
+                                           igraph_vector_t *path_vertex, 
+                                           igraph_vector_t *path_edge,
                                            igraph_bool_t directed,
                                            igraph_bool_t unconn);
 
