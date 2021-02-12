@@ -153,7 +153,7 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
         }
     }
     if (igraph_vector_int_size(ipiv) != n) {
-        IGRAPH_ERROR("Pivot vector not equal to number of matrix rows.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Pivot vector length must match number of matrix rows.", IGRAPH_EINVAL);
     }
     igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(*ipiv),
                   VECTOR(b->data), &ldb, &info);
