@@ -467,6 +467,7 @@ igraph_get_shortest_paths_dijkstra:
               weights ON graph
         IGNORE: RR, RC, RNamespace
 
+<<<<<<< HEAD
 igraph_get_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
@@ -477,6 +478,8 @@ igraph_get_shortest_paths_bellman_ford:
               weights ON graph
         IGNORE: RR, RC, RNamespace
 
+=======
+>>>>>>> correct_errors(2)
 igraph_get_all_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
                 VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
@@ -489,7 +492,6 @@ igraph_shortest_paths_bellman_ford:
                 VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
         DEPS: from ON graph, to ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
-
 
 igraph_shortest_paths_johnson:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
