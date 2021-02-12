@@ -371,6 +371,15 @@ void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* el
     }
 }
 
+void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff) {
+    int i;
+    for (i = 0; i < igraph_matrix_nrow(mat) * igraph_matrix_ncol(mat); i++) {
+        if (fabs(VECTOR(mat->data)[i]) < cutoff) {
+            VECTOR(mat->data)[i] = 0;
+        }
+    }
+}
+
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \
