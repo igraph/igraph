@@ -121,7 +121,7 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  *      diagonal entries are those of U. If A is singular, no warning or
  *      error wil be given and random output will be returned.
  * \param ipiv An integer vector, the pivot indices from \ref
- *      igraph_lapack_dgetrf must be given here. Row \c i of A was
+ *      igraph_lapack_dgetrf() must be given here. Row \c i of A was
  *      interchanged with row <code>ipiv[i]</code>.
  * \param b The right hand side matrix must be given here. The solution
             will also be placed here.
@@ -145,9 +145,12 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_size(ipiv) > 0 &&
-            (igraph_vector_int_max(ipiv) > n || igraph_vector_int_min(ipiv) < 1)) {
-        IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
+    if (igraph_vector_int_size(ipiv) > 0) {
+        igraph_integer_t min, max;
+        igraph_vector_int_minmax(ipiv, &min, &max);
+        if (max > n || min < 1) {
+            IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
+        }
     }
     if (igraph_vector_int_size(ipiv) != n) {
         IGRAPH_ERROR("Pivot vector not equal to number of matrix rows.", IGRAPH_EINVAL);
