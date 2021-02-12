@@ -251,7 +251,7 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
 
 /**
  * \function igraph_warning_handler_ignore
- * Ignore all warnings
+ * \brief Ignores all warnings.
  *
  * This warning handler function simply ignores all warnings.
  * \param reason Textual description of the warning.
@@ -274,7 +274,7 @@ void igraph_warning_handler_ignore(const char *reason, const char *file,
 
 /**
  * \function igraph_warning_handler_print
- * Print all warning to the standard error
+ * \brief Prints all warnings to the standard error.
  *
  * This warning handler function simply prints all warnings to the
  * standard error.

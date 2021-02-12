@@ -231,7 +231,7 @@ int igraph_erdos_renyi_game_gnm(
 /**
  * \ingroup generators
  * \function igraph_erdos_renyi_game
- * \brief Generates a random (Erdos-Renyi) graph.
+ * \brief Generates a random (Erdős-Rényi) graph.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param type The type of the random graph, possible values:
