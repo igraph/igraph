@@ -29,9 +29,18 @@
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
+/* -------------------------------------------------- */
+/* Indexed heap                                       */
+/* -------------------------------------------------- */
+
 #define PARENT(x)     (((x)+1)/2-1)
 #define LEFTCHILD(x)  (((x)+1)*2-1)
 #define RIGHTCHILD(x) (((x)+1)*2)
+
+static void igraph_indheap_i_build(igraph_indheap_t* h, long int head);
+static void igraph_indheap_i_shift_up(igraph_indheap_t* h, long int elem);
+static void igraph_indheap_i_sink(igraph_indheap_t* h, long int head);
+static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2);
 
 /**
  * \ingroup indheap
@@ -322,7 +331,7 @@ long int igraph_indheap_max_index(igraph_indheap_t *h) {
  * directly.
  */
 
-void igraph_indheap_i_build(igraph_indheap_t* h, long int head) {
+static void igraph_indheap_i_build(igraph_indheap_t* h, long int head) {
 
     long int size = igraph_indheap_size(h);
     if (RIGHTCHILD(head) < size) {
@@ -345,7 +354,7 @@ void igraph_indheap_i_build(igraph_indheap_t* h, long int head) {
  * directly.
  */
 
-void igraph_indheap_i_shift_up(igraph_indheap_t *h, long int elem) {
+static void igraph_indheap_i_shift_up(igraph_indheap_t *h, long int elem) {
 
     if (elem == 0 || h->stor_begin[elem] < h->stor_begin[PARENT(elem)]) {
         /* at the top */
@@ -361,7 +370,7 @@ void igraph_indheap_i_shift_up(igraph_indheap_t *h, long int elem) {
  * directly.
  */
 
-void igraph_indheap_i_sink(igraph_indheap_t* h, long int head) {
+static void igraph_indheap_i_sink(igraph_indheap_t* h, long int head) {
 
     long int size = igraph_indheap_size(h);
     if (LEFTCHILD(head) >= size) {
@@ -388,7 +397,7 @@ void igraph_indheap_i_sink(igraph_indheap_t* h, long int head) {
  * directly.
  */
 
-void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
+static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
     if (e1 != e2) {
         igraph_real_t tmp = h->stor_begin[e1];
         h->stor_begin[e1] = h->stor_begin[e2];
@@ -400,6 +409,16 @@ void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
     }
 }
 
+/*************************************************/
+
+/* -------------------------------------------------- */
+/* Doubly indexed heap                                */
+/* -------------------------------------------------- */
+
+/* static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head); */ /* Unused function */
+static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, long int elem);
+static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head);
+static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2);
 
 /**
  * \ingroup doubleindheap
@@ -617,7 +636,9 @@ void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *
  * \brief Builds the heap, don't call it directly.
  */
 
-void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head) {
+/* Unused function, temporarily disabled */
+#if 0
+static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head) {
 
     long int size = igraph_d_indheap_size(h);
     if (RIGHTCHILD(head) < size) {
@@ -633,13 +654,14 @@ void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head) {
         /* none */
     }
 }
+#endif
 
 /**
  * \ingroup doubleindheap
  * \brief Moves an element up in the heap, don't call it directly.
  */
 
-void igraph_d_indheap_i_shift_up(igraph_d_indheap_t *h, long int elem) {
+static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t *h, long int elem) {
 
     if (elem == 0 || h->stor_begin[elem] < h->stor_begin[PARENT(elem)]) {
         /* at the top */
@@ -654,7 +676,7 @@ void igraph_d_indheap_i_shift_up(igraph_d_indheap_t *h, long int elem) {
  * \brief Moves an element down in the heap, don't call it directly.
  */
 
-void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head) {
+static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head) {
 
     long int size = igraph_d_indheap_size(h);
     if (LEFTCHILD(head) >= size) {
@@ -680,7 +702,7 @@ void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head) {
  * \brief Switches two elements in the heap, don't call it directly.
  */
 
-void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) {
+static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) {
     if (e1 != e2) {
         long int tmpi;
         igraph_real_t tmp = h->stor_begin[e1];
@@ -715,8 +737,8 @@ void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) 
    In other words, for this heap the indexing operation is O(1), the
    normal heap does this in O(n) time.... */
 
-void igraph_i_2wheap_switch(igraph_2wheap_t *h,
-                            long int e1, long int e2) {
+static void igraph_i_2wheap_switch(igraph_2wheap_t *h,
+                                   long int e1, long int e2) {
     if (e1 != e2) {
         long int tmp1, tmp2;
         igraph_real_t tmp3 = VECTOR(h->data)[e1];
@@ -734,8 +756,8 @@ void igraph_i_2wheap_switch(igraph_2wheap_t *h,
     }
 }
 
-void igraph_i_2wheap_shift_up(igraph_2wheap_t *h,
-                              long int elem) {
+static void igraph_i_2wheap_shift_up(igraph_2wheap_t *h,
+                                     long int elem) {
     if (elem == 0 || VECTOR(h->data)[elem] < VECTOR(h->data)[PARENT(elem)]) {
         /* at the top */
     } else {
@@ -744,8 +766,8 @@ void igraph_i_2wheap_shift_up(igraph_2wheap_t *h,
     }
 }
 
-void igraph_i_2wheap_sink(igraph_2wheap_t *h,
-                          long int head) {
+static void igraph_i_2wheap_sink(igraph_2wheap_t *h,
+                                 long int head) {
     long int size = igraph_2wheap_size(h);
     if (LEFTCHILD(head) >= size) {
         /* no subtrees */

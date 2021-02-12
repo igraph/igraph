@@ -206,9 +206,9 @@ igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid,
     return x * x + y * y;
 }
 
-int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
-                                igraph_integer_t vid, igraph_real_t r,
-                                long int x, long int y) {
+static int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
+                                       igraph_integer_t vid, igraph_real_t r,
+                                       long int x, long int y) {
     long int act;
     igraph_real_t *v = VECTOR(grid->next);
 

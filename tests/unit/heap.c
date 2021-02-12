@@ -115,6 +115,10 @@ int main() {
         printf("%g ",igraph_heap_top(&h_max));
     }
     printf("\n");
+    while (igraph_heap_size(&h_max)>0){
+        printf("%g ",igraph_heap_delete_top(&h_max));
+    }
+    printf("\n");
 
     /* min heap top and push */
     printf("Test min heap top and push\n");
@@ -122,6 +126,10 @@ int main() {
     for (i=0;i<li_size;i++){
         igraph_heap_min_push(&h_min,random_list[i]);
         printf("%g ",igraph_heap_min_top(&h_min));
+    }
+    printf("\n");
+    while (igraph_heap_min_size(&h_min)>0){
+        printf("%g ",igraph_heap_min_delete_top(&h_min));
     }
     printf("\n");
 
