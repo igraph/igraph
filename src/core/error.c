@@ -34,8 +34,12 @@
  * Detecting ASan with Clang:
  *   https://clang.llvm.org/docs/AddressSanitizer.html#conditional-compilation-with-has-feature-address-sanitizer
  */
-#if defined(__SANITIZE_ADDRESS__) || (defined(__has_feature) && __has_feature(address_sanitizer))
-#define IGRAPH_SANITIZER_AVAILABLE 1
+#if defined(__SANITIZE_ADDRESS__)
+#  define IGRAPH_SANITIZER_AVAILABLE 1
+#elif defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#    define IGRAPH_SANITIZER_AVAILABLE 1
+#  endif
 #endif
 
 #ifdef IGRAPH_SANITIZER_AVAILABLE
