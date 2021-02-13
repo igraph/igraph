@@ -15,10 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_paths.h"
@@ -215,10 +212,14 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 /**
  * \ingroup structural
  * \function igraph_get_shortest_paths_bellman_ford
- * \brief Calculates the weighted shortest paths from/to one vertex, allowing negative weights.
+ * \brief Weighted shortest paths from/to a vertex, allowing negative weights.
+ *
+ * This function calculates weighted shortest paths to or from a single vertex,
+ * and allows negative weights. When there is more than one shortest path between
+ * two vertices, only one of them is returned.
  *
  * If there are no negative weights, you are better off with 
- * \ref igraph_shortest_paths_dijkstra() .
+ * \ref igraph_get_shortest_paths_dijkstra() .
  *
  * \param graph The input graph, can be directed.
  * \param vertices The result, the ids of the vertices along the paths.
@@ -270,16 +271,18 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *        during the search will have -1 in the corresponding entry of the
  *        vector. Note that the search terminates if all the vertices in
  *        \c to are reached.
- * \return Error code.
+ * \return Error code:
+ *         \clist
  *         \cli IGRAPH_ENOMEM
- *           not enough memory for temporary data.
+ *           Not enough memory for temporary data.
  *         \cli IGRAPH_EINVAL
  *           The weight vector doesn't math the number of edges.
- *          \cli IGRAPH_EINVVID
+ *         \cli IGRAPH_EINVVID
  *           \p from is invalid vertex id, or the length of \p to is
  *           not the same as the length of \p vertices or \p edges.
- *          \cli IGRAPH_ENEGLOOP
- *          Bellman-ford algorithm encounted a negative loop.
+ *         \cli IGRAPH_ENEGLOOP
+ *           Bellman-ford algorithm encounted a negative loop.
+ *         \endclist
  *
  * Time complexity: O(|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges.
@@ -287,8 +290,6 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \sa \ref igraph_shortest_paths() for a faster unweighted version
  * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
  * edge weights.
- *
- * \test tests/unit/igraph_get_shortest_paths_bellman_ford.c
  */
 
 int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
@@ -320,7 +321,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
     }
 
     IGRAPH_DQUEUE_INIT_FINALLY(&Q, no_of_nodes);
@@ -338,15 +339,15 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     if (vertices && IGRAPH_VIT_SIZE(tovit) != igraph_vector_ptr_size(vertices)) {
-        IGRAPH_ERROR("Size of `vertices' and `to' should match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Size of `vertices' and `to' should match.", IGRAPH_EINVAL);
     }
     if (edges && IGRAPH_VIT_SIZE(tovit) != igraph_vector_ptr_size(edges)) {
-        IGRAPH_ERROR("Size of `edges' and `to' should match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
     }
 
     parents = igraph_Calloc(no_of_nodes, long int);
     if (parents == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, parents);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
@@ -482,7 +483,8 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         igraph_vit_destroy(&tovit);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    igraph_free(parents);
+
+    igraph_Free(parents);
     igraph_dqueue_destroy(&Q);
     igraph_vector_destroy(&clean_vertices);
     igraph_vector_destroy(&num_queued);
