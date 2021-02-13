@@ -129,6 +129,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
             content="GTK-Doc V{$gtkdoc.version} (XML mode)"/>
     </xsl:if>
     <link rel="stylesheet" href="style.css" type="text/css"/>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css"/>
 
       <!-- copied from the html.head template in the docbook stylesheets
            we don't want links for all refentrys, thats just too much

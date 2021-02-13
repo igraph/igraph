@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_dot_product_game
- * Generate a random dot product graph
+ * \brief Generates a random dot product graph.
  *
  * In this model, each vertex is represented by a latent
  * position vector. Probability of an edge between two vertices are given
