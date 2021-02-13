@@ -377,6 +377,8 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_t neis;
     long int i;
 
+    IGRAPH_ERROR("Example error to test stack trace printing.", IGRAPH_FAILURE);
+
     if (!weights) {
         return igraph_degree(graph, res, vids, mode, loops);
     }
