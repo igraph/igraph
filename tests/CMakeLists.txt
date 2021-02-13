@@ -215,6 +215,7 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_is_bipartite
   igraph_is_tree
+  igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
   igraph_pagerank
   igraph_transitive_closure_dag
