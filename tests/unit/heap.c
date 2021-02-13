@@ -30,8 +30,8 @@ int main() {
     igraph_heap_t h_max;
     igraph_heap_min_t h_min;
     igraph_integer_t i;
-    igraph_real_t random_list[13]={-9.999,0,6,235,-2,-1000,-1,4,2000,0.5,1,-9,10};
-    const igraph_integer_t li_size=13;
+    igraph_real_t list[15]={-2,-9.999,0,6,235,-2,-1000,-1,4,2000,6,0.5,1,-9,10};
+    const igraph_integer_t l_size=sizeof(list)/sizeof(igraph_real_t);
 
     /* max heap init & destroy*/
     printf("Create empty max heap & destroy\n");
@@ -91,7 +91,7 @@ int main() {
 
     /* max heap init_array and delete_top */
     printf("Test max heap_init array and delete_top\n");
-    igraph_heap_init_array(&h_max,random_list,li_size);
+    igraph_heap_init_array(&h_max,list,l_size);
     while (igraph_heap_size(&h_max)>0){
         printf("%g ",igraph_heap_delete_top(&h_max));
     }
@@ -100,7 +100,7 @@ int main() {
 
     /* min heap init_array and delete_top */
     printf("Test min heap init_array and delete_top\n");
-    igraph_heap_min_init_array(&h_min,random_list,li_size);
+    igraph_heap_min_init_array(&h_min,list,l_size);
     while (igraph_heap_min_size(&h_min)>0){
         printf("%g ",igraph_heap_min_delete_top(&h_min));
     }
@@ -110,8 +110,8 @@ int main() {
     /* max heap top and push */
     printf("Test max heap top and push\n");
     igraph_heap_init(&h_max, 0);
-    for (i=0;i<li_size;i++){
-        igraph_heap_push(&h_max,random_list[i]);
+    for (i=0;i<l_size;i++){
+        igraph_heap_push(&h_max,list[i]);
         printf("%g ",igraph_heap_top(&h_max));
     }
     printf("\n");
@@ -123,8 +123,8 @@ int main() {
     /* min heap top and push */
     printf("Test min heap top and push\n");
     igraph_heap_min_init(&h_min, 0);
-    for (i=0;i<li_size;i++){
-        igraph_heap_min_push(&h_min,random_list[i]);
+    for (i=0;i<l_size;i++){
+        igraph_heap_min_push(&h_min,list[i]);
         printf("%g ",igraph_heap_min_top(&h_min));
     }
     printf("\n");
