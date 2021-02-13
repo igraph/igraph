@@ -33,11 +33,11 @@
 
 /**
  * \function igraph_shortest_paths_bellman_ford
- * Weighted shortest paths from some sources allowing negative weights.
+ * \brief Weighted shortest path lengths between vertices, allowing negative weights.
  *
- * This function is the Bellman-Ford algorithm to find the weighted
- * shortest paths to all vertices from a single source. (It is run
- * independently for the given sources.). If there are no negative
+ * This function implements the Bellman-Ford algorithm to find the weighted
+ * shortest paths to all vertices from a single source, allowing negative weights.
+ * It is run independently for the given sources. If there are no negative
  * weights, you are better off with \ref igraph_shortest_paths_dijkstra() .
  *
  * \param graph The input graph, can be directed.
@@ -47,6 +47,8 @@
  *    vertices in the graph, in the order of vertex ids. For unreachable
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
  * \param weights The edge weights. There mustn't be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
@@ -212,9 +214,9 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 /**
  * \ingroup structural
  * \function igraph_get_shortest_paths_bellman_ford
- * \brief Weighted shortest paths from/to a vertex, allowing negative weights.
+ * \brief Weighted shortest paths from a vertex, allowing negative weights.
  *
- * This function calculates weighted shortest paths to or from a single vertex,
+ * This function calculates weighted shortest paths from or to a single vertex,
  * and allows negative weights. When there is more than one shortest path between
  * two vertices, only one of them is returned.
  *

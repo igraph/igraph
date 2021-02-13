@@ -41,11 +41,9 @@
  *        vertices in the \c to argument. One row of the matrix shows the
  *        distances from/to a given vertex to the ones in \c to.
  *        For the unreachable vertices IGRAPH_INFINITY is returned.
- * \param from Vector of the vertex ids for which the path length
- *        calculations are done.
- * \param to Vector of the vertex ids to which the path length
- *        calculations are done. It is not allowed to have duplicated
- *        vertex ids here.
+ * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -193,7 +191,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
 /**
  * \ingroup structural
  * \function igraph_get_shortest_paths
- * \brief Calculates the shortest paths from/to one vertex.
+ * \brief Shortest paths from a vertex.
  *
  * </para><para>
  * If there is more than one geodesic between two vertices, this
@@ -464,7 +462,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 
 /**
  * \function igraph_get_shortest_path
- * Shortest path from one vertex to another one.
+ * \brief Shortest path from one vertex to another one.
  *
  * Calculates and returns a single unweighted shortest path from a
  * given vertex to another one. If there are more than one shortest
