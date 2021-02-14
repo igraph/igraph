@@ -100,14 +100,14 @@ static int igraph_i_betweenness_cutoff_weighted(
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
     }
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
-            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
         } else if (igraph_is_nan(minweight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         } else if (minweight <= eps) {
             IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
@@ -368,17 +368,17 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
     distance = igraph_Calloc(no_of_nodes, long int);
     if (distance == 0) {
-        IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -575,14 +575,14 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
     igraph_stack_t S;
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
     }
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
-            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
         } else if (igraph_is_nan(minweight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         } else if (minweight <= eps) {
             IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
@@ -844,17 +844,17 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
     distance = igraph_Calloc(no_of_nodes, long int);
     if (distance == 0) {
-        IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 

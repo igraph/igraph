@@ -643,17 +643,23 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     no_of_edges = igraph_ecount(graph);
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("fast greedy community detection works for undirected graphs only", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Fast greedy community detection works on undirected graphs only.", IGRAPH_UNIMPLEMENTED);
     }
 
     total_joins = no_of_nodes - 1;
 
     if (weights != 0) {
-        if (igraph_vector_size(weights) < igraph_ecount(graph)) {
-            IGRAPH_ERROR("fast greedy community detection: weight vector too short", IGRAPH_EINVAL);
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERROR("Length of weight vector must agree with number of edges.", IGRAPH_EINVAL);
         }
-        if (igraph_vector_any_smaller(weights, 0)) {
-            IGRAPH_ERROR("weights must be positive", IGRAPH_EINVAL);
+        if (no_of_edges > 0) {
+            igraph_real_t minweight = igraph_vector_min(weights);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Weights must not be negative.", IGRAPH_EINVAL);
+            }
+            if (igraph_is_nan(minweight)) {
+                IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
+            }
         }
         weight_sum = igraph_vector_sum(weights);
     } else {
@@ -662,7 +668,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
     if (has_multiple) {
-        IGRAPH_ERROR("fast-greedy community finding works only on graphs without multiple edges", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Fast greedy community detection works only on graphs without multi-edges.", IGRAPH_EINVAL);
     }
 
     if (membership != 0 && merges == 0) {
@@ -701,17 +707,17 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     communities.no_of_communities = no_of_nodes;
     communities.e = (igraph_i_fastgreedy_community*)calloc((size_t) no_of_nodes, sizeof(igraph_i_fastgreedy_community));
     if (communities.e == 0) {
-        IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, communities.e);
     communities.heap = (igraph_i_fastgreedy_community**)calloc((size_t) no_of_nodes, sizeof(igraph_i_fastgreedy_community*));
     if (communities.heap == 0) {
-        IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, communities.heap);
     communities.heapindex = (igraph_integer_t*)calloc((size_t)no_of_nodes, sizeof(igraph_integer_t));
     if (communities.heapindex == 0) {
-        IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_FINALLY(igraph_i_fastgreedy_community_list_destroy, &communities);
@@ -725,7 +731,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     debug("Allocating dq vector\n");
     dq = (igraph_real_t*)calloc((size_t) no_of_edges, sizeof(igraph_real_t));
     if (dq == 0) {
-        IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, dq);
     debug("Creating community pair list\n");
@@ -733,7 +739,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
     pairs = (igraph_i_fastgreedy_commpair*)calloc(2 * (size_t) no_of_edges, sizeof(igraph_i_fastgreedy_commpair));
     if (pairs == 0) {
-        IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, pairs);
     loop_weight_sum = 0;
@@ -820,7 +826,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     no_of_joins = 0;
     while (no_of_joins < total_joins) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_PROGRESS("fast greedy community detection", no_of_joins * 100.0 / total_joins, 0);
+        IGRAPH_PROGRESS("Fast greedy community detection", no_of_joins * 100.0 / total_joins, 0);
 
         /* Store the modularity */
         if (modularity) {
@@ -1026,7 +1032,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         long int *ivec;
         ivec = igraph_Calloc(igraph_matrix_nrow(merges), long int);
         if (ivec == 0) {
-            IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, ivec);
         for (i = 0; i < no_of_joins; i++) {
@@ -1036,7 +1042,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         igraph_Free(ivec);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    IGRAPH_PROGRESS("fast greedy community detection", 100.0, 0);
+    IGRAPH_PROGRESS("Fast greedy community detection", 100.0, 0);
 
     if (modularity) {
         VECTOR(*modularity)[no_of_joins] = q;

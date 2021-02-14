@@ -407,7 +407,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     if (result == 0) {
         result = igraph_Calloc(1, igraph_vector_t);
         if (result == 0) {
-            IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, result);
         IGRAPH_VECTOR_INIT_FINALLY(result, 0);
@@ -430,37 +430,49 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     distance = igraph_Calloc(no_of_nodes, double);
     if (distance == 0) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     if (weights == 0) {
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
     } else {
-        if (no_of_edges > 0 && igraph_vector_min(weights) <= 0) {
-            IGRAPH_ERROR("weights must be strictly positive", IGRAPH_EINVAL);
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
+        }
+
+        if (no_of_edges > 0) {
+            /* Must not call vector_min on empty vector */
+            igraph_real_t minweight = igraph_vector_min(weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Weights must be strictly positive.", IGRAPH_EINVAL);
+            }
+
+            if (igraph_is_nan(minweight)) {
+                IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
+            }
         }
 
         if (membership != 0) {
-            IGRAPH_WARNING("Membership vector will be selected based on the lowest "\
+            IGRAPH_WARNING("Membership vector will be selected based on the lowest "
                            "modularity score.");
         }
 
         if (modularity != 0 || membership != 0) {
-            IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "\
-                           "community detection might not make sense -- modularity treats edge "\
-                           "weights as similarities while edge betwenness treats them as "\
-                           "distances");
+            IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "
+                           "community detection might not make sense -- modularity treats edge "
+                           "weights as similarities while edge betwenness treats them as "
+                           "distances.");
         }
 
         IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
@@ -485,7 +497,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     passive = igraph_Calloc(no_of_edges, char);
     if (!passive) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, passive);
 

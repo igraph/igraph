@@ -40,6 +40,22 @@ jobs:
         parameters:
           build_shared: true
 
+  - job: linux_shared_external
+    steps:
+      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libopenblas-dev -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
+          int_arpack: false
+          int_cxsparse: false
+          int_gmp: false
+          int_glpk: false
+          extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
+          build_shared: true
+
   - job: linux_x87
     steps:
       - script: sudo apt-get install ninja-build ccache -y
@@ -91,6 +107,9 @@ jobs:
 
   - job: documentation
     steps:
+      - script: sudo apt-get update
+        displayName: Update package registry
+
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
         displayName: Install dependencies
 

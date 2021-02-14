@@ -126,7 +126,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
 
 /**
  * \function igraph_eccentricity
- * Eccentricity of some vertices
+ * \brief Eccentricity of some vertices.
  *
  * The eccentricity of a vertex is calculated by measuring the shortest
  * distance from (or to) the vertex, to (or from) all vertices in the
@@ -166,7 +166,7 @@ int igraph_eccentricity(const igraph_t *graph,
 
 /**
  * \function igraph_radius
- * Radius of a graph
+ * \brief Radius of a graph.
  *
  * The radius of a graph is the defined as the minimum eccentricity of
  * its vertices, see \ref igraph_eccentricity().

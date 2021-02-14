@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_shortest_paths_johnson
- * Calculate shortest paths from some sources using Johnson's algorithm.
+ * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm.
  *
  * See Wikipedia at http://en.wikipedia.org/wiki/Johnson's_algorithm
  * for Johnson's algorithm. This algorithm works even if the graph

@@ -14,10 +14,14 @@ include(BuildType)
 # Prevent in-source builds
 include(PreventInSourceBuilds)
 
-# Make use of ccache if it is present on the host system
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+# Make use of ccache if it is present on the host system -- unless explicitly
+# asked to disable it
+option(USE_CCACHE "Use ccache to speed up compilation if it is installed" ON)
+if(USE_CCACHE)
+  find_program(CCACHE_PROGRAM ccache)
+  if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+  endif()
 endif()
 
 # Include some compiler-related helpers and set global compiler options

@@ -162,7 +162,7 @@ IGRAPH_EXPORT int igraph_simple_interconnected_islands_game(
     igraph_integer_t n_inter);
 
 IGRAPH_EXPORT int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
-                                             igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
+                                             const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
                                              igraph_bool_t loops, igraph_bool_t multiple);
 
 IGRAPH_EXPORT int igraph_static_power_law_game(igraph_t *graph,
@@ -195,7 +195,7 @@ IGRAPH_EXPORT int igraph_correlated_game(const igraph_t *old_graph, igraph_t *ne
                                          const igraph_vector_t *permutation);
 
 IGRAPH_EXPORT int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
-                                              int n, igraph_real_t corr, igraph_real_t p,
+                                              igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
                                               igraph_bool_t directed,
                                               const igraph_vector_t *permutation);
 
