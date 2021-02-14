@@ -451,7 +451,7 @@ add_legacy_tests(
 )
 
 # use a higher test timeout for the Infomap algorithm
-set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 120)
+set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 150)
 
 # cliques.at
 add_examples(

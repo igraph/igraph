@@ -95,6 +95,8 @@ jobs:
 
     steps:
       - template: .azure/build-win.yml
+        parameters: 
+          build_type: Debug
 
   - job: windows_shared
     pool:
