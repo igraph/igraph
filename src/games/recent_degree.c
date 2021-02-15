@@ -188,7 +188,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_recent_degree_aging_game
- * \brief Preferential attachment based on the number of edges gained recently, with aging of vertices
+ * \brief Preferential attachment based on the number of edges gained recently, with aging of vertices.
  *
  * </para><para>
  * This game is very similar to \ref igraph_barabasi_aging_game(),
@@ -214,7 +214,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
  * \param pa_exp The exponent for the preferential attachment.
  * \param aging_exp The exponent for the aging, normally it is
  *        negative: old vertices gain edges with less probability.
- * \param aging_bins Integer constant, The number of age bins to use.
+ * \param aging_bins Integer constant, the number of age bins to use.
  * \param time_window The time window to use to count the number of
  *        incident edges for the vertices.
  * \param zero_appeal The degree dependent part of the attractiveness
@@ -257,13 +257,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         IGRAPH_ERRORF("Number of nodes should not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERRORF("Out-degree sequence is specified, but it length (%ld) does not equal the number of nodes (%ld).", IGRAPH_EINVAL, igraph_vector_size(outseq), no_of_nodes);
+        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%ld) does not equal the number of nodes (%ld).",
+                      IGRAPH_EINVAL, (long) igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERRORF("Out-degree cannot be negative, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
+        IGRAPH_ERRORF("Out-degree cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bins <= 0) {
-        IGRAPH_ERRORF("Aging bins should be positive, but found %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);
+        IGRAPH_ERRORF("Aging bins should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
