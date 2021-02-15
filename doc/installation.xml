@@ -126,7 +126,7 @@ $ cd build
       </listitem>
       <listitem>
         <para>
-          Run cmake, which will automatically configure igraph, and
+          Run CMake, which will automatically configure igraph, and
           report the configuration:
 <programlisting>
 $ cmake ..
@@ -139,7 +139,7 @@ $ cmake ..
       <listitem>
         <para>
           Check the output carefully, and ensure that all features you
-          need are enabled. If cmake could not find certain libraries,
+          need are enabled. If CMake could not find certain libraries,
           some features such as GraphML support may have been
           automatically disabled.
         </para>
@@ -189,20 +189,11 @@ $ cmake --install .
     <section id="igraph-Installation-microsoft-visual-studio">
       <title>Microsoft Visual Studio</title>
       <para>
-        – TODO –
-      </para>
-      <para>
         With Visual Studio, the steps to build igraph are generally the
         same as above. However, since the Visual Studio CMake generator is
-        a multi-configuration one, we must specify the configuration with
-        each build command using the <literal>--config Release</literal>
-        option:
-      </para>
-      <para>
-        When compiling with Visual Studio, we must specify the
-        configuration (Release or Debug) and separate building and running
-        the tests. To build igraph in Release configuration, first
-        configure it:
+        a multi-configuration one, we must specify the configuration
+        (typically Release or Debug) with each build command using the 
+        <literal>--config</literal> option:
       </para>
 <programlisting>
 mkdir build
@@ -232,30 +223,29 @@ cmake --build . --target check --config Release
           support.
         </para>
         <para>
-          In order to use <literal>vcpkg</literal>, please integrate the
-          <literal>vcpkg</literal> in the build environment by executing
-          <literal>vcpkg.exe integrate install</literal>. Please note that
-          you should add the <literal>-DCMAKE_TOOLCHAIN_FILE</literal> to
-          point to the correct <literal>vcpkg.cmake</literal> file, as
-          instructed.
+          In order to use vcpkg integrate it in the build environment by executing
+          <literal>vcpkg.exe integrate install</literal> on the command line.
+          When configuring igraph, point CMake to the correct
+          <literal>vcpkg.cmake</literal> file using <literal>-DCMAKE_TOOLCHAIN_FILE=...</literal>,
+          as instructed.
         </para>
         <para>
           Additionally, it might be that you need to set the appropriate
           so-called triplet using
           <literal>-DVCPKG_TARGET_TRIPLET</literal> when running
           <literal>cmake</literal>, for exampling, setting it to
-          <literal>x64-windows</literal> for shared builds or
-          <literal>x64-windows-static</literal> for static builds.
+          <literal>x64-windows</literal> when using shared builds of packages or
+          <literal>x64-windows-static</literal> when using static builds.
           Similarly, you also need to specify this target triplet when
-          installing pacakges. For example, to install
+          installing packages. For example, to install
           <literal>libxml2</literal> as a shared library, use
           <literal>vcpkg.exe install libxml2:x64-windows</literal> and to
           install <literal>libxml2</literal> as a static library, use
           <literal>vcpkg.exe install libxml2:x64-windows-static</literal>.
         </para>
         <para>
-          For some external libraries with <literal>vcpkg</literal>, there
-          are some known issues. When building with an external
+          There are some known issues with igraph when using certain external packages
+          from vcpkg. When building with an external
           <literal>suitesparse</literal> shared library, the
           <literal>suitesparse</literal> library is not copied over to the
           build directory, resulting in failing tests, see issue
@@ -265,60 +255,61 @@ cmake --build . --target check --config Release
           <ulink url="https://github.com/igraph/igraph/issues/1491">#1491</ulink>.
         </para>
       </section>
+    </section>
       <section id="igraph-Installation-msys2">
-        <title>MSYS2</title>
-        <para>
-          MSYS2 can be installed from www.msys2.org. After installing MSYS2,
-          ensure that it is up to date by opening a terminal and running
-          <literal>pacman -Syuu</literal>.
-        </para>
-        <para>
-          The instructions below assume that you want to compile for a 64-bit
-          target.
-        </para>
-        <para>
-          Install the following packages using <literal>pacman -S</literal>.
-        </para>
-        <itemizedlist>
-          <listitem>
-            <para>
-              Minimal requirements:
-              <literal>mingw-w64-x86_64-toolchain</literal>,
-              <literal>mingw-w64-x86_64-cmake</literal>.
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              Optional dependencies that enable certain features:
-              <literal>mingw-w64-x86_64-gmp</literal>,
-              <literal>mingw-w64-x86_64-libxml2</literal>
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              Optional external libraries for better performance:
-              <literal>mingw-w64-x86_64-openblas</literal>,
-              <literal>mingw-w64-x86_64-suitesparse</literal>,
-              <literal>mingw-w64-x86_64-arpack</literal>,
-              <literal>mingw-w64-x86_64-glpk</literal>
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              Only needed for running the tests: <literal>diffutils</literal>
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              Required only when building the development version:
-              <literal>git</literal>, <literal>bison</literal>,
-              <literal>flex</literal>
-            </para>
-          </listitem>
-        </itemizedlist>
-        <para>
-          The following command will install of these at once:
-        </para>
+      <title>MSYS2</title>
+      <para>
+        MSYS2 can be installed from www.msys2.org. After installing MSYS2,
+        ensure that it is up to date by opening a terminal and running
+        <literal>pacman -Syuu</literal>.
+      </para>
+      <para>
+        The instructions below assume that you want to compile for a 64-bit
+        target.
+      </para>
+      <para>
+        Install the following packages using <literal>pacman -S</literal>.
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Minimal requirements:
+            <literal>mingw-w64-x86_64-toolchain</literal>,
+            <literal>mingw-w64-x86_64-cmake</literal>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Optional dependencies that enable certain features:
+            <literal>mingw-w64-x86_64-gmp</literal>,
+            <literal>mingw-w64-x86_64-libxml2</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Optional external libraries for better performance:
+            <literal>mingw-w64-x86_64-openblas</literal>,
+            <literal>mingw-w64-x86_64-suitesparse</literal>,
+            <literal>mingw-w64-x86_64-arpack</literal>,
+            <literal>mingw-w64-x86_64-glpk</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Only needed for running the tests: <literal>diffutils</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Required only when building the development version:
+            <literal>git</literal>, <literal>bison</literal>,
+            <literal>flex</literal>
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        The following command will install of these at once:
+      </para>
 <programlisting>
 pacman -S \
   mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
@@ -327,41 +318,40 @@ pacman -S \
   diffutils \
   git bison flex
 </programlisting>
-        <para>
-          In order to build igraph, follow the <emphasis role="strong">General
-          build instructions</emphasis> above, paying attention to the
-          following:
-        </para>
-        <itemizedlist>
-          <listitem>
-            <para>
-              When using MSYS2, start the <quote>MSYS2 MinGW 64-bit</quote>
-              terminal, and <emphasis>not</emphasis> the <quote>MSYS2
-              MSYS</quote> one.
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              Be sure to install the <literal>mingw-w64-x86_64-cmake</literal>
-              package and not the <literal>cmake</literal> one. The latter
-              will not work.
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              When running <literal>cmake</literal>, pass the option
-              <literal>-G&quot;MSYS Makefiles&quot;</literal>.
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              Note that <literal>ccmake</literal> is not currently available.
-              <literal>cmake-gui</literal> can be used only if the
-              <literal>mingw-w64-x86_64-qt5</literal> package is installed.
-            </para>
-          </listitem>
-        </itemizedlist>
-      </section>
+      <para>
+        In order to build igraph, follow the <emphasis role="strong">General
+        build instructions</emphasis> above, paying attention to the
+        following:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            When using MSYS2, start the <quote>MSYS2 MinGW 64-bit</quote>
+            terminal, and <emphasis>not</emphasis> the <quote>MSYS2
+            MSYS</quote> one.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Be sure to install the <literal>mingw-w64-x86_64-cmake</literal>
+            package and not the <literal>cmake</literal> one. The latter
+            will not work.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            When running <literal>cmake</literal>, pass the option
+            <literal>-G&quot;MSYS Makefiles&quot;</literal>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Note that <literal>ccmake</literal> is not currently available.
+            <literal>cmake-gui</literal> can be used only if the
+            <literal>mingw-w64-x86_64-qt5</literal> package is installed.
+          </para>
+        </listitem>
+      </itemizedlist>
     </section>
   </section>  
 
@@ -467,7 +457,9 @@ pacman -S \
     possible, you may want to disable this auto-detection. To do so, set
     each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> option
     described above. Additionally, set <literal>BLA_VENDOR</literal> to
-    use the BLAS and LAPACK implementations of your choice.
+    use the BLAS and LAPACK implementations of your choice. This should
+    be the same BLAS and LAPACK library that igraph's other dependencies,
+    such as ARPACK and CXSparse are linked against.
   </para>
   <para>
     For example, to force igraph to use external versions of all
@@ -499,7 +491,7 @@ $ cmake .. \
     </listitem>
     <listitem>
       <para>
-        Link-time optimizaton noticeably improved the performance of
+        Link-time optimizaton noticeably improves the performance of
         some igraph functions. To enable it, use
         <literal>-DIGRAPH_ENABLE_LTO=1</literal>.
       </para>
