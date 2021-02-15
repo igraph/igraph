@@ -96,6 +96,7 @@
    * `igraph_es_adj()`.
    * `igraph_subgraph()`.
  - `igraph_pagerank_old()`, deprecated in 0.7, has been removed.
+ - `igraph_vector_bool` and `igraph_matrix_bool` functions that relied on inequality-comparing `igraph_bool_t` values are removed.
 
 ### Fixed
 
@@ -113,6 +114,8 @@
  - `igraph_modularity_matrix()` returned incorrect results for weighted graphs. This is now fixed. (PR #1649, thanks to Daniel Noom!)
  - `igraph_lapack_dgetrf()` would crash when passing `NULL` for its `ipiv` argument (thanks for the fix to Daniel Noom).
  - Some `igraph_matrix` functions would fail to report errors on out-of-memory conditions.
+ - `igraph_maxdegree()` now returns 0 for the null graph or empty vector set. Previously, it did not handle this case.
+ - `igraph_vector_bool_all_e()` now considers all nonzero (i.e. "true") values to be the same.
  - PageRank (PR #1640):
    * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
    * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.
