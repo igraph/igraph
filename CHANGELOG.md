@@ -24,6 +24,7 @@
  - The new `IGRAPH_WARNINGF`, `IGRAPH_ERRORF` and `IGRAPH_FATALF` macros provide warning/error reporting with `printf`-like syntax. (PR #1627, thanks to Daniel Noom!)
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
  - `igraph_get_shortest_paths_bellman_ford()` computes the shortest paths (including the vertex and edge IDs along the paths) using the Bellman-Ford algorithm (PR #1642, thanks to Guy Rozenberg). This makes it possible to calculate the shortest paths on graphs with negative edge weights, which was not possible before with Dijkstra's algorithm.
+ - `igraph_get_shortest_path_bellman_ford()` is a wrapper for `igraph_get_shortest_paths_bellman_ford()` for the single path case.
  - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
  - Harmonic centrality (PR #1583):
    * `igraph_harmonic_centrality()` computes the harmonic centrality of vertices.
@@ -64,6 +65,10 @@
    * `igraph_average_path_length()` now returns the number of disconnected vertex pairs in the new `unconn_pairs` output argument.
    * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
    * `igraph_average_path_length()`  and `igraph_diameter()` now return `IGRAPH_INFINITY` when `unconn=FALSE` and the graph is not connected. Previously they returned the number of vertices.
+ - Trait-based random graph generators:
+   * `igraph_callaway_traits_game()` and `igraph_establishment_game()` now have an optional output argument to retrieve the generated vertex types.
+   * `igraph_callaway_traits_game()` and `igraph_establishment_game()` now allow omitting the type distribution vector, in which case they assume a uniform distribution.
+   * `igraph_asymmetric_preference_game()` now accept a different number of in-types and out-types.
  - `igraph_subisomorphic_lad()` now supports graphs with self-loops.
  - `igraph_is_chordal()` and `igraph_maximum_cardinality_search()` now support non-simple graphs and directed graphs.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
@@ -98,13 +103,16 @@
  - The actual cutoff distance used in closeness calculation was one smaller than the `cutoff` parameter. This is corrected (PR #1630).
  - `igraph_layout_gem()` was not interruptible; now it is.
  - `igraph_barabasi_aging_game()` now checks its parameters more carefully.
- - `igraph_callaway_traits_game()` now checks its parameters.
+ - `igraph_callaway_traits_game()` and `igraph_establishment_game()` now check their parameters.
  - `igraph_lastcit_game()` checks its parameters more carefully, and no longer crashes with zero vertices (PR #1625).
+ - `igraph_cited_type_game()` incorrectly rounded the attractivity vector entries to integers.
  - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (PR #1598).
  - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
  - `igraph_incident()` now returns edges in the same order as `igraph_neighbors()`.
  - `igraph_modularity_matrix()` returned incorrect results for weighted graphs. This is now fixed. (PR #1649, thanks to Daniel Noom!)
+ - `igraph_lapack_dgetrf()` would crash when passing `NULL` for its `ipiv` argument (thanks for the fix to Daniel Noom).
+ - Some `igraph_matrix` functions would fail to report errors on out-of-memory conditions.
  - PageRank (PR #1640):
    * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
    * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.
@@ -112,7 +120,8 @@
    * `igraph_personalized_pagerank(_vs)()`: the result retuned for edgeless or all-zero-weight graphs with the `IGRAPH_PAGERANK_ALGO_ARPACK` ignored the personalization vector. This is now corrected.
    * `igraph_personalized_pagerank(_vs)()` with a non-uniform personalization vector, a disconnected graph and the `IGRAPH_PAGERANK_ALGO_PRPACK` method would return results that were inconsistent with `IGRAPH_PAGERANK_ALGO_ARPACK`. This happened because PRPACK always used a uniform reset distribution when the random walk got stuck in a sink vertex. Now it uses the user-specified reset distribution for this case as well.
  - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
- - Weighted betweenness, closeness, PageRank and shortest path calculations, as well as random walk functions now check if any weights are NaN.
+ - Weighted betweenness, closeness, PageRank, shortest path calculations and random walk functions now check if any weights are NaN.
+ - Many functions reject input arguments containing NaN values.
  - Compatibility with the PGI compiler.
 
 ### Other
@@ -122,6 +131,7 @@
  - More robust error handling.
  - General code cleanup to reduce the number of compiler warnings.
  - igraph's source files have been re-organized for better maintainability.
+ - Debugging aid: When igraph is build with AddressSanitizer, the default error handler prints a stack trace before exiting.
  - igraph can now be built with an external CXSparse library.
  - The references to igraph source files in error and warning messages are now always relative to igraph's base directory.
  - When igraph is built as a shared library, only public symbols are exported even on Linux and macOS.
