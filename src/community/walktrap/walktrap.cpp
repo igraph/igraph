@@ -155,12 +155,13 @@ int igraph_community_walktrap(const igraph_t *graph,
     }
 
     if (membership) {
-        long int m = igraph_vector_which_max(modularity);
+        long int m;
+        m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
         IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
                      /*steps=*/ m,
                      membership,
-                     /*csize=*/ 0));
+                     /*csize=*/ NULL));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
