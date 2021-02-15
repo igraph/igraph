@@ -81,7 +81,7 @@
  * \param merges The two-column matrix containing the merge
  *    operations. See \ref igraph_community_walktrap() for the
  *    detailed syntax.
- * \param nodes The number of leaf nodes in the dendrogram
+ * \param nodes The number of leaf nodes in the dendrogram.
  * \param steps Integer constant, the number of steps to take.
  * \param membership Pointer to an initialized vector, the membership
  *    results will be stored here, if not NULL. The vector will be
@@ -111,7 +111,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
 
     if (steps > igraph_matrix_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
-                      IGRAPH_PRId "steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
+                      IGRAPH_PRId " steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
     }
 
     if (igraph_matrix_ncol(merges) != 2) {
