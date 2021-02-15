@@ -270,7 +270,7 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
  * to a given graph.
  */
 int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
-                                int n, igraph_real_t corr, igraph_real_t p,
+                                igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
                                 igraph_bool_t directed,
                                 const igraph_vector_t *permutation) {
 

@@ -36,11 +36,11 @@
 
 /**
  * \function igraph_shortest_paths_dijkstra
- * Weighted shortest paths from some sources.
+ * \brief Weighted shortest path lengths between vertices.
  *
- * This function is Dijkstra's algorithm to find the weighted
- * shortest paths to all vertices from a single source. (It is run
- * independently for the given sources.) It uses a binary heap for
+ * This function implements Dijkstra's algorithm to find the weighted
+ * shortest path lengths to all vertices from a single source. It is run
+ * independently for the given sources. It uses a binary heap for
  * efficient implementation.
  *
  * \param graph The input graph, can be directed.
@@ -222,7 +222,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 /**
  * \ingroup structural
  * \function igraph_get_shortest_paths_dijkstra
- * \brief Calculates the weighted shortest paths from/to one vertex.
+ * \brief Weighted shortest paths from a vertex.
  *
  * </para><para>
  * If there is more than one path with the smallest weight between two vertices, this
@@ -533,7 +533,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
 /**
  * \function igraph_get_shortest_path_dijkstra
- * Weighted shortest path from one vertex to another one.
+ * \brief Weighted shortest path from one vertex to another one.
  *
  * Calculates a single (positively) weighted shortest path from
  * a single vertex to another one, using Dijkstra's algorithm.
@@ -625,7 +625,7 @@ static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
 /**
  * \ingroup structural
  * \function igraph_get_all_shortest_paths_dijkstra
- * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices.
+ * \brief All weighted shortest paths (geodesics) from a vertex.
  *
  * \param graph The graph object.
  * \param res Pointer to an initialized pointer vector, the result

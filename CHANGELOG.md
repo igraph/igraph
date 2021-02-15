@@ -23,6 +23,7 @@
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
  - The new `IGRAPH_WARNINGF`, `IGRAPH_ERRORF` and `IGRAPH_FATALF` macros provide warning/error reporting with `printf`-like syntax. (PR #1627, thanks to Daniel Noom!)
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
+ - `igraph_get_shortest_paths_bellman_ford()` computes the shortest paths (including the vertex and edge IDs along the paths) using the Bellman-Ford algorithm (PR #1642, thanks to Guy Rozenberg). This makes it possible to calculate the shortest paths on graphs with negative edge weights, which was not possible before with Dijkstra's algorithm.
  - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
  - Harmonic centrality (PR #1583):
    * `igraph_harmonic_centrality()` computes the harmonic centrality of vertices.

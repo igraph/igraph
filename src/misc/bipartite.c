@@ -511,7 +511,6 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
         (igraph_integer_t) igraph_vector_bool_size(types);
     long int no_of_edges = igraph_vector_size(edges);
     igraph_real_t min_edge = 0, max_edge = 0;
-    igraph_bool_t min_type = 0, max_type = 0;
     long int i;
 
     if (no_of_edges % 2 != 0) {
@@ -524,14 +523,6 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
     }
     if (min_edge < 0 || max_edge >= no_of_nodes) {
         IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
-    }
-
-    /* Check types vector */
-    if (no_of_nodes != 0) {
-        igraph_vector_bool_minmax(types, &min_type, &max_type);
-        if (min_type < 0 || max_type > 1) {
-            IGRAPH_WARNING("Non-binary type vector when creating a bipartite graph");
-        }
     }
 
     /* Check bipartiteness */

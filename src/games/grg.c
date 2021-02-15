@@ -28,20 +28,25 @@
 
 /**
  * \function igraph_grg_game
- * \brief Generating geometric random graphs.
+ * \brief Generates a geometric random graph.
  *
  * A geometric random graph is created by dropping points (=vertices)
- * randomly to the unit square and then connecting all those pairs
- * which are less than \c radius apart in Euclidean norm.
+ * randomly on the unit square and then connecting all those pairs
+ * which are less than \c radius apart in Euclidean distance.
  *
  * </para><para>
  * Original code contributed by Keith Briggs, thanks Keith.
- * \param graph Pointer to an uninitialized graph object,
+ *
+ * \param graph Pointer to an uninitialized graph object.
  * \param nodes The number of vertices in the graph.
  * \param radius The radius within which the vertices will be connected.
- * \param torus Logical constant, if true periodic boundary conditions
+ * \param torus Logical constant. If true, periodic boundary conditions
  *        will be used, i.e. the vertices are assumed to be on a torus
  *        instead of a square.
+ * \param x An initialized vector or \c NULL. If not \c NULL, the points'
+ *          x coordinates will be returned here.
+ * \param y An initialized vector or \c NULL. If not \c NULL, the points'
+ *          y coordinates will be returned here.
  * \return Error code.
  *
  * Time complexity: TODO, less than O(|V|^2+|E|).
@@ -149,5 +154,5 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

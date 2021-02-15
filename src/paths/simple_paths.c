@@ -33,9 +33,9 @@
 
 /**
  * \function igraph_get_all_simple_paths
- * List all simple paths from one source
+ * \brief List all simple paths from one source.
  *
- * A path is simple, if its vertices are unique, no vertex
+ * A path is simple if its vertices are unique, i.e. no vertex
  * is visited more than once.
  *
  * </para><para>

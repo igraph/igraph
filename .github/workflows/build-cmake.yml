@@ -1,4 +1,4 @@
-name: MINGW32 / MINGW64 (MSYS2) - cmake build
+name: MINGW
 
 # TODO: Check the BRANCHES element when merging the branch 'develop' to, say, 'master'.
 on:
