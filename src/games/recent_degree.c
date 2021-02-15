@@ -40,7 +40,7 @@
  *        new edge is proportional to the number of edges it has
  *        gained recently (in the last \p window time steps) to \p
  *        power.
- * \param window Integer constant, the size of the time window to use
+ * \param time_window Integer constant, the size of the time window to use
  *        to count the number of recent edges.
  * \param m Integer constant, the number of edges to add per time
  *        step if the \p outseq parameter is a null pointer or a
@@ -63,7 +63,7 @@
  */
 int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
                               igraph_real_t power,
-                              igraph_integer_t window,
+                              igraph_integer_t time_window,
                               igraph_integer_t m,
                               const igraph_vector_t *outseq,
                               igraph_bool_t outpref,
@@ -78,7 +78,6 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_psumtree_t sumtree;
     long int edgeptr = 0;
     igraph_vector_t degree;
-    long int time_window = window;
     igraph_dqueue_t history;
 
     if (no_of_nodes < 0) {
@@ -95,7 +94,6 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
     if (time_window < 0) {
         IGRAPH_ERRORF("Time window cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, time_window);
     }
-
     if (zero_appeal < 0) {
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
@@ -109,8 +107,9 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
         no_of_neighbors = m;
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
+        long int outseq_len = igraph_vector_size(outseq);
         no_of_edges = 0;
-        for (i = 1; i < igraph_vector_size(outseq); i++) {
+        for (i = 1; i < outseq_len; i++) {
             no_of_edges += VECTOR(*outseq)[i];
         }
     }
@@ -120,7 +119,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_dqueue_init(&history,
-                                    time_window * (no_of_neighbors + 1) + 10));
+                                    1.5 * time_window * no_of_edges / no_of_nodes + 10));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
 
     RNG_BEGIN();
@@ -261,13 +260,20 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     if (aging_bins <= 0) {
         IGRAPH_ERRORF("Aging bins should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);
     }
+    if (time_window < 0) {
+        IGRAPH_ERRORF("Time window cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, time_window);
+    }
+    if (zero_appeal < 0) {
+        IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
+    }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
         no_of_neighbors = m;
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
+        long int outseq_len = igraph_vector_size(outseq);
         no_of_edges = 0;
-        for (i = 1; i < igraph_vector_size(outseq); i++) {
+        for (i = 1; i < outseq_len; i++) {
             no_of_edges += VECTOR(*outseq)[i];
         }
     }
@@ -279,7 +285,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_dqueue_init(&history,
-                                    time_window * (no_of_neighbors + 1) + 10));
+                                    1.5 * time_window * no_of_edges / no_of_nodes + 10));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
 
     RNG_BEGIN();
