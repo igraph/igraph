@@ -1,5 +1,5 @@
 [![Build Status on Azure Pipelines](https://dev.azure.com/igraph-team/igraph/_apis/build/status/igraph.igraph?branchName=develop)](https://dev.azure.com/igraph-team/igraph/_build/latest?definitionId=1&branchName=develop)
-![Build Status on Github Actions](https://github.com/igraph/igraph/workflows/MINGW32%20/%20MINGW64%20(MSYS2)%20-%20cmake%20build/badge.svg?branch=develop)
+![Build Status on Github Actions](https://github.com/igraph/igraph/workflows/MINGW/badge.svg?branch=develop)
 
 [![DOI](https://zenodo.org/badge/8546198.svg)](https://zenodo.org/badge/latestdoi/8546198)
 
