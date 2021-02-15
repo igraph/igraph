@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 #define EPS 1e-13
 
 
@@ -45,10 +47,10 @@ void test_1x1(igraph_real_t value) {
     options.mode = 1;
     igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
                                     &values, &vectors);
-    printf("rnsolve:\n  - eigenvalues:\n    ");
-    igraph_matrix_print(&values);
-    printf("  - eigenvectors:\n    ");
-    igraph_matrix_print(&vectors);
+    printf("rnsolve:\n  - eigenvalues:\n");
+    print_matrix(&values);
+    printf("  - eigenvectors:\n");
+    print_matrix(&vectors);
     igraph_matrix_destroy(&values);
     igraph_matrix_destroy(&vectors);
 
@@ -57,10 +59,10 @@ void test_1x1(igraph_real_t value) {
     options.mode = 1;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values2, &vectors, IGRAPH_SPARSEMAT_SOLVE_LU);
-    printf("rssolve:\n  - eigenvalues:\n    ");
-    igraph_vector_print(&values2);
-    printf("  - eigenvectors:\n    ");
-    igraph_matrix_print(&vectors);
+    printf("rssolve:\n  - eigenvalues:\n");
+    print_vector(&values2);
+    printf("  - eigenvectors:\n");
+    print_matrix(&vectors);
     igraph_vector_destroy(&values2);
     igraph_matrix_destroy(&vectors);
 
@@ -90,10 +92,10 @@ void test_2x2(igraph_real_t a, igraph_real_t b, igraph_real_t c, igraph_real_t d
     igraph_matrix_init(&vectors, 0, 0);
     igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
                                     &values, &vectors);
-    printf("rnsolve:\n  - eigenvalues:\n    ");
-    igraph_matrix_print(&values);
-    printf("  - eigenvectors:\n    ");
-    igraph_matrix_print(&vectors);
+    printf("rnsolve:\n  - eigenvalues:\n");
+    print_matrix(&values);
+    printf("  - eigenvectors:\n");
+    print_matrix(&vectors);
     igraph_matrix_destroy(&values);
     igraph_matrix_destroy(&vectors);
 
@@ -102,10 +104,10 @@ void test_2x2(igraph_real_t a, igraph_real_t b, igraph_real_t c, igraph_real_t d
         igraph_matrix_init(&vectors, 0, 0);
         igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                         &values2, &vectors, IGRAPH_SPARSEMAT_SOLVE_QR);
-        printf("rssolve:\n  - eigenvalues:\n    ");
-        igraph_vector_print(&values2);
-        printf("  - eigenvectors:\n    ");
-        igraph_matrix_print(&vectors);
+        printf("rssolve:\n  - eigenvalues:\n");
+        print_vector(&values2);
+        printf("  - eigenvectors:\n");
+        print_matrix(&vectors);
         igraph_vector_destroy(&values2);
         igraph_matrix_destroy(&vectors);
     }
@@ -126,6 +128,7 @@ int main() {
     /***********************************************************************/
 
     /* Identity matrix */
+    printf("== Identity matrix ==\n");
 #define DIM 10
     igraph_sparsemat_init(&A, DIM, DIM, DIM);
     for (i = 0; i < DIM; i++) {
@@ -140,24 +143,19 @@ int main() {
     options.mode = 1;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ 0, /*solvemethod=*/0);
-    if (VECTOR(values)[0] != 1.0) {
-        return 1;
-    }
+    IGRAPH_ASSERT(VECTOR(values)[0] == 1.0);
 
     options.mode = 3;
     options.sigma = 2;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ 0,
                                     IGRAPH_SPARSEMAT_SOLVE_LU);
-    if (VECTOR(values)[0] != 1.0) {
-        return 21;
-    }
+    IGRAPH_ASSERT(VECTOR(values)[0] == 1.0);
+
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ 0,
                                     IGRAPH_SPARSEMAT_SOLVE_QR);
-    if (VECTOR(values)[0] != 1.0) {
-        return 31;
-    }
+    IGRAPH_ASSERT(VECTOR(values)[0] == 1.0);
 
     igraph_vector_destroy(&values);
     igraph_sparsemat_destroy(&B);
@@ -167,6 +165,7 @@ int main() {
     /***********************************************************************/
 
     /* Diagonal matrix */
+    printf("\n== Diagonal matrix ==\n");
 #define DIM 10
     igraph_sparsemat_init(&A, DIM, DIM, DIM);
     for (i = 0; i < DIM; i++) {
@@ -178,58 +177,50 @@ int main() {
     igraph_vector_init(&values, 0);
     igraph_matrix_init(&vectors, 0, 0);
 
+    /* Regular mode */
     options.mode = 1;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ &vectors,
                                     /*solvemethod=*/ 0);
     if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
-        printf("VECTOR(values)[0] numerical precision is only %g, should be %g",
+        printf("Regular: VECTOR(values)[0] numerical precision is only %g, should be %g",
                fabs((double)VECTOR(values)[0] - DIM), EPS);
-        return 2;
+        abort();
     }
 
-    if ( fabs(fabs(MATRIX(vectors, DIM - 1, 0)) - 1.0) > EPS) {
-        return 3;
-    }
+    IGRAPH_ASSERT( fabs(fabs(MATRIX(vectors, DIM - 1, 0)) - 1.0) < EPS);
+
     MATRIX(vectors, DIM - 1, 0) = 0.0;
     igraph_matrix_minmax(&vectors, &min, &max);
-    if (fabs(min) > EPS) {
-        return 3;
-    }
-    if (fabs(max) > EPS) {
-        return 3;
-    }
+    IGRAPH_ASSERT(fabs(min) < EPS);
+    IGRAPH_ASSERT(fabs(max) < EPS);
 
+    /* Shift and invert mode */
     options.mode = 3;
     options.sigma = 11;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ &vectors,
                                     IGRAPH_SPARSEMAT_SOLVE_LU);
     if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
-        printf("VECTOR(values)[0] numerical precision is only %g, should be %g",
+        printf("Shift and invert, LU: VECTOR(values)[0] numerical precision is only %g, should be %g",
                fabs((double)VECTOR(values)[0] - DIM), EPS);
-        return 22;
+        abort();
     }
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ &vectors,
                                     IGRAPH_SPARSEMAT_SOLVE_QR);
     if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
-        printf("VECTOR(values)[0] numerical precision is only %g, should be %g",
+        printf("Shift and invert, QR: VECTOR(values)[0] numerical precision is only %g, should be %g",
                fabs((double)VECTOR(values)[0] - DIM), EPS);
-        return 32;
+        abort();
     }
 
-    if ( fabs(fabs(MATRIX(vectors, DIM - 1, 0)) - 1.0) > EPS) {
-        return 23;
-    }
+    IGRAPH_ASSERT( fabs(fabs(MATRIX(vectors, DIM - 1, 0)) - 1.0) < EPS);
+
     MATRIX(vectors, DIM - 1, 0) = 0.0;
     igraph_matrix_minmax(&vectors, &min, &max);
-    if (fabs(min) > EPS) {
-        return 23;
-    }
-    if (fabs(max) > EPS) {
-        return 23;
-    }
+    IGRAPH_ASSERT(fabs(min) < EPS);
+    IGRAPH_ASSERT(fabs(max) < EPS);
 
     igraph_vector_destroy(&values);
     igraph_matrix_destroy(&vectors);
@@ -239,6 +230,7 @@ int main() {
     /***********************************************************************/
 
     /* A tree, plus a ring */
+    printf("\n== A tree, plus a ring ==\n");
 #define DIM 10
     igraph_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_UNDIRECTED);
     igraph_ring(&g2, DIM, IGRAPH_UNDIRECTED, /*mutual=*/ 0, /*circular=*/ 1);
@@ -254,6 +246,7 @@ int main() {
     igraph_vector_init(&values, 0);
     igraph_matrix_init(&vectors, 0, 0);
 
+    /* Regular mode */
     options.mode = 1;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, &vectors, /*solvemethod=*/ 0);
@@ -262,9 +255,13 @@ int main() {
         igraph_matrix_scale(&vectors, -1.0);
     }
 
-    igraph_vector_print(&values);
-    igraph_matrix_print(&vectors);
+    printf("\nRegular:\n");
+    printf("Eigenvalues:\n");
+    print_vector(&values);
+    printf("Eigenvectors:\n");
+    print_matrix(&vectors);
 
+    /* Shift and invert mode */
     options.mode = 3;
     options.sigma = VECTOR(values)[0] * 1.1;
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
@@ -274,8 +271,11 @@ int main() {
     if (MATRIX(vectors, 0, 0) < 0.0) {
         igraph_matrix_scale(&vectors, -1.0);
     }
-    igraph_vector_print(&values);
-    igraph_matrix_print(&vectors);
+    printf("\nShift and invert, LU:\n");
+    printf("Eigenvalues:\n");
+    print_vector(&values);
+    printf("Eigenvectors:\n");
+    print_matrix(&vectors);
 
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, &vectors,
@@ -283,19 +283,22 @@ int main() {
     if (MATRIX(vectors, 0, 0) < 0.0) {
         igraph_matrix_scale(&vectors, -1.0);
     }
-    igraph_vector_print(&values);
-    igraph_matrix_print(&vectors);
+    printf("\nShift and invert, QR:\n");
+    printf("Eigenvalues:\n");
+    print_vector(&values);
+    printf("Eigenvectors:\n");
+    print_matrix(&vectors);
 
     igraph_vector_destroy(&values);
     igraph_matrix_destroy(&vectors);
     igraph_sparsemat_destroy(&B);
 #undef DIM
 
-    printf("--\n");
 
     /***********************************************************************/
 
     /* A directed tree and a directed, mutual ring */
+    printf("\n== A directed tree and a directed, mutual ring ==\n");
 #define DIM 10
     igraph_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
     igraph_ring(&g2, DIM, IGRAPH_DIRECTED, /*mutual=*/ 1, /*circular=*/ 1);
@@ -311,6 +314,7 @@ int main() {
     igraph_matrix_init(&values2, 0, 0);
     igraph_matrix_init(&vectors, 0, 0);
 
+    /* Regular mode */
     options.mode = 1;
     igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
                                     &values2, &vectors);
@@ -319,8 +323,11 @@ int main() {
         igraph_matrix_scale(&vectors, -1.0);
     }
 
-    igraph_matrix_print(&values2);
-    igraph_matrix_print(&vectors);
+    printf("\nRegular:\n");
+    printf("Eigenvalues:\n");
+    print_matrix(&values2);
+    printf("Eigenvectors:\n");
+    print_matrix(&vectors);
 
     igraph_matrix_destroy(&values2);
     igraph_matrix_destroy(&vectors);
@@ -330,6 +337,7 @@ int main() {
     /***********************************************************************/
 
     /* A small test graph */
+    printf("\n== A small test graph ==\n");
 
     igraph_small(&g1, 11, IGRAPH_DIRECTED,
                  0, 1, 1, 3, 1, 8, 2, 10, 3, 6, 3, 10, 4, 2, 5, 4,
@@ -344,6 +352,7 @@ int main() {
     igraph_matrix_init(&values2, 0, 0);
     igraph_matrix_init(&vectors, 0, 0);
 
+    /* Regular mode */
     options.mode = 1;
     igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
                                     &values2, &vectors);
@@ -352,6 +361,12 @@ int main() {
         igraph_matrix_scale(&vectors, -1.0);
     }
 
+    printf("\nRegular:\n");
+    printf("Eigenvalues:\n");
+    print_matrix(&values2);
+    printf("Eigenvectors:\n");
+    print_matrix(&vectors);
+
     igraph_matrix_destroy(&values2);
     igraph_matrix_destroy(&vectors);
     igraph_sparsemat_destroy(&B);
@@ -359,7 +374,7 @@ int main() {
     /***********************************************************************/
 
     /* Testing the special case solver for 1x1 matrices */
-    printf("--\n");
+    printf("\n== Testing the special case solver for 1x1 matrices ==\n");
     test_1x1(2);
     test_1x1(0);
     test_1x1(-3);
@@ -367,11 +382,13 @@ int main() {
     /***********************************************************************/
 
     /* Testing the special case solver for 2x2 matrices */
-    printf("--\n");
+    printf("\n== Testing the special case solver for 2x2 matrices ==\n");
     test_2x2(1, 2, 2, 4);      /* symmetric */
     test_2x2(1, 2, 3, 4);      /* non-symmetric, real eigenvalues */
     test_2x2(1, -5, 10, 4);    /* non-symmetric, complex eigenvalues */
     test_2x2(0, 0, 0, 0);      /* symmetric, pathological */
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

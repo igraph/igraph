@@ -37,7 +37,6 @@ add_examples(
   igraph_sparsemat
   igraph_sparsemat3
   igraph_sparsemat4
-  igraph_sparsemat5
   igraph_sparsemat6
   igraph_sparsemat7
   igraph_sparsemat8
@@ -50,6 +49,7 @@ add_legacy_tests(
   igraph_array
   igraph_complex
   igraph_psumtree
+  igraph_sparsemat5
   igraph_sparsemat9
   igraph_sparsemat_is_symmetric
   igraph_sparsemat_minmax
@@ -215,6 +215,7 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_is_bipartite
   igraph_is_tree
+  igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
   igraph_pagerank
   igraph_transitive_closure_dag
@@ -451,7 +452,7 @@ add_legacy_tests(
 )
 
 # use a higher test timeout for the Infomap algorithm
-set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 120)
+set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 150)
 
 # cliques.at
 add_examples(
