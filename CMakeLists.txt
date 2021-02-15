@@ -6,13 +6,22 @@ cmake_minimum_required(VERSION 3.16)
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
 
+# Set a default build type if none was specified
+# This must precede the project() line, which would set the CMAKE_BUILD_TYPE
+# to 'Debug' with single-config generators on Windows.
+include(BuildType)
+
 # Prevent in-source builds
 include(PreventInSourceBuilds)
 
-# Make use of ccache if it is present on the host system
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+# Make use of ccache if it is present on the host system -- unless explicitly
+# asked to disable it
+option(USE_CCACHE "Use ccache to speed up compilation if it is installed" ON)
+if(USE_CCACHE)
+  find_program(CCACHE_PROGRAM ccache)
+  if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+  endif()
 endif()
 
 # Include some compiler-related helpers and set global compiler options
@@ -30,8 +39,9 @@ project(
   LANGUAGES C CXX
 )
 
-# Set a default build type if none was specified
-include(BuildType)
+# Set default symbol visibility to hidden
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)
@@ -70,6 +80,8 @@ endif()
 # First we check for some functions and symbols
 check_symbol_exists(expm1 math.h HAVE_EXPM1)
 check_symbol_exists(fmin math.h HAVE_FMIN)
+check_symbol_exists(finite math.h HAVE_FINITE)
+check_symbol_exists(isfinite math.h HAVE_ISFINITE)
 check_symbol_exists(log2 math.h HAVE_LOG2)
 check_symbol_exists(log1p math.h HAVE_LOG1P)
 check_symbol_exists(rint math.h HAVE_RINT)

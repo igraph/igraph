@@ -31,7 +31,7 @@ int main() {
     int i, n;
 
     /* turn on attribute handling */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     ifile = fopen("bipartite.net", "r");
     if (!ifile) {

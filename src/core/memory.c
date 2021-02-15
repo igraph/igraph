@@ -22,7 +22,6 @@
 */
 
 #include "igraph_memory.h"
-#include "config.h"
 
 /**
  * \function igraph_free

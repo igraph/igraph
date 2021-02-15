@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,39 +22,60 @@
 
 #include <igraph.h>
 
-void vector_print(igraph_vector_t *v) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
-    }
-    printf("\n");
+igraph_bool_t bfs_callback(const igraph_t *graph,
+                           igraph_integer_t vid,
+                           igraph_integer_t pred,
+                           igraph_integer_t succ,
+                           igraph_integer_t rank,
+                           igraph_integer_t dist,
+                           void *extra) {
+    printf(" %li", (long int) vid);
+    return 0;
 }
 
 int main() {
 
-    igraph_t g;
-    igraph_vector_t vids, layers, parents;
+    igraph_t graph, ring;
+    igraph_vector_t order, rank, father, pred, succ, dist;
 
-    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 0);
-    igraph_vector_init(&vids, 0);
-    igraph_vector_init(&layers, 0);
-    igraph_vector_init(&parents, 0);
-    igraph_i_bfs(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
-    vector_print(&vids);
-    vector_print(&layers);
-    vector_print(&parents);
-    igraph_destroy(&g);
+    /* Create a disjoint union of two rings */
+    igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
+    igraph_disjoint_union(&graph, &ring, &ring);
+    igraph_destroy(&ring);
 
-    igraph_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
-    igraph_i_bfs(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
-    vector_print(&vids);
-    vector_print(&layers);
-    vector_print(&parents);
-    igraph_destroy(&g);
+    /* Initialize the vectors where the result will be stored. Any of these
+     * can be omitted and replaced with a null pointer when calling
+     * igraph_bfs() */
+    igraph_vector_init(&order, 0);
+    igraph_vector_init(&rank, 0);
+    igraph_vector_init(&father, 0);
+    igraph_vector_init(&pred, 0);
+    igraph_vector_init(&succ, 0);
+    igraph_vector_init(&dist, 0);
 
-    igraph_vector_destroy(&vids);
-    igraph_vector_destroy(&layers);
-    igraph_vector_destroy(&parents);
+    /* Now call the BFS function */
+    igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+               /*unreachable=*/ 1, /*restricted=*/ 0,
+               &order, &rank, &father, &pred, &succ, &dist,
+               /*callback=*/ 0, /*extra=*/ 0);
+
+    /* Print the results */
+    igraph_vector_print(&order);
+    igraph_vector_print(&rank);
+    igraph_vector_print(&father);
+    igraph_vector_print(&pred);
+    igraph_vector_print(&succ);
+    igraph_vector_print(&dist);
+
+    /* Cleam up after ourselves */
+    igraph_vector_destroy(&order);
+    igraph_vector_destroy(&rank);
+    igraph_vector_destroy(&father);
+    igraph_vector_destroy(&pred);
+    igraph_vector_destroy(&succ);
+    igraph_vector_destroy(&dist);
+
+    igraph_destroy(&graph);
 
     return 0;
 }

@@ -22,16 +22,18 @@
 
 */
 
-#include "igraph_adjlist.h"
 #include "igraph_community.h"
+
+#include "igraph_adjlist.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "core/interruption.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_stack.h"
 #include "igraph_vector.h"
 #include "igraph_constructors.h"
+
+#include "core/interruption.h"
 
 /* Move nodes in order to improve the quality of a partition.
  *
@@ -785,7 +787,7 @@ int igraph_i_community_leiden(const igraph_t *graph,
     do {
 
         /* Get incidence list for fast iteration */
-        IGRAPH_CHECK(igraph_inclist_init( i_graph, &edges_per_node, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init( i_graph, &edges_per_node, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &edges_per_node);
 
         /* Move around the nodes in order to increase the quality */

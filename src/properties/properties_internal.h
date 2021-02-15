@@ -21,12 +21,13 @@
 
 */
 
-#ifndef STRUCTURAL_PROPERTIES_INTERNAL_H
-#define STRUCTURAL_PROPERTIES_INTERNAL_H
+#ifndef IGRAPH_PROPERTIES_INTERNAL_H
+#define IGRAPH_PROPERTIES_INTERNAL_H
 
+#include "igraph_adjlist.h"
 #include "igraph_constants.h"
-#include "igraph_types.h"
 #include "igraph_iterators.h"
+#include "igraph_types.h"
 
 int igraph_i_induced_subgraph_suggest_implementation(
     const igraph_t *graph, const igraph_vs_t vids,
@@ -43,5 +44,8 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
         const igraph_vs_t vids,
         igraph_vector_t *map,
         igraph_vector_t *invmap);
+
+int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+                                const igraph_vector_int_t *rank);
 
 #endif

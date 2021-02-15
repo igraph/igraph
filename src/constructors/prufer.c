@@ -27,7 +27,7 @@
 /**
  * \ingroup generators
  * \function igraph_from_prufer
- * \brief Generates a tree from a Pr&uuml;fer sequence
+ * \brief Generates a tree from a Pr&uuml;fer sequence.
  *
  * A Pr&uuml;fer sequence is a unique sequence of integers associated
  * with a labelled tree. A tree on n vertices can be represented by a

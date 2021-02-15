@@ -39,7 +39,7 @@ static void igraph_i_citing_cited_type_game_free (
 
 /**
  * \function igraph_lastcit_game
- * \brief Simulate citation network, based on time passed since the last citation.
+ * \brief Simulates a citation network, based on time passed since the last citation.
  *
  * This is a quite special stochastic graph generator, it models an
  * evolving graph. In each time step a single vertex is added to the
@@ -205,7 +205,7 @@ int igraph_lastcit_game(igraph_t *graph,
 
 /**
  * \function igraph_cited_type_game
- * \brief Simulate a citation based on vertex types.
+ * \brief Simulates a citation based on vertex types.
  *
  * Function to create a network based on some vertex categories. This
  * function creates a citation network, in each step a single vertex
@@ -335,7 +335,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
 
 /**
  * \function igraph_citing_cited_type_game
- * \brief Simulate a citation network based on vertex types.
+ * \brief Simulates a citation network based on vertex types.
  *
  * This game is similar to \ref igraph_cited_type_game() but here the
  * category of the citing vertex is also considered.

@@ -670,17 +670,17 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
     igraph_vector_init(&tmp, vc);
     IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
     if (!weights) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &outlist, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &outlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &outlist);
         if (!symmetric) {
-            IGRAPH_CHECK(igraph_adjlist_init(graph, &inlist, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_adjlist_init(graph, &inlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
             IGRAPH_FINALLY(igraph_adjlist_destroy, &inlist);
         }
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &eoutlist, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &eoutlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &eoutlist);
         if (!symmetric) {
-            IGRAPH_CHECK(igraph_inclist_init(graph, &einlist, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_inclist_init(graph, &einlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
             IGRAPH_FINALLY(igraph_inclist_destroy, &einlist);
         }
     }

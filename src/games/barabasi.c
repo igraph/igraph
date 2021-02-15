@@ -485,47 +485,46 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
         IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
     }
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     } else if (newn < 0) {
-        IGRAPH_ERROR("Starting graph has too many vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting graph has too many vertices.", IGRAPH_EINVAL);
     }
     if (start_from && start_nodes == 0) {
-        IGRAPH_ERROR("Cannot start from an empty graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot start from an empty graph.", IGRAPH_EINVAL);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 &&
         igraph_vector_size(outseq) != newn) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid out-degree sequence length.", IGRAPH_EINVAL);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of edges added per step must not be negative.", IGRAPH_EINVAL);
     }
     if (outseq && igraph_vector_min(outseq) < 0) {
-        IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Negative out-degree in sequence.", IGRAPH_EINVAL);
     }
     if (!outpref && A <= 0) {
-        IGRAPH_ERROR("Constant attractiveness (A) must be positive",
+        IGRAPH_ERROR("Constant attractiveness (A) must be positive.",
                      IGRAPH_EINVAL);
     }
     if (outpref && A < 0) {
-        IGRAPH_ERROR("Constant attractiveness (A) must be non-negative",
+        IGRAPH_ERROR("Constant attractiveness (A) must be non-negative.",
                      IGRAPH_EINVAL);
     }
     if (algo == IGRAPH_BARABASI_BAG) {
         if (power != 1) {
-            IGRAPH_ERROR("Power must be one for 'bag' algorithm", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Power must be one for 'bag' algorithm.", IGRAPH_EINVAL);
         }
         if (A != 1) {
-            IGRAPH_ERROR("Constant attractiveness (A) must be one for bag algorithm",
+            IGRAPH_ERROR("Constant attractiveness (A) must be one for bag algorithm.",
                          IGRAPH_EINVAL);
         }
     }
     if (start_from && directed != igraph_is_directed(start_from)) {
-        IGRAPH_WARNING("Directedness of the start graph and the output graph"
-                       " mismatch");
+        IGRAPH_WARNING("Directedness of the start graph and the output graph mismatch.");
     }
     if (start_from && !igraph_is_directed(start_from) && !outpref) {
-        IGRAPH_ERROR("`outpref' must be true if starting from an undirected "
-                     "graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`outpref' must be true if starting from an undirected graph.",
+                     IGRAPH_EINVAL);
     }
 
     if (n == 0) {
@@ -552,25 +551,29 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  * \brief Preferential attachment with aging of vertices
  *
  * </para><para>
- * In this game, the probability that a node gains a new edge is
- * given by its (in-)degree (k) and age (l). This probability has a
- * degree dependent component multiplied by an age dependent
- * component. The degree dependent part is: \p deg_coef times k to the
- * power of \p pa_exp plus \p zero_deg_appeal; and the age dependent
- * part is \p age_coef times l to the power of \p aging_exp plus \p
- * zero_age_appeal.
+ * This game starts with one vertex (if \p nodes > 0). In each step
+ * a new node is added, and it is connected to \p m existing nodes.
+ * Existing nodes to connect to are chosen with probability dependent
+ * on their (in-)degree (\c k) and age (\c l).
+ * The degree-dependent part is
+ * <code>deg_coef * k^pa_exp + zero_deg_appeal</code>,
+ * while the age-dependent part is
+ * <code>age_coef * l^aging_exp + zero_age_appeal</code>,
+ * which are summed to obtain the final weight.
  *
  * </para><para>
- * The age is based on the number of vertices in the
- * network and the \p aging_bin argument: vertices grew one unit older
- * after each \p aging_bin vertices added to the network.
+ * The age \c l is based on the number of vertices in the
+ * network and the \p aging_bins argument: the age of a node
+ * is incremented by 1 after each
+ * <code>floor(nodes / aging_bins) + 1</code>
+ * time steps.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param nodes The number of vertices in the graph.
- * \param m The number of edges to add in each time step. If the \p
- *        outseq argument is not a null vector and not a zero-length
- *        vector.
+ * \param m The number of edges to add in each time step.
+ *        Ignored if \p outseq is a non-zero length vector.
  * \param outseq The number of edges to add in each time step. If it
- *        is a null pointer or a zero-length vector then it is ignored
+ *        is \c NULL or a zero-length vector then it is ignored
  *        and the \p m argument is used instead.
  * \param outpref Logical constant, whether the edges
  *        initiated by a vertex contribute to the probability to gain
@@ -580,8 +583,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  *        linear preferential attachment.
  * \param aging_exp The exponent of the aging, this is a negative
  *        number usually.
- * \param aging_bin Integer constant, the number of vertices to add
- *        before vertices in the network grew one unit older.
+ * \param aging_bins Integer constant, the number of age bins to use.
  * \param zero_deg_appeal The degree dependent part of the
  *        attractiveness of the zero degree vertices.
  * \param zero_age_appeal The age dependent part of the attractiveness
@@ -592,7 +594,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  *        graph.
  * \return Error code.
  *
- * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
+ * Time complexity: O((|V|+|V|/aging_bins)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
 int igraph_barabasi_aging_game(igraph_t *graph,
@@ -602,7 +604,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                                igraph_bool_t outpref,
                                igraph_real_t pa_exp,
                                igraph_real_t aging_exp,
-                               igraph_integer_t aging_bin,
+                               igraph_integer_t aging_bins,
                                igraph_real_t zero_deg_appeal,
                                igraph_real_t zero_age_appeal,
                                igraph_real_t deg_coef,
@@ -610,7 +612,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                                igraph_bool_t directed) {
     long int no_of_nodes = nodes;
     long int no_of_neighbors = m;
-    long int binwidth = nodes / aging_bin + 1;
+    long int binwidth;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j, k;
@@ -619,23 +621,50 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     igraph_vector_t degree;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of nodes must not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The length of the out-degree sequence (%ld) does not agree with the number of nodes (%ld).",
+                       IGRAPH_EINVAL,
+                       igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The number of edges per time step must not be negative, got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL,
+                      m);
     }
-    if (aging_bin <= 0) {
-        IGRAPH_ERROR("Invalid aging bin", IGRAPH_EINVAL);
+    if (aging_bins <= 0) {
+        IGRAPH_ERRORF("Number of aging bins must be positive, got %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     aging_bins);
     }
     if (deg_coef < 0) {
-        IGRAPH_ERROR("Degree coefficient must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Degree coefficient must be non-negative, got %g.",
+                     IGRAPH_EINVAL,
+                     deg_coef);
     }
     if (age_coef < 0) {
-        IGRAPH_ERROR("Age coefficient must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Age coefficient must be non-negative, got %g.",
+                     IGRAPH_EINVAL,
+                     deg_coef);
     }
+
+    if (zero_deg_appeal < 0) {
+        IGRAPH_ERRORF("Zero degree appeal must be non-negative, got %g.",
+                     IGRAPH_EINVAL,
+                     zero_deg_appeal);
+    }
+    if (zero_age_appeal < 0) {
+        IGRAPH_ERRORF("Zero age appeal must be non-negative, got %g.",
+                     IGRAPH_EINVAL,
+                     zero_age_appeal);
+    }
+
+    if (no_of_nodes == 0) {
+         return igraph_empty(graph, 0, directed);
+    }
+
+    binwidth = no_of_nodes / aging_bins + 1;
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
         no_of_neighbors = m;
@@ -717,5 +746,5 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

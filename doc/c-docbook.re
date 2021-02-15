@@ -42,7 +42,7 @@ REPLACE ----- function object, extract its signature --------------------------
 [\s]*(?P<brief>[^\n]*?)\n        # brief description
 (?P<after>.*?)\*\/               # tail of the comment
 \s*
-(DECLDIR )?                      # strip DECLDIR from prototype
+(IGRAPH_EXPORT )?                # strip IGRAPH_EXPORT from prototype
 (?P<def>.*?\))                   # function head
 (?=(\s*;)|(\s*\{))               # prototype ends with ; function head with {
 .*\Z                             # and the remainder
@@ -618,8 +618,7 @@ WITH --------------------------------------------------------------------------
 
 REPLACE ----- add http:// and https:// links ----------------------------------
 
-(?P<link>https?:\/\/.*?)
-(?=(\s)|\))
+(?P<link>https?:\/\/[-\+=&;%@./~()'\w_]*[-\+=&;%@/~'\w_])
 
 WITH --------------------------------------------------------------------------
 

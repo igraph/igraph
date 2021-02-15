@@ -32,7 +32,7 @@ int main() {
     igraph_small(&g, 6, IGRAPH_DIRECTED,
                  0, 1, 0, 2, 1, 2, 1, 3, 2, 4, 3, 4, 3, 5, 4, 5, -1);
     igraph_small(&expected_residual, 6, IGRAPH_DIRECTED,
-		 0, 1, 1, 2, 1, 3, 2, 4, 3, 5, 4, 5, -1);
+         0, 1, 1, 2, 1, 3, 2, 4, 3, 5, 4, 5, -1);
     igraph_vector_init_int_end(&capacity, -1, 4, 2, 2, 3, 4, 1, 2, 5, -1);
     igraph_vector_init_int_end(&flow, -1, 3, 2, 1, 2, 3, 1, 1, 4, -1);
     igraph_vector_init_int_end(&expected_residual_capacity, -1, 1, 1, 1, 1, 1, 1, -1);

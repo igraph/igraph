@@ -23,10 +23,10 @@
 #include "igraph_operators.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_attributes.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
+#include "graph/attributes.h"
 #include "core/interruption.h"
 
 /**
@@ -79,9 +79,9 @@ int igraph_difference(igraph_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edge_ids, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_inclist_init(orig, &inc_orig, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_inclist_init(orig, &inc_orig, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inc_orig);
-    IGRAPH_CHECK(igraph_inclist_init(sub, &inc_sub, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_inclist_init(sub, &inc_sub, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inc_sub);
 
     smaller_nodes = no_of_nodes_orig > no_of_nodes_sub ?

@@ -80,7 +80,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_vector_long_init(&already_added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &already_added);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     IGRAPH_CHECK(igraph_vector_resize(res, 0));

@@ -20,8 +20,6 @@
 
 */
 
-#include <limits.h>
-
 #include "igraph_operators.h"
 
 #include "igraph_constructors.h"
@@ -31,6 +29,8 @@
 #include "igraph_qsort.h"
 
 #include "operators/misc_internal.h"
+
+#include <limits.h>
 
 /**
  * \function igraph_intersection

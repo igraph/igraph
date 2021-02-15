@@ -23,16 +23,7 @@
 #ifndef IGRAPH_CORE_TRIE_H
 #define IGRAPH_CORE_TRIE_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
-#else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_strvector.h"
 #include "igraph_vector.h"
@@ -66,15 +57,15 @@ typedef struct s_igraph_trie {
     do { IGRAPH_CHECK(igraph_trie_init(tr, sk)); \
         IGRAPH_FINALLY(igraph_trie_destroy, tr); } while (0)
 
-int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
-void igraph_trie_destroy(igraph_trie_t *t);
-int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
-int igraph_trie_check(igraph_trie_t *t, const char *key, long int *id);
-int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
-                     long int *id);
-void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
-int igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);
-long int igraph_trie_size(igraph_trie_t *t);
+IGRAPH_PRIVATE_EXPORT int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
+IGRAPH_PRIVATE_EXPORT void igraph_trie_destroy(igraph_trie_t *t);
+IGRAPH_PRIVATE_EXPORT int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
+IGRAPH_PRIVATE_EXPORT int igraph_trie_check(igraph_trie_t *t, const char *key, long int *id);
+IGRAPH_PRIVATE_EXPORT int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
+                                           long int *id);
+IGRAPH_PRIVATE_EXPORT void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
+IGRAPH_PRIVATE_EXPORT int igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);
+IGRAPH_PRIVATE_EXPORT long int igraph_trie_size(igraph_trie_t *t);
 
 __END_DECLS
 

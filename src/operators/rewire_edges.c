@@ -23,11 +23,12 @@
 
 #include "igraph_games.h"
 
-#include "igraph_attributes.h"
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+
+#include "graph/attributes.h"
 
 static int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
                                              igraph_bool_t loops,

@@ -19,15 +19,17 @@
 */
 
 #include "igraph_paths.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_dqueue.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
-#include <string.h>
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+
+#include <string.h>
 
 /*****************************************************/
 /***** Average path length and global efficiency *****/
@@ -61,7 +63,11 @@ static int igraph_i_average_path_length_unweighted(
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    igraph_adjlist_init(graph, &allneis, directed ? IGRAPH_OUT : IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_adjlist_init(
+        graph, &allneis,
+        directed ? IGRAPH_OUT : IGRAPH_ALL,
+        IGRAPH_LOOPS, IGRAPH_MULTIPLE
+    ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     for (source = 0; source < no_of_nodes; source++) {
@@ -188,7 +194,9 @@ static int igraph_i_average_path_length_dijkstra(
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, directed ? IGRAPH_OUT : IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(
+        graph, &inclist, directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS
+    ));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     *res = 0.0;
@@ -203,7 +211,7 @@ static int igraph_i_average_path_length_dijkstra(
         while (!igraph_2wheap_empty(&Q)) {
             long int minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
-            igraph_vector_t *neis;
+            igraph_vector_int_t *neis;
             long int nlen;
 
             if (minnei != source) {
@@ -217,7 +225,7 @@ static int igraph_i_average_path_length_dijkstra(
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
-            nlen = igraph_vector_size(neis);
+            nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
@@ -572,7 +580,7 @@ static int igraph_i_local_efficiency_dijkstra(
         while (!igraph_2wheap_empty(Q)) {
             long int minnei = igraph_2wheap_max_index(Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(Q);
-            igraph_vector_t *neis;
+            igraph_vector_int_t *neis;
             long int nlen;
 
             if (minnei != source && VECTOR(*nei_mask)[minnei]) {
@@ -586,7 +594,7 @@ static int igraph_i_local_efficiency_dijkstra(
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
-            nlen = igraph_vector_size(neis);
+            nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_real_t altdist, curdist;
                 igraph_bool_t active, has;
@@ -722,7 +730,11 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         }
         IGRAPH_FINALLY(igraph_free, already_counted);
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, directed ? IGRAPH_OUT : IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(
+            graph, &adjlist,
+            directed ? IGRAPH_OUT : IGRAPH_ALL,
+            IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
@@ -760,7 +772,9 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
             }
         }
 
-        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, directed ? IGRAPH_OUT : IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_lazy_inclist_init(
+            graph, &inclist, directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS
+        ));
         IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
         IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
         IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
@@ -947,7 +961,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -1144,7 +1158,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     for (source = 0; source < no_of_nodes; source++) {

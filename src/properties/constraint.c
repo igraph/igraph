@@ -21,7 +21,7 @@
 
 */
 
-#include "igraph_structural.h"
+#include "igraph_centrality.h"
 
 #include "igraph_interface.h"
 

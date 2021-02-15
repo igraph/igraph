@@ -21,7 +21,6 @@
 */
 
 #include "igraph_types.h"
-#include "config.h"
 
 #include "core/cutheap.h"
 
@@ -32,8 +31,8 @@
 #define UNDEFINED     0.0
 #define INDEXINC      1
 
-void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
-                             long int hidx1, long int hidx2) {
+static void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
+                                    long int hidx1, long int hidx2) {
     if (hidx1 != hidx2) {
         long int idx1 = (long int) VECTOR(ch->index)[hidx1];
         long int idx2 = (long int) VECTOR(ch->index)[hidx2];
@@ -50,7 +49,7 @@ void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
     }
 }
 
-void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, long int hidx) {
+static void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, long int hidx) {
     long int size = igraph_vector_size(&ch->heap);
     if (LEFTCHILD(hidx) >= size) {
         /* leaf node */
@@ -71,7 +70,7 @@ void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, long int hidx) {
     }
 }
 
-void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, long int hidx) {
+static void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, long int hidx) {
     if (hidx == 0 || VECTOR(ch->heap)[hidx] < VECTOR(ch->heap)[PARENT(hidx)]) {
         /* at the top */
     } else {

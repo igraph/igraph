@@ -2431,7 +2431,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
-      Partition::Cell* neighbour_cell =	p.get_cell(p.elements[start]);
+      Partition::Cell* neighbour_cell = p.get_cell(p.elements[start]);
 
 #if defined(BLISS_CONSISTENCY_CHECKS)
       assert(neighbour_cell->first == start);
@@ -2563,7 +2563,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
-      Partition::Cell* neighbour_cell =	p.get_cell(p.elements[start]);
+      Partition::Cell* neighbour_cell = p.get_cell(p.elements[start]);
 
 #if defined(BLISS_CONSISTENCY_CHECKS)
       assert(neighbour_cell->first == start);
@@ -4178,7 +4178,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
-      Partition::Cell* neighbour_cell =	p.get_cell(p.elements[start]);
+      Partition::Cell* neighbour_cell = p.get_cell(p.elements[start]);
 
 #if defined(BLISS_CONSISTENCY_CHECKS)
       if(neighbour_cell->is_unit()) {
