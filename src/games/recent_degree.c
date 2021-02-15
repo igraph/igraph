@@ -188,7 +188,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_recent_degree_aging_game
- * \brief Preferential attachment based on the number of edges gained recently, with aging of vertices
+ * \brief Preferential attachment based on the number of edges gained recently, with aging of vertices.
  *
  * </para><para>
  * This game is very similar to \ref igraph_barabasi_aging_game(),
@@ -214,9 +214,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
  * \param pa_exp The exponent for the preferential attachment.
  * \param aging_exp The exponent for the aging, normally it is
  *        negative: old vertices gain edges with less probability.
- * \param aging_bin Integer constant, gives the scale of the aging.
- *        The age of the vertices is incremented by one after every \p
- *        aging_bin vertex added.
+ * \param aging_bins Integer constant, the number of age bins to use.
  * \param time_window The time window to use to count the number of
  *        incident edges for the vertices.
  * \param zero_appeal The degree dependent part of the attractiveness
@@ -225,7 +223,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
  *        graph.
  * \return Error code.
  *
- * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
+ * Time complexity: O((|V|+|V|/aging_bins)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
 int igraph_recent_degree_aging_game(igraph_t *graph,
@@ -235,14 +233,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_bool_t outpref,
                                     igraph_real_t pa_exp,
                                     igraph_real_t aging_exp,
-                                    igraph_integer_t aging_bin,
+                                    igraph_integer_t aging_bins,
                                     igraph_integer_t time_window,
                                     igraph_real_t zero_appeal,
                                     igraph_bool_t directed) {
 
     long int no_of_nodes = nodes;
     long int no_of_neighbors = m;
-    long int binwidth = nodes / aging_bin + 1;
+    long int binwidth;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j, k;
@@ -251,17 +249,22 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_vector_t degree;
     igraph_dqueue_t history;
 
+    if (no_of_nodes == 0) {
+        igraph_empty(graph, 0, directed);
+        return IGRAPH_SUCCESS;
+    }
     if (no_of_nodes < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of nodes should not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%ld) does not equal the number of nodes (%ld).",
+                      IGRAPH_EINVAL, (long) igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Out-degree cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
-    if (aging_bin <= 0) {
-        IGRAPH_ERROR("Invalid aging bin", IGRAPH_EINVAL);
+    if (aging_bins <= 0) {
+        IGRAPH_ERRORF("Aging bins should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
@@ -273,6 +276,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
             no_of_edges += VECTOR(*outseq)[i];
         }
     }
+
+    binwidth = nodes / aging_bins + 1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
