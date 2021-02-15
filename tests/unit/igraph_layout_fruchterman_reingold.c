@@ -35,51 +35,81 @@ void destroy_bounds(igraph_vector_t *bounds) {
     }
 }
 
+void check_and_destroy(igraph_matrix_t *result) {
+    igraph_real_t min, max;
+    igraph_matrix_minmax(result, &min, &max);
+    IGRAPH_ASSERT(min >= -1.0);
+    IGRAPH_ASSERT(max <= 1.0);
+    igraph_matrix_destroy(result);
+}
+
 int main() {
     igraph_t g;
     igraph_matrix_t result;
     igraph_vector_t bounds[4];
     igraph_vector_t weights;
+    igraph_real_t seed[20] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1.0};
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    printf("Empty graph:\n");
+
+    printf("Empty graph.\n");
     igraph_small(&g, 0, 0, -1);
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 0, /*start_temp*/ 0.0, IGRAPH_LAYOUT_NOGRID,
+                  /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_NOGRID,
                   /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
                   /*maxy*/ NULL) == IGRAPH_SUCCESS);
     print_matrix(&result);
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);
 
-    printf("Full graph of 10 vertices with loops and bounds:\n");
-    igraph_full(&g, 10, 0, 1);
+    printf("Singleton graph in a box.\n");
+    igraph_small(&g, 1, 0, -1);
     igraph_matrix_init(&result, 0, 0);
-    make_box(10, 1.0, bounds);
+    make_box(1, 1.0, bounds);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_AUTOGRID,
-                  /*weight*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
-    print_matrix(&result);
-    igraph_matrix_destroy(&result);
+                  /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_NOGRID,
+                  /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
+    check_and_destroy(&result);
+    igraph_destroy(&g);
     destroy_bounds(bounds);
 
-    printf("Full graph of 10 vertices with loops and weights:\n");
-    igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init(&weights, 55);
+    printf("A few tests with a disconnected graph of 10 vertices with loops in a box from -1 to 1.\n");
+    igraph_small(&g, 10, 0, 0,1, 1,2, 2,0, 5,6, 6,7, 7,6, 7,7, 8,8, -1);
+    igraph_vector_init(&weights, 8);
     igraph_vector_fill(&weights, 100);
+    make_box(10, 1.0, bounds);
+    printf("Without weights and grid.\n");
+    igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_AUTOGRID,
-                  &weights, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
-                  /*maxy*/ NULL) == IGRAPH_SUCCESS);
-    print_matrix(&result);
-    igraph_matrix_destroy(&result);
+                  /*niter*/ 100, /*start_temp*/ 10.0, IGRAPH_LAYOUT_NOGRID,
+                  /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
+    check_and_destroy(&result);
+
+    printf("With weights and no grid.\n");
+    igraph_matrix_init(&result, 0, 0);
+    IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
+                  /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_NOGRID,
+                  &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
+    check_and_destroy(&result);
+
+    printf("With weights and grid and high temperature.\n");
+    igraph_matrix_init(&result, 0, 0);
+    IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
+                  /*niter*/ 10, /*start_temp*/ 1e10, IGRAPH_LAYOUT_GRID,
+                  &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
+    check_and_destroy(&result);
+
+    printf("With weights and grid and high temperature and seed.\n");
+    matrix_init_real_row_major(&result, 10, 2, seed);
+    IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 1,
+                  /*niter*/ 10, /*start_temp*/ 1e10, IGRAPH_LAYOUT_GRID,
+                  &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
+    check_and_destroy(&result);
     igraph_destroy(&g);
-    igraph_vector_destroy(&weights);
 
     printf("Full graph of 5 vertices, seed and no iterations:\n");
     igraph_full(&g, 5, 0, 0);
-    igraph_real_t seed[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
     matrix_init_real_row_major(&result, 5, 2, seed);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 1,
                   /*niter*/ 0, /*start_temp*/ 100, IGRAPH_LAYOUT_GRID,
@@ -88,6 +118,8 @@ int main() {
     print_matrix(&result);
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);
+    destroy_bounds(bounds);
+    igraph_vector_destroy(&weights);
 
     VERIFY_FINALLY_STACK();
     return 0;
