@@ -410,7 +410,9 @@ igraph_minimum_spanning_tree_prim:
         IGNORE: RR, RC, RNamespace
 
 igraph_closeness:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VECTOR res, \
+                OUT VECTOR_OR_0 reachable_count, OUT BOOLEANPTR_OR_0 all_reachable, \
+                VERTEXSET vids=ALL, \
                 NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, \
                 BOOLEAN normalized=False
         DEPS: vids ON graph, weights ON graph
@@ -418,7 +420,9 @@ igraph_closeness:
         IGNORE: RR
 
 igraph_closeness_cutoff:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, \
+                OUT VECTOR_OR_0 reachable_count, OUT BOOLEANPTR_OR_0 all_reachable, \
+                VERTEXSET vids=ALL, \
                 NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, \
                 BOOLEAN normalized=False, REAL cutoff
         DEPS: vids ON graph, weights ON graph, res ON graph vids
@@ -450,6 +454,16 @@ igraph_shortest_paths_dijkstra:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths_dijkstra:
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
+                OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
+                EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, \
+                OUT VECTOR_LONG_OR_0 predecessors=0, \
+                OUT VECTOR_LONG_OR_0 inbound_edges=0
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph,\
+              weights ON graph
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
                 EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, \

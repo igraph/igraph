@@ -28,7 +28,7 @@ int main() {
     igraph_t g;
     igraph_strvector_t names;
 
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* save a simple ring graph */
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0 /* mutual */, 1 /* circular */);

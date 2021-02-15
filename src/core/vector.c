@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_complex.h"
-#include "config.h"
+
 #include <float.h>
 
 #define BASE_IGRAPH_REAL
@@ -459,6 +459,36 @@ int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
         }
     }
     return 0;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_is_nan
+ * \brief Check for each element if it is NaN.
+ *
+ * </para><para>
+ * \param v The \type igraph_vector_t object to check.
+ * \param is_nan The resulting boolean vector indicating for each element
+ *               whether it is NaN or not.
+ * \return Error code,
+ *         \c IGRAPH_ENOMEM if there is not enough
+ *         memory. Note that this function \em never returns an error
+ *         if the vector \p is_nan will already be large enough.
+ * Time complexity: O(n), the number of elements.
+ */
+int igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool_t *is_nan)
+{
+    igraph_real_t *ptr;
+    igraph_bool_t *ptr_nan;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(is_nan != NULL);
+    IGRAPH_ASSERT(is_nan->stor_begin != NULL);
+    IGRAPH_CHECK(igraph_vector_bool_resize(is_nan, igraph_vector_size(v)));
+    for (ptr = v->stor_begin, ptr_nan = is_nan->stor_begin; ptr < v->end; ptr++, ptr_nan++) {
+        *ptr_nan = igraph_is_nan(*ptr);
+    }
+    return IGRAPH_SUCCESS;
 }
 
 /**

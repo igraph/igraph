@@ -188,14 +188,14 @@ int main() {
     /****************************************************/
 
     igraph_psumtree_init(&tree, 9);
-	if (igraph_psumtree_update(&tree, 2, -2) == IGRAPH_SUCCESS) {
-		return 12;
+    if (igraph_psumtree_update(&tree, 2, -2) == IGRAPH_SUCCESS) {
+        return 12;
     }
-	if (igraph_psumtree_update(&tree, 2, -INFINITY) == IGRAPH_SUCCESS) {
-		return 13;
+    if (igraph_psumtree_update(&tree, 2, -INFINITY) == IGRAPH_SUCCESS) {
+        return 13;
     }
-	if (igraph_psumtree_update(&tree, 2, IGRAPH_NAN) == IGRAPH_SUCCESS) {
-		return 14;
+    if (igraph_psumtree_update(&tree, 2, IGRAPH_NAN) == IGRAPH_SUCCESS) {
+        return 14;
     }
     igraph_psumtree_destroy(&tree);
 

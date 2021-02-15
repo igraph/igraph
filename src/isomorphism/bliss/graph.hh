@@ -244,8 +244,8 @@ protected:
 
 
   unsigned int refine_current_path_certificate_index;
-  bool refine_compare_certificate;
-  bool refine_equal_to_first;
+  bool refine_compare_certificate = false;
+  bool refine_equal_to_first = false;
   unsigned int refine_first_path_subcertificate_end;
   int refine_cmp_to_best;
   unsigned int refine_best_path_subcertificate_end;

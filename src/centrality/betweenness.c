@@ -19,6 +19,7 @@
 */
 
 #include "igraph_centrality.h"
+
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -99,14 +100,14 @@ static int igraph_i_betweenness_cutoff_weighted(
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
     }
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
-            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
         } else if (igraph_is_nan(minweight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         } else if (minweight <= eps) {
             IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
@@ -114,7 +115,7 @@ static int igraph_i_betweenness_cutoff_weighted(
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
@@ -347,16 +348,16 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
     directed = directed && igraph_is_directed(graph);
     if (directed) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_in);
         adjlist_out_p = &adjlist_out;
         adjlist_in_p = &adjlist_in;
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_in);
         adjlist_out_p = &adjlist_out;
         adjlist_in_p = &adjlist_in;
@@ -367,17 +368,17 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
     distance = igraph_Calloc(no_of_nodes, long int);
     if (distance == 0) {
-        IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -574,20 +575,20 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
     igraph_stack_t S;
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
     }
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
-            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
         } else if (igraph_is_nan(minweight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         } else if (minweight <= eps) {
             IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
     }
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
@@ -829,31 +830,31 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
     directed = directed && igraph_is_directed(graph);
     if (directed) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_in);
         elist_out_p = &elist_out;
         elist_in_p = &elist_in;
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
         elist_out_p = elist_in_p = &elist_out;
     }
 
     distance = igraph_Calloc(no_of_nodes, long int);
     if (distance == 0) {
-        IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 

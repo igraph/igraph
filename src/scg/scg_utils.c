@@ -28,6 +28,7 @@
  */
 
 #include "scg_headers.h"
+
 #include "igraph_error.h"
 #include "igraph_memory.h"
 

@@ -21,7 +21,9 @@
    * The macro `IGRAPH_FATAL()` and the functions `igraph_fatal()` and `igraph_fatalf()` raise a fatal error. These are for internal use.
    * `IGRAPH_ASSERT()` is a replacement for the `assert()` macro. It is for internal use.
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
+ - The new `IGRAPH_WARNINGF`, `IGRAPH_ERRORF` and `IGRAPH_FATALF` macros provide warning/error reporting with `printf`-like syntax. (PR #1627, thanks to Daniel Noom!)
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
+ - `igraph_get_shortest_paths_bellman_ford()` computes the shortest paths (including the vertex and edge IDs along the paths) using the Bellman-Ford algorithm (PR #1642, thanks to Guy Rozenberg). This makes it possible to calculate the shortest paths on graphs with negative edge weights, which was not possible before with Dijkstra's algorithm.
  - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
  - Harmonic centrality (PR #1583):
    * `igraph_harmonic_centrality()` computes the harmonic centrality of vertices.
@@ -30,37 +32,55 @@
    * `igraph_closeness_cutoff()`.
    * `igraph_betweenness_cutoff()`.
    * `igraph_edge_betweenness_cutoff()`.
+ - `igraph_vector_is_any_nan()` checks if any elements of an `igraph_vector_t` is NaN.
+ - `igraph_inclist_size()` returns the number of vertices in an incidence list.
+ - `igraph_lazy_adjlist_size()` returns the number of vertices in a lazy adjacency list.
+ - `igraph_lazy_inclist_size()` returns the number of vertices in a lazy incidence list.
+ - `igraph_bfs_simple()` now provides a simpler interface to the breadth-first search functionality.
 
 ### Changed
 
  - igraph now uses a CMake-based build sysyem.
- - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549)
- - Bliss has been updated to version 0.75. Bliss functions are now interruptible.
+ - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549).
+ - Bliss has been updated to version 0.75. Bliss functions are now interruptible. Thanks to Tommi Junttila for making this possible!
+ - Adjacency and incidence lists:
+   * `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now require the caller to specify what to do with loop and multiple edges.
+   * `igraph_inclist_init()` and `igraph_lazy_inclist_init()` now require the caller to specify what to do with loop edges.
+   * Adjacency and incidence lists now use `igraph_vector_int_t` consistently.
  - Community detection:
    * `igraph_community_multilevel()`: added resolution parameter.
    * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
  - Modularity:
    * `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
-   * `igraph_modularity()` now supports computing the directed version of modularity.
+   * `igraph_modularity()` and `igraph_modularity_matrix()` now support the directed version of modularity.
    * `igraph_modularity()` returns NaN for graphs with no edges to indicate that the modularity is not well-defined for such graphs.
  - Centralities:
    * `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
    * The `nobigint` argument has been removed from `igraph_betweenness()`, `igraph_betweenness_estimate()` and `igraph_centralization_betweenness()`, as it is not longer needed. The current implementation is more accurate than the old one using big integers.
+   * `igraph_closeness()` now considers only reachable vertices during the calculation (i.e. the closeness is calculated per-component in the undirected case) (PR #1630).
+   * `igraph_closeness()` gained two additional output parameters, `reachable_count` and `all_reachable`, returning the number of reached vertices from each vertex, as well as whether all vertices were reachable. This allows for computing various generalizations of closeness for disconnected graphs (PR #1630).
+   * `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` no longer support the `IGRAPH_PAGERANK_ALGO_POWER` method. Their `options` argument now has type `igraph_arpack_options_t *` instead of `void *`.
  - Shortest paths (PR #1344):
    * `igraph_average_path_length()` now returns the number of disconnected vertex pairs in the new `unconn_pairs` output argument.
    * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
    * `igraph_average_path_length()`  and `igraph_diameter()` now return `IGRAPH_INFINITY` when `unconn=FALSE` and the graph is not connected. Previously they returned the number of vertices.
+ - `igraph_subisomorphic_lad()` now supports graphs with self-loops.
+ - `igraph_is_chordal()` and `igraph_maximum_cardinality_search()` now support non-simple graphs and directed graphs.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
- - `igraph_to_directed()`: added RANDOM and ACYCLIC mode (PR #1511).
+ - `igraph_to_directed()`: added RANDOM and ACYCLIC modes (PR #1511).
  - `igraph_topological_sorting()` now issues an error if the input graph is not acyclic. Previously it issued a warning.
+ - `igraph_vector_(which_)(min|max|minmax)()` now handles NaN elements.
+ - `igraph_i_set_attribute_table()` is renamed to `igraph_set_attribute_table()`.
+ - `igraph_i_sparsemat_view()` is renamed to `igraph_sparsemat_view()`.
 
 ### Deprecated
 
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
  - `igraph_closeness_estimate()` is deprecated in favour of the newly added `igraph_closeness_cutoff()`.
  - `igraph_betweenness_estimate()` and `igraph_edge_betweenness_estimate()` are deprecated in favour of the newly added `igraph_betweenness_cutoff()` and `igraph_edge_betweenness_cutoff()`.
+ - `igraph_adjlist_remove_duplicate()` and `igraph_inclist_remove_duplicate()` are now deprecated in favour of the new constructor arguments in `igraph_adjlist_init()` and `igraph_inclist_init()`.
 
 ### Removed
 
@@ -70,15 +90,29 @@
    * `igraph_adjacent()`.
    * `igraph_es_adj()`.
    * `igraph_subgraph()`.
+ - `igraph_pagerank_old()`, deprecated in 0.7, has been removed.
 
 ### Fixed
 
  - Betweenness calculations are no longer at risk from integer overflow.
+ - The actual cutoff distance used in closeness calculation was one smaller than the `cutoff` parameter. This is corrected (PR #1630).
  - `igraph_layout_gem()` was not interruptible; now it is.
+ - `igraph_barabasi_aging_game()` now checks its parameters more carefully.
  - `igraph_callaway_traits_game()` now checks its parameters.
- - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (#1598).
- - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - `igraph_lastcit_game()` checks its parameters more carefully, and no longer crashes with zero vertices (PR #1625).
+ - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (PR #1598).
+ - `igraph_psumtree_update()` now checks for negative values and NaN.
  - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
+ - `igraph_incident()` now returns edges in the same order as `igraph_neighbors()`.
+ - `igraph_modularity_matrix()` returned incorrect results for weighted graphs. This is now fixed. (PR #1649, thanks to Daniel Noom!)
+ - PageRank (PR #1640):
+   * `igraph_(personalized_)pagerank(_vs)()` now check their parameters more carefully.
+   * `igraph_personalized_pagerank()` no longer modifies its `reset` parameter.
+   * `igraph_(personalized_)pagerank(_vs)`: the `IGRAPH_PAGERANK_ALGO_ARPACK` method now handles self-loops correctly.
+   * `igraph_personalized_pagerank(_vs)()`: the result retuned for edgeless or all-zero-weight graphs with the `IGRAPH_PAGERANK_ALGO_ARPACK` ignored the personalization vector. This is now corrected.
+   * `igraph_personalized_pagerank(_vs)()` with a non-uniform personalization vector, a disconnected graph and the `IGRAPH_PAGERANK_ALGO_PRPACK` method would return results that were inconsistent with `IGRAPH_PAGERANK_ALGO_ARPACK`. This happened because PRPACK always used a uniform reset distribution when the random walk got stuck in a sink vertex. Now it uses the user-specified reset distribution for this case as well.
+ - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - Weighted betweenness, closeness, PageRank and shortest path calculations, as well as random walk functions now check if any weights are NaN.
  - Compatibility with the PGI compiler.
 
 ### Other
@@ -90,6 +124,11 @@
  - igraph's source files have been re-organized for better maintainability.
  - igraph can now be built with an external CXSparse library.
  - The references to igraph source files in error and warning messages are now always relative to igraph's base directory.
+ - When igraph is built as a shared library, only public symbols are exported even on Linux and macOS.
+
+### Acknowledgments
+
+ - Thanks to Daniel Noom for significantly expanding igraph's test coverage and exposing several issues in the process!
 
 ## [0.8.5] - 2020-12-07
 

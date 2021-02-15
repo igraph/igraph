@@ -33,7 +33,7 @@ int main() {
     igraph_attribute_combination_t comb;
 
     /* turn on attribute handling */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_attribute_combination(&comb,
                                  "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
@@ -55,7 +55,7 @@ int main() {
     if (!igraph_is_nan(modularity)) {
         return 1;
     }
-	/* Should not crash if we omit 'modularity' */
+    /* Should not crash if we omit 'modularity' */
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, /* modularity = */ 0);
     igraph_destroy(&graph);
     igraph_vector_destroy(&membership);

@@ -93,6 +93,7 @@
     <xi:include href="heap.xml"/>
     <xi:include href="strvector.xml"/>
     <xi:include href="adjlist.xml"/>
+    <xi:include href="psumtree.xml"/>
   </chapter>
 
   <xi:include href="random.xml"/>

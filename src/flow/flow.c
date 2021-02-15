@@ -36,12 +36,13 @@
 #include "igraph_operators.h"
 #include "igraph_structural.h"
 #include "igraph_topology.h"
-#include "config.h"
 
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
 #include "core/math.h"
+
+#include "config.h"
 
 /*
  * Some general remarks about the functions in this file.
@@ -1299,10 +1300,10 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_cutheap_init(&heap, no_of_nodes));
     IGRAPH_FINALLY(igraph_i_cutheap_destroy, &heap);
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     while (igraph_i_cutheap_size(&heap) >= 2) {

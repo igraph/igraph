@@ -36,7 +36,7 @@ __BEGIN_DECLS
  * \brief The internal data structure for storing graphs.
  *
  * It is simple and efficient. It has the following members:
- * - <b>n</b> The number of vertices, reduntant.
+ * - <b>n</b> The number of vertices, redundant.
  * - <b>directed</b> Whether the graph is directed.
  * - <b>from</b> The first column of the edge list.
  * - <b>to</b> The second column of the edge list.

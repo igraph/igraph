@@ -22,13 +22,13 @@
 */
 
 #include "igraph_motifs.h"
+
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_nongraph.h"
 #include "igraph_stack.h"
-#include "config.h"
 
 #include "core/interruption.h"
 #include "isomorphism/isoclasses.h"
@@ -249,9 +249,9 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     }
     IGRAPH_FINALLY(igraph_free, subg);
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &alloutneis, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &alloutneis, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &alloutneis);
 
     IGRAPH_VECTOR_INIT_FINALLY(&vids, 0);
@@ -922,7 +922,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
 
     IGRAPH_CHECK(igraph_vector_long_init(&seen, vc));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &seen);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     *res2 = *res4 = 0;
 

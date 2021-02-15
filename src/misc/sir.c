@@ -22,12 +22,14 @@
 */
 
 #include "igraph_epidemics.h"
+
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
+
 #include "core/interruption.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
@@ -145,7 +147,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
     IGRAPH_CHECK(igraph_vector_int_init(&status, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &status);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_psumtree_init(&tree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &tree);

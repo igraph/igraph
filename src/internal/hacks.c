@@ -21,10 +21,10 @@
 
 */
 
-#include <memory.h>
+#include "internal/hacks.h"
+
 #include <string.h>
 #include <stdlib.h>
-#include "internal/hacks.h"
 
 /* These are implementations of common C functions that may be missing from some
  * compilers; for instance, icc does not provide stpcpy so we implement it

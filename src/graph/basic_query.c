@@ -25,7 +25,6 @@
 #include "igraph_types.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
-#include "config.h"
 
 /**
  * \ingroup structural

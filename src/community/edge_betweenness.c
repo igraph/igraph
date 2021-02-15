@@ -169,15 +169,15 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
 
 /**
  * \function igraph_community_eb_get_merges
- * \brief Calculating the merges, i.e. the dendrogram for an edge betweenness community structure
+ * \brief Calculating the merges, i.e. the dendrogram for an edge betweenness community structure.
  *
  * </para><para>
- * This function is handy if you have a sequence of edge which are
+ * This function is handy if you have a sequence of edges which are
  * gradually removed from the network and you would like to know how
  * the network falls apart into separate components. The edge sequence
  * may come from the \ref igraph_community_edge_betweenness()
  * function, but this is not necessary. Note that \ref
- * igraph_community_edge_betweenness can also calculate the
+ * igraph_community_edge_betweenness() can also calculate the
  * dendrogram, via its \p merges argument.
  *
  * \param graph The input graph.
@@ -189,20 +189,20 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * \param weights An optional vector containing edge weights. If null,
  *     the unweighted modularity scores will be calculated. If not null,
  *     the weighted modularity scores will be calculated. Ignored if both
- *     \p modularity and \p membership are nulls.
- * \param res Pointer to an initialized matrix, if not NULL then the
+ *     \p modularity and \p membership are \c NULL pointers.
+ * \param res Pointer to an initialized matrix, if not \c NULL then the
  *    dendrogram will be stored here, in the same form as for the \ref
  *    igraph_community_walktrap() function: the matrix has two columns
  *    and each line is a merge given by the ids of the merged
  *    components. The component ids are number from zero and
  *    component ids smaller than the number of vertices in the graph
  *    belong to individual vertices. The non-trivial components
- *    containing at least two vertices are numbered from \c n, \c n is
+ *    containing at least two vertices are numbered from \c n, where \c n is
  *    the number of vertices in the graph. So if the first line
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
  *    component \c n+1, etc. The matrix will be resized as needed.
- * \param bridges Pointer to an initialized vector or NULL. If not
+ * \param bridges Pointer to an initialized vector or \c NULL. If not
  *    null then the index of the edge removals which split the network
  *    will be stored here. The vector will be resized as needed.
  * \param modularity If not a null pointer, then the modularity values
@@ -310,7 +310,7 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
 
 /**
  * \function igraph_community_edge_betweenness
- * \brief Community finding based on edge betweenness
+ * \brief Community finding based on edge betweenness.
  *
  * Community structure detection based on the betweenness of the edges
  * in the network. The algorithm was invented by M. Girvan and
@@ -331,19 +331,19 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
  *     stored here, the ids of the removed edges in the order of their
- *     removal. It will be resized as needed. It may be NULL if
+ *     removal. It will be resized as needed. It may be \c NULL if
  *     the edge IDs are not needed by the caller.
  * \param edge_betweenness Pointer to an initialized vector or
- *     NULL. In the former case the edge betweenness of the removed
+ *     \c NULL. In the former case the edge betweenness of the removed
  *     edge is stored here. The vector will be resized as needed.
- * \param merges Pointer to an initialized matrix or NULL. If not NULL
+ * \param merges Pointer to an initialized matrix or \c NULL. If not \c NULL
  *     then merges performed by the algorithm are stored here. Even if
  *     this is a divisive algorithm, we can replay it backwards and
  *     note which two clusters were merged. Clusters are numbered from
  *     zero, see the \p merges argument of \ref
  *     igraph_community_walktrap() for details. The matrix will be
  *     resized as needed.
- * \param bridges Pointer to an initialized vector of NULL. If not
+ * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     NULL then all edge removals which separated the network into
  *     more components are marked here.
  * \param modularity If not a null pointer, then the modularity values
@@ -407,7 +407,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     if (result == 0) {
         result = igraph_Calloc(1, igraph_vector_t);
         if (result == 0) {
-            IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, result);
         IGRAPH_VECTOR_INIT_FINALLY(result, 0);
@@ -416,51 +416,63 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     directed = directed && igraph_is_directed(graph);
     if (directed) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_in, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_in);
         elist_out_p = &elist_out;
         elist_in_p = &elist_in;
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &elist_out, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
         elist_out_p = elist_in_p = &elist_out;
     }
 
     distance = igraph_Calloc(no_of_nodes, double);
     if (distance == 0) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     if (weights == 0) {
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
     } else {
-        if (no_of_edges > 0 && igraph_vector_min(weights) <= 0) {
-            IGRAPH_ERROR("weights must be strictly positive", IGRAPH_EINVAL);
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
+        }
+
+        if (no_of_edges > 0) {
+            /* Must not call vector_min on empty vector */
+            igraph_real_t minweight = igraph_vector_min(weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Weights must be strictly positive.", IGRAPH_EINVAL);
+            }
+
+            if (igraph_is_nan(minweight)) {
+                IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
+            }
         }
 
         if (membership != 0) {
-            IGRAPH_WARNING("Membership vector will be selected based on the lowest "\
+            IGRAPH_WARNING("Membership vector will be selected based on the lowest "
                            "modularity score.");
         }
 
         if (modularity != 0 || membership != 0) {
-            IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "\
-                           "community detection might not make sense -- modularity treats edge "\
-                           "weights as similarities while edge betwenness treats them as "\
-                           "distances");
+            IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "
+                           "community detection might not make sense -- modularity treats edge "
+                           "weights as similarities while edge betwenness treats them as "
+                           "distances.");
         }
 
         IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
@@ -485,7 +497,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     passive = igraph_Calloc(no_of_edges, char);
     if (!passive) {
-        IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, passive);
 

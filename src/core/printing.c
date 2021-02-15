@@ -22,6 +22,7 @@
 */
 
 #include "igraph_types.h"
+
 #include <float.h>
 
 #ifdef _MSC_VER

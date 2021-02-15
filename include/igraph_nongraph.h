@@ -70,22 +70,22 @@ typedef struct igraph_plfit_result_t {
     double p;
 } igraph_plfit_result_t;
 
-DECLDIR int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
-                                igraph_integer_t binwidth);
-DECLDIR int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
-                                 igraph_integer_t length);
-DECLDIR int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
-                               igraph_matrix_t *rescoords);
-DECLDIR int igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
-                          igraph_real_t (*f)(igraph_real_t x, void *info),
-                          void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
-DECLDIR int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
-                        igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-                        int maxit, int trace,
-                        igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
-                        igraph_integer_t *fncount, igraph_integer_t *grcount);
-DECLDIR int igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
-                                 igraph_real_t xmin, igraph_bool_t force_continuous);
+IGRAPH_EXPORT int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
+                                      igraph_integer_t binwidth);
+IGRAPH_EXPORT int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+                                       igraph_integer_t length);
+IGRAPH_EXPORT int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+                                     igraph_matrix_t *rescoords);
+IGRAPH_EXPORT int igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
+                                igraph_real_t (*f)(igraph_real_t x, void *info),
+                                void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
+IGRAPH_EXPORT int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
+                              igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
+                              int maxit, int trace,
+                              igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
+                              igraph_integer_t *fncount, igraph_integer_t *grcount);
+IGRAPH_EXPORT int igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
+                                       igraph_real_t xmin, igraph_bool_t force_continuous);
 
 __END_DECLS
 

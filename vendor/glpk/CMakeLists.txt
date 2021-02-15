@@ -32,17 +32,16 @@ target_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_BINARY_DIR}/include
 )
 
 if (BUILD_SHARED_LIBS)
   set_property(TARGET glpk_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if (WIN32)
-    # Since these are included as object files, they should call the
-    # function as is (without declspec)
-    target_compile_definitions(glpk_vendored PRIVATE IGRAPH_STATIC)
-endif()
+# Since these are included as object files, they should call the
+# function as is (without visibility specification)
+target_compile_definitions(glpk_vendored PRIVATE IGRAPH_STATIC)
 
 if (MSVC)
   target_compile_options(glpk_vendored PRIVATE

@@ -61,6 +61,7 @@
 <!-- doxrox-include igraph_es_seq -->
 <!-- doxrox-include igraph_es_pairs -->
 <!-- doxrox-include igraph_es_pairs_small -->
+<!-- doxrox-include igraph_es_path -->
 <!-- doxrox-include igraph_es_vector_copy -->
 </section>
 
@@ -73,6 +74,7 @@
 </section>
 
 <section id="generic-edge-selector-operations"><title>Generic edge selector operations</title>
+<!-- doxrox-include igraph_es_as_vector -->
 <!-- doxrox-include igraph_es_copy -->
 <!-- doxrox-include igraph_es_destroy -->
 <!-- doxrox-include igraph_es_is_all -->

@@ -45,17 +45,20 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
 
 /**
  * \function igraph_get_all_shortest_paths
- * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices.
+ * \brief All shortest paths (geodesics) from a vertex.
+ *
+ * When there is more than one shortest path between two vertices,
+ * all of them will be returned.
  *
  * \param graph The graph object.
  * \param res Pointer to an initialized pointer vector, the result
- *   will be stored here in igraph_vector_t objects. Each vector
+ *   will be stored here in \ref igraph_vector_t objects. Each vector
  *   object contains the vertices along a shortest path from \p from
  *   to another vertex. The vectors are ordered according to their
  *   target vertex: first the shortest paths to vertex 0, then to
  *   vertex 1, etc. No data is included for unreachable vertices.
- * \param nrgeo Pointer to an initialized igraph_vector_t object or
- *   NULL. If not NULL the number of shortest paths from \p from are
+ * \param nrgeo Pointer to an initialized \ref igraph_vector_t object or
+ *   \c NULL. If not \c NULL the number of shortest paths from \p from are
  *   stored here for every vertex in the graph. Note that the values
  *   will be accurate only for those vertices that are in the target
  *   vertex sequence (see \p to), since the search terminates as soon

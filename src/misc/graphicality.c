@@ -19,6 +19,7 @@
 */
 
 #include "igraph_graphicality.h"
+
 #include "igraph_qsort.h"
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
