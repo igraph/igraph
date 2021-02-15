@@ -161,6 +161,7 @@ add_legacy_tests(
   igraph_preference_game
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
+  igraph_recent_degree_game
   tree
   tree_game
   ring
