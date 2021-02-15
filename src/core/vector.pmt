@@ -1752,11 +1752,12 @@ FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
 
 #endif
 
+
+#ifndef NOTORDERED
+
 igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, long int *pos,
         long int start, long int end);
-
-#ifndef NOTORDERED
 
 /**
  * \ingroup vector

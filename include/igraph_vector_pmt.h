@@ -28,7 +28,11 @@
 IGRAPH_EXPORT int FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, long int size);
 IGRAPH_EXPORT int FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector)* v,
                                                      const BASE* data, long int length);
+
+#ifndef NOTORDERED
 IGRAPH_EXPORT int FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
+#endif
+
 IGRAPH_EXPORT int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
                                                 const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector)* v);
@@ -128,6 +132,7 @@ IGRAPH_EXPORT int FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
                                                            const TYPE(igraph_vector) *rhs);
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
                                                            const TYPE(igraph_vector) *rhs);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
@@ -136,11 +141,13 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_le)(const TYPE(igraph_ve
                                                             const TYPE(igraph_vector) *rhs);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
                                                             const TYPE(igraph_vector) *rhs);
+#endif
 
 /*------------------------------*/
 /* Finding minimum and maximum  */
 /*------------------------------*/
 
+#ifndef NOTORDERED
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v);
@@ -149,6 +156,7 @@ IGRAPH_EXPORT int FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
                                                   BASE *min, BASE *max);
 IGRAPH_EXPORT int FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
                                                         long int *which_min, long int *which_max);
+#endif
 
 /*-------------------*/
 /* Vector properties */
@@ -160,14 +168,18 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_ve
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v);
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v);
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v,
                                                                   BASE low, BASE high);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
                                                                  BASE limit);
+#endif
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
                                                               const TYPE(igraph_vector) *rhs);
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *m1,
                                                                    const TYPE(igraph_vector) *m2);
+#endif
 
 /*------------------------*/
 /* Searching for elements */
@@ -177,6 +189,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, search)(const TYPE(igraph_vector) *v,
                                                             long int from, BASE what,
                                                             long int *pos);
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
                                                                      BASE what, long int *pos,
                                                                      long int start, long int end);
@@ -184,6 +197,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph
                                                                BASE what, long int *pos);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
                                                                 BASE what);
+#endif
 
 /*------------------------*/
 /* Resizing operations    */
@@ -204,10 +218,14 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, remove_section)(TYPE(igraph_vector) *
 /* Sorting   */
 /*-----------*/
 
+#ifndef NOTORDERED
+
 IGRAPH_EXPORT void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
                                                           igraph_vector_t *inds, igraph_bool_t descending);
+
+#endif
 
 /*-----------*/
 /* Printing  */
@@ -248,15 +266,18 @@ IGRAPH_EXPORT int FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v
 IGRAPH_EXPORT void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
                                                        const igraph_vector_t *index,
                                                        long int nremove);
+#ifndef NOTORDERED
 IGRAPH_EXPORT int FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
+#endif
 IGRAPH_EXPORT int FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *v,
                                                         TYPE(igraph_vector) *res,
                                                         long int from, long int to);
+#ifndef NOTORDERED
 IGRAPH_EXPORT int FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
                                                              const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
 IGRAPH_EXPORT int FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
                                                             const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
-
+#endif
 IGRAPH_EXPORT int FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                                  TYPE(igraph_vector) *newv,
                                                  const igraph_vector_t *idx);
