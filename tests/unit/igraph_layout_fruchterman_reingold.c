@@ -35,11 +35,11 @@ void destroy_bounds(igraph_vector_t *bounds) {
     }
 }
 
-void check_and_destroy(igraph_matrix_t *result) {
+void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
     igraph_real_t min, max;
     igraph_matrix_minmax(result, &min, &max);
-    IGRAPH_ASSERT(min >= -1.0);
-    IGRAPH_ASSERT(max <= 1.0);
+    IGRAPH_ASSERT(min >= -half_size);
+    IGRAPH_ASSERT(max <= half_size);
     igraph_matrix_destroy(result);
 }
 
@@ -70,7 +70,7 @@ int main() {
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
                   /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_NOGRID,
                   /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
-    check_and_destroy(&result);
+    check_and_destroy(&result, 1.0);
     igraph_destroy(&g);
     destroy_bounds(bounds);
 
@@ -79,33 +79,35 @@ int main() {
     igraph_vector_init(&weights, 8);
     igraph_vector_fill(&weights, 100);
     make_box(10, 1.0, bounds);
-    printf("Without weights and grid.\n");
+    printf("Without weights, grid or bounds.\n");
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
                   /*niter*/ 100, /*start_temp*/ 10.0, IGRAPH_LAYOUT_NOGRID,
-                  /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
-    check_and_destroy(&result);
+                  /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
+                  /*maxy*/ NULL) == IGRAPH_SUCCESS);
+    check_and_destroy(&result, 50.0);
 
     printf("With weights and no grid.\n");
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
                   /*niter*/ 100, /*start_temp*/ 1.0, IGRAPH_LAYOUT_NOGRID,
-                  &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
-    check_and_destroy(&result);
+                  /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
+                  /*maxy*/ NULL) == IGRAPH_SUCCESS);
+    check_and_destroy(&result, 50.0);
 
     printf("With weights and grid and high temperature.\n");
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 0,
                   /*niter*/ 10, /*start_temp*/ 1e10, IGRAPH_LAYOUT_GRID,
                   &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
-    check_and_destroy(&result);
+    check_and_destroy(&result, 1.0);
 
     printf("With weights and grid and high temperature and seed.\n");
     matrix_init_real_row_major(&result, 10, 2, seed);
     IGRAPH_ASSERT(igraph_layout_fruchterman_reingold(&g, &result, /*use_seed*/ 1,
                   /*niter*/ 10, /*start_temp*/ 1e10, IGRAPH_LAYOUT_GRID,
                   &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3]) == IGRAPH_SUCCESS);
-    check_and_destroy(&result);
+    check_and_destroy(&result, 1.0);
     igraph_destroy(&g);
 
     printf("Full graph of 5 vertices, seed and no iterations:\n");
