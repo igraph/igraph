@@ -34,7 +34,7 @@
  * \brief Stochastic graph generator based on the number of incident edges a node has gained recently.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param n The number of vertices in the graph, this is the same as
+ * \param nodes The number of vertices in the graph, this is the same as
  *        the number of time steps.
  * \param power The exponent, the probability that a node gains a
  *        new edge is proportional to the number of edges it has
@@ -61,7 +61,7 @@
  * vertices, |E| is the number of edges in the graph.
  *
  */
-int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
+int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
                               igraph_real_t power,
                               igraph_integer_t window,
                               igraph_integer_t m,
@@ -70,7 +70,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
                               igraph_real_t zero_appeal,
                               igraph_bool_t directed) {
 
-    long int no_of_nodes = n;
+    long int no_of_nodes = nodes;
     long int no_of_neighbors;
     long int no_of_edges;
     igraph_vector_t edges;
@@ -81,37 +81,32 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     long int time_window = window;
     igraph_dqueue_t history;
 
-    if (n < 0) {
-        IGRAPH_ERRORF("Number of vertices cannot be negative, got %ld.", IGRAPH_EINVAL, n);
+    if (no_of_nodes < 0) {
+        IGRAPH_ERRORF("Number of vertices cannot be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
-        IGRAPH_ERRORF("Length of out-degree sequence (%ld) must equal the number of nodes (%ld).",
-                      IGRAPH_EINVAL, (long int) igraph_vector_size(outseq), n);
+    if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
+        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%ld) does not equal the number of nodes (%ld).",
+                      IGRAPH_EINVAL, (long) igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERRORF("Out degree cannot be negative if degree sequence is not specified, got %ld\n.",
+        IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".",
                        IGRAPH_EINVAL, m);
     }
     if (time_window < 0) {
-        IGRAPH_ERRORF("Time window cannot be negative, got %ld.", IGRAPH_EINVAL, time_window);
+        IGRAPH_ERRORF("Time window cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, time_window);
     }
 
     if (zero_appeal < 0) {
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
-    if (n == 0) {
+    if (nodes == 0) {
         igraph_empty(graph, 0, directed);
         return IGRAPH_SUCCESS;
     }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
         no_of_neighbors = m;
-
-        if (no_of_neighbors < 0) {
-            IGRAPH_ERRORF("Number of edges per time step cannot be negative, got %ld.", IGRAPH_EINVAL, no_of_neighbors);
-        }
-
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
         no_of_edges = 0;
@@ -179,7 +174,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(3);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -239,7 +234,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_bool_t directed) {
 
     long int no_of_nodes = nodes;
-    long int no_of_neighbors = m;
+    long int no_of_neighbors;
     long int binwidth;
     long int no_of_edges;
     igraph_vector_t edges;
@@ -261,7 +256,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
                       IGRAPH_EINVAL, (long) igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
-        IGRAPH_ERRORF("Out-degree cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
+        IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bins <= 0) {
         IGRAPH_ERRORF("Aging bins should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);
