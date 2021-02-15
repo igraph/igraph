@@ -64,11 +64,10 @@
  */
 
 int FUNCTION(igraph_matrix, init)(TYPE(igraph_matrix) *m, long int nrow, long int ncol) {
-    int ret1;
-    ret1 = FUNCTION(igraph_vector, init)(&m->data, nrow * ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, nrow * ncol));
     m->nrow = nrow;
     m->ncol = ncol;
-    return ret1;
+    return IGRAPH_SUCCESS;
 }
 
 const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(const TYPE(igraph_matrix) *m,
@@ -150,7 +149,7 @@ long int FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m) {
  */
 
 int FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, long int nrow, long int ncol) {
-    FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol));
     m->nrow = nrow;
     m->ncol = ncol;
     return 0;
@@ -292,7 +291,7 @@ void FUNCTION(igraph_matrix, null)(TYPE(igraph_matrix) *m) {
  */
 
 int FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, long int n) {
-    FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n));
     return 0;
 }
 
@@ -311,7 +310,7 @@ int FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, long int n) {
 
 int FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, long int n) {
     long int i;
-    FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n));
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n)));
     for (i = m->ncol - 1; i >= 0; i--) {
         FUNCTION(igraph_vector, move_interval2)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
                                                 (m->nrow + n)*i);
@@ -361,7 +360,7 @@ int FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m, long int *i
     for (i = 0; i < m->ncol; i++)
         FUNCTION(igraph_vector, remove_section)(&m->data,
                                                 (i + 1) * (m->nrow - nremove), (i + 1) * (m->nrow - nremove) + nremove);
-    FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
 
     return 0;
 }
@@ -386,7 +385,7 @@ int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
         }
         idx = 0;
     }
-    FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
 
     return 0;
 }
@@ -408,9 +407,10 @@ int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
  */
 
 int FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+    IGRAPH_CHECK(FUNCTION(igraph_vector, copy)(&to->data, &from->data));
     to->nrow = from->nrow;
     to->ncol = from->ncol;
-    return FUNCTION(igraph_vector, copy)(&to->data, &from->data);
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED
@@ -724,7 +724,7 @@ int FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
     if (nrow > 1 && ncol > 1) {
         TYPE(igraph_vector) newdata;
         long int i, size = nrow * ncol, mod = size - 1;
-        FUNCTION(igraph_vector, init)(&newdata, size);
+        IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, size));
         IGRAPH_FINALLY(FUNCTION(igraph_vector, destroy), &newdata);
         for (i = 0; i < size; i++) {
             VECTOR(newdata)[i] = VECTOR(m->data)[ (i * nrow) % mod ];
@@ -1544,7 +1544,7 @@ int FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, long int row) {
         index++;
     }
     m->nrow--;
-    FUNCTION(igraph_vector, resize)(&m->data, m->nrow * m->ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, m->nrow * m->ncol));
     return 0;
 }
 
