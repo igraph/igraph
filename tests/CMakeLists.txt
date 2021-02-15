@@ -518,6 +518,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_arpack_rnsolve
+  igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs
