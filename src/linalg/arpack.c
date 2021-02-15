@@ -1367,7 +1367,6 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
     long int i, j;
     long int new_vector_pos;
     long int vector_pos;
-    size_t colsize = (unsigned) nodes * sizeof(igraph_real_t);
     igraph_matrix_t new_vectors;
 
     /* Error checks */
@@ -1391,13 +1390,17 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
     for (i = 0; i < nev && vector_pos < igraph_matrix_ncol(vectors); i++) {
         if (MATRIX(*values, i, 1) == 0) {
             /* Real eigenvalue */
-            memcpy(&MATRIX(new_vectors, 0, new_vector_pos), &MATRIX(*vectors, 0, vector_pos), colsize);
+            for (j = 0; j < nodes; j++) {
+                MATRIX(new_vectors, j, new_vector_pos) = MATRIX(*vectors, j, vector_pos);
+            }
             new_vector_pos += 2;
             vector_pos += 1;
         } else {
             /* complex eigenvalue */
-            memcpy(&MATRIX(new_vectors, 0, new_vector_pos), &MATRIX(*vectors, 0, vector_pos), colsize);
-            memcpy(&MATRIX(new_vectors, 0, new_vector_pos + 1), &MATRIX(*vectors, 0, vector_pos + 1), colsize);
+            for (j = 0; j < nodes; j++) {
+                MATRIX(new_vectors, j, new_vector_pos) = MATRIX(*vectors, j, vector_pos);
+                MATRIX(new_vectors, j, new_vector_pos + 1) = MATRIX(*vectors, j, vector_pos + 1);
+            }
 
             /* handle the conjugate */
 
@@ -1412,17 +1415,16 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
             }
 
             /* then copy and negate */
-            memcpy(&MATRIX(new_vectors, 0, new_vector_pos + 2), &MATRIX(*vectors, 0, vector_pos), colsize);
-            memcpy(&MATRIX(new_vectors, 0, new_vector_pos + 3), &MATRIX(*vectors, 0, vector_pos + 1), colsize);
             for (j = 0; j < nodes; j++) {
-                MATRIX(new_vectors, j, new_vector_pos + 3) = -MATRIX(new_vectors, j, new_vector_pos + 3);
+                MATRIX(new_vectors, j, new_vector_pos + 2) = MATRIX(*vectors, j, vector_pos);
+                MATRIX(new_vectors, j, new_vector_pos + 3) = -MATRIX(*vectors, j, vector_pos + 1);
             }
             new_vector_pos += 4;
             vector_pos += 2;
         }
     }
     igraph_matrix_destroy(vectors);
-    igraph_matrix_copy(vectors, &new_vectors);
+    IGRAPH_CHECK(igraph_matrix_copy(vectors, &new_vectors));
     igraph_matrix_destroy(&new_vectors);
     IGRAPH_FINALLY_CLEAN(1);
 

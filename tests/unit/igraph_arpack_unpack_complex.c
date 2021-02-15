@@ -24,7 +24,7 @@ void print_and_destroy(igraph_matrix_t *vectors, igraph_matrix_t *values, int ne
     print_matrix_format(vectors, stdout, "%6.2f");
     printf("values in:\n");
     print_matrix_format(values, stdout, "%6.2f");
-    IGRAPH_ASSERT(igraph_arpack_unpack_complex(vectors, values, nev) == error);
+    IGRAPH_ASSERT(igraph_arpack_unpack_complex(vectors, values, nev) == (int)error);
     printf("vectors out:\n");
     print_matrix_format(vectors, stdout, "%6.2f");
     printf("values out:\n");
