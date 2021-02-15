@@ -67,6 +67,8 @@ int main() {
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vector_size(&node_types) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_min(&node_types) == 0);
+    IGRAPH_ASSERT(igraph_vector_max(&node_types) == 1);
     igraph_vector_destroy(&node_types);
     DESTROY_GVM();
 
@@ -78,6 +80,8 @@ int main() {
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(!igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vector_size(&node_types) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_min(&node_types) == 0);
+    IGRAPH_ASSERT(igraph_vector_max(&node_types) == 1);
     igraph_vector_destroy(&node_types);
     DESTROY_GVM();
 
