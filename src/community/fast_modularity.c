@@ -646,7 +646,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         IGRAPH_ERROR("Fast greedy community detection works on undirected graphs only.", IGRAPH_UNIMPLEMENTED);
     }
 
-    total_joins = no_of_nodes - 1;
+    total_joins = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
 
     if (weights != 0) {
         if (igraph_vector_size(weights) != no_of_edges) {
