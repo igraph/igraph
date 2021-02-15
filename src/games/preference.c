@@ -342,7 +342,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * </para><para>
  * This is the asymmetric variant of \ref igraph_preference_game().
  * A given number of vertices are generated. Every vertex is assigned to an
- * "incoming" and an "outgoing" vertex type according to the given joint
+ * "outgoing" and an "incoming " vertex type according to the given joint
  * type probabilities. Finally, every vertex pair is evaluated and a
  * directed edge is created between them with a probability depending on the
  * "outgoing" type of the source vertex and the "incoming" type of the target
@@ -350,16 +350,18 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *
  * \param graph Pointer to an uninitialized graph.
  * \param nodes The number of vertices in the graph.
- * \param types The number of vertex types.
- * \param type_dist_matrix Matrix giving the joint distribution of vertex types.
- *   If null, incoming and outgoing vertex types are independent and uniformly
+ * \param out_types The number of vertex out-types.
+ * \param in_types The number of vertex in-types.
+ * \param type_dist_matrix Matrix of size <code>out_types * in_types</code>,
+ *   giving the joint distribution of vertex types.
+ *   If \c NULL, incoming and outgoing vertex types are independent and uniformly
  *   distributed.
- * \param pref_matrix Matrix giving the connection probabilities for
- *   different vertex types.
- * \param node_type_in_vec A vector where the individual generated "incoming"
- *   vertex types will be stored. If NULL, the vertex types won't be saved.
+ * \param pref_matrix Matrix of size <code>out_types * in_types</code>,
+ *   giving the connection probabilities for different vertex types.
  * \param node_type_out_vec A vector where the individual generated "outgoing"
- *   vertex types will be stored. If NULL, the vertex types won't be saved.
+ *   vertex types will be stored. If \c NULL, the vertex types won't be saved.
+ * \param node_type_in_vec A vector where the individual generated "incoming"
+ *   vertex types will be stored. If \c NULL, the vertex types won't be saved.
  * \param loops Logical, whether loop edges are allowed.
  * \return Error code.
  *
@@ -388,7 +390,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_real_t maxcum, maxedges;
 
     if(nodes < 0){
-        IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
     if (in_types < 1) {
@@ -404,6 +406,11 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_matrix_ncol(type_dist_matrix) != in_types) {
             IGRAPH_ERROR("The type distribution matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
         }
+    }
+
+    if (igraph_matrix_nrow(pref_matrix) != out_types ||
+        igraph_matrix_ncol(pref_matrix) != in_types) {
+        IGRAPH_ERROR("The preference matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&cumdist, in_types * out_types + 1);
