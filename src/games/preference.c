@@ -372,12 +372,12 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  */
 
 int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
-                                      igraph_integer_t in_types,
                                       igraph_integer_t out_types,
+                                      igraph_integer_t in_types,                                      
                                       const igraph_matrix_t *type_dist_matrix,
                                       const igraph_matrix_t *pref_matrix,
-                                      igraph_vector_t *node_type_in_vec,
                                       igraph_vector_t *node_type_out_vec,
+                                      igraph_vector_t *node_type_in_vec,                                      
                                       igraph_bool_t loops) {
 
     long int i, j, k;
