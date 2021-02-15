@@ -116,18 +116,36 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     if (type_dist) {
+        igraph_real_t lo;
+
         if (igraph_vector_size(type_dist) != types) {
             IGRAPH_ERROR("The vertex type distribution vector must agree in length with the number of types.",
                          IGRAPH_EINVAL);
         }
 
-        if (igraph_vector_min(type_dist) < 0) {
+        lo = igraph_vector_min(type_dist);
+        if (lo < 0) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain negative values.", IGRAPH_EINVAL);
+        }
+        if (igraph_is_nan(lo)) {
+            IGRAPH_ERROR("The vertex type distribution vector must not contain NaN.", IGRAPH_EINVAL);
         }
     }
 
     if (igraph_matrix_nrow(pref_matrix) != types || igraph_matrix_ncol(pref_matrix) != types) {
         IGRAPH_ERROR("The preference matrix must be square and agree in dimensions with the number of types.", IGRAPH_EINVAL);
+    }
+
+    {
+        igraph_real_t lo, hi;
+        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+
+        if (lo < 0 || hi > 1) {
+            IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
+        }
+        if (igraph_is_nan(lo) || igraph_is_nan(hi)) {
+            IGRAPH_ERROR("The preference matrix must not contain NaN.", IGRAPH_EINVAL);
+        }
     }
 
     if (! directed && ! igraph_matrix_is_symmetric(pref_matrix)) {
@@ -402,15 +420,37 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     if (type_dist_matrix) {
+        igraph_real_t lo;
+
         if (igraph_matrix_nrow(type_dist_matrix) != out_types ||
             igraph_matrix_ncol(type_dist_matrix) != in_types) {
             IGRAPH_ERROR("The type distribution matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
+        }
+
+        lo = igraph_matrix_min(type_dist_matrix);
+        if (lo < 0) {
+            IGRAPH_ERROR("The type distribution matrix must not contain negative values.", IGRAPH_EINVAL);
+        }
+        if (igraph_is_nan(lo)) {
+            IGRAPH_ERROR("The type distribution matrix must not contain NaN.", IGRAPH_EINVAL);
         }
     }
 
     if (igraph_matrix_nrow(pref_matrix) != out_types ||
         igraph_matrix_ncol(pref_matrix) != in_types) {
         IGRAPH_ERROR("The preference matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
+    }
+
+    {
+        igraph_real_t lo, hi;
+        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+
+        if (lo < 0 || hi > 1) {
+            IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
+        }
+        if (igraph_is_nan(lo) || igraph_is_nan(hi)) {
+            IGRAPH_ERROR("The preference matrix must not contain NaN.", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&cumdist, in_types * out_types + 1);
