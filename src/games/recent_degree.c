@@ -31,7 +31,7 @@
 
 /**
  * \function igraph_recent_degree_game
- * \brief Stochastic graph generator based on the number of incident edges a node has gained recently
+ * \brief Stochastic graph generator based on the number of incident edges a node has gained recently.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph, this is the same as
@@ -47,10 +47,10 @@
  *        zero-length vector.
  * \param outseq The number of edges to add in each time step. This
  *        argument is ignored if it is a null pointer or a zero length
- *        vector, is this case the constant \p m parameter is used.
+ *        vector. In this case the constant \p m parameter is used.
  * \param outpref Logical constant, if true the edges originated by a
- *        vertex also count as recent incident edges. It is false in
- *        most cases.
+ *        vertex also count as recent incident edges.
+ *        For most applications it is reasonable to set it to false.
  * \param zero_appeal Constant giving the attractiveness of the
  *        vertices which haven't gained any edge recently.
  * \param directed Logical constant, whether to generate a directed
@@ -71,7 +71,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
                               igraph_bool_t directed) {
 
     long int no_of_nodes = n;
-    long int no_of_neighbors = m;
+    long int no_of_neighbors;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j;
@@ -85,8 +85,8 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
         IGRAPH_ERRORF("Number of vertices cannot be negative, got %ld.", IGRAPH_EINVAL, n);
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
-        IGRAPH_ERRORF("If out degree sequence is specified its length should equal the number of nodes. "
-                      "Length: %ld, number of nodes: %ld.", IGRAPH_EINVAL, igraph_vector_size(outseq), n);
+        IGRAPH_ERRORF("Length of out-degree sequence (%ld) must equal the number of nodes (%ld).",
+                      IGRAPH_EINVAL, (long int) igraph_vector_size(outseq), n);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
         IGRAPH_ERRORF("Out degree cannot be negative if degree sequence is not specified, got %ld\n.",
@@ -107,6 +107,11 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
         no_of_neighbors = m;
+
+        if (no_of_neighbors < 0) {
+            IGRAPH_ERRORF("Number of edges per time step cannot be negative, got %ld.", IGRAPH_EINVAL, no_of_neighbors);
+        }
+
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
         no_of_edges = 0;
