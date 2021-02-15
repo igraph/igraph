@@ -999,6 +999,7 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     max = *(v->stor_begin);
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
     if (igraph_is_nan(max)) { return max; }; /* Result is NaN */
@@ -1039,6 +1040,7 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
         BASE *ptr;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
+        IGRAPH_ASSERT(v->stor_begin != v->end);
         max = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
@@ -1077,6 +1079,7 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     min = *(v->stor_begin);
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
     if (igraph_is_nan(min)) { return min; }; /* Result is NaN */
@@ -1116,6 +1119,7 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
         BASE *ptr;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
+        IGRAPH_ASSERT(v->stor_begin != v->end);
         min = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
@@ -2475,6 +2479,7 @@ int FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
     BASE* ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     *min = *max = *(v->stor_begin);
     #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*min)) { return IGRAPH_SUCCESS; }; /* Result is NaN */
@@ -2524,6 +2529,7 @@ int FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     ptr = v->stor_begin;
     min = max = ptr;
     #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
