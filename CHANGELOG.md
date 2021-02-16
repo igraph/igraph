@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [0.9.0] - 2021-02-16
+
+### Added
+
  - Eulerian paths/cycles (PR #1346):
    * `igraph_is_eulerian()` finds out whether an Eulerian path/cycle exists.
    * `igraph_eulerian_path()` returns an Eulerian path.
