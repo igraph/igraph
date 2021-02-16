@@ -1,12 +1,12 @@
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: libigraph
-Description: A library for creating and manipulating graphs
-Version: @VERSION@
-URL: http://igraph.org
+Description: @PROJECT_DESCRIPTION@
+Version: @PROJECT_VERSION@
+URL: @PROJECT_HOMEPAGE_URL@
 Libs: -L${libdir} -ligraph
 Libs.private: @PKGCONFIG_LIBS_PRIVATE@
 Cflags: -I${includedir}/igraph

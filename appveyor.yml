@@ -3,67 +3,86 @@ branches:
   except:
   - /^(github|travis)\/.+$/
 
-# We are using Python 3.5 because Python requires MSVC 14 from
-# version 3.5 onwards so it does not matter which Python version we pick as
-# long as it's later than 3.5.
-environment:
-  PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
-  MSYSTEM: MINGW64
-  TARGET_ARCH: "x64"
-
-  matrix:
-    - MSVC_VERSION: "14"
-      PYTHON_VERSION: "3.5"
-    - MSVC_VERSION: "NONE"
-
 # We always use a 64-bit machine, but can build x86 distributions
-# with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
 platform:
     - x64
 
-init:
-  - cmd: "ECHO MSVC_VERSION=%MSVC_VERSION%"
+environment:
+    global:
+        VCPKG_DEFAULT_TRIPLET: x64-windows-static
 
-# all our builds have to happen in install...
-build: false
+    matrix:
+        - job_name: Static
+        - job_name: Dynamic
+
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+  - C:\Tools\vcpkg\installed -> appveyor.yml
 
 install:
-    - cmd: set PYTHONUNBUFFERED=1
+    # Install dependencies for MSVC build
+    - choco install winflexbison
 
-    # update msys2 keyring first
-    - C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-    - C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+    # Choose VS 2015, https://www.appveyor.com/docs/lang/cpp/#visual-studio-2015
+    - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
 
-    # update msys2
-    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
-    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S zstd"
-    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S autoconf automake bison flex"
-    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S libxml2-devel zip xz"
+    # Update vcpkg, as included version does not have GMP
+    # https://www.appveyor.com/docs/lang/cpp/#vc-packaging-tool
+    - cd C:\Tools\vcpkg
+    # - git pull --quiet
+    # - .\bootstrap-vcpkg.bat -disableMetrics
+    # - vcpkg install yasm-tool:x86-windows
+    # - vcpkg install gmp
+    - vcpkg install libxml2
+    - vcpkg integrate install
 
-    # Now start with the build: first the msys2 based one
-    - cmd: bash bootstrap.sh
-    - cmd: bash configure --enable-verify-finally
+for:
+    - matrix:
+        only:
+            - job_name: Static
+      before_build:
+        - cd "%APPVEYOR_BUILD_FOLDER%"
+        - mkdir build
+        - cd build
+        - cmake ..
+            -A x64
+            -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static
+            -DIGRAPH_GRAPHML_SUPPORT=1
+            -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1
+            -DIGRAPH_VERIFY_FINALLY_STACK=1
 
-    # now make the msvc-specific distribution
-    - cmd: if [%MSVC_VERSION%] NEQ [NONE] make msvc
-    - cmd: if [%MSVC_VERSION%] NEQ [NONE] cd igraph-*-msvc
+    - matrix:
+        only:
+            - job_name: Dynamic
+      before_build:
+        - cd "%APPVEYOR_BUILD_FOLDER%"
+        - mkdir build
+        - cd build
+        - cmake ..
+            -A x64
+            -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static
+            -DBUILD_SHARED_LIBS=1
+            -DIGRAPH_GRAPHML_SUPPORT=1
+            -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1
+            -DIGRAPH_VERIFY_FINALLY_STACK=1
 
-    # and run the build (use make or msbuild.exe, depending on whether we use MSVC)
-    - cmd: if %MSVC_VERSION%==NONE make
-    - cmd: if %MSVC_VERSION%==14 call "%VS140COMNTOOLS%\vsvars32.bat"
-    - cmd: if %MSVC_VERSION%==14 devenv /upgrade igraph.vcproj
-    - cmd: if %MSVC_VERSION%==14 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+configuration: Release
+
+build:
+    parallel: true
+    verbosity: minimal
 
 test_script:
-    - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
-    - cmd: set "PATH=%APPVEYOR_BUILD_FOLDER%\src\.libs;%PATH%"
-    - cmd: path
-    - cmd: if %MSVC_VERSION%==NONE make check
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    - cd build
+    - ctest --output-on-failure -C Release
 
 on_failure:
-    - cmd: echo zipping everything after a failure...
-    - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
-    - cmd: 7z a failed_state.zip . |grep -v "Compressing"
-    - cmd: appveyor PushArtifact failed_state.zip
+    - echo zipping everything after a failure...
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    - 7z a failed_state.zip . | grep -v "Compressing"
+    - appveyor PushArtifact failed_state.zip

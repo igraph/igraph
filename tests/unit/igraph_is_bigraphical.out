@@ -1,0 +1,24 @@
+( )
+( )
+simple: true, multi: true
+
+( 3 3 )
+( 1 2 3 )
+simple: false, multi: true
+
+( 3 2 1 )
+( 1 2 3 )
+simple: true, multi: true
+
+( 1 1 1 1 )
+( 2 3 )
+simple: false, multi: false
+
+( 1 1 1 1 )
+( 2 2 )
+simple: true, multi: true
+
+( 1 2 0 3 0 )
+( 2 3 1 )
+simple: true, multi: true
+

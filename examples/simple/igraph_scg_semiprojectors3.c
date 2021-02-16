@@ -41,13 +41,9 @@ int main() {
     igraph_matrix_complex_init(&V2, 0, 0);
     igraph_vector_init(&groups, 0);
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-
     igraph_tree(&g, 10, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 
     igraph_sparsemat_init(&laplacian, nodes, nodes, igraph_ecount(&g) * 2);
-
-    igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_laplacian(&g, /*res=*/ 0, /*sparseres=*/ &laplacian,
                      /*normalized=*/ 0, /*weights=*/ 0);

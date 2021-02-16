@@ -1,0 +1,9 @@
+Leiden found 2 clusters using CPM (resolution parameter 0.05), quality is 0.8929.
+Membership: 0 0 0 0 0 1 1 1 1 1
+
+Iterated Leiden, using CPM (resolution parameter 0.05), quality is 0.8929.
+Membership: 0 0 0 0 0 1 1 1 1 1
+
+Leiden found 2 clusters using modularity, quality is 0.4524.
+Membership: 0 0 0 0 0 1 1 1 1 1
+

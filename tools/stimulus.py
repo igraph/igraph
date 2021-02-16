@@ -233,18 +233,16 @@ class CodeGenerator(metaclass=abc.ABCMeta):
         parser = PParser()
         self.func = OrderedDict()
         for f in func:
-            ff = open(f)
-            newfunc = parser.parse(ff)
-            for nf, nv in newfunc.items():
-                self.func[nf] = nv
+            ff=open(f, "rU")
+            newfunc=parser.parse(ff)
+            self.func.extend(newfunc)
             ff.close()
 
         self.types = OrderedDict()
         for t in types:
-            ff = open(t)
-            newtypes = parser.parse(ff)
-            for nt, nv in newtypes.items():
-                self.types[nt] = nv
+            ff=open(t, "rU")
+            newtypes=parser.parse(ff)
+            self.types.extend(newtypes)
             ff.close()
 
         # The default return type is 'ERROR'
@@ -313,8 +311,8 @@ class CodeGenerator(metaclass=abc.ABCMeta):
 
     def append_inputs(self, inputs, output):
         for i in inputs:
-            ii = open(i)
-            str = ii.read()
+            ii=open(i, "rU")
+            str=ii.read()
             while str != "":
                 output.write(str)
                 str = ii.read()
@@ -376,9 +374,10 @@ class RRCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname = params[p]["type"]
             if not tname in self.types.keys():
-                print("Error: Unknown type " + tname + " in " + function)
-                return
-            params[p].setdefault("mode", "IN")
+                print "Error: Unknown type encountered:", tname
+                sys.exit(7)
+
+            params[p].setdefault('mode', 'IN')
 
         ## Roxygen to export the function
         internal = self.func[function].get("INTERNAL")
@@ -1010,7 +1009,7 @@ class JavaJavaCodeGenerator(JavaCodeGenerator):
         if len(inputs) > 1:
             raise StimulusError("Java code generator supports only a single input")
 
-        input = open(inputs[0])
+        input = open(inputs[0], "rU")
         for line in input:
             if "%STIMULUS%" not in line:
                 out.write(line)
@@ -1416,40 +1415,39 @@ class ShellCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname = params[p]["type"]
             if not tname in self.types.keys():
-                print("Error: Unknown type ", tname, " in ", function)
+                print "W: Unknown type encountered:", tname
                 return
 
-            params[p].setdefault("mode", "IN")
-            t = self.types[tname]
-            mode = params[p]["mode"]
-            if "INCONV" in t or "OUTCONV" in t:
-                args[p] = params[p].copy()
-                args[p]["shell_no"] = len(args) - 1
-                if mode == "INOUT":
-                    args[p]["mode"] = "IN"
-                    args[p + "-out"] = params[p].copy()
-                    args[p + "-out"]["mode"] = "OUT"
-                    args[p + "-out"]["shell_no"] = len(args) - 1
-                    if "INCONV" not in t or "IN" not in t["INCONV"]:
-                        print("Warning: no INCONV for type", tname, ", mode IN")
-                    if "OUTCONV" not in t or "OUT" not in t["OUTCONV"]:
-                        print("Warning: no OUTCONV for type", tname, ", mode OUT")
-            if mode == "IN" and ("INCONV" not in t or mode not in t["INCONV"]):
-                print("Warning: no INCONV for type", tname, ", mode", mode)
-            if mode == "OUT" and ("OUTCONV" not in t or mode not in t["OUTCONV"]):
-                print("Warning: no OUTCONV for type", tname, ", mode", mode)
+            params[p].setdefault('mode', 'IN')
+            t=self.types[tname]
+            mode=params[p]['mode']
+            if 'INCONV' in t or 'OUTCONV' in t:
+                args[p]=params[p].copy()
+                args[p]['shell_no']=len(args)-1
+                if mode=="INOUT":
+                    args[p]['mode']='IN'
+                    args[p+'-out']=params[p].copy()
+                    args[p+'-out']['mode']='OUT'
+                    args[p+'-out']['shell_no']=len(args)-1
+                    if 'INCONV' not in t or 'IN' not in t['INCONV']:
+                        print "Warning: no INCONV for type", tname, ", mode IN"
+                    if 'OUTCONV' not in t or 'OUT' not in t['OUTCONV']:
+                        print "Warning: no OUTCONV for type", tname, ", mode OUT"
+            if mode =='IN' and ('INCONV' not in t or mode not in t['INCONV']):
+                print "Warning: no INCONV for type", tname, ", mode", mode
+            if mode == 'OUT' and ('OUTCONV' not in t or mode not in t['OUTCONV']):
+                print "Warning: no OUTCONV for type", tname, ", mode", mode
 
-        res = {"nargs": len(args)}
-        res["func"] = function
-        res["args"] = self.chunk_args(function, args)
-        res["decl"] = self.chunk_decl(function, params)
-        res["inconv"] = self.chunk_inconv(function, args)
-        res["call"] = self.chunk_call(function, params)
-        res["outconv"] = self.chunk_outconv(function, args)
-        res["default"] = self.chunk_default(function, args)
-        res["usage"] = self.chunk_usage(function, args)
-        text = (
-            """
+        res={'nargs': len(args)}
+        res['func']=function
+        res['args']=self.chunk_args(function, args)
+        res['decl']=self.chunk_decl(function, params)
+        res['inconv']=self.chunk_inconv(function, args)
+        res['call']=self.chunk_call(function, params)
+        res['outconv']=self.chunk_outconv(function, args)
+        res['default']=self.chunk_default(function, args)
+        res['usage']=self.chunk_usage(function, args)
+        text="""
 /*-------------------------------------------/
 / %(func)-42s /
 /-------------------------------------------*/

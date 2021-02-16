@@ -7,9 +7,9 @@
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
-#include "igraph_blas_internal.h"
-#include "igraph_lapack_internal.h"
-#include "igraph_arpack_internal.h"
+#include "linalg/blas_internal.h"
+#include "linalg/lapack_internal.h"
+#include "linalg/arpack_internal.h"
 
 typedef int integer;
 typedef unsigned int uinteger;
@@ -164,8 +164,12 @@ typedef struct Namelist Namelist;
 
 #define abs(x) ((x) >= 0 ? (x) : -(x))
 #define dabs(x) (doublereal)abs(x)
+#ifndef min
 #define min(a,b) ((a) <= (b) ? (a) : (b))
+#endif
+#ifndef max
 #define max(a,b) ((a) >= (b) ? (a) : (b))
+#endif
 #define dmin(a,b) (doublereal)min(a,b)
 #define dmax(a,b) (doublereal)max(a,b)
 #define bit_test(a,b)   ((a) >> (b) & 1)

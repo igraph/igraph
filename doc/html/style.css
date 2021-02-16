@@ -4,11 +4,17 @@
 .index { padding: 0px 20px 10px; }
 .legalnotice { padding: 0px 20px 10px; }
 .releaseinfo { padding: 0px 20px 10px; }
+.navigation-header { position: absolute; right: 20px; top: 7px; }
+.navigation-footer { padding: 0px 20px 10px; }
 .programlisting 
 {
   background: #eeeeff;
   border: solid 1px #4444ff;
   padding: 0.5em;
+  font-size: 16px;
+}
+.literal {
+  font-size: 16px;
 }
 .variablelist 
 {
@@ -19,6 +25,7 @@
 {
   vertical-align: top;
 }
+
 table.navigation 
 {
     color: #fff;
@@ -69,6 +76,12 @@ h1 {
     border-bottom: 1px solid #1c477f;
     font-size: large;
 }
+.chapter h1 {
+    /* compensate for main page horizontal padding */
+    margin: 0 -20px;
+    padding: 7px 20px 7px 35px;
+}
+
 h2 {
     font-size: 1.2em;
 }
@@ -151,6 +164,17 @@ a:hover { color: #00f; text-decoration: underline; cursor: hand; }
 h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
 h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
 h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
+
+.navigation-header a {
+  color: white;
+  text-decoration: none;
+  padding: 4px 10px;
+  text-shadow: 0 1px 2px #000;
+  transition: background-color 300ms;
+  border-radius: 4px;
+}
+.navigation-header a:visited { color: white; text-decoration: none }
+.navigation-header a:hover { color: white; text-decoration: none; background-color: rgba(255, 255, 255, 0.3) }
 
 span.type { font-family: monospace; }
 

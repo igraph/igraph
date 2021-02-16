@@ -2,8 +2,7 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,37 +15,37 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 #include <stdio.h>
 
 int main() {
-    igraph_t g;
+    igraph_t graph;
     igraph_vector_t membership;
     igraph_real_t modularity;
 
-    igraph_famous(&g, "Zachary"); /* we use Zachary's karate club network */
+    igraph_famous(&graph, "Zachary"); /* We use Zachary's karate club network. */
 
-    /* label propagation is a stochastic method; the result will depend on the random seed */
+    /* Label propagation is a stochastic method; the result will depend on the random seed. */
     igraph_rng_seed(igraph_rng_default(), 123);
 
+    /* All igraph functions that returns their result in an igraph_vector_t must be given
+       an already initialized vector. */
     igraph_vector_init(&membership, 0);
     igraph_community_label_propagation(
-                &g, &membership,
+                &graph, &membership,
                 /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
                 &modularity);
 
-    printf("%d communities found; modularity score is %f.\n",
-           (int) (igraph_vector_max(&membership) + 1),
+    printf("%ld communities found; modularity score is %g.\n",
+           (long int) (igraph_vector_max(&membership) + 1),
            modularity);
 
+    /* Destroy data structures at the end. */
     igraph_vector_destroy(&membership);
-    igraph_destroy(&g);
+    igraph_destroy(&graph);
 
     return 0;
 }

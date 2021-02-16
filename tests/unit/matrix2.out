@@ -1,0 +1,167 @@
+igraph_matrix_e
+0 1 2 
+3 4 5 
+6 7 8 
+9 10 11 
+igraph_matrix_e_ptr
+0 1 2 
+3 4 5 
+6 7 8 
+9 10 11 
+igraph_matrix_set
+[        0        0        0
+         1        1        1
+         2        2        2
+         3        3        3 ]
+[        0        1        2
+         0        1        2
+         0        1        2
+         0        1        2 ]
+igraph_matrix_fill
+[       42       42       42
+        42       42       42
+        42       42       42
+        42       42       42 ]
+[    -42.1    -42.1    -42.1
+     -42.1    -42.1    -42.1
+     -42.1    -42.1    -42.1
+     -42.1    -42.1    -42.1 ]
+igraph_matrix_update
+[        0        1        2
+         3        4        5
+         6        7        8
+         9       10       11 ]
+igraph_matrix_rbind
+[        0        1        2
+         3        4        5
+         6        7        8
+         9       10       11
+         0        1        2
+         3        4        5
+         6        7        8
+         9       10       11 ]
+
+[        0        1        2
+         3        4        5
+         6        7        8
+         9       10       11
+         0        1        2
+         3        4        5
+         6        7        8
+         9       10       11 ]
+
+[        0        1        2
+         3        4        5
+         6        7        8
+         9       10       11
+         0        1        2
+         3        4        5
+         6        7        8
+         9       10       11 ]
+igraph_matrix_cbind
+[        0        1        2        0        1
+         3        4        5        2        3
+         6        7        8        4        5
+         9       10       11        6        7 ]
+igraph_matrix_swap
+[        0        1
+         2        3
+         4        5
+         6        7 ]
+[        0        0
+         0        0
+         0        0
+         0        0 ]
+igraph_matrix_get_row
+igraph_matrix_set_row
+[        0        1
+         2        3
+         4        5
+         6        7 ]
+igraph_matrix_set_col
+[        0        1
+         2        3
+         4        5
+         6        7 ]
+igraph_matrix_swap_rows
+[        4        5
+         2        3
+         0        1
+         6        7 ]
+igraph_matrix_swap_cols
+[        5        4
+         3        2
+         1        0
+         7        6 ]
+igraph_matrix_add_constant
+[        5        4
+         3        2
+         1        0
+         7        6 ]
+[        4        3
+         2        1
+         0       -1
+         6        5 ]
+igraph_matrix_add
+[        0        2
+         4        6
+         8       10
+        12       14 ]
+igraph_matrix_sub
+[        0        1
+         2        3
+         4        5
+         6        7 ]
+igraph_matrix_mul_elements
+[        0        1
+         4        9
+        16       25
+        36       49 ]
+igraph_matrix_div_elements
+[        0      0.5
+         2      4.5
+         8     12.5
+        18     24.5 ]
+igraph_matrix_min
+igraph_matrix_which_min
+igraph_matrix_which_max
+igraph_matrix_minmax
+-2 100
+igraph_matrix_which_minmax
+igraph_matrix_isnull
+igraph_matrix_empty
+igraph_matrix_is_symmetric
+igraph_matrix_prod
+[        1        2
+         3        4
+         5        6 ]
+product: 720
+igraph_matrix_rowsum
+( 3 7 11 )
+igraph_matrix_colsum
+( 9 12 )
+igraph_matrix_contains
+igraph_matrix_search
+igraph_matrix_remove_row
+[        1        2
+         5        6 ]
+[        0        1        2        3
+         4        5        6        7
+         8        9       10       11
+        12       13       14       15 ]
+[        4        5        6        7
+         8        9       10       11
+        12       13       14       15 ]
+igraph_matrix_select_cols
+[        0        4        2
+         0        4        2
+         0        4        2
+         0        4        2
+         0        4        2
+         0        4        2 ]
+[        0
+         0
+         0
+         0
+         0
+         0 ]

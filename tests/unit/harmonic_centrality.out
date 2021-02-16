@@ -1,0 +1,33 @@
+Unweighted undirected:
+( 0.408333 0.547222 0.597222 0.611111 0.597222 0.547222 0.408333 )
+Unweighted directed:
+( 0.408333 0.380556 0.347222 0.305556 0.25 0.166667 0 )
+Unweighted undirected, cutoff=0:
+( 0 0 0 0 0 0 0 )
+Unweighted undirected, cutoff=1:
+( 0.166667 0.333333 0.333333 0.333333 0.333333 0.333333 0.166667 )
+Unit-weighted undirected:
+( 0.408333 0.547222 0.597222 0.611111 0.597222 0.547222 0.408333 )
+Unit-weighted directed:
+( 0.408333 0.380556 0.347222 0.305556 0.25 0.166667 0 )
+Unit-weighted undirected, cutoff=0:
+( 0 0 0 0 0 0 0 )
+Unit-weighted undirected, cutoff=1:
+( 0.166667 0.333333 0.333333 0.333333 0.333333 0.333333 0.166667 )
+Weighted undirected:
+( 0.285714 0.32209 0.241402 0.187963 0.149146 0.116534 0.0795695 )
+Weighted directed:
+( 0.285714 0.155423 0.102513 0.0712963 0.0484848 0.0277778 0 )
+Null graph:
+( )
+( )
+Singleton graph:
+( 0 )
+( 0 )
+Empty graph with two vertices:
+( 0 0 )
+( 0 0 )
+Multiple components, unweighted:
+( 0 0.1 0.1 0.1 0.3125 0.358333 0.325 0.260833 0.329167 0.368333 0.260833 0.23 0 0.315 0.315 0.315 0.315 0.05 0.05 0.220833 0.220833 )
+Multiple components, constant weight vector:
+( 0 0.7 0.7 0.7 2.1875 2.50833 2.275 1.82583 2.30417 2.57833 1.82583 1.61 0 2.205 2.205 2.205 2.205 0.35 0.35 1.54583 1.54583 )

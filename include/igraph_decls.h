@@ -8,16 +8,12 @@
     #define __END_DECLS /* empty */
 #endif
 
-/* In igraph 0.8, we use DECLDIR only with MSVC, not other compilers on Windows. */
-#undef DECLDIR
-#if defined (_MSC_VER)
-    #ifdef IGRAPH_EXPORTS
-        #define DECLDIR __declspec(dllexport)
-    #elif defined(IGRAPH_STATIC)
-        #define DECLDIR /**/
-    #else
-        #define DECLDIR __declspec(dllimport)
-    #endif
-#else
-    #define DECLDIR /**/
-#endif
+/* This is to eliminate gcc warnings about unused parameters */
+#define IGRAPH_UNUSED(x) (void)(x)
+
+/* Include the definition of macros controlling symbol visibility */
+#include "igraph_export.h"
+
+/* Used instead of IGRAPH_EXPORT with functions that need to be tested,
+ * but are not part of the public API. */
+#define IGRAPH_PRIVATE_EXPORT IGRAPH_EXPORT

@@ -36,9 +36,13 @@ __BEGIN_DECLS
 
 typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
 
-typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1 } igraph_i_loops_t;
+/* Note for the enum below: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
+ * is 2. This is intentional, for the sake of backwards compatibility with
+ * earlier versions where we only had IGRAPH_LOOPS and it meant
+ * IGRAPH_LOOPS_TWICE */
+typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IGRAPH_LOOPS_ONCE = 2 } igraph_loops_t;
 
-typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_i_multiple_t;
+typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_multiple_t;
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
@@ -110,7 +114,9 @@ typedef enum { IGRAPH_EDGEORDER_ID = 0,
              } igraph_edgeorder_type_t;
 
 typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY = 0,
-               IGRAPH_TO_DIRECTED_MUTUAL
+               IGRAPH_TO_DIRECTED_MUTUAL,
+               IGRAPH_TO_DIRECTED_RANDOM,
+               IGRAPH_TO_DIRECTED_ACYCLIC
              } igraph_to_directed_t;
 
 typedef enum { IGRAPH_TO_UNDIRECTED_EACH = 0,

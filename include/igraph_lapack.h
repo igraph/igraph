@@ -24,9 +24,9 @@
 #ifndef IGRAPH_LAPACK_H
 #define IGRAPH_LAPACK_H
 
+#include "igraph_decls.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
-#include "igraph_decls.h"
 
 __BEGIN_DECLS
 
@@ -56,32 +56,32 @@ __BEGIN_DECLS
  * </para>
  */
 
-DECLDIR int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                                 int *info);
-DECLDIR int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-                                 igraph_vector_int_t *ipiv, igraph_matrix_t *b);
-DECLDIR int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                                igraph_matrix_t *b, int *info);
+IGRAPH_EXPORT int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+                                       int *info);
+IGRAPH_EXPORT int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
+                                       const igraph_vector_int_t *ipiv, igraph_matrix_t *b);
+IGRAPH_EXPORT int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+                                      igraph_matrix_t *b, int *info);
 
 typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
                IGRAPH_LAPACK_DSYEV_INTERVAL,
                IGRAPH_LAPACK_DSYEV_SELECT
              } igraph_lapack_dsyev_which_t;
 
-DECLDIR int igraph_lapack_dsyevr(const igraph_matrix_t *A,
-                                 igraph_lapack_dsyev_which_t which,
-                                 igraph_real_t vl, igraph_real_t vu, int vestimate,
-                                 int il, int iu, igraph_real_t abstol,
-                                 igraph_vector_t *values, igraph_matrix_t *vectors,
-                                 igraph_vector_int_t *support);
+IGRAPH_EXPORT int igraph_lapack_dsyevr(const igraph_matrix_t *A,
+                                       igraph_lapack_dsyev_which_t which,
+                                       igraph_real_t vl, igraph_real_t vu, int vestimate,
+                                       int il, int iu, igraph_real_t abstol,
+                                       igraph_vector_t *values, igraph_matrix_t *vectors,
+                                       igraph_vector_int_t *support);
 
 /* TODO: should we use complex vectors/matrices? */
 
-DECLDIR int igraph_lapack_dgeev(const igraph_matrix_t *A,
-                                igraph_vector_t *valuesreal,
-                                igraph_vector_t *valuesimag,
-                                igraph_matrix_t *vectorsleft,
-                                igraph_matrix_t *vectorsright, int *info);
+IGRAPH_EXPORT int igraph_lapack_dgeev(const igraph_matrix_t *A,
+                                      igraph_vector_t *valuesreal,
+                                      igraph_vector_t *valuesimag,
+                                      igraph_matrix_t *vectorsleft,
+                                      igraph_matrix_t *vectorsright, int *info);
 
 typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE = 0,
                IGRAPH_LAPACK_DGEEVX_BALANCE_PERM,
@@ -90,24 +90,21 @@ typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE = 0,
              }
 igraph_lapack_dgeevx_balance_t;
 
-DECLDIR int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
-                                 const igraph_matrix_t *A,
-                                 igraph_vector_t *valuesreal,
-                                 igraph_vector_t *valuesimag,
-                                 igraph_matrix_t *vectorsleft,
-                                 igraph_matrix_t *vectorsright,
-                                 int *ilo, int *ihi, igraph_vector_t *scale,
-                                 igraph_real_t *abnrm,
-                                 igraph_vector_t *rconde,
-                                 igraph_vector_t *rcondv,
-                                 int *info);
+IGRAPH_EXPORT int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+                                       const igraph_matrix_t *A,
+                                       igraph_vector_t *valuesreal,
+                                       igraph_vector_t *valuesimag,
+                                       igraph_matrix_t *vectorsleft,
+                                       igraph_matrix_t *vectorsright,
+                                       int *ilo, int *ihi, igraph_vector_t *scale,
+                                       igraph_real_t *abnrm,
+                                       igraph_vector_t *rconde,
+                                       igraph_vector_t *rcondv,
+                                       int *info);
 
-DECLDIR int igraph_lapack_dgehrd(const igraph_matrix_t *A,
-                                 int ilo, int ihi,
-                                 igraph_matrix_t *result);
-
-DECLDIR int igraph_lapack_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
-                               igraph_real_t *res);
+IGRAPH_EXPORT int igraph_lapack_dgehrd(const igraph_matrix_t *A,
+                                       int ilo, int ihi,
+                                       igraph_matrix_t *result);
 
 __END_DECLS
 

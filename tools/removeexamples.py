@@ -1,28 +1,31 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 from xml.etree.ElementTree import ElementTree
 
+
 def usage():
-    print sys.argv[0], "<infile> <outfile>"
+    print(sys.argv[0], "<infile> <outfile>")
+
 
 def main():
     if len(sys.argv) != 3:
         usage()
         sys.exit(2)
-    
+
     # Read in
-    tree=ElementTree()
+    tree = ElementTree()
     tree.parse(sys.argv[1])
-    
+
     # Remove examples
-    examples=tree.findall(".//example")
+    examples = tree.findall(".//example")
     for ex in examples:
-        prog=ex.find("programlisting")
+        prog = ex.find("programlisting")
         ex.remove(prog)
 
     # Write result
-    tree.write(sys.argv[2])    
+    tree.write(sys.argv[2])
+
 
 if __name__ == "__main__":
     main()

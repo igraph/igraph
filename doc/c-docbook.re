@@ -42,7 +42,7 @@ REPLACE ----- function object, extract its signature --------------------------
 [\s]*(?P<brief>[^\n]*?)\n        # brief description
 (?P<after>.*?)\*\/               # tail of the comment
 \s*
-(DECLDIR )?                      # strip DECLDIR from prototype
+(IGRAPH_EXPORT )?                # strip IGRAPH_EXPORT from prototype
 (?P<def>.*?\))                   # function head
 (?=(\s*;)|(\s*\{))               # prototype ends with ; function head with {
 .*\Z                             # and the remainder
@@ -92,7 +92,7 @@ WITH --------------------------------------------------------------------------
 \g<before></para>
 <formalpara><title>Arguments:</title><para>
 <variablelist role="params">
-\param
+\\param
 
 REPLACE ----- function parameter descriptions, tail ---------------------------
 
@@ -110,7 +110,7 @@ REPLACE ----- function parameter descriptions, tail ---------------------------
 
 WITH
 
-\param\g<paramtext></variablelist></para></formalpara><para>
+\\param\g<paramtext></variablelist></para></formalpara><para>
 \g<endmark>\g<after>
 
 REPLACE ----- function parameter descriptions ---------------------------------
@@ -269,7 +269,7 @@ WITH --------------------------------------------------------------------------
 \g<before></para>
 <formalpara><title>Values:</title><para>
 <variablelist role="params">
-\enumval
+\\enumval
 
 REPLACE ----- enumeration value descriptions, tail ----------------------------
 
@@ -283,7 +283,7 @@ REPLACE ----- enumeration value descriptions, tail ----------------------------
 
 WITH
 
-\enumval\g<paramtext></variablelist></para></formalpara><para>
+\\enumval\g<paramtext></variablelist></para></formalpara><para>
 \g<endmark>\g<after>
 
 REPLACE ----- enumeration value descriptions ----------------------------------
@@ -618,8 +618,7 @@ WITH --------------------------------------------------------------------------
 
 REPLACE ----- add http:// and https:// links ----------------------------------
 
-(?P<link>https?:\/\/.*?)
-(?=(\s)|\))
+(?P<link>https?:\/\/[-\+=&;%@./~()'\w_]*[-\+=&;%@/~'\w_])
 
 WITH --------------------------------------------------------------------------
 
@@ -654,3 +653,48 @@ WITH --------------------------------------------------------------------------
       xmlns:xi="http://www.w3.org/2001/XInclude"/>
   <para></para>
 </example>
+
+REPLACE ----- \deprecated-by --------------------------------------------------
+
+\\deprecated-by\b\s*
+(?P<replacement>[^ \n]+)\s*
+(?P<version>[^\n]+)\n
+
+WITH --------------------------------------------------------------------------
+
+</para>
+<warning>
+<para>Deprecated since version \g<version>. Please do not use this function in new
+code; use <link linkend="\g<replacement>"><function>\g<replacement>()</function></link>
+instead.</para>
+</warning>
+<para>
+
+REPLACE ----- \deprecated -----------------------------------------------------
+
+\\deprecated\b\s*
+(?P<version>[^\n]*?)\n
+
+WITH --------------------------------------------------------------------------
+
+</para>
+<warning>
+<para>Deprecated since version \g<version>. Please do not use this function in new
+code.</para>
+</warning>
+<para>
+
+REPLACE ----- \experimental ---------------------------------------------------
+
+\\experimental\b\s*\n
+
+WITH --------------------------------------------------------------------------
+
+</para>
+<warning>
+<para>This function is experimental and its signature is not considered final yet.
+We reserve the right to change the function signature without changing the
+major version of igraph. Use it at your own risk.</para>
+</warning>
+<para>
+

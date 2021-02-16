@@ -25,7 +25,6 @@
 #include <stdio.h>
 
 int main() {
-
     igraph_t g;
     FILE *ifile;
 

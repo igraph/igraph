@@ -1,28 +1,37 @@
 
 #include <igraph.h>
-#include <assert.h>
 
 int main() {
     igraph_t graph;
     igraph_vector_int_t colors;
 
+    /* Setting a seed makes the result of erdos_renyi_game deterministic. */
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 1000, 10000, /* directed = */ 0, /* loops = */ 0);
+    /* IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS are both equivalent to 0/FALSE, but
+       communicate intent better in this context. */
+    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
+    /* As with all igraph functions, the vector in which the result is returned must
+       be initialized in advance. */
     igraph_vector_int_init(&colors, 0);
-
     igraph_vertex_coloring_greedy(&graph, &colors, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS);
 
-    /* verify that the colouring is valid: */
+    /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
     {
-        long i;
-        long no_of_edges = igraph_ecount(&graph);
+        long int i;
+        /* Store the edge count to avoid the overhead from igraph_ecount in the for loop. */
+        long int no_of_edges = igraph_ecount(&graph);
         for (i = 0; i < no_of_edges; ++i) {
-            assert( VECTOR(colors)[ IGRAPH_FROM(&graph, i) ] != VECTOR(colors)[ IGRAPH_TO(&graph, i) ]  );
+            if ( VECTOR(colors)[ IGRAPH_FROM(&graph, i) ] == VECTOR(colors)[ IGRAPH_TO(&graph, i) ]  ) {
+                printf("Inconsistent coloring! Vertices %ld and %ld are adjacent but have the same color.\n",
+                       (long) IGRAPH_FROM(&graph, i), (long) IGRAPH_TO(&graph, i));
+                abort();
+            }
         }
     }
 
+    /* Destroy data structure when we are done. */
     igraph_vector_int_destroy(&colors);
     igraph_destroy(&graph);
 

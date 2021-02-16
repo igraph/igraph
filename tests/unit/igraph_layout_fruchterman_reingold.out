@@ -1,0 +1,13 @@
+Empty graph.
+Singleton graph in a box.
+A few tests with a disconnected graph of 10 vertices with loops in a box from -1 to 1.
+Without weights, grid or bounds.
+With weights and no grid.
+With weights and grid and high temperature.
+With weights and grid and high temperature and seed.
+Full graph of 5 vertices, seed and no iterations:
+[      0.1      0.2
+       0.3      0.4
+       0.5      0.6
+       0.7      0.8
+       0.9        1 ]

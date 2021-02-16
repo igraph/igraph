@@ -1,5 +1,6 @@
 
 language: c
+cache: ccache
 dist: xenial
 os: linux
 
@@ -10,7 +11,9 @@ branches:
 
 env:
   global:
-    - MAKEFLAGS="-j 2"
+    - CMAKE_GENERATOR=Ninja   # build with ninja instead of make
+    - CTEST_PARALLEL_LEVEL=2  # run tests in parallel
+    - PATH="/snap/bin:$PATH"  # needed in order to run the cmake installed with snap
 
 git:
   depth: 200    # to make sure we find the latest tag when building. Increase if not enough.
@@ -18,6 +21,7 @@ git:
 addons:
   apt:
     packages:
+    - ninja-build
     - flex
     - bison
     - docbook2x
@@ -32,61 +36,111 @@ addons:
     - libarpack2-dev
     - libblas-dev
     - liblapack-dev
+    - git
+    - colordiff
+  snaps:
+    - name: cmake
+      confinement: classic
   homebrew:
     packages:
-    - flex
-    - bison
+    - ccache
+    - ninja
+    - colordiff
+    # - flex  # test with the old flex version that ships with macOS
+    # - bison # test with the old bison version that ships with macOS
     - gmp
-    - glpk
+    # - glpk # currently we test with internal GLPK on macOS
 
-before_install:
-  - git fetch --unshallow    # to make sure that we can fetch the latest tag
+# configuration (running cmake) is in before_script
+# if this phase fails, the build stops immediately
+before_script:
+  - mkdir build && cd build
+  - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DUSE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
 
+# building and testing is in script
+# use && to ensure that ctest is not run if the build failed
 script:
-  - make check
+  - cmake --build . --target build_tests && ctest --output-on-failure
 
 after_failure:
-  - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+  - for file in tests/*.diff; do cat "$file" | colordiff; done
 
 jobs:
   include:
     - name: "Linux"
       os: linux
+
+    - name: "Linux shared libs"
+      os: linux
+      before_script:
+        - mkdir build && cd build
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DUSE_INTERNAL_GMP=1 
+                   -DIGRAPH_VERIFY_FINALLY_STACK=1
+                   -DBUILD_SHARED_LIBS=1
+
+    # - name: "Linux arm64"
+    #   os: linux
+    #   arch: arm64-graviton2 # faster than arm64
+
+    # - name: "Linux ppc64"
+    #   os: linux
+    #   dist: focal # snap fails with ppc64 on earlier Ubuntu
+    #   arch: ppc64le
+
+    # - name: "Linux s390x"
+    #   os: linux
+    #   arch: s390x
+
+    - name: "Alpine Linux (chroot)"
+      os: linux
+      dist: xenial
+      language: shell
       install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --with-external-glpk
-        - make
+        - "wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.12.1/alpine-chroot-install \
+            && echo '5571ad4d17d14bb09ad23a75060f05553786e564  alpine-chroot-install' | sha1sum -c \
+            || exit 1"
+        - alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
+        - sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja ccache bison flex gmp-dev'
+      before_script:
+        - mkdir build && cd build
+        - alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+      script:
+        - alpine cmake --build . --target build_tests
+        - alpine ctest --output-on-failure -j 2
+
     - name: "Linux external deps"
       os: linux
-      dist: bionic
-      install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
-        - make
+      before_script:
+        - mkdir build && cd build
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=0 -DIGRAPH_USE_INTERNAL_GLPK=0 -DIGRAPH_USE_INTERNAL_CXSPARSE=0 -DIGRAPH_USE_INTERNAL_GMP=0 -DIGRAPH_VERIFY_FINALLY_STACK=1
+
+    # Test with x87 floating-point instructions instead of SSE
+    # This may reveal tests that are numerically unstable, and therefore have a high risk of producing false positives
+    # Since most numerically intensive computations happen in the dependencies, build with all-internal libraries
     - name: "Linux x87"
       os: linux
       env:
         - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
-      install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --with-external-glpk
-        - make
+
     - name: "macOS"
       os: osx
-      install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --enable-asan --with-external-glpk
-        - make
+      osx_image: xcode11.5    # we need a newer CMake in the image
+      before_script:
+        - mkdir build && cd build
+        # disable internal BLAS/LAPACK in order to test building with Apple vecLib, which provides these APIs
+        # do not use IGRAPH_VERIFY_FINALLY_STACK as it increases the runtimes immensely in combination with Address Sanitizer
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1
+                   -DUSE_SANITIZER=Address\;Undefined
+                   -DCMAKE_C_FLAGS="-g -Og" -DCMAKE_CXX_FLAGS="-g -Og"
+
     - name: "Documentation"
       language: shell
       os: linux
-      install:
-        - ./bootstrap.sh
-        - ./configure
-        - cd doc
+      before_script:
+        - mkdir build && cd build
+        - cmake ..
       script:
-        - make html
-        - make pdf
+        - cmake --build . --target doc
 
 notifications:
   email:

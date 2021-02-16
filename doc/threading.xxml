@@ -25,5 +25,19 @@ ARPACK library is not thread-safe.
 </para>
 </section>
 
+<section id="thread-safe-rng"><title>Thread-safety of random number generators</title>
+<para>
+The default random number generator that igraph uses is <emphasis>not</emphasis>
+guaranteed to be thread-safe. You need to set a different random number generator
+instance for every thread that you want to use igraph from. This is especially
+important if you set the seed of the random number generator to ensure
+reproducibility; sharing a random number generator between threads would break
+reproducibility as the order in which the various threads are scheduled is
+random, and therefore they would still receive random numbers in an unpredictable
+order from the shared random number generator.
+</para>
+</section>
+
+
 </section>
 

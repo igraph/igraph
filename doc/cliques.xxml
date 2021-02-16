@@ -19,6 +19,8 @@ to cliques and independent vertex sets.
 <!-- doxrox-include igraph_largest_cliques -->
 <!-- doxrox-include igraph_maximal_cliques -->
 <!-- doxrox-include igraph_maximal_cliques_count -->
+<!-- doxrox-include igraph_maximal_cliques_file -->
+<!-- doxrox-include igraph_maximal_cliques_subset -->
 <!-- doxrox-include igraph_maximal_cliques_hist -->
 <!-- doxrox-include igraph_maximal_cliques_callback -->
 <!-- doxrox-include igraph_clique_number -->

@@ -3,9 +3,9 @@
 [igraph](https://igraph.org) includes or links to code from the following sources.
 
 
-#### [bliss 0.73](http://www.tcs.hut.fi/Software/bliss/)
+#### [bliss 0.74](https://users.aalto.fi/~tjunttil/bliss/)
 
-Copyright (c) 2003-2015 Tommi Junttila.
+Copyright (c) 2003-2021 Tommi Junttila.
 
 License: [GNU LGPLv3][lgpl3]
 
@@ -179,62 +179,6 @@ use or performance of this software.
 
 
 #### [SuiteSparse](http://www.suitesparse.com)
-
- * AMD, Copyright (c) 2009-2012 by Timothy A. Davis (http://www.suitesparse.com),
-Patrick R. Amestoy, and Iain S. Duff.  All Rights Reserved.  AMD is available
-under alternate licences; contact T. Davis for details.
-
-   License: [GNU LGPLv2.1][lgpl2] or later
-
- * CHOLMOD/Check Module.  Copyright (C) 2005-2006, Timothy A. Davis
-CHOLMOD is also available under other licenses; contact authors for details.
-
-   License: [GNU LGPLv2.1][lgpl2] or later
-
- * CHOLMOD/Cholesky module, Copyright (C) 2005-2006, Timothy A. Davis
-CHOLMOD is also available under other licenses; contact authors for details.
-http://www.suitesparse.com
-
-   License: [GNU LGPLv2.1][lgpl2] or later
-
- * CHOLMOD/Core Module.  Copyright (C) 2005-2006, Univ. of Florida.
-Author: Timothy A. Davis
-CHOLMOD is also available under other licenses; contact authors for details.
-http://www.suitesparse.com
-
-   License: [GNU LGPLv2.1][lgpl2] or later
-
- * CHOLMOD/MatrixOps Module.  Copyright (C) 2005-2006,
-Timothy A. Davis
-CHOLMOD is also available under other licenses; contact authors for details.
-http://www.suitesparse.com
-
-   License: [GNU GPLv2][gpl2] or later
-
- * CHOLMOD/Modify Module.
-Copyright (C) 2005-2006, Timothy A. Davis and William W. Hager
-CHOLMOD is also available under other licenses; contact authors for details.
-http://www.suitesparse.com
-
-   License: [GNU GPLv2][gpl2] or later
-
- * CHOLMOD/Partition Module.
-Copyright (C) 2005-2006, Univ. of Florida.  Author: Timothy A. Davis
-CHOLMOD is also available under other licenses; contact authors for details.
-http://www.suitesparse.com
-
-   License: [GNU LGPLv2.1][lgpl2] or later
-
- * CHOLMOD/Supernodal Module.
-Copyright (C) 2005-2006, Timothy A. Davis
-CHOLMOD is also available under other licenses; contact authors for details.
-http://www.suitesparse.com
-
-   License: [GNU GPLv2][gpl2] or later
-
- * COLAMD, Copyright 1998-2012, Timothy A. Davis.  http://www.suitesparse.com
-
-   License: [GNU LGPLv2.1][lgpl2] or later
 
  * CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2009, Timothy A. Davis.
 
