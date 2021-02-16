@@ -27,7 +27,7 @@
 
 /**
  * \function igraph_layout_bipartite
- * Simple layout for bipartite graphs
+ * Simple layout for bipartite graphs.
  *
  * The layout is created by first placing the vertices in two rows,
  * according to their types. Then the positions within the rows are
@@ -77,5 +77,5 @@ int igraph_layout_bipartite(const igraph_t *graph,
     igraph_vector_destroy(&layers);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
