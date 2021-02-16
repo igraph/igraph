@@ -249,6 +249,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_fruchterman_reingold
   igraph_layout_grid
   igraph_layout_lgl
   igraph_layout_mds
