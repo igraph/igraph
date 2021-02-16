@@ -35,6 +35,8 @@ jobs:
           update: true
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
       - name: Configuration
         run: |
           mkdir -p build-${{ matrix.arch }}
