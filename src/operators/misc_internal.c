@@ -164,12 +164,12 @@ int igraph_i_merge(igraph_t *res, int mode,
                    &edges2, igraph_i_order_edgelist_cmp);
 
 #define INC1() if ( (++idx1) < no_edges_left) {          \
-        edge1 = VECTOR(order1)[idx1];                \
+        edge1 = VECTOR(order1)[idx1];                    \
         from1 = VECTOR(edges1)[2*edge1];                 \
         to1 = VECTOR(edges1)[2*edge1+1];                 \
     }
 #define INC2() if ( (++idx2) < no_edges_right) {         \
-        edge2 = VECTOR(order2)[idx2];                \
+        edge2 = VECTOR(order2)[idx2];                    \
         from2 = VECTOR(edges2)[2*edge2];                 \
         to2 = VECTOR(edges2)[2*edge2+1];                 \
     }
@@ -178,13 +178,13 @@ int igraph_i_merge(igraph_t *res, int mode,
     INC1();
     INC2();
 
-#define CONT() switch (mode) {              \
-    case IGRAPH_MERGE_MODE_UNION:                \
+#define CONT() switch (mode) {                               \
+    case IGRAPH_MERGE_MODE_UNION:                            \
         l = idx1 < no_edges_left || idx2 < no_edges_right;   \
-        break;                       \
-    case IGRAPH_MERGE_MODE_INTERSECTION:             \
+        break;                                               \
+    case IGRAPH_MERGE_MODE_INTERSECTION:                     \
         l = idx1 < no_edges_left && idx2 < no_edges_right;   \
-        break;                       \
+        break;                                               \
     }
 
     CONT();
