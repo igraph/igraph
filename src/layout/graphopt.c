@@ -307,7 +307,7 @@ static int igraph_i_move_nodes(
  * is zero.
  *
  * </para><para>
- * graphopt uses physical analogies for defining attracting and repelling
+ * Graphopt uses physical analogies for defining attracting and repelling
  * forces among the vertices and then the physical system is simulated
  * until it reaches an equilibrium. (There is no simulated annealing or
  * anything like that, so a stable fixed point is not guaranteed.)
@@ -316,17 +316,17 @@ static int igraph_i_move_nodes(
  * See also http://www.schmuhl.org/graphopt/ for the original graphopt.
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result will be stored here
- *    and its initial contents is used the starting point of the simulation
+ *    and its initial contents are used as the starting point of the simulation
  *    if the \p use_seed argument is true. Note that in this case the
  *    matrix should have the proper size, otherwise a warning is issued and
  *    the supplied values are ignored. If no starting positions are given
- *    (or they are invalid) then a random staring position is used.
+ *    (or they are invalid) then a random starting position is used.
  *    The matrix will be resized if needed.
  * \param niter Integer constant, the number of iterations to perform.
  *    Should be a couple of hundred in general. If you have a large graph
  *    then you might want to only do a few iterations and then check the
  *    result. If it is not good enough you can feed it in again in
- *    the \p res argument. The original graphopt default if 500.
+ *    the \p res argument. The original graphopt default is 500.
  * \param node_charge The charge of the vertices, used to calculate electric
  *    repulsion. The original graphopt default is 0.001.
  * \param node_mass The mass of the vertices, used for the spring forces.
