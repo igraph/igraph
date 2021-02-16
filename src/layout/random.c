@@ -61,7 +61,7 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
 /**
  * \function igraph_layout_random_3d
- * \brief Random layout in 3D
+ * \brief Random layout between -1 and 1 in 3D.
  *
  * \param graph The graph to place.
  * \param res Pointer to an initialized matrix object. It will be
@@ -90,5 +90,5 @@ int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
