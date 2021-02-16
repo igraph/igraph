@@ -57,7 +57,7 @@ static int igraph_i_determine_spring_axal_forces(
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
-        igraph_integer_t spring_length,
+        igraph_real_t spring_length,
         long int other_node,
         long int this_node);
 
@@ -66,7 +66,7 @@ static int igraph_i_apply_spring_force(
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
         long int other_node,
-        long int this_node, igraph_integer_t spring_length,
+        long int this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant);
 
 static int igraph_i_move_nodes(
@@ -166,7 +166,7 @@ static int igraph_i_determine_spring_axal_forces(
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
-        igraph_integer_t spring_length,
+        igraph_real_t spring_length,
         long int other_node, long int this_node) {
 
     // if the spring is just the right size, the forces will be 0, so we can
@@ -205,7 +205,7 @@ static int igraph_i_apply_spring_force(
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
         long int other_node,
-        long int this_node, igraph_integer_t spring_length,
+        long int this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant) {
 
     // determined using Hooke's Law:
@@ -331,7 +331,7 @@ static int igraph_i_move_nodes(
  *    repulsion. The original graphopt default is 0.001.
  * \param node_mass The mass of the vertices, used for the spring forces.
  *    The original graphopt defaults to 30.
- * \param spring_length The length of the springs, an integer number.
+ * \param spring_length The length of the springs.
  *    The original graphopt defaults to zero.
  * \param spring_constant The spring constant, the original graphopt defaults
  *    to one.
@@ -349,7 +349,7 @@ static int igraph_i_move_nodes(
 int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_integer_t niter,
                            igraph_real_t node_charge, igraph_real_t node_mass,
-                           igraph_integer_t spring_length,
+                           igraph_real_t spring_length,
                            igraph_real_t spring_constant,
                            igraph_real_t max_sa_movement,
                            igraph_bool_t use_seed) {
