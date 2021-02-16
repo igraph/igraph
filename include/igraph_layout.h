@@ -123,7 +123,7 @@ IGRAPH_EXPORT int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_ma
 IGRAPH_EXPORT int igraph_layout_graphopt(const igraph_t *graph,
                                          igraph_matrix_t *res, igraph_integer_t niter,
                                          igraph_real_t node_charge, igraph_real_t node_mass,
-                                         igraph_real_t spring_length,
+                                         igraph_integer_t spring_length,
                                          igraph_real_t spring_constant,
                                          igraph_real_t max_sa_movement,
                                          igraph_bool_t use_seed);
