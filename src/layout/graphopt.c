@@ -372,7 +372,7 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
     if (use_seed) {
         if (igraph_matrix_nrow(res) != no_of_nodes ||
             igraph_matrix_ncol(res) != 2) {
-            IGRAPH_WARNING("Invalid size for initial matrix, starting from random layout");
+            IGRAPH_WARNING("Invalid size for initial matrix, starting from random layout.");
             IGRAPH_CHECK(igraph_layout_random(graph, res));
         }
     } else {
@@ -441,5 +441,5 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&pending_forces_x);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
