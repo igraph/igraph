@@ -255,6 +255,7 @@ add_legacy_tests(
   igraph_layout_mds
   igraph_layout_merge2
   igraph_layout_merge3
+  igraph_layout_reingold_tilford_circular
   igraph_layout_reingold_tilford_extended
   igraph_layout_star
   igraph_layout_sugiyama

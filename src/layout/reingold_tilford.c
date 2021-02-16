@@ -682,7 +682,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     if (igraph_vector_size(proots) == 1) {
         real_root = (long int) VECTOR(*proots)[0];
         if (real_root < 0 || real_root >= no_of_nodes) {
-            IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Invalid vertex id.", IGRAPH_EINVVID);
         }
 
         /* else, we need to make real_root */
@@ -792,10 +792,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
  *   considered if not a null pointer and the \p roots argument is also given
- *   (and it is not a null pointer of an empty vector). Note that if you supply
- *   a null pointer here and the graph has multiple components, all of the root
- *   vertices will be mapped to the origin of the coordinate system, which does
- *   not really make sense.
+ *   (and it is not a null pointer or an empty vector).
  * \return Error code.
  *
  * \sa \ref igraph_layout_reingold_tilford().
