@@ -123,8 +123,9 @@
    * `igraph_personalized_pagerank(_vs)()`: the result retuned for edgeless or all-zero-weight graphs with the `IGRAPH_PAGERANK_ALGO_ARPACK` ignored the personalization vector. This is now corrected.
    * `igraph_personalized_pagerank(_vs)()` with a non-uniform personalization vector, a disconnected graph and the `IGRAPH_PAGERANK_ALGO_PRPACK` method would return results that were inconsistent with `IGRAPH_PAGERANK_ALGO_ARPACK`. This happened because PRPACK always used a uniform reset distribution when the random walk got stuck in a sink vertex. Now it uses the user-specified reset distribution for this case as well.
  - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - Fixed problems in several functions when passing in a graph with zero vertices.
  - Weighted betweenness, closeness, PageRank, shortest path calculations and random walk functions now check if any weights are NaN.
- - Many functions reject input arguments containing NaN values.
+ - Many functions now reject input arguments containing NaN values.
  - Compatibility with the PGI compiler.
 
 ### Other
