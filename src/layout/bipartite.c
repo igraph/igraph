@@ -58,7 +58,7 @@ int igraph_layout_bipartite(const igraph_t *graph,
     igraph_vector_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERRORF("The vertex type vector size (%" IGRAPH_PRId ") should be equal to the number of nodes (%" IGRAPH_PRId ").",
+        IGRAPH_ERRORF("The vertex type vector size (%ld) should be equal to the number of nodes (%ld).",
                       IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
     if (hgap < 0) {
