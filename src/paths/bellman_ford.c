@@ -207,7 +207,6 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 
     return 0;
 }
-<<<<<<< HEAD
 
 
 /**
@@ -576,5 +575,3 @@ int igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
-=======
->>>>>>> retrun diameter path with edges
