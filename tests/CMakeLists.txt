@@ -682,3 +682,8 @@ add_legacy_tests(
   igraph_read_graph_gml_invalid_inputs
 )
 
+# non-graph
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_running_mean
+)
