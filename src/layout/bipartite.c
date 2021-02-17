@@ -67,7 +67,7 @@ int igraph_layout_bipartite(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&layers, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(layers)[i] = VECTOR(*types)[i] ? 1 : 0;
+        VECTOR(layers)[i] = VECTOR(*types)[i] ? 0 : 1;
     }
 
     IGRAPH_CHECK(igraph_layout_sugiyama(graph, res, /*extd_graph=*/ 0,
