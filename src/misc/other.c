@@ -60,10 +60,10 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
 
     /* Check */
     if (igraph_vector_size(data) < binwidth) {
-        IGRAPH_ERRORF("Data vector length (%ld) smaller than binwidth (%" IGRAPH_PRId ").", IGRAPH_EINVAL, igraph_vector_size(data), binwidth);
+        IGRAPH_ERRORF("Data vector length (%ld) smaller than bin width (%" IGRAPH_PRId ").", IGRAPH_EINVAL, igraph_vector_size(data), binwidth);
     }
     if (binwidth < 1) {
-        IGRAPH_ERRORF("Binwidth should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, igraph_vector_size(data), binwidth);
+        IGRAPH_ERRORF("Bin width for running mean should be at least 1, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, igraph_vector_size(data), binwidth);
     }
 
     /* Memory for result */
