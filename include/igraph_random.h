@@ -110,9 +110,10 @@ double Rf_dnorm4(double x, double mu, double sigma, int give_log);
 
 #else
 
-#define RNG_BEGIN()      if (igraph_rng_default()->def==1) {    \
-        igraph_rng_seed(igraph_rng_default(), time(0));       \
-        igraph_rng_default()->def=2;                  \
+#define RNG_BEGIN() \
+    if (igraph_rng_default()->def == 1) { \
+        igraph_rng_seed(igraph_rng_default(), time(0)); \
+        igraph_rng_default()->def=2; \
     }
 #define RNG_END()       /* do nothing */
 
