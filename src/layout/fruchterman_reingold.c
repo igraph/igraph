@@ -339,7 +339,7 @@ static int igraph_layout_i_grid_fr(
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param start_temp Start temperature. This is the maximum amount
- *        of movement alloved along one axis, within one step, for a
+ *        of movement allowed along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
  * \param grid Whether to use the (fast but less accurate) grid based
