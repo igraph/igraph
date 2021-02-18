@@ -479,6 +479,7 @@ int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
 
     IGRAPH_HANDLE_EXCEPTIONS(
         RNG_BEGIN();
+
         drl::graph neighbors(graph, options, weights);
         neighbors.init_parms(options);
         if (use_seed) {
