@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
@@ -30,10 +26,14 @@ int main() {
     igraph_t g;
     igraph_real_t result;
     igraph_integer_t from, to;
-    igraph_vector_t path_edge, path_vertex, weights_vec;
+    igraph_vector_t path_edge, path_vertex, weights_vec, edge_vec;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1};
-
-
+    igraph_real_t vec[] = {2,8};
+    igraph_es_t edge_sele;
+    
+    printf("diameter of Barabasi graph:\n");
+    
+    igraph_rng_seed(igraph_rng_default(), 1234);
     igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1,
                          IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,
                          /*start_from=*/ 0);
@@ -50,8 +50,8 @@ int main() {
     igraph_vector_init(&path_edge, 0);
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
     igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %li, from %li to %li\n", (long int) result,
-           (long int) from, (long int) to);
+    printf("diameter: %g, from %g to %g\n", result,
+            from, to);
     print_vector_round(&path_vertex); 
     print_vector_round(&path_edge); 
     igraph_vector_destroy(&path_vertex);
@@ -61,8 +61,8 @@ int main() {
 
     igraph_vector_init(&path_edge, 0);
     igraph_diameter_dijkstra(&g, &weights_vec, &result, &from, &to, 0, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %li, from %li to %li\n", (long int) result,
-           (long int) from, (long int) to);
+    printf("diameter: %g, from %g to %g\n", result,
+           from, to);
     print_vector_round(&path_edge);
     igraph_vector_destroy(&path_edge);
 
@@ -70,12 +70,39 @@ int main() {
 
     igraph_vector_init(&path_vertex, 0);
     igraph_diameter_dijkstra(&g, &weights_vec, &result, &from, &to, &path_vertex, 0, IGRAPH_DIRECTED, 1);
-    printf("diameter: %li, from %li to %li\n", (long int) result,
-           (long int) from, (long int) to);
+    printf("diameter: %g, from %g to %g\n", result,
+           from, to);
     print_vector_round(&path_vertex);
     igraph_vector_destroy(&path_vertex);
+    
+    //disconnected graph
+    printf("disconnected ring graph\n");
+    igraph_vector_view(&edge_vec, vec, sizeof(vec) / sizeof(igraph_real_t));
+    igraph_es_vector(&edge_sele, &edge_vec);
+    igraph_delete_edges(&g, edge_sele);
+    printf("The largest path in one connected component\n");
+    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
+    print_real(stdout, result, "%g");
+    printf("\nuconn = False \n");
+    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 0);
+    print_real(stdout, result, "%g");
 
+    igraph_es_destroy(&edge_sele);
+    igraph_destroy(&g);
 
+    // test graph with zero nodes
+    printf("\ngraph with zero nodes\n");
+    igraph_empty(&g, 0, IGRAPH_DIRECTED);
+    igraph_diameter_dijkstra(&g, 0, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
+    print_real(stdout, result, "%g");
+    igraph_destroy(&g);
+
+    //test graph with one node
+    printf("\ngraph with one node\n");
+    igraph_empty(&g, 1, IGRAPH_DIRECTED);
+    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
+    print_real(stdout, result, "%g");
+    printf("\n");
     igraph_destroy(&g);
 
     return 0;

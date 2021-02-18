@@ -177,6 +177,7 @@ add_examples(
   dijkstra
   igraph_average_path_length
   igraph_cocitation
+  igraph_diameter
   igraph_eccentricity
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
