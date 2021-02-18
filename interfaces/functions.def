@@ -25,6 +25,7 @@ igraph_delete_edges:
 igraph_delete_vertices:
         PARAMS: INOUT GRAPH graph, VERTEXSET vertices
         NAME-R: delete.vertices
+        DEPS: vertices ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_vcount:
@@ -53,6 +54,7 @@ igraph_degree:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
                 BOOLEAN loops
         NAME-R: degree
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_edge:
@@ -432,6 +434,7 @@ igraph_closeness_cutoff:
 igraph_shortest_paths:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, NEIMODE mode=OUT
+        DEPS: from ON graph, to ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths:
@@ -451,6 +454,7 @@ igraph_get_all_shortest_paths:
 igraph_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        DEPS: from ON graph, to ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths_dijkstra:
@@ -489,6 +493,7 @@ igraph_shortest_paths_bellman_ford:
 igraph_shortest_paths_johnson:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
                 VERTEXSET to=ALL, EDGEWEIGHTS weights
+        DEPS: from ON graph, to ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_simple_paths:
@@ -501,13 +506,14 @@ igraph_get_all_simple_paths:
 
 igraph_subcomponent:
         PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
+        DEPS: vid ON graph, res ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
                 BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
         IGNORE: RR, RC, RNamespace
-        DEPS: weights ON graph
+        DEPS: weights ON graph, vids ON graph
         FLAGS: PROGRESS
 
 igraph_betweenness_cutoff:
@@ -539,7 +545,7 @@ igraph_pagerank:
                 VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 REAL damping=0.85, EDGEWEIGHTS weights=NULL, \
                 INOUT PAGERANKOPT options=NULL
-        DEPS: vids ON graph, weights ON graph, vector ON graph vids \
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids, \
               options ON algo
         NAME-R: page_rank
         IGNORE: RR, RC, RNamespace
@@ -602,7 +608,7 @@ igraph_transitivity_avglocal_undirected:
 igraph_transitivity_barrat:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
                 EDGEWEIGHTS weights=NULL, TRANSITIVITYMODE mode=NAN
-        DEPENDS: weights ON graph
+        DEPS: res ON graph, vids ON graph, weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_reciprocity:
@@ -612,11 +618,13 @@ igraph_reciprocity:
 
 igraph_constraint:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, VECTOR_OR_0 weights
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_maxdegree:
         PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
                 BOOLEAN loops=True
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_density:
@@ -676,6 +684,7 @@ igraph_count_multiple:
 
 igraph_girth:
         PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VERTEXSET circle
+        DEPS: circle ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_add_edge:
@@ -687,7 +696,7 @@ igraph_eigenvector_centrality:
                 BOOLEAN directed=False, BOOLEAN scale=True, \
                 EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=arpack_defaults
-        DEPS: weights ON graph, vector ON graph
+        DEPS: weights ON graph, vector ON graph V(graph)
         DEFAULT-R: options=arpack_defaults
         NAME-R: eigen_centrality
 
@@ -696,7 +705,7 @@ igraph_hub_score:
                 BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=arpack_defaults
         DEFAULT-R: options=arpack_defaults
-        DEPS: weights ON graph, vector ON graph
+        DEPS: weights ON graph, vector ON graph V(graph)
         NAME-R: hub_score
 
 igraph_authority_score:
@@ -704,7 +713,7 @@ igraph_authority_score:
                 BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=arpack_defaults
         DEFAULT-R: options=arpack_defaults
-        DEPS: weights ON graph, vector ON graph
+        DEPS: weights ON graph, vector ON graph V(graph)
         NAME-R: authority_score
 
 igraph_arpack_rssolve:
@@ -855,7 +864,7 @@ igraph_diversity:
         NAME-R: diversity
 
 igraph_random_walk:
-        PARAMS: GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode = OUT, \
+        PARAMS: GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode=OUT, \
 	        INTEGER steps, RWSTUCK stuck=RETURN
         DEPS: start ON graph, walk ON graph
         NAME-R: random_walk
@@ -1062,6 +1071,7 @@ igraph_layout_random:
 
 igraph_layout_circle:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET order=ALL
+        DEPS: order ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_star:
@@ -1229,10 +1239,12 @@ igraph_layout_davidson_harel:
 
 igraph_cocitation:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_bibcoupling:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+        DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_similarity_jaccard:
@@ -1293,6 +1305,7 @@ igraph_community_eb_get_merges:
         PARAMS: GRAPH graph, VECTOR edges, EDGEWEIGHTS weights=NULL, \
                 OUT MATRIX merges, OUT VECTOR bridges, \
                 OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership
+        DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_community_fastgreedy:
@@ -1375,6 +1388,7 @@ igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
                 OUT VECTOR_OR_0 membership, \
                 EDGEWEIGHTS weights=NULL
+        DEPS: weights ON graph
         NAME-R: cluster_optimal
         IGNORE: RR
 
@@ -1384,6 +1398,7 @@ igraph_community_leiden:
                 REAL resolution_parameter, REAL beta, \
                 BOOLEAN start, INOUT VECTOR_OR_0 membership, \
                 OUT INTEGERPTR nb_clusters, OUT REALPTR quality
+        DEPS: weights ON graph, vertex_weights ON graph
         NAME-R: cluster_leiden
         IGNORE: RR
 
@@ -1419,6 +1434,7 @@ igraph_hrg_predict:
         PARAMS: GRAPH graph, OUT VERTEXSET edges, OUT VECTOR prob, \
                 INOUT HRG hrg=Default, BOOLEAN start=False, \
                 INT num_samples=10000, INT num_bins=25
+        DEPS: edges ON graph
         NAME-R: predict_edges
         IGNORE: RR
 
@@ -1446,8 +1462,8 @@ igraph_graphlets:
 igraph_graphlets_candidate_basis:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 OUT VERTEXSETLIST cliques, OUT VECTOR thresholds
+        DEPS: weights ON graph, cliques ON graph
         NAME-R: graphlets.candidate.basis
-        DEPS: weights ON graph
         IGNORE: RR, RC
 
 igraph_graphlets_project:
@@ -1625,7 +1641,7 @@ igraph_local_scan_1_ecount:
 igraph_local_scan_1_ecount_them:
         PARAMS: GRAPH us, GRAPH them, OUT VECTOR res, \
                 EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
-        DEPS: weigths_them ON them
+        DEPS: weigths_them ON them, weights_them ON them
         IGNORE: RR, RNamespace
 
 igraph_local_scan_k_ecount:

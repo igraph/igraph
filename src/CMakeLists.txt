@@ -440,8 +440,8 @@ generate_export_header(igraph
 include(GNUInstallDirs)
 install(
   TARGETS igraph
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(
   DIRECTORY ${CMAKE_SOURCE_DIR}/include/

@@ -250,7 +250,9 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_layout_drl
+  igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
+  igraph_layout_graphopt
   igraph_layout_grid
   igraph_layout_lgl
   igraph_layout_mds
@@ -682,3 +684,8 @@ add_legacy_tests(
   igraph_read_graph_gml_invalid_inputs
 )
 
+# non-graph
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_running_mean
+)
