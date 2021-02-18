@@ -30,7 +30,7 @@ int main() {
     igraph_vector_init(&path, 0);
     igraph_vector_init(&path_edge, 0);
     igraph_diameter(&g, &result, &from, &to, &path, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %li, from %li to %li\n", (long int) result,
+    printf("diameter: %li, from %li to %li", (long int) result,
            (long int) from, (long int) to);
     print_vector(&path);
     print_vector(&path_edge);
