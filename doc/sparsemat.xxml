@@ -27,13 +27,14 @@
 <!-- doxrox-include igraph_sparsemat_type -->
 <!-- doxrox-include igraph_sparsemat_is_triplet -->
 <!-- doxrox-include igraph_sparsemat_is_cc -->
-<!-- doxrox-include igraph_sparsemat_min-->
-<!-- doxrox-include igraph_sparsemat_max-->
-<!-- doxrox-include igraph_sparsemat_minmax-->
-<!-- doxrox-include igraph_sparsemat_count_nonzero-->
-<!-- doxrox-include igraph_sparsemat_count_nonzerotol-->
-<!-- doxrox-include igraph_sparsemat_rowsums-->
-<!-- doxrox-include igraph_sparsemat_colsums-->
+<!-- doxrox-include igraph_sparsemat_min -->
+<!-- doxrox-include igraph_sparsemat_max -->
+<!-- doxrox-include igraph_sparsemat_minmax -->
+<!-- doxrox-include igraph_sparsemat_count_nonzero -->
+<!-- doxrox-include igraph_sparsemat_count_nonzerotol -->
+<!-- doxrox-include igraph_sparsemat_rowsums -->
+<!-- doxrox-include igraph_sparsemat_colsums -->
+<!-- doxrox-include igraph_sparsemat_nonzero_storage -->
 </section>
 
 <section id="operations-on-sprase-matrices"><title>Operations on sprase matrices</title>

@@ -53,6 +53,7 @@ add_legacy_tests(
   igraph_sparsemat9
   igraph_sparsemat_is_symmetric
   igraph_sparsemat_minmax
+  igraph_sparsemat_nonzero_storage
   igraph_sparsemat_which_minmax
   matrix
   matrix2
