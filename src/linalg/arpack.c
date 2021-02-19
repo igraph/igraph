@@ -1218,11 +1218,17 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     options->iparam[10] = 0;  // return value
     options->info = options->start;
     if (options->start) {
-        if (igraph_matrix_nrow(vectors) != options->n || igraph_matrix_ncol(vectors) != 1) {
+        if (!storage && !vectors) {
+            IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
+        }
+        if (vectors && (igraph_matrix_nrow(vectors) != options->n ||
+                        igraph_matrix_ncol(vectors) != 1)) {
             IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
         }
-        for (i = 0; i < options->n; i++) {
-            resid[i] = MATRIX(*vectors, i, 0);
+        if (vectors) {
+            for (i = 0; i < options->n; i++) {
+                resid[i] = MATRIX(*vectors, i, 0);
+            }
         }
     }
 
