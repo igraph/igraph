@@ -671,6 +671,8 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   fatal_handler
+  igraph_progress_handler_stderr
+  igraph_set_progress_handler
 )
 
 # error output
