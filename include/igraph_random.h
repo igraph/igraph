@@ -89,9 +89,9 @@ IGRAPH_EXPORT int igraph_rng_get_dirichlet(igraph_rng_t *rng,
 
 /* --------------------------------- */
 
-extern const igraph_rng_type_t igraph_rngtype_glibc2;
-extern const igraph_rng_type_t igraph_rngtype_rand;
-extern const igraph_rng_type_t igraph_rngtype_mt19937;
+IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_glibc2;
+IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_rand;
+IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_mt19937;
 
 IGRAPH_EXPORT igraph_rng_t *igraph_rng_default(void);
 IGRAPH_EXPORT void igraph_rng_set_default(igraph_rng_t *rng);
