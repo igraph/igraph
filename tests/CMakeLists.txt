@@ -634,6 +634,7 @@ add_legacy_tests(
   igraph_rng_get_exp
   mt
   rng_reproducibility
+  rng_init_destroy_max_min_name_set_default
 )
 
 # qsort.at
