@@ -509,7 +509,9 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
  * \brief Adds an element to a sparse matrix.
  *
  * This function can be used to add the entries to a sparse matrix,
- * after initializing it with \ref igraph_sparsemat_init().
+ * after initializing it with \ref igraph_sparsemat_init(). If you add
+ * multiple entries in the same position, they will all be saved, and
+ * the resulting value is the sum of all entries in that position.
  * \param A The input matrix, it must be in triplet format.
  * \param row The row index of the entry to add.
  * \param col The column index of the entry to add.
@@ -2788,6 +2790,22 @@ int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
     }
     return 0;
 }
+
+/**
+ * \function igraph_sparsemat_nonzero_storage
+ * \brief Returns number of stored entries of a sparse matrix.
+ *
+ * This function will return the number of stored entries of a sparse
+ * matrix. These entries can be zero, and multiple entries can be
+ * at the same position. Use \ref igraph_sparsemat_dupl() to sum
+ * duplicate entries, and \ref igraph_sparsemat_dropzeros() to remove
+ * zeros.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \return Number of stored entries.
+ *
+ * Time complexity: O(1).
+ */
 
 int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
     if (A->cs->nz < 0) {
