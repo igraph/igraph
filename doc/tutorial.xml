@@ -16,17 +16,22 @@ the <command>igraph</command> library.
 <programlisting>
 <![CDATA[#include <igraph.h>
 
-int main(void)
-{
-     igraph_integer_t diameter;
+int main() {
+     igraph_real_t diameter;
      igraph_t graph;
+
      igraph_rng_seed(igraph_rng_default(), 42);
-     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 1000, 5.0/1000,
+
+     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 1000, 3000,
                              IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+
      igraph_diameter(&graph, &diameter, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
-     printf("Diameter of a random graph with average degree 5: %d\n",
-             (int) diameter);
+     printf("Diameter of a random graph with average degree %g: %g\n",
+             2.0 * igraph_ecount(&graph) / igraph_vcount(&graph), 
+             (double) diameter);
+
      igraph_destroy(&graph);
+
      return 0;
 }]]>
 </programlisting>
@@ -52,7 +57,7 @@ For compiling this program you need a C compiler, if this is called
 <command>gcc</command> and the previous code is saved in file
 <filename>igraph_test.c</filename>, you will need a command like this:
 <programlisting>
-gcc igraph_test.c -I/usr/local/igraph -L/usr/local/lib -ligraph -o igraph_test
+gcc igraph_test.c -I/usr/local/include/igraph -L/usr/local/lib -ligraph -o igraph_test
 </programlisting>
 </para>
 
@@ -136,11 +141,11 @@ can reduce path lengths a lot.)
 <programlisting>
 <![CDATA[#include <igraph.h>
 
-int main(void) {
-  igraph_real_t avg_path;
+int main(void) {  
   igraph_t graph;
   igraph_vector_t dimvector;
   igraph_vector_t edges;
+  igraph_real_t avg_path_len;
   int i;
   
   igraph_vector_init(&dimvector, 2);
@@ -148,18 +153,18 @@ int main(void) {
   VECTOR(dimvector)[1]=30;
   igraph_lattice(&graph, &dimvector, 0, IGRAPH_UNDIRECTED, 0, 1);
 
+  igraph_average_path_length(&graph, &avg_path_len, NULL, IGRAPH_UNDIRECTED, 1);
+  printf("Average path length (lattice):            %f\n", (double) avg_path_len);
+
   igraph_rng_seed(igraph_rng_default(), 42);
   igraph_vector_init(&edges, 20);
-  for (i=0; i<igraph_vector_size(&edges); i++) {
-    VECTOR(edges)[i] = rand() % (int)igraph_vcount(&graph);
+  for (i=0; i < igraph_vector_size(&edges); i++) {
+    VECTOR(edges)[i] = RNG_INTEGER(0, igraph_vcount(&graph) - 1);
   }
 
-  igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
-  printf("Average path length (lattice):            %f\n", (double) avg_path);
-
   igraph_add_edges(&graph, &edges, 0);
-  igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
-  printf("Average path length (randomized lattice): %f\n", (double) avg_path);
+  igraph_average_path_length(&graph, &avg_path_len, NULL, IGRAPH_UNDIRECTED, 1);
+  printf("Average path length (randomized lattice): %f\n", (double) avg_path_len);
   
   igraph_vector_destroy(&dimvector);
   igraph_vector_destroy(&edges);
@@ -236,7 +241,7 @@ individual vertices in the graph.
 <programlisting>
 <![CDATA[#include <igraph.h>
 
-int main(void) {
+int main() {
      igraph_t graph;
      igraph_vector_t v;
      igraph_vector_t result;
@@ -253,25 +258,24 @@ int main(void) {
                               32,33
      };
 
-     igraph_vector_view(&v, edges, sizeof(edges)/sizeof(double));
+     igraph_vector_view(&v, edges, sizeof(edges) / sizeof(double));
      igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
      igraph_vector_init(&result, 0);
 
-     igraph_degree(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
-                   IGRAPH_LOOPS);
+     igraph_degree(&graph, &result, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
      printf("Maximum degree is      %10i, vertex %2i.\n",
-            (int)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
+            (int) igraph_vector_max(&result), (int) igraph_vector_which_max(&result));
 
-     igraph_closeness(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
+     igraph_closeness(&graph, &result, NULL, NULL, igraph_vss_all(), IGRAPH_ALL,
                       /*weights=*/ 0, /*normalized=*/ 0);
      printf("Maximum closeness is   %10f, vertex %2i.\n",
-             (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
+             (double) igraph_vector_max(&result), (int) igraph_vector_which_max(&result));
 
      igraph_betweenness(&graph, &result, igraph_vss_all(),
-                        IGRAPH_UNDIRECTED, /*weights=*/ 0, /*nobigint=*/ 1);
+                        IGRAPH_UNDIRECTED, /*weights=*/ 0);
      printf("Maximum betweenness is %10f, vertex %2i.\n",
-             (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
+             (double) igraph_vector_max(&result), (int) igraph_vector_which_max(&result));
 
      igraph_vector_destroy(&result);
      igraph_destroy(&graph);
