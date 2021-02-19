@@ -280,10 +280,12 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
  * \param bycol Logical, if true, the edges will be returned
- *        columnwise, eg. the first edge is
+ *        columnwise, e.g. the first edge is
  *        <code>res[0]->res[|E|]</code>, the second is
  *        <code>res[1]->res[|E|+1]</code>, etc.
  * \return Error code.
+ *
+ * \sa \ref igraph_edges() to return the result only for some edge ids.
  *
  * Time complexity: O(|E|), the
  * number of edges in the graph.
