@@ -633,6 +633,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rng_get_exp
+  igraph_rng_get_integer
   mt
   rng_reproducibility
   rng_init_destroy_max_min_name_set_default
