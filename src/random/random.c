@@ -225,7 +225,8 @@ void igraph_rng_glibc2_destroy(void *vstate) {
  * buffer. This generator was the default prior to igraph version 0.6,
  * at least on systems relying on GNU libc.
  *
- * This generator was ported from the GNU Scientific Library.
+ * This generator was ported from the GNU Scientific Library. It is a
+ * reimplementation and does not call the system glibc generator.
  */
 
 const igraph_rng_type_t igraph_rngtype_glibc2 = {
@@ -288,7 +289,7 @@ void igraph_rng_rand_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_rand
- * \brief The old BSD rand/stand random number generator
+ * \brief The old BSD rand/srand random number generator
  *
  * The sequence is
  *     x_{n+1} = (a x_n + c) mod m
