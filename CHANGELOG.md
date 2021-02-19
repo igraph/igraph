@@ -1,5 +1,18 @@
 # igraph C library changelog
 
+## [Unreleased]
+
+### Fixed
+
+ - CMake settings that controlled the library installation directory name, such as `CMAKE_INSTALL_LIBDIR`, were not respected.
+ - Built-in random number generators (`igraph_rngtype_mt19937`, `igraph_rngtype_rand`, `igraph_rngtype_glibc2`) were not exported from the shared library.
+ - `igraph_status_handler_stderr` and `igraph_progress_handler_stderr` were not exported from the shared library.
+ - `igraph_layout_graphopt` no longer rounds the `spring_length` parameter to an integer.
+
+### Other
+
+ - Documentation improvements
+
 ## [0.9.0] - 2021-02-16
 
 ### Added
