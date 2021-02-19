@@ -53,7 +53,7 @@ int main() {
     IGRAPH_ASSERT(igraph_rng_init(&rng_def, &igraph_rngtype_glibc2) == IGRAPH_SUCCESS);
 
     for (i = 0; i < 3; i++) {
-        test_and_destroy(rng_types + i, &rng_def);
+        test_and_destroy(&rng_types[i], &rng_def);
     }
 
     igraph_rng_destroy(&rng_def);
