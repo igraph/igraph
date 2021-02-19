@@ -145,7 +145,7 @@ __BEGIN_DECLS
 typedef int igraph_progress_handler_t(const char *message, igraph_real_t percent,
                                       void *data);
 
-extern igraph_progress_handler_t igraph_progress_handler_stderr;
+IGRAPH_EXPORT extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
 IGRAPH_EXPORT igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 

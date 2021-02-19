@@ -19,8 +19,27 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
+int handler(const char* message, igraph_real_t percent, void*data) {
+    printf("handler, %s, %f, %d\n", message, percent, *(int*)data);
+    return IGRAPH_SUCCESS;
+}
+
 int main() {
-    igraph_progress_handler_stderr("This is a message ", 10, NULL);
+    igraph_set_progress_handler(handler);
+    int data = 10;
+
+    printf("progress with set progress handler:\n");
+    IGRAPH_PROGRESS("message", 100.0, &data);
+
+    igraph_progress_handler_t *previous = igraph_set_progress_handler(NULL);
+
+    printf("\nprogress with no handler:\n");
+    IGRAPH_PROGRESS("message", 100.0, &data);
+
+    igraph_set_progress_handler(previous);
+
+    printf("\nprogress with previous handler:\n");
+    IGRAPH_PROGRESS("message", 100.0, &data);
 
     VERIFY_FINALLY_STACK();
     return 0;
