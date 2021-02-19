@@ -709,7 +709,9 @@ int igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
     if (!fkeep) {
         IGRAPH_ERROR("The filter function is a NULL pointer.", IGRAPH_EINVAL);
     }
-    cs_fkeep(A->cs, fkeep, other);
+    if (cs_fkeep(A->cs, fkeep, other) < 0) {
+        IGRAPH_ERROR("External function cs_keep has returned an unknown error while filtering the matrix.", IGRAPH_FAILURE);
+    }
 
     return IGRAPH_SUCCESS;
 }
