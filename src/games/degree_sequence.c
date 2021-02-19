@@ -349,7 +349,6 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
             igraph_vector_null(&residual_in_degrees);
             igraph_set_clear(&incomplete_out_vertices);
             igraph_set_clear(&incomplete_in_vertices);
-            outsum = 0;
 
             /* Shuffle the out-stubs in-place */
             igraph_vector_shuffle(&out_stubs);
