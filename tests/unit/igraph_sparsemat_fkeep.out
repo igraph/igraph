@@ -1,0 +1,11 @@
+0x0 matrix.
+3x3 matrix:
+col 0: locations 0 to 0
+3 : 1
+col 1: locations 1 to 0
+col 2: locations 1 to 1
+1 : 4
+col 3: locations 2 to 1
+uncompressed matrix.
+NULL as matrix pointer.
+NULL as function pointer.
