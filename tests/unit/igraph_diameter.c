@@ -83,9 +83,11 @@ int main() {
     printf("The largest path in one connected component\n");
     igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
+    printf("\n");
     printf("\nuconn = False \n");
     igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 0);
     print_real(stdout, result, "%g");
+    printf("\n");
 
     igraph_es_destroy(&edge_sele);
     igraph_destroy(&g);
@@ -95,6 +97,7 @@ int main() {
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
     igraph_diameter_dijkstra(&g, 0, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
+    printf("\n");
     igraph_destroy(&g);
 
     //test graph with one node
