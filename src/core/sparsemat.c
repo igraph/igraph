@@ -700,14 +700,10 @@ int igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
                            int (*fkeep)(int, int, igraph_real_t, void*),
                            void *other) {
 
-    if (!A) {
-        IGRAPH_ERROR("The sparse matrix pointer is NULL.", IGRAPH_EINVAL);
-    }
+    IGRAPH_ASSERT(A);
+    IGRAPH_ASSERT(fkeep);
     if (A->cs->nz != -1) {
         IGRAPH_ERROR("The sparse matrix is not in compressed format.", IGRAPH_EINVAL);
-    }
-    if (!fkeep) {
-        IGRAPH_ERROR("The filter function is a NULL pointer.", IGRAPH_EINVAL);
     }
     if (cs_fkeep(A->cs, fkeep, other) < 0) {
         IGRAPH_ERROR("External function cs_keep has returned an unknown error while filtering the matrix.", IGRAPH_FAILURE);

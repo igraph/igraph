@@ -62,17 +62,6 @@ int main() {
     IGRAPH_ASSERT(igraph_sparsemat_fkeep(&spmat, &fkeep, &a) == IGRAPH_EINVAL);
     igraph_sparsemat_destroy(&spmat);
 
-    printf("NULL as matrix pointer.\n");
-    IGRAPH_ASSERT(igraph_sparsemat_fkeep(NULL, &fkeep, &a) == IGRAPH_EINVAL);
-
-    printf("NULL as function pointer.\n");
-    igraph_sparsemat_init(&spmat, 0, 0, /*nzmax*/0);
-    igraph_sparsemat_compress(&spmat, &spmat_comp);
-    IGRAPH_ASSERT(igraph_sparsemat_fkeep(&spmat_comp, NULL, &a) == IGRAPH_EINVAL);
-    igraph_sparsemat_print(&spmat_comp, stdout);
-    igraph_sparsemat_destroy(&spmat);
-    igraph_sparsemat_destroy(&spmat_comp);
-
     VERIFY_FINALLY_STACK();
     return 0;
 }

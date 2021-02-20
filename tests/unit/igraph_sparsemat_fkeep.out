@@ -7,5 +7,3 @@ col 2: locations 1 to 1
 1 : 4
 col 3: locations 2 to 1
 uncompressed matrix.
-NULL as matrix pointer.
-NULL as function pointer.
