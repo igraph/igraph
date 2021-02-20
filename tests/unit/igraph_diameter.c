@@ -50,7 +50,7 @@ int main() {
     igraph_vector_init(&path_edge, 0);
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
     igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %g to %g\n", result,
+    printf("diameter: %g, from %d to %d\n", result,
             from, to);
     print_vector_round(&path_vertex); 
     print_vector_round(&path_edge); 
@@ -61,7 +61,7 @@ int main() {
 
     igraph_vector_init(&path_edge, 0);
     igraph_diameter_dijkstra(&g, &weights_vec, &result, &from, &to, 0, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %g to %g\n", result,
+    printf("diameter: %g, from %d to %d\n", result,
            from, to);
     print_vector_round(&path_edge);
     igraph_vector_destroy(&path_edge);
@@ -70,7 +70,7 @@ int main() {
 
     igraph_vector_init(&path_vertex, 0);
     igraph_diameter_dijkstra(&g, &weights_vec, &result, &from, &to, &path_vertex, 0, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %g to %g\n", result,
+    printf("diameter: %g, from %d to %d\n", result,
            from, to);
     print_vector_round(&path_vertex);
     igraph_vector_destroy(&path_vertex);
@@ -83,11 +83,9 @@ int main() {
     printf("The largest path in one connected component\n");
     igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
-    printf("\n");
     printf("\nuconn = False \n");
     igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 0);
     print_real(stdout, result, "%g");
-    printf("\n");
 
     igraph_es_destroy(&edge_sele);
     igraph_destroy(&g);
@@ -97,7 +95,6 @@ int main() {
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
     igraph_diameter_dijkstra(&g, 0, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
-    printf("\n");
     igraph_destroy(&g);
 
     //test graph with one node
