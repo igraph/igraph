@@ -2961,6 +2961,40 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
     return 0;
 }
 
+/**
+ * \function igraph_sparsemat_view
+ * \brief Initialize a sparse matrix and set all parameters.
+ *
+ * This function allocates memory for a sparse matrix and sets all its
+ * parameters to the given values. For a simpler way to initialize an
+ * empty sparse matrix, see \ref igraph_sparsemat_init(). Using
+ * \ref igraph_sparsemat_destroy() on the resulting matrix will try
+ * to free \p p, \p i and \p x. To only free memory allocated in this
+ * function, use free() on the \c cs field of A.
+ *
+ * \param A The non-initialized sparse matrix.
+ * \param nzmax The maximum number of entries.
+ * \param m The number of rows.
+ * \param n The number of columns.
+ * \param p The column vector. For a triplet matrix this should contain
+  *         the columns of the elements in \x. For a compressed matrix,
+            if the column index is \c k, then <code>j[k]</code>
+ *          is the index in \p x of the start of the \c k-th column, and
+ *          the last element of \c j is the total number of elements.
+ *          The total number of elements in the \c k-th column is
+ *          therefore <code>j[k+1] - j[k]</code>. For example, if there
+ *          is one element in the first column, and five in the second,
+ *          \c j should be set to <code>{0, 1, 6}</code>.
+ * \param i The row vector. This should contain the row indices of the
+ *          elements in x.
+ * \param x The elements of the sparse matrix.
+ * \param nz For a triplet matrix, this is the number of elements. For
+ *           a compressed matrix, this should be -1.
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
 int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
                           int *p, int *i, double *x, int nz) {
 
@@ -2973,7 +3007,7 @@ int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
     A->cs->x = x;
     A->cs->nz = nz;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
