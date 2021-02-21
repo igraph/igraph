@@ -207,6 +207,7 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_shortest_paths
   efficiency
   igraph_are_connected
   igraph_betweenness
@@ -217,9 +218,9 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
   igraph_is_tree
-  igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
   igraph_pagerank
   igraph_transitive_closure_dag
