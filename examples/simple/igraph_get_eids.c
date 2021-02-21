@@ -73,7 +73,7 @@ int check_simple() {
             }
         }
 
-        igraph_diameter(&g, /*res=*/ 0, /*from=*/ 0, /*to=*/ 0, &path, 0,
+        igraph_diameter(&g, /*res=*/ 0, /*from=*/ 0, /*to=*/ 0, &path, NULL,
                         IGRAPH_UNDIRECTED, /*unconn=*/ 1);
         igraph_get_eids(&g, &eids, /*pairs=*/ 0, &path, 0, /*error=*/ 1);
         for (e = 0; e < igraph_vector_size(&path) - 1; e++) {

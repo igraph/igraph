@@ -1033,22 +1033,10 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
                 igraph_vector_clear(edge_path);
             }
         } else {
-            if ((vertex_path != 0) && (edge_path != 0)) {
-                IGRAPH_CHECK(igraph_get_shortest_path(graph, vertex_path, edge_path,
+            IGRAPH_CHECK(igraph_get_shortest_path(graph, vertex_path, edge_path,
                                                     (igraph_integer_t) from,
                                                     (igraph_integer_t)to,
                                                     dirmode));
-            } else if (vertex_path != 0) {
-                IGRAPH_CHECK(igraph_get_shortest_path(graph, vertex_path, 0,
-                                                    (igraph_integer_t) from,
-                                                    (igraph_integer_t)to,
-                                                    dirmode));
-            } else if (edge_path != 0) {
-                IGRAPH_CHECK(igraph_get_shortest_path(graph, 0, edge_path,
-                                                    (igraph_integer_t) from,
-                                                    (igraph_integer_t)to,
-                                                    dirmode));
-            }
         }
     }
 
@@ -1264,25 +1252,11 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
                 igraph_vector_clear(edge_path);
             }
         } else {
-            if ((vertex_path) && (edge_path)) {
-                IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
                             /*vertices=*/ vertex_path, /*edges=*/ edge_path,
                             (igraph_integer_t) from,
                             (igraph_integer_t) to,
                             weights, dirmode));
-            } else if (vertex_path) {
-                IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
-                            /*vertices=*/ vertex_path, /*edges=*/ 0,
-                            (igraph_integer_t) from,
-                            (igraph_integer_t) to,
-                            weights, dirmode));
-            } else if (edge_path) {
-                IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
-                            /*vertices=*/ 0, /*edges=*/ edge_path,
-                            (igraph_integer_t) from,
-                            (igraph_integer_t) to,
-                            weights, dirmode));
-            }
         }
     }
     return 0;
