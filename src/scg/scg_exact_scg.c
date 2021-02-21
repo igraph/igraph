@@ -32,6 +32,7 @@
 #include "scg_headers.h"
 
 #include "igraph_memory.h"
+#include "igraph_qsort.h"
 
 #include <math.h>
 
@@ -50,7 +51,7 @@ int igraph_i_exact_coarse_graining(const igraph_real_t *v,
         w[i].ind = i;
     }
 
-    qsort(w, (size_t) n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
+    igraph_qsort(w, (size_t) n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
 
     gr_nb = 0;
     gr[w[0].ind] = gr_nb;

@@ -509,7 +509,9 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
  * \brief Adds an element to a sparse matrix.
  *
  * This function can be used to add the entries to a sparse matrix,
- * after initializing it with \ref igraph_sparsemat_init().
+ * after initializing it with \ref igraph_sparsemat_init(). If you add
+ * multiple entries in the same position, they will all be saved, and
+ * the resulting value is the sum of all entries in that position.
  * \param A The input matrix, it must be in triplet format.
  * \param row The row index of the entry to add.
  * \param col The column index of the entry to add.
@@ -2794,6 +2796,22 @@ int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
     return 0;
 }
 
+/**
+ * \function igraph_sparsemat_nonzero_storage
+ * \brief Returns number of stored entries of a sparse matrix.
+ *
+ * This function will return the number of stored entries of a sparse
+ * matrix. These entries can be zero, and multiple entries can be
+ * at the same position. Use \ref igraph_sparsemat_dupl() to sum
+ * duplicate entries, and \ref igraph_sparsemat_dropzeros() to remove
+ * zeros.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \return Number of stored entries.
+ *
+ * Time complexity: O(1).
+ */
+
 int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
     if (A->cs->nz < 0) {
         return A->cs->p[A->cs->n];
@@ -2983,6 +3001,32 @@ int igraph_sparsemat_sort(const igraph_sparsemat_t *A,
     return 0;
 }
 
+/**
+ * \function igraph_sparsemat_getelements_sorted
+ * \brief Returns the sorted elements of a sparse matrix.
+ *
+ * This function will sort a sparse matrix and return the elements in
+ * 3 vectors. Two vectors will indicate where the elements are located,
+ * and one will give the elements.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \param i An initialized int vector. This will store the rows of the
+ *          returned elements.
+ * \param j An initialized int vector. For a triplet matrix this will
+ *          store the columns of the returned elements. For a compressed
+ *          matrix, if the column index is \c k, then <code>j[k]</code>
+ *          is the index in \p x of the start of the \c k-th column, and
+ *          the last element of \c j is the total number of elements.
+ *          The total number of elements in the \c k-th column is
+ *          therefore <code>j[k+1] - j[k]</code>. For example, if there
+ *          is one element in the first column, and five in the second,
+ *          \c j will be set to <code>{0, 1, 6}</code>.
+ * \param x An initialized vector. The elements will be placed here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of stored elements in the sparse matrix.
+ */
+
 int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
                                         igraph_vector_int_t *i,
                                         igraph_vector_int_t *j,
@@ -2998,7 +3042,7 @@ int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
         IGRAPH_CHECK(igraph_sparsemat_getelements(A, i, j, x));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A) {

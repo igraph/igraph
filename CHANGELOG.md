@@ -1,5 +1,24 @@
 # igraph C library changelog
 
+## [Unreleased]
+
+### Fixed
+
+ - CMake settings that controlled the library installation directory name, such as `CMAKE_INSTALL_LIBDIR`, were not respected.
+ - Under some conditions, the generated pkg-config file contained an incorrect include directory path.
+ - Built-in random number generators (`igraph_rngtype_mt19937`, `igraph_rngtype_rand`, `igraph_rngtype_glibc2`) were not exported from the shared library.
+ - `igraph_status_handler_stderr()` and `igraph_progress_handler_stderr()` were not exported from the shared library.
+ - `igraph_layout_graphopt()` no longer rounds the `spring_length` parameter to an integer.
+ - `igraph_get_all_shortest_paths_dijkstra()` no longer modifies the `res` vector's item destructor.
+ - `igraph_get_shortest_path_bellman_ford()` did not work correctly when calculating paths to all vertices.
+ - `igraph_arpack_rnsolve()` checks its parameters more carefully.
+ - `igraph_community_to_membership()` does not crash anymore when `csize` is requested but `membership` is not.
+ - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.9.0] - 2021-02-16
 
 ### Added

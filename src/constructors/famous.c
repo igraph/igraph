@@ -271,7 +271,7 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
  * </para><para>
  * The name of the graph can be simply supplied as a string.
  * Note that this function creates graphs which don't take any parameters,
- * there are separate functions for graphs with parameters, eg. \ref
+ * there are separate functions for graphs with parameters, e.g. \ref
  * igraph_full() for creating a full graph.
  *
  * </para><para>

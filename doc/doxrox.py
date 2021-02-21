@@ -128,7 +128,7 @@ def main():
 
         with operation("Substituting template file..."):
             chunk_iterator = re.finditer(
-                r"<!--\s*doxrox-include\s+(\w+)\s+-->", tstring
+                r"<!--\s*doxrox-include\s+(\w+)\s*-->", tstring
             )
             outstring = []
             last = 0

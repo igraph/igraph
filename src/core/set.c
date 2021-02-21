@@ -46,10 +46,12 @@
  * O(n), n is the expected size of the set.
  */
 int igraph_set_init(igraph_set_t *set, int long size) {
-    long int alloc_size = size > 0 ? size : 1;
+    long int alloc_size;
+    
     if (size < 0) {
         size = 0;
     }
+    alloc_size = size > 0 ? size : 1;
     set->stor_begin = igraph_Calloc(alloc_size, igraph_integer_t);
     set->stor_end = set->stor_begin + alloc_size;
     set->end = set->stor_begin;
