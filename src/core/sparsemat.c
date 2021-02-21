@@ -3009,10 +3009,14 @@ int igraph_sparsemat_sort(const igraph_sparsemat_t *A,
  *          returned elements.
  * \param j An initialized int vector. For a triplet matrix this will
  *          store the columns of the returned elements. For a compressed
- *          matrix this will first store a 0, and then for each column
- *          the cumulative number of elements that have been returned.
- *          So if this there was 1 element returned in the first column,
- *          and 5 in the second, this will return {0, 1, 6}.
+ *          matrix, if the column index is \c k, then <code>j[k]</code>
+ *          is the index in \p x of the start of the \c k-th column, and
+ *          the last element of \c j is the total number of elements.
+ *          The total number of elements in the \c k-th column is
+ *          therefore <code>j[k+1] - j[k]</code>. For example, if there
+ *          is one element in the first column, and five in the second,
+ *          \c j will be set to <code>{0, 1, 6}</code>.
+ * \param x An initialized vector. The elements will be placed here.
  * \return Error code.
  *
  * Time complexity: O(n), the number of stored elements in the sparse matrix.

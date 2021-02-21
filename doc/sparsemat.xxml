@@ -27,6 +27,7 @@
 <!-- doxrox-include igraph_sparsemat_type -->
 <!-- doxrox-include igraph_sparsemat_is_triplet -->
 <!-- doxrox-include igraph_sparsemat_is_cc -->
+<!-- doxrox-include igraph_sparsemat_getelements_sorted -->
 <!-- doxrox-include igraph_sparsemat_min -->
 <!-- doxrox-include igraph_sparsemat_max -->
 <!-- doxrox-include igraph_sparsemat_minmax -->
