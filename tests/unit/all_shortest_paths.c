@@ -31,6 +31,8 @@ int main() {
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
     igraph_vector_init(&nrgeo, 0);
 
+    igraph_vector_init(&weights, 0);
+
     /* get_all_shortest_paths functions are expected to return
      * results in sorted order, so we do not need to canonicalize
      * the result before printing it. */
@@ -41,6 +43,18 @@ int main() {
     from = 0; to = 0;
 
     igraph_get_all_shortest_paths(&graph, &paths, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
+
+    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
+        print_vector(VECTOR(paths)[i]);
+    }
+    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
+
+    igraph_vector_ptr_free_all(&paths);
+
+    printf("\nSingleton graph, weighted\n");
+    igraph_vector_resize(&weights, igraph_ecount(&graph));
+    igraph_vector_fill(&weights, 1);
+    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector(VECTOR(paths)[i]);
@@ -87,7 +101,7 @@ int main() {
     igraph_vector_ptr_free_all(&paths);
 
     printf("\nWeighted, uniform weights\n");
-    igraph_vector_init(&weights, igraph_ecount(&graph));
+    igraph_vector_resize(&weights, igraph_ecount(&graph));
     igraph_vector_fill(&weights, 1.5); /* constant weights */
 
     igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);

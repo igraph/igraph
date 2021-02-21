@@ -698,6 +698,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists, order;
     igraph_vector_ptr_t parents;
+    igraph_finally_func_t *res_item_destructor;
     unsigned char *is_target;
     long int i, n, to_reach;
 
@@ -950,6 +951,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* clear the paths vector */
         igraph_vector_ptr_clear(res);
+        res_item_destructor = igraph_vector_ptr_get_item_destructor(res);
         igraph_vector_ptr_set_item_destructor(res,
                                               (igraph_finally_func_t*)igraph_vector_destroy);
 
@@ -1026,8 +1028,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             }
         }
 
-        /* remove the destructor from the path vector */
-        igraph_vector_ptr_set_item_destructor(res, 0);
+        /* remove the path vector's original item destructor */
+        igraph_vector_ptr_set_item_destructor(res, res_item_destructor);
 
         /* free those paths from the result vector which we won't need */
         n = igraph_vector_ptr_size(res);
