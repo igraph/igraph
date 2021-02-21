@@ -519,7 +519,7 @@ static int igraph_i_realize_undirected_degree_sequence(
         IGRAPH_ERROR("The sum of degrees must be even for an undirected graph.", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_min(deg) < 0) {
+    if (node_count > 0 && igraph_vector_min(deg) < 0) {
         IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
     }
 
@@ -615,7 +615,7 @@ static int igraph_i_realize_directed_degree_sequence(
         IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value.", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_min(outdeg) < 0 || igraph_vector_min(indeg) < 0) {
+    if (node_count > 0 && (igraph_vector_min(outdeg) < 0 || igraph_vector_min(indeg) < 0)) {
         IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
     }
 

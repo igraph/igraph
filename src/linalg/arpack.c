@@ -1343,6 +1343,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  * eigenvalues than requested. The common use of this function is to
  * call it directly after \ref igraph_arpack_rnsolve with its \p
  * vectors and \p values argument and \c options->nev as \p nev.
+ * This will add the vectors for eigenvalues with a negative imaginary
+ * part and return all vectors as 2 columns, a real and imaginary part.
  * \param vectors The eigenvector matrix, as returned by \ref
  *   igraph_arpack_rnsolve. It will be resized, typically it will be
  *   larger.
@@ -1362,8 +1364,10 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
 
     long int nodes = igraph_matrix_nrow(vectors);
     long int no_evs = igraph_matrix_nrow(values);
-    long int i, j, k, wh;
-    size_t colsize = (unsigned) nodes * sizeof(igraph_real_t);
+    long int i, j;
+    long int new_vector_pos;
+    long int vector_pos;
+    igraph_matrix_t new_vectors;
 
     /* Error checks */
     if (nev < 0) {
@@ -1374,64 +1378,55 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, nodes, nev * 2));
-    for (i = nev; i < igraph_matrix_nrow(values); i++) {
+    for (i = no_evs -1; i >= nev; i--) {
         IGRAPH_CHECK(igraph_matrix_remove_row(values, i));
     }
 
-    /* Calculate where to start copying */
-    for (i = 0, j = 0, wh = 0; i < nev; i++) {
-        if (MATRIX(*values, i, 1) == 0) { /* TODO: == 0.0 ???? */
-            /* real */
-            j++;
-        } else {
-            /* complex */
-            if (wh == 0) {
-                j += 2;
-                wh = 1 - wh;
-            }
-        }
-    }
-    j--;
+    IGRAPH_CHECK(igraph_matrix_init(&new_vectors, nodes, nev * 2));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &new_vectors);
 
-    /* if (j>=origcol) { */
-    /*   IGRAPH_WARNING("Too few columns in `vectors', ARPACK results are likely wrong"); */
-    /* } */
-
-    /* We copy the j-th eigenvector to the (k-1)-th and k-th column */
-    k = nev * 2 - 1;
-
-    for (i = nev - 1; i >= 0; i--) {
+    new_vector_pos = 0;
+    vector_pos = 0;
+    for (i = 0; i < nev && vector_pos < igraph_matrix_ncol(vectors); i++) {
         if (MATRIX(*values, i, 1) == 0) {
-
-            /* real */
-            memset( &MATRIX(*vectors, 0, k), 0, colsize);
-            if (k - 1 != j) {
-                memcpy( &MATRIX(*vectors, 0, k - 1), &MATRIX(*vectors, 0, j), colsize);
+            /* Real eigenvalue */
+            for (j = 0; j < nodes; j++) {
+                MATRIX(new_vectors, j, new_vector_pos) = MATRIX(*vectors, j, vector_pos);
             }
-            k -= 2;
-            j -= 1;
+            new_vector_pos += 2;
+            vector_pos += 1;
         } else {
-            /* complex */
-            if (k != j) {
-                /* Separate copy required, otherwise 'from' and 'to' might
-                   overlap */
-                memcpy( &MATRIX(*vectors, 0, k), &MATRIX(*vectors, 0, j), colsize);
-                memcpy( &MATRIX(*vectors, 0, k - 1), &MATRIX(*vectors, 0, j - 1), colsize);
+            /* complex eigenvalue */
+            for (j = 0; j < nodes; j++) {
+                MATRIX(new_vectors, j, new_vector_pos) = MATRIX(*vectors, j, vector_pos);
+                MATRIX(new_vectors, j, new_vector_pos + 1) = MATRIX(*vectors, j, vector_pos + 1);
             }
-            if (i > 1 && MATRIX(*values, i, 1) != -MATRIX(*values, i - 1, 1)) {
-                /* The next one is not a conjugate of this one */
-                j -= 2;
-            } else {
-                /* Conjugate */
-                int l;
-                for (l = 0; l < nodes; l++) {
-                    MATRIX(*vectors, l, k) = - MATRIX(*vectors, l, k);
-                }
+
+            /* handle the conjugate */
+
+            /* first check if the conjugate eigenvalue is there */
+            i++;
+            if (i >= nev) {
+                break;
             }
-            k -= 2;
+
+            if (MATRIX(*values, i, 1) != -MATRIX(*values, i-1, 1)) {
+                IGRAPH_ERROR("Complex eigenvalue not followed by its conjugate.", IGRAPH_EINVAL);
+            }
+
+            /* then copy and negate */
+            for (j = 0; j < nodes; j++) {
+                MATRIX(new_vectors, j, new_vector_pos + 2) = MATRIX(*vectors, j, vector_pos);
+                MATRIX(new_vectors, j, new_vector_pos + 3) = -MATRIX(*vectors, j, vector_pos + 1);
+            }
+            new_vector_pos += 4;
+            vector_pos += 2;
         }
     }
+    igraph_matrix_destroy(vectors);
+    IGRAPH_CHECK(igraph_matrix_copy(vectors, &new_vectors));
+    igraph_matrix_destroy(&new_vectors);
+    IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

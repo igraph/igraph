@@ -208,9 +208,9 @@ int igraph_lastcit_game(igraph_t *graph,
  * \brief Simulates a citation based on vertex types.
  *
  * Function to create a network based on some vertex categories. This
- * function creates a citation network, in each step a single vertex
- * and \p edges_per_step citating edges are added, nodes with
- * different categories (may) have different probabilities to get
+ * function creates a citation network: in each step a single vertex
+ * and \p edges_per_step citing edges are added. Nodes with
+ * different categories may have different probabilities to get
  * cited, as given by the \p pref vector.
  *
  * </para><para>
@@ -246,22 +246,27 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     igraph_vector_t edges;
     igraph_vector_t cumsum;
-    igraph_real_t sum;
-    long int i, j, nnval, type;
+    igraph_real_t sum, nnval;
+    long int i, j, type;
+    long int pref_len = igraph_vector_size(pref);
 
     if (igraph_vector_size(types) != nodes) {
-        IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Length of types vector (%ld) must match number of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, (long) igraph_vector_size(types), nodes);
+    }
+
+    if (nodes == 0) {
+        igraph_empty(graph, 0, directed);
+        return IGRAPH_SUCCESS;
+    }
+
+    /* the case of zero-length type vector is caught above, safe to call vector_min here */
+    if (igraph_vector_min(types) < 0) {
+        IGRAPH_ERRORF("Types should be non-negative, but found %g.",
+                      IGRAPH_EINVAL, igraph_vector_min(types));
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-
-    /* return an empty graph is nodes is zero */
-    if (nodes == 0) {
-        igraph_create(graph, &edges, nodes, directed);
-        igraph_vector_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(1);
-        return 0;
-    }
 
     IGRAPH_VECTOR_INIT_FINALLY(&cumsum, 2);
     IGRAPH_CHECK(igraph_vector_reserve(&cumsum, nodes + 1));
@@ -270,12 +275,12 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     /* first node */
     VECTOR(cumsum)[0] = 0;
     type = (long int) VECTOR(*types)[0];
-    if (type >= igraph_vector_size(pref)) {
-        IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
+    if (type >= pref_len) {
+        goto err_pref_too_short;
     }
     nnval = VECTOR(*pref)[type];
     if (nnval < 0) {
-        IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+        goto err_pref_neg;
     }
     sum = VECTOR(cumsum)[1] = nnval;
 
@@ -293,12 +298,12 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_vector_push_back(&edges, to - 1);
         }
         type = (long int) VECTOR(*types)[i];
-        if (type >= igraph_vector_size(pref)) {
-            IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
+        if (type >= pref_len) {
+            goto err_pref_too_short;
         }
         nnval = VECTOR(*pref)[type];
         if (nnval < 0) {
-            IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+            goto err_pref_neg;
         }
         sum += nnval;
         igraph_vector_push_back(&cumsum, sum);
@@ -312,7 +317,15 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
+
+err_pref_too_short:
+    IGRAPH_ERRORF("Preference vector should have length at least %ld with the given types.", IGRAPH_EINVAL,
+                  (long) igraph_vector_max(types) + 1);
+
+err_pref_neg:
+    IGRAPH_ERRORF("Preferences should be non-negative, but found %g.", IGRAPH_EINVAL,
+                  igraph_vector_min(pref));
 }
 
 static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {

@@ -76,6 +76,11 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
         omode = IGRAPH_IN;
     }
 
+    if (no_of_nodes == 0) {
+        igraph_vector_clear(cores);
+        return IGRAPH_SUCCESS;
+    }
+
     vert = igraph_Calloc(no_of_nodes, long int);
     if (vert == 0) {
         IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);

@@ -14,5 +14,8 @@ int main() {
         printf("%ld\n", RNG_INTEGER(0, 100));
     }
 
+    for (i = 0; i < 32; ++i) {
+        printf("%g\n", RNG_UNIF(0, 1e-6));
+    }
     return 0;
 }

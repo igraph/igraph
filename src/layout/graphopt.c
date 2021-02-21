@@ -57,7 +57,7 @@ static int igraph_i_determine_spring_axal_forces(
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
-        int spring_length,
+        igraph_real_t spring_length,
         long int other_node,
         long int this_node);
 
@@ -66,7 +66,7 @@ static int igraph_i_apply_spring_force(
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
         long int other_node,
-        long int this_node, int spring_length,
+        long int this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant);
 
 static int igraph_i_move_nodes(
@@ -166,7 +166,7 @@ static int igraph_i_determine_spring_axal_forces(
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
-        int spring_length,
+        igraph_real_t spring_length,
         long int other_node, long int this_node) {
 
     // if the spring is just the right size, the forces will be 0, so we can
@@ -205,7 +205,7 @@ static int igraph_i_apply_spring_force(
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
         long int other_node,
-        long int this_node, int spring_length,
+        long int this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant) {
 
     // determined using Hooke's Law:
@@ -307,7 +307,7 @@ static int igraph_i_move_nodes(
  * is zero.
  *
  * </para><para>
- * graphopt uses physical analogies for defining attracting and repelling
+ * Graphopt uses physical analogies for defining attracting and repelling
  * forces among the vertices and then the physical system is simulated
  * until it reaches an equilibrium. (There is no simulated annealing or
  * anything like that, so a stable fixed point is not guaranteed.)
@@ -316,22 +316,22 @@ static int igraph_i_move_nodes(
  * See also http://www.schmuhl.org/graphopt/ for the original graphopt.
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result will be stored here
- *    and its initial contents is used the starting point of the simulation
+ *    and its initial contents are used as the starting point of the simulation
  *    if the \p use_seed argument is true. Note that in this case the
  *    matrix should have the proper size, otherwise a warning is issued and
  *    the supplied values are ignored. If no starting positions are given
- *    (or they are invalid) then a random staring position is used.
+ *    (or they are invalid) then a random starting position is used.
  *    The matrix will be resized if needed.
  * \param niter Integer constant, the number of iterations to perform.
  *    Should be a couple of hundred in general. If you have a large graph
  *    then you might want to only do a few iterations and then check the
  *    result. If it is not good enough you can feed it in again in
- *    the \p res argument. The original graphopt default if 500.
+ *    the \p res argument. The original graphopt default is 500.
  * \param node_charge The charge of the vertices, used to calculate electric
  *    repulsion. The original graphopt default is 0.001.
  * \param node_mass The mass of the vertices, used for the spring forces.
  *    The original graphopt defaults to 30.
- * \param spring_length The length of the springs, an integer number.
+ * \param spring_length The length of the springs.
  *    The original graphopt defaults to zero.
  * \param spring_constant The spring constant, the original graphopt defaults
  *    to one.
@@ -356,7 +356,6 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
-    int my_spring_length = (int) spring_length;
     igraph_vector_t pending_forces_x, pending_forces_y;
     /* Set a flag to calculate (or not) the electrical forces that the nodes */
     /* apply on each other based on if both node types' charges are zero. */
@@ -372,7 +371,7 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
     if (use_seed) {
         if (igraph_matrix_nrow(res) != no_of_nodes ||
             igraph_matrix_ncol(res) != 2) {
-            IGRAPH_WARNING("Invalid size for initial matrix, starting from random layout");
+            IGRAPH_WARNING("Invalid size for initial matrix, starting from random layout.");
             IGRAPH_CHECK(igraph_layout_random(graph, res));
         }
     } else {
@@ -427,7 +426,7 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
             long int oother_node = IGRAPH_TO(graph, edge);
             // Apply spring force on both nodes
             igraph_i_apply_spring_force(res, &pending_forces_x, &pending_forces_y,
-                                        oother_node, tthis_node, my_spring_length,
+                                        oother_node, tthis_node, spring_length,
                                         spring_constant);
         }
 
@@ -441,5 +440,5 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&pending_forces_x);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

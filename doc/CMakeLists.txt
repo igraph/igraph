@@ -120,6 +120,7 @@ if(DOC_BUILD_SUPPORTED)
   set(DOXROX_CHUNKS ${CMAKE_CURRENT_BINARY_DIR}/chunks.pickle)
 
   set(DOCBOOK_INPUTS "")
+  set(DOCBOOK_GENERATED_INPUTS "")
 
   # Specify that each DocBook .xml file is to be copied to the build folder
   # TODO(ntamas): currently this works with out-of-tree builds only
@@ -139,6 +140,7 @@ if(DOC_BUILD_SUPPORTED)
 
     string(PREPEND DOXROX_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/")
     list(APPEND DOCBOOK_INPUTS "${DOXROX_OUTPUT}")
+    list(APPEND DOCBOOK_GENERATED_INPUTS "${DOXROX_OUTPUT}")
 
     add_custom_command(
       OUTPUT ${DOXROX_OUTPUT}
@@ -158,15 +160,15 @@ if(DOC_BUILD_SUPPORTED)
   # a ctags-compatible "tags" file. This will then be used later by
   # source-highlight to cross-reference the known tokens from the source code
   # of the examples
-  list(JOIN DOCBOOK_INPUTS ";" DOCBOOK_INPUTS_AS_STRING)
+  list(JOIN DOCBOOK_GENERATED_INPUTS ";" DOCBOOK_GENERATED_INPUTS_AS_STRING)
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/tags"
     COMMAND ${CMAKE_COMMAND}
     ARGS
-    -DINPUT_FILES="${DOCBOOK_INPUTS_AS_STRING}"
+    -DINPUT_FILES="${DOCBOOK_GENERATED_INPUTS_AS_STRING}"
     -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/tags
     -P ${CMAKE_SOURCE_DIR}/etc/cmake/generate_tags_file.cmake
-    DEPENDS ${DOCBOOK_INPUTS}
+    DEPENDS ${DOCBOOK_GENERATED_INPUTS}
     COMMENT "Creating tags file from DocBook xmls"
   )
 

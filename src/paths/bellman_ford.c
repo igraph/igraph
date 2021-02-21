@@ -495,3 +495,85 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_get_shortest_path_bellman_ford
+ * \brief Weighted shortest path from one vertex to another one.
+ *
+ * Calculates a single (positively) weighted shortest path from
+ * a single vertex to another one, using Bellman-Ford algorithm.
+ *
+ * </para><para>
+ * This function is a special case (and a wrapper) to
+ * \ref igraph_get_shortest_paths_bellman_ford().
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param vertices Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the vertex ids along
+ *        the path are stored here, including the source and target
+ *        vertices.
+ * \param edges Pointer to an uninitialized vector or a null
+ *        pointer. If not a null pointer, then the edge ids along the
+ *        path are stored here.
+ * \param from The id of the source vertex.
+ * \param to The id of the target vertex.
+ * \param weights The edge weights. There mustn't be any closed loop in
+ *        the graph that has a negative total weight (since this would allow
+ *        us to decrease the weight of any path containing at least a single
+ *        vertex of this loop infinitely). If this is a null pointer, then the
+ *        unweighted version is called.
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. \c IGRAPH_OUT follows edge
+ *        directions, \c IGRAPH_IN follows the opposite directions,
+ *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|log|E|+|V|), |V| is the number of vertices,
+ * |E| is the number of edges in the graph.
+ *
+ * \sa \ref igraph_get_shortest_paths_bellman_ford() for the version with
+ * more target vertices.
+ */
+
+int igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
+                                          igraph_vector_t *vertices,
+                                          igraph_vector_t *edges,
+                                          igraph_integer_t from,
+                                          igraph_integer_t to,
+                                          const igraph_vector_t *weights,
+                                          igraph_neimode_t mode) {
+
+    igraph_vector_ptr_t vertices2, *vp = &vertices2;
+    igraph_vector_ptr_t edges2, *ep = &edges2;
+
+    if (vertices) {
+        IGRAPH_CHECK(igraph_vector_ptr_init(&vertices2, 1));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vertices2);
+        VECTOR(vertices2)[0] = vertices;
+    } else {
+        vp = NULL;
+    }
+    if (edges) {
+        IGRAPH_CHECK(igraph_vector_ptr_init(&edges2, 1));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &edges2);
+        VECTOR(edges2)[0] = edges;
+    } else {
+        ep = NULL;
+    }
+
+    IGRAPH_CHECK(igraph_get_shortest_paths_bellman_ford(graph, vp, ep,
+                                                        from, igraph_vss_1(to),
+                                                        weights, mode, NULL, NULL));
+
+    if (edges) {
+        igraph_vector_ptr_destroy(&edges2);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+    if (vertices) {
+        igraph_vector_ptr_destroy(&vertices2);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}

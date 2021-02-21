@@ -1,0 +1,8 @@
+No values, binwidth 0 should fail.
+No values, binwidth 1 should fail.
+One value, binwidth 1:
+( 1 )
+1, 2, 3, 4, 5, binwidth 1:
+( 1 2 3 4 5 )
+1, 2, 3, 4, 5, binwidth 2:
+( 1.5 2.5 3.5 4.5 )

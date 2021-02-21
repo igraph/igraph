@@ -34,7 +34,7 @@
  * This function is a somewhat more user-friendly interface to
  * the \c dgemv function in BLAS. \c dgemv performs the operation
  * y = alpha*A*x + beta*y, where x and y are vectors and A is an
- * appropriately sized matrix (symmetric or unsymmetric).
+ * appropriately sized matrix (symmetric or non-symmetric).
  *
  * \param transpose whether to transpose the matrix \p A
  * \param alpha     the constant \p alpha
@@ -74,7 +74,7 @@ void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
  * This function is a somewhat more user-friendly interface to
  * the \c dgemv function in BLAS. \c dgemv performs the operation
  * y = alpha*A*x + beta*y, where x and y are vectors and A is an
- * appropriately sized matrix (symmetric or unsymmetric).
+ * appropriately sized matrix (symmetric or non-symmetric).
  *
  * \param transpose whether to transpose the matrix \p A
  * \param alpha     the constant \p alpha
@@ -109,6 +109,18 @@ igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
     return igraphdnrm2_(&n, VECTOR(*v), &one);
 }
 
+/**
+ * \function igraph_blas_ddot
+ * \brief Dot product of two vectors.
+ *
+ * \param v1 The first vector.
+ * \param v2 The second vector.
+ * \param res Pointer to a real, the result will be stored here.
+ *
+ * Time complexity: O(n) where n is the length of the vectors.
+ *
+ * \example examples/simple/blas.c
+ */
 int igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
                        igraph_real_t *res) {
 
@@ -116,7 +128,7 @@ int igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
     int one = 1;
 
     if (igraph_vector_size(v2) != n) {
-        IGRAPH_ERROR("Dot product of vectors with different dimensions",
+        IGRAPH_ERROR("Dot product of vectors with different dimensions.",
                      IGRAPH_EINVAL);
     }
 

@@ -55,12 +55,12 @@ int igraph_i_read_network(const igraph_t *graph,
 
     double av_k = 0.0, sum_weight = 0.0, min_weight = 1e60, max_weight = -1e60;
     unsigned long min_k = 999999999, max_k = 0;
-    long max_index = 0;
     char name[255];
     NNode *node1, *node2;
     DLList_Iter<NNode*> iter;
     igraph_vector_t edgelist;
-    long int no_of_edges = (long int)igraph_ecount(graph);
+    long int no_of_nodes = (long int) igraph_vcount(graph);
+    long int no_of_edges = (long int) igraph_ecount(graph);
     long int ii;
     char *empty = new char[1];
     empty[0] = '\0';
@@ -68,35 +68,26 @@ int igraph_i_read_network(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edgelist, no_of_edges * 2);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0 /* rowwise */));
 
+    for (ii = 0; ii < no_of_nodes; ii++) {
+        net->node_list->Push(new NNode(ii, 0, net->link_list, empty, states));
+    }
+
     for (ii = 0; ii < no_of_edges; ii++) {
-        long int i1 = (long int)VECTOR(edgelist)[2 * ii] + 1;
-        long int i2 = (long int)VECTOR(edgelist)[2 * ii + 1] + 1;
+        long int i1 = (long int)VECTOR(edgelist)[2 * ii];
+        long int i2 = (long int)VECTOR(edgelist)[2 * ii + 1];
         igraph_real_t Links;
         if (use_weights) {
             Links = VECTOR(*weights)[ii];
         } else {
             Links = 1.0;
         }
-        // From the original source
-        if (max_index < i1) {
-            for (long int i = max_index; i < i1; i++) {
-                net->node_list->Push(new NNode(i, 0, net->link_list, empty, states));
-            }
-            max_index = i1;
-        }
-        if (max_index < i2) {
-            for (long int i = max_index; i < i2; i++) {
-                net->node_list->Push(new NNode(i, 0, net->link_list, empty, states));
-            }
-            max_index = i2;
-        }
 
-        node1 = net->node_list->Get(i1 - 1);
-        sprintf(name, "%li", i1);
+        node1 = net->node_list->Get(i1);
+        sprintf(name, "%li", i1+1);
         node1->Set_Name(name);
 
-        node2 = net->node_list->Get(i2 - 1);
-        sprintf(name, "%li", i2);
+        node2 = net->node_list->Get(i2);
+        sprintf(name, "%li", i2+1);
         node2->Set_Name(name);
 
         node1->Connect_To(node2, Links);
@@ -137,7 +128,7 @@ int igraph_i_read_network(const igraph_t *graph,
 
     delete [] empty;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 //###############################################################################################################

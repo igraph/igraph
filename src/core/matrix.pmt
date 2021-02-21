@@ -64,11 +64,10 @@
  */
 
 int FUNCTION(igraph_matrix, init)(TYPE(igraph_matrix) *m, long int nrow, long int ncol) {
-    int ret1;
-    ret1 = FUNCTION(igraph_vector, init)(&m->data, nrow * ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, nrow * ncol));
     m->nrow = nrow;
     m->ncol = ncol;
-    return ret1;
+    return IGRAPH_SUCCESS;
 }
 
 const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(const TYPE(igraph_matrix) *m,
@@ -150,7 +149,7 @@ long int FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m) {
  */
 
 int FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, long int nrow, long int ncol) {
-    FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol));
     m->nrow = nrow;
     m->ncol = ncol;
     return 0;
@@ -292,7 +291,7 @@ void FUNCTION(igraph_matrix, null)(TYPE(igraph_matrix) *m) {
  */
 
 int FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, long int n) {
-    FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n));
     return 0;
 }
 
@@ -311,7 +310,7 @@ int FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, long int n) {
 
 int FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, long int n) {
     long int i;
-    FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n));
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n)));
     for (i = m->ncol - 1; i >= 0; i--) {
         FUNCTION(igraph_vector, move_interval2)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
                                                 (m->nrow + n)*i);
@@ -361,7 +360,7 @@ int FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m, long int *i
     for (i = 0; i < m->ncol; i++)
         FUNCTION(igraph_vector, remove_section)(&m->data,
                                                 (i + 1) * (m->nrow - nremove), (i + 1) * (m->nrow - nremove) + nremove);
-    FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
 
     return 0;
 }
@@ -386,7 +385,7 @@ int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
         }
         idx = 0;
     }
-    FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
 
     return 0;
 }
@@ -408,24 +407,26 @@ int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
  */
 
 int FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+    IGRAPH_CHECK(FUNCTION(igraph_vector, copy)(&to->data, &from->data));
     to->nrow = from->nrow;
     to->ncol = from->ncol;
-    return FUNCTION(igraph_vector, copy)(&to->data, &from->data);
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED
 
 /**
  * \function igraph_matrix_max
+ * \brief Largest element of a matrix.
  *
- * Returns the maximal element of a matrix.
+ * </para><para>
+ * If the matrix is empty, an arbitrary number is returned.
  * \param m The matrix object.
- * \return The maximum element. For empty matrix the returned value is
- * undefined.
+ * \return The maximum element of \p m, or NaN if any element is NaN.
  *
  * Added in version 0.2.</para><para>
  *
- * Time complexity: O(n), the number of elements in the matrix.
+ * Time complexity: O(mn), the number of elements in the matrix.
  */
 
 igraph_real_t FUNCTION(igraph_matrix, max)(const TYPE(igraph_matrix) *m) {
@@ -723,7 +724,7 @@ int FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
     if (nrow > 1 && ncol > 1) {
         TYPE(igraph_vector) newdata;
         long int i, size = nrow * ncol, mod = size - 1;
-        FUNCTION(igraph_vector, init)(&newdata, size);
+        IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, size));
         IGRAPH_FINALLY(FUNCTION(igraph_vector, destroy), &newdata);
         for (i = 0; i < size; i++) {
             VECTOR(newdata)[i] = VECTOR(m->data)[ (i * nrow) % mod ];
@@ -1186,13 +1187,13 @@ int FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
 
 /**
  * \function igraph_matrix_min
- * Minimum element.
+ * \brief Smallest element of a matrix.
  *
- * Returns the smallest element of a non-empty matrix.
+ * The matrix must be non-empty.
  * \param m The input matrix.
- * \return The smallest element.
+ * \return The smallest element of \p m, or NaN if any element is NaN.
  *
- * Time complexity: O(mn), the number of elements.
+ * Time complexity: O(mn), the number of elements in the matrix.
  */
 
 igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m) {
@@ -1201,10 +1202,12 @@ igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m) {
 
 /**
  * \function igraph_matrix_which_min
- * Indices of the minimum.
+ * \brief Indices of the smallest element.
  *
- * Gives the indices of the (first) smallest element in a non-empty
- * matrix.
+ * </para><para>
+ * The matrix must be non-empty. If the smallest element is not unique,
+ * then the indices of the first such element are returned. If the matrix contains
+ * NaN values, the indices of the first NaN value are returned.
  * \param m The matrix.
  * \param i Pointer to a <type>long int</type>. The row index of the
  *   minimum is stored here.
@@ -1225,10 +1228,12 @@ int FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_which_max
- * Indices of the maximum.
+ * \brief Indices of the largest element.
  *
- * Gives the indices of the (first) largest element in a non-empty
- * matrix.
+ * </para><para>
+ * The matrix must be non-empty. If the largest element is not unique,
+ * then the indices of the first such element are returned. If the matrix contains
+ * NaN values, the indices of the first NaN value are returned.
  * \param m The matrix.
  * \param i Pointer to a <type>long int</type>. The row index of the
  *   maximum is stored here.
@@ -1249,12 +1254,14 @@ int FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_minmax
- * Minimum and maximum
+ * \brief Minimum and maximum elements of a matrix.
  *
- * The maximum and minimum elements of a non-empty matrix.
- * \param m The input matrix.
- * \param min Pointer to a base type. The minimum is stored here.
- * \param max Pointer to a base type. The maximum is stored here.
+ * Handy if you want to have both the smallest and largest element of
+ * a matrix. The matrix is only traversed once. The matrix must be non-empty.
+ * If a matrix contains at least one NaN, both \c min and \c max will be NaN.
+ * \param m The input matrix. It must contain at least one element.
+ * \param min Pointer to a base type variable. The minimum is stored here.
+ * \param max Pointer to a base type variable. The maximum is stored here.
  * \return Error code.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1267,10 +1274,15 @@ int FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_which_minmax
- * Indices of the minimum and maximum
+ * \brief Indices of the minimum and maximum elements
  *
- * Find the positions of the smallest and largest elements of a
- * non-empty matrix.
+ * </para><para>
+ * Handy if you need the indices of the smallest and largest
+ * elements. The matrix is traversed only once. The matrix must be
+ * non-empty. If the minimum or maximum is not unique, the index
+ * of the first minimum or the first maximum is returned, respectively.
+ * If a matrix contains at least one NaN, both \c which_min and \c which_max
+ * will point to the first NaN value.
  * \param m The input matrix.
  * \param imin Pointer to a <type>long int</type>, the row index of
  *   the minimum is stored here.
@@ -1532,7 +1544,7 @@ int FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, long int row) {
         index++;
     }
     m->nrow--;
-    FUNCTION(igraph_vector, resize)(&m->data, m->nrow * m->ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, m->nrow * m->ncol));
     return 0;
 }
 

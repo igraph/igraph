@@ -132,8 +132,8 @@ int igraph_community_walktrap(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    Graph* G = new Graph;
-    if (G->convert_from_igraph(graph, weights)) {
+    Graph G;
+    if (G.convert_from_igraph(graph, weights)) {
         IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
     }
 
@@ -147,22 +147,21 @@ int igraph_community_walktrap(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
         igraph_vector_null(modularity);
     }
-    Communities C(G, length, max_memory, merges, modularity);
+    Communities C(&G, length, max_memory, merges, modularity);
 
     while (!C.H->is_empty()) {
         IGRAPH_ALLOW_INTERRUPTION();
         C.merge_nearest_communities();
     }
 
-    delete G;
-
     if (membership) {
-        long int m = igraph_vector_which_max(modularity);
+        long int m;
+        m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
         IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
                      /*steps=*/ m,
                      membership,
-                     /*csize=*/ 0));
+                     /*csize=*/ NULL));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

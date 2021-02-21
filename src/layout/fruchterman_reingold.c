@@ -384,36 +384,36 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
-                     "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+                     "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
                      igraph_matrix_ncol(res) != 2)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
-                     "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+                     "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
-        IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
     if (maxx && igraph_vector_size(maxx) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
-        IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
     if (miny && igraph_vector_size(miny) != no_nodes) {
-        IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
     if (maxy && igraph_vector_size(maxy) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
-        IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+        IGRAPH_ERROR("miny must not be greater than maxy.", IGRAPH_EINVAL);
     }
 
     if (grid == IGRAPH_LAYOUT_AUTOGRID) {

@@ -37,7 +37,6 @@ add_examples(
   igraph_sparsemat
   igraph_sparsemat3
   igraph_sparsemat4
-  igraph_sparsemat5
   igraph_sparsemat6
   igraph_sparsemat7
   igraph_sparsemat8
@@ -50,6 +49,7 @@ add_legacy_tests(
   igraph_array
   igraph_complex
   igraph_psumtree
+  igraph_sparsemat5
   igraph_sparsemat9
   igraph_sparsemat_is_symmetric
   igraph_sparsemat_minmax
@@ -148,6 +148,7 @@ add_legacy_tests(
   igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_cited_type_game
   igraph_correlated_game
   igraph_extended_chordal_ring
   igraph_from_prufer
@@ -160,6 +161,8 @@ add_legacy_tests(
   igraph_kautz
   igraph_preference_game
   igraph_realize_degree_sequence
+  igraph_recent_degree_aging_game
+  igraph_recent_degree_game
   tree
   tree_game
   ring
@@ -246,11 +249,16 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_bipartite
+  igraph_layout_fruchterman_reingold
+  igraph_layout_graphopt
   igraph_layout_grid
   igraph_layout_lgl
   igraph_layout_mds
   igraph_layout_merge2
   igraph_layout_merge3
+  igraph_layout_random_3d
+  igraph_layout_reingold_tilford_circular
   igraph_layout_reingold_tilford_extended
   igraph_layout_star
   igraph_layout_sugiyama
@@ -515,6 +523,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_arpack_rnsolve
+  igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs
@@ -674,3 +683,8 @@ add_legacy_tests(
   igraph_read_graph_gml_invalid_inputs
 )
 
+# non-graph
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_running_mean
+)

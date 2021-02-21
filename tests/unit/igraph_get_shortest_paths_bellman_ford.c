@@ -24,11 +24,12 @@
 #include "test_utilities.inc"
 #include <stdlib.h>
 
-int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
-                const igraph_vector_ptr_t *evecs, int error_code) {
+void check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
+                 const igraph_vector_ptr_t *evecs) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
     long int i, n = igraph_vector_ptr_size(vecs);
+
     IGRAPH_ASSERT(igraph_vector_ptr_size(evecs) == n);
 
     for (i = 0; i < n; i++) {
@@ -46,7 +47,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
             long int to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 IGRAPH_ASSERT(from == IGRAPH_FROM(graph, edge) &&
-                    to   == IGRAPH_TO  (graph, edge));
+                              to == IGRAPH_TO(graph, edge));
             } else {
                 long int from2 = IGRAPH_FROM(graph, edge);
                 long int to2 = IGRAPH_TO(graph, edge);
@@ -58,16 +59,15 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
             }
         }
     }
-
-    return 0;
 }
 
-int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
-                       const igraph_vector_long_t* inbound, int start, int error_code) {
+void check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
+                        const igraph_vector_long_t* inbound, int start) {
+
     long int i, n = igraph_vcount(graph);
 
-    IGRAPH_ASSERT(igraph_vector_long_size(pred) == n &&
-        igraph_vector_long_size(inbound) == n);
+    IGRAPH_ASSERT(igraph_vector_long_size(pred) == n);
+    IGRAPH_ASSERT(igraph_vector_long_size(inbound) == n);
 
     IGRAPH_ASSERT(VECTOR(*pred)[start] == start && VECTOR(*inbound)[start] == -1);
 
@@ -92,8 +92,6 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
             IGRAPH_ASSERT(u == VECTOR(*pred)[i]);
         }
     }
-
-    return 0;
 }
 
 int main() {
@@ -126,21 +124,21 @@ int main() {
                 2, 1,
                 -1);
     igraph_vector_view(&weights_vec, weights_data_0, sizeof(weights_data_0) / sizeof(igraph_real_t));
-    igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs,
-                                    /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
-                                    &weights_vec, IGRAPH_OUT,
-                                    /*predecessors=*/ &pred,
-                                    /*inbound_edges=*/ &inbound);
+    igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
+                                           /*from=*/ 0, /*to=*/ vs,
+                                           &weights_vec, IGRAPH_OUT,
+                                           /*predecessors=*/ &pred,
+                                           /*inbound_edges=*/ &inbound);
 
-    check_evecs(&g, &vecs, &evecs, 30);
-    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
+    check_evecs(&g, &vecs, &evecs);
+    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-            print_vector_round(VECTOR(vecs)[i]);
-            igraph_vector_destroy(VECTOR(vecs)[i]);
-            free(VECTOR(vecs)[i]);
-            igraph_vector_destroy(VECTOR(evecs)[i]);
-            free(VECTOR(evecs)[i]);
+        print_vector_round(VECTOR(vecs)[i]);
+        igraph_vector_destroy(VECTOR(vecs)[i]);
+        free(VECTOR(vecs)[i]);
+        igraph_vector_destroy(VECTOR(evecs)[i]);
+        free(VECTOR(evecs)[i]);
     }
 
     igraph_vector_ptr_destroy(&vecs);
@@ -165,29 +163,31 @@ int main() {
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
         VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(vecs)[i], 0);VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
+        igraph_vector_init(VECTOR(vecs)[i], 0);
+        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
         igraph_vector_init(VECTOR(evecs)[i], 0);
     }
     igraph_vs_vector_small(&vs, 0, 1, 3, 2, 1,  -1);
     igraph_small(&g, 5, IGRAPH_DIRECTED,
-                 0, 1, 0, 3, 1, 3, 1, 4, 2, 1, 3, 2, 3, 4, 4, 0, 4, 2, -1);
+                 0, 1, 0, 3, 1, 3, 1, 4, 2, 1, 3, 2, 3, 4, 4, 0, 4, 2,
+                 -1);
 
     igraph_vector_view(&weights_vec, weights_data_1, sizeof(weights_data_1) / sizeof(igraph_real_t));
-    igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs,
-                                    /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
-                                    &weights_vec, IGRAPH_OUT,
-                                    /*predecessors=*/ &pred,
-                                    /*inbound_edges=*/ &inbound);
+    igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
+                                           /*from=*/ 0, /*to=*/ vs,
+                                           &weights_vec, IGRAPH_OUT,
+                                           /*predecessors=*/ &pred,
+                                           /*inbound_edges=*/ &inbound);
 
-    check_evecs(&g, &vecs, &evecs, 30);
-    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
+    check_evecs(&g, &vecs, &evecs);
+    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-            print_vector_round(VECTOR(vecs)[i]);
-            igraph_vector_destroy(VECTOR(vecs)[i]);
-            free(VECTOR(vecs)[i]);
-            igraph_vector_destroy(VECTOR(evecs)[i]);
-            free(VECTOR(evecs)[i]);
+        print_vector_round(VECTOR(vecs)[i]);
+        igraph_vector_destroy(VECTOR(vecs)[i]);
+        free(VECTOR(vecs)[i]);
+        igraph_vector_destroy(VECTOR(evecs)[i]);
+        free(VECTOR(evecs)[i]);
     }
 
     /***************************************/
@@ -196,13 +196,11 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_vector_view(&weights_vec, weights_data_2,
                        sizeof(weights_data_2) / sizeof(igraph_real_t));
-    if (igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs,
-                                    /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
-                                    &weights_vec, IGRAPH_OUT,
-                                    /*predecessors=*/ &pred,
-                                    /*inbound_edges=*/ &inbound) != IGRAPH_ENEGLOOP) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
+                                                         /*from=*/ 0, /*to=*/ vs,
+                                                         &weights_vec, IGRAPH_OUT,
+                                                         /*predecessors=*/ &pred,
+                                                         /*inbound_edges=*/ &inbound) == IGRAPH_ENEGLOOP);
 
     igraph_vector_ptr_destroy(&vecs);
     igraph_vector_ptr_destroy(&evecs);

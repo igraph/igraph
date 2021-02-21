@@ -11,6 +11,10 @@
   background: #eeeeff;
   border: solid 1px #4444ff;
   padding: 0.5em;
+  font-size: 16px;
+}
+.literal {
+  font-size: 16px;
 }
 .variablelist 
 {

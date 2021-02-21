@@ -79,6 +79,13 @@ IGRAPH_EXPORT int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
                                                      const igraph_vs_t to,
                                                      const igraph_vector_t *weights,
                                                      igraph_neimode_t mode);
+IGRAPH_EXPORT int igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
+                                                        igraph_vector_t *vertices,
+                                                        igraph_vector_t *edges,
+                                                        igraph_integer_t from,
+                                                        igraph_integer_t to,
+                                                        const igraph_vector_t *weights,
+                                                        igraph_neimode_t mode);
 IGRAPH_EXPORT int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                                      igraph_vector_ptr_t *vertices,
                                                      igraph_vector_ptr_t *edges,
