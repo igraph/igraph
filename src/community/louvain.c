@@ -26,6 +26,7 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_qsort.h"
 
 #include "core/interruption.h"
 
@@ -105,8 +106,8 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
         links[i].id = i;
     }
 
-    qsort((void*)links, (size_t) ecount, sizeof(igraph_i_multilevel_link),
-          igraph_i_multilevel_link_cmp);
+    igraph_qsort((void*)links, (size_t) ecount, sizeof(igraph_i_multilevel_link),
+                 igraph_i_multilevel_link_cmp);
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     for (i = 0; i < ecount; i++) {
@@ -216,8 +217,8 @@ static int igraph_i_multilevel_community_links(
     }
 
     /* Sort links by community ID and merge the same */
-    qsort((void*)links, (size_t) n, sizeof(igraph_i_multilevel_community_link),
-          igraph_i_multilevel_community_link_cmp);
+    igraph_qsort((void*)links, (size_t) n, sizeof(igraph_i_multilevel_community_link),
+                 igraph_i_multilevel_community_link_cmp);
     for (i = 0; i < n; i++) {
         to_community = links[i].community;
         if (to_community != last) {

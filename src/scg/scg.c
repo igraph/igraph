@@ -84,6 +84,7 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_memory.h"
+#include "igraph_qsort.h"
 
 #include "scg_headers.h"
 
@@ -463,7 +464,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
             g[i].gr = &MATRIX(gr_mat, 0, i);
         }
 
-        qsort(g, (size_t) no_of_nodes, sizeof(igraph_i_scg_groups_t),
+        igraph_qsort(g, (size_t) no_of_nodes, sizeof(igraph_i_scg_groups_t),
               igraph_i_compare_groups);
         VECTOR(*groups)[g[0].ind] = gr_nb;
         for (i = 1; i < no_of_nodes; i++) {
