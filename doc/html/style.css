@@ -13,7 +13,7 @@
   padding: 0.5em;
   font-size: 16px;
 }
-.literal {
+.constant, .literal {
   font-size: 16px;
 }
 .variablelist 
@@ -24,6 +24,11 @@
 .variablelist td:first-child
 {
   vertical-align: top;
+}
+
+code
+{
+  font-size: 16px;
 }
 
 table.navigation 
