@@ -104,17 +104,8 @@ int main() {
     igraph_real_t weights_data_2[] = { 6, 7, 2, -4, -2, -3, 9, 2, 7 };
     igraph_vector_t weights_vec;
     igraph_vs_t vs;
-    igraph_vector_ptr_init(&vecs, 6);
-    igraph_vector_ptr_init(&evecs, 6);
-    igraph_vector_long_init(&pred, 0);
-    igraph_vector_long_init(&inbound, 0);
+    igraph_integer_t vs_size;
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(vecs)[i], 0);VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(evecs)[i], 0);
-    }
-    igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
     igraph_small(&g, 10, IGRAPH_DIRECTED,
                 0, 1, 0, 2, 0, 3,    1, 2, 1, 4, 1, 5,
                 2, 3, 2, 6,         3, 2, 3, 6,
@@ -123,6 +114,25 @@ int main() {
                 5, 2,
                 2, 1,
                 -1);
+
+    igraph_vector_long_init(&pred, 0);
+    igraph_vector_long_init(&inbound, 0);
+
+    printf("Paths to only some vertices\n");
+
+    igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
+    igraph_vs_size(&g, &vs, &vs_size);
+
+    igraph_vector_ptr_init(&vecs, vs_size);
+    igraph_vector_ptr_init(&evecs, vs_size);
+
+    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
+        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
+        igraph_vector_init(VECTOR(vecs)[i], 0);
+        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
+        igraph_vector_init(VECTOR(evecs)[i], 0);
+    }
+
     igraph_vector_view(&weights_vec, weights_data_0, sizeof(weights_data_0) / sizeof(igraph_real_t));
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ vs,
@@ -141,8 +151,40 @@ int main() {
         free(VECTOR(evecs)[i]);
     }
 
+    printf("\nPaths to all vertices\n");
+
+    vs_size = igraph_vcount(&g);
+
+    igraph_vector_ptr_resize(&vecs, vs_size);
+    igraph_vector_ptr_resize(&evecs, vs_size);
+
+    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
+        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
+        igraph_vector_init(VECTOR(vecs)[i], 0);
+        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
+        igraph_vector_init(VECTOR(evecs)[i], 0);
+    }
+
+    igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
+                                           /*from=*/ 0, /*to=*/ igraph_vss_all(),
+                                           &weights_vec, IGRAPH_OUT,
+                                           /*predecessors=*/ &pred,
+                                           /*inbound_edges=*/ &inbound);
+
+    check_evecs(&g, &vecs, &evecs);
+    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
+
+    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
+        print_vector_round(VECTOR(vecs)[i]);
+        igraph_vector_destroy(VECTOR(vecs)[i]);
+        free(VECTOR(vecs)[i]);
+        igraph_vector_destroy(VECTOR(evecs)[i]);
+        free(VECTOR(evecs)[i]);
+    }
+
     igraph_vector_ptr_destroy(&vecs);
     igraph_vector_ptr_destroy(&evecs);
+
     igraph_vector_long_destroy(&pred);
     igraph_vector_long_destroy(&inbound);
 
@@ -150,7 +192,7 @@ int main() {
     igraph_destroy(&g);
 
 
-    printf("\n");
+    printf("\nGraph with negative weights\n");
 
     /***************************************/
 
