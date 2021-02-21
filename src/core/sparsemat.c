@@ -2996,6 +2996,32 @@ int igraph_sparsemat_sort(const igraph_sparsemat_t *A,
     return 0;
 }
 
+/**
+ * \function igraph_sparsemat_getelements_sorted
+ * \brief Returns the sorted elements of a sparse matrix.
+ *
+ * This function will sort a sparse matrix and return the elements in
+ * 3 vectors. Two vectors will indicate where the elements are located,
+ * and one will give the elements.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \param i An initialized int vector. This will store the rows of the
+ *          returned elements.
+ * \param j An initialized int vector. For a triplet matrix this will
+ *          store the columns of the returned elements. For a compressed
+ *          matrix, if the column index is \c k, then <code>j[k]</code>
+ *          is the index in \p x of the start of the \c k-th column, and
+ *          the last element of \c j is the total number of elements.
+ *          The total number of elements in the \c k-th column is
+ *          therefore <code>j[k+1] - j[k]</code>. For example, if there
+ *          is one element in the first column, and five in the second,
+ *          \c j will be set to <code>{0, 1, 6}</code>.
+ * \param x An initialized vector. The elements will be placed here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of stored elements in the sparse matrix.
+ */
+
 int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
                                         igraph_vector_int_t *i,
                                         igraph_vector_int_t *j,
@@ -3011,7 +3037,7 @@ int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
         IGRAPH_CHECK(igraph_sparsemat_getelements(A, i, j, x));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A) {
