@@ -19,6 +19,14 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
+int fkeep_none(int row, int col, igraph_real_t value, void *other) {
+    IGRAPH_UNUSED(row);
+    IGRAPH_UNUSED(col);
+    IGRAPH_UNUSED(value);
+    IGRAPH_UNUSED(other);
+    return 0;
+}
+
 int fkeep(int row, int col, igraph_real_t value, void *other) {
     if (row == 0 || col == 1 || value > *(int*)other) {
         return 0;
@@ -39,7 +47,7 @@ int main() {
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat_comp);
 
-    printf("3x3 matrix:\n");
+    printf("3x3 matrix.\n");
     igraph_sparsemat_init(&spmat, 3, 3, /*nzmax*/7);
     igraph_sparsemat_entry(&spmat, 0, 0, 5);
     igraph_sparsemat_entry(&spmat, 1, 1, 6);
@@ -50,7 +58,11 @@ int main() {
     igraph_sparsemat_entry(&spmat, 1, 2, 4);
     igraph_sparsemat_compress(&spmat, &spmat_comp);
     a = 6;
+    printf("Remove row 0, column 1, and values above 6:\n");
     IGRAPH_ASSERT(igraph_sparsemat_fkeep(&spmat_comp, &fkeep, &a) == IGRAPH_SUCCESS);
+    igraph_sparsemat_print(&spmat_comp, stdout);
+    printf("Remove everything:\n");
+    IGRAPH_ASSERT(igraph_sparsemat_fkeep(&spmat_comp, &fkeep_none, &a) == IGRAPH_SUCCESS);
     igraph_sparsemat_print(&spmat_comp, stdout);
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat_comp);
