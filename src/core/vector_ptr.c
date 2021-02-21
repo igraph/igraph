@@ -25,6 +25,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
+#include "igraph_qsort.h"
 
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
@@ -542,7 +543,7 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
  * to the underlying object the address of which is stored in \c v .
  */
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
-    qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*),
+    igraph_qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*),
           compar);
 }
 

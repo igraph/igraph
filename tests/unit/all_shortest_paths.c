@@ -33,9 +33,13 @@ int main() {
 
     igraph_vector_init(&weights, 0);
 
-    /* get_all_shortest_paths functions are expected to return
-     * results in sorted order, so we do not need to canonicalize
-     * the result before printing it. */
+    /* Note on the output:
+     * get_all_shortest_paths functions sort their output based on the
+     * last vertex only. Thus the ordering is not fully defined.
+     *
+     * This test does not currently canonicalize (i.e. sort)
+     * the result before printing it.
+     */
 
     printf("Singleton graph\n");
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
