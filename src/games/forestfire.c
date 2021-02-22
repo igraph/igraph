@@ -48,7 +48,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
 
 /**
  * \function igraph_forest_fire_game
- * \brief Generates a network according to the \quote forest fire game \endquote
+ * \brief Generates a network according to the \quote forest fire game \endquote.
  *
  * The forest fire model intends to reproduce the following network
  * characteristics, observed in real networks:

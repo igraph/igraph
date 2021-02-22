@@ -149,7 +149,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
 /**
  * \ingroup generators
  * \function igraph_tree_game
- * \brief Generates a random tree with the given number of nodes
+ * \brief Generates a random tree with the given number of nodes.
  *
  * This function samples uniformly from the set of labelled trees,
  * i.e. it generates each labelled tree with the same probability.

@@ -30,7 +30,7 @@
  * \function igraph_grg_game
  * \brief Generates a geometric random graph.
  *
- * A geometric random graph is created by dropping points (=vertices)
+ * A geometric random graph is created by dropping points (i.e. vertices)
  * randomly on the unit square and then connecting all those pairs
  * which are less than \c radius apart in Euclidean distance.
  *
