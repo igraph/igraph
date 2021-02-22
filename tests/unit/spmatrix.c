@@ -204,8 +204,6 @@ int main() {
     igraph_spmatrix_destroy(&m);
     printf("=========================\n");
 
-    /* TODO: igraph_spmatrix_add_col_values */
-
     VERIFY_FINALLY_STACK();
 
     return 0;
