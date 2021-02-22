@@ -209,7 +209,7 @@ if(DOC_BUILD_SUPPORTED)
     ARGS
     -e ${DOXROX_RULES}
     -o ${DOXROX_CHUNKS}
-	--cache ${DOXROX_CACHE}
+    --cache ${DOXROX_CACHE}
     ${IGRAPH_SOURCES_FOR_DOXROX}
     MAIN_DEPENDENCY ${DOXROX_RULES}
     DEPENDS ${IGRAPH_SOURCES_FOR_DOXROX}
@@ -243,7 +243,7 @@ if(DOC_BUILD_SUPPORTED)
       --xinclude
       --output igraph-docs-with-resolved-includes-tmp.xml
       igraph-docs.xml
-      COMMAND ${PYTHON3}
+      COMMAND ${Python3_EXECUTABLE}
       ARGS
       ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
       igraph-docs-with-resolved-includes-tmp.xml
