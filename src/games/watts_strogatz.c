@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_watts_strogatz_game
- * \brief The Watts-Strogatz small-world model
+ * \brief The Watts-Strogatz small-world model.
  *
  * This function generates a graph according to the Watts-Strogatz
  * model of small-world networks. The graph is obtained by creating a
@@ -38,6 +38,7 @@
  * </para><para>See also: Duncan J Watts and Steven H Strogatz:
  * Collective dynamics of <quote>small world</quote> networks, Nature
  * 393, 440-442, 1998.
+ *
  * \param graph The graph to initialize.
  * \param dim The dimension of the lattice.
  * \param size The size of the lattice along each dimension.

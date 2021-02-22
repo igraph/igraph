@@ -219,9 +219,9 @@ void igraph_rng_glibc2_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_glibc2
- * \brief The random number generator type introduced in GNU libc 2
+ * \brief The random number generator introduced in GNU libc 2.
  *
- * It is a linear feedback shift register generator with a 128-byte
+ * This is a linear feedback shift register generator with a 128-byte
  * buffer. This generator was the default prior to igraph version 0.6,
  * at least on systems relying on GNU libc.
  *
@@ -289,20 +289,25 @@ void igraph_rng_rand_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_rand
- * \brief The old BSD rand/srand random number generator
+ * \brief The old BSD rand/srand random number generator.
  *
  * The sequence is
- *     x_{n+1} = (a x_n + c) mod m
- * with a = 1103515245, c = 12345 and m = 2^31 = 2147483648. The seed
- * specifies the initial value, x_1.
+ *     <code>x_{n+1} = (a x_n + c) mod m</code>
+ * with <code>a = 1103515245</code>, <code>c = 12345</code> and
+ * <code>m = 2^31 = 2147483648</code>.
+ * The seed specifies the initial value, <code>x_1</code>.
  *
- * The theoretical value of x_{10001} is 1910041713.
+ * </para><para>
+ * The theoretical value of <code>x_{10001}</code> is 1910041713.
  *
- *  The period of this generator is 2^31.
+ * </para><para>
+ * The period of this generator is 2^31.
  *
- * This generator is not very good -- the low bits of successive
+ * </para><para>
+ * This generator is not very good—the low bits of successive
  * numbers are correlated.
  *
+ * </para><para>
  * This generator was ported from the GNU Scientific Library.
  */
 
@@ -432,7 +437,7 @@ void igraph_rng_mt19937_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_mt19937
- * \brief The MT19937 random number generator
+ * \brief The MT19937 random number generator.
  *
  * The MT19937 generator of Makoto Matsumoto and Takuji Nishimura is a
  * variant of the twisted generalized feedback shift-register
@@ -441,22 +446,25 @@ void igraph_rng_mt19937_destroy(void *vstate) {
  * equi-distributed in 623 dimensions. It has passed the diehard
  * statistical tests. It uses 624 words of state per generator and is
  * comparable in speed to the other generators. The original generator
- * used a default seed of 4357 and choosing s equal to zero in
- * gsl_rng_set reproduces this. Later versions switched to 5489 as the
- * default seed, you can choose this explicitly via igraph_rng_seed
+ * used a default seed of 4357 and choosing \c s equal to zero in
+ * \c gsl_rng_set reproduces this. Later versions switched to 5489 as the
+ * default seed, you can choose this explicitly via \ref igraph_rng_seed()
  * instead if you require it.
  *
+ * </para><para>
  * For more information see,
  * Makoto Matsumoto and Takuji Nishimura, “Mersenne Twister: A
  * 623-dimensionally equidistributed uniform pseudorandom number
  * generator”. ACM Transactions on Modeling and Computer Simulation,
  * Vol. 8, No. 1 (Jan. 1998), Pages 3–30
  *
- * The generator igraph_rngtype_mt19937 uses the second revision of the
+ * </para><para>
+ * The generator \c igraph_rngtype_mt19937 uses the second revision of the
  * seeding procedure published by the two authors above in 2002. The
  * original seeding procedures could cause spurious artifacts for some
  * seed values.
  *
+ * </para><para>
  * This generator was ported from the GNU Scientific Library.
  */
 

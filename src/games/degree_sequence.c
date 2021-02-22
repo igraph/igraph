@@ -667,7 +667,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
 /**
  * \ingroup generators
  * \function igraph_degree_sequence_game
- * \brief Generates a random graph with a given degree sequence
+ * \brief Generates a random graph with a given degree sequence.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param out_deg The degree sequence for an undirected graph (if
@@ -711,7 +711,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *          generated graph is not simple, it rejects it and re-starts the
  *          generation. It generates all simple graphs with the same probability.
  *          \cli IGRAPH_DEGSEQ_VL
- *          This method samples undirected connected graphs approximately
+ *          This method samples undirected \em connected graphs approximately
  *          uniformly. It is a Monte Carlo method based on degree-preserving
  *          edge swaps.
  *          This generator should be favoured if undirected and connected

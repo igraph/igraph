@@ -33,6 +33,7 @@ __BEGIN_DECLS
 
 /**
  * \struct igraph_sir_t
+ * \brief The result of one SIR model simulation.
  *
  * Data structure to store the results of one simulation
  * of the SIR (susceptible-infected-recovered) model on a graph.

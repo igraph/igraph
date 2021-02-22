@@ -548,7 +548,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_barabasi_aging_game
- * \brief Preferential attachment with aging of vertices
+ * \brief Preferential attachment with aging of vertices.
  *
  * </para><para>
  * This game starts with one vertex (if \p nodes > 0). In each step

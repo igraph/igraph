@@ -45,7 +45,7 @@ static void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs
 
 /**
  * \function igraph_preference_game
- * \brief Generates a graph with vertex types and connection preferences
+ * \brief Generates a graph with vertex types and connection preferences.
  *
  * </para><para>
  * This is practically the nongrowing variant of
@@ -355,7 +355,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
 /**
  * \function igraph_asymmetric_preference_game
- * \brief Generates a graph with asymmetric vertex types and connection preferences
+ * \brief Generates a graph with asymmetric vertex types and connection preferences.
  *
  * </para><para>
  * This is the asymmetric variant of \ref igraph_preference_game().

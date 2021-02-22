@@ -35,8 +35,7 @@
 /**
  * \ingroup generators
  * \function igraph_static_fitness_game
- * \brief Generates a non-growing random graph with edge probabilities
- *        proportional to node fitness scores.
+ * \brief Non-growing random graph with edge probabilities proportional to node fitness scores.
  *
  * This game generates a directed or undirected random graph where the
  * probability of an edge between vertices i and j depends on the fitness
