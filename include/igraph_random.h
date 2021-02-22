@@ -21,8 +21,8 @@
 
 */
 
-#ifndef REST_RANDOM_H
-#define REST_RANDOM_H
+#ifndef IGRAPH_RANDOM_H
+#define IGRAPH_RANDOM_H
 
 #include "igraph_decls.h"
 
