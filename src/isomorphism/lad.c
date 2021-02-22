@@ -53,6 +53,8 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
+#include "igraph_qsort.h"
+
 #include "core/interruption.h"
 
 #include <stdlib.h>
@@ -481,8 +483,8 @@ static bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
        a different element v of mv such that u <= v;
        return false otherwise */
     int i, j;
-    qsort(mu, (size_t) size_mu, sizeof(int), igraph_i_lad_qcompare);
-    qsort(mv, (size_t) size_mv, sizeof(int), igraph_i_lad_qcompare);
+    igraph_qsort(mu, (size_t) size_mu, sizeof(int), igraph_i_lad_qcompare);
+    igraph_qsort(mv, (size_t) size_mv, sizeof(int), igraph_i_lad_qcompare);
     i = size_mv - 1;
     for (j = size_mu - 1; j >= 0; j--) {
         if (mu[j] > mv[i]) {

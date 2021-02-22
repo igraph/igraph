@@ -51,8 +51,11 @@ add_legacy_tests(
   igraph_psumtree
   igraph_sparsemat5
   igraph_sparsemat9
+  igraph_sparsemat_fkeep
+  igraph_sparsemat_getelements_sorted
   igraph_sparsemat_is_symmetric
   igraph_sparsemat_minmax
+  igraph_sparsemat_nonzero_storage
   igraph_sparsemat_which_minmax
   matrix
   matrix2
@@ -206,6 +209,7 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_shortest_paths
   efficiency
   igraph_are_connected
   igraph_betweenness
@@ -216,9 +220,9 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
   igraph_is_tree
-  igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
   igraph_pagerank
   igraph_transitive_closure_dag
@@ -249,6 +253,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_drl
   igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
   igraph_layout_graphopt
@@ -632,8 +637,10 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rng_get_exp
+  igraph_rng_get_integer
   mt
   rng_reproducibility
+  rng_init_destroy_max_min_name_set_default
 )
 
 # qsort.at
@@ -668,6 +675,8 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   fatal_handler
+  igraph_progress_handler_stderr
+  igraph_set_progress_handler
 )
 
 # error output

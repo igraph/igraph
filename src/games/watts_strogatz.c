@@ -53,7 +53,7 @@
  *
  * \sa \ref igraph_lattice(), \ref igraph_connect_neighborhood() and
  * \ref igraph_rewire_edges() can be used if more flexibility is
- * needed, eg. a different type of lattice.
+ * needed, e.g. a different type of lattice.
  *
  * Time complexity: O(|V|*d^o+|E|), |V| and |E| are the number of
  * vertices and edges, d is the average degree, o is the \p nei

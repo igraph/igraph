@@ -29,7 +29,6 @@ int main() {
     igraph_t g;
     igraph_matrix_t result;
     igraph_vector_t roots, rootlevel;
-    igraph_rng_seed(igraph_rng_default(), 42);
 
     printf("Empty graph check:\n");
     igraph_small(&g, 0, 0, -1);
