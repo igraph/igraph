@@ -360,7 +360,7 @@ WITH --------------------------------------------------------------------------
 
 REPLACE ----- \typedef function -----------------------------------------------
 
-(?P<before>.*?)                   # comment head
+(?P<before>\A.*?)                   # comment head
 \\typedef\s+                      # \typedef command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 [\s]*(?P<brief>[^\n]*?)\n         # brief description
