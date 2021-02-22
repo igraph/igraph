@@ -69,18 +69,17 @@ REPLACE ----- <paramdef> for functions (not used currently) -------------------
 
 RUN ---------------------------------------------------------------------------
 
-if matched != None:
-    dr_params=string.split(matched.group("params"), ',')
-    dr_out=""
-    for dr_i in dr_params:
-        dr_i=string.strip(dr_i)
-        if dr_i=="...":
-            dr_out=dr_out+"<varargs/>"
-        else:
-            dr_words=re.match(r"([\w\*\&\s]+)(\b\w+)$", dr_i).groups()
-            dr_out=dr_out+"<paramdef>"+dr_words[0]+"<parameter>"+dr_words[1]+ \
-                    "</parameter></paramdef>\n"
-    actch=actch[0:matched.start()]+dr_out+actch[matched.end():]
+dr_params=string.split(matched.group("params"), ',')
+dr_out=""
+for dr_i in dr_params:
+    dr_i=string.strip(dr_i)
+    if dr_i=="...":
+        dr_out=dr_out+"<varargs/>"
+    else:
+        dr_words=re.match(r"([\w\*\&\s]+)(\b\w+)$", dr_i).groups()
+        dr_out=dr_out+"<paramdef>"+dr_words[0]+"<parameter>"+dr_words[1]+ \
+                "</parameter></paramdef>\n"
+actch=actch[0:matched.start()]+dr_out+actch[matched.end():]
 
 REPLACE ----- function parameter descriptions, head ---------------------------
 
