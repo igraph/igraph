@@ -575,9 +575,10 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
 
 /**
  * \function igraph_spmatrix_clear_row
- * \brief Clears a row in the matrix (sets all of its elements to zero)
+ * \brief Clears a row in the matrix (sets all of its elements to zero).
  * \param m The matrix.
  * \param row The index of the row to be cleared.
+ * \return Error code. The current implementation always succeeds.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
  */
@@ -614,7 +615,7 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     igraph_vector_permdelete(&m->data, &permvec, nremove);
     igraph_vector_destroy(&permvec);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Unused local functions---temporarily disabled */
@@ -667,7 +668,7 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
 
 /**
  * \function igraph_spmatrix_clear_col
- * \brief Clears a column in the matrix (sets all of its elements to zero)
+ * \brief Clears a column in the matrix (sets all of its elements to zero).
  * \param m The matrix.
  * \param col The index of the column to be cleared.
  * \return Error code. The current implementation always succeeds.
@@ -692,7 +693,7 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
     for (i = col + 1; i <= m->ncol; i++) {
         VECTOR(m->cidx)[i] -= n;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
