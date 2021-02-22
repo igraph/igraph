@@ -57,6 +57,7 @@ add_legacy_tests(
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
   igraph_sparsemat_which_minmax
+  spmatrix_clear
   matrix
   matrix2
   matrix3

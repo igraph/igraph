@@ -583,6 +583,9 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
  */
 
 int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
+    if (row < 0 || row >= m->nrow) {
+       IGRAPH_ERROR("The row does not exist.", IGRAPH_EINVAL);
+    }
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
@@ -673,6 +676,9 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
  */
 
 int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
+    if (col < 0 || col >= m->ncol) {
+       IGRAPH_ERROR("The column does not exist.", IGRAPH_EINVAL);
+    }
     long int i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (long)VECTOR(m->cidx)[col + 1] - (long)VECTOR(m->cidx)[col];
