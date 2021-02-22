@@ -704,6 +704,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists, order;
     igraph_vector_ptr_t parents, parents_edge;
+    igraph_finally_func_t *res_item_destructor;
     unsigned char *is_target;
     long int i, n, to_reach;
     igraph_bool_t free_vertices = 0;
@@ -973,6 +974,19 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         paths_index = &dists;
         n = igraph_vector_size(&order);
         igraph_vector_null(paths_index);
+
+        if (edges){
+            igraph_vector_ptr_clear(edges);
+            res_item_destructor = igraph_vector_ptr_get_item_destructor(edges);
+            igraph_vector_ptr_set_item_destructor(edges,
+                                                (igraph_finally_func_t*)igraph_vector_destroy);
+        }
+        if (vertices){
+            igraph_vector_ptr_clear(vertices);
+            res_item_destructor = igraph_vector_ptr_get_item_destructor(vertices);
+            igraph_vector_ptr_set_item_destructor(vertices,
+                                                (igraph_finally_func_t*)igraph_vector_destroy);
+        }
 
         /* by definition, the shortest path leading to the starting vertex
         * consists of the vertex itself only */
