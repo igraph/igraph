@@ -39,11 +39,13 @@ import sys
 import re
 
 from argparse import ArgumentParser
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from hashlib import sha1
+from operator import itemgetter
 from pathlib import Path
 from pickle import dump, load
+from time import time
 
 #: Constant indicating the start of a comment that doxrox.py will process
 DOXHEAD = r"/\*\*"
@@ -106,6 +108,8 @@ def main():
     else:
         all_chunks = {}
 
+    rule_timings = defaultdict(list)
+
     for ifile in inputs:
         with operation("Parsing input file {0}...".format(ifile)) as op:
             try:
@@ -123,7 +127,7 @@ def main():
             if chunks is not None:
                 op("{0} chunks read from cache".format(len(chunks)))
             else:
-                chunks = collect_chunks_from_input_file(contents, rules)
+                chunks = collect_chunks_from_input_file(contents, rules, rule_timings)
                 op("{0} chunks parsed".format(len(chunks)))
                 if key:
                     cache.put(key, chunks)
@@ -132,6 +136,12 @@ def main():
                 if name in all_chunks:
                     fatal("Multiple files provide chunks for {0!r}".format(name), code=4)
                 all_chunks[name] = chunk
+
+    if arguments.timing_stats and rule_timings:
+        rule_timings = {name: sum(dts) / len(dts) for name, dts in rule_timings.items()}
+        for name, dt in sorted(rule_timings.items(), key=itemgetter(1), reverse=True):
+            print("{0}: {1:.3f}us".format(name, dt))
+        print("======")
 
     if cache:
         cache.close()
@@ -231,6 +241,13 @@ def create_argument_parser():
         help="name of a previously saved chunk file",
     )
     parser.add_argument(
+        "--timing-stats",
+        dest="timing_stats",
+        action="store_true",
+        default=False,
+        help="print the average time it takes to process regex rules from the rules file"
+    )
+    parser.add_argument(
         "inputs", metavar="INPUT", nargs="*", help="input files to process"
     )
 
@@ -326,7 +343,7 @@ def read_regex_rules_file(filename):
 #################
 # parse an input file string
 #################
-def collect_chunks_from_input_file(strinput, rules):
+def collect_chunks_from_input_file(strinput, rules, rule_timings):
     result = {}
 
     # split the file
@@ -337,7 +354,6 @@ def collect_chunks_from_input_file(strinput, rules):
     for chunk in chunks:
         name = None
 
-        rule_timings = defaultdict(list)
         for index, rule in enumerate(rules):
             start = time()
 
@@ -369,16 +385,13 @@ def collect_chunks_from_input_file(strinput, rules):
             else:
                 fatal("Invalid rule type: {0!r}".format(rule.type), code=6)
 
-            rule_timings[rule.name].append(len((time() - start) * 1000000))
+            rule_timings[rule.name].append((time() - start) * 1000000)
 
         if not name:
             # print("Chunk without a name ignored:" + ch[0:60] + "...")
             continue
 
         result[name] = chunk.strip()
-
-    rule_timings = {name: sum(dts) / len(dts) for name, dts in rule_timings}
-    print(repr(rule_timings))
 
     return result
 
