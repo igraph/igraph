@@ -396,7 +396,7 @@ void print_spmatrix(igraph_spmatrix_t *m) {
     long int i, j;
     for (i = 0; i < igraph_spmatrix_nrow(m); i++) {
         for (j = 0; j < igraph_spmatrix_ncol(m); j++) {
-            printf(" %g", igraph_spmatrix_e(m, i, j));
+            printf(" %8g", igraph_spmatrix_e(m, i, j));
         }
         printf("\n");
     }
