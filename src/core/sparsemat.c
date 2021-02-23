@@ -3110,25 +3110,57 @@ int igraph_sparsemat_neg(igraph_sparsemat_t *A) {
     return 0;
 }
 
+/**
+ * \function igraph_sparsemat_iterator_init
+ * \brief Initialize a sparse matrix iterator.
+ *
+ * \param it A pointer to an uninitialized sparse matrix iterator.
+ * \param sparsemat Pointer to the sparse matrix.
+ * \return Error code. This will always return \c IGRAPH_SUCCESS
+ *
+ * Time complexity: O(n), the number of columns of the sparse matrix.
+ */
+
 int igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
                                    igraph_sparsemat_t *sparsemat) {
 
     it->mat = sparsemat;
     igraph_sparsemat_iterator_reset(it);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_sparsemat_iterator_reset
+ * \brief Reset a sparse matrix iterator to the first element.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return Error code. This will always return \c IGRAPH_SUCCESS
+ *
+ * Time complexity: O(n), the number of columns of the sparse matrix.
+ */
 
 int igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it) {
     it->pos = 0;
+    it->col = 0;
     if (!igraph_sparsemat_is_triplet(it->mat)) {
-        it->col = 0;
         while (it->col < it->mat->cs->n &&
                it->mat->cs->p[it->col + 1] == it->pos) {
             it->col ++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_sparsemat_iterator_end
+ * \brief Query if the iterator is past the last element.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return true if the iterator is past the last element, false if it
+ *         points to an element in a sparse matrix.
+ *
+ * Time complexity: O(1).
+ */
 
 igraph_bool_t
 igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it) {
@@ -3137,9 +3169,29 @@ igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it) {
     return it->pos >= nz;
 }
 
+/**
+ * \function igraph_sparsemat_iterator_row
+ * \brief Return the row of the iterator.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return The row of the element at the current iterator position.
+ *
+ * Time complexity: O(1).
+ */
+
 int igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it) {
     return it->mat->cs->i[it->pos];
 }
+
+/**
+ * \function igraph_sparsemat_iterator_col
+ * \brief Return the column of the iterator.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return The column of the element at the current iterator position.
+ *
+ * Time complexity: O(1).
+ */
 
 int igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it) {
     if (igraph_sparsemat_is_triplet(it->mat)) {
@@ -3149,10 +3201,30 @@ int igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it) {
     }
 }
 
+/**
+ * \function igraph_sparsemat_iterator_get
+ * \brief Return the element at the current iterator position.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return The value of the element at the current iterator position.
+ *
+ * Time complexity: O(1).
+ */
+
 igraph_real_t
 igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it) {
     return it->mat->cs->x[it->pos];
 }
+
+/**
+ * \function igraph_sparsemat_iterator_next
+ * \brief Let a sparse matrix iterator go to the next element.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return The position of the iterator in the element vector.
+ *
+ * Time complexity: O(n), the number of columns of the sparse matrix.
+ */
 
 int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
     it->pos += 1;
@@ -3162,6 +3234,16 @@ int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
     }
     return it->pos;
 }
+
+/**
+ * \function igraph_sparsemat_iterator_idx
+ * \brief Returns the element vector index of a sparse matrix iterator.
+ *
+ * \param it A pointer to the sparse matrix iterator.
+ * \return The position of the iterator in the element vector.
+ *
+ * Time complexity: O(1).
+ */
 
 int igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it) {
     return it->pos;
