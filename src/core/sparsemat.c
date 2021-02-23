@@ -2966,10 +2966,60 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
     return 0;
 }
 
+/**
+ * \function igraph_sparsemat_view
+ * \brief Initialize a sparse matrix and set all parameters.
+ *
+ * This function can be used to temporarily handle existing sparse matrix data,
+ * usually created by another software library, as an \c igraph_sparsemat_t object,
+ * and thus avoid unnecessary copying. It supports data stored in either the
+ * compressed sparse column format, or the <code>(i, j, x)</code> triplet format
+ * where \c i and \c j are the matrix indices of a non-zero element, and \c x
+ * is its value.
+ *
+ * </para><para>
+ * The compressed sparse column (or row) format is commonly used to represent
+ * sparse matrix data. It consists of three vectors, the \p p column pointers, the
+ * \p i row indices, and the \p x values. <code>p[k]</code> is the number
+ * of non-zero entires in matrix columns <code>k-1</code> and lower.
+ * <code>p[0]</code> is always zero and <code>p[n]</code> is always the total
+ * number of non-zero entires in the matrix. <code>i[l]</code> is the row index
+ * of the \c l-th stored element, while <code>x[l]</code> is its value. 
+ * If a matrix element with indices <code>(j, k)</code> is explicitly stored,
+ * it must be located between positions <code>p[k]</code> and <code>p[k+1] - 1</code>
+ * (inclusive) in the \p i and \p x vectors.
+ *
+ * </para><para>
+ * Do not call \ref igraph_sparsemat_destroy() on a sparse matrix created with
+ * this function. Instead, \ref igraph_free() must be called on the \c cs
+ * field of \p A to free the storage allocated by this function.
+ *
+ * </para><para>
+ * Warning: Matrices created with this function must not be used with functions
+ * that may reallocate the underlying storage, such as \ref igraph_sparsemat_entry().
+ *
+ * \param A The non-initialized sparse matrix.
+ * \param nzmax The maximum number of entries, typically the actual number of entries.
+ * \param m The number of matrix rows.
+ * \param n The number of matrix columns.
+ * \param p For a compressed matrix, this is the column pointer vector, and
+ *          must be of size <code>n+1</code>. For a triplet format matrix, it
+ *          is a vector of column indices and must be of size \p nzmax.
+ * \param i The row vector. This should contain the row indices of the
+ *          elements in \p x. It must be of size \p nzmax.
+ * \param x The values of the non-zero elements of the sparse matrix.
+ *          It must be of size \p nzmax.
+ * \param nz For a compressed matrix, is must be -1. For a triplet format
+ *           matrix, is must contain the number of entries.
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
 int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
                           int *p, int *i, double *x, int nz) {
 
-    A->cs = cs_calloc(1, sizeof(cs_di));
+    A->cs = igraph_Calloc(1, cs_di);
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
@@ -2978,7 +3028,7 @@ int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
     A->cs->x = x;
     A->cs->nz = nz;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
