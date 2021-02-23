@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 int main() {
-
+/**/
     igraph_t g, g2;
     igraph_adjlist_t adjlist;
     igraph_bool_t iso;
