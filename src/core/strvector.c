@@ -166,7 +166,7 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
 /**
  * \ingroup strvector
  * \function igraph_strvector_set2
- * \brief Sets an element
+ * \brief Sets an element.
  *
  * This is almost the same as \ref igraph_strvector_set, but the new
  * value is not a zero terminated string, but its length is given.
@@ -181,6 +181,9 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
  */
 int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
                           const char *value, int len) {
+    if (idx < 0 || idx >= sv->len) {
+        IGRAPH_ERROR("String vector index out of bounds.", IGRAPH_EINVAL);
+    }
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
     if (sv->data[idx] == 0) {
@@ -198,7 +201,7 @@ int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
     memcpy(sv->data[idx], value, (size_t) len * sizeof(char));
     sv->data[idx][len] = '\0';
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
