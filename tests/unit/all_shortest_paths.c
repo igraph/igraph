@@ -30,7 +30,7 @@ int main() {
     igraph_vector_ptr_init(&paths, 0);
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
     igraph_vector_ptr_init(&paths_edge, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_edge, igraph_vector_destroy);
     igraph_vector_init(&nrgeo, 0);
 
     igraph_vector_init(&weights, 0);
