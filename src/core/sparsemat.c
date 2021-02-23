@@ -2977,7 +2977,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
  * \param m The number of rows.
  * \param n The number of columns.
  * \param p The column vector. For a triplet matrix this should contain
-  *         the columns of the elements in \x. For a compressed matrix,
+  *         the columns of the elements in \p x. For a compressed matrix,
             if the column index is \c k, then <code>j[k]</code>
  *          is the index in \p x of the start of the \c k-th column, and
  *          the last element of \c j is the total number of elements.
@@ -2986,7 +2986,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
  *          is one element in the first column, and five in the second,
  *          \c j should be set to <code>{0, 1, 6}</code>.
  * \param i The row vector. This should contain the row indices of the
- *          elements in x.
+ *          elements in \p x.
  * \param x The elements of the sparse matrix.
  * \param nz For a triplet matrix, this is the number of elements. For
  *           a compressed matrix, this should be -1.
