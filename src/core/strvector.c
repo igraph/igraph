@@ -243,7 +243,7 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
  * \brief Removes a single element from a string vector.
  *
  * The string will be one shorter.
- * \param The string vector.
+ * \param v The string vector.
  * \param elem The index of the element to remove.
  *
  * Time complexity: O(n), the length of the string.
@@ -560,6 +560,16 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
     v->len -= nremove;
 }
 
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_print
+ * \brief Prints a string vector.
+ *
+ * \param v The string vector.
+ * \param file The file to write to.
+ * \param sep The separator to print between strings.
+ * \return Error code.
+ */
 int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                            const char *sep) {
 
@@ -570,8 +580,7 @@ int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
     for (i = 1; i < n; i++) {
         fprintf(file, "%s%s", sep, STR(*v, i));
     }
-    return 0;
-
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_strvector_index(const igraph_strvector_t *v,
