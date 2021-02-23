@@ -178,6 +178,7 @@ void igraph_sparsemat_destroy(igraph_sparsemat_t *A) {
  * Sparse matrices automatically allocate more memory, as needed. To
  * control memory allocation, the user can call this function, to
  * allocate memory for a given number of non-zero elements.
+ *
  * \param A The sparse matrix, it can be in triplet or
  *    column-compressed format.
  * \param nzmax The new maximum number of non-zero elements.
@@ -187,7 +188,10 @@ void igraph_sparsemat_destroy(igraph_sparsemat_t *A) {
  */
 
 int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax) {
-    return !cs_sprealloc(A->cs, nzmax);
+    if (!cs_sprealloc(A->cs, nzmax)) {
+        IGRAPH_ERROR("Could not allocate more memory for sparse matrix.", IGRAPH_ENOMEM);
+    }
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -512,24 +516,29 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
  * after initializing it with \ref igraph_sparsemat_init(). If you add
  * multiple entries in the same position, they will all be saved, and
  * the resulting value is the sum of all entries in that position.
+ *
  * \param A The input matrix, it must be in triplet format.
  * \param row The row index of the entry to add.
  * \param col The column index of the entry to add.
  * \param elem The value of the entry.
  * \return Error code.
  *
- * Time complexity: TODO.
+ * Time complexity: O(1) on average.
  */
 
 int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col,
                            igraph_real_t elem) {
+    if (!igraph_sparsemat_is_triplet(A)) {
+        IGRAPH_ERROR("Entries can only be added to sparse matrices that are in triplet format.",
+                     IGRAPH_EINVAL);
+    }
 
     if (!cs_entry(A->cs, row, col, elem)) {
-        IGRAPH_ERROR("Cannot add entry to sparse matrix",
+        IGRAPH_ERROR("Cannot add entry to sparse matrix.",
                      IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -545,18 +554,21 @@ int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col,
  *    compressed version of \p A is stored here.
  * \return Error code.
  *
- * Time complexity: TODO.
+ * Time complexity: O(nz) where \c nz is the number of non-zero elements.
  */
 
 int igraph_sparsemat_compress(const igraph_sparsemat_t *A,
                               igraph_sparsemat_t *res) {
 
+    if (! igraph_sparsemat_is_triplet(A)) {
+        IGRAPH_ERROR("Sparse matrix to compress is not in triplet format.", IGRAPH_EINVAL);
+    }
     res->cs = cs_compress(A->cs);
     if (!res->cs) {
         IGRAPH_ERROR("Cannot compress sparse matrix", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
