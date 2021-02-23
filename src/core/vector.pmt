@@ -999,6 +999,7 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     max = *(v->stor_begin);
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
     if (igraph_is_nan(max)) { return max; }; /* Result is NaN */
@@ -1039,6 +1040,7 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
         BASE *ptr;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
+        IGRAPH_ASSERT(v->stor_begin != v->end);
         max = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
@@ -1077,6 +1079,7 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     min = *(v->stor_begin);
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
     if (igraph_is_nan(min)) { return min; }; /* Result is NaN */
@@ -1116,6 +1119,7 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
         BASE *ptr;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
+        IGRAPH_ASSERT(v->stor_begin != v->end);
         min = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
@@ -1752,11 +1756,12 @@ FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
 
 #endif
 
+
+#ifndef NOTORDERED
+
 igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, long int *pos,
         long int start, long int end);
-
-#ifndef NOTORDERED
 
 /**
  * \ingroup vector
@@ -2457,8 +2462,8 @@ int FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
  * \brief Minimum and maximum elements of a vector.
  *
  * Handy if you want to have both the smallest and largest element of
- * a vector. The vector is only traversed once. The vector must by non-empty.
- * If a vector contains any NaN, both \c min and \c max will be NaN.
+ * a vector. The vector is only traversed once. The vector must be non-empty.
+ * If a vector contains at least one NaN, both \c min and \c max will be NaN.
  * \param v The input vector. It must contain at least one element.
  * \param min Pointer to a base type variable, the minimum is stored
  *     here.
@@ -2474,6 +2479,7 @@ int FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
     BASE* ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     *min = *max = *(v->stor_begin);
     #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
         if (igraph_is_nan(*min)) { return IGRAPH_SUCCESS; }; /* Result is NaN */
@@ -2502,10 +2508,10 @@ int FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
  *
  * </para><para>
  * Handy if you need the indices of the smallest and largest
- * elements. The vector is traversed only once. The vector must to
+ * elements. The vector is traversed only once. The vector must be
  * non-empty. If the minimum or maximum is not unique, the index
- * of respectively the first minimum or the first maximum is returned.
- * If a vector contains any NaN, both \c which_min and \c which_max
+ * of the first minimum or the first maximum is returned, respectively.
+ * If a vector contains at least one NaN, both \c which_min and \c which_max
  * will point to the first NaN value.
  * \param v The input vector. It must contain at least one element.
  * \param which_min The index of the minimum element will be stored
@@ -2523,6 +2529,7 @@ int FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     ptr = v->stor_begin;
     min = max = ptr;
     #if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)

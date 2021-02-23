@@ -84,6 +84,7 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_memory.h"
+#include "igraph_qsort.h"
 
 #include "scg_headers.h"
 
@@ -450,9 +451,11 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
             VECTOR(*groups)[i] = MATRIX(gr_mat, i, 0);
         }
     } else {
-        igraph_i_scg_groups_t *g = igraph_Calloc(no_of_nodes,
-                                   igraph_i_scg_groups_t);
+        igraph_i_scg_groups_t *g;
         int gr_nb = 0;
+        
+        g = igraph_Calloc(no_of_nodes, igraph_i_scg_groups_t);
+        IGRAPH_FINALLY(igraph_free, g);
 
         IGRAPH_CHECK(igraph_matrix_int_transpose(&gr_mat));
         for (i = 0; i < no_of_nodes; i++) {
@@ -461,7 +464,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
             g[i].gr = &MATRIX(gr_mat, 0, i);
         }
 
-        qsort(g, (size_t) no_of_nodes, sizeof(igraph_i_scg_groups_t),
+        igraph_qsort(g, (size_t) no_of_nodes, sizeof(igraph_i_scg_groups_t),
               igraph_i_compare_groups);
         VECTOR(*groups)[g[0].ind] = gr_nb;
         for (i = 1; i < no_of_nodes; i++) {
@@ -470,7 +473,9 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
             }
             VECTOR(*groups)[g[i].ind] = gr_nb;
         }
+        
         igraph_Free(g);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     igraph_matrix_int_destroy(&gr_mat);

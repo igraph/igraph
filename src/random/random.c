@@ -194,7 +194,7 @@ int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
         igraph_rng_glibc2_get(state);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_rng_glibc2_init(void **state) {
@@ -208,7 +208,7 @@ int igraph_rng_glibc2_init(void **state) {
 
     igraph_rng_glibc2_seed(st, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_rng_glibc2_destroy(void *vstate) {
@@ -219,13 +219,14 @@ void igraph_rng_glibc2_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_glibc2
- * \brief The random number generator type introduced in GNU libc 2
+ * \brief The random number generator introduced in GNU libc 2.
  *
- * It is a linear feedback shift register generator with a 128-byte
+ * This is a linear feedback shift register generator with a 128-byte
  * buffer. This generator was the default prior to igraph version 0.6,
  * at least on systems relying on GNU libc.
  *
- * This generator was ported from the GNU Scientific Library.
+ * This generator was ported from the GNU Scientific Library. It is a
+ * reimplementation and does not call the system glibc generator.
  */
 
 const igraph_rng_type_t igraph_rngtype_glibc2 = {
@@ -263,7 +264,7 @@ igraph_real_t igraph_rng_rand_get_real(void *vstate) {
 int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = seed;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_rng_rand_init(void **state) {
@@ -277,7 +278,7 @@ int igraph_rng_rand_init(void **state) {
 
     igraph_rng_rand_seed(st, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_rng_rand_destroy(void *vstate) {
@@ -288,20 +289,25 @@ void igraph_rng_rand_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_rand
- * \brief The old BSD rand/stand random number generator
+ * \brief The old BSD rand/srand random number generator.
  *
  * The sequence is
- *     x_{n+1} = (a x_n + c) mod m
- * with a = 1103515245, c = 12345 and m = 2^31 = 2147483648. The seed
- * specifies the initial value, x_1.
+ *     <code>x_{n+1} = (a x_n + c) mod m</code>
+ * with <code>a = 1103515245</code>, <code>c = 12345</code> and
+ * <code>m = 2^31 = 2147483648</code>.
+ * The seed specifies the initial value, <code>x_1</code>.
  *
- * The theoretical value of x_{10001} is 1910041713.
+ * </para><para>
+ * The theoretical value of <code>x_{10001}</code> is 1910041713.
  *
- *  The period of this generator is 2^31.
+ * </para><para>
+ * The period of this generator is 2^31.
  *
- * This generator is not very good -- the low bits of successive
+ * </para><para>
+ * This generator is not very good—the low bits of successive
  * numbers are correlated.
  *
+ * </para><para>
  * This generator was ported from the GNU Scientific Library.
  */
 
@@ -406,7 +412,7 @@ int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     }
 
     state->mti = i;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_rng_mt19937_init(void **state) {
@@ -420,7 +426,7 @@ int igraph_rng_mt19937_init(void **state) {
 
     igraph_rng_mt19937_seed(st, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_rng_mt19937_destroy(void *vstate) {
@@ -431,7 +437,7 @@ void igraph_rng_mt19937_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_mt19937
- * \brief The MT19937 random number generator
+ * \brief The MT19937 random number generator.
  *
  * The MT19937 generator of Makoto Matsumoto and Takuji Nishimura is a
  * variant of the twisted generalized feedback shift-register
@@ -440,22 +446,25 @@ void igraph_rng_mt19937_destroy(void *vstate) {
  * equi-distributed in 623 dimensions. It has passed the diehard
  * statistical tests. It uses 624 words of state per generator and is
  * comparable in speed to the other generators. The original generator
- * used a default seed of 4357 and choosing s equal to zero in
- * gsl_rng_set reproduces this. Later versions switched to 5489 as the
- * default seed, you can choose this explicitly via igraph_rng_seed
+ * used a default seed of 4357 and choosing \c s equal to zero in
+ * \c gsl_rng_set reproduces this. Later versions switched to 5489 as the
+ * default seed, you can choose this explicitly via \ref igraph_rng_seed()
  * instead if you require it.
  *
+ * </para><para>
  * For more information see,
  * Makoto Matsumoto and Takuji Nishimura, “Mersenne Twister: A
  * 623-dimensionally equidistributed uniform pseudorandom number
  * generator”. ACM Transactions on Modeling and Computer Simulation,
  * Vol. 8, No. 1 (Jan. 1998), Pages 3–30
  *
- * The generator igraph_rngtype_mt19937 uses the second revision of the
+ * </para><para>
+ * The generator \c igraph_rngtype_mt19937 uses the second revision of the
  * seeding procedure published by the two authors above in 2002. The
  * original seeding procedures could cause spurious artifacts for some
  * seed values.
  *
+ * </para><para>
  * This generator was ported from the GNU Scientific Library.
  */
 
@@ -510,11 +519,11 @@ IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
 
 /**
  * \function igraph_rng_set_default
- * Set the default igraph random number generator
+ * \brief Set the default igraph random number generator.
  *
  * \param rng The random number generator to use as default from now
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
- *    being used as the default will result crashes and/or
+ *    being used as the default will result in crashes and/or
  *    unpredictable results.
  *
  * Time complexity: O(1).
@@ -541,7 +550,7 @@ double  Rf_rgamma(double, double);
 int igraph_rng_R_init(void **state) {
     IGRAPH_ERROR("R RNG error, unsupported function called",
                  IGRAPH_EINTERNAL);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_rng_R_destroy(void *state) {
@@ -552,7 +561,7 @@ void igraph_rng_R_destroy(void *state) {
 int igraph_rng_R_seed(void *state, unsigned long int seed) {
     IGRAPH_ERROR("R RNG error, unsupported function called",
                  IGRAPH_EINTERNAL);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 unsigned long int igraph_rng_R_get(void *state) {
@@ -640,14 +649,14 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
 
 /**
  * \function igraph_rng_init
- * Initialize a random number generator
+ * \brief Initialize a random number generator.
  *
  * This function allocates memory for a random number generator, with
  * the given type, and sets its seed to the default.
  *
  * \param rng Pointer to an uninitialized RNG.
- * \param type The type of the RNG, please see the documentation for
- *    the supported types.
+ * \param type The type of the RNG, like \ref igraph_rngtype_glibc2,
+ * \ref igraph_rngtype_mt19937 or \ref igraph_rngtype_rand.
  * \return Error code.
  *
  * Time complexity: depends on the type of the generator, but usually
@@ -657,12 +666,12 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
 int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
     rng->type = type;
     IGRAPH_CHECK(rng->type->init(&rng->state));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_rng_destroy
- * Deallocate memory associated with a random number generator
+ * \brief Deallocate memory associated with a random number generator.
  *
  * \param rng The RNG to destroy. Do not destroy an RNG that is used
  *    as the default igraph RNG.
@@ -676,7 +685,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_seed
- * Set the seed of a random number generator
+ * \brief Set the seed of a random number generator.
  *
  * \param rng The RNG.
  * \param seed The new seed.
@@ -689,12 +698,12 @@ int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
     const igraph_rng_type_t *type = rng->type;
     rng->def = 0;
     IGRAPH_CHECK(type->seed(rng->state, seed));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_rng_max
- * Query the maximum possible integer for a random number generator
+ * \brief Query the maximum possible integer for a random number generator.
  *
  * \param rng The RNG.
  * \return The largest possible integer that can be generated by
@@ -710,7 +719,7 @@ unsigned long int igraph_rng_max(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_min
- * Query the minimum possible integer for a random number generator
+ * \brief Query the minimum possible integer for a random number generator.
  *
  * \param rng The RNG.
  * \return The smallest possible integer that can be generated by
@@ -726,7 +735,7 @@ unsigned long int igraph_rng_min(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_name
- * Query the type of a random number generator
+ * \brief Query the type of a random number generator.
  *
  * \param rng The RNG.
  * \return The name of the type of the generator. Do not deallocate or
@@ -742,7 +751,7 @@ const char *igraph_rng_name(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_get_integer
- * Generate an integer random number from an interval
+ * \brief Generate an integer random number from an interval.
  *
  * \param rng Pointer to the RNG to use for the generation. Use \ref
  *        igraph_rng_default() here to use the default igraph RNG.
@@ -1006,7 +1015,7 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
     l += S + 1;
     igraph_vector_push_back(res, l);  /* allocated */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1086,11 +1095,11 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
     if (l == h) {
         IGRAPH_CHECK(igraph_vector_resize(res, 1));
         VECTOR(*res)[0] = l;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     if (length == 0) {
         igraph_vector_clear(res);
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     if (length == N) {
         long int i = 0;
@@ -1098,7 +1107,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
         for (i = 0; i < length; i++) {
             VECTOR(*res)[i] = l++;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     igraph_vector_clear(res);
@@ -2418,7 +2427,7 @@ int igraph_rng_get_dirichlet(igraph_rng_t *rng,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**********************************************************

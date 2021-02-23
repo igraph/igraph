@@ -109,7 +109,6 @@ int igraph_community_fluid_communities(const igraph_t *graph,
 
     /* Internal variables initialization */
     max_density = 1.0;
-    running = 1;
 
     /* Resize membership vector (number of nodes) */
     IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));

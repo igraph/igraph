@@ -1,1 +1,0 @@
-BLAS = lapack/dscal.c lapack/dswap.c lapack/lsame.c lapack/dnrm2.c lapack/idamax.c lapack/daxpy.c lapack/dgemv.c lapack/dger.c lapack/dgemm.c lapack/dcopy.c lapack/dtrmm.c lapack/dtrmv.c lapack/drot.c lapack/ddot.c lapack/dasum.c lapack/dsymv.c lapack/dsyr2k.c lapack/dsyr2.c lapack/dtrsm.c lapack/dsyrk.c lapack/dtrsv.c 

@@ -37,7 +37,6 @@ add_examples(
   igraph_sparsemat
   igraph_sparsemat3
   igraph_sparsemat4
-  igraph_sparsemat5
   igraph_sparsemat6
   igraph_sparsemat7
   igraph_sparsemat8
@@ -50,9 +49,15 @@ add_legacy_tests(
   igraph_array
   igraph_complex
   igraph_psumtree
+  igraph_sparsemat5
   igraph_sparsemat9
+  igraph_sparsemat_fkeep
+  igraph_sparsemat_getelements_sorted
   igraph_sparsemat_is_symmetric
+  igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
+  igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   matrix
   matrix2
@@ -148,6 +153,7 @@ add_legacy_tests(
   igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_cited_type_game
   igraph_correlated_game
   igraph_extended_chordal_ring
   igraph_from_prufer
@@ -160,6 +166,8 @@ add_legacy_tests(
   igraph_kautz
   igraph_preference_game
   igraph_realize_degree_sequence
+  igraph_recent_degree_aging_game
+  igraph_recent_degree_game
   tree
   tree_game
   ring
@@ -203,6 +211,7 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_shortest_paths
   efficiency
   igraph_are_connected
   igraph_betweenness
@@ -210,9 +219,11 @@ add_legacy_tests(
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
+  igraph_diameter
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
@@ -245,12 +256,19 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_drl
+  igraph_layout_bipartite
+  igraph_layout_fruchterman_reingold
+  igraph_layout_graphopt
   igraph_layout_grid
   igraph_layout_lgl
   igraph_layout_mds
   igraph_layout_merge2
   igraph_layout_merge3
+  igraph_layout_random_3d
+  igraph_layout_reingold_tilford_circular
   igraph_layout_reingold_tilford_extended
+  igraph_layout_star
   igraph_layout_sugiyama
 )
 add_legacy_tests(
@@ -449,7 +467,7 @@ add_legacy_tests(
 )
 
 # use a higher test timeout for the Infomap algorithm
-set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 120)
+set_tests_properties("test::igraph_community_infomap" PROPERTIES TIMEOUT 150)
 
 # cliques.at
 add_examples(
@@ -513,8 +531,10 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_arpack_rnsolve
+  igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
+  igraph_lapack_dgetrs
 )
 
 # bipartite.at
@@ -620,8 +640,10 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rng_get_exp
+  igraph_rng_get_integer
   mt
   rng_reproducibility
+  rng_init_destroy_max_min_name_set_default
 )
 
 # qsort.at
@@ -656,6 +678,8 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   fatal_handler
+  igraph_progress_handler_stderr
+  igraph_set_progress_handler
 )
 
 # error output
@@ -671,3 +695,8 @@ add_legacy_tests(
   igraph_read_graph_gml_invalid_inputs
 )
 
+# non-graph
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_running_mean
+)

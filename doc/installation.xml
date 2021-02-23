@@ -7,13 +7,505 @@
 <chapter id="igraph-Installation">
 <title>Installation</title>
 
-<para>
-The easiest way to install the igraph C library
-depends on your system, and it might also change, 
-so we no longer include installation instructions here. 
-Please see the igraph homepage at <ulink
-url="https://igraph.org/c/#startc">https://igraph.org/c/</ulink>
-instead.
-</para>
+<section id="igraph-Installation-prerequisites">
+  <title>Prerequisites</title>
+  <para>
+    To build igraph from sources, you will need at least:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <ulink url="https://cmake.org">CMake</ulink> 3.16 or later
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        C and C++ compilers
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    Visual Studio 2015 and later are supported. Earlier Visual Studio
+    versions may or may not work.
+  </para>
+  <para>
+    Certain features also require the following libraries:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <ulink url="http://www.xmlsoft.org/">libxml2</ulink>,
+        required for GraphML support
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    igraph bundles a number of libraries for convenience. However, it is
+    preferable to use external versions of these libraries, which may
+    improve performance. These are:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <ulink url="https://gmplib.org/">GMP</ulink> (the bundled
+        alternative is Mini-GMP)
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <ulink url="https://www.gnu.org/software/glpk/">GLPK</ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <ulink url="https://www.caam.rice.edu/software/ARPACK/">ARPACK</ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        CXSparse from
+        <ulink url="https://people.engr.tamu.edu/davis/suitesparse.html">SuiteSparse</ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A library providing a
+        <ulink url="https://www.netlib.org/blas/">BLAS</ulink> API
+        (available by default on macOS;
+        <ulink url="https://openblas.net">OpenBLAS</ulink> is one
+        option on other systems)
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A library providing a
+        <ulink url="https://www.netlib.org/lapack/">LAPACK</ulink>
+        API (available by default on macOS;
+        <ulink url="https://openblas.net">OpenBLAS</ulink> is one
+        option on other systems)
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    When building the development version of igraph,
+    <literal>bison</literal>, <literal>flex</literal> and
+    <literal>git</literal> are also required. Released versions do not
+    require these tools.
+  </para>
+  <para>
+    To run the tests, <literal>diff</literal> is also required.
+  </para>
+</section>
+
+<section id="igraph-Installation-installation">
+  <title>Installation</title>
+  <section id="igraph-Installation-general-build-instructions">
+    <title>General build instructions</title>
+    <para>
+      igraph uses a
+      <ulink url="https://cmake.org/cmake/help/latest/guide/user-interaction/index.html">CMake-based
+      build system</ulink>. To compile it,
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Enter the directory where the igraph sources are:
+<programlisting>
+$ cd igraph
+</programlisting>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Create a new directory. This is where igraph will be built:
+<programlisting>
+$ mkdir build
+$ cd build
+</programlisting>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Run CMake, which will automatically configure igraph, and
+          report the configuration:
+<programlisting>
+$ cmake ..
+</programlisting>
+          To set a non-default installation location, such as
+          <literal>/opt/local</literal>, use:
+          <programlisting>cmake .. -DCMAKE_INSTALL_PREFIX=/opt/local</programlisting>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Check the output carefully, and ensure that all features you
+          need are enabled. If CMake could not find certain libraries,
+          some features such as GraphML support may have been
+          automatically disabled.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          There are several ways to adjust the configuration:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              Run <literal>ccmake .</literal> on Unix-like systems or
+              <literal>cmake-gui</literal> on Windows for a convenient
+              interface.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Simply edit the <literal>CMakeCache.txt</literal> file.
+              Some of the relevant options are listed below.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para>
+          Once the configuration has been adjusted, run
+          <literal>cmake ..</literal> again.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Once igraph has been successfully configured, it can be built,
+          tested and installed using:
+<programlisting>
+$ cmake --build .
+$ cmake --build . --target check
+$ cmake --install .
+</programlisting>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section id="igraph-Installation-specific-instructions-for-windows">
+    <title>Specific instructions for Windows</title>
+    <section id="igraph-Installation-microsoft-visual-studio">
+      <title>Microsoft Visual Studio</title>
+      <para>
+        With Visual Studio, the steps to build igraph are generally the
+        same as above. However, since the Visual Studio CMake generator is
+        a multi-configuration one, we must specify the configuration
+        (typically Release or Debug) with each build command using the 
+        <literal>--config</literal> option:
+      </para>
+<programlisting>
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+cmake --build . --target check --config Release
+</programlisting>
+      <para>
+        When building the development version, <literal>bison</literal>
+        and <literal>flex</literal> must be available on the system.
+        <ulink url="https://github.com/lexxmark/winflexbison"><literal>winflexbison</literal></ulink>
+        for Bison version 3.x can be useful for this purpose—make sure
+        that the executables are in the system <literal>PATH</literal>.
+        The easiest installation option is probably by installing
+        <literal>winflexbison3</literal> from the
+        <ulink url="https://chocolatey.org/packages/winflexbison3">Chocolatey
+        package manager</ulink>.
+      </para>
+      <section id="instal-Installation-vcpkg">
+        <title>vcpkg</title>
+        <para>
+          Most external dependencies can be conveniently installed using
+          <ulink url="https://github.com/microsoft/vcpkg#quick-start-windows"><literal>vcpkg</literal></ulink>.
+          Note that <literal>igraph</literal> bundles all dependencies
+          except <literal>libxml2</literal>, which is needed for GraphML
+          support.
+        </para>
+        <para>
+          In order to use vcpkg integrate it in the build environment by executing
+          <literal>vcpkg.exe integrate install</literal> on the command line.
+          When configuring igraph, point CMake to the correct
+          <literal>vcpkg.cmake</literal> file using <literal>-DCMAKE_TOOLCHAIN_FILE=...</literal>,
+          as instructed.
+        </para>
+        <para>
+          Additionally, it might be that you need to set the appropriate
+          so-called triplet using
+          <literal>-DVCPKG_TARGET_TRIPLET</literal> when running
+          <literal>cmake</literal>, for exampling, setting it to
+          <literal>x64-windows</literal> when using shared builds of packages or
+          <literal>x64-windows-static</literal> when using static builds.
+          Similarly, you also need to specify this target triplet when
+          installing packages. For example, to install
+          <literal>libxml2</literal> as a shared library, use
+          <literal>vcpkg.exe install libxml2:x64-windows</literal> and to
+          install <literal>libxml2</literal> as a static library, use
+          <literal>vcpkg.exe install libxml2:x64-windows-static</literal>.
+        </para>
+        <para>
+          There are some known issues with igraph when using certain external packages
+          from vcpkg. When building with an external
+          <literal>suitesparse</literal> shared library, the
+          <literal>suitesparse</literal> library is not copied over to the
+          build directory, resulting in failing tests, see issue
+          <ulink url="https://github.com/igraph/igraph/issues/1492">#1492</ulink>.
+          When building against OpenBLAS, this results a few differences
+          in some unit tests, see issue
+          <ulink url="https://github.com/igraph/igraph/issues/1491">#1491</ulink>.
+        </para>
+      </section>
+    </section>
+      <section id="igraph-Installation-msys2">
+      <title>MSYS2</title>
+      <para>
+        MSYS2 can be installed from www.msys2.org. After installing MSYS2,
+        ensure that it is up to date by opening a terminal and running
+        <literal>pacman -Syuu</literal>.
+      </para>
+      <para>
+        The instructions below assume that you want to compile for a 64-bit
+        target.
+      </para>
+      <para>
+        Install the following packages using <literal>pacman -S</literal>.
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Minimal requirements:
+            <literal>mingw-w64-x86_64-toolchain</literal>,
+            <literal>mingw-w64-x86_64-cmake</literal>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Optional dependencies that enable certain features:
+            <literal>mingw-w64-x86_64-gmp</literal>,
+            <literal>mingw-w64-x86_64-libxml2</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Optional external libraries for better performance:
+            <literal>mingw-w64-x86_64-openblas</literal>,
+            <literal>mingw-w64-x86_64-suitesparse</literal>,
+            <literal>mingw-w64-x86_64-arpack</literal>,
+            <literal>mingw-w64-x86_64-glpk</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Only needed for running the tests: <literal>diffutils</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Required only when building the development version:
+            <literal>git</literal>, <literal>bison</literal>,
+            <literal>flex</literal>
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        The following command will install of these at once:
+      </para>
+<programlisting>
+pacman -S \
+  mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
+  mingw-w64-x86_64-gmp mingw-w64-x86_64-libxml2 \
+  mingw-w64-x86_64-openblas mingw-w64-x86_64-suitesparse mingw-w64-x86_64-arpack mingw-w64-x86_64-glpk \
+  diffutils \
+  git bison flex
+</programlisting>
+      <para>
+        In order to build igraph, follow the <emphasis role="strong">General
+        build instructions</emphasis> above, paying attention to the
+        following:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            When using MSYS2, start the <quote>MSYS2 MinGW 64-bit</quote>
+            terminal, and <emphasis>not</emphasis> the <quote>MSYS2
+            MSYS</quote> one.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Be sure to install the <literal>mingw-w64-x86_64-cmake</literal>
+            package and not the <literal>cmake</literal> one. The latter
+            will not work.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            When running <literal>cmake</literal>, pass the option
+            <literal>-G&quot;MSYS Makefiles&quot;</literal>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Note that <literal>ccmake</literal> is not currently available.
+            <literal>cmake-gui</literal> can be used only if the
+            <literal>mingw-w64-x86_64-qt5</literal> package is installed.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </section>  
+
+  <section id="igraph-Installation-notable-configuration-options">
+    <title>Notable configuration options</title>
+    <para>
+      The following options may be set to <literal>ON</literal> or
+      <literal>OFF</literal>. Some of them have an <literal>AUTO</literal>
+      setting, which chooses a reasonable default based on what libraries
+      are available on the current system.
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          igraph bundles some of its dependencies for convenience. The
+          <literal>IGRAPH_USE_INTERNAL_XXX</literal> flags control whether
+          these should be used instead of external versions. Set them to
+          <literal>ON</literal> to use the bundled
+          (<quote>vendored</quote>) versions. Generally, external versions
+          are preferable as they may be newer and usually provide better
+          performance.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>IGRAPH_GLPK_SUPPORT</literal>: whether to make use of
+          the
+          <ulink url="https://www.gnu.org/software/glpk/">GLPK</ulink>
+          library. Some features, such as finding a minimum feedback arc
+          set or finding communities through exact modularity
+          optimization, require this.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>IGRAPH_GRAPHML_SUPPORT</literal>: whether to enable
+          support for reading and writing
+          <ulink url="http://graphml.graphdrawing.org/">GraphML</ulink>
+          files. Requires the
+          <ulink url="http://xmlsoft.org/">libxml2</ulink> library.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>IGRAPH_ENABLE_LTO</literal>: whether to build igraph
+          with link-time optimization, which improves performance. Not
+          supported with all compilers.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>IGRAPH_ENABLE_TLS</literal>: whether to enable
+          thread-local storage. Required when using igraph from multiple
+          threads.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="https://cmake.org/cmake/help/latest/variable/BUILD_SHARED_LIBS.html"><literal>BUILD_SHARED_LIBS</literal></ulink>:
+          whether to build a shared library instead of a static one.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>BLA_VENDOR</literal>: controls which library to use for
+          <ulink url="https://cmake.org/cmake/help/latest/module/FindBLAS.html">BLAS</ulink>
+          and
+          <ulink url="https://cmake.org/cmake/help/latest/module/FindLAPACK.html">LAPACK</ulink>
+          functionality.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html"><literal>CMAKE_INSTALL_PREFIX</literal></ulink>:
+          the location where igraph will be installed
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
+</section>
+
+<section id="igraph-Installation-compiling-programs-that-use-igraph">
+  <title>Compiling programs that use igraph</title>
+  <para>
+    If igraph was built as a static library on Windows, it is necessary
+    to define <literal>IGRAPH_STATIC</literal> when building programs
+    that will link to igraph.
+  </para>
+</section>
+
+<section id="igraph-Installation-notes-for-package-maintainers">
+  <title>Notes for package maintainers</title>
+  <para>
+    This section is for people who package igraph for Linux distros or
+    other package managers.
+  </para>
+  <para>
+    igraph bundles several of its dependencies (or simplified versions
+    of its dependencies). During configuration time, it checks whether
+    each dependency is present on the system. If yes, it uses it.
+    Otherwise, it falls back to the bundled (<quote>vendored</quote>)
+    version. In order to make configuration as deterministic as
+    possible, you may want to disable this auto-detection. To do so, set
+    each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> option
+    described above. Additionally, set <literal>BLA_VENDOR</literal> to
+    use the BLAS and LAPACK implementations of your choice. This should
+    be the same BLAS and LAPACK library that igraph's other dependencies,
+    such as ARPACK and CXSparse are linked against.
+  </para>
+  <para>
+    For example, to force igraph to use external versions of all
+    dependencies, and to use OpenBLAS for BLAS/LAPACK, use
+  </para>
+  <para>
+<programlisting>
+$ cmake .. \
+    -DIGRAPH_USE_INTERNAL_BLAS=0 \
+    -DIGRAPH_USE_INTERNAL_LAPACK=0 \
+    -DIGRAPH_USE_INTERNAL_ARPACK=0 \
+    -DIGRAPH_USE_INTERNAL_GLPK=0 \
+    -DIGRAPH_USE_INTERNAL_CXSPARSE=0 \
+    -DIGRAPH_USE_INTERNAL_GMP=0 \
+    -DBLA_VENDOR=OpenBLAS \
+    -DIGRAPH_GRAPHML_SUPPORT=1
+</programlisting>
+  </para>
+  <para>
+    Additional notes:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        As of igraph 0.9, there is no tangible benefit to using an
+        external GMP, as igraph does not yet use GMP in any
+        performance-critical way. The bundled Mini-GMP is sufficient.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Link-time optimizaton noticeably improves the performance of
+        some igraph functions. To enable it, use
+        <literal>-DIGRAPH_ENABLE_LTO=1</literal>.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        We saw occasional hangs on Windows when igraph was built for a
+        32-bit target with MinGW and linked to OpenBLAS. We believe this
+        to be an issue with OpenBLAS, not igraph. On this platform, you
+        may want to opt for a different BLAS/LAPACK or the bundled
+        BLAS/LAPACK.
+      </para>
+    </listitem>
+  </itemizedlist>
+</section>
 
 </chapter>

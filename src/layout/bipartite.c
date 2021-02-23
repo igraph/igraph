@@ -27,7 +27,7 @@
 
 /**
  * \function igraph_layout_bipartite
- * Simple layout for bipartite graphs
+ * Simple layout for bipartite graphs.
  *
  * The layout is created by first placing the vertices in two rows,
  * according to their types. Then the positions within the rows are
@@ -58,12 +58,16 @@ int igraph_layout_bipartite(const igraph_t *graph,
     igraph_vector_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid vertex type vector size", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The vertex type vector size (%ld) should be equal to the number of nodes (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
+    }
+    if (hgap < 0) {
+        IGRAPH_ERRORF("The horizontal gap cannot be negative, got %f.", IGRAPH_EINVAL, hgap);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&layers, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(layers)[i] = 1 - VECTOR(*types)[i];
+        VECTOR(layers)[i] = VECTOR(*types)[i] ? 0 : 1;
     }
 
     IGRAPH_CHECK(igraph_layout_sugiyama(graph, res, /*extd_graph=*/ 0,
@@ -73,5 +77,5 @@ int igraph_layout_bipartite(const igraph_t *graph,
     igraph_vector_destroy(&layers);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

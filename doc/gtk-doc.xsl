@@ -4,7 +4,6 @@
 
   <!-- import the chunked XSL stylesheet -->
   <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
-  <xsl:include href="devhelp.xsl"/>
   <xsl:include href="version-greater-or-equal.xsl"/>
 
   <!-- change some parameters -->
@@ -60,36 +59,6 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     </xsl:if>
     <xsl:apply-imports/>
 
-    <!-- generate the index.sgml href index -->
-    <xsl:call-template name="generate.index"/>
-    <xsl:call-template name="generate.devhelp"/>
-  </xsl:template>
-
-  <xsl:template name="generate.index">
-    <xsl:call-template name="write.text.chunk">
-      <xsl:with-param name="filename" select="'index.sgml'"/>
-      <xsl:with-param name="content">
-        <!-- check all anchor and refentry elements -->
-        <xsl:apply-templates select="//anchor|//refentry"
-                             mode="generate.index.mode"/>
-      </xsl:with-param>
-      <xsl:with-param name="encoding" select="'utf-8'"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template match="*" mode="generate.index.mode">
-    <xsl:if test="not(@href)">
-      <xsl:text>&lt;ANCHOR id=&quot;</xsl:text>
-      <xsl:value-of select="@id"/>
-      <xsl:text>&quot; href=&quot;</xsl:text>
-      <xsl:if test="$gtkdoc.bookname">
-        <xsl:value-of select="$gtkdoc.bookname"/>
-        <xsl:text>/</xsl:text>
-      </xsl:if>
-      <xsl:call-template name="href.target"/>
-      <xsl:text>&quot;&gt;
-</xsl:text>
-    </xsl:if>
   </xsl:template>
 
   <!-- ========================================================= -->
@@ -129,6 +98,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
             content="GTK-Doc V{$gtkdoc.version} (XML mode)"/>
     </xsl:if>
     <link rel="stylesheet" href="style.css" type="text/css"/>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css"/>
 
       <!-- copied from the html.head template in the docbook stylesheets
            we don't want links for all refentrys, thats just too much

@@ -1,0 +1,40 @@
+No nodes:
+directed: false
+vcount: 0
+edges: {
+}
+No edges:
+directed: false
+vcount: 3
+edges: {
+}
+Make a star of double edges:
+directed: true
+vcount: 5
+edges: {
+1 0
+1 0
+2 0
+2 0
+3 0
+3 0
+4 0
+4 0
+}
+Make a line:
+directed: true
+vcount: 7
+edges: {
+1 0
+2 1
+3 2
+4 3
+5 4
+6 5
+}
+Checking negative number of nodes error handling.
+Checking too few types error handling.
+Checking too many types error handling.
+Checking negative type for error handling.
+Checking too big type for error handling.
+Checking negative preference error handling.

@@ -132,6 +132,7 @@ IGRAPH_EXPORT void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m,
 /* Finding minimum and maximum */
 /*-----------------------------*/
 
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_matrix, max)(const TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT int FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
@@ -143,6 +144,7 @@ IGRAPH_EXPORT int FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
 IGRAPH_EXPORT int FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
                                                         long int *imin, long int *jmin,
                                                         long int *imax, long int *jmax);
+#endif
 
 /*------------------------------*/
 /* Comparison                   */
@@ -150,6 +152,7 @@ IGRAPH_EXPORT int FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix
 
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, all_e)(const TYPE(igraph_matrix) *lhs,
                                                            const TYPE(igraph_matrix) *rhs);
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, all_l)(const TYPE(igraph_matrix) *lhs,
                                                            const TYPE(igraph_matrix) *rhs);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, all_g)(const TYPE(igraph_matrix) *lhs,
@@ -158,6 +161,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, all_le)(const TYPE(igraph_ma
                                                             const TYPE(igraph_matrix) *rhs);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, all_ge)(const TYPE(igraph_matrix) *lhs,
                                                             const TYPE(igraph_matrix) *rhs);
+#endif
 
 /*-------------------*/
 /* Matrix properties */
@@ -177,8 +181,10 @@ IGRAPH_EXPORT int FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
                                                   TYPE(igraph_vector) *res);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, is_equal)(const TYPE(igraph_matrix) *m1,
                                                               const TYPE(igraph_matrix) *m2);
+#ifndef NOTORDERED
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *m1,
                                                                    const TYPE(igraph_matrix) *m2);
+#endif
 
 /*------------------------*/
 /* Searching for elements */

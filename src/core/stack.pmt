@@ -43,11 +43,12 @@
  */
 
 int FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long int size) {
-    long int alloc_size = size > 0 ? size : 1;
+    long int alloc_size;
     IGRAPH_ASSERT(s != NULL);
     if (size < 0) {
         size = 0;
     }
+    alloc_size = size > 0 ? size : 1;
     s->stor_begin = igraph_Calloc(alloc_size, BASE);
     if (s->stor_begin == 0) {
         IGRAPH_ERROR("stack init failed", IGRAPH_ENOMEM);

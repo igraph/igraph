@@ -257,7 +257,7 @@ IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  * \function igraph_set_error_handler
- * \brief Set a new error handler.
+ * \brief Sets a new error handler.
  *
  * Installs a new error handler. If called with 0, it installs the
  * default error handler (which is currently
@@ -449,7 +449,7 @@ typedef enum {
 
 /**
  * \function igraph_error
- * \brief Trigger an error.
+ * \brief Triggers an error.
  *
  * \a igraph functions usually call this function (most often via the
  * \ref IGRAPH_ERROR macro) if they notice an error.
@@ -471,7 +471,7 @@ IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
 
 /**
  * \define IGRAPH_ERRORF
- * \brief Trigger an error, with printf-like error output.
+ * \brief Triggers an error, with printf-like syntax.
  *
  * \a igraph functions can use this macro when they notice an error and
  * want to pass on extra information to the user about what went wrong.
@@ -501,7 +501,7 @@ IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
 
 /**
  * \function igraph_errorf
- * \brief Trigger an error, printf-like version.
+ * \brief Triggers an error, printf-like version.
  *
  * \param reason Textual description of the error, interpreted as
  *               a \c printf format string.
@@ -555,7 +555,7 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
 
 /**
  * \function IGRAPH_FINALLY_CLEAN
- * \brief Signal clean deallocation of objects.
+ * \brief Signals clean deallocation of objects.
  *
  * Removes the specified number of objects from the stack of
  * temporarily allocated objects. Most often this is called just
@@ -568,7 +568,7 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_CLEAN(int num);
 
 /**
  * \function IGRAPH_FINALLY_FREE
- * \brief Deallocate all registered objects.
+ * \brief Deallocates all registered objects.
  *
  * Calls the destroy function for all objects in the stack of
  * temporarily allocated objects. This is usually called only from an
@@ -582,7 +582,7 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_FREE(void);
 
 /**
  * \function IGRAPH_FINALLY_STACK_SIZE
- * \brief Returns the number of registered objects.
+ * \brief The number of registered objects.
  *
  * Returns the number of objects in the stack of temporarily allocated
  * objects. This function is handy if you write an own igraph routine and
@@ -602,13 +602,13 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * \brief Returns true if there are no registered objects, false otherwise.
  *
  * This is just a shorthand notation for checking that
- * \ref IGRAPH_FINALLY_STACK_SIZE is zero.
+ * \ref IGRAPH_FINALLY_STACK_SIZE() is zero.
  */
 #define IGRAPH_FINALLY_STACK_EMPTY (IGRAPH_FINALLY_STACK_SIZE() == 0)
 
 /**
  * \define IGRAPH_FINALLY
- * \brief Register an object for deallocation.
+ * \brief Registers an object for deallocation.
  * \param func The address of the function which is normally called to
  *   destroy the object.
  * \param ptr Pointer to the object itself.
@@ -655,7 +655,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 #else
 /**
  * \define IGRAPH_CHECK
- * \brief Check the return value of a function call.
+ * \brief Checks the return value of a function call.
  *
  * \param a An expression, usually a function call.
  *
@@ -712,7 +712,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 
 /**
  * \typedef igraph_warning_handler_t
- * \brief The type of igraph warning handler functions
+ * \brief The type of igraph warning handler functions.
  *
  * Currently it is defined to have the same type as
  * \ref igraph_error_handler_t, although the last (error code)
@@ -723,7 +723,7 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
 
 /**
  * \function igraph_set_warning_handler
- * Install a warning handler
+ * \brief Installs a warning handler.
  *
  * Install the supplied warning handler function.
  * \param new_handler The new warning handler function to install.
@@ -739,7 +739,7 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
- * \brief Trigger a warning.
+ * \brief Triggers a warning.
  *
  * Call this function if you want to trigger a warning from within
  * a function that uses \a igraph.
@@ -757,7 +757,7 @@ IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
 
 /**
  * \define IGRAPH_WARNINGF
- * \brief Trigger a warning, with printf-like warning output.
+ * \brief Triggers a warning, with printf-like syntax.
  *
  * \a igraph functions can use this macro when they notice a warning and
  * want to pass on extra information to the user about what went wrong.
@@ -779,7 +779,7 @@ IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
 
 /**
  * \function igraph_warningf
- * \brief Trigger a warning, printf-like version.
+ * \brief Triggers a warning, printf-like version.
  *
  * This function is similar to \ref igraph_warning(), but
  * uses a printf-like syntax. It substitutes the additional arguments
@@ -801,7 +801,7 @@ IGRAPH_EXPORT int igraph_warningf(const char *reason, const char *file, int line
 
 /**
  * \define IGRAPH_WARNING
- * Trigger a warning.
+ * \brief Triggers a warning.
  *
  * This is the usual way of triggering a warning from an igraph
  * function. It calls \ref igraph_warning().
@@ -914,7 +914,7 @@ IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char 
 
 /**
  * \define IGRAPH_FATALF
- * \brief Trigger a fatal error, with printf-like error output.
+ * \brief Triggers a fatal error, with printf-like syntax.
  *
  * \a igraph functions can use this macro when a fatal error occurs and
  * want to pass on extra information to the user about what went wrong.

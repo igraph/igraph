@@ -117,6 +117,18 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
         }
     }
 
+    /* Avoid problems with the null graph */
+    if (no_of_nodes < 2) {
+        if (membership) {
+            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+            igraph_vector_fill(membership, 0);
+        }
+        if (modularity) {
+            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+        }
+        return IGRAPH_SUCCESS;
+    }
+
     if (weights) {
         total_weight = igraph_vector_sum(weights);
     } else {
@@ -261,7 +273,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     glp_delete_prob(ip);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 #endif
 

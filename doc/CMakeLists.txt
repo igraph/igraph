@@ -108,7 +108,7 @@ else()
   set(HTML_DOC_BUILD_SUPPORTED FALSE)
 endif()
 
-if(PDF_DOC_BUILD_SUPPORTED AND XMLLINT_COMMAND AND XSLTPROC_COMMAND AND FOP_COMMAND)
+if(DOC_BUILD_SUPPORTED AND XMLLINT_COMMAND AND XSLTPROC_COMMAND AND FOP_COMMAND)
   set(PDF_DOC_BUILD_SUPPORTED TRUE)
 else()
   set(PDF_DOC_BUILD_SUPPORTED FALSE)
@@ -118,8 +118,10 @@ if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
   set(DOXROX_RULES ${CMAKE_CURRENT_SOURCE_DIR}/c-docbook.re)
   set(DOXROX_CHUNKS ${CMAKE_CURRENT_BINARY_DIR}/chunks.pickle)
+  set(DOXROX_CACHE ${CMAKE_CURRENT_BINARY_DIR}/doxrox.cache)
 
   set(DOCBOOK_INPUTS "")
+  set(DOCBOOK_GENERATED_INPUTS "")
 
   # Specify that each DocBook .xml file is to be copied to the build folder
   # TODO(ntamas): currently this works with out-of-tree builds only
@@ -139,6 +141,7 @@ if(DOC_BUILD_SUPPORTED)
 
     string(PREPEND DOXROX_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/")
     list(APPEND DOCBOOK_INPUTS "${DOXROX_OUTPUT}")
+    list(APPEND DOCBOOK_GENERATED_INPUTS "${DOXROX_OUTPUT}")
 
     add_custom_command(
       OUTPUT ${DOXROX_OUTPUT}
@@ -158,15 +161,15 @@ if(DOC_BUILD_SUPPORTED)
   # a ctags-compatible "tags" file. This will then be used later by
   # source-highlight to cross-reference the known tokens from the source code
   # of the examples
-  list(JOIN DOCBOOK_INPUTS ";" DOCBOOK_INPUTS_AS_STRING)
+  list(JOIN DOCBOOK_GENERATED_INPUTS ";" DOCBOOK_GENERATED_INPUTS_AS_STRING)
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/tags"
     COMMAND ${CMAKE_COMMAND}
     ARGS
-    -DINPUT_FILES="${DOCBOOK_INPUTS_AS_STRING}"
+    -DINPUT_FILES="${DOCBOOK_GENERATED_INPUTS_AS_STRING}"
     -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/tags
     -P ${CMAKE_SOURCE_DIR}/etc/cmake/generate_tags_file.cmake
-    DEPENDS ${DOCBOOK_INPUTS}
+    DEPENDS ${DOCBOOK_GENERATED_INPUTS}
     COMMENT "Creating tags file from DocBook xmls"
   )
 
@@ -201,11 +204,12 @@ if(DOC_BUILD_SUPPORTED)
   endforeach()
 
   add_custom_command(
-    OUTPUT ${DOXROX_CHUNKS}
+    OUTPUT ${DOXROX_CHUNKS} ${DOXROX_CACHE}
     COMMAND ${DOXROX_COMMAND}
     ARGS
     -e ${DOXROX_RULES}
     -o ${DOXROX_CHUNKS}
+    --cache ${DOXROX_CACHE}
     ${IGRAPH_SOURCES_FOR_DOXROX}
     MAIN_DEPENDENCY ${DOXROX_RULES}
     DEPENDS ${IGRAPH_SOURCES_FOR_DOXROX}
@@ -239,7 +243,7 @@ if(DOC_BUILD_SUPPORTED)
       --xinclude
       --output igraph-docs-with-resolved-includes-tmp.xml
       igraph-docs.xml
-      COMMAND ${PYTHON3}
+      COMMAND ${Python3_EXECUTABLE}
       ARGS
       ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
       igraph-docs-with-resolved-includes-tmp.xml

@@ -29,6 +29,23 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+/* Detecting ASan with GCC:
+ *   https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+ * Detecting ASan with Clang:
+ *   https://clang.llvm.org/docs/AddressSanitizer.html#conditional-compilation-with-has-feature-address-sanitizer
+ */
+#if defined(__SANITIZE_ADDRESS__)
+#  define IGRAPH_SANITIZER_AVAILABLE 1
+#elif defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#    define IGRAPH_SANITIZER_AVAILABLE 1
+#  endif
+#endif
+
+#ifdef IGRAPH_SANITIZER_AVAILABLE
+#include <sanitizer/asan_interface.h>
+#endif
+
 #ifdef USING_R
 #include <R.h>
 #endif
@@ -47,6 +64,10 @@
  */
 static IGRAPH_NORETURN void igraph_abort() {
 #ifndef USING_R
+#ifdef IGRAPH_SANITIZER_AVAILABLE
+    fprintf(stderr, "\nStack trace:\n");
+    __sanitizer_print_stack_trace();
+#endif
     abort();
 #else
     /* R's error() function is declared 'noreturn'. We use it here to satisfy the compiler that igraph_abort() does indeed not return. */
@@ -251,7 +272,7 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
 
 /**
  * \function igraph_warning_handler_ignore
- * Ignore all warnings
+ * \brief Ignores all warnings.
  *
  * This warning handler function simply ignores all warnings.
  * \param reason Textual description of the warning.
@@ -274,7 +295,7 @@ void igraph_warning_handler_ignore(const char *reason, const char *file,
 
 /**
  * \function igraph_warning_handler_print
- * Print all warning to the standard error
+ * \brief Prints all warnings to the standard error.
  *
  * This warning handler function simply prints all warnings to the
  * standard error.

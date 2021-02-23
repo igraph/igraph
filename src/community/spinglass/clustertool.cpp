@@ -246,6 +246,7 @@ static int igraph_i_community_spinglass_orig(
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma) {
 
+    long int no_of_nodes = igraph_vcount(graph);
     unsigned long changes, runs;
     igraph_bool_t use_weights = 0;
     bool zeroT;
@@ -275,6 +276,27 @@ static int igraph_i_community_spinglass_orig(
     if (starttemp / stoptemp < 1.0) {
         IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
                      IGRAPH_EINVAL);
+    }
+
+    /* The spinglass algorithm does not handle the trivial cases of the
+       null and singleton graphs, so we catch them here. */
+    if (no_of_nodes < 2) {
+        if (membership) {
+            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+            igraph_vector_fill(membership, 0);
+        }
+        if (modularity) {
+            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+        }
+        if (temperature) {
+            *temperature = stoptemp;
+        }
+        if (csize) {
+            /* 0 clusters for 0 nodes, 1 cluster for 1 node */
+            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+            igraph_vector_fill(membership, 1);
+        }
+        return IGRAPH_SUCCESS;
     }
 
     /* Check whether we have a single component */
@@ -504,6 +526,7 @@ static int igraph_i_community_spinglass_negative(
         /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus) {
 
+    long int no_of_nodes = igraph_vcount(graph);
     unsigned long changes, runs;
     igraph_bool_t use_weights = 0;
     bool zeroT;
@@ -540,6 +563,27 @@ static int igraph_i_community_spinglass_negative(
     if (starttemp / stoptemp < 1.0) {
         IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
                      IGRAPH_EINVAL);
+    }
+
+    /* The spinglass algorithm does not handle the trivial cases of the
+       null and singleton graphs, so we catch them here. */
+    if (no_of_nodes < 2) {
+        if (membership) {
+            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+            igraph_vector_fill(membership, 0);
+        }
+        if (modularity) {
+            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+        }
+        if (temperature) {
+            *temperature = stoptemp;
+        }
+        if (csize) {
+            /* 0 clusters for 0 nodes, 1 cluster for 1 node */
+            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+            igraph_vector_fill(membership, 1);
+        }
+        return IGRAPH_SUCCESS;
     }
 
     /* Check whether we have a single component */

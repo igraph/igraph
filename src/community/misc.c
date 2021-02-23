@@ -81,7 +81,7 @@
  * \param merges The two-column matrix containing the merge
  *    operations. See \ref igraph_community_walktrap() for the
  *    detailed syntax.
- * \param nodes The number of leaf nodes in the dendrogram
+ * \param nodes The number of leaf nodes in the dendrogram.
  * \param steps Integer constant, the number of steps to take.
  * \param membership Pointer to an initialized vector, the membership
  *    results will be stored here, if not NULL. The vector will be
@@ -108,10 +108,12 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     long int i, found = 0;
     igraph_vector_t tmp;
     igraph_vector_bool_t already_merged;
+    igraph_vector_t own_membership;
+    igraph_bool_t using_own_membership = 0;
 
     if (steps > igraph_matrix_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
-                      IGRAPH_PRId "steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
+                      IGRAPH_PRId " steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
     }
 
     if (igraph_matrix_ncol(merges) != 2) {
@@ -122,6 +124,13 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         IGRAPH_ERRORF("Number of steps should be non-negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
     }
 
+    if (csize != 0 && membership == 0) {
+        /* we need a membership vector to calculate 'csize' but the user did
+         * not provide one; let's allocate one ourselves */
+        IGRAPH_VECTOR_INIT_FINALLY(&own_membership, no_of_nodes);
+        using_own_membership = 1;
+        membership = &own_membership;
+    }
 
     if (membership) {
         IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
@@ -183,6 +192,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     }
 
     if (membership || csize) {
+        /* it can never happen that csize != 0 and membership == 0; we have
+         * handled that case above */
         for (i = 0; i < no_of_nodes; i++) {
             long int tmp = (long int) VECTOR(*membership)[i];
             if (tmp != 0) {
@@ -204,6 +215,11 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     igraph_vector_destroy(&tmp);
     igraph_vector_bool_destroy(&already_merged);
     IGRAPH_FINALLY_CLEAN(2);
+
+    if (using_own_membership) {
+        igraph_vector_destroy(&own_membership);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     return 0;
 }

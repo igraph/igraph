@@ -34,7 +34,7 @@
 
 /**
  * \function igraph_sbm_game
- * Sample from a stochastic block model
+ * \brief Sample from a stochastic block model.
  *
  * This function samples graphs from a stochastic block
  * model by (doing the equivalent of) Bernoulli
@@ -220,7 +220,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_hsbm_game
- * Hierarchical stochastic block model
+ * \brief Hierarchical stochastic block model.
  *
  * The function generates a random graph according to the hierarchical
  * stochastic block model.
@@ -395,7 +395,7 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_hsbm_list_game
- * Hierarchical stochastic block model, more general version
+ * \brief Hierarchical stochastic block model, more general version.
  *
  * The function generates a random graph according to the hierarchical
  * stochastic block model.

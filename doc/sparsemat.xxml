@@ -18,6 +18,7 @@
 <!-- doxrox-include igraph_sparsemat_destroy -->
 <!-- doxrox-include igraph_sparsemat_eye -->
 <!-- doxrox-include igraph_sparsemat_diag -->
+<!-- doxrox-include igraph_sparsemat_view -->
 </section>
 
 <section id="query-properties-of-a-sparse-matrix"><title>Query properties of a sparse matrix</title>
@@ -27,16 +28,18 @@
 <!-- doxrox-include igraph_sparsemat_type -->
 <!-- doxrox-include igraph_sparsemat_is_triplet -->
 <!-- doxrox-include igraph_sparsemat_is_cc -->
-<!-- doxrox-include igraph_sparsemat_min-->
-<!-- doxrox-include igraph_sparsemat_max-->
-<!-- doxrox-include igraph_sparsemat_minmax-->
-<!-- doxrox-include igraph_sparsemat_count_nonzero-->
-<!-- doxrox-include igraph_sparsemat_count_nonzerotol-->
-<!-- doxrox-include igraph_sparsemat_rowsums-->
-<!-- doxrox-include igraph_sparsemat_colsums-->
+<!-- doxrox-include igraph_sparsemat_getelements_sorted -->
+<!-- doxrox-include igraph_sparsemat_min -->
+<!-- doxrox-include igraph_sparsemat_max -->
+<!-- doxrox-include igraph_sparsemat_minmax -->
+<!-- doxrox-include igraph_sparsemat_count_nonzero -->
+<!-- doxrox-include igraph_sparsemat_count_nonzerotol -->
+<!-- doxrox-include igraph_sparsemat_rowsums -->
+<!-- doxrox-include igraph_sparsemat_colsums -->
+<!-- doxrox-include igraph_sparsemat_nonzero_storage -->
 </section>
 
-<section id="operations-on-sprase-matrices"><title>Operations on sprase matrices</title>
+<section id="operations-on-sparse-matrices"><title>Operations on sparse matrices</title>
 <!-- doxrox-include igraph_sparsemat_entry -->
 <!-- doxrox-include igraph_sparsemat_fkeep -->
 <!-- doxrox-include igraph_sparsemat_dropzeros -->
@@ -50,6 +53,17 @@
 <!-- doxrox-include igraph_sparsemat_add_rows -->
 <!-- doxrox-include igraph_sparsemat_add_cols -->
 <!-- doxrox-include igraph_sparsemat_resize -->
+</section>
+
+<section id="operations-on_sparse_matrix_iterators"><title>Operations on sparse matrix iterators</title>
+<!-- doxrox-include igraph_sparsemat_iterator_init -->
+<!-- doxrox-include igraph_sparsemat_iterator_reset -->
+<!-- doxrox-include igraph_sparsemat_iterator_end -->
+<!-- doxrox-include igraph_sparsemat_iterator_row -->
+<!-- doxrox-include igraph_sparsemat_iterator_col -->
+<!-- doxrox-include igraph_sparsemat_iterator_get -->
+<!-- doxrox-include igraph_sparsemat_iterator_next -->
+<!-- doxrox-include igraph_sparsemat_iterator_idx -->
 </section>
 
 <section id="operations-that-change-the-internal-representation"><title>Operations that change the internal representation</title>

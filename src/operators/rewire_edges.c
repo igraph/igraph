@@ -190,7 +190,7 @@ static int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob
 
 /**
  * \function igraph_rewire_edges
- * \brief Rewire the edges of a graph with constant probability
+ * \brief Rewires the edges of a graph with constant probability.
  *
  * This function rewires the edges of a graph with a constant
  * probability. More precisely each end point of each edge is rewired
@@ -284,7 +284,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
 
 /**
  * \function igraph_rewire_directed_edges
- * \brief Rewire the chosen endpoint of directed edges
+ * \brief Rewires the chosen endpoint of directed edges.
  *
  * This function rewires either the start or end of directed edges in a graph
  * with a constant probability. Correspondingly, either the in-degree sequence

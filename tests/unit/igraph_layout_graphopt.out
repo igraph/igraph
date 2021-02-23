@@ -1,0 +1,16 @@
+No vertices:
+One vertex.
+Full graph of 4 vertices, no loops.
+4 vertices, disconnected, with loops and multi-edges.
+Full graph of 4 vertices, no loops with no repulsion.
+4 vertices in a line, with no repulsion, spring length 1 and a seed:
+[  1.06066 -1.06066
+  0.353553 -0.353553
+  -0.353553 0.353553
+  -1.06066  1.06066 ]
+4 vertices in a line, with no repulsion, spring length 1 and a seed, no sa_movement:
+[     0.15    -0.15
+      0.05    -0.05
+     -0.05     0.05
+     -0.15     0.15 ]
+Wrong size seed.

@@ -101,7 +101,7 @@ int igraph_vs_all(igraph_vs_t *vs) {
  * \brief All vertices of a graph (immediate version).
  *
  * Immediate vertex selector for all vertices in a graph. It can
- * be used conveniently when some vertex property (eg. betweenness,
+ * be used conveniently when some vertex property (e.g. betweenness,
  * degree, etc.) should be calculated for all vertices.
  *
  * \return A vertex selector for all vertices in a graph.
@@ -646,7 +646,7 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * This function instantiates a vertex selector object with a given
  * graph. This is the step when the actual vertex ids are created from
  * the \em logical notion of the vertex selector based on the graph.
- * Eg. a vertex selector created with \ref igraph_vs_all() contains
+ * E.g. a vertex selector created with \ref igraph_vs_all() contains
  * knowledge that \em all vertices are included in a (yet indefinite)
  * graph. When instantiating it a vertex iterator object is created,
  * this contains the actual vertex ids in the graph supplied as a

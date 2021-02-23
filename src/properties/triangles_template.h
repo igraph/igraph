@@ -45,6 +45,15 @@ igraph_vector_int_t order;
 igraph_vector_int_t rank;
 igraph_vector_t degree;
 
+if (no_of_nodes == 0) {
+#ifndef TRIANGLES
+    igraph_vector_clear(res);
+#else
+    igraph_vector_int_clear(res);
+#endif
+    return IGRAPH_SUCCESS;
+}
+
 igraph_vector_int_init(&order, no_of_nodes);
 IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
 IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);

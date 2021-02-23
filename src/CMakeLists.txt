@@ -388,6 +388,10 @@ endif()
 # Turn on all warnings for GCC, clang and MSVC
 use_all_warnings(igraph)
 
+# GNUInstallDirs be included before generating the pkgconfig file, as it defines
+# CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR variables.
+include(GNUInstallDirs)
+
 # Generate pkgconfig file.
 # The library names being used here are Linux-specific, but pkgconfig files
 # are omstly used on Linux anyway. Nevertheless, we take care not to include
@@ -437,11 +441,10 @@ generate_export_header(igraph
 )
 
 # Define how to install the library
-include(GNUInstallDirs)
 install(
   TARGETS igraph
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(
   DIRECTORY ${CMAKE_SOURCE_DIR}/include/

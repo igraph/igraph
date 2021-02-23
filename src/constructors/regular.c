@@ -400,7 +400,7 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
 
 /**
  * \function igraph_extended_chordal_ring
- * Create an extended chordal ring
+ * \brief Create an extended chordal ring.
  *
  * An extended chordal ring is a cycle graph with additional chords
  * connecting its vertices.
