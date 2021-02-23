@@ -20,6 +20,9 @@ jobs:
           { msystem: MINGW64, arch: x86_64 }
           ]
 
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/ccache
+
     defaults:
       run:
         shell: msys2 {0}
@@ -29,12 +32,17 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          install: git base-devel mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-suitesparse mingw-w64-${{ matrix.arch }}-lapack
+          install: git base-devel mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-ccache mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-suitesparse mingw-w64-${{ matrix.arch }}-lapack
           update: true
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Ccache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.arch }}-ccache
       - name: Configuration
         run: |
           mkdir -p build-${{ matrix.arch }}
