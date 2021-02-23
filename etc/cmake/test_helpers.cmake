@@ -64,8 +64,8 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
 
     # The next line is necessitated by MinGW on Windows. MinGW uses forward slashes in
     # IGRAPH_LIBDIR, but we need to supply CTest with backslashes because CTest is executed
-    # in a cmd.exe shell. So we simply replace forward slashes with backslases in
-    # IGRAPH_LIBDIR.
+    # in a cmd.exe shell. We therefore explicitly ensure that that path is transformed to a
+    # native path.
     file(TO_NATIVE_PATH "${IGRAPH_LIBDIR}" IGRAPH_LIBDIR)
 
     # Semicolons are used as list separators in CMake so we need to escape them in the PATH,
