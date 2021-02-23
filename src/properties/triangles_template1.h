@@ -36,6 +36,11 @@ IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
 IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
+if (nodes_to_calc == 0) {
+    igraph_vector_clear(res);
+    return IGRAPH_SUCCESS;
+}
+
 neis = igraph_Calloc(no_of_nodes, long int);
 if (neis == 0) {
     IGRAPH_ERROR("local undirected transitivity failed", IGRAPH_ENOMEM);

@@ -1831,9 +1831,6 @@ static int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
 
     /* Do the maximum flow */
 
-    no_of_nodes = igraph_vcount(&newgraph);
-    no_of_edges = igraph_ecount(&newgraph);
-
     IGRAPH_CHECK(igraph_maxflow_value(&newgraph, &real_res,
                                       source, target, 0, 0));
     *res = (igraph_integer_t)real_res;

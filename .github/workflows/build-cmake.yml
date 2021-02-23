@@ -1,4 +1,4 @@
-name: MINGW32 / MINGW64 (MSYS2) - cmake build
+name: MINGW
 
 # TODO: Check the BRANCHES element when merging the branch 'develop' to, say, 'master'.
 on:
@@ -35,6 +35,8 @@ jobs:
           update: true
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Configuration
         run: |
           mkdir -p build-${{ matrix.arch }}

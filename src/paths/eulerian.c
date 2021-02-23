@@ -161,8 +161,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
 }
 
 
-static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
-    igraph_bool_t res_weak;
+static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle,                                         igraph_integer_t *start_of_path) {
     igraph_integer_t incoming_excess, outgoing_excess, n;
     long int i, vsize;
     long int cluster_count;
@@ -185,7 +184,6 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
 
     incoming_excess = 0;
     outgoing_excess = 0;
-    res_weak = 1;
 
     /* check for weak connectedness, but singletons are special since they affect
      * the Eulerian nature only if there is a self-loop AND another edge

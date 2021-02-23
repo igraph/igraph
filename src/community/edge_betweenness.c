@@ -194,7 +194,7 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    dendrogram will be stored here, in the same form as for the \ref
  *    igraph_community_walktrap() function: the matrix has two columns
  *    and each line is a merge given by the ids of the merged
- *    components. The component ids are number from zero and
+ *    components. The component ids are numbered from zero and
  *    component ids smaller than the number of vertices in the graph
  *    belong to individual vertices. The non-trivial components
  *    containing at least two vertices are numbered from \c n, where \c n is
@@ -231,6 +231,23 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_vector_t ptr;
     long int i, midx = 0;
     igraph_integer_t no_comps;
+
+    /* catch null graph early */
+    if (no_of_nodes == 0) {
+        if (res) {
+            igraph_matrix_resize(res, 0, 2);
+        }
+        if (bridges) {
+            igraph_vector_clear(bridges);
+        }
+        if (modularity) {
+            igraph_vector_clear(modularity);
+        }
+        if (membership) {
+            igraph_vector_clear(membership);
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     if (membership || modularity) {
         return igraph_i_community_eb_get_merges2(graph,
@@ -284,7 +301,7 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_vector_destroy(&ptr);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Find the smallest active element in the vector */

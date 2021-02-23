@@ -41,7 +41,7 @@
  *
  * </para><para>
  * De Bruijn graphs have some interesting properties, please see another source,
- * eg. Wikipedia for details.
+ * e.g. Wikipedia for details.
  *
  * \param graph Pointer to an uninitialized graph object, the result will be
  *        stored here.

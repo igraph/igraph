@@ -25,12 +25,12 @@
 
 /**
  * \function igraph_free
- * Deallocate memory that was allocated by igraph functions
+ * \brief Deallocate memory that was allocated by igraph functions.
  *
  * Some igraph functions return a pointer vector (igraph_vector_ptr_t)
  * containing pointers to other igraph or other data types. These data
  * types are dynamically allocated and have to be deallocated
- * manually, if the user does not need them any more. This can be done
+ * manually when the user does not need them any more. This can be done
  * by calling igraph_free on them.
  *
  * </para><para>
@@ -44,12 +44,12 @@
  *    igraph_vector_ptr_t seps;
  *    long int i;
  *
- *    igraph_famous(&graph, "tutte");
+ *    igraph_famous(&graph, "Tutte");
  *    igraph_vector_ptr_init(&seps, 0);
  *    igraph_minimum_size_separators(&graph, &seps);
  *
  *    for (i=0; i<igraph_vector_ptr_size(&seps); i++) {
- *      igraph_vector_t *v=VECTOR(seps)[i];
+ *      igraph_vector_t *v = VECTOR(seps)[i];
  *      igraph_vector_print(v);
  *      igraph_vector_destroy(v);
  *      igraph_free(v);
@@ -77,7 +77,7 @@ void igraph_free(void *p) {
 
 /**
  * \function igraph_malloc
- * Allocate memory that can be safely deallocated by igraph functions
+ * \brief Allocate memory that can be safely deallocated by igraph functions.
  *
  * Some igraph functions, such as \ref igraph_vector_ptr_free_all() and
  * \ref igraph_vector_ptr_destroy_all() can free memory that may have been

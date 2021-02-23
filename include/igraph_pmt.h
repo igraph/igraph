@@ -69,6 +69,9 @@
     #define ZERO 0
     #define ONE 1
     #define MULTIPLICITY 1
+    #define NOTORDERED 1
+    #define NOABS 1
+    #define EQ(a,b) ((a && b) || (!a && !b))
 
 #elif defined(BASE_INT)
     #define BASE int

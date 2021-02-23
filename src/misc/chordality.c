@@ -26,20 +26,37 @@
  * \function igraph_maximum_cardinality_search
  * \brief Maximum cardinality search.
  *
- * This function implements the maximum cardinality search algorithm
- * discussed in
+ * This function implements the maximum cardinality search algorithm.
+ * It computes a rank \p alpha for each vertex, such that visiting
+ * vertices in decreasing rank order corresponds to always choosing
+ * the vertex with the most already visited neighbors as the next one
+ * to visit.
+ *
+ * </para><para>
+ * Maximum cardinality search is useful in deciding the chordality
+ * of a graph. A graph is chordal if and only if any two neighbors
+ * of a vertex which are higher in rank than it are connected to
+ * each other.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
  * Robert E Tarjan and Mihalis Yannakakis: Simple linear-time
  * algorithms to test chordality of graphs, test acyclicity of
  * hypergraphs, and selectively reduce acyclic hypergraphs.
  * SIAM Journal of Computation 13, 566--579, 1984.
+ * https://doi.org/10.1137/0213035
  *
  * \param graph The input graph. Edge directions will be ignored.
  * \param alpha Pointer to an initialized vector, the result is stored here.
  *   It will be resized, as needed. Upon return it contains
- *   the rank of the each vertex.
+ *   the rank of the each vertex in the range 0 to <code>n - 1</code>,
+ *   where \c n is the number of vertices.
  * \param alpham1 Pointer to an initialized vector or a \c NULL
  *   pointer. If not \c NULL, then the inverse of \p alpha is stored
- *   here.
+ *   here. In other words, the elements of \p alpham1 are vertex IDs
+ *   in reverse maximum cardinality search order.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in terms of the number of

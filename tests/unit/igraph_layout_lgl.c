@@ -32,6 +32,8 @@ int main() {
     igraph_matrix_t coords;
     igraph_real_t vc;
 
+    igraph_rng_seed(igraph_rng_default(), 33);
+
     igraph_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
     /*   igraph_barabasi_game(&g, 1000, 1, 0, 0, IGRAPH_UNDIRECTED); */
     igraph_matrix_init(&coords, 0, 0);

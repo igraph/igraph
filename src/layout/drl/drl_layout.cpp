@@ -419,7 +419,7 @@ int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
         break;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -456,6 +456,26 @@ int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_layout_drl_options_t *options,
                       const igraph_vector_t *weights,
                       const igraph_vector_bool_t *fixed) {
+    const char msg[] = "Damping multipliers cannot be negative, got %f.";
+
+    if (options->init_damping_mult < 0) {
+        IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->init_damping_mult);
+    }
+    if (options->liquid_damping_mult < 0) {
+        IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->liquid_damping_mult);
+    }
+    if (options->expansion_damping_mult < 0) {
+        IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->expansion_damping_mult);
+    }
+    if (options->cooldown_damping_mult < 0) {
+        IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->cooldown_damping_mult);
+    }
+    if (options->crunch_damping_mult < 0) {
+        IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->crunch_damping_mult);
+    }
+    if (options->simmer_damping_mult < 0) {
+        IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->simmer_damping_mult);
+    }
 
     IGRAPH_HANDLE_EXCEPTIONS(
         RNG_BEGIN();
@@ -471,5 +491,5 @@ int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
         RNG_END();
     );
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

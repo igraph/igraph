@@ -136,7 +136,7 @@ static int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *e
 /**
  * \ingroup generators
  * \function igraph_adjacency
- * \brief Creates a graph object from an adjacency matrix.
+ * \brief Creates a graph from an adjacency matrix.
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
@@ -440,7 +440,7 @@ static int igraph_i_weighted_adjacency_min(
 /**
  * \ingroup generators
  * \function igraph_weighted_adjacency
- * \brief Creates a graph object from a weighted adjacency matrix.
+ * \brief Creates a graph from a weighted adjacency matrix.
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
@@ -577,7 +577,7 @@ int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 
 /**
  * \function igraph_adjlist
- * Create a graph from an adjacency list
+ * \brief Creates a graph from an adjacency list.
  *
  * An adjacency list is a list of vectors, containing the neighbors
  * of all vertices. For operations that involve many changes to the

@@ -50,7 +50,7 @@
 //#################################################################################
 //###############################################################################
 //Constructor
-NNode::NNode(unsigned long ind, unsigned long c_ind, DLList<NLink*> *ll, char* n, int states) {
+NNode::NNode(unsigned long ind, unsigned long c_ind, DLList<NLink*> *ll, const char *n, int states) {
     index = ind;
     cluster_index = c_ind;
     neighbours = new DLList<NNode*>();

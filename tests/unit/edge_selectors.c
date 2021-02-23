@@ -34,7 +34,6 @@ int main() {
     igraph_t g, g_no_vertices, g_no_edges;
     igraph_es_t es;
     igraph_vector_t v, check_as_vector;
-    igraph_vs_t v_from, v_to;
     igraph_eit_t eit;
 
     igraph_small(&g, 5, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, -1);
@@ -58,7 +57,7 @@ int main() {
     igraph_vector_destroy(&v);
 
     printf("Fromto not implemented.\n");
-    IGRAPH_ASSERT(igraph_es_fromto(&es, v_from, v_to) == IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ASSERT(igraph_es_fromto(&es, igraph_vss_all(), igraph_vss_all()) == IGRAPH_UNIMPLEMENTED);
 
     printf("Checking es_seq:\n");
     IGRAPH_ASSERT(igraph_es_seq(&es, 2, 4) == IGRAPH_SUCCESS);

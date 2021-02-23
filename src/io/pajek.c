@@ -371,7 +371,7 @@ static int igraph_i_pajek_escape(char* src, char** dest) {
  * the attributes of the vertices and edges, of course this requires
  * an attribute handler to be installed. The names of the
  * corresponding vertex and edge attributes are listed at \ref
- * igraph_read_graph_pajek(), eg. the \c color vertex attributes
+ * igraph_read_graph_pajek(), e.g. the \c color vertex attributes
  * determines the color (\c c in Pajek) parameter.
  *
  * </para><para>

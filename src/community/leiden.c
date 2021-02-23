@@ -670,7 +670,7 @@ static int igraph_i_community_leiden_quality(
     /* Create the edgelist */
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    i = 0;
+
     while (!IGRAPH_EIT_END(eit)) {
         igraph_integer_t e = IGRAPH_EIT_GET(eit), from, to;
         IGRAPH_CHECK(igraph_edge(graph, e, &from, &to));

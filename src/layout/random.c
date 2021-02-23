@@ -61,7 +61,11 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
 /**
  * \function igraph_layout_random_3d
- * \brief Random layout in 3D
+ * \brief Places the vertices uniform randomly in a cube.
+ *
+ * </para><para>
+ * Vertex coordinates range from -1 to 1, and are placed in 3 columns
+ * of a matrix, with a row for each vertex.
  *
  * \param graph The graph to place.
  * \param res Pointer to an initialized matrix object. It will be
@@ -90,5 +94,5 @@ int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

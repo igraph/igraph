@@ -27,11 +27,13 @@
 
 /**
  * \function igraph_maxdegree
- * \brief Calculate the maximum degree in a graph (or set of vertices).
+ * \brief The maximum degree in a graph (or set of vertices).
  *
  * </para><para>
  * The largest in-, out- or total degree of the specified vertices is
- * calculated.
+ * calculated. If the graph has no vertices, or \p vids is empty,
+ * 0 is returned, as this is the smallest possible value for degrees.
+ *
  * \param graph The input graph.
  * \param res Pointer to an integer (\c igraph_integer_t), the result
  *        will be stored here.
@@ -61,12 +63,17 @@ int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
 
-    igraph_degree(graph, &tmp, vids, mode, loops);
-    *res = (igraph_integer_t) igraph_vector_max(&tmp);
+    IGRAPH_CHECK(igraph_degree(graph, &tmp, vids, mode, loops));
+    if (igraph_vector_size(&tmp) == 0) {
+        *res = 0;
+    } else {
+        *res = (igraph_integer_t) igraph_vector_max(&tmp);
+    }
 
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
@@ -286,7 +293,7 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(),
                                neighbor_degree_mode, IGRAPH_LOOPS));
-    igraph_maxdegree(graph, &maxdeg, igraph_vss_all(), mode, IGRAPH_LOOPS);
+    IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg, igraph_vss_all(), mode, IGRAPH_LOOPS));
     IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
     igraph_vector_resize(&neis, 0);
 

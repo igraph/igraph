@@ -1,0 +1,22 @@
+Star of 8 points and a center:
+[        0        0
+         1        0
+  0.707107 0.707107
+         0        1
+  -0.707107 0.707107
+        -1        0
+  -0.707107 -0.707107
+         0       -1
+  0.707107 -0.707107 ]
+Star of 8 points and a center in reverse:
+[        0        0
+  0.707107 -0.707107
+         0       -1
+  -0.707107 -0.707107
+        -1        0
+  -0.707107 0.707107
+         0        1
+  0.707107 0.707107
+         1        0 ]
+Checking if negative center fails nicely.
+Checking if order out of range fails nicely.

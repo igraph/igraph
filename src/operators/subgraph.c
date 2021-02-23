@@ -399,11 +399,11 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     if (vremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
+    IGRAPH_FINALLY(igraph_free, vremain);
     eremain = igraph_Calloc(no_of_edges, char);
     if (eremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, vremain);
     IGRAPH_FINALLY(igraph_free, eremain);
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_edges - IGRAPH_EIT_SIZE(eit)));
 

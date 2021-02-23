@@ -11,6 +11,7 @@
 
 <section id="about-blas">
 <!-- doxrox-include about_blas -->
+<!-- doxrox-include igraph_blas_ddot -->
 <!-- doxrox-include igraph_blas_dgemv -->
 <!-- doxrox-include igraph_blas_dgemv_array -->
 </section>

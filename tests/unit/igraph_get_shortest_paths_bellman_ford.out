@@ -1,0 +1,26 @@
+Paths to only some vertices
+( 0 )
+( 0 1 )
+( 0 3 )
+( 0 1 5 )
+( 0 1 2 )
+( 0 1 )
+
+Paths to all vertices
+( 0 )
+( 0 1 )
+( 0 1 2 )
+( 0 3 )
+( 0 1 4 )
+( 0 1 5 )
+( 0 1 2 6 )
+( 0 1 4 7 )
+( 0 1 5 8 )
+( 0 1 5 9 )
+
+Graph with negative weights
+( 0 )
+( 0 3 2 1 )
+( 0 3 )
+( 0 3 2 )
+( 0 3 2 1 )
