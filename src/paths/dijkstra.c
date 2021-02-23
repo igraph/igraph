@@ -910,7 +910,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (vertices || edges) {
         igraph_vector_t *path, *paths_index, *parent_vec, *parent_edge_vec;
         igraph_stack_t stack;
-        long int j, node;
+        long int j, node, k;
 
         /* a shortest path from the starting vertex to vertex i can be
          * obtained by calculating the shortest paths from the "parents"
@@ -1132,6 +1132,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 }
                 if (edges) {
                     path = (igraph_vector_t*)VECTOR(*edges)[i];
+                    // for sorting purpuse add the terget to the end of the path
+                    igraph_vector_push_back(path, (igraph_real_t) tmp);
                     VECTOR(*edges)[j] = path;
                 }
                 j++;
@@ -1155,6 +1157,10 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         if (edges){
             IGRAPH_CHECK(igraph_vector_ptr_resize(edges, j));
             igraph_vector_ptr_sort(edges, igraph_i_vector_tail_cmp);
+            for (i = 0; i < igraph_vector_ptr_size(edges); i++) {
+                path = (igraph_vector_t *) VECTOR(*edges)[i];
+                igraph_vector_pop_back(path);
+            }
         }
     }
 
