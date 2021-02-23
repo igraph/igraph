@@ -306,6 +306,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   simplify_and_colorize
   bliss_automorphisms
+  igraph_subisomorphic
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses
