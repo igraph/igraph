@@ -66,7 +66,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
     # IGRAPH_LIBDIR, but we need to supply CTest with backslashes because CTest is executed
     # in a cmd.exe shell. So we simply replace forward slashes with backslases in
     # IGRAPH_LIBDIR.
-    string(REPLACE "/" "\\" IGRAPH_LIBDIR ${IGRAPH_LIBDIR})
+    file(TO_NATIVE_PATH "${IGRAPH_LIBDIR}" IGRAPH_LIBDIR)
 
     # Semicolons are used as list separators in CMake so we need to escape them in the PATH,
     # otherwise the PATH envvar gets split by CMake before it passes the PATH on to CTest.
