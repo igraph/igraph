@@ -8,8 +8,6 @@ on:
       - '!appveyor/**'
       - '!travis/**'
   pull_request:
-    branches:
-      - develop
 
 jobs:
   build:
