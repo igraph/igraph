@@ -21,15 +21,26 @@
 
 int main() {
     igraph_sparsemat_t spmat;
-    int p = 10;
-    int i = 10;
-    double x = 10.;
+    igraph_matrix_t mat;
+    int p[] = {0, 1, 3};
+    int i[]  = {1, 0, 2};
+    double x[] = {1, 5, 2};
 
+    printf("Empty sparsemat.\n");
+    igraph_matrix_init(&mat, 0, 0);
     igraph_sparsemat_view(&spmat, /*nzmax*/ 0, /*m*/ 0, /*n*/ 0, /*p*/ NULL, /*i*/ NULL, /*x*/ NULL, /*nz*/ 0);
-    igraph_sparsemat_destroy(&spmat);
+    igraph_sparsemat_as_matrix(&mat, &spmat);
+    print_matrix(&mat);
+    igraph_free(spmat.cs);
+    igraph_matrix_destroy(&mat);
 
-    igraph_sparsemat_view(&spmat, /*nzmax*/ 10, /*m*/ 10, /*n*/ 10, &p, &i, &x, /*nz*/ 10);
-    free(spmat.cs);
+    printf("3x2 sparsemat:\n");
+    igraph_matrix_init(&mat, 0, 0);
+    igraph_sparsemat_view(&spmat, /*nzmax*/ 3, /*m*/ 3, /*n*/ 2, p, i, x, /*nz*/ -1);
+    igraph_sparsemat_as_matrix(&mat, &spmat);
+    print_matrix(&mat);
+    igraph_free(spmat.cs);
+    igraph_matrix_destroy(&mat);
 
     VERIFY_FINALLY_STACK();
     return 0;

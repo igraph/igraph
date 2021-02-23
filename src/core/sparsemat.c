@@ -3014,7 +3014,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
                           int *p, int *i, double *x, int nz) {
 
-    A->cs = igraph_Calloc(1, sizeof(cs_di));
+    A->cs = igraph_Calloc(1, cs_di);
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
