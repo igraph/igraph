@@ -716,7 +716,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (vertices == 0 && nrgeo == 0 && edges == 0) {
         return IGRAPH_SUCCESS;
     }
-
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
