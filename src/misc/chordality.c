@@ -33,6 +33,12 @@
  * to visit.
  *
  * </para><para>
+ * Maximum cardinality search is useful in deciding the chordality
+ * of a graph. A graph is chordal if and only if any two neighbors
+ * of a vertex which are higher in rank than it are connected to
+ * each other.
+ *
+ * </para><para>
  * References:
  *
  * </para><para>
