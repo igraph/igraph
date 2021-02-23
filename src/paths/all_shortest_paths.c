@@ -131,7 +131,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     /* paths will store the shortest paths during the search */
     IGRAPH_CHECK(igraph_vector_ptr_init(&paths, 0));
     IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &paths);
-    /* paths will store the shortest paths during the search */
+    /* path_edge will store the shortest paths during the search */
     IGRAPH_CHECK(igraph_vector_ptr_init(&path_edge, 0));
     IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &path_edge);
     /* neis is a temporary vector holding the neighbors of the
@@ -183,14 +183,14 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     /* from -> from */
     vptr = igraph_Calloc(1, igraph_vector_t);
     if (vptr == 0) {
-    IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
     }
     IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
     IGRAPH_CHECK(igraph_vector_init(vptr, 1));
     VECTOR(*vptr)[0] = from;
     vptr_e = igraph_Calloc(1, igraph_vector_t);
     if (vptr_e == 0) {
-    IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
     }
     IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
     IGRAPH_CHECK(igraph_vector_init(vptr_e, 1));
@@ -273,7 +273,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_push_back(vptr, neighbor));
                 vptr_e = igraph_Calloc(1, igraph_vector_t);
                 if (vptr_e == 0) {
-                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
                 }
                 IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
                 /* If the previous vertex was the source then there is no edge to add*/
@@ -333,16 +333,14 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             while (fatherptr != 0) {
                 if (vertices) {
                     VECTOR(*vertices)[j++] = VECTOR(paths)[fatherptr - 1];
-                } 
-                if (edges) {
-                    VECTOR(*edges)[t++] = VECTOR(path_edge)[fatherptr - 1];
-                }
-                /* If dont return the vertex or the edge path then release*/
-                if (!vertices) {
+                } else{
+                    /* If dont return the vertex or the edge path then release*/
                     igraph_vector_destroy(VECTOR(paths)[fatherptr - 1]);
                     igraph_Free(VECTOR(paths)[fatherptr - 1]);
                 }
-                if (!edges) {
+                if (edges) {
+                    VECTOR(*edges)[t++] = VECTOR(path_edge)[fatherptr - 1];
+                } else {
                     igraph_vector_destroy(VECTOR(path_edge)[fatherptr - 1]);
                     igraph_Free(VECTOR(path_edge)[fatherptr - 1]);
                 }

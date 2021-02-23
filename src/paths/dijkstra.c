@@ -627,14 +627,14 @@ static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
  * \brief All weighted shortest paths (geodesics) from a vertex.
  *
  * \param graph The graph object.
- * \param vertices Pointer to an initialized pointer vector or NULL
- *   If not NULL Each vector object contains the vertices along a 
+ * \param vertices Pointer to an initialized pointer vector or NULL.
+ *   If not NULL, then each vector object contains the vertices along a 
  *   shortest path from \p from to another vertex. The vectors are
  *   ordered according to their target vertex: first the shortest 
  *   paths to vertex 0, then to vertex 1, etc. No data is included 
  *   for unreachable vertices.
  * \param edges Pointer to an initialized pointer vector or NULL. If 
- *   not null the Each vector object contains the edges along a 
+ *   not null then each vector object contains the edges along a 
  *   shortest path from \p from  to another vertex. The vectors are 
  *   ordered according to their target vertex: first the shortest 
  *   paths to vertex 0, then to vertex 1, etc. No data is included for
@@ -910,7 +910,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (vertices || edges) {
         igraph_vector_t *path, *paths_index, *parent_vec, *parent_edge_vec;
         igraph_stack_t stack;
-        long int j, node, k;
+        long int j, node;
 
         /* a shortest path from the starting vertex to vertex i can be
          * obtained by calculating the shortest paths from the "parents"
@@ -1158,6 +1158,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         if (edges){
             IGRAPH_CHECK(igraph_vector_ptr_resize(edges, j));
             igraph_vector_ptr_sort(edges, igraph_i_vector_tail_cmp);
+            // removing the target from the tail of each vector in edges
             for (i = 0; i < igraph_vector_ptr_size(edges); i++) {
                 path = (igraph_vector_t *) VECTOR(*edges)[i];
                 igraph_vector_pop_back(path);
