@@ -15,11 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: [
-          { msystem: MINGW32, arch: i686   },
-          { msystem: MINGW64, arch: x86_64 }
-          ]
+        arch: ['i686', 'x86_64']
         shared_libs: ['ON', 'OFF']
+        include:
+          - arch: i686
+            msystem: MINGW32
+          - arch: x86_64
+            msystem: MINGW64
 
     env:
       CCACHE_DIR: ${{ github.workspace }}\ccache
