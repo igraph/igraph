@@ -42,7 +42,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ matrix.arch }}-ccache
+          key: ${{ runner.os }}-${{ matrix.arch }}-ccache-${{ hashFiles('ccache/**') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.arch }}-ccache
       - name: Configuration
         run: |
           mkdir -p build-${{ matrix.arch }}
