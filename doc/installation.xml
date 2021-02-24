@@ -479,6 +479,31 @@ $ cmake .. \
 </programlisting>
   </para>
   <para>
+    When building igraph with an internal ARPACK, LAPACK or BLAS, it
+    makes use of f2c, which compiles and runs the <literal>arithchk</literal>
+    program at build time to detect the floating point characteristics of the
+    current system. It writes the results into the <literal>arith.h</literal>
+    header. Since running this program is not possible when cross-compiling,
+    igraph's build system allows specifying a pre-generated version of this
+    header file through the <literal>F2C_EXTERNAL_ARITH_HEADER</literal>
+    CMake option. An example version of this header follows for the
+    x86_64 and arm64 target architecures on macOS. Warning: Do not use this
+    version of <literal>arith.h</literal> on other systems or architectures.
+  </para>
+  <para>
+<programlisting>
+#define IEEE_8087
+#define Arith_Kind_ASL 1
+#define Long int
+#define Intcast (int)(long)
+#define Double_Align
+#define X64_bit_pointers
+#define NANCHECK
+#define QNaN0 0x0
+#define QNaN1 0x7ff80000
+</programlisting>
+  </para>
+  <para>
     Additional notes:
   </para>
   <itemizedlist>
