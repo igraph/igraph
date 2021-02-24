@@ -36,7 +36,7 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           install: git base-devel mingw-w64-${{ matrix.arch }}-ccache mingw-w64-${{ matrix.arch }}-ninja mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-suitesparse mingw-w64-${{ matrix.arch }}-lapack
-          update: true
+          update: false
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -66,6 +66,9 @@ jobs:
       - name: Test
         run: ctest -j $(nproc) --output-on-failure --timeout 180
         working-directory: build-${{ matrix.arch }}
+
+      - name: Ccache stats
+        run: ccache -s
 
       - name: Generate Artifacts upon Failure
         if: ${{ failure() }}
