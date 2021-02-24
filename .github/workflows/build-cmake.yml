@@ -50,6 +50,9 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}-ccache-${{ github.sha }}
           restore-keys: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}-ccache-
 
+      - name: Ccache stats
+        run: ccache -s
+
       - name: Configuration
         run: |
           mkdir -p build-${{ matrix.arch }}
