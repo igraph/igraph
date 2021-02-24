@@ -47,8 +47,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ matrix.arch }}-ccache-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-${{ matrix.arch }}-ccache-
+          key: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}-ccache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}-ccache-
 
       - name: Configuration
         run: |
