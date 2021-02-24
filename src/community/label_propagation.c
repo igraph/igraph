@@ -164,8 +164,6 @@ int igraph_community_label_propagation(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, 2));
 
-    RNG_BEGIN();
-
     /* Initialize node ordering vector with only the not fixed nodes */
     if (fixed) {
         IGRAPH_VECTOR_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
@@ -192,6 +190,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
         /* Shuffle the node ordering vector */
         IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+
+        RNG_BEGIN();
         /* In the prescribed order, loop over the vertices and reassign labels */
         for (i = 0; i < no_of_not_fixed_nodes; i++) {
             v1 = (long int) VECTOR(node_order)[i];
@@ -264,9 +264,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
                 VECTOR(label_counters)[(long int)VECTOR(nonzero_labels)[j]] = 0;
             }
         }
+        RNG_END();
     }
-
-    RNG_END();
 
     /* Shift back the membership vector, permute labels in increasing order */
     /* We recycle label_counters here :) */
