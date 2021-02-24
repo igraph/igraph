@@ -36,7 +36,7 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           install: git base-devel mingw-w64-${{ matrix.arch }}-ccache mingw-w64-${{ matrix.arch }}-ninja mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-suitesparse mingw-w64-${{ matrix.arch }}-lapack
-          update: false
+          update: true
 
       - name: Checkout
         uses: actions/checkout@v2
