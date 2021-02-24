@@ -737,7 +737,12 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_ptr_set_item_destructor(&parents, (igraph_finally_func_t*)igraph_vector_destroy);
     /* parents_edge stores a vector for each vertex, listing the parent edges
      * of each vertex in the traversal */
-    IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, no_of_edges));
+    if (no_of_edges == 0) {
+        IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, 1));
+    }
+    else {
+        IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, no_of_edges));
+    }
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents_edge);
     igraph_vector_ptr_set_item_destructor(&parents_edge, (igraph_finally_func_t*)igraph_vector_destroy);
 
@@ -1171,16 +1176,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_Free(is_target);
     igraph_vector_destroy(&dists);
     igraph_vector_ptr_destroy_all(&parents);
-    if (no_of_edges == 0) {
-        for (i = 0; i < igraph_vector_ptr_size(&parents_edge); i++) {
-            igraph_vector_t *vec = (igraph_vector_t *) VECTOR(parents_edge)[i];
-            igraph_vector_destroy(vec); igraph_free(vec);
-        }
-        igraph_vector_ptr_destroy(&parents_edge);
-    }
-    else {
-        igraph_vector_ptr_destroy_all(&parents_edge);
-    }
+    igraph_vector_ptr_destroy_all(&parents_edge);
     if (free_vertices){
         igraph_vector_ptr_destroy_all(vertices);
         IGRAPH_FINALLY_CLEAN(1);
