@@ -71,8 +71,6 @@ int main() {
     }
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
 
-    igraph_vector_ptr_free_all(&paths);
-
     igraph_destroy(&graph);
 
     printf("\nNo paths\n");

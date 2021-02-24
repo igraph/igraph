@@ -1172,6 +1172,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_destroy(&dists);
     igraph_vector_ptr_destroy_all(&parents);
     igraph_vector_ptr_destroy_all(&parents_edge);
+    igraph_free(&parents);
+    igraph_free(&parents_edge);
     if (free_vertices){
         igraph_vector_ptr_destroy_all(vertices);
         IGRAPH_FINALLY_CLEAN(1);
