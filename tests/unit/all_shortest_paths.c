@@ -146,7 +146,9 @@ int main() {
 
     igraph_vector_ptr_free_all(&paths);
     igraph_vector_ptr_free_all(&paths_edge);
-    
+
+    igraph_vector_ptr_destroy(&paths);
+    igraph_vector_ptr_destroy(&paths_edge);
     igraph_vector_destroy(&nrgeo);
     igraph_vector_destroy(&weights); 
     igraph_destroy(&graph);
