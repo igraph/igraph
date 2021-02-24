@@ -101,16 +101,16 @@
 int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax) {
 
     if (rows < 0) {
-        IGRAPH_ERROR("Negative number of rows", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Negative number of rows.", IGRAPH_EINVAL);
     }
     if (cols < 0) {
-        IGRAPH_ERROR("Negative number of columns", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Negative number of columns.", IGRAPH_EINVAL);
     }
 
     A->cs = cs_spalloc( rows, cols, nzmax, /*values=*/ 1,
                         /*triplet=*/ 1);
     if (!A->cs) {
-        IGRAPH_ERROR("Cannot allocate memory for sparse matrix", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot allocate memory for sparse matrix.", IGRAPH_ENOMEM);
     }
 
     return 0;
