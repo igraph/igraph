@@ -21,7 +21,7 @@ check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
 set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
-  set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+  set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-Wl,--disable-new-dtags")
 endif()
 
 # version.at
