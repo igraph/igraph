@@ -1679,7 +1679,7 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
  *
  * This function collects all isomorphic mappings of \p graph2 to a
  * subgraph of \p graph1. It uses the \ref
- * igraph_subisomorphic_function_vf2() function. The graphs shoud be simple.
+ * igraph_subisomorphic_function_vf2() function. The graphs should be simple.
  * \param graph1 The first input graph, may be directed or
  *    undirected. This is supposed to be the larger graph.
  * \param graph2 The second input graph, it must have the same
