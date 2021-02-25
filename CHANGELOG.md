@@ -4,7 +4,7 @@
 
 ### Changed
 
- - `igraph_community_multilevel()` is now randomized (PR ##1696, thanks to Daniel Noom).
+ - `igraph_community_multilevel()` is now randomized (PR #1696, thanks to Daniel Noom).
 
 ### Fixed
 
