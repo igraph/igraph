@@ -14,10 +14,13 @@
  - `igraph_arpack_rnsolve()` checks its parameters more carefully.
  - `igraph_community_to_membership()` does not crash anymore when `csize` is requested but `membership` is not.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
+ - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
 
 ### Other
 
  - Documentation improvements.
+ - Much faster documentation builds.
+ - Allow using a pre-generated `arith.h` header for f2c when cross-compiling; see the Installation section of the documentation.
 
 ## [0.9.0] - 2021-02-16
 

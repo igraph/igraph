@@ -716,7 +716,7 @@ int igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
 
     IGRAPH_ASSERT(A);
     IGRAPH_ASSERT(fkeep);
-    if (A->cs->nz != -1) {
+    if (!igraph_sparsemat_is_cc(A)) {
         IGRAPH_ERROR("The sparse matrix is not in compressed format.", IGRAPH_EINVAL);
     }
     if (cs_fkeep(A->cs, fkeep, other) < 0) {
@@ -763,12 +763,15 @@ int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
 
 int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol) {
 
-    if (!cs_droptol(A->cs, tol)) {
-        IGRAPH_ERROR("Cannot drop (almost) zeros from sparse matrix",
-                     IGRAPH_FAILURE);
+    IGRAPH_ASSERT(A);
+    if (!igraph_sparsemat_is_cc(A)) {
+        IGRAPH_ERROR("The sparse matrix is not in compressed format.", IGRAPH_EINVAL);
+    }
+    if (cs_droptol(A->cs, tol) < 0) {
+        IGRAPH_ERROR("External function cs_droptol has returned an unknown error.", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

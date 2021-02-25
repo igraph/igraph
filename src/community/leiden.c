@@ -428,7 +428,7 @@ static int igraph_i_community_leiden_mergenodes(
              * will be moved.
              */
             if (total_cum_trans_diff < IGRAPH_INFINITY) {
-                igraph_real_t r = igraph_rng_get_unif(igraph_rng_default(), 0, total_cum_trans_diff);
+                igraph_real_t r = RNG_UNIF(0, total_cum_trans_diff);
                 long int chosen_idx;
                 igraph_vector_binsearch_slice(&cum_trans_diff, r, &chosen_idx, 0, nb_neigh_clusters);
                 chosen_cluster = VECTOR(neighbor_clusters)[chosen_idx];
