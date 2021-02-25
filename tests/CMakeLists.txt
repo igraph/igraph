@@ -24,7 +24,11 @@ if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-Wl,--disable-new-dtags")
 endif()
 
-# tutorial examples from the documentation
+# tutorial examples and other snippets from the documentation
+add_examples(
+  FOLDER examples/simple NAMES
+  igraph_free
+)
 add_examples(
   FOLDER examples/tutorial NAMES
   tutorial1
@@ -68,6 +72,7 @@ add_legacy_tests(
   igraph_sparsemat_nonzero_storage
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
+  igraph_spmatrix_add_col_values
   matrix
   matrix2
   matrix3
@@ -165,6 +170,7 @@ add_legacy_tests(
   igraph_callaway_traits_game
   igraph_cited_type_game
   igraph_correlated_game
+  igraph_establishment_game
   igraph_extended_chordal_ring
   igraph_from_prufer
   igraph_full_citation

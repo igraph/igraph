@@ -35,32 +35,8 @@
  *
  * </para><para>
  * Here is a complete example on how to use \c igraph_free properly.
- * <programlisting>
- * <![CDATA[#include <igraph.h>
  *
- * int main(void)
- * {
- *    igraph_t graph;
- *    igraph_vector_ptr_t seps;
- *    long int i;
- *
- *    igraph_famous(&graph, "Tutte");
- *    igraph_vector_ptr_init(&seps, 0);
- *    igraph_minimum_size_separators(&graph, &seps);
- *
- *    for (i=0; i<igraph_vector_ptr_size(&seps); i++) {
- *      igraph_vector_t *v = VECTOR(seps)[i];
- *      igraph_vector_print(v);
- *      igraph_vector_destroy(v);
- *      igraph_free(v);
- *    }
- *
- *    igraph_vector_ptr_destroy(&seps);
- *    igraph_destroy(&graph);
- *    return 0;
- * }]]>
- * </programlisting>
- *
+ * \example examples/simple/igraph_free.c
  *
  * \param p Pointer to the piece of memory to be deallocated.
  * \return Error code, currently always zero, meaning success.
