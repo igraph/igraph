@@ -19,6 +19,7 @@
  - `igraph_community_to_membership()` does not crash anymore when `csize` is requested but `membership` is not.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
+ - When compiling the development version (as opposed to the release tarball), the build would fail with newer versions of `bison` and `flex`.
 
 ### Other
 
