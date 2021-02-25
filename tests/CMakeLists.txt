@@ -167,6 +167,7 @@ add_legacy_tests(
   igraph_correlated_game
   igraph_establishment_game
   igraph_extended_chordal_ring
+  igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
   igraph_growing_random_game
