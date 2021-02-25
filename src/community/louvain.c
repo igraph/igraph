@@ -550,7 +550,7 @@ static int igraph_i_community_multilevel_step(
 /**
  * \ingroup communities
  * \function igraph_community_multilevel
- * \brief Finding community structure by multi-level optimization of modularity
+ * \brief Finding community structure by multi-level optimization of modularity.
  *
  * This function implements the multi-level modularity optimization
  * algorithm for finding community structure, see
@@ -564,12 +564,12 @@ static int igraph_i_community_multilevel_step(
  * </para><para>
  * The algorithm is based on the modularity measure and a hierarchical approach.
  * Initially, each vertex is assigned to a community on its own. In every step,
- * vertices are re-assigned to communities in a local, greedy way: each vertex
- * is moved to the community with which it achieves the highest contribution to
- * modularity. When no vertices can be reassigned, each community is considered
- * a vertex on its own, and the process starts again with the merged communities.
- * The process stops when there is only a single vertex left or when the modularity
- * cannot be increased any more in a step.
+ * vertices are re-assigned to communities in a local, greedy way: in a random
+ * order, each vertex is moved to the community with which it achieves the highest
+ * contribution to modularity. When no vertices can be reassigned, each community
+ * is considered a vertex on its own, and the process starts again with the merged
+ * communities. The process stops when there is only a single vertex left or when
+ * the modularity cannot be increased any more in a step.
  *
  * </para><para>
  * The resolution parameter \c gamma allows finding communities at different
@@ -719,5 +719,5 @@ int igraph_community_multilevel(const igraph_t *graph,
     igraph_vector_destroy(&level_membership);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
