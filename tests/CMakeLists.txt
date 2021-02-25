@@ -65,6 +65,7 @@ add_legacy_tests(
   matrix3
   spmatrix
   stack
+  strvector_set2_remove_print
   vector
   vector2
   vector3
