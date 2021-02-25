@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+ - `igraph_community_multilevel()` is now randomized (PR ##1696, thanks to Daniel Noom).
+
 ### Fixed
 
  - CMake settings that controlled the library installation directory name, such as `CMAKE_INSTALL_LIBDIR`, were not respected.
