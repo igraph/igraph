@@ -97,7 +97,7 @@ jobs:
       - template: .azure/build-win.yml
         parameters:
           build_shared: false
-          vcpkg_target_triplet: x64-windows-static
+          vcpkg_target_triplet: x64-windows-static-md
 
   - job: windows_shared
     pool:
