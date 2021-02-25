@@ -392,6 +392,16 @@ void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff) {
     }
 }
 
+void print_spmatrix(igraph_spmatrix_t *m) {
+    long int i, j;
+    for (i = 0; i < igraph_spmatrix_nrow(m); i++) {
+        for (j = 0; j < igraph_spmatrix_ncol(m); j++) {
+            printf(" %8g", igraph_spmatrix_e(m, i, j));
+        }
+        printf("\n");
+    }
+}
+
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \

@@ -72,6 +72,7 @@ add_legacy_tests(
   igraph_sparsemat_nonzero_storage
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
+  igraph_spmatrix_add_col_values
   matrix
   matrix2
   matrix3

@@ -360,12 +360,18 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
  * \function igraph_spmatrix_add_col_values
  * \brief Adds the values of a column to another column.
  *
- * \param to The index of the column to be added to
- * \param from The index of the column to be added
+ * \param to The index of the column to be added to.
+ * \param from The index of the column to be added.
  * \return Error code.
  */
 int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from) {
     long int i;
+    if (to < 0 || to >= m->ncol) {
+       IGRAPH_ERROR("The 'to' column does not exist.", IGRAPH_EINVAL);
+    }
+    if (from < 0 || from >= m->ncol) {
+       IGRAPH_ERROR("The 'from' column does not exist.", IGRAPH_EINVAL);
+    }
     /* TODO: I think this implementation could be speeded up if I don't use
      * igraph_spmatrix_add_e directly -- but maybe it's not worth the fuss */
     for (i = (long int) VECTOR(m->cidx)[from]; i < VECTOR(m->cidx)[from + 1]; i++) {
@@ -373,7 +379,7 @@ int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int f
                                            to, VECTOR(m->data)[i]));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
