@@ -94,24 +94,31 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
     /* Do some initial checks */
     if (fixed && igraph_vector_bool_size(fixed) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid fixed labeling vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Fixed labeling vector length must agree with number of nodes.", IGRAPH_EINVAL);
     }
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
-        } else if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Length of weight vector must agree with number of edges.", IGRAPH_EINVAL);
+        }
+        if (no_of_edges > 0) {
+            igraph_real_t minweight = igraph_vector_min(weights);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Weights must not be negative.", IGRAPH_EINVAL);
+            }
+            if (igraph_is_nan(minweight)) {
+                IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
+            }
         }
     }
     if (fixed && !initial) {
-        IGRAPH_WARNING("Ignoring fixed vertices as no initial labeling given");
+        IGRAPH_WARNING("Ignoring fixed vertices as no initial labeling given.");
     }
 
     IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
 
     if (initial) {
         if (igraph_vector_size(initial) != no_of_nodes) {
-            IGRAPH_ERROR("Invalid initial labeling vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Initial labeling vector length must agree with number of nodes.", IGRAPH_EINVAL);
         }
         /* Check if the labels used are valid, initialize membership vector */
         for (i = 0; i < no_of_nodes; i++) {
@@ -125,7 +132,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
             for (i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*fixed)[i]) {
                     if (VECTOR(*membership)[i] == 0) {
-                        IGRAPH_WARNING("Fixed nodes cannot be unlabeled, ignoring them");
+                        IGRAPH_WARNING("Fixed nodes cannot be unlabeled, ignoring them.");
                         VECTOR(*fixed)[i] = 0;
                     } else {
                         no_of_not_fixed_nodes--;
@@ -136,10 +143,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
         i = (long int) igraph_vector_max(membership);
         if (i > no_of_nodes) {
-            IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1.", IGRAPH_EINVAL);
         }
         if (i <= 0) {
-            IGRAPH_ERROR("At least one vertex must be labeled in the initial labeling", IGRAPH_EINVAL);
+            IGRAPH_ERROR("At least one vertex must be labeled in the initial labeling.", IGRAPH_EINVAL);
         }
     } else {
         for (i = 0; i < no_of_nodes; i++) {
@@ -307,5 +314,5 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_vector_destroy(&nonzero_labels);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
