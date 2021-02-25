@@ -92,6 +92,7 @@ int main() {
         return 1;
     }
     igraph_set_error_handler(oldhandler);
+
     fclose(ifile);
 
     /* Write it back */
