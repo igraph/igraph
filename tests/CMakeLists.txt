@@ -24,6 +24,14 @@ if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-Wl,--disable-new-dtags")
 endif()
 
+# tutorial examples from the documentation
+add_examples(
+  FOLDER examples/tutorial NAMES
+  tutorial1
+  tutorial2
+  tutorial3
+)
+
 # version.at
 add_examples(
   FOLDER examples/simple NAMES
