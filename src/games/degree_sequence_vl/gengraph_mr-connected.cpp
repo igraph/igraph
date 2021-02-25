@@ -25,6 +25,7 @@
 #include "gengraph_random.h"
 
 #include "igraph_datatype.h"
+#include "igraph_graphicality.h"
 #include "igraph_types.h"
 #include "igraph_error.h"
 
@@ -140,17 +141,19 @@ extern "C" {
                                        const igraph_vector_t *out_seq,
                                        const igraph_vector_t *in_seq) {
         IGRAPH_HANDLE_EXCEPTIONS(
-            long int sum = igraph_vector_sum(out_seq);
-            if (sum % 2 != 0) {
-                IGRAPH_ERROR("Sum of degrees should be even", IGRAPH_EINVAL);
+            igraph_bool_t is_graphical;
+
+            if (in_seq && igraph_vector_size(in_seq) != 0) {
+                IGRAPH_ERROR("This generator works with undirected graphs only", IGRAPH_EINVAL);
+            }
+
+            IGRAPH_CHECK(igraph_is_graphical(out_seq, 0, IGRAPH_SIMPLE_SW, &is_graphical));
+            if (!is_graphical) {
+                IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph",
+                             IGRAPH_EINVAL);
             }
 
             RNG_BEGIN();
-
-            if (in_seq && igraph_vector_size(in_seq) != 0) {
-                RNG_END();
-                IGRAPH_ERROR("This generator works with undirected graphs only", IGRAPH_EINVAL);
-            }
 
             degree_sequence *dd = new degree_sequence(out_seq);
 
@@ -160,8 +163,7 @@ extern "C" {
             if (!g->havelhakimi()) {
                 delete g;
                 RNG_END();
-                IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph",
-                             IGRAPH_EINVAL);
+                IGRAPH_FATAL("g->havelhakimi() failed; please report as a bug.");
             }
 
             if (!g->make_connected()) {

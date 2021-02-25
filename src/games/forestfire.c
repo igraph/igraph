@@ -68,10 +68,10 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * present in the network, chosen uniformly random. Now, for each cited
  * vertex <code>v</code> we do the following procedure:
  * \olist
- * \oli We generate two random number, <code>x</code> and <code>y</code>, that are
+ * \oli We generate two random numbers, <code>x</code> and <code>y</code>, that are
  *   geometrically distributed with means <code>p/(1-p)</code> and
- *   <code>rp(1-rp)</code>. (<code>p</code> is <code>fw_prob</code>, <code>r</code> is
- *   <code>bw_factor</code>.) The new vertex cites <code>x</code> outgoing neighbors
+ *   <code>rp(1-rp)</code>. (<code>p</code> is \p fw_prob, <code>r</code> is
+ *   \p bw_factor.) The new vertex cites <code>x</code> outgoing neighbors
  *   and <code>y</code> incoming neighbors of <code>v</code>, from those which are
  *   not yet cited by the new vertex. If there are less than <code>x</code> or
  *   <code>y</code> such vertices available then we cite all of them.
@@ -139,12 +139,12 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     inneis = igraph_Calloc(no_of_nodes, igraph_vector_t);
     if (!inneis) {
-        IGRAPH_ERROR("Cannot run forest fire model", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, inneis);
     outneis = igraph_Calloc(no_of_nodes, igraph_vector_t);
     if (!outneis) {
-        IGRAPH_ERROR("Cannot run forest fire model", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, outneis);
     data.inneis = inneis;
@@ -259,5 +259,5 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
