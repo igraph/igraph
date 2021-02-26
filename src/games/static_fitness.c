@@ -396,7 +396,8 @@ int igraph_static_power_law_game(igraph_t *graph,
 
     if (exponent_in >= 0) {
         if (exponent_in < 2) {
-            IGRAPH_ERRORF("In-degree exponent must be either negative or >= 2, got %g.", IGRAPH_EINVAL, exponent_in);
+            IGRAPH_ERRORF("For directed graphs the in-degree exponent must be >= 2, got %g.",
+                          IGRAPH_EINVAL, exponent_in);
         } else if (igraph_finite(exponent_in)) {
             alpha_in = -1.0 / (exponent_in - 1);
         } else {
