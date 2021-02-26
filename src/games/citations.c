@@ -394,10 +394,23 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         return igraph_empty(graph, 0, directed);
     }
     if (igraph_vector_size(types) != nodes) {
-        IGRAPH_ERRORF("Length of types vector (%ld), not equal to number of nodes (%" IGRAPH_PRId ").", IGRAPH_EINVAL, igraph_vector_size(types), nodes);
+        IGRAPH_ERRORF("Length of types vector (%ld) not equal to number"
+                      " of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(types), nodes);
     }
     if (igraph_matrix_ncol(pref) != igraph_vector_max(types) + 1) {
-        IGRAPH_ERRORF("Number of preference matrix colums (%ld) not equal to number of types (%g).", IGRAPH_EINVAL, igraph_matrix_ncol(pref), igraph_vector_max(types) + 1);
+        IGRAPH_ERRORF("Number of preference matrix colums (%ld) not "
+                      "equal to number of types (%g).",
+                      IGRAPH_EINVAL,
+                      igraph_matrix_ncol(pref),
+                      igraph_vector_max(types) + 1);
+    }
+    if (igraph_matrix_nrow(pref) != igraph_vector_max(types) + 1) {
+        IGRAPH_ERRORF("Number of preference matrix rows (%ld) not "
+                      "equal to number of types (%g).",
+                      IGRAPH_EINVAL,
+                      igraph_matrix_nrow(pref),
+                      igraph_vector_max(types) + 1);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
