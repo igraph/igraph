@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "gengraph_definitions.h"
+#include <stdexcept>
 #include <cassert>
 #include <cstdlib>
 #include <cstdio>
@@ -394,9 +395,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
             K *= 2; delete[] Kbuff; Kbuff = new int[int(K) + 1];
             break;
         default:
-            IGRAPH_ERROR("Error in graph_molloy_hash::shuffle(): "
-                         "Unknown heuristics type", IGRAPH_EINVAL);
-            return 0;
+            throw std::invalid_argument("Error in graph_molloy_hash::shuffle(): Unknown heuristics type.");
         }
     }
 
@@ -404,7 +403,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
     delete[] visited;
 
     if (maxtimes <= all_swaps) {
-        IGRAPH_WARNING("Cannot shuffle graph, maybe there is only a single one?");
+        IGRAPH_WARNING("Cannot shuffle graph, maybe it is the only realization of its degree sequence?");
     }
 
     // Status report
