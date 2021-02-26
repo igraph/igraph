@@ -387,59 +387,56 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_i_citing_cited_type_game_struct_t str = { 0, NULL };
     igraph_psumtree_t *sumtrees;
     igraph_vector_t sums;
-    long int nocats;
+    long int no_of_types;
     long int i, j;
 
-    if (nodes == 0) {
-        return igraph_empty(graph, 0, directed);
-    }
     if (igraph_vector_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%ld) not equal to number"
                       " of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(types), nodes);
     }
-    if (igraph_matrix_ncol(pref) != igraph_vector_max(types) + 1) {
+
+    /* avoid calling vector_max on empty vector */
+    no_of_types = nodes == 0 ? 0 : igraph_vector_max(types) + 1;
+
+    if (igraph_matrix_ncol(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix colums (%ld) not "
                       "equal to number of types (%g).",
                       IGRAPH_EINVAL,
                       igraph_matrix_ncol(pref),
-                      igraph_vector_max(types) + 1);
+                      no_of_types);
     }
-    if (igraph_matrix_nrow(pref) != igraph_vector_max(types) + 1) {
+    if (igraph_matrix_nrow(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix rows (%ld) not "
                       "equal to number of types (%g).",
                       IGRAPH_EINVAL,
                       igraph_matrix_nrow(pref),
-                      igraph_vector_max(types) + 1);
+                      no_of_types);
+    }
+
+    /* return an empty graph if nodes is zero */
+    if (nodes == 0) {
+        return igraph_empty(graph, 0, directed);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-    /* return an empty graph is nodes is zero */
-    if (nodes == 0) {
-        igraph_create(graph, &edges, nodes, directed);
-        igraph_vector_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(2); /* str and edges */
-        return 0;
-    }
-
-    nocats = igraph_matrix_ncol(pref);
-    str.sumtrees = sumtrees = igraph_Calloc(nocats, igraph_psumtree_t);
+    str.sumtrees = sumtrees = igraph_Calloc(no_of_types, igraph_psumtree_t);
     if (!sumtrees) {
         IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_i_citing_cited_type_game_free, &str);
 
-    for (i = 0; i < nocats; i++) {
+    for (i = 0; i < no_of_types; i++) {
         IGRAPH_CHECK(igraph_psumtree_init(&sumtrees[i], nodes));
         str.no++;
     }
-    IGRAPH_VECTOR_INIT_FINALLY(&sums, nocats);
+    IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_types);
 
     IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes * edges_per_step));
 
     /* First node */
-    for (i = 0; i < nocats; i++) {
+    for (i = 0; i < no_of_types; i++) {
         long int type = (long int) VECTOR(*types)[0];
         if ( MATRIX(*pref, i, type) < 0) {
             IGRAPH_ERRORF("Preference matrix contains negative entry: %g.", IGRAPH_EINVAL, MATRIX(*pref, i, type));
@@ -461,7 +458,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         }
 
         /* add i */
-        for (j = 0; j < nocats; j++) {
+        for (j = 0; j < no_of_types; j++) {
             if ( MATRIX(*pref, j, type) < 0) {
                 IGRAPH_ERRORF("Preference matrix contains negative entry: %g.", IGRAPH_EINVAL, MATRIX(*pref, j, type));
             }
