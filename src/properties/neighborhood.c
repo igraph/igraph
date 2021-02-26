@@ -54,7 +54,8 @@
  *   of the edges. This argument is ignored for undirected graphs.
  * \param mindist The minimum distance to include a vertex in the counting.
  *   If this is one, then the starting vertex is not counted. If this is
- *   two, then its neighbors are not counted, either, etc.
+ *   two, then its neighbors are not counted, either, etc. Vertices which
+ *   can also be reached by longer paths are still excluded.
  * \return Error code.
  *
  * \sa \ref igraph_neighborhood() for calculating the actual neighborhood,
@@ -77,17 +78,18 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_t neis;
 
     if (order < 0) {
-        IGRAPH_ERROR("Negative order in neighborhood size", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Negative order in neighborhood size: %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, order);
     }
 
     if (mindist < 0 || mindist > order) {
-        IGRAPH_ERROR("Minimum distance should be between zero and order",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Minimum distance should be between zero and order, got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, mindist);
     }
 
     added = igraph_Calloc(no_of_nodes, long int);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate neighborhood size.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
@@ -150,7 +152,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
     igraph_Free(added);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

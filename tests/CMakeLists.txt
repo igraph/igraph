@@ -228,6 +228,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_neighborhood_size
 )
 
 add_legacy_tests(
