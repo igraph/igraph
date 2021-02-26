@@ -58,19 +58,9 @@ IGRAPH_EXPORT int igraph_real_printf_precise(igraph_real_t val);
 IGRAPH_EXPORT int igraph_real_fprintf_precise(FILE *file, igraph_real_t val);
 IGRAPH_EXPORT int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val);
 
-/* igraph_i_fdiv is needed here instead of in core/math.h because
- * some constants use it */
-double igraph_i_fdiv(const double a, const double b);
-
-#if defined(INFINITY)
-    #define IGRAPH_INFINITY INFINITY
-    #define IGRAPH_POSINFINITY INFINITY
-    #define IGRAPH_NEGINFINITY (-INFINITY)
-#else
-    #define IGRAPH_INFINITY (igraph_i_fdiv(1.0, 0.0))
-    #define IGRAPH_POSINFINITY (igraph_i_fdiv(1.0, 0.0))
-    #define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
-#endif
+#define IGRAPH_INFINITY INFINITY
+#define IGRAPH_POSINFINITY INFINITY
+#define IGRAPH_NEGINFINITY (-INFINITY)
 
 IGRAPH_EXPORT int igraph_finite(double x);
 #define IGRAPH_FINITE(x) igraph_finite(x)
@@ -80,13 +70,7 @@ IGRAPH_EXPORT int igraph_is_inf(double x);
 IGRAPH_EXPORT int igraph_is_posinf(double x);
 IGRAPH_EXPORT int igraph_is_neginf(double x);
 
-#if defined(NAN)
-    #define IGRAPH_NAN NAN
-#elif defined(INFINITY)
-    #define IGRAPH_NAN (INFINITY/INFINITY)
-#else
-    #define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
-#endif
+#define IGRAPH_NAN NAN
 
 __END_DECLS
 
