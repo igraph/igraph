@@ -93,6 +93,9 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     igraph_vector_t degree;
     igraph_vector_t triangles;
 
+    if (igraph_vcount(graph) == 0) {
+        IGRAPH_ERROR("Graph should have at least 1 vertex, but has 0.\n", IGRAPH_EINVAL);
+    }
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
@@ -112,7 +115,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 
     neis = igraph_Calloc(no_of_nodes, long int);
     if (neis == 0) {
-        IGRAPH_ERROR("undirected average local transitivity failed",
+        IGRAPH_ERROR("undirected average local transitivity failed.",
                      IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, neis);
@@ -166,7 +169,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_local_undirected1(const igraph_t *graph,
