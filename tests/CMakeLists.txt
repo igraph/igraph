@@ -169,6 +169,7 @@ add_legacy_tests(
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_cited_type_game
+  igraph_citing_cited_type_game
   igraph_correlated_game
   igraph_degree_sequence_game
   igraph_establishment_game
