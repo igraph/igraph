@@ -30,6 +30,7 @@
 #include "igraph_operators.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
+#include "igraph_structural.h"
 #include "igraph_vector.h"
 
 #include "core/interruption.h"
