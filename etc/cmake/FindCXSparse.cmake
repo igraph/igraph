@@ -40,7 +40,6 @@ find_path(CXSPARSE_INCLUDE_DIR NAMES cs.h PATH_SUFFIXES suitesparse)
 
 find_library(CXSPARSE_LIBRARY_RELEASE NAMES cxsparse libcxsparse)
 find_library(CXSPARSE_LIBRARY_DEBUG NAMES cxsparsed libcxsparsed)
-MESSAGE(STATUS "Debug library: ${CXSPARSE_LIBRARY_DEBUG}")
 select_library_configurations(CXSPARSE)
 
 if(CXSPARSE_INCLUDE_DIR)
