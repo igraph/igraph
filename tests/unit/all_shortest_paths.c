@@ -149,8 +149,10 @@ int main() {
 
     igraph_vector_ptr_destroy(&paths);
     igraph_vector_ptr_destroy(&paths_edge);
-    igraph_vector_destroy(&nrgeo);
-    igraph_vector_destroy(&weights); 
+
+    igraph_vector_destroy(&weights);
+    igraph_vector_destroy(&nrgeo);    
+
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

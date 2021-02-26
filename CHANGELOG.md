@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+ - `igraph_community_multilevel()` is now randomized (PR #1696, thanks to Daniel Noom).
+
 ### Fixed
 
  - CMake settings that controlled the library installation directory name, such as `CMAKE_INSTALL_LIBDIR`, were not respected.
@@ -13,11 +17,16 @@
  - `igraph_get_shortest_path_bellman_ford()` did not work correctly when calculating paths to all vertices.
  - `igraph_arpack_rnsolve()` checks its parameters more carefully.
  - `igraph_community_to_membership()` does not crash anymore when `csize` is requested but `membership` is not.
+ - `igraph_citing_cited_type_game()`: fixed memory leaks (PR #1700, thanks to Daniel Noom).
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
+ - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
+ - When compiling the development version (as opposed to the release tarball), the build would fail with newer versions of `bison` and `flex`.
 
 ### Other
 
  - Documentation improvements.
+ - Much faster documentation builds.
+ - Allow using a pre-generated `arith.h` header for f2c when cross-compiling; see the Installation section of the documentation.
 
 ## [0.9.0] - 2021-02-16
 

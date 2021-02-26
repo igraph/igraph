@@ -44,6 +44,15 @@
  * \p pref_matrix. Then another two vertices are selected and this is
  * repeated \p edges_per_step times in each time step.
  *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * D. S. Callaway, J. E. Hopcroft, J. M. Kleinberg, M. E. J. Newman, and S. H. Strogatz,
+ * Are randomly grown graphs really random?
+ * Phys. Rev. E 64, 041902 (2001).
+ * https://doi.org/10.1103/PhysRevE.64.041902
+ *
  * \param graph Pointer to an uninitialized graph.
  * \param nodes The number of nodes in the graph.
  * \param types Number of node types.
