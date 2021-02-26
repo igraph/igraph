@@ -169,9 +169,12 @@ add_legacy_tests(
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_cited_type_game
+  igraph_citing_cited_type_game
   igraph_correlated_game
+  igraph_degree_sequence_game
   igraph_establishment_game
   igraph_extended_chordal_ring
+  igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
   igraph_growing_random_game
@@ -184,6 +187,7 @@ add_legacy_tests(
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
+  igraph_simple_interconnected_islands_game
   tree
   tree_game
   ring

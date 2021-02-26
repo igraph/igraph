@@ -433,11 +433,3 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
     return 0;
 }
 
-/**
- * Internal function, floating point division
- * Used only in compilers not supporting INFINITY and HUGE_VAL to create
- * infinity values
- */
-double igraph_i_fdiv(const double a, const double b) {
-    return a / b;
-}

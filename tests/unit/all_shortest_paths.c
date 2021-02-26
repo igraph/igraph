@@ -130,6 +130,7 @@ int main() {
 
     igraph_vector_ptr_destroy_all(&paths);
 
+    igraph_vector_destroy(&weights);
     igraph_vector_destroy(&nrgeo);    
     igraph_destroy(&graph);
 

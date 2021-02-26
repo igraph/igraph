@@ -253,6 +253,8 @@ void powerlaw::adjust_offset_mean(double _mean, double err, double factor) {
 
 double powerlaw::init_to_mean(double _mean) {
     if (maxi >= 0 && _mean >= 0.5 * double((mini + maxi))) {
+        /* Cannot use IGRAPH_ERRORF() as this function does not
+         * return an igraph error code. */
         igraph_errorf("Fatal error in powerlaw::init_to_mean(%f): "
                       "Mean must be in ]min, (min+max)/2[ = ]%d, %d[",
                       IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL,

@@ -186,7 +186,7 @@ extern "C" {
             RNG_END();
         );
 
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
 }
