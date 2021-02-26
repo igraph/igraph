@@ -186,6 +186,7 @@ add_legacy_tests(
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
+  igraph_simple_interconnected_islands_game
   tree
   tree_game
   ring
