@@ -634,6 +634,11 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     igraph_vector_int_t *neis1, *neis2;
     long int i, j, neilen1, neilen2;
 
+    if (no_of_nodes == 0) {
+        *res = mode == IGRAPH_TRANSITIVITY_ZERO ? 0.0 : IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
