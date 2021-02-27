@@ -590,11 +590,14 @@ int igraph_list_triangles(const igraph_t *graph,
  * value for the whole graph. See the following reference for more details:
  *
  * </para><para>
- * S. Wasserman and K. Faust: Social Network Analysis: Methods and
- * Applications. Cambridge: Cambridge University Press, 1994.
+ * Clustering coefficient is an alternative name for transitivity.
  *
  * </para><para>
- * Clustering coefficient is an alternative name for transitivity.
+ * References:
+ *
+ * </para><para>
+ * S. Wasserman and K. Faust: Social Network Analysis: Methods and
+ * Applications. Cambridge: Cambridge University Press, 1994.
  *
  * \param graph The graph object.
  * \param res Pointer to a real variable, the result will be stored here.
@@ -613,7 +616,6 @@ int igraph_list_triangles(const igraph_t *graph,
  *
  * \example examples/simple/igraph_transitivity.c
  */
-
 
 int igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
