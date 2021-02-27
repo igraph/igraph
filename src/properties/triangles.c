@@ -93,7 +93,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     igraph_vector_t degree;
     igraph_vector_t triangles;
 
-    if (igraph_vcount(graph) == 0) {
+    if (no_of_nodes == 0) {
         if (mode == IGRAPH_TRANSITIVITY_ZERO) {
             *res = 0;
         } else {
@@ -121,7 +121,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 
     neis = igraph_Calloc(no_of_nodes, long int);
     if (neis == 0) {
-        IGRAPH_ERROR("undirected average local transitivity failed.",
+        IGRAPH_ERROR("Undirected average local transitivity failed.",
                      IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, neis);
@@ -187,7 +187,7 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
 #include "properties/triangles_template1.h"
 #undef TRANSIT
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_local_undirected2(const igraph_t *graph,
