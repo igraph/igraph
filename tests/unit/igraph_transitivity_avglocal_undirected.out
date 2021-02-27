@@ -1,6 +1,11 @@
-No vertices.
-One vertex:
+No vertices, transitivity zero:
 0
+No vertices, transitivity NaN:
+NaN
+One vertex, transitivity zero:
+0
+One vertex, transitivity NaN:
+NaN
 Simple graph:
 0.444444
 Multigraph:

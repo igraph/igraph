@@ -32,11 +32,23 @@ int main() {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    printf("No vertices.\n");
-    IGRAPH_ASSERT(igraph_transitivity_avglocal_undirected(&g_0, &result, IGRAPH_TRANSITIVITY_ZERO) == IGRAPH_EINVAL);
+    printf("No vertices, transitivity zero:\n");
+    IGRAPH_ASSERT(igraph_transitivity_avglocal_undirected(&g_0, &result, IGRAPH_TRANSITIVITY_ZERO) == IGRAPH_SUCCESS);
+    print_real(stdout, result, "%g");
+    printf("\n");
 
-    printf("One vertex:\n");
+    printf("No vertices, transitivity NaN:\n");
+    IGRAPH_ASSERT(igraph_transitivity_avglocal_undirected(&g_0, &result, IGRAPH_TRANSITIVITY_NAN) == IGRAPH_SUCCESS);
+    print_real(stdout, result, "%g");
+    printf("\n");
+
+    printf("One vertex, transitivity zero:\n");
     IGRAPH_ASSERT(igraph_transitivity_avglocal_undirected(&g_1, &result, IGRAPH_TRANSITIVITY_ZERO) == IGRAPH_SUCCESS);
+    print_real(stdout, result, "%g");
+    printf("\n");
+
+    printf("One vertex, transitivity NaN:\n");
+    IGRAPH_ASSERT(igraph_transitivity_avglocal_undirected(&g_1, &result, IGRAPH_TRANSITIVITY_NAN) == IGRAPH_SUCCESS);
     print_real(stdout, result, "%g");
     printf("\n");
 

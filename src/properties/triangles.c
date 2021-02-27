@@ -94,8 +94,14 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     igraph_vector_t triangles;
 
     if (igraph_vcount(graph) == 0) {
-        IGRAPH_ERROR("Graph should have at least 1 vertex, but has 0.\n", IGRAPH_EINVAL);
+        if (mode == IGRAPH_TRANSITIVITY_ZERO) {
+            *res = 0;
+        } else {
+            *res = IGRAPH_NAN;
+        }
+        return IGRAPH_SUCCESS;
     }
+
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
