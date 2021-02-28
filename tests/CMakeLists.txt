@@ -21,7 +21,7 @@ check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
 set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
-  set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-Wl,--disable-new-dtags")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
 endif()
 
 # tutorial examples and other snippets from the documentation
@@ -228,7 +228,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rewire # Uses internal igraph_i_rewire
-  igraph_neighborhood_size
 )
 
 add_legacy_tests(
@@ -248,8 +247,10 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_neighborhood_size
   igraph_pagerank
   igraph_transitive_closure_dag
+  igraph_transitivity_avglocal_undirected
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path

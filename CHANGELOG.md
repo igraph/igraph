@@ -18,6 +18,7 @@
  - `igraph_arpack_rnsolve()` checks its parameters more carefully.
  - `igraph_community_to_membership()` does not crash anymore when `csize` is requested but `membership` is not.
  - `igraph_citing_cited_type_game()`: fixed memory leaks (PR #1700, thanks to Daniel Noom).
+ - `igraph_transitivity_undirected()` and `igraph_transitivity_avglocal_undirected()` no longer trigger an assertion failure when used with the null graph.
  - The following functions were not exported from the shared library: `igraph_subcomponent()`, `igraph_stack_ptr_free_all()`, `igraph_stack_ptr_destroy_all()`.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
