@@ -1253,7 +1253,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     double *tmpscore;
     igraph_stack_t stack = IGRAPH_STACK_NULL;
     long int source;
-    long int j, k, nneis;
+    long int j, nneis;
     igraph_vector_int_t *neis;
     igraph_vit_t vit;
     unsigned char *is_target;
