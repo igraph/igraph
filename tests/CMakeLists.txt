@@ -228,7 +228,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rewire # Uses internal igraph_i_rewire
-  igraph_transitivity_avglocal_undirected
 )
 
 add_legacy_tests(
@@ -248,8 +247,10 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_neighborhood_size
   igraph_pagerank
   igraph_transitive_closure_dag
+  igraph_transitivity_avglocal_undirected
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
