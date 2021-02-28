@@ -2,17 +2,14 @@
 /*
    IGraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -48,6 +45,13 @@ void test_bug950() {
     igraph_vector_init(&eb, 0);
 
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
+    print_vector(&eb);
+
+    igraph_vector_destroy(&eb);
+
+    printf("\n testing subset with subset = vss_all() \n");
+    igraph_vector_init(&eb, 0);
+    igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, &weights, igraph_vss_all());
     print_vector(&eb);
 
     igraph_vector_destroy(&eb);
@@ -101,7 +105,9 @@ void test_bug1050() {
 
 int main() {
     igraph_t g;
-    igraph_vector_t eb;
+    igraph_vector_t eb, node_vec;
+    igraph_vs_t vs;
+
 
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
@@ -131,7 +137,16 @@ int main() {
         igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
         print_vector(&eb);
         igraph_vector_destroy(&eb);
+
+        igraph_vector_init_seq(&node_vec, 0, 32);
+        igraph_vs_vector(&vs, &node_vec);
+        igraph_vector_init(&eb, 0);
+        igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, vs);
+        print_vector(&eb);
+        igraph_vector_destroy(&eb);
         igraph_destroy(&g);
+        igraph_vs_destroy(&vs);
+        igraph_vector_destroy(&node_vec);
     }
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -140,7 +155,17 @@ int main() {
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
+
+    igraph_vector_init(&eb, 0);
+    igraph_vector_init_seq(&node_vec, 0, 3);
+    igraph_vs_vector(&vs, &node_vec);
+    igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*subset=*/vs);
+    print_vector(&eb);
+    igraph_vector_destroy(&eb);
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&node_vec);
     igraph_destroy(&g);
+
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
@@ -149,6 +174,16 @@ int main() {
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
+
+    igraph_vector_init(&eb, 0);
+    igraph_vector_init_seq(&node_vec, 0, 8);
+    igraph_vector_remove(&node_vec, 0);
+    igraph_vs_vector(&vs, &node_vec);
+    igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*subset=*/vs);
+    print_vector(&eb);
+    igraph_vector_destroy(&eb);
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&node_vec);
     igraph_destroy(&g);
 
     test_bug950();
