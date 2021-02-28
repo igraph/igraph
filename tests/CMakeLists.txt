@@ -251,6 +251,7 @@ add_legacy_tests(
   igraph_pagerank
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
+  igraph_transitivity_barrat
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
