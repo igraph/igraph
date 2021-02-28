@@ -991,7 +991,6 @@ int igraph_transitivity_barrat(const igraph_t *graph,
                                const igraph_vs_t vids,
                                const igraph_vector_t *weights,
                                igraph_transitivity_mode_t mode) {
-
     if (igraph_vs_is_all(&vids)) {
         return igraph_transitivity_barrat4(graph, res, vids, weights, mode);
     } else {
