@@ -757,7 +757,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
                       igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_nodes == 0) {
-        igraph_vector_resize(res, 0);
+        igraph_vector_clear(res);
         return IGRAPH_SUCCESS;
     }
 
@@ -857,7 +857,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
                       igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_nodes == 0) {
-        igraph_vector_resize(res, 0);
+        igraph_vector_clear(res);
         return IGRAPH_SUCCESS;
     }
 
