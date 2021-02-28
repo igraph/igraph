@@ -745,12 +745,20 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     igraph_vector_t strength;
 
     if (!weights) {
-        IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
+        if (no_of_edges != 0) {
+            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
+        }
         return igraph_transitivity_local_undirected(graph, res, vids, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
+                      "number of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+    if (no_of_nodes == 0) {
+        igraph_vector_resize(res, 0);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -818,7 +826,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_barrat4(const igraph_t *graph,
@@ -838,12 +846,19 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     long int i, nn;
 
     if (!weights) {
-        IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
+        if (no_of_edges != 0) {
+            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
+        }
         return igraph_transitivity_local_undirected(graph, res, vids, mode);
     }
-
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
+                      "number of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+    if (no_of_nodes == 0) {
+        igraph_vector_resize(res, 0);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
@@ -930,7 +945,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -976,6 +991,7 @@ int igraph_transitivity_barrat(const igraph_t *graph,
                                const igraph_vs_t vids,
                                const igraph_vector_t *weights,
                                igraph_transitivity_mode_t mode) {
+
     if (igraph_vs_is_all(&vids)) {
         return igraph_transitivity_barrat4(graph, res, vids, weights, mode);
     } else {
