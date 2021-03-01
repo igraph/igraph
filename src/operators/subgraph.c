@@ -33,10 +33,10 @@
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
-                                      const igraph_vs_t vids,
-                                      igraph_vector_t *map,
-                                      igraph_vector_t *invmap) {
+static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+                                             const igraph_vs_t vids,
+                                             igraph_vector_t *map,
+                                             igraph_vector_t *invmap) {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *remain;
@@ -87,11 +87,11 @@ int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
  * Subgraph creation, new version: creates the new graph instead of
  * copying the old one.
  */
-int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
-        igraph_t *res,
-        const igraph_vs_t vids,
-        igraph_vector_t *map,
-        igraph_vector_t *invmap) {
+static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
+                                                 igraph_t *res,
+                                                 const igraph_vs_t vids,
+                                                 igraph_vector_t *map,
+                                                 igraph_vector_t *invmap) {
     igraph_bool_t directed = igraph_is_directed(graph);
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_new_nodes = 0;
@@ -300,9 +300,9 @@ int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                        /* invmap= */ 0);
 }
 
-int igraph_i_induced_subgraph_suggest_implementation(
-    const igraph_t *graph, const igraph_vs_t vids,
-    igraph_subgraph_implementation_t *result) {
+static int igraph_i_induced_subgraph_suggest_implementation(
+        const igraph_t *graph, const igraph_vs_t vids,
+        igraph_subgraph_implementation_t *result) {
     double ratio;
     igraph_integer_t num_vs;
 

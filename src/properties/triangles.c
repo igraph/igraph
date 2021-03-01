@@ -403,8 +403,8 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 /* This removes loop, multiple edges and edges that point
      "backwards" according to the rank vector. */
 /* Note: Also used in scan.c */
-int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
-                                const igraph_vector_int_t *rank) {
+static int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+                                       const igraph_vector_int_t *rank) {
     long int i;
     long int n = al->length;
     igraph_vector_int_t mark;
@@ -517,15 +517,15 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     }
 }
 
-int igraph_adjacent_triangles1(const igraph_t *graph,
-                               igraph_vector_t *res,
-                               const igraph_vs_t vids) {
+static int igraph_adjacent_triangles1(const igraph_t *graph,
+                                      igraph_vector_t *res,
+                                      const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
     return 0;
 }
 
-int igraph_adjacent_triangles4(const igraph_t *graph,
-                               igraph_vector_t *res) {
+static int igraph_adjacent_triangles4(const igraph_t *graph,
+                                      igraph_vector_t *res) {
 # include "properties/triangles_template.h"
     return 0;
 }

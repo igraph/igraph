@@ -1528,7 +1528,7 @@ double igraph_qnorm5(double p, double mu, double sigma, int lower_tail, int log_
     return mu + sigma * val;
 }
 
-double fsign(double x, double y) {
+static double fsign(double x, double y) {
 #ifdef IEEE_754
     if (ISNAN(x) || ISNAN(y)) {
         return x + y;
@@ -1537,11 +1537,11 @@ double fsign(double x, double y) {
     return ((y >= 0) ? fabs(x) : -fabs(x));
 }
 
-int imax2(int x, int y) {
+static int imax2(int x, int y) {
     return (x < y) ? y : x;
 }
 
-int imin2(int x, int y) {
+static int imin2(int x, int y) {
     return (x < y) ? x : y;
 }
 
