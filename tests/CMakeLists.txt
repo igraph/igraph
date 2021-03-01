@@ -333,6 +333,7 @@ add_legacy_tests(
   simplify_and_colorize
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
+  igraph_get_subisomorphisms_vf2
   igraph_subisomorphic
   igraph_isomorphic_bliss
   isomorphism_test
