@@ -28,14 +28,18 @@ void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn,
 
     igraph_vector_init(&path_edge, 0);
     igraph_vector_init(&path_vertex, 0);
+
     igraph_diameter_dijkstra(g, weights, &result, &from, &to, &path_vertex, &path_edge, directed, unconn);
-    printf("Diameter: %g, from %d to %d\n", result,
-           from, to);
+
+    printf("Diameter: ");
+    print_real(stdout, result, "%g");
+    printf(", from %d to %d\n", from, to);
     printf("Edges:\n");
     print_vector_round(&path_edge);
-    igraph_vector_destroy(&path_edge);
     printf("Vertices:\n");
     print_vector_round(&path_vertex);
+
+    igraph_vector_destroy(&path_edge);
     igraph_vector_destroy(&path_vertex);
     printf("\n");
 }

@@ -1,5 +1,5 @@
 Graph with zero nodes:
-Diameter: nan, from -1 to -1
+Diameter: NaN, from -1 to -1
 Edges:
 ( )
 Vertices:
@@ -27,7 +27,7 @@ Vertices:
 ( 0 )
 
 Graph with two nodes, returns inf for unconnected:
-Diameter: inf, from -1 to -1
+Diameter: Inf, from -1 to -1
 Edges:
 ( )
 Vertices:
