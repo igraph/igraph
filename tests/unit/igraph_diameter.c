@@ -30,14 +30,14 @@ int main() {
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1};
     igraph_real_t vec[] = {2,8};
     igraph_es_t edge_sele;
-    
+
     printf("diameter of Barabasi graph:\n");
-    
+
     igraph_rng_seed(igraph_rng_default(), 1234);
     igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1,
                          IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,
                          /*start_from=*/ 0);
-    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
+    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
 
     printf("Diameter: %li\n", (long int) result);
 
@@ -52,39 +52,21 @@ int main() {
     igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
     printf("diameter: %g, from %d to %d\n", result,
             from, to);
-    print_vector_round(&path_vertex); 
-    print_vector_round(&path_edge); 
-    igraph_vector_destroy(&path_vertex);
-    igraph_vector_destroy(&path_edge);
-
-    printf("diameter of ring and the path in terms of edges with weights \n");
-
-    igraph_vector_init(&path_edge, 0);
-    igraph_diameter_dijkstra(&g, &weights_vec, &result, &from, &to, 0, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %d to %d\n", result,
-           from, to);
-    print_vector_round(&path_edge);
-    igraph_vector_destroy(&path_edge);
-
-    printf("diameter of ring and the path in terms of vertices with weights \n");
-
-    igraph_vector_init(&path_vertex, 0);
-    igraph_diameter_dijkstra(&g, &weights_vec, &result, &from, &to, &path_vertex, 0, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %d to %d\n", result,
-           from, to);
     print_vector_round(&path_vertex);
+    print_vector_round(&path_edge);
     igraph_vector_destroy(&path_vertex);
-    
+    igraph_vector_destroy(&path_edge);
+
     //disconnected graph
     printf("disconnected ring graph\n");
     igraph_vector_view(&edge_vec, vec, sizeof(vec) / sizeof(igraph_real_t));
     igraph_es_vector(&edge_sele, &edge_vec);
     igraph_delete_edges(&g, edge_sele);
     printf("The largest path in one connected component\n");
-    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
     printf("\nuconn = False \n");
-    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 0);
+    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 0);
     print_real(stdout, result, "%g");
 
     igraph_es_destroy(&edge_sele);
@@ -93,17 +75,18 @@ int main() {
     // test graph with zero nodes
     printf("\ngraph with zero nodes\n");
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
-    igraph_diameter_dijkstra(&g, 0, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
     igraph_destroy(&g);
 
     //test graph with one node
     printf("\ngraph with one node\n");
     igraph_empty(&g, 1, IGRAPH_DIRECTED);
-    igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
     printf("\n");
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     return 0;
 }
