@@ -97,6 +97,7 @@ int main() {
     igraph_destroy(&g_1);
     igraph_destroy(&g_2);
     igraph_destroy(&g_ring);
+    igraph_destroy(&g_lm);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&weights_neg);
     igraph_vector_destroy(&weights_0);
