@@ -1326,13 +1326,13 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale) {
 /* Formerly private part of Mathlib.h */
 
 /* always remap internal functions */
-#define bd0         Rf_bd0
+#define bd0             Rf_bd0
 #define chebyshev_eval  Rf_chebyshev_eval
 #define chebyshev_init  Rf_chebyshev_init
-#define i1mach      Rf_i1mach
-#define gammalims   Rf_gammalims
-#define lfastchoose Rf_lfastchoose
-#define lgammacor   Rf_lgammacor
+#define i1mach          Rf_i1mach
+#define gammalims       Rf_gammalims
+#define lfastchoose     Rf_lfastchoose
+#define lgammacor       Rf_lgammacor
 #define stirlerr        Rf_stirlerr
 
 /* Chebyshev Series */
