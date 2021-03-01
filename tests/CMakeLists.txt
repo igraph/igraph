@@ -249,6 +249,7 @@ add_legacy_tests(
   igraph_local_transitivity
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
