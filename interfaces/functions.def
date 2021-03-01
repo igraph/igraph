@@ -446,9 +446,10 @@ igraph_get_shortest_paths:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths:
-        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VERTEXSETLIST res_e, OUT VECTOR nrgeo, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
+                OUT EDGESETLIST_OR_0 edges, OUT VECTOR_OR_0 nrgeo, \
                 VERTEX from, VERTEXSET to, NEIMODE mode=OUT
-        DEPS: res ON graph, from ON graph, to ON graph
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
         IGNORE: RR, RNamespace
 
 igraph_shortest_paths_dijkstra:
