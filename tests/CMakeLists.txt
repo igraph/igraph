@@ -247,6 +247,8 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_neighborhood
+  igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
   igraph_transitive_closure_dag
