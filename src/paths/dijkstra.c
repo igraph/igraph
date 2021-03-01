@@ -634,8 +634,8 @@ static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
  *   paths to vertex 0, then to vertex 1, etc. No data is included 
  *   for unreachable vertices.
  * \param edges Pointer to an initialized pointer vector or NULL. If 
- *   not null then each vector object contains the edges along a 
- *   shortest path from \p from  to another vertex. The vectors are 
+ *   not null, then each vector object contains the edges along a 
+ *   shortest path from \p from to another vertex. The vectors are 
  *   ordered according to their target vertex: first the shortest 
  *   paths to vertex 0, then to vertex 1, etc. No data is included for
  *   unreachable vertices.
@@ -705,7 +705,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_t dists, order;
     igraph_vector_ptr_t parents, parents_edge;
 
-    igraph_finally_func_t *edge_item_destructor, *vertices_item_destructor;
+    igraph_finally_func_t *old_edge_item_destructor, *old_vertices_item_destructor;
     unsigned char *is_target;
     long int i, n, to_reach;
     igraph_bool_t free_vertices = 0;
@@ -980,45 +980,44 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         n = igraph_vector_size(&order);
         igraph_vector_null(paths_index);
 
-        if (edges){
+        if (edges) {
             igraph_vector_ptr_clear(edges);
-            edge_item_destructor = igraph_vector_ptr_get_item_destructor(edges);
+            old_edge_item_destructor = igraph_vector_ptr_get_item_destructor(edges);
             igraph_vector_ptr_set_item_destructor(edges,
                                                 (igraph_finally_func_t*)igraph_vector_destroy);
         }
-        if (vertices){
+
+        if (vertices) {
             igraph_vector_ptr_clear(vertices);
-            vertices_item_destructor = igraph_vector_ptr_get_item_destructor(vertices);
-            igraph_vector_ptr_set_item_destructor(vertices,
-                                                (igraph_finally_func_t*)igraph_vector_destroy);
-        }
-
-
-        /* by definition, the shortest path leading to the starting vertex
-        * consists of the vertex itself only */
-        path = igraph_Calloc(1, igraph_vector_t);
-        if (path == 0)
-            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths_dijkstra",
-                        IGRAPH_ENOMEM);
-        IGRAPH_FINALLY(igraph_free, path);
-        IGRAPH_CHECK(igraph_vector_init(path, 1));
-
-        /* clear the paths vector */
-        /* If res doesn't exist, then create one, in order for the algorithm to work. */
-        if (!vertices) {
+            old_vertices_item_destructor = igraph_vector_ptr_get_item_destructor(vertices);
+        } else {
+            /* If the 'vertices' vector doesn't exist, then create one, in order
+             * for the algorithm to work. */
             vertices = igraph_Calloc(1, igraph_vector_ptr_t);
             if (vertices == 0) {
                 IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
             }
             IGRAPH_CHECK(igraph_vector_ptr_init(vertices, 0));
-            igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
+            IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, vertices);
             free_vertices = 1;
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
-        } else {
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
+            old_vertices_item_destructor = 0;
         }
-        
+
+        igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
+
+        /* by definition, the shortest path leading to the starting vertex
+        * consists of the vertex itself only */
+        path = igraph_Calloc(1, igraph_vector_t);
+        if (path == 0) {
+            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths_dijkstra",
+                        IGRAPH_ENOMEM);
+        }
+        IGRAPH_FINALLY(igraph_free, path);
+        IGRAPH_CHECK(igraph_vector_init(path, 1));
+
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to vertices */
+
         VECTOR(*path)[0] = from;
         if (edges) {
             path = igraph_Calloc(1, igraph_vector_t);
@@ -1115,10 +1114,10 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         }
         if (!free_vertices) {
             /* remove the destructor from the path vector */
-            igraph_vector_ptr_set_item_destructor(vertices, vertices_item_destructor);
+            igraph_vector_ptr_set_item_destructor(vertices, old_vertices_item_destructor);
         }
         if (edges) {
-            igraph_vector_ptr_set_item_destructor(edges, edge_item_destructor);
+            igraph_vector_ptr_set_item_destructor(edges, old_edge_item_destructor);
         }
 
         /* free those paths from the result vector which we won't need */
@@ -1151,16 +1150,17 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 }
             }
         }
-        if (!free_vertices){
+        if (!free_vertices) {
             IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, j));
             /* sort the paths by the target vertices */
             igraph_vector_ptr_sort(vertices, igraph_i_vector_tail_cmp);
         }
         
-        if (edges){
+        if (edges) {
             IGRAPH_CHECK(igraph_vector_ptr_resize(edges, j));
             igraph_vector_ptr_sort(edges, igraph_i_vector_tail_cmp);
-            // removing the target from the tail of each vector in edges
+            /* removing the target from the tail of each vector in edges; these
+             * were used earlier to get the sort order right */
             for (i = 0; i < igraph_vector_ptr_size(edges); i++) {
                 path = (igraph_vector_t *) VECTOR(*edges)[i];
                 igraph_vector_pop_back(path);
@@ -1174,11 +1174,13 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_destroy(&dists);
     igraph_vector_ptr_destroy_all(&parents);
     igraph_vector_ptr_destroy_all(&parents_edge);
-    if (free_vertices){
-        igraph_vector_ptr_destroy_all(vertices);
-        IGRAPH_FINALLY_CLEAN(1);
-        igraph_free(vertices);
-    }
     IGRAPH_FINALLY_CLEAN(5);
+
+    if (free_vertices) {
+        igraph_vector_ptr_destroy_all(vertices);
+        igraph_free(vertices);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
     return 0;
 }
