@@ -235,6 +235,7 @@ add_legacy_tests(
   all_shortest_paths
   efficiency
   igraph_are_connected
+  igraph_average_path_length_dijkstra
   igraph_betweenness
   igraph_closeness
   igraph_convergence_degree
