@@ -26,6 +26,8 @@
 #include "igraph_constructors.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 /**
  * \function igraph_grg_game
  * \brief Generates a geometric random graph.
@@ -94,6 +96,9 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_real_t yy1 = VECTOR(*yy)[i];
             long int j = i + 1;
             igraph_real_t dx, dy;
+
+            IGRAPH_ALLOW_INTERRUPTION();
+
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = VECTOR(*yy)[j] - yy1;
                 if (dx * dx + dy * dy < r2) {
@@ -109,6 +114,9 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_real_t yy1 = VECTOR(*yy)[i];
             long int j = i + 1;
             igraph_real_t dx, dy;
+
+            IGRAPH_ALLOW_INTERRUPTION();
+
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = fabs(VECTOR(*yy)[j] - yy1);
                 if (dx > 0.5) {
