@@ -1046,7 +1046,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1058,6 +1058,8 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
  *
  * \param graph The input graph, can be directed or undirected.
+ * \param weights The edge weights of the graph. Can be \c NULL for an
+ *        unweighted graph.
  * \param pres Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param pfrom Pointer to an integer, if not \c NULL it will be set to the
@@ -1155,16 +1157,17 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%ld) not equal to number of edges (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
 
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %f.", IGRAPH_EINVAL, min);
         }
         else if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
@@ -1259,5 +1262,5 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
                             weights, dirmode));
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
