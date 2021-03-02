@@ -33,6 +33,7 @@
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
+#include "misc/conversion_internal.h"
 
 /**
  * \ingroup conversion

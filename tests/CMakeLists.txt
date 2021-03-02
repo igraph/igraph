@@ -21,7 +21,7 @@ check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
 set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
-  set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-Wl,--disable-new-dtags")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
 endif()
 
 # tutorial examples and other snippets from the documentation
@@ -188,6 +188,7 @@ add_legacy_tests(
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
   igraph_simple_interconnected_islands_game
+  igraph_static_power_law_game
   tree
   tree_game
   ring
@@ -234,6 +235,7 @@ add_legacy_tests(
   all_shortest_paths
   efficiency
   igraph_are_connected
+  igraph_average_path_length_dijkstra
   igraph_betweenness
   igraph_closeness
   igraph_convergence_degree
@@ -248,8 +250,13 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_neighborhood
+  igraph_neighborhood_graphs
+  igraph_neighborhood_size
   igraph_pagerank
   igraph_transitive_closure_dag
+  igraph_transitivity_avglocal_undirected
+  igraph_transitivity_barrat
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
@@ -331,6 +338,7 @@ add_legacy_tests(
   simplify_and_colorize
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
+  igraph_get_subisomorphisms_vf2
   igraph_subisomorphic
   igraph_isomorphic_bliss
   isomorphism_test

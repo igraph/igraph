@@ -108,7 +108,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
     }
 
     if (no_of_edges < 0) {
-        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of edges cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_edges);
     }
 
     no_of_nodes = (igraph_integer_t) igraph_vector_size(fitness_out);
@@ -367,12 +367,12 @@ int igraph_static_power_law_game(igraph_t *graph,
     igraph_real_t j;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERROR("Invalid number of nodes.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of nodes cannot be negative, got %" IGRAPH_PRId".", IGRAPH_EINVAL, no_of_nodes);
     }
 
     /* Calculate alpha_out */
     if (exponent_out < 2) {
-        IGRAPH_ERROR("Out-degree exponent must be >= 2.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Out-degree exponent must be >= 2, got %g.", IGRAPH_EINVAL, exponent_out);
     } else if (igraph_finite(exponent_out)) {
         alpha_out = -1.0 / (exponent_out - 1);
     } else {
@@ -396,7 +396,8 @@ int igraph_static_power_law_game(igraph_t *graph,
 
     if (exponent_in >= 0) {
         if (exponent_in < 2) {
-            IGRAPH_ERROR("In-degree exponent must be >= 2.", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("For directed graphs the in-degree exponent must be >= 2, got %g.",
+                          IGRAPH_EINVAL, exponent_in);
         } else if (igraph_finite(exponent_in)) {
             alpha_in = -1.0 / (exponent_in - 1);
         } else {

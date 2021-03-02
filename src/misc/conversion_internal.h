@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2011-2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,15 +16,13 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef IGRAPH_PROPERTIES_INTERNAL_H
-#define IGRAPH_PROPERTIES_INTERNAL_H
+#ifndef IGRAPH_MISC_CONVERSION_INTERNAL_H
+#define IGRAPH_MISC_CONVERSION_INTERNAL_H
 
-#include "igraph_adjlist.h"
-#include "igraph_constants.h"
-#include "igraph_iterators.h"
+#include "igraph_sparsemat.h"
 #include "igraph_types.h"
 
-int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
-                                const igraph_vector_int_t *rank);
+int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
+                                 igraph_bool_t column_wise);
 
 #endif

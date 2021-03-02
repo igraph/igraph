@@ -94,12 +94,12 @@
  * of \p vid.
  */
 
-int igraph_ecumulative_proportionate_values(const igraph_t *graph,
-        const igraph_vector_t *U,
-        igraph_vector_t *V,
-        igraph_bool_t islocal,
-        igraph_integer_t vid,
-        igraph_neimode_t mode) {
+static int igraph_i_ecumulative_proportionate_values(const igraph_t *graph,
+                                                     const igraph_vector_t *U,
+                                                     igraph_vector_t *V,
+                                                     igraph_bool_t islocal,
+                                                     igraph_integer_t vid,
+                                                     igraph_neimode_t mode) {
     igraph_eit_t A;   /* all edges in v's perspective */
     igraph_es_t es;
     igraph_integer_t e;
@@ -243,12 +243,12 @@ int igraph_ecumulative_proportionate_values(const igraph_t *graph,
  * perspective of vid.
  */
 
-int igraph_vcumulative_proportionate_values(const igraph_t *graph,
-        const igraph_vector_t *U,
-        igraph_vector_t *V,
-        igraph_bool_t islocal,
-        igraph_integer_t vid,
-        igraph_neimode_t mode) {
+static int igraph_i_vcumulative_proportionate_values(const igraph_t *graph,
+                                                     const igraph_vector_t *U,
+                                                     igraph_vector_t *V,
+                                                     igraph_bool_t islocal,
+                                                     igraph_integer_t vid,
+                                                     igraph_neimode_t mode) {
     igraph_integer_t v;
     igraph_real_t C;  /* cumulative probability */
     igraph_real_t P;  /* probability */
@@ -417,13 +417,13 @@ int igraph_vcumulative_proportionate_values(const igraph_t *graph,
  *         \endclist
  */
 
-int igraph_microscopic_standard_tests(const igraph_t *graph,
-                                      igraph_integer_t vid,
-                                      const igraph_vector_t *quantities,
-                                      const igraph_vector_t *strategies,
-                                      igraph_neimode_t mode,
-                                      igraph_bool_t *updates,
-                                      igraph_bool_t islocal) {
+static int igraph_i_microscopic_standard_tests(const igraph_t *graph,
+                                               igraph_integer_t vid,
+                                               const igraph_vector_t *quantities,
+                                               const igraph_vector_t *strategies,
+                                               igraph_neimode_t mode,
+                                               igraph_bool_t *updates,
+                                               igraph_bool_t islocal) {
 
     igraph_integer_t nvert;
     igraph_vector_t degv;
@@ -583,7 +583,7 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
     igraph_vector_t adj;
     igraph_bool_t updates;
 
-    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+    IGRAPH_CHECK(igraph_i_microscopic_standard_tests(graph, vid, quantities,
                  strategies, mode, &updates,
                  /*is local?*/ 1));
     if (!updates) {
@@ -744,7 +744,7 @@ int igraph_moran_process(const igraph_t *graph,
     long int i;
 
     /* don't test for vertex isolation, hence vid = -1 and islocal = 0 */
-    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, /*vid*/ -1,
+    IGRAPH_CHECK(igraph_i_microscopic_standard_tests(graph, /*vid*/ -1,
                  quantities, strategies, mode,
                  &updates, /*is local?*/ 0));
     if (!updates) {
@@ -761,7 +761,7 @@ int igraph_moran_process(const igraph_t *graph,
 
     /* Cumulative proportionate quantities. We are using the global */
     /* perspective, hence islocal = 0, vid = -1 and mode = IGRAPH_ALL. */
-    IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
+    IGRAPH_CHECK(igraph_i_vcumulative_proportionate_values(graph, quantities, &V,
                  /*is local?*/ 0,
                  /*vid*/ -1,
                  /*mode*/ IGRAPH_ALL));
@@ -810,7 +810,7 @@ int igraph_moran_process(const igraph_t *graph,
     /* still might happen that the edge weights of interest would sum to zero. */
     /* An error would be raised in that case. */
     igraph_vector_destroy(&V);
-    IGRAPH_CHECK(igraph_ecumulative_proportionate_values(graph, weights, &V,
+    IGRAPH_CHECK(igraph_i_ecumulative_proportionate_values(graph, weights, &V,
                  /*is local?*/ 1,
                  /*vertex*/ a, mode));
 
@@ -978,7 +978,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
     igraph_vs_t vs;
     long int i;
 
-    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+    IGRAPH_CHECK(igraph_i_microscopic_standard_tests(graph, vid, quantities,
                  strategies, mode, &updates,
                  islocal));
     if (!updates) {
@@ -995,7 +995,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
     IGRAPH_FINALLY(igraph_vit_destroy, &A);
 
-    IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
+    IGRAPH_CHECK(igraph_i_vcumulative_proportionate_values(graph, quantities, &V,
                  islocal, vid, mode));
 
     /* Finally, choose a vertex u to imitate. The vertex u is chosen */
@@ -1144,7 +1144,7 @@ int igraph_stochastic_imitation(const igraph_t *graph,
         IGRAPH_ERROR("Unsupported stochastic imitation algorithm",
                      IGRAPH_EINVAL);
     }
-    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+    IGRAPH_CHECK(igraph_i_microscopic_standard_tests(graph, vid, quantities,
                  strategies, mode, &updates,
                  /*is local?*/ 1));
     if (!updates) {

@@ -1,0 +1,173 @@
+No vertices:
+
+Directed graph with loops and multi-edges, order 0:
+One vertex, no edges
+directed: true
+vcount: 1
+edges: {
+0 0
+}
+One vertex, no edges
+One vertex, no edges
+One vertex, no edges
+One vertex, no edges
+
+Directed graph with loops and multi-edges, order 1, ignoring direction:
+directed: true
+vcount: 3
+edges: {
+0 1
+0 2
+1 1
+2 0
+}
+directed: true
+vcount: 3
+edges: {
+0 1
+1 1
+1 2
+}
+directed: true
+vcount: 3
+edges: {
+0 1
+1 0
+1 2
+}
+directed: true
+vcount: 4
+edges: {
+0 0
+0 2
+1 2
+2 3
+2 3
+}
+directed: true
+vcount: 2
+edges: {
+0 1
+0 1
+}
+One vertex, no edges
+
+Directed graph with loops and multi-edges, order 1, only checking IGRAPH_IN:
+directed: true
+vcount: 2
+edges: {
+0 1
+1 0
+}
+directed: true
+vcount: 2
+edges: {
+0 1
+1 1
+}
+directed: true
+vcount: 2
+edges: {
+0 1
+1 0
+}
+directed: true
+vcount: 3
+edges: {
+0 0
+0 2
+1 2
+}
+directed: true
+vcount: 2
+edges: {
+0 1
+0 1
+}
+One vertex, no edges
+
+Directed graph with loops and multi-edges, order 10, ignoring direction:
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 0
+2 3
+3 4
+3 4
+}
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 0
+2 3
+3 4
+3 4
+}
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 0
+2 3
+3 4
+3 4
+}
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 0
+2 3
+3 4
+3 4
+}
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 0
+2 3
+3 4
+3 4
+}
+One vertex, no edges
+
+Directed graph with loops and multi-edges, order 2, mindist 2, IGRAPH_OUT:
+One vertex, no edges
+One vertex, no edges
+directed: true
+vcount: 2
+edges: {
+0 0
+}
+null graph
+null graph
+null graph
+
+Directed graph with loops and multi-edges, order 4, mindist 4, IGRAPH_ALL:
+null graph
+null graph
+null graph
+null graph
+null graph
+null graph
+
+Negative order.
+Negative mindist.

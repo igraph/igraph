@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -192,7 +192,7 @@ $ cmake --install .
         With Visual Studio, the steps to build igraph are generally the
         same as above. However, since the Visual Studio CMake generator is
         a multi-configuration one, we must specify the configuration
-        (typically Release or Debug) with each build command using the 
+        (typically Release or Debug) with each build command using the
         <literal>--config</literal> option:
       </para>
 <programlisting>
@@ -242,15 +242,13 @@ cmake --build . --target check --config Release
           <literal>vcpkg.exe install libxml2:x64-windows</literal> and to
           install <literal>libxml2</literal> as a static library, use
           <literal>vcpkg.exe install libxml2:x64-windows-static</literal>.
+          In addition, there is the possibility to use a static library
+          with dynamic runtime linking using the
+          <literal>x64-windows-static-md</literal> triplet.
         </para>
         <para>
           There are some known issues with igraph when using certain external packages
-          from vcpkg. When building with an external
-          <literal>suitesparse</literal> shared library, the
-          <literal>suitesparse</literal> library is not copied over to the
-          build directory, resulting in failing tests, see issue
-          <ulink url="https://github.com/igraph/igraph/issues/1492">#1492</ulink>.
-          When building against OpenBLAS, this results a few differences
+          from vcpkg. When building against OpenBLAS, this results in a few differences
           in some unit tests, see issue
           <ulink url="https://github.com/igraph/igraph/issues/1491">#1491</ulink>.
         </para>
@@ -353,7 +351,7 @@ pacman -S \
         </listitem>
       </itemizedlist>
     </section>
-  </section>  
+  </section>
 
   <section id="igraph-Installation-notable-configuration-options">
     <title>Notable configuration options</title>
