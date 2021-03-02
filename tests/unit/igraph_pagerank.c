@@ -278,6 +278,42 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    /* Multigraph */
+
+    printf("\nSmall undirected multigraph (unweighted)\n");
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 1,2,
+                 -1);
+
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
+                    igraph_vss_all(), 1, 0.85, NULL, &arpack_options);
+    printf("ARPACK: "); print_vector(&res);
+    IGRAPH_ASSERT(is_almost_one(value));
+
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+                    igraph_vss_all(), 1, 0.85, NULL, 0);
+    printf("PRPACK: "); print_vector(&res);
+    IGRAPH_ASSERT(is_almost_one(value));
+
+    printf("\nSmall undirected multigraph (unit weights)\n");
+
+    igraph_vector_init(&weights, 3);
+    igraph_vector_fill(&weights, 1.0);
+
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
+                    igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
+    printf("ARPACK: "); print_vector(&res);
+    IGRAPH_ASSERT(is_almost_one(value));
+
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+                    igraph_vss_all(), 1, 0.85, &weights, 0);
+    printf("PRPACK: "); print_vector(&res);
+    IGRAPH_ASSERT(is_almost_one(value));
+
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
     igraph_vector_destroy(&res);
 
     /* Graph with more than 127 vertices. PRPACK uses a different method above this size. */
