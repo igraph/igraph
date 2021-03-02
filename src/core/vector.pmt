@@ -898,7 +898,80 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     return 0;
 }
 
-#endif
+/**
+ * \function igraph_vector_lex_cmp
+ * \brief Lexicographical comparison of two vectors.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return A negative number if \p lhs is lexicographically smaller,
+ *         0 if \p lhs and \p rhs are equal, else a positive number.
+ *
+ * Time complexity: O(n), the number of elements in the smaller vector.
+ */
+int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
+    const TYPE(igraph_vector) *a = lhs;
+    const TYPE(igraph_vector) *b = rhs;
+    long int i, sa, sb;
+
+    sa = FUNCTION(igraph_vector, size)(a);
+    sb = FUNCTION(igraph_vector, size)(b);
+
+    for (i = 0; i < sa; i++) {
+        if (i >= sb) {
+            /* b is shorter, and equal to the first part of a */
+            return 1;
+        }
+        if (VECTOR(*a)[i] != VECTOR(*b)[i]) {
+            return VECTOR(*a)[i] - VECTOR(*b)[i];
+        }
+    }
+    if (i == sb) {
+        return 0;
+    }
+    /* a is shorter, and equal to the first part of b */
+    return -1;
+}
+
+/**
+ * \function igraph_vector_lex_cmp_rev
+ * \brief Reverse lexicographical comparison of two vectors.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return A negative number if \p lhs in reverse order is
+ *         lexicographically smaller than the reverse of \p rhs,
+ *         0 if \p lhs and \p rhs are equal, else a positive number.
+ *
+ * Time complexity: O(n), the number of elements in the smaller vector.
+ */
+int FUNCTION(igraph_vector, lex_cmp_rev)(const void *lhs, const void *rhs) {
+    const TYPE(igraph_vector) *a = lhs;
+    const TYPE(igraph_vector) *b = rhs;
+    long int i, sa, sb, rai, rbi;
+
+    sa = FUNCTION(igraph_vector, size)(a);
+    sb = FUNCTION(igraph_vector, size)(b);
+
+    for (i = 0; i < sa; i++) {
+        if (i >= sb) {
+            /* b is shorter, and equal to the last part of a */
+            return 1;
+        }
+        /* use reversed indexes */
+        rai = sa - i - 1;
+        rbi = sb - i - 1;
+        if (VECTOR(*a)[rai] != VECTOR(*b)[rbi]) {
+            return VECTOR(*a)[rai] - VECTOR(*b)[rbi];
+        }
+    }
+    if (i == sb) {
+        return 0;
+    }
+    /* a is shorter, and equal to the last part of b */
+    return -1;
+}
+#endif /*NOTORDERED*/
 
 /**
  * \ingroup vector

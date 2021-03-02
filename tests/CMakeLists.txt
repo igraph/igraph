@@ -73,6 +73,7 @@ add_legacy_tests(
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
+  igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
