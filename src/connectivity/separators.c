@@ -730,13 +730,14 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     /* Work on a copy of 'graph' */
     IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
     IGRAPH_FINALLY(igraph_destroy, &graph_copy);
+    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* multiple */ 1, /* loops */ 1, NULL));
 
     /* ---------------------------------------------------------------- */
     /* 2 Find k vertices with the largest degrees (x1;..,xk). Check
        if these k vertices form a separating k-set of G */
     IGRAPH_CHECK(igraph_vector_init(&X, conn));
     IGRAPH_FINALLY(igraph_vector_destroy, &X);
-    IGRAPH_CHECK(igraph_i_minimum_size_separators_topkdeg(graph, &X, k));
+    IGRAPH_CHECK(igraph_i_minimum_size_separators_topkdeg(&graph_copy, &X, k));
     IGRAPH_CHECK(igraph_is_separator(&graph_copy, igraph_vss_vector(&X),
                                      &issepX));
     if (issepX) {
