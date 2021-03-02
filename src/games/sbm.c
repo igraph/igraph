@@ -29,6 +29,8 @@
 #include "igraph_constructors.h"
 #include "igraph_games.h"
 
+#include "core/interruption.h"
+
 #include <float.h>      /* for DBL_EPSILON */
 #include <math.h>       /* for sqrt */
 
@@ -122,6 +124,9 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
         double fromsize = VECTOR(*block_sizes)[from];
         long int start = directed ? 0 : from;
         long int i, tooff = 0;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         for (i = 0; i < start; i++) {
             tooff += VECTOR(*block_sizes)[i];
         }
