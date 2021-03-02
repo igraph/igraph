@@ -22,13 +22,13 @@
 int main() {
     igraph_vector_t v1, v2, v3, v4, v5, v6, v7;
 
-    igraph_vector_init_int(&v1, 3, 1, 2, 9);
-    igraph_vector_init_int(&v2, 3, 1, 2, 3);
-    igraph_vector_init_int(&v3, 2, 1, 2);
-    igraph_vector_init_int(&v4, 0);
-    igraph_vector_init_int(&v5, 3, 1, 2, 9);
-    igraph_vector_init_int(&v6, 0);
-    igraph_vector_init_int(&v7, 3, 9, 2, 1);
+    igraph_vector_init_real(&v1, 3, 1e30, 2e30, 9e30);
+    igraph_vector_init_real(&v2, 3, 1e30, 2e30, 3e30);
+    igraph_vector_init_real(&v3, 2, 1e30, 2e30);
+    igraph_vector_init_real(&v4, 0);
+    igraph_vector_init_real(&v5, 3, 1e30, 2e30, 9e30);
+    igraph_vector_init_real(&v6, 0);
+    igraph_vector_init_real(&v7, 3, 9e30, 2e30, 1e30);
 
     igraph_vector_t vectors[] = {v1, v2, v3, v4, v5, v6, v7};
 

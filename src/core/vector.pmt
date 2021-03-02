@@ -904,8 +904,8 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return A negative number if \p lhs is lexicographically smaller,
- *         0 if \p lhs and \p rhs are equal, else a positive number.
+ * \return -1 if \p lhs is lexicographically smaller,
+ *         0 if \p lhs and \p rhs are equal, else 1.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
@@ -922,8 +922,11 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
             /* b is shorter, and equal to the first part of a */
             return 1;
         }
-        if (VECTOR(*a)[i] != VECTOR(*b)[i]) {
-            return VECTOR(*a)[i] - VECTOR(*b)[i];
+        if (VECTOR(*a)[i] < VECTOR(*b)[i]) {
+            return -1;
+        }
+        if (VECTOR(*a)[i] > VECTOR(*b)[i]) {
+            return 1;
         }
     }
     if (i == sb) {
@@ -939,9 +942,9 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return A negative number if \p lhs in reverse order is
+ * \return -1 if \p lhs in reverse order is
  *         lexicographically smaller than the reverse of \p rhs,
- *         0 if \p lhs and \p rhs are equal, else a positive number.
+ *         0 if \p lhs and \p rhs are equal, else 1.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
@@ -961,8 +964,11 @@ int FUNCTION(igraph_vector, lex_cmp_rev)(const void *lhs, const void *rhs) {
         /* use reversed indexes */
         rai = sa - i - 1;
         rbi = sb - i - 1;
-        if (VECTOR(*a)[rai] != VECTOR(*b)[rbi]) {
-            return VECTOR(*a)[rai] - VECTOR(*b)[rbi];
+        if (VECTOR(*a)[rai] < VECTOR(*b)[rbi]) {
+            return -1;
+        }
+        if (VECTOR(*a)[rai] > VECTOR(*b)[rbi]) {
+            return 1;
         }
     }
     if (i == sb) {
