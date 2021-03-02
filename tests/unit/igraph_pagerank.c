@@ -18,6 +18,7 @@
 */
 
 #include <igraph.h>
+#include <math.h>
 #include <float.h>
 
 #include "test_utilities.inc"
@@ -264,12 +265,12 @@ int main() {
     VECTOR(weights)[6] = 3;
     VECTOR(weights)[7] = 4;
     VECTOR(weights)[8] = 4;
-    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
                     igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
-    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
                     igraph_vss_all(), 1, 0.85, &weights, 0);
     printf("PRPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
@@ -278,6 +279,84 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&res);
+
+    /* Graph with more than 127 vertices. PRPACK uses a different method above this size. */
+
+    {
+        igraph_vector_t edges_to_delete;
+        igraph_vector_t res_arpack, res_prpack;
+        igraph_vector_t weights;
+        long int i, n;
+
+        printf("\nLarge test graph, unweighted\n");
+
+        /* 243 vertices, 729 edges */
+        igraph_de_bruijn(&g, 3, 5);
+
+        /* We delete some edges to break the symmetry of the graph.
+         * Otherwise all vertices would have the same PageRank. */
+        igraph_vector_init_seq(&edges_to_delete, 0, 37);
+        igraph_delete_edges(&g, igraph_ess_vector(&edges_to_delete));
+        igraph_vector_destroy(&edges_to_delete);
+
+        /* Note: This test graph is not connected and has self-loops. */
+
+        igraph_vector_init(&res_arpack, 0);
+        igraph_vector_init(&res_prpack, 0);
+
+        igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res_arpack, &value,
+                        igraph_vss_all(), 1, 0.85, NULL, &arpack_options);
+        IGRAPH_ASSERT(is_almost_one(value));
+
+        igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res_prpack, &value,
+                        igraph_vss_all(), 1, 0.85, NULL, NULL);
+        IGRAPH_ASSERT(is_almost_one(value));
+
+        n = igraph_vector_size(&res_arpack);
+        for (i=0; i < n; ++i) {
+            igraph_real_t ar = VECTOR(res_arpack)[i];
+            igraph_real_t pr = VECTOR(res_prpack)[i];
+            if (fabs(ar - pr) > 1e-12) {
+                printf("Unexpected difference between ARPACK and PRPACK results for vertex %ld:\n"
+                       "ARPACK: %g\n"
+                       "PRPACK: %g\n"
+                       "Difference: %g\n",
+                       i, ar, pr, fabs(ar - pr));
+            }
+        }
+
+        printf("\nLarge test graph, weighted\n");
+
+        igraph_vector_init_seq(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g));
+
+        igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res_arpack, &value,
+                        igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
+        IGRAPH_ASSERT(is_almost_one(value));
+
+        igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res_prpack, &value,
+                        igraph_vss_all(), 1, 0.85, &weights, NULL);
+        IGRAPH_ASSERT(is_almost_one(value));
+
+        n = igraph_vector_size(&res_arpack);
+        for (i=0; i < n; ++i) {
+            igraph_real_t ar = VECTOR(res_arpack)[i];
+            igraph_real_t pr = VECTOR(res_prpack)[i];
+            if (fabs(ar - pr) > 1e-12) {
+                printf("Unexpected difference between ARPACK and PRPACK results for vertex %ld:\n"
+                       "ARPACK: %g\n"
+                       "PRPACK: %g\n"
+                       "Difference: %g\n",
+                       i, ar, pr, fabs(ar - pr));
+            }
+        }
+
+        igraph_vector_destroy(&weights);
+
+        igraph_vector_destroy(&res_arpack);
+        igraph_vector_destroy(&res_prpack);
+
+        igraph_destroy(&g);
+    }
 
     VERIFY_FINALLY_STACK();
 
