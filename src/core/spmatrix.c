@@ -584,7 +584,7 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
  * \brief Clears a row in the matrix (sets all of its elements to zero).
  * \param m The matrix.
  * \param row The index of the row to be cleared.
- * \return Error code. The current implementation always succeeds.
+ * \return Error code.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
  */
@@ -677,7 +677,7 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
  * \brief Clears a column in the matrix (sets all of its elements to zero).
  * \param m The matrix.
  * \param col The index of the column to be cleared.
- * \return Error code. The current implementation always succeeds.
+ * \return Error code.
  *
  * Time complexity: TODO
  */
