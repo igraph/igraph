@@ -150,7 +150,7 @@
 #endif
 
 #ifdef IGRAPH_MC_ORIG
-void igraph_i_maximal_cliques_free(void *ptr) {
+static void igraph_i_maximal_cliques_free(void *ptr) {
     igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
     int i, n = igraph_vector_ptr_size(res);
     for (i = 0; i < n; i++) {
@@ -165,7 +165,7 @@ void igraph_i_maximal_cliques_free(void *ptr) {
 #endif
 
 #ifdef IGRAPH_MC_FULL
-void igraph_i_maximal_cliques_free_full(void *ptr) {
+static void igraph_i_maximal_cliques_free_full(void *ptr) {
     if (ptr) {
         igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
         int i, n = igraph_vector_ptr_size(res);
@@ -181,7 +181,7 @@ void igraph_i_maximal_cliques_free_full(void *ptr) {
 }
 #endif
 
-int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
+static int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     igraph_vector_int_t *PX, int PS, int PE,
     int XS, int XE, int oldPS, int oldXE,
     igraph_vector_int_t *R,

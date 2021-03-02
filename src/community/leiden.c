@@ -428,7 +428,7 @@ static int igraph_i_community_leiden_mergenodes(
              * will be moved.
              */
             if (total_cum_trans_diff < IGRAPH_INFINITY) {
-                igraph_real_t r = igraph_rng_get_unif(igraph_rng_default(), 0, total_cum_trans_diff);
+                igraph_real_t r = RNG_UNIF(0, total_cum_trans_diff);
                 long int chosen_idx;
                 igraph_vector_binsearch_slice(&cum_trans_diff, r, &chosen_idx, 0, nb_neigh_clusters);
                 chosen_cluster = VECTOR(neighbor_clusters)[chosen_idx];
@@ -712,10 +712,11 @@ static int igraph_i_community_leiden_quality(
  * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network.
  */
-int igraph_i_community_leiden(const igraph_t *graph,
-                              igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
-                              const igraph_real_t resolution_parameter, const igraph_real_t beta,
-                              igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
+static int igraph_i_community_leiden(
+        const igraph_t *graph,
+        igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
+        const igraph_real_t resolution_parameter, const igraph_real_t beta,
+        igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_integer_t nb_refined_clusters;
     long int i, c, n = igraph_vcount(graph);
     igraph_t aggregated_graph, *i_graph;

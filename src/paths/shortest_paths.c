@@ -171,7 +171,7 @@ static int igraph_i_average_path_length_dijkstra(
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     long int source, j;
-    igraph_real_t no_of_pairs = no_of_nodes * (no_of_nodes - 1.0); /* no. of ordered vertex pairs */
+    igraph_real_t no_of_pairs;
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
     if (!weights) {
@@ -179,18 +179,25 @@ static int igraph_i_average_path_length_dijkstra(
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%ld) does not match the number of edges (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
-
+    
+    /* Avoid returning a negative zero, which would be printed as -0 in tests. */
+    if (no_of_nodes > 0) {
+        no_of_pairs = no_of_nodes * (no_of_nodes - 1.0);
+    } else {
+        no_of_pairs = 0;
+    }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
@@ -323,16 +330,19 @@ int igraph_average_path_length(const igraph_t *graph,
  * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c TRUE,
  * NaN is returned.
  *
- * \param weights The edge weights. All edge weights must be
- *       non-negative for Dijkstra's algorithm to work. Additionally, no
- *       edge weight may be NaN. If either case does not hold, an error
- *       is returned. If this is a null pointer, then the unweighted
- *       version, \ref igraph_average_path_length() is called.
+ * </para><para>
+ * All distinct ordered vertex pairs are taken into account.
+ *
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
  *    ordered vertex pairs where the second vertex is unreachable from the first one
  *    will be stored here.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_average_path_length() is called.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param unconn If \c TRUE, only those pairs are considered for the calculation

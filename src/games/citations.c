@@ -336,6 +336,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
     for (i = 0; i < s->no; i++) {
         igraph_psumtree_destroy(&s->sumtrees[i]);
     }
+    igraph_free(s->sumtrees);
 }
 
 /**
@@ -383,46 +384,62 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
                                   igraph_bool_t directed) {
 
     igraph_vector_t edges;
-    igraph_i_citing_cited_type_game_struct_t str = { 0, 0 };
+    igraph_i_citing_cited_type_game_struct_t str = { 0, NULL };
     igraph_psumtree_t *sumtrees;
     igraph_vector_t sums;
-    long int nocats;
+    long int no_of_types;
     long int i, j;
 
     if (igraph_vector_size(types) != nodes) {
-        IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Length of types vector (%ld) not equal to number"
+                      " of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(types), nodes);
+    }
+
+    /* avoid calling vector_max on empty vector */
+    no_of_types = nodes == 0 ? 0 : igraph_vector_max(types) + 1;
+
+    if (igraph_matrix_ncol(pref) != no_of_types) {
+        IGRAPH_ERRORF("Number of preference matrix colums (%ld) not "
+                      "equal to number of types (%g).",
+                      IGRAPH_EINVAL,
+                      igraph_matrix_ncol(pref),
+                      no_of_types);
+    }
+    if (igraph_matrix_nrow(pref) != no_of_types) {
+        IGRAPH_ERRORF("Number of preference matrix rows (%ld) not "
+                      "equal to number of types (%g).",
+                      IGRAPH_EINVAL,
+                      igraph_matrix_nrow(pref),
+                      no_of_types);
+    }
+
+    /* return an empty graph if nodes is zero */
+    if (nodes == 0) {
+        return igraph_empty(graph, 0, directed);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-    /* return an empty graph is nodes is zero */
-    if (nodes == 0) {
-        igraph_create(graph, &edges, nodes, directed);
-        igraph_vector_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(2); /* str and edges */
-        return 0;
-    }
-
-    nocats = igraph_matrix_ncol(pref);
-    str.sumtrees = sumtrees = igraph_Calloc(nocats, igraph_psumtree_t);
+    str.sumtrees = sumtrees = igraph_Calloc(no_of_types, igraph_psumtree_t);
     if (!sumtrees) {
-        IGRAPH_ERROR("Citing-cited type game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_i_citing_cited_type_game_free, &str);
 
-    for (i = 0; i < nocats; i++) {
+    for (i = 0; i < no_of_types; i++) {
         IGRAPH_CHECK(igraph_psumtree_init(&sumtrees[i], nodes));
         str.no++;
     }
-    IGRAPH_VECTOR_INIT_FINALLY(&sums, nocats);
+    IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_types);
 
     IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes * edges_per_step));
 
     /* First node */
-    for (i = 0; i < nocats; i++) {
+    for (i = 0; i < no_of_types; i++) {
         long int type = (long int) VECTOR(*types)[0];
         if ( MATRIX(*pref, i, type) < 0) {
-            IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Preference matrix contains negative entry: %g.", IGRAPH_EINVAL, MATRIX(*pref, i, type));
         }
         IGRAPH_CHECK(igraph_psumtree_update(&sumtrees[i], 0, MATRIX(*pref, i, type)));
         VECTOR(sums)[i] = MATRIX(*pref, i, type);
@@ -441,9 +458,9 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         }
 
         /* add i */
-        for (j = 0; j < nocats; j++) {
+        for (j = 0; j < no_of_types; j++) {
             if ( MATRIX(*pref, j, type) < 0) {
-                IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+                IGRAPH_ERRORF("Preference matrix contains negative entry: %g.", IGRAPH_EINVAL, MATRIX(*pref, j, type));
             }
             IGRAPH_CHECK(igraph_psumtree_update(&sumtrees[j], i, MATRIX(*pref, j,  type)));
             VECTOR(sums)[j] += MATRIX(*pref, j, type);
@@ -457,6 +474,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     igraph_create(graph, &edges, nodes, directed);
     igraph_vector_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    igraph_vector_destroy(&sums);
+    IGRAPH_FINALLY_CLEAN(2);
+    return IGRAPH_SUCCESS;
 }

@@ -86,6 +86,8 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
+#include "misc/conversion_internal.h"
+
 #include "scg_headers.h"
 
 #include "math.h"
@@ -1108,10 +1110,6 @@ static int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix,
 
     return 0;
 }
-
-/* TODO prototype; function is defined in conversion.c */
-int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
-                                 igraph_bool_t column_wise);
 
 static int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
                                          igraph_sparsemat_t *mysparse,

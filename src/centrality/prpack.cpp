@@ -75,6 +75,16 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
             u = v;
         }
 
+        // Since PRPACK uses the algebraic method to solve PageRank, damping factors very close to 1.0
+        // may lead to numerical instability, the apperance of non-finite values, or the iteration
+        // never terminating.
+        if (damping > 0.999) {
+            IGRAPH_WARNINGF(
+                    "Damping factor is %g. "
+                    "Damping values close to 1 may lead to numerical instability when using PRPACK.",
+                    damping);
+        }
+
         // Construct and run the solver
         prpack_igraph_graph prpack_graph(graph, weights, directed);
         prpack_solver solver(&prpack_graph, false);

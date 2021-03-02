@@ -46,7 +46,7 @@ int igraph_sir_init(igraph_sir_t *sir) {
 
 /**
  * \function igraph_sir_destroy
- * Deallocate memory associated with a SIR simulation run
+ * \brief Deallocates memory associated with a SIR simulation run.
  *
  * \param sir The \ref igraph_sir_t object storing the simulation.
  */
@@ -74,7 +74,7 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
 
 /**
  * \function igraph_sir
- * Perform a number of SIR epidemics model runs on a graph
+ * \brief Performs a number of SIR epidemics model runs on a graph.
  *
  * The SIR model is a simple model from epidemiology. The individuals
  * of the population might be in three states: susceptible, infected

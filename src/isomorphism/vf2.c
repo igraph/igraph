@@ -881,9 +881,9 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
 
 /**
  * \function igraph_get_isomorphisms_vf2
- * Collect the isomorphic mappings
+ * \brief Collect all isomorphic mappings of two graphs.
  *
- * This function finds all the isomorphic mappings between two
+ * This function finds all the isomorphic mappings between two simple
  * graphs. It uses the \ref igraph_isomorphic_function_vf2()
  * function. Call the function with the same graph as \p graph1 and \p
  * graph2 to get automorphisms.
@@ -903,7 +903,7 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it is empty if the input graphs
- *   are no isomorphic. Otherwise it contains pointers to
+ *   are not isomorphic. Otherwise it contains pointers to
  *   \ref igraph_vector_t objects, each vector is an
  *   isomorphic mapping of \p graph2 to \p graph1. Please note that
  *   you need to 1) Destroy the vectors via \ref
@@ -936,20 +936,20 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
                                 void *arg) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, arg };
-    igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
-    igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
+    igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
+    igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : NULL;
 
     igraph_vector_ptr_clear(maps);
     IGRAPH_FINALLY(igraph_i_get_isomorphisms_free, maps);
     IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
-                 0, 0,
+                 NULL, NULL,
                  (igraph_isohandler_t*)
                  igraph_i_get_isomorphisms_vf2,
                  ncb, ecb, &data));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1675,11 +1675,11 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
 
 /**
  * \function igraph_get_subisomorphisms_vf2
- * Return all subgraph isomorphic mappings
+ * \brief Return all subgraph isomorphic mappings.
  *
  * This function collects all isomorphic mappings of \p graph2 to a
  * subgraph of \p graph1. It uses the \ref
- * igraph_subisomorphic_function_vf2() function.
+ * igraph_subisomorphic_function_vf2() function. The graphs should be simple.
  * \param graph1 The first input graph, may be directed or
  *    undirected. This is supposed to be the larger graph.
  * \param graph2 The second input graph, it must have the same
@@ -1730,18 +1730,18 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                                    void *arg) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, arg };
-    igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
-    igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
+    igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
+    igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : NULL;
 
     igraph_vector_ptr_clear(maps);
     IGRAPH_FINALLY(igraph_i_get_subisomorphisms_free, maps);
     IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
-                 0, 0,
+                 NULL, NULL,
                  (igraph_isohandler_t*)
                  igraph_i_get_subisomorphisms_vf2,
                  ncb, ecb, &data));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -747,7 +747,7 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
  * \ref igraph_vector_sort().
  */
 
-int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
+static int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
     const BASE *da = (const BASE *) a;
     const BASE *db = (const BASE *) b;
 
@@ -761,7 +761,7 @@ int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
  * \ref igraph_vector_reverse_sort().
  */
 
-int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
+static int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
     const BASE *da = (const BASE *) a;
     const BASE *db = (const BASE *) b;
 
@@ -813,7 +813,7 @@ void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v) {
 /**
  * Ascending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
+static int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -828,7 +828,7 @@ int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2)
 /**
  * Descending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
+static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {

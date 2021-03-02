@@ -21,8 +21,20 @@ check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
 set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
-  set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
 endif()
+
+# tutorial examples and other snippets from the documentation
+add_examples(
+  FOLDER examples/simple NAMES
+  igraph_free
+)
+add_examples(
+  FOLDER examples/tutorial NAMES
+  tutorial1
+  tutorial2
+  tutorial3
+)
 
 # version.at
 add_examples(
@@ -51,18 +63,23 @@ add_legacy_tests(
   igraph_psumtree
   igraph_sparsemat5
   igraph_sparsemat9
+  igraph_sparsemat_droptol
   igraph_sparsemat_fkeep
   igraph_sparsemat_getelements_sorted
   igraph_sparsemat_is_symmetric
+  igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_view
   igraph_sparsemat_which_minmax
-  spmatrix_clear
+  igraph_spmatrix_add_col_values
   matrix
   matrix2
   matrix3
   spmatrix
+  spmatrix_clear
   stack
+  strvector_set2_remove_print
   vector
   vector2
   vector3
@@ -153,8 +170,12 @@ add_legacy_tests(
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_cited_type_game
+  igraph_citing_cited_type_game
   igraph_correlated_game
+  igraph_degree_sequence_game
+  igraph_establishment_game
   igraph_extended_chordal_ring
+  igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
   igraph_growing_random_game
@@ -167,6 +188,8 @@ add_legacy_tests(
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
+  igraph_simple_interconnected_islands_game
+  igraph_static_power_law_game
   tree
   tree_game
   ring
@@ -213,6 +236,7 @@ add_legacy_tests(
   all_shortest_paths
   efficiency
   igraph_are_connected
+  igraph_average_path_length_dijkstra
   igraph_betweenness
   igraph_closeness
   igraph_convergence_degree
@@ -225,8 +249,13 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_neighborhood
+  igraph_neighborhood_graphs
+  igraph_neighborhood_size
   igraph_pagerank
   igraph_transitive_closure_dag
+  igraph_transitivity_avglocal_undirected
+  igraph_transitivity_barrat
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
@@ -307,6 +336,9 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   simplify_and_colorize
   bliss_automorphisms
+  igraph_get_isomorphisms_vf2
+  igraph_get_subisomorphisms_vf2
+  igraph_subisomorphic
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses

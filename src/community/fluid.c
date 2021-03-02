@@ -128,8 +128,6 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     /* Initialize densities to max_density */
     igraph_vector_fill(&density, max_density);
 
-    RNG_BEGIN();
-
     /* Initialize com_to_numvertices and initialize communities into membership vector */
     IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
     for (i = 0; i < no_of_communities; i++) {
@@ -206,6 +204,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
                 }
             }
 
+            RNG_BEGIN();
             if (!igraph_vector_empty(&dominant_labels)) {
                 /* Maintain same label if it exists in dominant_labels */
                 same_label_in_dominant = igraph_vector_contains(&dominant_labels, kv1);
@@ -234,10 +233,9 @@ int igraph_community_fluid_communities(const igraph_t *graph,
                     VECTOR(density)[k - 1] = max_density / VECTOR(com_to_numvertices)[k - 1];
                 }
             }
+            RNG_END();
         }
     }
-
-    RNG_END();
 
 
     /* Shift back the membership vector */
@@ -268,5 +266,5 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     igraph_vector_destroy(&nonzero_labels);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
