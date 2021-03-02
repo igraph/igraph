@@ -29,6 +29,7 @@ int main() {
     igraph_spmatrix_init(&spmat, 0, 0);
     IGRAPH_ASSERT(igraph_spmatrix_clear_col(&spmat, 0) == IGRAPH_EINVAL);
     IGRAPH_ASSERT(igraph_spmatrix_clear_row(&spmat, 0) == IGRAPH_EINVAL);
+
     igraph_spmatrix_destroy(&spmat);
 
     printf("\n5x6 matrix\n");
@@ -36,12 +37,15 @@ int main() {
     for (i = 0; i < 30; i++) {
         igraph_spmatrix_set(&spmat, i/6, i%6, i);
     }
+
     printf("\nClearing col 3\n");
     IGRAPH_ASSERT(igraph_spmatrix_clear_col(&spmat, 3) == IGRAPH_SUCCESS);
     print_spmatrix(&spmat);
+
     printf("\nClearing row 3\n");
     IGRAPH_ASSERT(igraph_spmatrix_clear_row(&spmat, 3) == IGRAPH_SUCCESS);
     print_spmatrix(&spmat);
+
     igraph_spmatrix_destroy(&spmat);
 
     VERIFY_FINALLY_STACK();
