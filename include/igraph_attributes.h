@@ -78,6 +78,15 @@ __BEGIN_DECLS
  */
 
 /**
+ * \section about_attribute_combination
+ *
+ * <para>Attribute combination lists are used to indicate how to combine
+ * attributes. For example, \ref igraph_simplify() removes loops and multiple
+ * edges, and the way to combine the attributes of multiple edges has to
+ * be indicated.</para>
+ */
+
+/**
  * \typedef igraph_attribute_type_t
  * The possible types of the attributes.
  *
@@ -117,6 +126,25 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH = 0,
                IGRAPH_ATTRIBUTE_EDGE
              } igraph_attribute_elemtype_t;
 
+/**
+ * \typedef igraph_attribute_combination_type_t
+ * The possible types of attribute combinations.
+ *
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_IGNORE   Ignore old attributes. TODO
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_DEFAULT  Use the default way to combine attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_FUNCTION Supply your own function to combine
+ *                                            attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_SUM      Take the sum of the attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_PROD     Take the product of the attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_MIN      Take the minimum attribute.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_MAX      Take the maximum attribute.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_RANDOM   Take a random attribute.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_FIRST    Take the first attribute.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_LAST     Take the last attribute.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_MEAN     Take the mean of the attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_MEDIAN   Take the median of the attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_CONCAT   Concatenate the attributes.
+ */
 typedef enum {
     IGRAPH_ATTRIBUTE_COMBINE_IGNORE = 0,
     IGRAPH_ATTRIBUTE_COMBINE_DEFAULT = 1,

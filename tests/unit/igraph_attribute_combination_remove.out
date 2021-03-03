@@ -1,0 +1,18 @@
+starting combinations:
+name: weight
+name: type
+name: NULL
+
+Removing nonexistent combination:
+name: weight
+name: type
+name: NULL
+
+Removing weight:
+name: type
+name: NULL
+
+Removing type and NULL:
+
+Removing nonexistent combination again:
+

@@ -17,12 +17,21 @@
 <!-- doxrox-include igraph_attribute_type_t -->
 </section>
 
+<section id="attribute-combinations">
+<title>Handling attribute combination lists</title>
+<!-- doxrox-include about_attribute_combination -->
+<!-- doxrox-include igraph_attribute_combination_init -->
+<!-- doxrox-include igraph_attribute_combination_add -->
+<!-- doxrox-include igraph_attribute_combination_remove -->
+<!-- doxrox-include igraph_attribute_combination_destroy -->
+<!-- doxrox-include igraph_attribute_combination_type_t -->
+</section>
+
 <section id="accessing-attributes-from-c">
 <title>Accessing attributes from C</title>
-
 <!-- doxrox-include cattributes -->
 
-<section id="query-attributes"><title>Query attributes</title>
+<section id="query-attributes"><title>Query C attributes</title>
 <!-- doxrox-include igraph_cattribute_list -->
 <!-- doxrox-include igraph_cattribute_has_attr -->
 <!-- doxrox-include igraph_cattribute_GAN -->
@@ -58,7 +67,7 @@
 </section>
 
 <section id="set-attributes">
-<title>Set attributes</title>
+<title>Set C attributes</title>
 <!-- doxrox-include igraph_cattribute_GAN_set -->
 <!-- doxrox-include SETGAN -->
 <!-- doxrox-include igraph_cattribute_GAB_set -->
@@ -91,7 +100,7 @@
 <!-- doxrox-include SETEASV -->
 </section>
 
-<section id="remove-attributes"><title>Remove attributes</title>
+<section id="remove-attributes"><title>Remove C attributes</title>
 <!-- doxrox-include igraph_cattribute_remove_g -->
 <!-- doxrox-include DELGA -->
 <!-- doxrox-include igraph_cattribute_remove_v -->
