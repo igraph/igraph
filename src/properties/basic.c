@@ -100,13 +100,19 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * H(i) = -sum(p[i,j] log(p[i,j]), j=1..k[i]),
  * where p[i,j]=w[i,j]/sum(w[i,l], l=1..k[i]),  k[i] is the (total)
  * degree of vertex i, and w[i,j] is the weight of the edge(s) between
- * vertex i and j.
+ * vertex i and j. The diversity of isolated vertices will be NaN
+ * (not-a-number).
+ *
+ * </para><para>
+ * The measure works only if the graph has no multiple edges. If the graph has
+ * multiple edges, simplify it first using \ref igraph_simplify().
+ *
  * \param graph The input graph, edge directions are ignored.
  * \param weights The edge weights, in the order of the edge ids, must
  *    have appropriate length.
  * \param res An initialized vector, the results are stored here.
- * \param vids Vector with the vertex ids for which to calculate the
- *    measure.
+ * \param vids Vertex selector that specifies the vertices which to calculate
+ *    the measure.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear.
@@ -121,13 +127,19 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
     igraph_vit_t vit;
     igraph_real_t s, ent, w;
     int i, j, k;
+    igraph_bool_t has_multiple;
 
     if (!weights) {
-        IGRAPH_ERROR("Edge weights must be given", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Edge weights must be given.", IGRAPH_EINVAL);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge weight vector length.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
+    if (has_multiple) {
+        IGRAPH_ERROR("Diversity measure works only if the graph has no multiple edges.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
