@@ -104,10 +104,12 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * (not-a-number).
  *
  * </para><para>
- * The measure works only if the graph has no multiple edges. If the graph has
- * multiple edges, simplify it first using \ref igraph_simplify().
+ * The measure works only if the graph is undirected and has no multiple edges.
+ * If the graph has multiple edges, simplify it first using \ref
+ * igraph_simplify(). If the graph is directed, convert it into an undirected
+ * graph with \ref igraph_to_undirected() .
  *
- * \param graph The input graph, edge directions are ignored.
+ * \param graph The undirected input graph.
  * \param weights The edge weights, in the order of the edge ids, must
  *    have appropriate length.
  * \param res An initialized vector, the results are stored here.
@@ -128,6 +130,10 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
     igraph_real_t s, ent, w;
     int i, j, k;
     igraph_bool_t has_multiple;
+
+    if (igraph_is_directed(graph)) {
+        IGRAPH_ERROR("Diversity measure works with undirected graphs only.", IGRAPH_EINVAL);
+    }
 
     if (!weights) {
         IGRAPH_ERROR("Edge weights must be given.", IGRAPH_EINVAL);
