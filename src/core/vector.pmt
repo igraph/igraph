@@ -902,10 +902,17 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * \function igraph_vector_lex_cmp
  * \brief Lexicographical comparison of two vectors.
  *
+ * </para><para>
+ * If the elements of two vectors match but one is shorter, the shorter
+ * one comes first. So {0, 1} comes before {0, 1, 2}, which comes before
+ * {0, 1, 3}.
+ *
  * \param lhs The first vector.
  * \param rhs The second vector.
  * \return -1 if \p lhs is lexicographically smaller,
  *         0 if \p lhs and \p rhs are equal, else 1.
+ * \sa \ref igraph_vector_lex_cmp_rev() to compare vectors starting from
+ *     the last element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
@@ -938,13 +945,21 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
 
 /**
  * \function igraph_vector_lex_cmp_rev
- * \brief Reverse lexicographical comparison of two vectors.
+ * \brief Lexicographical comparison of two vectors in reverse order.
+ *
+ * </para><para>
+ * This comparison starts from the last element of both vectors and
+ * moves backward. If the elements of two vectors match but one is
+ * shorter, the shorter one comes first. So {1, 0} comes before
+ * {2, 1, 0}, which comes before {3, 1, 0}.
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
  * \return -1 if \p lhs in reverse order is
  *         lexicographically smaller than the reverse of \p rhs,
  *         0 if \p lhs and \p rhs are equal, else 1.
+ * \sa \ref igraph_vector_lex_cmp() to compare vectors starting from
+ *     the first element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
