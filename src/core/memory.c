@@ -69,5 +69,5 @@ void igraph_free(void *p) {
  */
 
 void *igraph_malloc(size_t n) {
-    return malloc(n);
+    return malloc(n + 1);
 }
