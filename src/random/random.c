@@ -773,7 +773,7 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
         unsigned long int max = type->max;
         return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
     }
-    IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
+    IGRAPH_FATAL("Internal random generator error");
 }
 
 /**
@@ -822,7 +822,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
         unsigned long int max = type->max;
         return type->get(rng->state) / ((double)max + 1) * (double)(h - l) + l;
     }
-    IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
+    IGRAPH_FATAL("Internal random generator error");
 }
 
 /**
@@ -844,7 +844,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
         unsigned long int max = type->max;
         return type->get(rng->state) / ((double)max + 1);
     }
-    IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
+    IGRAPH_FATAL("Internal random generator error");
 }
 
 /**
