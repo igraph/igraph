@@ -944,7 +944,7 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
 
 /**
  * \function igraph_vector_colex_cmp
- * \brief Coexicographical comparison of two vectors.
+ * \brief Colexicographical comparison of two vectors.
  *
  * </para><para>
  * This comparison starts from the last element of both vectors and
