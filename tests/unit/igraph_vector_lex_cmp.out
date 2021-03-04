@@ -5,6 +5,7 @@ Lexicographical ordering:
 ( 1e+30 2e+30 3e+30 )
 ( 1e+30 2e+30 9e+30 )
 ( 1e+30 2e+30 9e+30 )
+( 3e+30 3e+30 )
 ( 9e+30 2e+30 1e+30 )
 
 Reverse lexicographical ordering:
@@ -13,5 +14,6 @@ Reverse lexicographical ordering:
 ( 9e+30 2e+30 1e+30 )
 ( 1e+30 2e+30 )
 ( 1e+30 2e+30 3e+30 )
+( 3e+30 3e+30 )
 ( 1e+30 2e+30 9e+30 )
 ( 1e+30 2e+30 9e+30 )

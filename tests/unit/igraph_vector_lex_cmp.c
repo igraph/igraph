@@ -20,7 +20,7 @@
 #include "test_utilities.inc"
 
 int main() {
-    igraph_vector_t v1, v2, v3, v4, v5, v6, v7;
+    igraph_vector_t v1, v2, v3, v4, v5, v6, v7, v8;
 
     igraph_vector_init_real(&v1, 3, 1e30, 2e30, 9e30);
     igraph_vector_init_real(&v2, 3, 1e30, 2e30, 3e30);
@@ -29,20 +29,21 @@ int main() {
     igraph_vector_init_real(&v5, 3, 1e30, 2e30, 9e30);
     igraph_vector_init_real(&v6, 0);
     igraph_vector_init_real(&v7, 3, 9e30, 2e30, 1e30);
+    igraph_vector_init_real(&v8, 2, 3e30, 3e30);
 
-    igraph_vector_t vectors[] = {v1, v2, v3, v4, v5, v6, v7};
+    igraph_vector_t vectors[] = {v1, v2, v3, v4, v5, v6, v7, v8};
 
     printf("Lexicographical ordering:\n");
-    qsort(vectors, 7, sizeof(igraph_vector_t), igraph_vector_lex_cmp);
+    qsort(vectors, 8, sizeof(igraph_vector_t), igraph_vector_lex_cmp);
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
         print_vector(&vectors[i]);
     }
 
     printf("\nReverse lexicographical ordering:\n");
-    qsort(vectors, 7, sizeof(igraph_vector_t), igraph_vector_lex_cmp_rev);
+    qsort(vectors, 8, sizeof(igraph_vector_t), igraph_vector_lex_cmp_rev);
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
         print_vector(&vectors[i]);
         igraph_vector_destroy(&vectors[i]);
     }
