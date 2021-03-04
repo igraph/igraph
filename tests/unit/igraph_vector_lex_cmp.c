@@ -40,8 +40,8 @@ int main() {
         print_vector(&vectors[i]);
     }
 
-    printf("\nReverse lexicographical ordering:\n");
-    qsort(vectors, 8, sizeof(igraph_vector_t), igraph_vector_lex_cmp_rev);
+    printf("\nColexicographical ordering:\n");
+    qsort(vectors, 8, sizeof(igraph_vector_t), igraph_vector_colex_cmp);
 
     for (int i = 0; i < 8; i++) {
         print_vector(&vectors[i]);

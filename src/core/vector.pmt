@@ -910,7 +910,7 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * \param rhs The second vector.
  * \return -1 if \p lhs is lexicographically smaller,
  *         0 if \p lhs and \p rhs are equal, else 1.
- * \sa \ref igraph_vector_lex_cmp_rev() to compare vectors starting from
+ * \sa \ref igraph_vector_colex_cmp() to compare vectors starting from
  *     the last element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
@@ -943,8 +943,8 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
 }
 
 /**
- * \function igraph_vector_lex_cmp_rev
- * \brief Lexicographical comparison of two vectors in reverse order.
+ * \function igraph_vector_colex_cmp
+ * \brief Coexicographical comparison of two vectors.
  *
  * </para><para>
  * This comparison starts from the last element of both vectors and
@@ -962,7 +962,7 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
-int FUNCTION(igraph_vector, lex_cmp_rev)(const void *lhs, const void *rhs) {
+int FUNCTION(igraph_vector, colex_cmp)(const void *lhs, const void *rhs) {
     const TYPE(igraph_vector) *a = lhs;
     const TYPE(igraph_vector) *b = rhs;
     long int i, sa, sb, rai, rbi;
