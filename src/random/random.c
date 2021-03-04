@@ -232,7 +232,7 @@ void igraph_rng_glibc2_destroy(void *vstate) {
 const igraph_rng_type_t igraph_rngtype_glibc2 = {
     /* name= */      "LIBC",
     /* min=  */      0,
-    /* max=  */      RAND_MAX,
+    /* max=  */      0x7fffffffUL,
     /* init= */      igraph_rng_glibc2_init,
     /* destroy= */   igraph_rng_glibc2_destroy,
     /* seed= */      igraph_rng_glibc2_seed,
