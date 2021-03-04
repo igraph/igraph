@@ -397,7 +397,7 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(10); /* + res */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef RESTYPE
