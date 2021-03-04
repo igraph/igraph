@@ -38,7 +38,7 @@ __BEGIN_DECLS
 
 typedef struct igraph_rng_type_t {
     const char *name;
-    unsigned long int min;
+    unsigned long int min; /* at the moment, 'min' must always be set to 0 */
     unsigned long int max;
     int (*init)(void **state);
     void (*destroy)(void *state);
