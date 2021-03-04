@@ -1,0 +1,10 @@
+No vertices:
+( )
+Graph with loops and multiple edges:
+( 6 6 2 )
+Same graph, minimum clique size 2:
+( 0 6 2 )
+Same graph, maximum clique size 2:
+( 6 6 )
+Same graph, minimum and maximum clique size 10:
+( )
