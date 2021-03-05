@@ -581,14 +581,18 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
 
 /**
  * \function igraph_spmatrix_clear_row
- * \brief Clears a row in the matrix (sets all of its elements to zero)
+ * \brief Clears a row in the matrix (sets all of its elements to zero).
  * \param m The matrix.
  * \param row The index of the row to be cleared.
+ * \return Error code.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
  */
 
 int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
+    if (row < 0 || row >= m->nrow) {
+       IGRAPH_ERROR("The row does not exist.", IGRAPH_EINVAL);
+    }
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
@@ -617,7 +621,7 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     igraph_vector_permdelete(&m->data, &permvec, nremove);
     igraph_vector_destroy(&permvec);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Unused local functions---temporarily disabled */
@@ -670,15 +674,18 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
 
 /**
  * \function igraph_spmatrix_clear_col
- * \brief Clears a column in the matrix (sets all of its elements to zero)
+ * \brief Clears a column in the matrix (sets all of its elements to zero).
  * \param m The matrix.
  * \param col The index of the column to be cleared.
- * \return Error code. The current implementation always succeeds.
+ * \return Error code.
  *
  * Time complexity: TODO
  */
 
 int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
+    if (col < 0 || col >= m->ncol) {
+       IGRAPH_ERROR("The column does not exist.", IGRAPH_EINVAL);
+    }
     long int i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (long)VECTOR(m->cidx)[col + 1] - (long)VECTOR(m->cidx)[col];
@@ -692,7 +699,7 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
     for (i = col + 1; i <= m->ncol; i++) {
         VECTOR(m->cidx)[i] -= n;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
