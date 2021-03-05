@@ -339,7 +339,7 @@ int main() {
         printf("subset without %d\n", i);
         printf("Unweighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet2,
+            /* res=       */ &bet,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* sources = */ igraph_vss_all(),
