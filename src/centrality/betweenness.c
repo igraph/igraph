@@ -86,7 +86,7 @@ static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_
     igraph_dqueue_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_SUCCESS; 
+    return IGRAPH_SUCCESS; 
 }
 
 static int igraph_i_sspf_weighted(
@@ -172,7 +172,7 @@ static int igraph_i_sspf_weighted(
     igraph_2wheap_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 /***** Vertex betweenness *****/
@@ -393,7 +393,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(6);
 
-    IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -627,7 +627,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     igraph_Free(nrgeo);
     IGRAPH_FINALLY_CLEAN(5);
 
-    IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -871,7 +871,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_vit_destroy(&vit_target);
     IGRAPH_FINALLY_CLEAN(9);
 
-    IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 /***** Edge betweenness subset*****/
@@ -1070,5 +1070,5 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_vit_destroy(&vit_target);
     IGRAPH_FINALLY_CLEAN(9);
 
-    IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
