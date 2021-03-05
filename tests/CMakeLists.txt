@@ -515,6 +515,7 @@ add_legacy_tests(
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
+  igraph_maximal_cliques_file
   igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
