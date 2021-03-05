@@ -38,7 +38,6 @@ static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_
     igraph_inclist_t *inclist,
     igraph_real_t cutoff) {
     
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
     igraph_dqueue_t Q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     long int nlen;
@@ -284,7 +283,6 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     double *tmpscore;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_vit_t vit;
-    int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (weights) {
@@ -539,7 +537,6 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     double *nrgeo;
     double *tmpscore;
     long int source, j;
-    int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
     igraph_stack_t S;
 
@@ -737,7 +734,6 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     double *tmpscore;
     igraph_vit_t vit, vit_source, vit_target;
     unsigned char *is_target;
-    int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (weights) {
