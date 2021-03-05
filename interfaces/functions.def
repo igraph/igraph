@@ -548,7 +548,8 @@ igraph_edge_betweenness_cutoff:
         IGNORE: RR
 
 igraph_edge_betweenness_subset:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX res, EDGEWEIGHTS vids=ALL, \
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, EDGESET vids=ALL, \
+                VERTEXSET sources=ALL, VERTEXSET targets=ALL,
                 BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: estimate_betweenness

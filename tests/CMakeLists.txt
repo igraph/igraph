@@ -209,6 +209,7 @@ add_legacy_tests(
   efficiency
   igraph_are_connected
   igraph_betweenness
+  igraph_betweenness_subset
   igraph_closeness
   igraph_convergence_degree
   igraph_count_multiple

@@ -45,13 +45,7 @@ void test_bug950() {
     igraph_vector_init(&eb, 0);
 
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
-    print_vector(&eb);
-
-    igraph_vector_destroy(&eb);
-
-    printf("\n testing subset with subset = vss_all() \n");
-    igraph_vector_init(&eb, 0);
-    igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, &weights, igraph_vss_all());
+    printf("bug 950");
     print_vector(&eb);
 
     igraph_vector_destroy(&eb);
@@ -105,8 +99,7 @@ void test_bug1050() {
 
 int main() {
     igraph_t g;
-    igraph_vector_t eb, node_vec;
-    igraph_vs_t vs;
+    igraph_vector_t eb;
 
 
     {
@@ -135,35 +128,19 @@ int main() {
         igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
         igraph_vector_init(&eb, 0);
         igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
-        print_vector(&eb);
-        igraph_vector_destroy(&eb);
-
-        igraph_vector_init_seq(&node_vec, 0, 32);
-        igraph_vs_vector(&vs, &node_vec);
-        igraph_vector_init(&eb, 0);
-        igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, vs);
+        printf("\n betweenness test for unweighted graph \n");
         print_vector(&eb);
         igraph_vector_destroy(&eb);
         igraph_destroy(&g);
-        igraph_vs_destroy(&vs);
-        igraph_vector_destroy(&node_vec);
     }
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, 0);
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
+    printf("\n unweighted small graphs \n");
     print_vector(&eb);
     igraph_vector_destroy(&eb);
-
-    igraph_vector_init(&eb, 0);
-    igraph_vector_init_seq(&node_vec, 0, 3);
-    igraph_vs_vector(&vs, &node_vec);
-    igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*subset=*/vs);
-    print_vector(&eb);
-    igraph_vector_destroy(&eb);
-    igraph_vs_destroy(&vs);
-    igraph_vector_destroy(&node_vec);
     igraph_destroy(&g);
 
 
@@ -174,16 +151,6 @@ int main() {
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
-
-    igraph_vector_init(&eb, 0);
-    igraph_vector_init_seq(&node_vec, 0, 8);
-    igraph_vector_remove(&node_vec, 0);
-    igraph_vs_vector(&vs, &node_vec);
-    igraph_edge_betweenness_subset(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*subset=*/vs);
-    print_vector(&eb);
-    igraph_vector_destroy(&eb);
-    igraph_vs_destroy(&vs);
-    igraph_vector_destroy(&node_vec);
     igraph_destroy(&g);
 
     test_bug950();
