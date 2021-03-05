@@ -48,7 +48,7 @@ static int igraph_i_average_path_length_unweighted(
     long int no_of_nodes = igraph_vcount(graph);
     long int source, j, n;
     long int *already_added;
-    igraph_real_t no_of_pairs = no_of_nodes * (no_of_nodes - 1.0); /* no. of ordered vertex pairs */
+    igraph_real_t no_of_pairs = no_of_nodes > 0 ? no_of_nodes * (no_of_nodes - 1.0) : 0.0; /* no. of ordered vertex pairs */
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;

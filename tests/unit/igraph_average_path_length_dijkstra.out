@@ -14,6 +14,14 @@ Two vertices, inf for unconnected pairs:
 Result: Inf
 Unconnected pairs:        2
 
+Smallest bifurcating directed tree:
+Result:        1
+Unconnected pairs:        4
+
+Smallest bifurcating directed tree, inf for unconnected pairs:
+Result: Inf
+Unconnected pairs:        4
+
 Graph with loops and multiple edges:
 Result:        5
 Unconnected pairs:       19

@@ -898,7 +898,100 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     return 0;
 }
 
-#endif
+/**
+ * \function igraph_vector_lex_cmp
+ * \brief Lexicographical comparison of two vectors.
+ *
+ * </para><para>
+ * If the elements of two vectors match but one is shorter, the shorter
+ * one comes first. Thus {1, 3} comes after {1, 2, 3}, but before {1, 3, 4}.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return -1 if \p lhs is lexicographically smaller,
+ *         0 if \p lhs and \p rhs are equal, else 1.
+ * \sa \ref igraph_vector_colex_cmp() to compare vectors starting from
+ *     the last element.
+ *
+ * Time complexity: O(n), the number of elements in the smaller vector.
+ */
+int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
+    const TYPE(igraph_vector) *a = lhs;
+    const TYPE(igraph_vector) *b = rhs;
+    long int i, sa, sb;
+
+    sa = FUNCTION(igraph_vector, size)(a);
+    sb = FUNCTION(igraph_vector, size)(b);
+
+    for (i = 0; i < sa; i++) {
+        if (i >= sb) {
+            /* b is shorter, and equal to the first part of a */
+            return 1;
+        }
+        if (VECTOR(*a)[i] < VECTOR(*b)[i]) {
+            return -1;
+        }
+        if (VECTOR(*a)[i] > VECTOR(*b)[i]) {
+            return 1;
+        }
+    }
+    if (i == sb) {
+        return 0;
+    }
+    /* a is shorter, and equal to the first part of b */
+    return -1;
+}
+
+/**
+ * \function igraph_vector_colex_cmp
+ * \brief Colexicographical comparison of two vectors.
+ *
+ * </para><para>
+ * This comparison starts from the last element of both vectors and
+ * moves backward. If the elements of two vectors match but one is
+ * shorter, the shorter one comes first. Thus {1, 2} comes after {3, 2, 1},
+ * but before {0, 1, 2}.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return -1 if \p lhs in reverse order is
+ *         lexicographically smaller than the reverse of \p rhs,
+ *         0 if \p lhs and \p rhs are equal, else 1.
+ * \sa \ref igraph_vector_lex_cmp() to compare vectors starting from
+ *     the first element.
+ *
+ * Time complexity: O(n), the number of elements in the smaller vector.
+ */
+int FUNCTION(igraph_vector, colex_cmp)(const void *lhs, const void *rhs) {
+    const TYPE(igraph_vector) *a = lhs;
+    const TYPE(igraph_vector) *b = rhs;
+    long int i, sa, sb, rai, rbi;
+
+    sa = FUNCTION(igraph_vector, size)(a);
+    sb = FUNCTION(igraph_vector, size)(b);
+
+    for (i = 0; i < sa; i++) {
+        if (i >= sb) {
+            /* b is shorter, and equal to the last part of a */
+            return 1;
+        }
+        /* use reversed indexes */
+        rai = sa - i - 1;
+        rbi = sb - i - 1;
+        if (VECTOR(*a)[rai] < VECTOR(*b)[rbi]) {
+            return -1;
+        }
+        if (VECTOR(*a)[rai] > VECTOR(*b)[rbi]) {
+            return 1;
+        }
+    }
+    if (i == sb) {
+        return 0;
+    }
+    /* a is shorter, and equal to the last part of b */
+    return -1;
+}
+#endif /*NOTORDERED*/
 
 /**
  * \ingroup vector

@@ -30,6 +30,8 @@
 #include "igraph_psumtree.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
                                       igraph_integer_t m,
                                       const igraph_vector_t *outseq,
@@ -134,6 +136,9 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     for (i = (start_from ? start_nodes : 1), k = (start_from ? 0 : 1);
          i < no_of_nodes; i++, k++) {
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* draw edges */
         if (outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
@@ -233,6 +238,9 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
          i < no_of_nodes; i++, k++) {
         igraph_real_t sum = igraph_psumtree_sum(&sumtree);
         long int to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         if (outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
         }
@@ -337,6 +345,9 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
          i < no_of_nodes; i++, k++) {
         igraph_real_t sum;
         long int to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         if (outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
         }
@@ -690,6 +701,9 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
         long int to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         if (outseq != 0 && igraph_vector_size(outseq) != 0) {
             no_of_neighbors = (long int) VECTOR(*outseq)[i];
         }

@@ -10,8 +10,8 @@
 
  - CMake settings that controlled the library installation directory name, such as `CMAKE_INSTALL_LIBDIR`, were not respected.
  - Under some conditions, the generated pkg-config file contained an incorrect include directory path.
+ - The following functions were not exported from the shared library: `igraph_subcomponent()`, `igraph_stack_ptr_free_all()`, `igraph_stack_ptr_destroy_all()`, `igraph_status_handler_stderr()`, `igraph_progress_handler_stderr()`.
  - Built-in random number generators (`igraph_rngtype_mt19937`, `igraph_rngtype_rand`, `igraph_rngtype_glibc2`) were not exported from the shared library.
- - `igraph_status_handler_stderr()` and `igraph_progress_handler_stderr()` were not exported from the shared library.
  - `igraph_layout_graphopt()` no longer rounds the `spring_length` parameter to an integer.
  - `igraph_get_all_shortest_paths_dijkstra()` no longer modifies the `res` vector's item destructor.
  - `igraph_get_shortest_path_bellman_ford()` did not work correctly when calculating paths to all vertices.
@@ -19,7 +19,8 @@
  - `igraph_community_to_membership()` does not crash anymore when `csize` is requested but `membership` is not.
  - `igraph_citing_cited_type_game()`: fixed memory leaks (PR #1700, thanks to Daniel Noom).
  - `igraph_transitivity_undirected()`, `igraph_transitivity_avglocal_undirected()` and `igraph_transitivity_barrat()` no longer trigger an assertion failure when used with the null graph (PRs #1709, #1710).
- - The following functions were not exported from the shared library: `igraph_subcomponent()`, `igraph_stack_ptr_free_all()`, `igraph_stack_ptr_destroy_all()`.
+ - `igraph_(personalized_)pagerank()` would return incorrect results for weighted multigraphs with fewer than 128 vertices when using `IGRAPH_PAGERANK_ALGO_PRPACK`.
+ - `igraph_diversity()` now checks its input more carefully, and throws an error when the input graph has multi-edges or is directed.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
  - When compiling the development version (as opposed to the release tarball), the build would fail with newer versions of `bison` and `flex`.
@@ -29,6 +30,7 @@
  - Documentation improvements.
  - Much faster documentation builds.
  - Allow using a pre-generated `arith.h` header for f2c when cross-compiling; see the Installation section of the documentation.
+ - The following functions are now interruptible: `igraph_grg_game()`, `igraph_sbm_game()`, `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`.
 
 ### Acknowledgments
 
