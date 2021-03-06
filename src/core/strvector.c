@@ -144,15 +144,19 @@ void igraph_strvector_get(const igraph_strvector_t *sv, long int idx,
 
 int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
                          const char *value) {
+    size_t value_len;
+
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
-    if (sv->data[idx] == 0) {
-        sv->data[idx] = igraph_Calloc(strlen(value) + 1, char);
+
+    value_len = strlen(value);
+    if (sv->data[idx] == 0) {        
+        sv->data[idx] = igraph_Calloc(value_len + 1, char);
         if (sv->data[idx] == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
     } else {
-        char *tmp = igraph_Realloc(sv->data[idx], strlen(value) + 1, char);
+        char *tmp = igraph_Realloc(sv->data[idx], value_len + 1, char);
         if (tmp == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
@@ -485,6 +489,7 @@ long int igraph_strvector_size(const igraph_strvector_t *sv) {
 
 int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     long int s = igraph_strvector_size(v);
+    long int value_len = strlen(value);
     char **tmp;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
@@ -493,7 +498,7 @@ int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
     v->data = tmp;
-    v->data[s] = igraph_Calloc(strlen(value) + 1, char);
+    v->data[s] = igraph_Calloc(value_len + 1, char);
     if (v->data[s] == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }

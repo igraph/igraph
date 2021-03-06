@@ -1599,6 +1599,7 @@ static int igraph_i_eit_create_allfromto(const igraph_t *graph,
                                          igraph_neimode_t mode) {
     igraph_vector_t *vec;
     long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
     long int i;
 
     vec = igraph_Calloc(1, igraph_vector_t);
@@ -1607,7 +1608,7 @@ static int igraph_i_eit_create_allfromto(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(vec, igraph_ecount(graph)));
+    IGRAPH_CHECK(igraph_vector_reserve(vec, no_of_edges));
 
     if (igraph_is_directed(graph)) {
         igraph_vector_t adj;
@@ -1625,7 +1626,7 @@ static int igraph_i_eit_create_allfromto(const igraph_t *graph,
         igraph_bool_t *added;
         long int j;
         IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
-        added = igraph_Calloc(igraph_ecount(graph), igraph_bool_t);
+        added = igraph_Calloc(no_of_edges, igraph_bool_t);
         if (added == 0) {
             IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
         }
