@@ -82,7 +82,7 @@ static int igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_rea
         value = igraph_gml_tree_get_real(node, pos);
         break;
     default:
-        IGRAPH_ERROR("Internal error while parsing GML file", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Internal error while parsing GML file.", IGRAPH_FAILURE);
         break;
     }
 
@@ -212,7 +212,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
         } else {
-            IGRAPH_ERROR("Cannot read GML file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_PARSEERROR);
         }
     }
 
@@ -223,18 +223,18 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     if (i >= 0 &&
         igraph_gml_tree_type(context.tree, i) == IGRAPH_I_GML_TREE_INTEGER &&
         igraph_gml_tree_get_integer(context.tree, i) != 1) {
-        IGRAPH_ERROR("Unknown GML version", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Unknown GML version.", IGRAPH_UNIMPLEMENTED);
         /* RETURN HERE!!!! */
     }
 
     /* get the graph */
     gidx = igraph_gml_tree_find(context.tree, "graph", 0);
     if (gidx == -1) {
-        IGRAPH_ERROR("No 'graph' object in GML file", IGRAPH_PARSEERROR);
+        IGRAPH_ERROR("No 'graph' object in GML file.", IGRAPH_PARSEERROR);
     }
     if (igraph_gml_tree_type(context.tree, gidx) !=
         IGRAPH_I_GML_TREE_TREE) {
-        IGRAPH_ERROR("Invalid type for 'graph' object in GML file", IGRAPH_PARSEERROR);
+        IGRAPH_ERROR("Invalid type for 'graph' object in GML file.", IGRAPH_PARSEERROR);
     }
     gtree = igraph_gml_tree_get_tree(context.tree, gidx);
 
@@ -267,7 +267,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             igraph_bool_t hasid;
             no_of_nodes++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
-                IGRAPH_ERROR("'node' is not a list", IGRAPH_PARSEERROR);
+                IGRAPH_ERROR("'node' is not a list in GML file.", IGRAPH_PARSEERROR);
             }
             node = igraph_gml_tree_get_tree(gtree, i);
             hasid = 0;
@@ -280,7 +280,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     igraph_attribute_record_t *atrec = igraph_Calloc(1, igraph_attribute_record_t);
                     int type = igraph_gml_tree_type(node, j);
                     if (!atrec) {
-                        IGRAPH_ERROR("Cannot read GML file", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
                     }
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
                     atrec->name = strdup(name);
@@ -302,7 +302,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (!hasid && !strcmp(name, "id")) {
                     long int id;
                     if (igraph_gml_tree_type(node, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERROR("Non-integer node id in GML file", IGRAPH_PARSEERROR);
+                        IGRAPH_ERROR("Non-integer node id in GML file.", IGRAPH_PARSEERROR);
                     }
                     id = igraph_gml_tree_get_integer(node, j);
                     snprintf(cname, sizeof(cname) / sizeof(char) -1, "%li", id);
@@ -311,14 +311,14 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 }
             }
             if (!hasid) {
-                IGRAPH_ERROR("Node without 'id' while parsing GML file", IGRAPH_PARSEERROR);
+                IGRAPH_ERROR("Node without 'id' while parsing GML file.", IGRAPH_PARSEERROR);
             }
         } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
             igraph_bool_t has_source = 0, has_target = 0;
             no_of_edges++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
-                IGRAPH_ERROR("'edge' is not a list", IGRAPH_PARSEERROR);
+                IGRAPH_ERROR("'edge' is not a list in GML file.", IGRAPH_PARSEERROR);
             }
             edge = igraph_gml_tree_get_tree(gtree, i);
             has_source = has_target = 0;
@@ -327,13 +327,13 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (!strcmp(name, "source")) {
                     has_source = 1;
                     if (igraph_gml_tree_type(edge, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERROR("Non-integer 'source' for an edge in GML file",
+                        IGRAPH_ERROR("Non-integer 'source' for an edge in GML file.",
                                      IGRAPH_PARSEERROR);
                     }
                 } else if (!strcmp(name, "target")) {
                     has_target = 1;
                     if (igraph_gml_tree_type(edge, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERROR("Non-integer 'source' for an edge in GML file",
+                        IGRAPH_ERROR("Non-integer 'source' for an edge in GML file.",
                                      IGRAPH_PARSEERROR);
                     }
                 } else {
@@ -344,7 +344,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         igraph_attribute_record_t *atrec = igraph_Calloc(1, igraph_attribute_record_t);
                         int type = igraph_gml_tree_type(edge, j);
                         if (!atrec) {
-                            IGRAPH_ERROR("Cannot read GML file", IGRAPH_ENOMEM);
+                            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
                         }
                         IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
                         atrec->name = strdup(name);
@@ -365,10 +365,10 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 }
             } /* for */
             if (!has_source) {
-                IGRAPH_ERROR("No 'source' for edge in GML file", IGRAPH_PARSEERROR);
+                IGRAPH_ERROR("No 'source' for edge in GML file.", IGRAPH_PARSEERROR);
             }
             if (!has_target) {
-                IGRAPH_ERROR("No 'target' for edge in GML file", IGRAPH_PARSEERROR);
+                IGRAPH_ERROR("No 'target' for edge in GML file.", IGRAPH_PARSEERROR);
             }
         } else {
             /* anything to do? Maybe add as graph attribute.... */
@@ -377,7 +377,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     /* check vertex id uniqueness */
     if (igraph_trie_size(&trie) != no_of_nodes) {
-        IGRAPH_ERROR("Node 'id' not unique", IGRAPH_PARSEERROR);
+        IGRAPH_ERROR("Node 'id' not unique in GML file.", IGRAPH_PARSEERROR);
     }
 
     /* now we allocate the vectors and strvectors for the attributes */
@@ -393,7 +393,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             atrec->value = p;
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_nodes));
         } else {
-            IGRAPH_WARNING("A composite attribute ignored");
+            IGRAPH_WARNING("A composite attribute was ignored in the GML file.");
         }
     }
 
@@ -409,7 +409,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             atrec->value = p;
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_edges));
         } else {
-            IGRAPH_WARNING("A composite attribute ignored");
+            IGRAPH_WARNING("A composite attribute was ignored in the GML file.");
         }
     }
 
@@ -453,7 +453,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         snprintf(name, sizeof(name) / sizeof(char) -1, "%li", to);
         IGRAPH_CHECK(igraph_trie_get(&trie, name, &to));
         if (igraph_trie_size(&trie) != no_of_nodes) {
-            IGRAPH_ERROR("Unknown node id found at an edge", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Unknown node id found in an edge in GML file.", IGRAPH_PARSEERROR);
         }
         VECTOR(edges)[edgeptr++] = from;
         VECTOR(edges)[edgeptr++] = to;
@@ -527,7 +527,7 @@ static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
     }
     *key = igraph_Calloc(newlen + 1, char);
     if (! *key) {
-        IGRAPH_ERROR("Writing GML file failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM);
     }
     memcpy(*key, strno, plen * sizeof(char));
     for (i = 0; i < len; i++) {
@@ -537,10 +537,10 @@ static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
     }
     (*key)[newlen] = '\0';
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE); } while (0)
+#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
 
 /**
  * \function igraph_write_graph_gml
