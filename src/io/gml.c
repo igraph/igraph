@@ -506,7 +506,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_i_gml_parsedata_destroy(&context);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
@@ -657,6 +657,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         char *name, *newname;
         igraph_strvector_get(&gnames, i, &name);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
+        IGRAPH_FINALLY(igraph_free, newname);
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
             IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
             CHECK(fprintf(outstream, "  %s ", newname));
@@ -675,6 +676,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
         }
         igraph_Free(newname);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* Now come the vertices */
@@ -692,6 +694,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 continue;
             }
             IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
+            IGRAPH_FINALLY(igraph_free, newname);
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name,
                              igraph_vss_1((igraph_integer_t) i), &numv));
@@ -713,6 +716,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
             }
             igraph_Free(newname);
+            IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ]\n"));
     }
@@ -738,6 +742,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 continue;
             }
             IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
+            IGRAPH_FINALLY(igraph_free, newname);
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name,
                              igraph_ess_1((igraph_integer_t) i), &numv));
@@ -759,6 +764,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
             }
             igraph_Free(newname);
+            IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ]\n"));
     }
@@ -781,7 +787,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     igraph_strvector_destroy(&gnames);
     IGRAPH_FINALLY_CLEAN(9);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef CHECK
