@@ -1030,7 +1030,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
      * the excess rows from the merge matrix */
     if (no_of_joins < total_joins) {
         long int *ivec;
-        ivec = igraph_Calloc(igraph_matrix_nrow(merges), long int);
+        long int merges_nrow = igraph_matrix_nrow(merges);
+        ivec = igraph_Calloc(merges_nrow, long int);
         if (ivec == 0) {
             IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
         }

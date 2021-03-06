@@ -1311,9 +1311,13 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 
 int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
                                   const TYPE(igraph_vector) *from) {
+    long int from_size;
+
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(from->stor_begin != NULL);
-    to->stor_begin = igraph_Calloc(FUNCTION(igraph_vector, size)(from), BASE);
+
+    from_size = FUNCTION(igraph_vector, size)(from);
+    to->stor_begin = igraph_Calloc(from_size, BASE);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
     }

@@ -498,9 +498,14 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  */
 
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+    long int from_size;
+
     IGRAPH_ASSERT(from != NULL);
     /*   IGRAPH_ASSERT(from->stor_begin != NULL); */ /* TODO */
-    to->stor_begin = igraph_Calloc(igraph_vector_ptr_size(from), void*);
+
+    from_size = igraph_vector_ptr_size(from);
+
+    to->stor_begin = igraph_Calloc(from_size, void*);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
     }
