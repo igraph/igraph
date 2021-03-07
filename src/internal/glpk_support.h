@@ -36,19 +36,21 @@
 #include <glpk.h>
 #include <setjmp.h>
 
-typedef struct igraph_i_glpk_interrupt_s {
-    jmp_buf jmp;
-    int     interrupted;
-    char    msg[4096];
-    char   *msg_ptr;
-} igraph_i_glpk_interrupt_t;
+typedef struct igraph_i_glpk_error_info_s {
+    jmp_buf jmp;            /* used for bailing when there is a GLPK error */
+    int     is_interrupted; /* Boolean; true if there was an interruption */
+    int     is_error;       /* Boolean; true if the error hook was called */
+    char    msg[4096];      /* GLPK error messages are collected here */
+    char   *msg_ptr;        /* Points to the end (null terminator) of msg */
+} igraph_i_glpk_error_info_t;
 
-extern IGRAPH_THREAD_LOCAL igraph_i_glpk_interrupt_t igraph_i_glpk_interrupt;
+extern IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 
 int igraph_i_glpk_check(int retval, const char* message);
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info);
 void igraph_i_glpk_error_hook(void *info);
 int igraph_i_glpk_terminal_hook(void *info, const char *s);
+void igraph_i_glp_delete_prob(glp_prob *p);
 
 #define IGRAPH_GLPK_CHECK(func, message) do { \
         int igraph_i_ret = igraph_i_glpk_check(func, message); \
@@ -68,19 +70,20 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s);
     do { \
         glp_error_hook(igraph_i_glpk_error_hook, NULL); \
         glp_term_hook(igraph_i_glpk_terminal_hook, NULL); \
-        igraph_i_glpk_interrupt.interrupted = 0; \
-        igraph_i_glpk_interrupt.msg_ptr = igraph_i_glpk_interrupt.msg; \
-        if (setjmp(igraph_i_glpk_interrupt.jmp)) { \
-            if (igraph_i_glpk_interrupt.interrupted) { \
+        igraph_i_glpk_error_info.is_interrupted = 0; \
+        igraph_i_glpk_error_info.is_error = 0; \
+        igraph_i_glpk_error_info.msg_ptr = igraph_i_glpk_error_info.msg; \
+        if (setjmp(igraph_i_glpk_error_info.jmp)) { \
+            if (igraph_i_glpk_error_info.is_interrupted) { \
                 return IGRAPH_INTERRUPTED; \
             } else { \
-                if (igraph_i_glpk_interrupt.msg_ptr != igraph_i_glpk_interrupt.msg) { \
-                    while ( *(igraph_i_glpk_interrupt.msg_ptr - 1) == '\n' && \
-                            igraph_i_glpk_interrupt.msg_ptr > igraph_i_glpk_interrupt.msg ) { \
-                        igraph_i_glpk_interrupt.msg_ptr--; \
+                if (igraph_i_glpk_error_info.msg_ptr != igraph_i_glpk_error_info.msg) { \
+                    while ( *(igraph_i_glpk_error_info.msg_ptr - 1) == '\n' && \
+                            igraph_i_glpk_error_info.msg_ptr > igraph_i_glpk_error_info.msg ) { \
+                        igraph_i_glpk_error_info.msg_ptr--; \
                     } \
-                    *igraph_i_glpk_interrupt.msg_ptr = '\0'; \
-                    igraph_error(igraph_i_glpk_interrupt.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                    *igraph_i_glpk_error_info.msg_ptr = '\0'; \
+                    igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
                 } \
                 return IGRAPH_EGLP; \
             } \

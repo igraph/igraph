@@ -32,23 +32,23 @@
 
 #include <stdio.h>
 
-IGRAPH_THREAD_LOCAL igraph_i_glpk_interrupt_t igraph_i_glpk_interrupt;
+IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 
 int igraph_i_glpk_terminal_hook(void *info, const char *s) {
     IGRAPH_UNUSED(info);
 
     if (igraph_i_interruption_handler) {
-        if (!igraph_i_glpk_interrupt.interrupted && igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        if (!igraph_i_glpk_error_info.is_interrupted && igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
             /* If an interruption has already occurred, do not set another error. */
-            igraph_i_glpk_interrupt.interrupted = 1;
+            igraph_i_glpk_error_info.is_interrupted = 1;
             glp_error("GLPK was interrupted.");
         } else {
             /* Copy the error messages into a buffer for later reporting */
-            const size_t n = sizeof(igraph_i_glpk_interrupt.msg) / sizeof(char) - 1;
-            while (*s != '\0' && igraph_i_glpk_interrupt.msg_ptr < igraph_i_glpk_interrupt.msg + n) {
-                *(igraph_i_glpk_interrupt.msg_ptr++) = *(s++);
+            const size_t n = sizeof(igraph_i_glpk_error_info.msg) / sizeof(char) - 1;
+            while (*s != '\0' && igraph_i_glpk_error_info.msg_ptr < igraph_i_glpk_error_info.msg + n) {
+                *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
             }
-            *igraph_i_glpk_interrupt.msg_ptr = '\0';
+            *igraph_i_glpk_error_info.msg_ptr = '\0';
         }
     }
     return 1; /* Do not print from GLPK */
@@ -56,10 +56,9 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
 
 void igraph_i_glpk_error_hook(void *info) {
     IGRAPH_UNUSED(info);
-    /* We do NOT call glp_free_env() here. Freeing still-in-use resources
-     * will be done by the 'finally' stack. Trying to use glp_free_env()
-     * here may lead to a double-free and a crash. */
-    longjmp(igraph_i_glpk_interrupt.jmp, 1);
+    igraph_i_glpk_error_info.is_error = 1;
+    glp_free_env();
+    longjmp(igraph_i_glpk_error_info.jmp, 1);
 }
 
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
@@ -74,6 +73,16 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
         if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
             glp_ios_terminate(tree);
         }
+    }
+}
+
+/* Only delete problem if GLPK is not at an error state.
+ * If there is an error, glp_free_env() will be called instead.
+ * We do not use glp_at_error() as igraph's old embedded GLPK
+ * does not yet have this function. */
+void igraph_i_glp_delete_prob(glp_prob *p) {
+    if (! igraph_i_glpk_error_info.is_error) {
+        glp_delete_prob(p);
     }
 }
 
