@@ -19,49 +19,50 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void print_and_destroy(igraph_t *g) {
+void print_result(igraph_t *g, igraph_integer_t start_vid) {
     igraph_real_t result;
-    IGRAPH_ASSERT(igraph_pseudo_diameter(g, &result) == IGRAPH_SUCCESS);
+    igraph_integer_t from, to;
+    IGRAPH_ASSERT(igraph_pseudo_diameter(g, &result, start_vid, &from, &to) == IGRAPH_SUCCESS);
     printf("result:");
     print_real(stdout, result, "%g");
-    printf("\n\n");
-    igraph_destroy(g);
+    printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n\n", from, to);
 }
 
 int main() {
-    igraph_t graph;
+    igraph_t g;
     igraph_real_t result;
     int i;
 
-    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_set_error_handler(igraph_error_handler_ignore);
 
-    printf("No vertices:\n");
-    igraph_small(&graph, 0, 0, -1);
-    print_and_destroy(&graph);
+    printf("No vertices, no allowed starting vertex id:\n");
+    igraph_small(&g, 0, 0, -1);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &result, 0, NULL, NULL) == IGRAPH_EINVAL);
+    igraph_destroy(&g);
 
     printf("1 vertex:\n");
-    igraph_small(&graph, 1, 0, -1);
-    print_and_destroy(&graph);
+    igraph_small(&g, 1, 0, -1);
+    print_result(&g, 0);
+    igraph_destroy(&g);
 
     printf("2 vertices:\n");
-    igraph_small(&graph, 2, 0, -1);
-    print_and_destroy(&graph);
+    igraph_small(&g, 2, 0, -1);
+    print_result(&g, 0);
+    igraph_destroy(&g);
 
     printf("Disconnected graph with loops and multiple edges.\n");
-    igraph_small(&graph, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
-    for (i = 0; i < 10; i ++) {
-        IGRAPH_ASSERT(igraph_pseudo_diameter(&graph, &result) == IGRAPH_SUCCESS);
-        IGRAPH_ASSERT(result == 0 || result == 2 || result == 3);
+    igraph_small(&g, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
+    for (i = 0; i < 6; i ++) {
+        print_result(&g, i);
     }
-    igraph_destroy(&graph);
+    igraph_destroy(&g);
 
-    printf("Tutte graph.\n");
-    igraph_famous(&graph, "tutte");
-    for (i = 0; i < 10; i ++) {
-        IGRAPH_ASSERT(igraph_pseudo_diameter(&graph, &result) == IGRAPH_SUCCESS);
-        IGRAPH_ASSERT(result == 8);
+    printf("Petersen graph.\n");
+    igraph_famous(&g, "petersen");
+    for (i = 0; i < 6; i ++) {
+        print_result(&g, i);
     }
-    igraph_destroy(&graph);
+    igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
     return 0;

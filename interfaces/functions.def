@@ -858,7 +858,8 @@ igraph_radius:
         NAME-R: radius
 
 igraph_pseudo_diameter:
-        PARAMS: GRAPH graph, OUT REALPTR p_diameter
+        PARAMS: GRAPH graph, OUT REALPTR diameter, INTEGER start_vid, \
+                OUT INTEGERPTR from=NULL, OUT INTEGERPTR to=NULL
         NAME-R: pseudo_diameter
 
 igraph_diversity:

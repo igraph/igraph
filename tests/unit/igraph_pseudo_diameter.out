@@ -1,11 +1,33 @@
-No vertices:
-result:NaN
-
+No vertices, no allowed starting vertex id:
 1 vertex:
-result:0
+result:0, from 0 to 0
 
 2 vertices:
-result:0
+result:0, from 0 to 0
 
 Disconnected graph with loops and multiple edges.
-Tutte graph.
+result:3, from 0 to 4
+
+result:3, from 4 to 0
+
+result:2, from 2 to 1
+
+result:3, from 0 to 4
+
+result:3, from 4 to 0
+
+result:0, from 5 to 5
+
+Petersen graph.
+result:2, from 0 to 2
+
+result:2, from 1 to 4
+
+result:2, from 2 to 0
+
+result:2, from 3 to 1
+
+result:2, from 4 to 1
+
+result:2, from 5 to 1
+
