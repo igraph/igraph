@@ -44,6 +44,14 @@ int main() {
     }
 
     igraph_vector_destroy(&v);
+    
+    /* regression test for #1479 -- calling resize_min() on an empty vector */
+    igraph_vector_init_seq(&v, 1, 1000);
+    igraph_vector_clear(&v);
+    igraph_vector_resize_min(&v);
+    if (igraph_vector_capacity(&v) != 1 || igraph_vector_size(&v) != 0) {
+        return 4;
+    }
 
     VERIFY_FINALLY_STACK();
 
