@@ -463,7 +463,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
-        igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
+        igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
             IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
         }
@@ -582,7 +582,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
-        igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
+        igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
             IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
         }
