@@ -148,7 +148,7 @@ static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
-    vdata = igraph_Calloc(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
+    vdata = IGRAPH_CALLOC(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
     if (vdata == 0) {
         IGRAPH_ERROR("igraph_layout_reingold_tilford failed", IGRAPH_ENOMEM);
     }

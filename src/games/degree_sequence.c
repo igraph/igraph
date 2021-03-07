@@ -61,7 +61,7 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
     no_of_nodes = igraph_vector_size(out_seq);
     no_of_edges = directed ? outsum : outsum / 2;
 
-    bag1 = igraph_Calloc(outsum, long int);
+    bag1 = IGRAPH_CALLOC(outsum, long int);
     if (bag1 == 0) {
         IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
@@ -73,7 +73,7 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
         }
     }
     if (directed) {
-        bag2 = igraph_Calloc(insum, long int);
+        bag2 = IGRAPH_CALLOC(insum, long int);
         if (bag2 == 0) {
             IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
         }
@@ -116,10 +116,10 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
 
     RNG_END();
 
-    igraph_Free(bag1);
+    IGRAPH_FREE(bag1);
     IGRAPH_FINALLY_CLEAN(1);
     if (directed) {
-        igraph_Free(bag2);
+        IGRAPH_FREE(bag2);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

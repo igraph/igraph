@@ -47,7 +47,7 @@ static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *re
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     IGRAPH_VECTOR_INIT_FINALLY(&delete, 0);
-    remain = igraph_Calloc(no_of_nodes, char);
+    remain = IGRAPH_CALLOC(no_of_nodes, char);
     if (remain == 0) {
         IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
     }
@@ -67,7 +67,7 @@ static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *re
         }
     }
 
-    igraph_Free(remain);
+    IGRAPH_FREE(remain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* must set res->attr to 0 before calling igraph_copy */
@@ -395,12 +395,12 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_VECTOR_INIT_FINALLY(&delete, 0);
-    vremain = igraph_Calloc(no_of_nodes, char);
+    vremain = IGRAPH_CALLOC(no_of_nodes, char);
     if (vremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vremain);
-    eremain = igraph_Calloc(no_of_edges, char);
+    eremain = IGRAPH_CALLOC(no_of_edges, char);
     if (eremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
@@ -423,7 +423,7 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
         }
     }
 
-    igraph_Free(eremain);
+    IGRAPH_FREE(eremain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Delete the unnecessary edges */
@@ -444,7 +444,7 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
         }
     }
 
-    igraph_Free(vremain);
+    IGRAPH_FREE(vremain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Delete the unnecessary vertices */

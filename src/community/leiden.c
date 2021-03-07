@@ -499,7 +499,7 @@ static int igraph_i_community_get_clusters(const igraph_vector_t *membership, ig
 
         /* No cluster vector exists yet, so we create a new one */
         if (!cluster) {
-            cluster = igraph_Calloc(1, igraph_vector_t);
+            cluster = IGRAPH_CALLOC(1, igraph_vector_t);
             if (cluster == 0) {
                 IGRAPH_ERROR("Cannot allocate memory for assigning cluster", IGRAPH_ENOMEM);
             }
@@ -1017,7 +1017,7 @@ int igraph_community_leiden(const igraph_t *graph,
 
     /* Check edge weights to possibly use default */
     if (!edge_weights) {
-        i_edge_weights = igraph_Calloc(1, igraph_vector_t);
+        i_edge_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         if (i_edge_weights == 0) {
             IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM);
         }
@@ -1031,7 +1031,7 @@ int igraph_community_leiden(const igraph_t *graph,
 
     /* Check edge weights to possibly use default */
     if (!node_weights) {
-        i_node_weights = igraph_Calloc(1, igraph_vector_t);
+        i_node_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         if (i_node_weights == 0) {
             IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM);
         }
@@ -1050,13 +1050,13 @@ int igraph_community_leiden(const igraph_t *graph,
 
     if (!edge_weights) {
         igraph_vector_destroy(i_edge_weights);
-        igraph_Free(i_edge_weights);
+        IGRAPH_FREE(i_edge_weights);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
     if (!node_weights) {
         igraph_vector_destroy(i_node_weights);
-        igraph_Free(i_node_weights);
+        IGRAPH_FREE(i_node_weights);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

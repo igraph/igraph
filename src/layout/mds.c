@@ -240,7 +240,7 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
         IGRAPH_CHECK(igraph_matrix_init(&dist_submatrix, 0, 0));
         IGRAPH_FINALLY(igraph_matrix_destroy, &dist_submatrix);
 
-        seen_vertices = igraph_Calloc(no_of_nodes, igraph_bool_t);
+        seen_vertices = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
         if (seen_vertices == 0) {
             IGRAPH_ERROR("cannot calculate MDS layout", IGRAPH_ENOMEM);
         }
@@ -261,7 +261,7 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_matrix_select_rows_cols(&m, &dist_submatrix,
                          &comp, &comp));
             /* Allocate a new matrix for storing the layout */
-            layout = igraph_Calloc(1, igraph_matrix_t);
+            layout = IGRAPH_CALLOC(1, igraph_matrix_t);
             if (layout == 0) {
                 IGRAPH_ERROR("cannot calculate MDS layout", IGRAPH_ENOMEM);
             }

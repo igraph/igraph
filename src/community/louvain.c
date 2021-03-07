@@ -93,7 +93,7 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
     /* Make sure there's enough space in eids to store the new edge IDs */
     IGRAPH_CHECK(igraph_vector_resize(eids, ecount));
 
-    links = igraph_Calloc(ecount, igraph_i_multilevel_link);
+    links = IGRAPH_CALLOC(ecount, igraph_i_multilevel_link);
     if (links == 0) {
         IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
     }
@@ -128,7 +128,7 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
         VECTOR(*eids)[links[i].id] = l;
     }
 
-    igraph_Free(links);
+    IGRAPH_FREE(links);
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_destroy(graph);
@@ -185,7 +185,7 @@ static int igraph_i_multilevel_community_links(
     igraph_incident(graph, edges, vertex, IGRAPH_ALL);
 
     n = igraph_vector_size(edges);
-    links = igraph_Calloc(n, igraph_i_multilevel_community_link);
+    links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);
     if (links == 0) {
         IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
     }
@@ -381,7 +381,7 @@ static int igraph_i_community_multilevel_step(
     communities.weights = weights;
     communities.weight_sum = 2 * igraph_vector_sum(weights);
     communities.membership = membership;
-    communities.item = igraph_Calloc(vcount, igraph_i_multilevel_community);
+    communities.item = IGRAPH_CALLOC(vcount, igraph_i_multilevel_community);
     if (communities.item == 0) {
         IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
     }

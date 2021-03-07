@@ -140,11 +140,11 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
 
 igraph_real_t igraph_lgl_get_number(const char *str, long int length) {
   igraph_real_t num;
-  char *tmp=igraph_Calloc(length+1, char);
+  char *tmp=IGRAPH_CALLOC(length+1, char);
   
   strncpy(tmp, str, length);
   tmp[length]='\0';
   sscanf(tmp, "%lf", &num);
-  igraph_Free(tmp);
+  IGRAPH_FREE(tmp);
   return num;
 } 

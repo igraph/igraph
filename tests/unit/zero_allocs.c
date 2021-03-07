@@ -20,15 +20,15 @@
 #include "test_utilities.inc"
 
 int main() {
-    int *a = igraph_Calloc(0, int);
+    int *a = IGRAPH_CALLOC(0, int);
 
     IGRAPH_ASSERT(a);
 
-    a = igraph_Realloc(a, 0, int);
+    a = IGRAPH_REALLOC(a, 0, int);
 
     IGRAPH_ASSERT(a);
 
-    igraph_Free(a);
+    IGRAPH_FREE(a);
 
     IGRAPH_ASSERT(!a);
 

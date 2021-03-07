@@ -193,12 +193,12 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 
     /* init coords & weights */
 
-    coords = igraph_Calloc(dims, long int);
+    coords = IGRAPH_CALLOC(dims, long int);
     if (coords == 0) {
         IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, coords);
-    weights = igraph_Calloc(dims, long int);
+    weights = IGRAPH_CALLOC(dims, long int);
     if (weights == 0) {
         IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
@@ -268,8 +268,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
     }
 
     /* clean up */
-    igraph_Free(coords);
-    igraph_Free(weights);
+    IGRAPH_FREE(coords);
+    IGRAPH_FREE(weights);
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(3);
 
