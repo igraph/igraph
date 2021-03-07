@@ -45,9 +45,9 @@
 
 void glp_printf(const char *fmt, ...)
 {     va_list arg;
-      /* va_start(arg, fmt); */
-      /* xvprintf(fmt, arg); */
-      /* va_end(arg); */
+      va_start(arg, fmt);
+      xvprintf(fmt, arg);
+      va_end(arg);
       return;
 }
 
