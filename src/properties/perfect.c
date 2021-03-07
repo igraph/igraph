@@ -55,7 +55,6 @@
  *     will be stored here.
  * \return Error code.
  *
- * \example examples/simple/igraph_girth.c
  */
 int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     
