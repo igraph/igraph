@@ -522,12 +522,12 @@ static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
     }
     k1 = (long int)igraph_vector_max(v1) + 1;
     k2 = (long int)igraph_vector_max(v2) + 1;
-    p1 = igraph_Calloc(k1, double);
+    p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, p1);
-    p2 = igraph_Calloc(k2, double);
+    p2 = IGRAPH_CALLOC(k2, double);
     if (p2 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
     }
@@ -579,7 +579,7 @@ static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
 
     igraph_spmatrix_iter_destroy(&mit);
     igraph_spmatrix_destroy(&m);
-    igraph_Free(p1); igraph_Free(p2);
+    IGRAPH_FREE(p1); IGRAPH_FREE(p2);
 
     IGRAPH_FINALLY_CLEAN(4);
 

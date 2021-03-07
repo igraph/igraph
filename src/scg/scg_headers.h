@@ -123,6 +123,6 @@ int igraph_i_compare_int(const void *a, const void *b);
 igraph_real_t *igraph_i_real_sym_matrix(int size);
 #define igraph_i_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
 #define igraph_i_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
-#define igraph_i_free_real_sym_matrix(S) igraph_Free(S)
+#define igraph_i_free_real_sym_matrix(S) IGRAPH_FREE(S)
 
 #endif

@@ -54,14 +54,14 @@ int igraph_indheap_init(igraph_indheap_t* h, long int alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
-    h->stor_begin = igraph_Calloc(alloc_size, igraph_real_t);
+    h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
     if (h->stor_begin == 0) {
         h->index_begin = 0;
         IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
     }
-    h->index_begin = igraph_Calloc(alloc_size, long int);
+    h->index_begin = IGRAPH_CALLOC(alloc_size, long int);
     if (h->index_begin == 0) {
-        igraph_Free(h->stor_begin);
+        IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
     }
@@ -89,14 +89,14 @@ int igraph_indheap_clear(igraph_indheap_t *h) {
 int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, long int len) {
     long int i;
 
-    h->stor_begin = igraph_Calloc(len, igraph_real_t);
+    h->stor_begin = IGRAPH_CALLOC(len, igraph_real_t);
     if (h->stor_begin == 0) {
         h->index_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
     }
-    h->index_begin = igraph_Calloc(len, long int);
+    h->index_begin = IGRAPH_CALLOC(len, long int);
     if (h->index_begin == 0) {
-        igraph_Free(h->stor_begin);
+        IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
     }
@@ -123,11 +123,11 @@ void igraph_indheap_destroy        (igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     if (h->destroy) {
         if (h->stor_begin != 0) {
-            igraph_Free(h->stor_begin);
+            IGRAPH_FREE(h->stor_begin);
             h->stor_begin = 0;
         }
         if (h->index_begin != 0) {
-            igraph_Free(h->index_begin);
+            IGRAPH_FREE(h->index_begin);
             h->index_begin = 0;
         }
     }
@@ -290,20 +290,20 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
         return 0;
     }
 
-    tmp1 = igraph_Calloc(size, igraph_real_t);
+    tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
     if (tmp1 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp1);
-    tmp2 = igraph_Calloc(size, long int);
+    tmp2 = IGRAPH_CALLOC(size, long int);
     if (tmp2 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp2);
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
     memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));
-    igraph_Free(h->stor_begin);
-    igraph_Free(h->index_begin);
+    IGRAPH_FREE(h->stor_begin);
+    IGRAPH_FREE(h->index_begin);
 
     h->stor_begin = tmp1;
     h->index_begin = tmp2;
@@ -432,7 +432,7 @@ int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size)
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
-    h->stor_begin = igraph_Calloc(alloc_size, igraph_real_t);
+    h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
     if (h->stor_begin == 0) {
         h->index_begin = 0;
         h->index2_begin = 0;
@@ -441,17 +441,17 @@ int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size)
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
     h->destroy = 1;
-    h->index_begin = igraph_Calloc(alloc_size, long int);
+    h->index_begin = IGRAPH_CALLOC(alloc_size, long int);
     if (h->index_begin == 0) {
-        igraph_Free(h->stor_begin);
+        IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         h->index2_begin = 0;
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
     }
-    h->index2_begin = igraph_Calloc(alloc_size, long int);
+    h->index2_begin = IGRAPH_CALLOC(alloc_size, long int);
     if (h->index2_begin == 0) {
-        igraph_Free(h->stor_begin);
-        igraph_Free(h->index_begin);
+        IGRAPH_FREE(h->stor_begin);
+        IGRAPH_FREE(h->index_begin);
         h->stor_begin = 0;
         h->index_begin = 0;
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
@@ -469,15 +469,15 @@ void igraph_d_indheap_destroy        (igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     if (h->destroy) {
         if (h->stor_begin != 0) {
-            igraph_Free(h->stor_begin);
+            IGRAPH_FREE(h->stor_begin);
             h->stor_begin = 0;
         }
         if (h->index_begin != 0) {
-            igraph_Free(h->index_begin);
+            IGRAPH_FREE(h->index_begin);
             h->index_begin = 0;
         }
         if (h->index2_begin != 0) {
-            igraph_Free(h->index2_begin);
+            IGRAPH_FREE(h->index2_begin);
             h->index2_begin = 0;
         }
     }
@@ -586,17 +586,17 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
         return 0;
     }
 
-    tmp1 = igraph_Calloc(size, igraph_real_t);
+    tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
     if (tmp1 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp1);
-    tmp2 = igraph_Calloc(size, long int);
+    tmp2 = IGRAPH_CALLOC(size, long int);
     if (tmp2 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp2);
-    tmp3 = igraph_Calloc(size, long int);
+    tmp3 = IGRAPH_CALLOC(size, long int);
     if (tmp3 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
@@ -605,9 +605,9 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
     memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));
     memcpy(tmp3, h->index2_begin, (size_t) actual_size * sizeof(long int));
-    igraph_Free(h->stor_begin);
-    igraph_Free(h->index_begin);
-    igraph_Free(h->index2_begin);
+    IGRAPH_FREE(h->stor_begin);
+    IGRAPH_FREE(h->index_begin);
+    IGRAPH_FREE(h->index2_begin);
 
     h->stor_begin = tmp1;
     h->stor_end = h->stor_begin + size;

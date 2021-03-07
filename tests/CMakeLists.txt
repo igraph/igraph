@@ -735,3 +735,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
 )
+# memory allocation
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  zero_allocs
+)

@@ -160,7 +160,7 @@ inline int bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
         mpz_init(group_size);
         stats.get_group_size().get(group_size);
         group_size_strlen = mpz_sizeinbase(group_size, /* base */ 10) + 2;
-        info->group_size = igraph_Calloc(group_size_strlen, char);
+        info->group_size = IGRAPH_CALLOC(group_size_strlen, char);
         if (! info->group_size) {
             IGRAPH_ERROR("Insufficient memory to retrieve automotphism group size.", IGRAPH_ENOMEM);
         }
@@ -197,7 +197,7 @@ public:
 
     void operator ()(unsigned int n, const unsigned int *aut) {
         int err;
-        igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
+        igraph_vector_t *newvector = IGRAPH_CALLOC(1, igraph_vector_t);
         if (! newvector) {
             throw bad_alloc();
         }

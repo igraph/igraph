@@ -200,7 +200,7 @@ int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
 int igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
-    st = igraph_Calloc(1, igraph_i_rng_glibc2_state_t);
+    st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
     if (!st) {
         IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
     }
@@ -214,7 +214,7 @@ int igraph_rng_glibc2_init(void **state) {
 void igraph_rng_glibc2_destroy(void *vstate) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
-    igraph_Free(state);
+    IGRAPH_FREE(state);
 }
 
 /**
@@ -270,7 +270,7 @@ int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
 int igraph_rng_rand_init(void **state) {
     igraph_i_rng_rand_state_t *st;
 
-    st = igraph_Calloc(1, igraph_i_rng_rand_state_t);
+    st = IGRAPH_CALLOC(1, igraph_i_rng_rand_state_t);
     if (!st) {
         IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
     }
@@ -284,7 +284,7 @@ int igraph_rng_rand_init(void **state) {
 void igraph_rng_rand_destroy(void *vstate) {
     igraph_i_rng_rand_state_t *state =
         (igraph_i_rng_rand_state_t*) vstate;
-    igraph_Free(state);
+    IGRAPH_FREE(state);
 }
 
 /**
@@ -418,7 +418,7 @@ int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
 int igraph_rng_mt19937_init(void **state) {
     igraph_i_rng_mt19937_state_t *st;
 
-    st = igraph_Calloc(1, igraph_i_rng_mt19937_state_t);
+    st = IGRAPH_CALLOC(1, igraph_i_rng_mt19937_state_t);
     if (!st) {
         IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
     }
@@ -432,7 +432,7 @@ int igraph_rng_mt19937_init(void **state) {
 void igraph_rng_mt19937_destroy(void *vstate) {
     igraph_i_rng_mt19937_state_t *state =
         (igraph_i_rng_mt19937_state_t*) vstate;
-    igraph_Free(state);
+    IGRAPH_FREE(state);
 }
 
 /**

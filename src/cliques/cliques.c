@@ -66,7 +66,7 @@ static int igraph_i_find_k_cliques(
     igraph_bool_t ok;
 
     /* Allocate the storage */
-    *new_member_storage = igraph_Realloc(*new_member_storage,
+    *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                          (size_t) (size * old_clique_count),
                                          igraph_real_t);
     if (*new_member_storage == 0) {
@@ -165,7 +165,7 @@ static int igraph_i_find_k_cliques(
                 /* See if new_member_storage is full. If so, reallocate */
                 if (m == new_member_storage_size) {
                     IGRAPH_FINALLY_CLEAN(1);
-                    *new_member_storage = igraph_Realloc(*new_member_storage,
+                    *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                                          (size_t) new_member_storage_size * 2,
                                                          igraph_real_t);
                     if (*new_member_storage == 0) {
@@ -217,14 +217,14 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
 
     /* Will be resized later, if needed. */
-    member_storage = igraph_Calloc(1, igraph_real_t);
+    member_storage = IGRAPH_CALLOC(1, igraph_real_t);
     if (member_storage == 0) {
         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, member_storage);
 
     /* Find all 1-cliques: every vertex will be a clique */
-    new_member_storage = igraph_Calloc(no_of_nodes, igraph_real_t);
+    new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (new_member_storage == 0) {
         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
     }
@@ -241,7 +241,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
         IGRAPH_CHECK(igraph_vector_ptr_resize(res, no_of_nodes));
         igraph_vector_ptr_null(res);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_vector_t *p = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             if (p == 0) {
                 IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
             }
@@ -280,7 +280,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
         /* Add the cliques just found to the result if requested */
         if (i >= min_size && i <= max_size) {
             for (j = 0, k = 0; j < clique_count; j++, k += i) {
-                igraph_vector_t *p = igraph_Calloc(1, igraph_vector_t);
+                igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (p == 0) {
                     IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
                 }
@@ -634,7 +634,7 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
         igraph_integer_t size = 0;
         if (res) {
             igraph_vector_t *vec;
-            vec = igraph_Calloc(1, igraph_vector_t);
+            vec = IGRAPH_CALLOC(1, igraph_vector_t);
             if (vec == 0) {
                 IGRAPH_ERROR("igraph_i_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
             }
@@ -768,7 +768,7 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
         igraph_set_destroy(array + i);
         i++;
     }
-    igraph_Free(array);
+    IGRAPH_FREE(array);
 }
 
 /**
@@ -824,7 +824,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-    clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (clqdata.IS == 0) {
         IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
     }
@@ -835,7 +835,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
-    clqdata.buckets = igraph_Calloc(no_of_nodes + 1, igraph_set_t);
+    clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
     if (clqdata.buckets == 0) {
         IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
     }
@@ -903,7 +903,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
     ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-    clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (clqdata.IS == 0) {
         IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM);
     }
@@ -914,7 +914,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
-    clqdata.buckets = igraph_Calloc(no_of_nodes + 1, igraph_set_t);
+    clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
     if (clqdata.buckets == 0) {
         IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM);
     }
@@ -962,7 +962,7 @@ static int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* d
     igraph_vector_t* vec;
 
     IGRAPH_UNUSED(cont);
-    vec = igraph_Calloc(1, igraph_vector_t);
+    vec = IGRAPH_CALLOC(1, igraph_vector_t);
     if (vec == 0) {
         IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
     }
@@ -983,7 +983,7 @@ static int igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* cliq
         return IGRAPH_SUCCESS;
     }
 
-    vec = igraph_Calloc(1, igraph_vector_t);
+    vec = IGRAPH_CALLOC(1, igraph_vector_t);
     if (vec == 0) {
         IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
     }
@@ -1017,7 +1017,7 @@ static int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* d
         }
     }
 
-    vec = igraph_Calloc(1, igraph_vector_t);
+    vec = IGRAPH_CALLOC(1, igraph_vector_t);
     if (vec == 0) {
         IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
     }
@@ -1294,7 +1294,7 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
         }
 
         /* Create a new stack frame in case we back out later */
-        new_frame_ptr = igraph_Calloc(1, igraph_i_maximal_cliques_stack_frame);
+        new_frame_ptr = IGRAPH_CALLOC(1, igraph_i_maximal_cliques_stack_frame);
         if (new_frame_ptr == 0) {
             IGRAPH_ERROR("cannot allocate new stack frame", IGRAPH_ENOMEM);
         }
@@ -1361,7 +1361,7 @@ static int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-    clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (clqdata.IS == 0) {
         IGRAPH_ERROR("igraph_i_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM);
     }
@@ -1372,7 +1372,7 @@ static int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
-    clqdata.buckets = igraph_Calloc(no_of_nodes + 1, igraph_set_t);
+    clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
     if (clqdata.buckets == 0) {
         IGRAPH_ERROR("igraph_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM);
     }

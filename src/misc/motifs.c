@@ -237,13 +237,13 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
         }
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
 
-    subg = igraph_Calloc(no_of_nodes, char);
+    subg = IGRAPH_CALLOC(no_of_nodes, char);
     if (subg == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
@@ -411,8 +411,8 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 
     RNG_END();
 
-    igraph_Free(added);
-    igraph_Free(subg);
+    IGRAPH_FREE(added);
+    IGRAPH_FREE(subg);
     igraph_vector_destroy(&vids);
     igraph_vector_destroy(&adjverts);
     igraph_adjlist_destroy(&alloutneis);
@@ -479,7 +479,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     long int sam;
     long int i;
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
@@ -492,7 +492,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
     if (parsample == 0) {
-        sample = igraph_Calloc(1, igraph_vector_t);
+        sample = IGRAPH_CALLOC(1, igraph_vector_t);
         if (sample == 0) {
             IGRAPH_ERROR("Cannot estimate motifs", IGRAPH_ENOMEM);
         }
@@ -627,11 +627,11 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 
     if (parsample == 0) {
         igraph_vector_destroy(sample);
-        igraph_Free(sample);
+        IGRAPH_FREE(sample);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     igraph_vector_destroy(&vids);
     igraph_vector_destroy(&adjverts);
     igraph_stack_destroy(&stack);
@@ -675,7 +675,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     long int father;
     long int i;
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
@@ -805,7 +805,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 
     RNG_END();
 
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     igraph_vector_destroy(&vids);
     igraph_vector_destroy(&adjverts);
     igraph_stack_destroy(&stack);
