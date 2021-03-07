@@ -502,7 +502,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
 #define VAR2IDX(i, j) (i*(n-1)+j-(i+1)*i/2)
 
     /* Configure GLPK */
-    glp_term_out(GLP_OFF);
+    IGRAPH_GLPK_SETUP();
     glp_init_iocp(&parm);
     parm.br_tech = GLP_BR_DTH;
     parm.bt_tech = GLP_BT_BLB;

@@ -156,7 +156,8 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(),
                                  IGRAPH_OUT, IGRAPH_LOOPS, weights));
 
-    glp_term_out(GLP_OFF);
+    IGRAPH_GLPK_SETUP();
+
     ip = glp_create_prob();
     IGRAPH_FINALLY(glp_delete_prob, ip);
 

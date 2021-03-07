@@ -32,6 +32,36 @@
 
 #include <stdio.h>
 
+IGRAPH_THREAD_LOCAL igraph_i_glpk_interrupt_t igraph_i_glpk_interrupt;
+
+int igraph_i_glpk_terminal_hook(void *info, const char *s) {
+    IGRAPH_UNUSED(info);
+
+    if (igraph_i_interruption_handler) {
+        if (!igraph_i_glpk_interrupt.interrupted && igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+            /* If an interruption has already occurred, do not set another error. */
+            igraph_i_glpk_interrupt.interrupted = 1;
+            glp_error("GLPK was interrupted.");
+        } else {
+            /* Copy the error messages into a buffer for later reporting */
+            const size_t n = sizeof(igraph_i_glpk_interrupt.msg) / sizeof(char) - 1;
+            while (*s != '\0' && igraph_i_glpk_interrupt.msg_ptr < igraph_i_glpk_interrupt.msg + n) {
+                *(igraph_i_glpk_interrupt.msg_ptr++) = *(s++);
+            }
+            *igraph_i_glpk_interrupt.msg_ptr = '\0';
+        }
+    }
+    return 1; /* Do not print from GLPK */
+}
+
+IGRAPH_NORETURN void igraph_i_glpk_error_hook(void *info) {
+    IGRAPH_UNUSED(info);
+    /* We do NOT call glp_free_env() here. Freeing still-in-use resources
+     * will be done by the 'finally' stack. Trying to use glp_free_env()
+     * here may lead to a double-free and a crash. */
+    longjmp(igraph_i_glpk_interrupt.jmp, 1);
+}
+
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
     IGRAPH_UNUSED(info);
 
@@ -78,7 +108,7 @@ int igraph_i_glpk_check(int retval, const char* message) {
         HANDLE_CODE2(GLP_EITLIM);
 
     default:
-        IGRAPH_ERROR("unknown GLPK error", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Unknown GLPK error", IGRAPH_FAILURE);
     }
 #undef HANDLE_CODE
 #undef HANDLE_CODE2

@@ -24,6 +24,7 @@
 
 #include "glpapi.h"
 #include "igraph_error.h"
+#include "../src/core/error.h"
 
 /***********************************************************************
 *  NAME
@@ -46,6 +47,10 @@ static void error(const char *fmt, ...)
       env->term_out = GLP_ON;
       va_start(arg, fmt);
       igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
+      va_end(arg);
+      if (env->err_hook != NULL)
+         env->err_hook(env->err_info);
+      igraph_abort();
       /* no return */
 }
 
