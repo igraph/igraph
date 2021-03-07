@@ -687,7 +687,7 @@ igraph_girth:
         DEPS: circle ON graph
         IGNORE: RR, RC, RNamespace
 
-igraph_perfect:
+igraph_is_perfect:
         PARAMS: GRAPH graph, OUT BOOLEANPTR res
         IGNORE: RR, RC, RNamespace
 

@@ -33,7 +33,7 @@ int main() {
     printf("bipartite \n");
     printf("==========================================================\n");
     igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, 0, IGRAPH_ALL);
-    igraph_perfect(&graph, &is_perfect);
+    igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect == 1);
     igraph_destroy(&graph);
     x = IGRAPH_FINALLY_STACK_SIZE();
@@ -42,7 +42,7 @@ int main() {
     printf("==========================================================\n");
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_complementer(&comp_graph, &graph, 0);
-    igraph_perfect(&comp_graph, &is_perfect);
+    igraph_is_perfect(&comp_graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect == 1);
     igraph_destroy(&graph);
     igraph_destroy(&comp_graph);
@@ -52,7 +52,7 @@ int main() {
     printf("A cycle of size 5\n");
     printf("==========================================================\n");
     igraph_ring(&graph, 5, 0, 0, 1);
-    igraph_perfect(&graph, &is_perfect);
+    igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect == 0);
     igraph_destroy(&graph);
     x = IGRAPH_FINALLY_STACK_SIZE();
@@ -62,7 +62,7 @@ int main() {
     igraph_small(&graph, 9, 0,
                 0, 1, 0, 3, 0, 6, 0, 2, 1, 2, 1, 4, 1, 7, 2, 5, 2, 8,
                 3, 4, 3, 5, 3, 6, 4, 5, 4, 7, 5, 8, 6, 7, 7, 8, 6, 8, -1);
-    igraph_perfect(&graph, &is_perfect);
+    igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect == 1);
     igraph_destroy(&graph);
     x = IGRAPH_FINALLY_STACK_SIZE();

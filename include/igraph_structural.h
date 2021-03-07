@@ -73,7 +73,7 @@ IGRAPH_EXPORT int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
                                                    igraph_bool_t loops,
                                                    igraph_order_t order,
                                                    igraph_bool_t only_indices);
-IGRAPH_EXPORT int igraph_perfect(const igraph_t *graph, igraph_bool_t *perfect);
+IGRAPH_EXPORT int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect);
 
 /* -------------------------------------------------- */
 /* Structural properties                              */

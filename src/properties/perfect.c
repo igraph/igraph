@@ -57,7 +57,7 @@
  *
  * \example examples/simple/igraph_girth.c
  */
-int igraph_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
+int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     
     igraph_bool_t is_bipartite, is_chordal, iso;
     igraph_integer_t girth, comp_girth, num_of_vertices = igraph_vcount(graph);
