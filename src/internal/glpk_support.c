@@ -54,7 +54,7 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
     return 1; /* Do not print from GLPK */
 }
 
-IGRAPH_NORETURN void igraph_i_glpk_error_hook(void *info) {
+void igraph_i_glpk_error_hook(void *info) {
     IGRAPH_UNUSED(info);
     /* We do NOT call glp_free_env() here. Freeing still-in-use resources
      * will be done by the 'finally' stack. Trying to use glp_free_env()
