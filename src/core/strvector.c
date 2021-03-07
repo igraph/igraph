@@ -151,12 +151,12 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
 
     value_len = strlen(value);
     if (sv->data[idx] == 0) {        
-        sv->data[idx] = igraph_CALLOC(value_len + 1, char);
+        sv->data[idx] = IGRAPH_CALLOC(value_len + 1, char);
         if (sv->data[idx] == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
     } else {
-        char *tmp = igraph_REALLOC(sv->data[idx], value_len + 1, char);
+        char *tmp = IGRAPH_REALLOC(sv->data[idx], value_len + 1, char);
         if (tmp == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
@@ -495,11 +495,7 @@ int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
     v->data = tmp;
-<<<<<<< HEAD
-    v->data[s] = igraph_Calloc(value_len + 1, char);
-=======
-    v->data[s] = IGRAPH_CALLOC(strlen(value) + 1, char);
->>>>>>> Change alloc macro case, use ? for macros
+    v->data[s] = IGRAPH_CALLOC(value_len + 1, char);
     if (v->data[s] == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }

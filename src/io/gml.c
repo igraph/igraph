@@ -715,12 +715,8 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             } else {
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
             }
-<<<<<<< HEAD
-            igraph_Free(newname);
-            IGRAPH_FINALLY_CLEAN(1);
-=======
             IGRAPH_FREE(newname);
->>>>>>> Change alloc macro case, use ? for macros
+            IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ]\n"));
     }
@@ -767,12 +763,8 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             } else {
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
             }
-<<<<<<< HEAD
-            igraph_Free(newname);
-            IGRAPH_FINALLY_CLEAN(1);
-=======
             IGRAPH_FREE(newname);
->>>>>>> Change alloc macro case, use ? for macros
+            IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ]\n"));
     }

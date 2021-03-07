@@ -1317,7 +1317,7 @@ int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
     IGRAPH_ASSERT(from->stor_begin != NULL);
 
     from_size = FUNCTION(igraph_vector, size)(from);
-    to->stor_begin = igraph_CALLOC(from_size, BASE);
+    to->stor_begin = IGRAPH_CALLOC(from_size, BASE);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
     }

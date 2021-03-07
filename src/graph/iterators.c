@@ -1626,7 +1626,7 @@ static int igraph_i_eit_create_allfromto(const igraph_t *graph,
         igraph_bool_t *added;
         long int j;
         IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
-        added = igraph_CALLOC(no_of_edges, igraph_bool_t);
+        added = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
         if (added == 0) {
             IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
         }

@@ -505,7 +505,7 @@ int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *f
 
     from_size = igraph_vector_ptr_size(from);
 
-    to->stor_begin = igraph_CALLOC(from_size, void*);
+    to->stor_begin = IGRAPH_CALLOC(from_size, void*);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
     }

@@ -200,12 +200,8 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             } else {
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
             }
-<<<<<<< HEAD
-            igraph_Free(newname);
-            IGRAPH_FINALLY_CLEAN(1);
-=======
             IGRAPH_FREE(newname);
->>>>>>> Change alloc macro case, use ? for macros
+            IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ];\n"));
     }
@@ -243,12 +239,8 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 } else {
                     IGRAPH_WARNING("A non-numeric, non-string, non-boolean vertex attribute was ignored");
                 }
-<<<<<<< HEAD
-                igraph_Free(newname);
-                IGRAPH_FINALLY_CLEAN(1);
-=======
                 IGRAPH_FREE(newname);
->>>>>>> Change alloc macro case, use ? for macros
+                IGRAPH_FINALLY_CLEAN(1);
             }
             CHECK(fprintf(outstream, "  ];\n"));
         }
@@ -280,10 +272,6 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                         CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                         CHECK(fputc('\n', outstream));
                     }
-<<<<<<< HEAD
-=======
-                    IGRAPH_FREE(newname);
->>>>>>> Change alloc macro case, use ? for macros
                 } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                     char *s, *news;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph,
@@ -291,12 +279,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                     igraph_strvector_get(&strv, 0, &s);
                     IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
                     CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
-<<<<<<< HEAD
-                    igraph_Free(news);
-=======
-                    IGRAPH_FREE(newname);
                     IGRAPH_FREE(news);
->>>>>>> Change alloc macro case, use ? for macros
                 } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph,
                                  name, igraph_ess_1((igraph_integer_t) i), &boolv));
@@ -305,7 +288,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 } else {
                     IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
                 }
-                igraph_Free(newname);
+                IGRAPH_FREE(newname);
                 IGRAPH_FINALLY_CLEAN(1);
             }
             CHECK(fprintf(outstream, "  ];\n"));
