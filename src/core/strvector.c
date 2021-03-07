@@ -404,9 +404,6 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
     long int toadd = newsize - v->len, i, j;
     char **tmp;
     long int reallocsize = newsize;
-    if (reallocsize == 0) {
-        reallocsize = 1;
-    }
 
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
