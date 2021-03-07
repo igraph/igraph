@@ -201,7 +201,8 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_rewire # Uses internal igraph_i_rewire
+  igraph_rewire # Uses internal igraph_i_rewire\
+  igraph_perfect
 )
 
 add_legacy_tests(
