@@ -29,29 +29,23 @@ int main() {
     igraph_vector_t v;
 
     igraph_vector_init_seq(&v, 1, 1000);
-    if (igraph_vector_capacity(&v) != 1000) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_vector_capacity(&v) == 1000);
 
     igraph_vector_push_back(&v, 1001);
-    if (igraph_vector_capacity(&v) != 2000) {
-        return 2;
-    }
+    IGRAPH_ASSERT(igraph_vector_capacity(&v) == 2000);
 
     igraph_vector_resize_min(&v);
-    if (igraph_vector_capacity(&v) != igraph_vector_size(&v)) {
-        return 3;
-    }
+    IGRAPH_ASSERT(igraph_vector_capacity(&v) == igraph_vector_size(&v));
 
     igraph_vector_destroy(&v);
-    
+
     /* regression test for #1479 -- calling resize_min() on an empty vector */
     igraph_vector_init_seq(&v, 1, 1000);
     igraph_vector_clear(&v);
     igraph_vector_resize_min(&v);
-    if (igraph_vector_capacity(&v) != 1 || igraph_vector_size(&v) != 0) {
-        return 4;
-    }
+    IGRAPH_ASSERT(igraph_vector_capacity(&v) == 0);
+    IGRAPH_ASSERT(igraph_vector_size(&v) == 0);
+    igraph_vector_destroy(&v);
 
     VERIFY_FINALLY_STACK();
 
