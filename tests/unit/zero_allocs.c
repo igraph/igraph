@@ -32,14 +32,6 @@ int main() {
 
     IGRAPH_ASSERT(!a);
 
-    a = igraph_malloc(0);
-
-    IGRAPH_ASSERT(a);
-
-    igraph_free(a);
-
-    /*igraph_free does not set 'a' to NULL*/
-
     VERIFY_FINALLY_STACK();
     return 0;
 }
