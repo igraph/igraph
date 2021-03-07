@@ -200,7 +200,7 @@ int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
                (size_t) FUNCTION(igraph_stack, size)(s)*sizeof(BASE));
 
         s->end        = bigger + (s->stor_end - s->stor_begin);
-        s->stor_end   = bigger + 2 * (s->stor_end - s->stor_begin) + 1;
+        s->stor_end   = bigger + 2 * (s->stor_end - s->stor_begin);
         s->stor_begin = bigger;
 
         *(s->end) = elem;
