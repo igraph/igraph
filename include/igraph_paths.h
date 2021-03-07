@@ -153,6 +153,8 @@ IGRAPH_EXPORT int igraph_eccentricity(const igraph_t *graph,
 IGRAPH_EXPORT int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);
 
+IGRAPH_EXPORT int igraph_pseudo_diameter(const igraph_t *graph, igraph_real_t *p_diameter);
+
 IGRAPH_EXPORT int igraph_get_all_simple_paths(const igraph_t *graph,
                                               igraph_vector_int_t *res,
                                               igraph_integer_t from,

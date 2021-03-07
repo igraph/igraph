@@ -30,6 +30,7 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
+#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -37,7 +38,8 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
                                  igraph_neimode_t mode,
-                                 const igraph_adjlist_t *adjlist) {
+                                 const igraph_adjlist_t *adjlist,
+                                 igraph_integer_t *ecc_vid) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_long_t q;
@@ -46,6 +48,13 @@ static int igraph_i_eccentricity(const igraph_t *graph,
     int i, mark = 1;
     igraph_vector_t vneis;
     igraph_vector_int_t *neis;
+    igraph_integer_t min_degree = 0;
+    igraph_integer_t degree;
+    igraph_vector_t degrees;
+
+    if (ecc_vid) {
+        IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
+    }
 
     IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
     IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
@@ -80,6 +89,18 @@ static int igraph_i_eccentricity(const igraph_t *graph,
             long int dist = igraph_dqueue_long_pop(&q);
             int j, n;
 
+            if (ecc_vid) {
+                /* Return the vertex id of the vertex which has the lowest */
+                /* degree of the vertices most distant from the starting */
+                /* vertex. Assumes there is only 1 vid in vids. */
+                IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_1(act), mode, IGRAPH_NO_LOOPS));
+                degree = VECTOR(degrees)[0];
+                if (dist > VECTOR(*res)[i] || (dist == VECTOR(*res)[i] && degree < min_degree)) {
+                    VECTOR(*res)[i] = dist;
+                    *ecc_vid = act;
+                    min_degree = degree;
+                }
+            }
             if (dist > VECTOR(*res)[i]) {
                 VECTOR(*res)[i] = dist;
             }
@@ -116,12 +137,16 @@ static int igraph_i_eccentricity(const igraph_t *graph,
         igraph_vector_destroy(&vneis);
         IGRAPH_FINALLY_CLEAN(1);
     }
+    if (ecc_vid) {
+        igraph_vector_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
     igraph_vector_int_destroy(&counted);
     igraph_vit_destroy(&vit);
     igraph_dqueue_long_destroy(&q);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -161,7 +186,8 @@ int igraph_eccentricity(const igraph_t *graph,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
 
-    return igraph_i_eccentricity(graph, res, vids, mode, /*adjlist=*/ 0);
+    return igraph_i_eccentricity(graph, res, vids, mode, /*adjlist=*/ 0,
+                                 /*ecc_vid*/ NULL);
 }
 
 /**
@@ -203,7 +229,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc, igraph_vss_all(),
-                                           mode, &adjlist));
+                                           mode, &adjlist, /*ecc_vid*/ NULL));
         *radius = igraph_vector_min(&ecc);
         igraph_vector_destroy(&ecc);
         igraph_adjlist_destroy(&adjlist);
@@ -211,4 +237,71 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
     }
 
     return 0;
+}
+
+/**
+ * \function igraph_pseudo_diameter
+ * \brief Approximation and lower bound of diameter.
+ *
+ * This algorithm finds a pseudo-peripheral vertex and returns its
+ * eccentricity. This value can be used as an approximation
+ * and lower bound of the diameter of a graph.
+ *
+ * </para><para>
+ * A pseudo-peripheral vertex is a vertex v, such that for every
+ * vertex u which is as far away from v as possible, v is also as
+ * far away from u as possible.
+ *
+ * \param graph The input graph, if it is directed, its edge directions
+ *   are ignored.
+ * \param p_diameter Pointer to a real variable, the result is stored
+ *   here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V||E|)), where |V| is the number of
+ * vertices and |E| is the number of edges.
+ *
+ * \sa \ref igraph_eccentricity(), \ref igraph_diameter().
+ *
+ */
+int igraph_pseudo_diameter(const igraph_t *graph, igraph_real_t *p_diameter) {
+
+    int no_of_nodes = igraph_vcount(graph);
+    igraph_vector_t ecc_u;
+    igraph_vector_t ecc_v;
+    igraph_integer_t ecc_vid;
+    igraph_integer_t u_vid;
+
+    if (no_of_nodes == 0) {
+        *p_diameter = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    RNG_BEGIN();
+    u_vid = RNG_INTEGER(0, no_of_nodes - 1);
+    RNG_END();
+
+    IGRAPH_VECTOR_INIT_FINALLY(&ecc_u, igraph_vcount(graph));
+    IGRAPH_VECTOR_INIT_FINALLY(&ecc_v, igraph_vcount(graph));
+
+    IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_u, igraph_vss_1(u_vid),
+                IGRAPH_ALL, NULL, &ecc_vid));
+    while(1) {
+        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_v, igraph_vss_1(ecc_vid),
+                    IGRAPH_ALL, NULL, &ecc_vid));
+
+        if (VECTOR(ecc_u)[0] < VECTOR(ecc_v)[0]) {
+            igraph_vector_swap(&ecc_u, &ecc_v);
+        } else {
+            break;
+        }
+    }
+
+    *p_diameter = VECTOR(ecc_u)[0];
+
+    igraph_vector_destroy(&ecc_u);
+    igraph_vector_destroy(&ecc_v);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
 }

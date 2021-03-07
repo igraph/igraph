@@ -1,0 +1,11 @@
+No vertices:
+result:NaN
+
+1 vertex:
+result:0
+
+2 vertices:
+result:0
+
+Disconnected graph with loops and multiple edges.
+Tutte graph.
