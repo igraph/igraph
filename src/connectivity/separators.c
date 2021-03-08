@@ -132,13 +132,13 @@ static int igraph_i_is_separator(const igraph_t *graph,
 
 /**
  * \function igraph_is_separator
- * Decides whether the removal of a set of vertices disconnects the graph
+ * \brief Would removing this set of vertices disconnect the graph?
  *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
- * \param condidate The candidate separator. It must not contain all
+ * \param candidate The candidate separator. It must not contain all
  *        vertices.
- * \param res Pointer to a boolean variable, the result is stored here.
+ * \param res Pointer to a Boolean variable, the result is stored here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
@@ -178,7 +178,7 @@ int igraph_is_separator(const igraph_t *graph,
 
 /**
  * \function igraph_is_minimal_separator
- * Decides whether a set of vertices is a minimal separator
+ * \brief Decides whether a set of vertices is a minimal separator.
  *
  * A set of vertices is a minimal separator, if the removal of the
  * vertices disconnects the graph, and this is not true for any subset
@@ -189,6 +189,7 @@ int igraph_is_separator(const igraph_t *graph,
  * igraph_is_separator(). If it is a separator, then it checks that
  * each subset of size n-1, where n is the size of the candidate, is
  * not a separator.
+ *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
  * \param candidate Pointer to a vector of long integers, the
@@ -400,12 +401,13 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
 
 /**
  * \function igraph_all_minimal_st_separators
- * List all vertex sets that are minimal (s,t) separators for some s and t
+ * \brief List all vertex sets that are minimal (s,t) separators for some s and t.
  *
  * This function lists all vertex sets that are minimal (s,t)
  * separators for some (s,t) vertex pair.
  *
- * </para><para>See more about the implemented algorithm in
+ * </para><para>
+ * See more about the implemented algorithm in
  * Anne Berry, Jean-Paul Bordat and Olivier Cogis: Generating All the
  * Minimal Separators of a Graph, In: Peter Widmayer, Gabriele Neyer
  * and Stephan Eidenbenz (editors): Graph-theoretic concepts in
@@ -627,12 +629,13 @@ static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
 
 /**
  * \function igraph_minimum_size_separators
- * Find all minimum size separating vertex sets
+ * \brief Find all minimum size separating vertex sets.
  *
  * This function lists all separator vertex sets of minimum size.
  * A vertex set is a separator if its removal disconnects the graph.
  *
- * </para><para>The implementation is based on the following paper:
+ * </para><para>
+ * The implementation is based on the following paper:
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
  *
