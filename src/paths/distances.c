@@ -30,7 +30,6 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
-#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -187,7 +186,7 @@ int igraph_eccentricity(const igraph_t *graph,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
 
-    return igraph_i_eccentricity(graph, res, vids, mode, /*adjlist=*/ 0,
+    return igraph_i_eccentricity(graph, res, vids, mode, /*adjlist=*/ NULL,
                                  /*ecc_vid*/ NULL);
 }
 
