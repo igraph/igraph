@@ -26,7 +26,7 @@
 #define RESNAME res
 #define SUFFIX
 #define RECORD do {                         \
-        igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t);      \
+        igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
         int j;                              \
         if (!cl) {                              \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
@@ -39,7 +39,7 @@
         igraph_vector_ptr_clear(res);           \
         IGRAPH_FINALLY(igraph_i_maximal_cliques_free, res); \
     } while (0)
-#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
@@ -49,7 +49,7 @@
     #define SUFFIX _count
     #define RECORD (*res)++
     #define FINALLY *res=0;
-    #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+    #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
     #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
@@ -59,7 +59,7 @@
     #define SUFFIX _file
     #define RECORD igraph_vector_int_fprint(R, res)
     #define FINALLY
-    #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+    #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
     #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
@@ -73,7 +73,7 @@
 #define SUFFIX _subset
 #define RECORD do {                         \
         if (res) {                                \
-            igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t);      \
+            igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
             int j;                              \
             if (!cl) {                              \
                 IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
@@ -94,7 +94,7 @@
     } while (0)
 #define FOR_LOOP_OVER_VERTICES                  \
     nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;    \
-    for (ii=0; ii<nn; ii++) {
+    for (ii=0; ii<nn; ii++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE do {  \
         i= subset ? VECTOR(*subset)[ii] : ii;    \
     } while (0)
@@ -107,7 +107,7 @@
 #define RESNAME cliquehandler_fn, arg
 #define SUFFIX _callback
 #define RECORD do { \
-        igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t); \
+        igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t); \
         long j; \
         if (!cl) { \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
@@ -118,7 +118,7 @@
             return IGRAPH_STOP; \
     } while (0)
 #define FINALLY
-#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
@@ -145,7 +145,7 @@
 #define FINALLY \
     igraph_vector_clear(hist); \
     igraph_vector_reserve(hist, 50); /* initially reserve space for 50 elements */
-#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
@@ -156,7 +156,7 @@ static void igraph_i_maximal_cliques_free(void *ptr) {
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*res)[i];
         if (v) {
-            igraph_Free(v);
+            IGRAPH_FREE(v);
             igraph_vector_destroy(v);
         }
     }
@@ -172,7 +172,7 @@ static void igraph_i_maximal_cliques_free_full(void *ptr) {
         for (i = 0; i < n; i++) {
             igraph_vector_t *v = VECTOR(*res)[i];
             if (v) {
-                igraph_Free(v);
+                IGRAPH_FREE(v);
                 igraph_vector_destroy(v);
             }
         }
@@ -296,108 +296,108 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
     FINALLY;
 
-    FOR_LOOP_OVER_VERTICES
-    int v;
-    int vrank;
-    igraph_vector_int_t *vneis;
-    int vdeg;
-    int Pptr, Xptr, PS, PE, XS, XE;
-    int j;
+    FOR_LOOP_OVER_VERTICES {
+        int v;
+        int vrank;
+        igraph_vector_int_t *vneis;
+        int vdeg;
+        int Pptr, Xptr, PS, PE, XS, XE;
+        int j;
 
-    FOR_LOOP_OVER_VERTICES_PREPARE;
+        FOR_LOOP_OVER_VERTICES_PREPARE;
 
-    v = VECTOR(order)[i];
-    vrank = VECTOR(rank)[v];
-    vneis = igraph_adjlist_get(&fulladjlist, v);
-    vdeg = igraph_vector_int_size(vneis);
-    Pptr = 0; Xptr = vdeg - 1; PS = 0; XE = vdeg - 1;
+        v = VECTOR(order)[i];
+        vrank = VECTOR(rank)[v];
+        vneis = igraph_adjlist_get(&fulladjlist, v);
+        vdeg = igraph_vector_int_size(vneis);
+        Pptr = 0; Xptr = vdeg - 1; PS = 0; XE = vdeg - 1;
 
-    pg--;
-    if (pg <= 0) {
-        IGRAPH_PROGRESS("Maximal cliques: ", pgc++, NULL);
-        pg = pgreset;
-    }
-
-    IGRAPH_ALLOW_INTERRUPTION();
-
-    igraph_vector_int_resize(&PX, vdeg);
-    igraph_vector_int_resize(&R, 1);
-    igraph_vector_int_resize(&H, 1);
-    igraph_vector_int_null(&pos); /* TODO: makes it quadratic? */
-    igraph_vector_int_resize(&nextv, 1);
-
-    VECTOR(H)[0] = -1;      /* marks the end of the recursion */
-    VECTOR(nextv)[0] = -1;
-
-    /* ================================================================*/
-    /* P <- G(v[i]) intersect { v[i+1], ..., v[n-1] }
-       X <- G(v[i]) intersect { v[0], ..., v[i-1] } */
-
-    VECTOR(R)[0] = v;
-    for (j = 0; j < vdeg; j++) {
-        int vx = VECTOR(*vneis)[j];
-        if (VECTOR(rank)[vx] > vrank) {
-            VECTOR(PX)[Pptr] = vx;
-            VECTOR(pos)[vx] = Pptr + 1;
-            Pptr++;
-        } else if (VECTOR(rank)[vx] < vrank) {
-            VECTOR(PX)[Xptr] = vx;
-            VECTOR(pos)[vx] = Xptr + 1;
-            Xptr--;
+        pg--;
+        if (pg <= 0) {
+            IGRAPH_PROGRESS("Maximal cliques: ", pgc++, NULL);
+            pg = pgreset;
         }
-    }
 
-    PE = Pptr - 1; XS = Xptr + 1; /* end of P, start of X in PX */
+        IGRAPH_ALLOW_INTERRUPTION();
 
-    /* Create an adjacency list that is specific to the
-       v vertex. It only contains 'v' and its neighbors. Moreover, we
-       only deal with the vertices in P and X (and R). */
-    igraph_vector_int_update(igraph_adjlist_get(&adjlist, v),
-                             igraph_adjlist_get(&fulladjlist, v));
-    for (j = 0; j <= vdeg - 1; j++) {
-        int vv = VECTOR(PX)[j];
-        igraph_vector_int_t *fadj = igraph_adjlist_get(&fulladjlist, vv);
-        igraph_vector_int_t *radj = igraph_adjlist_get(&adjlist, vv);
-        int k, fn = igraph_vector_int_size(fadj);
-        igraph_vector_int_clear(radj);
-        for (k = 0; k < fn; k++) {
-            int nei = VECTOR(*fadj)[k];
-            int neipos = VECTOR(pos)[nei] - 1;
-            if (neipos >= PS && neipos <= XE) {
-                igraph_vector_int_push_back(radj, nei);
+        igraph_vector_int_resize(&PX, vdeg);
+        igraph_vector_int_resize(&R, 1);
+        igraph_vector_int_resize(&H, 1);
+        igraph_vector_int_null(&pos); /* TODO: makes it quadratic? */
+        igraph_vector_int_resize(&nextv, 1);
+
+        VECTOR(H)[0] = -1;      /* marks the end of the recursion */
+        VECTOR(nextv)[0] = -1;
+
+        /* ================================================================*/
+        /* P <- G(v[i]) intersect { v[i+1], ..., v[n-1] }
+           X <- G(v[i]) intersect { v[0], ..., v[i-1] } */
+
+        VECTOR(R)[0] = v;
+        for (j = 0; j < vdeg; j++) {
+            int vx = VECTOR(*vneis)[j];
+            if (VECTOR(rank)[vx] > vrank) {
+                VECTOR(PX)[Pptr] = vx;
+                VECTOR(pos)[vx] = Pptr + 1;
+                Pptr++;
+            } else if (VECTOR(rank)[vx] < vrank) {
+                VECTOR(PX)[Xptr] = vx;
+                VECTOR(pos)[vx] = Xptr + 1;
+                Xptr--;
             }
         }
+
+        PE = Pptr - 1; XS = Xptr + 1; /* end of P, start of X in PX */
+
+        /* Create an adjacency list that is specific to the
+           v vertex. It only contains 'v' and its neighbors. Moreover, we
+           only deal with the vertices in P and X (and R). */
+        igraph_vector_int_update(igraph_adjlist_get(&adjlist, v),
+                                 igraph_adjlist_get(&fulladjlist, v));
+        for (j = 0; j <= vdeg - 1; j++) {
+            int vv = VECTOR(PX)[j];
+            igraph_vector_int_t *fadj = igraph_adjlist_get(&fulladjlist, vv);
+            igraph_vector_int_t *radj = igraph_adjlist_get(&adjlist, vv);
+            int k, fn = igraph_vector_int_size(fadj);
+            igraph_vector_int_clear(radj);
+            for (k = 0; k < fn; k++) {
+                int nei = VECTOR(*fadj)[k];
+                int neipos = VECTOR(pos)[nei] - 1;
+                if (neipos >= PS && neipos <= XE) {
+                    igraph_vector_int_push_back(radj, nei);
+                }
+            }
+        }
+
+        /* Reorder the adjacency lists, according to P and X. */
+        igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
+                &adjlist);
+
+        err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
+                &PX, PS, PE, XS, XE, PS, XE, &R, &pos,
+                &adjlist, RESNAME, &nextv, &H, min_size,
+                max_size);
+        if (err == IGRAPH_STOP) {
+            break;
+        } else {
+            IGRAPH_CHECK(err);
+        }
     }
 
-    /* Reorder the adjacency lists, according to P and X. */
-    igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
-            &adjlist);
+    IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
 
-    err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
-              &PX, PS, PE, XS, XE, PS, XE, &R, &pos,
-              &adjlist, RESNAME, &nextv, &H, min_size,
-              max_size);
-    if (err == IGRAPH_STOP) {
-        break;
-    } else {
-        IGRAPH_CHECK(err);
-    }
-}
+    igraph_vector_int_destroy(&nextv);
+    igraph_vector_int_destroy(&pos);
+    igraph_vector_int_destroy(&H);
+    igraph_vector_int_destroy(&R);
+    igraph_vector_int_destroy(&PX);
+    igraph_adjlist_destroy(&fulladjlist);
+    igraph_adjlist_destroy(&adjlist);
+    igraph_vector_int_destroy(&rank);
+    igraph_vector_destroy(&order);
+    IGRAPH_FINALLY_CLEAN(10); /* + res */
 
-IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
-
-igraph_vector_int_destroy(&nextv);
-igraph_vector_int_destroy(&pos);
-igraph_vector_int_destroy(&H);
-igraph_vector_int_destroy(&R);
-igraph_vector_int_destroy(&PX);
-igraph_adjlist_destroy(&fulladjlist);
-igraph_adjlist_destroy(&adjlist);
-igraph_vector_int_destroy(&rank);
-igraph_vector_destroy(&order);
-IGRAPH_FINALLY_CLEAN(10); /* + res */
-
-return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef RESTYPE

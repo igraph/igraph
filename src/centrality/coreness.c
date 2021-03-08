@@ -81,12 +81,12 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
         return IGRAPH_SUCCESS;
     }
 
-    vert = igraph_Calloc(no_of_nodes, long int);
+    vert = IGRAPH_CALLOC(no_of_nodes, long int);
     if (vert == 0) {
         IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vert);
-    pos = igraph_Calloc(no_of_nodes, long int);
+    pos = IGRAPH_CALLOC(no_of_nodes, long int);
     if (pos == 0) {
         IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
     }
@@ -97,7 +97,7 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
                                IGRAPH_LOOPS));
     maxdeg = (long int) igraph_vector_max(cores);
 
-    bin = igraph_Calloc(maxdeg + 1, long int);
+    bin = IGRAPH_CALLOC(maxdeg + 1, long int);
     if (bin == 0) {
         IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
     }

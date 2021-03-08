@@ -203,21 +203,21 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-    s->v = igraph_Calloc(maxldv * maxncv, igraph_real_t); CHECKMEM(s->v);
-    s->workd = igraph_Calloc(3 * maxn, igraph_real_t); CHECKMEM(s->workd);
-    s->d = igraph_Calloc(2 * maxncv, igraph_real_t); CHECKMEM(s->d);
-    s->resid = igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->resid);
-    s->ax = igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->ax);
-    s->select = igraph_Calloc(maxncv, int); CHECKMEM(s->select);
+    s->v = IGRAPH_CALLOC(maxldv * maxncv, igraph_real_t); CHECKMEM(s->v);
+    s->workd = IGRAPH_CALLOC(3 * maxn, igraph_real_t); CHECKMEM(s->workd);
+    s->d = IGRAPH_CALLOC(2 * maxncv, igraph_real_t); CHECKMEM(s->d);
+    s->resid = IGRAPH_CALLOC(maxn, igraph_real_t); CHECKMEM(s->resid);
+    s->ax = IGRAPH_CALLOC(maxn, igraph_real_t); CHECKMEM(s->ax);
+    s->select = IGRAPH_CALLOC(maxncv, int); CHECKMEM(s->select);
 
     if (symm) {
-        s->workl = igraph_Calloc(maxncv * (maxncv + 8), igraph_real_t); CHECKMEM(s->workl);
+        s->workl = IGRAPH_CALLOC(maxncv * (maxncv + 8), igraph_real_t); CHECKMEM(s->workl);
         s->di = 0;
         s->workev = 0;
     } else {
-        s->workl = igraph_Calloc(3 * maxncv * (maxncv + 2), igraph_real_t); CHECKMEM(s->workl);
-        s->di = igraph_Calloc(2 * maxncv, igraph_real_t); CHECKMEM(s->di);
-        s->workev = igraph_Calloc(3 * maxncv, igraph_real_t); CHECKMEM(s->workev);
+        s->workl = IGRAPH_CALLOC(3 * maxncv * (maxncv + 2), igraph_real_t); CHECKMEM(s->workl);
+        s->di = IGRAPH_CALLOC(2 * maxncv, igraph_real_t); CHECKMEM(s->di);
+        s->workev = IGRAPH_CALLOC(3 * maxncv, igraph_real_t); CHECKMEM(s->workev);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -240,19 +240,19 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
 
     if (s->di) {
-        igraph_Free(s->di);
+        IGRAPH_FREE(s->di);
     }
     if (s->workev) {
-        igraph_Free(s->workev);
+        IGRAPH_FREE(s->workev);
     }
 
-    igraph_Free(s->workl);
-    igraph_Free(s->select);
-    igraph_Free(s->ax);
-    igraph_Free(s->resid);
-    igraph_Free(s->d);
-    igraph_Free(s->workd);
-    igraph_Free(s->v);
+    IGRAPH_FREE(s->workl);
+    IGRAPH_FREE(s->select);
+    IGRAPH_FREE(s->ax);
+    IGRAPH_FREE(s->resid);
+    IGRAPH_FREE(s->d);
+    IGRAPH_FREE(s->workd);
+    IGRAPH_FREE(s->v);
 }
 
 /**
@@ -928,13 +928,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-        v = igraph_Calloc(options->ldv * options->ncv, igraph_real_t); CHECKMEM(v);
-        workl = igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
-        workd = igraph_Calloc(3 * options->n, igraph_real_t); CHECKMEM(workd);
-        d = igraph_Calloc(2 * options->ncv, igraph_real_t); CHECKMEM(d);
-        resid = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
-        ax = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(ax);
-        select = igraph_Calloc(options->ncv, int); CHECKMEM(select);
+        v = IGRAPH_CALLOC(options->ldv * options->ncv, igraph_real_t); CHECKMEM(v);
+        workl = IGRAPH_CALLOC(options->lworkl, igraph_real_t); CHECKMEM(workl);
+        workd = IGRAPH_CALLOC(3 * options->n, igraph_real_t); CHECKMEM(workd);
+        d = IGRAPH_CALLOC(2 * options->ncv, igraph_real_t); CHECKMEM(d);
+        resid = IGRAPH_CALLOC(options->n, igraph_real_t); CHECKMEM(resid);
+        ax = IGRAPH_CALLOC(options->n, igraph_real_t); CHECKMEM(ax);
+        select = IGRAPH_CALLOC(options->ncv, int); CHECKMEM(select);
 
 #undef CHECKMEM
 
@@ -1054,13 +1054,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     /* Clean up if needed */
     if (free_them) {
-        igraph_Free(select);
-        igraph_Free(ax);
-        igraph_Free(resid);
-        igraph_Free(d);
-        igraph_Free(workd);
-        igraph_Free(workl);
-        igraph_Free(v);
+        IGRAPH_FREE(select);
+        IGRAPH_FREE(ax);
+        IGRAPH_FREE(resid);
+        IGRAPH_FREE(d);
+        IGRAPH_FREE(workd);
+        IGRAPH_FREE(workl);
+        IGRAPH_FREE(v);
         IGRAPH_FINALLY_CLEAN(7);
     }
     return 0;
@@ -1189,15 +1189,15 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-        v = igraph_Calloc(options->n * options->ncv, igraph_real_t); CHECKMEM(v);
-        workl = igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
-        workd = igraph_Calloc(3 * options->n, igraph_real_t); CHECKMEM(workd);
+        v = IGRAPH_CALLOC(options->n * options->ncv, igraph_real_t); CHECKMEM(v);
+        workl = IGRAPH_CALLOC(options->lworkl, igraph_real_t); CHECKMEM(workl);
+        workd = IGRAPH_CALLOC(3 * options->n, igraph_real_t); CHECKMEM(workd);
         d_size = 2 * options->nev + 1 > options->ncv ? 2 * options->nev + 1 : options->ncv;
-        dr = igraph_Calloc(d_size, igraph_real_t); CHECKMEM(dr);
-        di = igraph_Calloc(d_size, igraph_real_t); CHECKMEM(di);
-        resid = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
-        select = igraph_Calloc(options->ncv, int); CHECKMEM(select);
-        workev = igraph_Calloc(3 * options->ncv, igraph_real_t); CHECKMEM(workev);
+        dr = IGRAPH_CALLOC(d_size, igraph_real_t); CHECKMEM(dr);
+        di = IGRAPH_CALLOC(d_size, igraph_real_t); CHECKMEM(di);
+        resid = IGRAPH_CALLOC(options->n, igraph_real_t); CHECKMEM(resid);
+        select = IGRAPH_CALLOC(options->ncv, int); CHECKMEM(select);
+        workev = IGRAPH_CALLOC(3 * options->ncv, igraph_real_t); CHECKMEM(workev);
 
 #undef CHECKMEM
 
@@ -1319,14 +1319,14 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     /* Clean up if needed */
     if (free_them) {
-        igraph_Free(workev);
-        igraph_Free(select);
-        igraph_Free(resid);
-        igraph_Free(di);
-        igraph_Free(dr);
-        igraph_Free(workd);
-        igraph_Free(workl);
-        igraph_Free(v);
+        IGRAPH_FREE(workev);
+        IGRAPH_FREE(select);
+        IGRAPH_FREE(resid);
+        IGRAPH_FREE(di);
+        IGRAPH_FREE(dr);
+        IGRAPH_FREE(workd);
+        IGRAPH_FREE(workl);
+        IGRAPH_FREE(v);
         IGRAPH_FINALLY_CLEAN(8);
     }
     return 0;

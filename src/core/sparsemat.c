@@ -1828,7 +1828,7 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
         IGRAPH_CHECK(igraph_vector_update(res, b));
     }
 
-    workspace = igraph_Calloc(n, igraph_real_t);
+    workspace = IGRAPH_CALLOC(n, igraph_real_t);
     if (!workspace) {
         IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_ENOMEM);
     }
@@ -1847,7 +1847,7 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
         IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_FAILURE);
     }
 
-    igraph_Free(workspace);
+    IGRAPH_FREE(workspace);
     IGRAPH_FINALLY_CLEAN(1);
 
     return 0;
@@ -1884,7 +1884,7 @@ int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
         IGRAPH_CHECK(igraph_vector_update(res, b));
     }
 
-    workspace = igraph_Calloc(dis->symbolic ? dis->symbolic->m2 : 1,
+    workspace = IGRAPH_CALLOC(dis->symbolic ? dis->symbolic->m2 : 1,
                               igraph_real_t);
     if (!workspace) {
         IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
@@ -1906,7 +1906,7 @@ int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
         IGRAPH_ERROR("Cannot QR (re)solve sparse matrix", IGRAPH_FAILURE);
     }
 
-    igraph_Free(workspace);
+    IGRAPH_FREE(workspace);
     IGRAPH_FINALLY_CLEAN(1);
 
     return 0;
@@ -3034,7 +3034,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
                           int *p, int *i, double *x, int nz) {
 
-    A->cs = igraph_Calloc(1, cs_di);
+    A->cs = IGRAPH_CALLOC(1, cs_di);
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;

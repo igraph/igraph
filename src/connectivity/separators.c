@@ -372,7 +372,7 @@ static int igraph_i_separators_store(igraph_vector_ptr_t *separators,
         /* Add it to the list of separators, if it is new */
 
         if (igraph_i_separators_newsep(separators, sorter)) {
-            igraph_vector_t *newc = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *newc = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!newc) {
                 IGRAPH_ERROR("Cannot calculate minimal separators", IGRAPH_ENOMEM);
             }
@@ -393,7 +393,7 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
         igraph_vector_t *vec = VECTOR(*separators)[i];
         if (vec) {
             igraph_vector_destroy(vec);
-            igraph_Free(vec);
+            IGRAPH_FREE(vec);
         }
     }
 }
@@ -693,7 +693,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_ptr_resize(separators, n));
         igraph_vector_ptr_null(separators);
         for (i = 0; i < n; i++) {
-            igraph_vector_t *v = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!v) {
                 IGRAPH_ERROR("Minimum size separators failed", IGRAPH_ENOMEM);
             }
@@ -710,7 +710,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_ptr_resize(separators, no_of_nodes));
         igraph_vector_ptr_null(separators);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_vector_t *v = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!v) {
                 IGRAPH_ERROR("Cannot list minimum size separators", IGRAPH_ENOMEM);
             }
@@ -741,7 +741,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     IGRAPH_CHECK(igraph_is_separator(&graph_copy, igraph_vss_vector(&X),
                                      &issepX));
     if (issepX) {
-        igraph_vector_t *v = igraph_Calloc(1, igraph_vector_t);
+        igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!v) {
             IGRAPH_ERROR("Cannot find minimal size separators", IGRAPH_ENOMEM);
         }

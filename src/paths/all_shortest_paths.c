@@ -37,7 +37,7 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
     for (i = 0; i < igraph_vector_ptr_size(v); i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_destroy(VECTOR(*v)[i]);
-            igraph_Free(VECTOR(*v)[i]);
+            IGRAPH_FREE(VECTOR(*v)[i]);
         }
     }
     igraph_vector_ptr_destroy(v);
@@ -144,7 +144,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
      * is in the target vertex sequence. Otherwise it is
      * one larger than the length of the shortest path from the
      * source */
-    geodist = igraph_Calloc(no_of_nodes, long int);
+    geodist = IGRAPH_CALLOC(no_of_nodes, long int);
     if (geodist == 0) {
         IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM);
     }
@@ -174,7 +174,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     }
 
     /* from -> from */
-    vptr = igraph_Calloc(1, igraph_vector_t); /* TODO: dirty */
+    vptr = IGRAPH_CALLOC(1, igraph_vector_t); /* TODO: dirty */
     IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
     IGRAPH_CHECK(igraph_vector_init(vptr, 1));
     VECTOR(*vptr)[0] = from;
@@ -246,7 +246,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             fatherptr = (long int) VECTOR(ptrhead)[actnode];
             while (fatherptr != 0) {
                 /* allocate a new igraph_vector_t at the end of paths */
-                vptr = igraph_Calloc(1, igraph_vector_t);
+                vptr = IGRAPH_CALLOC(1, igraph_vector_t);
                 IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
                 IGRAPH_CHECK(igraph_vector_copy(vptr, VECTOR(paths)[fatherptr - 1]));
                 IGRAPH_CHECK(igraph_vector_reserve(vptr, actdist + 2));
@@ -300,13 +300,13 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             /* no, free them */
             while (fatherptr != 0) {
                 igraph_vector_destroy(VECTOR(paths)[fatherptr - 1]);
-                igraph_Free(VECTOR(paths)[fatherptr - 1]);
+                IGRAPH_FREE(VECTOR(paths)[fatherptr - 1]);
                 fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
             }
         }
     }
 
-    igraph_Free(geodist);
+    IGRAPH_FREE(geodist);
     igraph_vector_destroy(&ptrlist);
     igraph_vector_destroy(&ptrhead);
     igraph_vector_destroy(&neis);

@@ -95,13 +95,13 @@ void *thread_function(void *arg) {
     options.iparam[6] = options.mode;
     options.info = options.start;
 
-    v = igraph_Calloc(options.ldv * options.ncv, igraph_real_t);
-    workl = igraph_Calloc(options.lworkl, igraph_real_t);
-    workd = igraph_Calloc(3 * options.n, igraph_real_t);
-    d = igraph_Calloc(2 * options.ncv, igraph_real_t);
-    resid = igraph_Calloc(options.n, igraph_real_t);
-    ax = igraph_Calloc(options.n, igraph_real_t);
-    select = igraph_Calloc(options.ncv, int);
+    v = IGRAPH_CALLOC(options.ldv * options.ncv, igraph_real_t);
+    workl = IGRAPH_CALLOC(options.lworkl, igraph_real_t);
+    workd = IGRAPH_CALLOC(3 * options.n, igraph_real_t);
+    d = IGRAPH_CALLOC(2 * options.ncv, igraph_real_t);
+    resid = IGRAPH_CALLOC(options.n, igraph_real_t);
+    ax = IGRAPH_CALLOC(options.n, igraph_real_t);
+    select = IGRAPH_CALLOC(options.ncv, int);
 
     if (!v || !workl || !workd || !d || !resid || !ax || !select) {
         printf("Out of memory\n");

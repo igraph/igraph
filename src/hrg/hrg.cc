@@ -504,7 +504,7 @@ int igraph_hrg_sample(const igraph_t *input_graph,
         d->makeRandomGraph();
         d->recordGraphStructure(sample);
         if (samples) {
-            igraph_t *G = igraph_Calloc(1, igraph_t);
+            igraph_t *G = IGRAPH_CALLOC(1, igraph_t);
             if (!G) {
                 IGRAPH_ERROR("Cannot sample HRG graphs", IGRAPH_ENOMEM);
             }
@@ -516,7 +516,7 @@ int igraph_hrg_sample(const igraph_t *input_graph,
         // Sample many
         IGRAPH_CHECK(igraph_vector_ptr_resize(samples, no_samples));
         for (i = 0; i < no_samples; i++) {
-            igraph_t *G = igraph_Calloc(1, igraph_t);
+            igraph_t *G = IGRAPH_CALLOC(1, igraph_t);
             if (!G) {
                 IGRAPH_ERROR("Cannot sample HRG graphs", IGRAPH_ENOMEM);
             }

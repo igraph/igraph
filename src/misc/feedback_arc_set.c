@@ -197,7 +197,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
     long int order_next_pos = 0, order_next_neg = -1;
     igraph_real_t diff, maxdiff;
 
-    ordering = igraph_Calloc(no_of_nodes, long int);
+    ordering = IGRAPH_CALLOC(no_of_nodes, long int);
     IGRAPH_FINALLY(igraph_free, ordering);
 
     IGRAPH_VECTOR_INIT_FINALLY(&indegrees, no_of_nodes);
@@ -468,7 +468,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &edges_by_components);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_t* vptr;
-        vptr = igraph_Calloc(1, igraph_vector_t);
+        vptr = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
@@ -480,7 +480,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_destroy);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_t* vptr;
-        vptr = igraph_Calloc(1, igraph_vector_t);
+        vptr = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }

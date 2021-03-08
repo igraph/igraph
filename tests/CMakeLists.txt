@@ -73,6 +73,7 @@ add_legacy_tests(
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
+  igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
@@ -427,6 +428,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
+  igraph_get_adjacency_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist
@@ -515,6 +517,7 @@ add_legacy_tests(
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
+  igraph_maximal_cliques_file
   igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
@@ -732,4 +735,9 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+)
+# memory allocation
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  zero_allocs
 )

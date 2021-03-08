@@ -89,7 +89,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
                       IGRAPH_EINVAL, order, mindist);
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size.", IGRAPH_ENOMEM);
     }
@@ -151,7 +151,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -221,7 +221,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
                      IGRAPH_EINVAL);
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -280,7 +280,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
 
         } /* while q not empty */
 
-        newv = igraph_Calloc(1, igraph_vector_t);
+        newv = IGRAPH_CALLOC(1, igraph_vector_t);
         if (newv == 0) {
             IGRAPH_ERROR("Cannot calculate neighborhood", IGRAPH_ENOMEM);
         }
@@ -294,7 +294,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
@@ -368,7 +368,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
                      IGRAPH_EINVAL);
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -427,7 +427,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 
         } /* while q not empty */
 
-        newg = igraph_Calloc(1, igraph_t);
+        newg = IGRAPH_CALLOC(1, igraph_t);
         if (newg == 0) {
             IGRAPH_ERROR("Cannot create neighborhood graph", IGRAPH_ENOMEM);
         }
@@ -447,7 +447,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
