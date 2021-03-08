@@ -39,7 +39,8 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vs_t vids,
                                  igraph_neimode_t mode,
                                  const igraph_adjlist_t *adjlist,
-                                 igraph_integer_t *vid_ecc) {
+                                 igraph_integer_t *vid_ecc,
+                                 igraph_bool_t unconn) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_long_t q;
@@ -77,6 +78,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
          IGRAPH_VIT_NEXT(vit), mark++, i++) {
 
         long int source;
+        long int nodes_reached = 1;
         source = IGRAPH_VIT_GET(vit);
         IGRAPH_CHECK(igraph_dqueue_long_push(&q, source));
         IGRAPH_CHECK(igraph_dqueue_long_push(&q, 0));
@@ -113,6 +115,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                     int nei = (int) VECTOR(*neis)[j];
                     if (VECTOR(counted)[nei] != mark) {
                         VECTOR(counted)[nei] = mark;
+                        nodes_reached++;
                         IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
                         IGRAPH_CHECK(igraph_dqueue_long_push(&q, dist + 1));
                     }
@@ -125,6 +128,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                     int nei = (int) VECTOR(vneis)[j];
                     if (VECTOR(counted)[nei] != mark) {
                         VECTOR(counted)[nei] = mark;
+                        nodes_reached++;
                         IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
                         IGRAPH_CHECK(igraph_dqueue_long_push(&q, dist + 1));
                     }
@@ -132,6 +136,10 @@ static int igraph_i_eccentricity(const igraph_t *graph,
             }
         } /* while !igraph_dqueue_long_empty(dqueue) */
 
+        if (nodes_reached != no_of_nodes && !unconn && vid_ecc) {
+            *vid_ecc = -1;
+            break;
+        }
     } /* for IGRAPH_VIT_NEXT(vit) */
 
     if (!adjlist) {
@@ -188,7 +196,7 @@ int igraph_eccentricity(const igraph_t *graph,
                         igraph_neimode_t mode) {
 
     return igraph_i_eccentricity(graph, res, vids, mode, /*adjlist=*/ NULL,
-                                 /*vid_ecc*/ NULL);
+                                 /*vid_ecc*/ NULL, /*unconn*/ 1);
 }
 
 /**
@@ -230,7 +238,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc, igraph_vss_all(),
-                                           mode, &adjlist, /*vid_ecc*/ NULL));
+                                           mode, &adjlist, /*vid_ecc*/ NULL, /*unconn*/ 1));
         *radius = igraph_vector_min(&ecc);
         igraph_vector_destroy(&ecc);
         igraph_adjlist_destroy(&adjlist);
@@ -263,9 +271,14 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * \param vid_start Id of the starting vertex. If this is negative, a
  *   random starting vertex is chosen.
  * \param from Pointer to an integer, if not \c NULL it will be set to the
- *        source vertex of the diameter path.
+ *        source vertex of the diameter path. If \p unconn is FALSE, and
+ *        a disconnected graph is detected, this is set to -1.
  * \param to Pointer to an integer, if not \c NULL it will be set to the
- *        target vertex of the diameter path.
+ *        target vertex of the diameter path. If \p unconn is FALSE, and
+ *        a disconnected graph is detected, this is set to -1.
+ * \param unconn What to do if the graph is not connected. If
+ *        \c TRUE the longest geodesic within a component
+ *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
  * \return Error code.
  *
  * Time complexity: O(|V||E|)), where |V| is the number of
@@ -278,12 +291,14 @@ int igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_real_t *diameter,
                            igraph_integer_t vid_start,
                            igraph_integer_t *from,
-                           igraph_integer_t *to) {
+                           igraph_integer_t *to,
+                           igraph_bool_t unconn) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
+    igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex id out of range.\n", IGRAPH_EINVAL);
@@ -304,16 +319,24 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&ecc_vec, igraph_vcount(graph));
 
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_start),
-                    IGRAPH_ALL, NULL, &vid_ecc));
+                    IGRAPH_ALL, NULL, &vid_ecc, unconn));
         ecc_u = VECTOR(ecc_vec)[0];
 
-        while (1) {
+        if (!unconn && vid_ecc == -1) {
+            inf = 1;
+        }
+
+        while (!inf) {
             if (to) {
                 *to = vid_ecc;
             }
 
             IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_ecc),
-                        IGRAPH_ALL, NULL, &vid_ecc));
+                        IGRAPH_ALL, NULL, &vid_ecc, unconn));
+            if (!unconn && vid_ecc == -1) {
+                inf = 1;
+                break;
+            }
             ecc_v = VECTOR(ecc_vec)[0];
 
             if (ecc_u < ecc_v) {
@@ -325,8 +348,6 @@ int igraph_pseudo_diameter(const igraph_t *graph,
                 break;
             }
         }
-
-        *diameter = ecc_u;
 
         igraph_vector_destroy(&ecc_vec);
         IGRAPH_FINALLY_CLEAN(1);
@@ -342,9 +363,9 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&ecc_out, igraph_vcount(graph));
 
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_start),
-                    IGRAPH_OUT, NULL, &vid_ecc_out));
+                    IGRAPH_OUT, NULL, &vid_ecc_out, unconn));
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_start),
-                    IGRAPH_IN, NULL, &vid_ecc_in));
+                    IGRAPH_IN, NULL, &vid_ecc_in, unconn));
 
         if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
             vid_ecc = vid_ecc_out;
@@ -353,14 +374,21 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             vid_ecc = vid_ecc_in;
             ecc_u = VECTOR(ecc_in)[0];
         }
+        if (!unconn && (vid_ecc_out == -1 || vid_ecc_in == -1)) {
+            inf = 1;
+        }
 
-        while (1) {
+        while (!inf) {
             vid_end = vid_ecc;
 
             IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_ecc),
-                        IGRAPH_OUT, NULL, &vid_ecc_out));
+                        IGRAPH_OUT, NULL, &vid_ecc_out, unconn));
             IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_ecc),
-                        IGRAPH_IN, NULL, &vid_ecc_in));
+                        IGRAPH_IN, NULL, &vid_ecc_in, unconn));
+            if (!unconn && (vid_ecc_out == -1 || vid_ecc_in == -1)) {
+                inf = 1;
+                break;
+            }
 
             if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
                 vid_ecc = vid_ecc_out;
@@ -380,26 +408,38 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             }
         }
 
-        if (from) {
-            if (direction) {
-                *from = vid_end;
-            } else {
-                *from = vid_start;
+        if (!inf) {
+            if (from) {
+                if (direction) {
+                    *from = vid_end;
+                } else {
+                    *from = vid_start;
+                }
+            }
+            if (to) {
+                if (direction) {
+                    *to = vid_start;
+                } else {
+                    *to = vid_end;
+                }
             }
         }
-        if (to) {
-            if (direction) {
-                *to = vid_start;
-            } else {
-                *to = vid_end;
-            }
-        }
-
-        *diameter = ecc_u;
 
         igraph_vector_destroy(&ecc_out);
         igraph_vector_destroy(&ecc_in);
         IGRAPH_FINALLY_CLEAN(2);
+    }
+
+    if (inf) {
+        *diameter = IGRAPH_INFINITY;
+        if (from) {
+            *from = -1;
+        }
+        if (to) {
+            *to = -1;
+        }
+    } else {
+        *diameter = ecc_u;
     }
 
     return IGRAPH_SUCCESS;

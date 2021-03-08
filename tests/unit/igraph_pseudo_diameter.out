@@ -1,9 +1,19 @@
-No vertices, no allowed starting vertex id:
+No vertices, no allowed starting vertex id.
+
 1 vertex:
 result:0, from 0 to 0
 
-2 vertices:
+2 vertices unconn = true:
 result:0, from 0 to 0
+
+2 vertices unconn = false:
+result:Inf, from -1 to -1
+
+2 vertices, directed, unconn = true:
+result:0, from 0 to 0
+
+2 vertices, directed, unconn = false:
+result:Inf, from -1 to -1
 
 Undirected disconnected graph with loops and multiple edges.
 result:3, from 0 to 4
@@ -41,6 +51,9 @@ result:2, from 2 to 0
 result:2, from 2 to 0
 
 result:2, from 2 to 4
+
+Same graph, unconn = false.
+result:Inf, from -1 to -1
 
 Same graph, undirected.
 result:4, from 0 to 4

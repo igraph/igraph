@@ -155,9 +155,10 @@ IGRAPH_EXPORT int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
 
 IGRAPH_EXPORT int igraph_pseudo_diameter(const igraph_t *graph,
                                          igraph_real_t *diameter,
-                                         igraph_integer_t start_vid,
+                                         igraph_integer_t vid_start,
                                          igraph_integer_t *from,
-                                         igraph_integer_t *to);
+                                         igraph_integer_t *to,
+                                         igraph_bool_t unconn);
 
 IGRAPH_EXPORT int igraph_get_all_simple_paths(const igraph_t *graph,
                                               igraph_vector_int_t *res,
