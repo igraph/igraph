@@ -294,13 +294,13 @@ int igraph_pseudo_diameter(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&ecc_v, igraph_vcount(graph));
 
     IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_u, igraph_vss_1(start_vid),
-                IGRAPH_ALL, NULL, &ecc_vid));
-    while(1) {
+                                       IGRAPH_ALL, NULL, &ecc_vid));
+    while (1) {
         if (to) {
             *to = ecc_vid;
         }
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_v, igraph_vss_1(ecc_vid),
-                    IGRAPH_ALL, NULL, &ecc_vid));
+                                           IGRAPH_ALL, NULL, &ecc_vid));
         if (VECTOR(ecc_u)[0] < VECTOR(ecc_v)[0]) {
             igraph_vector_swap(&ecc_u, &ecc_v);
             if (from) {
