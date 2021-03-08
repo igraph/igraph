@@ -960,12 +960,7 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     }
 
     size = (size_t) (v->end - v->stor_begin);
-    if (size) {
-        tmp = igraph_Realloc(v->stor_begin, size, BASE);
-    } else {
-        igraph_Free(v->stor_begin);
-        tmp = igraph_Calloc(0, BASE);
-    }
+    tmp = igraph_Realloc(v->stor_begin, size, BASE);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot resize vector", IGRAPH_ENOMEM);
     } else {
