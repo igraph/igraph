@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2005-2021 The igraph development team
+   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,30 +14,24 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_structural.h"
-#include "igraph_bipartite.h"
-#include "igraph_operators.h"
 #include "core/interruption.h"
-#include "igraph_constructors.h"
-#include "igraph_topology.h"
-#include "igraph_interface.h"
 
-#include <limits.h>
+#include "igraph_bipartite.h"
+#include "igraph_constructors.h"
+#include "igraph_conversion.h"
+#include "igraph_interface.h"
+#include "igraph_operators.h"
+#include "igraph_structural.h"
+#include "igraph_topology.h"
 
 /**
- * \function igraph_perfect
+ * \function igraph_is_perfect
  * \brief Check if the graph is perfect.
  *
  * </para><para>
- * The current implementation works for undirected graphs only,
- * directed graphs are treated as undirected graphs. Self-loops and
- * multiple edges are ignored.
  *
  * </para><para>
  * A perfect graph is a graph in which the chromatic number of every induced
@@ -48,9 +41,11 @@
  *
  * </para><para>
  * This implementation is based on the strong perfect graph theorem which was
- * conjectured by Claude Berge and prooved by Maria Chudnovsky, Neil Robertson,
+ * conjectured by Claude Berge and proved by Maria Chudnovsky, Neil Robertson,
  * Paul Seymour, and Robin Thomas.
- * \param graph The input graph.
+ * 
+ * \param graph The input graph. The current implementation works for undirected graphs only,
+ *     directed graphs are treated as undirected graphs. Self-loops and multiple edges are ignored.
  * \param perfect Pointer to an integer, if not \c NULL then the result
  *     will be stored here.
  * \return Error code.
@@ -60,13 +55,19 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     
     igraph_bool_t is_bipartite, is_chordal, iso;
     igraph_integer_t girth, comp_girth, num_of_vertices = igraph_vcount(graph);
-    int start;
-    igraph_vector_t edge_list;
+    igraph_integer_t start;
+    long int i;
     igraph_t comp_graph, cycle;
 
     if (!perfect) {
         return IGRAPH_SUCCESS;
     }
+
+    // If the graph is directed return error
+    if (igraph_is_directed(graph)) {
+        IGRAPH_ERROR("perfect graph function doesn't support directed graphs", IGRAPH_EINVAL);
+    }
+
     
     IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, NULL));
     IGRAPH_CHECK(igraph_is_chordal(graph, NULL, NULL, &is_chordal, NULL, NULL));
@@ -78,11 +79,12 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         return IGRAPH_SUCCESS;
     }
 
-    // The weak perfect graph theorem - a graph is perfect iff its compemeny is perfect
+    // The weak perfect graph theorem - a graph is perfect iff its complement is perfect
     IGRAPH_CHECK(igraph_complementer(&comp_graph, graph, 0));
+    IGRAPH_FINALLY(igraph_destroy, &comp_graph);
     IGRAPH_CHECK(igraph_is_bipartite(&comp_graph, &is_bipartite, NULL));
     IGRAPH_CHECK(igraph_is_chordal(&comp_graph, NULL, NULL, &is_chordal, NULL, NULL));
-    if ((is_chordal) || (is_bipartite)) {
+    if (is_chordal || is_bipartite) {
         *perfect = 1;
         igraph_destroy(&comp_graph);
         return IGRAPH_SUCCESS;
@@ -92,51 +94,51 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     // the graph isn't perfect
     IGRAPH_CHECK(igraph_girth(graph, &girth, NULL));
     IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
-    if ((girth >3) &&(girth % 2 == 1)) {
+    if ((girth >3) && (girth % 2 == 1)) {
         *perfect = 0;
         igraph_destroy(&comp_graph);
+        IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
-    if ((comp_girth >3) &&(comp_girth % 2 == 1)) {
+    if ((comp_girth >3) && (comp_girth % 2 == 1)) {
         *perfect = 0;
         igraph_destroy(&comp_graph);
+        IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
 
-    //strong perfect theorem
+    // since bipartiteQ() also catches trees, at this point girth and comp_girth are both at least 3.
+    // for trees, their value would have been 0
+
+    //strong perfect graph theorem
     // a graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
     start = girth > comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start+1 : start+2;
-    for (int i = start; i < num_of_vertices; i+= 2) {
-        IGRAPH_VECTOR_INIT_FINALLY(&edge_list, 2*i);
-        for (int s = 0; s < i; s++) {
-            VECTOR(edge_list)[s*2] = s;
-            VECTOR(edge_list)[s*2+1] =  s+1 < i ? s+1 : 0;
-        }
-        IGRAPH_CHECK(igraph_create(&cycle, &edge_list, i, 0));
-        IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, 1, 0));
+    for (i = start; i <= num_of_vertices; i+= 2) {
+        
+        IGRAPH_CHECK(igraph_ring(&cycle, i, 0, 0, 1));
+        IGRAPH_FINALLY(igraph_destroy, &cycle);
+        IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
         if ((i > girth) && (iso)) {
             *perfect = 0;
             igraph_destroy(&cycle);
             igraph_destroy(&comp_graph);
-            igraph_vector_destroy(&edge_list);
-            IGRAPH_FINALLY_CLEAN(1);
+            IGRAPH_FINALLY_CLEAN(2);
             return IGRAPH_SUCCESS;
         }
                 
-        IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, 1, 0));
-        if ((i > girth) && (iso)) {
+        IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
+        if ((i > girth) && iso) {
             *perfect = 0;
             igraph_destroy(&cycle);
             igraph_destroy(&comp_graph);
-            igraph_vector_destroy(&edge_list);
-            IGRAPH_FINALLY_CLEAN(1);
+            IGRAPH_FINALLY_CLEAN(2);
             return IGRAPH_SUCCESS;
         }
         igraph_destroy(&cycle);
-        igraph_vector_destroy(&edge_list);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_FINALLY_CLEAN(2);
     }
+    IGRAPH_ALLOW_INTERRUPTION();
     *perfect = 1;
     igraph_destroy(&comp_graph);
     return IGRAPH_SUCCESS;

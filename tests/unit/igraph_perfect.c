@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2021  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,58 +14,71 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
-#include "igraph_structural.h"
-
 #include "test_utilities.inc"
 
 int main() {
     igraph_t graph, comp_graph;
     igraph_bool_t is_perfect;
-    int x;
 
-    printf("bipartite \n");
-    printf("==========================================================\n");
+    igraph_rng_seed(igraph_rng_default(), 0);
+
+    //bipartite 
+    //==========================================================
     igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, 0, IGRAPH_ALL);
     igraph_is_perfect(&graph, &is_perfect);
-    IGRAPH_ASSERT(is_perfect == 1);
+    IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
-    x = IGRAPH_FINALLY_STACK_SIZE();
 
-    printf("complanetry to star graph size 10 - chordal\n");
-    printf("==========================================================\n");
+    //complement to star graph size 10 - chordal
+    //==========================================================
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_complementer(&comp_graph, &graph, 0);
     igraph_is_perfect(&comp_graph, &is_perfect);
-    IGRAPH_ASSERT(is_perfect == 1);
+    IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
     igraph_destroy(&comp_graph);
-    x = IGRAPH_FINALLY_STACK_SIZE();
 
     
-    printf("A cycle of size 5\n");
-    printf("==========================================================\n");
-    igraph_ring(&graph, 5, 0, 0, 1);
+    //A cycle of size 5
+    //==========================================================
+    igraph_ring(&graph, 5, IGRAPH_UNDIRECTED, 0, 1);
     igraph_is_perfect(&graph, &is_perfect);
-    IGRAPH_ASSERT(is_perfect == 0);
+    IGRAPH_ASSERT(!is_perfect);
     igraph_destroy(&graph);
-    x = IGRAPH_FINALLY_STACK_SIZE();
 
-    printf("Paley graph of order 9\n");
-    printf("==========================================================\n");
-    igraph_small(&graph, 9, 0,
+    //Paley graph of order 9
+    //==========================================================
+    igraph_small(&graph, 9, IGRAPH_UNDIRECTED,
                 0, 1, 0, 3, 0, 6, 0, 2, 1, 2, 1, 4, 1, 7, 2, 5, 2, 8,
                 3, 4, 3, 5, 3, 6, 4, 5, 4, 7, 5, 8, 6, 7, 7, 8, 6, 8, -1);
     igraph_is_perfect(&graph, &is_perfect);
-    IGRAPH_ASSERT(is_perfect == 1);
+    IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
-    x = IGRAPH_FINALLY_STACK_SIZE();
+
+    //Null graph
+    //==========================================================
+    igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(is_perfect);
+    igraph_destroy(&graph);
+
+    //singleton graph
+    //==========================================================
+    igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(is_perfect);
+    igraph_destroy(&graph);
+
+    //Empty graph
+    //==========================================================
+    igraph_empty(&graph, 2, IGRAPH_UNDIRECTED);
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(is_perfect);
+    igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
 
