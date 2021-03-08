@@ -30,6 +30,7 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
+#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -38,7 +39,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vs_t vids,
                                  igraph_neimode_t mode,
                                  const igraph_adjlist_t *adjlist,
-                                 igraph_integer_t *ecc_vid) {
+                                 igraph_integer_t *vid_ecc) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_long_t q;
@@ -51,7 +52,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
     igraph_integer_t degree;
     igraph_vector_t degrees;
 
-    if (ecc_vid) {
+    if (vid_ecc) {
         IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
     }
 
@@ -88,7 +89,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
             long int dist = igraph_dqueue_long_pop(&q);
             int j, n;
 
-            if (ecc_vid) {
+            if (vid_ecc) {
                 /* Return the vertex id of the vertex which has the lowest */
                 /* degree of the vertices most distant from the starting */
                 /* vertex. Assumes there is only 1 vid in vids. Used for */
@@ -97,7 +98,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                 degree = VECTOR(degrees)[0];
                 if (dist > VECTOR(*res)[i] || (dist == VECTOR(*res)[i] && degree < min_degree)) {
                     VECTOR(*res)[i] = dist;
-                    *ecc_vid = act;
+                    *vid_ecc = act;
                     min_degree = degree;
                 }
             }
@@ -137,7 +138,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
         igraph_vector_destroy(&vneis);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    if (ecc_vid) {
+    if (vid_ecc) {
         igraph_vector_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -187,7 +188,7 @@ int igraph_eccentricity(const igraph_t *graph,
                         igraph_neimode_t mode) {
 
     return igraph_i_eccentricity(graph, res, vids, mode, /*adjlist=*/ NULL,
-                                 /*ecc_vid*/ NULL);
+                                 /*vid_ecc*/ NULL);
 }
 
 /**
@@ -229,7 +230,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc, igraph_vss_all(),
-                                           mode, &adjlist, /*ecc_vid*/ NULL));
+                                           mode, &adjlist, /*vid_ecc*/ NULL));
         *radius = igraph_vector_min(&ecc);
         igraph_vector_destroy(&ecc);
         igraph_adjlist_destroy(&adjlist);
@@ -252,14 +253,15 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * vertex u which is as far away from v as possible, v is also as
  * far away from u as possible. The process of finding one depends
  * on where the search starts, and for a disconnected graph the
- * maximum diameter found will be that of the component \p start_vid
+ * maximum diameter found will be that of the component \p vid_start
  * is in.
  *
  * \param graph The input graph, if it is directed, its edge directions
  *   are ignored.
  * \param diameter Pointer to a real variable, the result is stored
  *   here.
- * \param start_vid Id of the starting vertex.
+ * \param vid_start Id of the starting vertex. If this is negative, a
+ *   random starting vertex is chosen.
  * \param from Pointer to an integer, if not \c NULL it will be set to the
  *        source vertex of the diameter path.
  * \param to Pointer to an integer, if not \c NULL it will be set to the
@@ -274,48 +276,131 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  */
 int igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_real_t *diameter,
-                           igraph_integer_t start_vid,
+                           igraph_integer_t vid_start,
                            igraph_integer_t *from,
                            igraph_integer_t *to) {
 
     int no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t ecc_u;
-    igraph_vector_t ecc_v;
-    igraph_integer_t ecc_vid;
+    igraph_real_t ecc_v;
+    igraph_real_t ecc_u;
+    igraph_integer_t vid_ecc;
 
-    if (start_vid >= no_of_nodes || start_vid < 0) {
+    if (vid_start >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex id out of range.\n", IGRAPH_EINVAL);
     }
-    if (from) {
-        *from = start_vid;
+
+    if (vid_start < 0) {
+        RNG_BEGIN();
+        vid_start = RNG_INTEGER(0, no_of_nodes - 1);
+        RNG_END();
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ecc_u, igraph_vcount(graph));
-    IGRAPH_VECTOR_INIT_FINALLY(&ecc_v, igraph_vcount(graph));
+    if (!igraph_is_directed(graph)) {
+        igraph_vector_t ecc_vec;
 
-    IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_u, igraph_vss_1(start_vid),
-                                       IGRAPH_ALL, NULL, &ecc_vid));
-    while (1) {
-        if (to) {
-            *to = ecc_vid;
+        if (from) {
+            *from = vid_start;
         }
-        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_v, igraph_vss_1(ecc_vid),
-                                           IGRAPH_ALL, NULL, &ecc_vid));
-        if (VECTOR(ecc_u)[0] < VECTOR(ecc_v)[0]) {
-            igraph_vector_swap(&ecc_u, &ecc_v);
-            if (from) {
-                *from = *to;
+        IGRAPH_VECTOR_INIT_FINALLY(&ecc_vec, igraph_vcount(graph));
+
+        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_start),
+                    IGRAPH_ALL, NULL, &vid_ecc));
+        ecc_u = VECTOR(ecc_vec)[0];
+
+        while (1) {
+            if (to) {
+                *to = vid_ecc;
             }
-        } else {
-            break;
+
+            IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_ecc),
+                        IGRAPH_ALL, NULL, &vid_ecc));
+            ecc_v = VECTOR(ecc_vec)[0];
+
+            if (ecc_u < ecc_v) {
+                ecc_u = ecc_v;
+                if (from) {
+                    *from = *to;
+                }
+            } else {
+                break;
+            }
         }
+
+        *diameter = ecc_u;
+
+        igraph_vector_destroy(&ecc_vec);
+        IGRAPH_FINALLY_CLEAN(1);
+    } else {
+        igraph_vector_t ecc_out;
+        igraph_vector_t ecc_in;
+        igraph_integer_t vid_ecc_in;
+        igraph_integer_t vid_ecc_out;
+        igraph_integer_t vid_end;
+        igraph_bool_t direction;
+
+        IGRAPH_VECTOR_INIT_FINALLY(&ecc_in, igraph_vcount(graph));
+        IGRAPH_VECTOR_INIT_FINALLY(&ecc_out, igraph_vcount(graph));
+
+        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_start),
+                    IGRAPH_OUT, NULL, &vid_ecc_out));
+        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_start),
+                    IGRAPH_IN, NULL, &vid_ecc_in));
+
+        if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
+            vid_ecc = vid_ecc_out;
+            ecc_u = VECTOR(ecc_out)[0];
+        } else {
+            vid_ecc = vid_ecc_in;
+            ecc_u = VECTOR(ecc_in)[0];
+        }
+
+        while (1) {
+            vid_end = vid_ecc;
+
+            IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_ecc),
+                        IGRAPH_OUT, NULL, &vid_ecc_out));
+            IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_ecc),
+                        IGRAPH_IN, NULL, &vid_ecc_in));
+
+            if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
+                vid_ecc = vid_ecc_out;
+                ecc_v = VECTOR(ecc_out)[0];
+                direction = 1;
+            } else {
+                vid_ecc = vid_ecc_in;
+                ecc_v = VECTOR(ecc_in)[0];
+                direction = 0;
+            }
+
+            if (ecc_u < ecc_v) {
+                ecc_u = ecc_v;
+                vid_start = vid_end;
+            } else {
+                break;
+            }
+        }
+
+        if (from) {
+            if (direction) {
+                *from = vid_end;
+            } else {
+                *from = vid_start;
+            }
+        }
+        if (to) {
+            if (direction) {
+                *to = vid_start;
+            } else {
+                *to = vid_end;
+            }
+        }
+
+        *diameter = ecc_u;
+
+        igraph_vector_destroy(&ecc_out);
+        igraph_vector_destroy(&ecc_in);
+        IGRAPH_FINALLY_CLEAN(2);
     }
-
-    *diameter = VECTOR(ecc_u)[0];
-
-    igraph_vector_destroy(&ecc_u);
-    igraph_vector_destroy(&ecc_v);
-    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }

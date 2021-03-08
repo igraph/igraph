@@ -33,6 +33,7 @@ int main() {
     igraph_real_t result;
     int i;
 
+    igraph_rng_seed(igraph_rng_default(), 42);
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("No vertices, no allowed starting vertex id:\n");
@@ -50,17 +51,38 @@ int main() {
     print_result(&g, 0);
     igraph_destroy(&g);
 
-    printf("Disconnected graph with loops and multiple edges.\n");
+    printf("Undirected disconnected graph with loops and multiple edges.\n");
+    igraph_small(&g, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
+    for (i = 0; i < 6; i ++) {
+        print_result(&g, i);
+    }
+    igraph_destroy(&g);
+
+    printf("Directed disconnected graph with loops and multiple edges.\n");
     igraph_small(&g, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
     for (i = 0; i < 6; i ++) {
         print_result(&g, i);
     }
     igraph_destroy(&g);
 
-    printf("Petersen graph.\n");
+    printf("Directed graph, pointing outward from 2.\n");
+    igraph_small(&g, 5, 1, 1,0, 2,1, 2,3, 3,4, -1);
+    for (i = 0; i < 5; i ++) {
+        print_result(&g, i);
+    }
+    igraph_destroy(&g);
+
+    printf("Same graph, undirected.\n");
+    igraph_small(&g, 5, 0, 1,0, 2,1, 2,3, 3,4, -1);
+    for (i = 0; i < 5; i ++) {
+        print_result(&g, i);
+    }
+    igraph_destroy(&g);
+
+    printf("Petersen graph with random starts.\n");
     igraph_famous(&g, "petersen");
     for (i = 0; i < 6; i ++) {
-        print_result(&g, i);
+        print_result(&g, -1);
     }
     igraph_destroy(&g);
 
