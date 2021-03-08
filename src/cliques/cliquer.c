@@ -195,7 +195,9 @@ int igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t *hist,
     }
 
     if (max_size < min_size) {
-        IGRAPH_ERROR("max_size must not be smaller than min_size", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Maximum clique size (%" IGRAPH_PRId ") must not be "
+                      "smaller than minimum clique size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, max_size, min_size);
     }
 
     igraph_to_cliquer(graph, &g);
