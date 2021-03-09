@@ -26,14 +26,14 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 0);
 
-    //bipartite 
+    // Bipartite
     //==========================================================
     igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
 
-    //complement to star graph size 10 - chordal
+    // Complement to star graph size 10 - chordal
     //==========================================================
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_complementer(&comp_graph, &graph, 0);
@@ -42,45 +42,45 @@ int main() {
     igraph_destroy(&graph);
     igraph_destroy(&comp_graph);
 
-    
-    //A cycle of size 5
+
+    // A cycle of size 5
     //==========================================================
     igraph_ring(&graph, 5, IGRAPH_UNDIRECTED, 0, 1);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(!is_perfect);
     igraph_destroy(&graph);
 
-    //Paley graph of order 9
+    // Paley graph of order 9
     //==========================================================
     igraph_small(&graph, 9, IGRAPH_UNDIRECTED,
-                0, 1, 0, 3, 0, 6, 0, 2, 1, 2, 1, 4, 1, 7, 2, 5, 2, 8,
-                3, 4, 3, 5, 3, 6, 4, 5, 4, 7, 5, 8, 6, 7, 7, 8, 6, 8, -1);
+                 0, 1, 0, 3, 0, 6, 0, 2, 1, 2, 1, 4, 1, 7, 2, 5, 2, 8,
+                 3, 4, 3, 5, 3, 6, 4, 5, 4, 7, 5, 8, 6, 7, 7, 8, 6, 8, -1);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
 
-    //Null graph
+    // Null graph
     //==========================================================
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
 
-    //singleton graph
+    // Singleton graph
     //==========================================================
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
 
-    //Empty graph
+    // Empty graph
     //==========================================================
     igraph_empty(&graph, 2, IGRAPH_UNDIRECTED);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
 
-    //Test directed paths
+    // Test directed paths
     igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, IGRAPH_DIRECTED, IGRAPH_ALL);
     igraph_set_error_handler(igraph_error_handler_ignore);
     IGRAPH_ASSERT(igraph_is_perfect(&graph, &is_perfect) == IGRAPH_EINVAL);
