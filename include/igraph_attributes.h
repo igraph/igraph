@@ -80,10 +80,19 @@ __BEGIN_DECLS
 /**
  * \section about_attribute_combination
  *
- * <para>Attribute combination lists are used to indicate how to combine
- * attributes. For example, \ref igraph_simplify() removes loops and multiple
- * edges, and the way to combine the attributes of multiple edges has to
- * be indicated.</para>
+ * <para>Several graph operations may collapse multiple vertices or edges into
+ * a single one. Attribute combination lists are used to indicate to the attribute
+ * handler how to combine the attributes of the original vertices or edges and
+ * how to derive the final attribute value that is to be assigned to the collapsed
+ * vertex or edge. For example, \ref igraph_simplify() removes loops and combines
+ * multiple edges into a single one; in case of a graph with an edge attribute
+ * named \c weight the attribute combination list can tell the attribute handler
+ * whether the weight of a collapsed edge should be the sum, the mean or some other
+ * function of the weights of the original edges that were collapsed into one.</para>
+ *
+ * <para>One attribute combination list may contain several attribute combination
+ * records, one for each vertex or edge attribute that is to be handled during the
+ * operation.</para>
  */
 
 /**
