@@ -31,7 +31,6 @@
  * \function igraph_is_perfect
  * \brief Checks if the graph is perfect.
  *
- * </para><para>
  * A perfect graph is an undirected graph in which the chromatic number of every induced
  * subgraph equals the order of the largest clique of that subgraph.
  * The chromatic number of a graph G is the smallest number of colors needed to
