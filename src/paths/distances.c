@@ -355,6 +355,8 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_start),
                                            &adjlist_in, &vid_ecc_in, unconn));
 
+        /* A directed graph is strongly connected iff all vertices are reachable
+         * from vid_start both when moving along or moving opposite the edge directions. */
         if (!unconn && (vid_ecc_out == -1 || vid_ecc_in == -1)) {
             inf = 1;
         } else {
