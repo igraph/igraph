@@ -63,31 +63,32 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         return IGRAPH_SUCCESS;
     }
 
-    // If the graph is directed return error
+    // If the graph is directed return error.
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("perfect graph function doesn't support directed graphs", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The concept of perfect graphs is only defined for undirected graphs.", IGRAPH_EINVAL);
     }
 
-    //If the graph isn't simple then return an error
+    // If the graph isn't simple then return an error.
     IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
     if (!is_simple) {
-        IGRAPH_ERROR("perfect graph function doesn't support graphs with multi edges", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Perfect graph testing is implemented for simple graphs only. Simplify the graph.", IGRAPH_EINVAL);
     }
 
-
+    // Chordal and bipartite graph types are perfect.
+    // possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
     IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, NULL));
     IGRAPH_CHECK(igraph_is_chordal(graph, NULL, NULL, &is_chordal, NULL, NULL));
-    // chordal and bipartite graph types are perfect.
-    // possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
 
     if (is_chordal || is_bipartite) {
         *perfect = 1;
         return IGRAPH_SUCCESS;
     }
 
-    // The weak perfect graph theorem - a graph is perfect iff its complement is perfect
+    // The weak perfect graph theorem:
+    // A graph is perfect iff its complement is perfect.
     IGRAPH_CHECK(igraph_complementer(&comp_graph, graph, 0));
     IGRAPH_FINALLY(igraph_destroy, &comp_graph);
+
     IGRAPH_CHECK(igraph_is_bipartite(&comp_graph, &is_bipartite, NULL));
     IGRAPH_CHECK(igraph_is_chordal(&comp_graph, NULL, NULL, &is_chordal, NULL, NULL));
     if (is_chordal || is_bipartite) {
@@ -98,7 +99,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     }
 
     // If the girth (or the smallest circle in the graph) is bigger than 3 and have odd number of vertices then
-    // the graph isn't perfect
+    // the graph isn't perfect.
     IGRAPH_CHECK(igraph_girth(graph, &girth, NULL));
     IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
     if ((girth > 3) && (girth % 2 == 1)) {
@@ -114,17 +115,18 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         return IGRAPH_SUCCESS;
     }
 
-    // since igraph_is_bipartite also catches trees, at this point girth and comp_girth are both at least 3.
-    // for trees, their value would have been 0
+    // Since igraph_is_bipartite also catches trees, at this point girth and comp_girth are both at least 3.
+    // For trees, their value would have been 0.
 
-    // strong perfect graph theorem
-    // a graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
+    // Strong perfect graph theorem:
+    // A graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
     start = girth > comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start + 1 : start + 2;
     for (i = start; i <= num_of_vertices; i += 2) {
 
         IGRAPH_CHECK(igraph_ring(&cycle, i, 0, 0, 1));
         IGRAPH_FINALLY(igraph_destroy, &cycle);
+
         IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
         if ((i > girth) && (iso)) {
             *perfect = 0;
@@ -142,12 +144,16 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
             IGRAPH_FINALLY_CLEAN(2);
             return IGRAPH_SUCCESS;
         }
+
         igraph_destroy(&cycle);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
     IGRAPH_ALLOW_INTERRUPTION();
     *perfect = 1;
+
     igraph_destroy(&comp_graph);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
