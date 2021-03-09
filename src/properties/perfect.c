@@ -51,7 +51,7 @@
 int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
-    igraph_integer_t girth, comp_girth, num_of_vertices = igraph_vcount(graph);
+    igraph_integer_t girth, comp_girth, no_of_vertices = igraph_vcount(graph);
     igraph_integer_t start;
     long int cycle_len;
     igraph_t comp_graph, cycle;
@@ -116,7 +116,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     // (i.e. an odd hole). TODO: Find a more efficient way to check for odd holes.
     start = girth < comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start + 1 : start + 2;
-    for (cycle_len = start; cycle_len <= num_of_vertices; cycle_len += 2) {
+    for (cycle_len = start; cycle_len <= no_of_vertices; cycle_len += 2) {
 
         IGRAPH_ALLOW_INTERRUPTION();
 
