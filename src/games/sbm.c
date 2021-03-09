@@ -29,12 +29,14 @@
 #include "igraph_constructors.h"
 #include "igraph_games.h"
 
+#include "core/interruption.h"
+
 #include <float.h>      /* for DBL_EPSILON */
 #include <math.h>       /* for sqrt */
 
 /**
  * \function igraph_sbm_game
- * Sample from a stochastic block model
+ * \brief Sample from a stochastic block model.
  *
  * This function samples graphs from a stochastic block
  * model by (doing the equivalent of) Bernoulli
@@ -73,8 +75,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                     const igraph_vector_int_t *block_sizes,
                     igraph_bool_t directed, igraph_bool_t loops) {
 
-    int no_blocks = igraph_matrix_nrow(pref_matrix);
-    int from, to, fromoff = 0;
+    long int no_blocks = igraph_matrix_nrow(pref_matrix);
+    long int from, to, fromoff = 0;
     igraph_real_t minp, maxp;
     igraph_vector_t edges;
 
@@ -120,8 +122,11 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
     for (from = 0; from < no_blocks; from++) {
         double fromsize = VECTOR(*block_sizes)[from];
-        int start = directed ? 0 : from;
-        int i, tooff = 0;
+        long int start = directed ? 0 : from;
+        long int i, tooff = 0;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         for (i = 0; i < start; i++) {
             tooff += VECTOR(*block_sizes)[i];
         }
@@ -132,8 +137,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             if (directed && loops) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    long int vto = floor(last / fromsize);
+                    long int vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -142,8 +147,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (directed && !loops && from != to) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    long int vto = floor(last / fromsize);
+                    long int vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -152,8 +157,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (directed && !loops && from == to) {
                 maxedges = fromsize * (fromsize - 1);
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    long int vto = floor(last / fromsize);
+                    long int vfrom = last - (igraph_real_t)vto * fromsize;
                     if (vfrom == vto) {
                         vto = fromsize - 1;
                     }
@@ -165,8 +170,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (!directed && loops && from != to) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    long int vto = floor(last / fromsize);
+                    long int vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -185,8 +190,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (!directed && !loops && from != to) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    long int vto = floor(last / fromsize);
+                    long int vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -195,8 +200,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else { /*!directed && !loops && from==to */
                 maxedges = fromsize * (fromsize - 1) / 2.0;
                 while (last < maxedges) {
-                    int vto = floor((sqrt(8 * last + 1) + 1) / 2);
-                    int vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
+                    long int vto = floor((sqrt(8 * last + 1) + 1) / 2);
+                    long int vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -220,7 +225,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_hsbm_game
- * Hierarchical stochastic block model
+ * \brief Hierarchical stochastic block model.
  *
  * The function generates a random graph according to the hierarchical
  * stochastic block model.
@@ -395,7 +400,7 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_hsbm_list_game
- * Hierarchical stochastic block model, more general version
+ * \brief Hierarchical stochastic block model, more general version.
  *
  * The function generates a random graph according to the hierarchical
  * stochastic block model.

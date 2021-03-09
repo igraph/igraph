@@ -71,7 +71,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
         igraph_vector_null(outs_p);
     }
 
-    geodist = igraph_Calloc(no_of_nodes, long int);
+    geodist = IGRAPH_CALLOC(no_of_nodes, long int);
     if (geodist == 0) {
         IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
     }
@@ -165,7 +165,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_Free(geodist);
+    IGRAPH_FREE(geodist);
     igraph_dqueue_destroy(&q);
     IGRAPH_FINALLY_CLEAN(2);
 

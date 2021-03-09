@@ -1,0 +1,7 @@
+progress with set progress handler:
+handler, message, 100.000000, 10
+
+progress with no handler:
+
+progress with previous handler:
+handler, message, 100.000000, 10

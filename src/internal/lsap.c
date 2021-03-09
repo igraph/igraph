@@ -152,6 +152,7 @@ int ap_assignment(AP *p, int *res) {
 /* read data from file                                             */
 /*******************************************************************/
 
+#if 0
 AP *ap_read_problem(char *file) {
     FILE *f;
     int i, j, c;
@@ -239,7 +240,9 @@ AP *ap_read_problem(char *file) {
     p->f = NULL;
     return p;
 }
+#endif
 
+#if 0
 AP     *ap_create_problem_from_matrix(double **t, int n) {
     int i, j;
     AP *p;
@@ -276,6 +279,7 @@ AP     *ap_create_problem_from_matrix(double **t, int n) {
     p->f = NULL;
     return p;
 }
+#endif
 
 /* read data from vector */
 AP *ap_create_problem(double *t, int n) {

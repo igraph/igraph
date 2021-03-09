@@ -49,8 +49,8 @@ int main() {
     igraph_vector_t bounds[4];
     igraph_vector_t weights;
     igraph_real_t seed[20] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1.0};
-    igraph_rng_seed(igraph_rng_default(), 42);
 
+    igraph_rng_seed(igraph_rng_default(), 42);
 
     printf("Empty graph.\n");
     igraph_small(&g, 0, 0, -1);

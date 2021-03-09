@@ -266,12 +266,12 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
 
 /**
  * \function igraph_famous
- * \brief Create a famous graph by simply providing its name
+ * \brief Create a famous graph by simply providing its name.
  *
  * </para><para>
  * The name of the graph can be simply supplied as a string.
  * Note that this function creates graphs which don't take any parameters,
- * there are separate functions for graphs with parameters, eg. \ref
+ * there are separate functions for graphs with parameters, e.g. \ref
  * igraph_full() for creating a full graph.
  *
  * </para><para>
@@ -413,7 +413,7 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
  * \param graph Pointer to an uninitialized graph object.
  * \param name Character constant, the name of the graph to be
  *     created, it is case insensitive.
- * \return Error code, IGRAPH_EINVAL if there is no graph with the
+ * \return Error code, \c IGRAPH_EINVAL if there is no graph with the
  *     given name.
  *
  * \sa Other functions for creating graph structures:

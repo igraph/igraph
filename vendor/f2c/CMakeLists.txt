@@ -5,13 +5,24 @@ if (NOT MSVC)
   target_link_libraries(arithchk PRIVATE m)
 endif()
 
-add_custom_command(
-  OUTPUT arith.h
-  COMMENT "Generating arith.h for f2c..."
-  COMMAND arithchk > ${CMAKE_CURRENT_BINARY_DIR}/arith.h
-  DEPENDS arithchk
-  VERBATIM
+# Provide an option for the user to provide an external arith.h for
+# cross-compilation
+set(
+  F2C_EXTERNAL_ARITH_HEADER "" CACHE FILEPATH
+  "Path to an external arith.h to use for compiling f2c, typically for cross-compilation"
 )
+
+if(F2C_EXTERNAL_ARITH_HEADER)
+  configure_file(${F2C_EXTERNAL_ARITH_HEADER} arith.h COPYONLY)
+else()
+  add_custom_command(
+    OUTPUT arith.h
+    COMMENT "Generating arith.h for f2c..."
+    COMMAND arithchk > ${CMAKE_CURRENT_BINARY_DIR}/arith.h
+    DEPENDS arithchk
+    VERBATIM
+  )
+endif()
 
 # Declare the files needed to compile our vendored f2c copy
 add_library(

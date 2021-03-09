@@ -62,8 +62,7 @@ int igraph_i_read_network(const igraph_t *graph,
     long int no_of_nodes = (long int) igraph_vcount(graph);
     long int no_of_edges = (long int) igraph_ecount(graph);
     long int ii;
-    char *empty = new char[1];
-    empty[0] = '\0';
+    const char *empty = "";
 
     IGRAPH_VECTOR_INIT_FINALLY(&edgelist, no_of_edges * 2);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0 /* rowwise */));
@@ -125,8 +124,6 @@ int igraph_i_read_network(const igraph_t *graph,
     net->sum_bids = 0;
     net->min_bids = 0;
     net->max_bids = 0;
-
-    delete [] empty;
 
     return IGRAPH_SUCCESS;
 }

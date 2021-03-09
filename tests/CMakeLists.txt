@@ -21,8 +21,20 @@ check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
 set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
-  set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
 endif()
+
+# tutorial examples and other snippets from the documentation
+add_examples(
+  FOLDER examples/simple NAMES
+  igraph_free
+)
+add_examples(
+  FOLDER examples/tutorial NAMES
+  tutorial1
+  tutorial2
+  tutorial3
+)
 
 # version.at
 add_examples(
@@ -51,14 +63,24 @@ add_legacy_tests(
   igraph_psumtree
   igraph_sparsemat5
   igraph_sparsemat9
+  igraph_sparsemat_droptol
+  igraph_sparsemat_fkeep
+  igraph_sparsemat_getelements_sorted
   igraph_sparsemat_is_symmetric
+  igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
+  igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_view
   igraph_sparsemat_which_minmax
+  igraph_spmatrix_add_col_values
+  igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
   spmatrix
+  spmatrix_clear
   stack
+  strvector_set2_remove_print
   vector
   vector2
   vector3
@@ -149,8 +171,12 @@ add_legacy_tests(
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_cited_type_game
+  igraph_citing_cited_type_game
   igraph_correlated_game
+  igraph_degree_sequence_game
+  igraph_establishment_game
   igraph_extended_chordal_ring
+  igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
   igraph_growing_random_game
@@ -164,6 +190,8 @@ add_legacy_tests(
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
+  igraph_simple_interconnected_islands_game
+  igraph_static_power_law_game
   tree
   tree_game
   ring
@@ -207,22 +235,32 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_shortest_paths
   efficiency
   igraph_are_connected
+  igraph_average_path_length
+  igraph_average_path_length_dijkstra
   igraph_betweenness
   igraph_closeness
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
+  igraph_diversity
+  igraph_eccentricity
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
   igraph_is_tree
-  igraph_get_shortest_paths_bellman_ford
   igraph_local_transitivity
+  igraph_neighborhood
+  igraph_neighborhood_graphs
+  igraph_neighborhood_size
   igraph_pagerank
   igraph_transitive_closure_dag
+  igraph_transitivity_avglocal_undirected
+  igraph_transitivity_barrat
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
@@ -250,6 +288,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_drl
   igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
   igraph_layout_graphopt
@@ -302,6 +341,9 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   simplify_and_colorize
   bliss_automorphisms
+  igraph_get_isomorphisms_vf2
+  igraph_get_subisomorphisms_vf2
+  igraph_subisomorphic
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses
@@ -388,6 +430,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
+  igraph_get_adjacency_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist
@@ -472,9 +515,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_clique_size_hist
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
+  igraph_maximal_cliques_file
   igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
@@ -633,8 +678,10 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_rng_get_exp
+  igraph_rng_get_integer
   mt
   rng_reproducibility
+  rng_init_destroy_max_min_name_set_default
 )
 
 # qsort.at
@@ -669,6 +716,8 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   fatal_handler
+  igraph_progress_handler_stderr
+  igraph_set_progress_handler
 )
 
 # error output
@@ -677,6 +726,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   error_macros
 )
+
+# GLPK
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  glpk_error
+)
+
 # regression and fuzzing tests
 
 add_legacy_tests(
@@ -685,7 +742,15 @@ add_legacy_tests(
 )
 
 # non-graph
+
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+)
+
+# memory allocation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  zero_allocs
 )

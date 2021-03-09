@@ -301,9 +301,9 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
     for (i = 0; i < n; i++) {
         igraph_attribute_combination_record_t *rec = VECTOR(comb->list)[i];
         if (rec->name) {
-            igraph_Free(rec->name);
+            IGRAPH_FREE(rec->name);
         }
-        igraph_Free(rec);
+        IGRAPH_FREE(rec);
     }
     igraph_vector_ptr_destroy(&comb->list);
 }
@@ -329,7 +329,7 @@ int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
     if (i == n) {
         /* This is a new attribute name */
         igraph_attribute_combination_record_t *rec =
-            igraph_Calloc(1, igraph_attribute_combination_record_t);
+            IGRAPH_CALLOC(1, igraph_attribute_combination_record_t);
 
         if (!rec) {
             IGRAPH_ERROR("Cannot create attribute combination data",
@@ -367,9 +367,9 @@ int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
     if (i != n) {
         igraph_attribute_combination_record_t *r = VECTOR(comb->list)[i];
         if (r->name) {
-            igraph_Free(r->name);
+            IGRAPH_FREE(r->name);
         }
-        igraph_Free(r);
+        IGRAPH_FREE(r);
         igraph_vector_ptr_remove(&comb->list, i);
     } else {
         /* It is not there, we don't do anything */

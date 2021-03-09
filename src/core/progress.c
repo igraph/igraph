@@ -103,13 +103,13 @@ int igraph_progressf(const char *message, igraph_real_t percent, void *data,
 
 /**
  * \function igraph_progress_handler_stderr
- * A simple predefined progress handler
+ * \brief A simple predefined progress handler.
  *
  * This simple progress handler first prints \p message, and then
  * the percentage complete value in a short message to standard error.
  * \param message A string describing the function or algorithm
  *     that is reporting the progress. Current igraph functions
- *     always use the name \p message argument if reporting from the
+ *     always use the same \p message argument if reporting from the
  *     same function.
  * \param percent Numeric, the percentage that was completed by the
  *     algorithm or function.
@@ -126,14 +126,14 @@ int igraph_progress_handler_stderr(const char *message, igraph_real_t percent,
                                    void* data) {
     IGRAPH_UNUSED(data);
     fputs(message, stderr);
-    fprintf(stderr, "%.1f percent ready\n", (double)percent);
-    return 0;
+    fprintf(stderr, "%.1f percent ready.\n", percent);
+    return IGRAPH_SUCCESS;
 }
 #endif
 
 /**
- * \function igraph_set_progress_handler
- * Install a progress handler, or remove the current handler
+ * \function igraph_set_progress_handler.
+ * \brief Install a progress handler, or remove the current handler.
  *
  * There is a single simple predefined progress handler:
  * \ref igraph_progress_handler_stderr().

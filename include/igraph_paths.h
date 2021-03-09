@@ -34,14 +34,15 @@ __BEGIN_DECLS
 
 IGRAPH_EXPORT int igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,
-                                  igraph_vector_t *path,
+                                  igraph_vector_t *vertex_path, igraph_vector_t *edge_path,
                                   igraph_bool_t directed, igraph_bool_t unconn);
 IGRAPH_EXPORT int igraph_diameter_dijkstra(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            igraph_real_t *pres,
                                            igraph_integer_t *pfrom,
                                            igraph_integer_t *pto,
-                                           igraph_vector_t *path,
+                                           igraph_vector_t *vertex_path, 
+                                           igraph_vector_t *edge_path,
                                            igraph_bool_t directed,
                                            igraph_bool_t unconn);
 
@@ -98,7 +99,7 @@ IGRAPH_EXPORT int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 IGRAPH_EXPORT int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                                       igraph_vector_ptr_t *vertices,
                                                       igraph_vector_ptr_t *edges,
-                                                      const igraph_integer_t from,
+                                                      igraph_integer_t from,
                                                       igraph_vs_t to,
                                                       const igraph_vector_t *weights,
                                                       igraph_neimode_t mode,

@@ -86,7 +86,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
                 igraph_vector_int_destroy(data->resultids + i);
             }
         }
-        igraph_Free(data->resultids);
+        IGRAPH_FREE(data->resultids);
     }
     if (data->result) {
         for (i = 0; i < data->nc; i++) {
@@ -94,7 +94,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
                 igraph_destroy(data->result + i);
             }
         }
-        igraph_Free(data->result);
+        IGRAPH_FREE(data->result);
     }
     if (data->resultweights) {
         for (i = 0; i < data->nc; i++) {
@@ -102,7 +102,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
                 igraph_vector_destroy(data->resultweights + i);
             }
         }
-        igraph_Free(data->resultweights);
+        IGRAPH_FREE(data->resultweights);
     }
 }
 
@@ -156,17 +156,17 @@ static int igraph_i_subclique_next(const igraph_t *graph,
     }
 
     IGRAPH_FINALLY(igraph_i_subclique_next_free, &freedata);
-    *resultids = igraph_Calloc(nc, igraph_vector_int_t);
+    *resultids = IGRAPH_CALLOC(nc, igraph_vector_int_t);
     if (!*resultids) {
         IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
     }
     freedata.resultids = *resultids;
-    *resultweights = igraph_Calloc(nc, igraph_vector_t);
+    *resultweights = IGRAPH_CALLOC(nc, igraph_vector_t);
     if (!*resultweights) {
         IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
     }
     freedata.resultweights = *resultweights;
-    *result = igraph_Calloc(nc, igraph_t);
+    *result = IGRAPH_CALLOC(nc, igraph_t);
     if (!*result) {
         IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
     }

@@ -126,7 +126,7 @@ int FUNCTION(igraph_vector, init)      (TYPE(igraph_vector)* v, int long size) {
     if (size < 0) {
         size = 0;
     }
-    v->stor_begin = igraph_Calloc(alloc_size, BASE);
+    v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
     }
@@ -377,7 +377,7 @@ int FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, int endmark, .
 void FUNCTION(igraph_vector, destroy)   (TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != 0);
     if (v->stor_begin != 0) {
-        igraph_Free(v->stor_begin);
+        IGRAPH_FREE(v->stor_begin);
         v->stor_begin = NULL;
     }
 }
@@ -440,7 +440,7 @@ int FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, long int size) {
         return 0;
     }
 
-    tmp = igraph_Realloc(v->stor_begin, (size_t) size, BASE);
+    tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, BASE);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
     }
@@ -747,7 +747,7 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
  * \ref igraph_vector_sort().
  */
 
-int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
+static int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
     const BASE *da = (const BASE *) a;
     const BASE *db = (const BASE *) b;
 
@@ -761,7 +761,7 @@ int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
  * \ref igraph_vector_reverse_sort().
  */
 
-int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
+static int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
     const BASE *da = (const BASE *) a;
     const BASE *db = (const BASE *) b;
 
@@ -813,7 +813,7 @@ void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v) {
 /**
  * Ascending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
+static int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -828,7 +828,7 @@ int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2)
 /**
  * Descending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
+static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -878,7 +878,7 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     if (n == 0) {
         return 0;
     }
-    vind = igraph_Calloc(n, BASE*);
+    vind = IGRAPH_CALLOC(n, BASE*);
     if (vind == 0) {
         IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
     }
@@ -894,11 +894,104 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = vind[i] - first;
     }
-    igraph_Free(vind);
+    IGRAPH_FREE(vind);
     return 0;
 }
 
-#endif
+/**
+ * \function igraph_vector_lex_cmp
+ * \brief Lexicographical comparison of two vectors.
+ *
+ * </para><para>
+ * If the elements of two vectors match but one is shorter, the shorter
+ * one comes first. Thus {1, 3} comes after {1, 2, 3}, but before {1, 3, 4}.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return -1 if \p lhs is lexicographically smaller,
+ *         0 if \p lhs and \p rhs are equal, else 1.
+ * \sa \ref igraph_vector_colex_cmp() to compare vectors starting from
+ *     the last element.
+ *
+ * Time complexity: O(n), the number of elements in the smaller vector.
+ */
+int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
+    const TYPE(igraph_vector) *a = lhs;
+    const TYPE(igraph_vector) *b = rhs;
+    long int i, sa, sb;
+
+    sa = FUNCTION(igraph_vector, size)(a);
+    sb = FUNCTION(igraph_vector, size)(b);
+
+    for (i = 0; i < sa; i++) {
+        if (i >= sb) {
+            /* b is shorter, and equal to the first part of a */
+            return 1;
+        }
+        if (VECTOR(*a)[i] < VECTOR(*b)[i]) {
+            return -1;
+        }
+        if (VECTOR(*a)[i] > VECTOR(*b)[i]) {
+            return 1;
+        }
+    }
+    if (i == sb) {
+        return 0;
+    }
+    /* a is shorter, and equal to the first part of b */
+    return -1;
+}
+
+/**
+ * \function igraph_vector_colex_cmp
+ * \brief Colexicographical comparison of two vectors.
+ *
+ * </para><para>
+ * This comparison starts from the last element of both vectors and
+ * moves backward. If the elements of two vectors match but one is
+ * shorter, the shorter one comes first. Thus {1, 2} comes after {3, 2, 1},
+ * but before {0, 1, 2}.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return -1 if \p lhs in reverse order is
+ *         lexicographically smaller than the reverse of \p rhs,
+ *         0 if \p lhs and \p rhs are equal, else 1.
+ * \sa \ref igraph_vector_lex_cmp() to compare vectors starting from
+ *     the first element.
+ *
+ * Time complexity: O(n), the number of elements in the smaller vector.
+ */
+int FUNCTION(igraph_vector, colex_cmp)(const void *lhs, const void *rhs) {
+    const TYPE(igraph_vector) *a = lhs;
+    const TYPE(igraph_vector) *b = rhs;
+    long int i, sa, sb, rai, rbi;
+
+    sa = FUNCTION(igraph_vector, size)(a);
+    sb = FUNCTION(igraph_vector, size)(b);
+
+    for (i = 0; i < sa; i++) {
+        if (i >= sb) {
+            /* b is shorter, and equal to the last part of a */
+            return 1;
+        }
+        /* use reversed indexes */
+        rai = sa - i - 1;
+        rbi = sb - i - 1;
+        if (VECTOR(*a)[rai] < VECTOR(*b)[rbi]) {
+            return -1;
+        }
+        if (VECTOR(*a)[rai] > VECTOR(*b)[rbi]) {
+            return 1;
+        }
+    }
+    if (i == sb) {
+        return 0;
+    }
+    /* a is shorter, and equal to the last part of b */
+    return -1;
+}
+#endif /*NOTORDERED*/
 
 /**
  * \ingroup vector
@@ -960,7 +1053,7 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     }
 
     size = (size_t) (v->end - v->stor_begin);
-    tmp = igraph_Realloc(v->stor_begin, size, BASE);
+    tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot resize vector", IGRAPH_ENOMEM);
     } else {
@@ -1164,7 +1257,7 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
 
 int FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector) *v,
                                        const BASE *data, long int length) {
-    v->stor_begin = igraph_Calloc(length, BASE);
+    v->stor_begin = IGRAPH_CALLOC(length, BASE);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
     }
@@ -1218,9 +1311,13 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 
 int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
                                   const TYPE(igraph_vector) *from) {
+    long int from_size;
+
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(from->stor_begin != NULL);
-    to->stor_begin = igraph_Calloc(FUNCTION(igraph_vector, size)(from), BASE);
+
+    from_size = FUNCTION(igraph_vector, size)(from);
+    to->stor_begin = IGRAPH_CALLOC(from_size, BASE);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
     }
@@ -2837,7 +2934,7 @@ int FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
     BASE *tmp;
     int i, n = igraph_vector_int_size(idx);
 
-    tmp = igraph_Calloc(n, BASE);
+    tmp = IGRAPH_CALLOC(n, BASE);
     if (!tmp) {
         IGRAPH_ERROR("Cannot index vector", IGRAPH_ENOMEM);
     }
@@ -2846,7 +2943,7 @@ int FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
         tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ];
     }
 
-    igraph_Free(v->stor_begin);
+    IGRAPH_FREE(v->stor_begin);
     v->stor_begin = tmp;
     v->stor_end = v->end = tmp + n;
 

@@ -31,6 +31,7 @@
 #include <cmath>
 #include <cassert>
 #include <vector>
+#include <stdexcept>
 
 // using namespace __gnu_cxx;
 using namespace std;
@@ -183,9 +184,9 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
     if (exp == 0.0) {
         // Binomial distribution
         if (z < 0) {
-            igraph_error("Fatal error in degree_sequence Ctor: "
-                         "positive average degree must be specified", IGRAPH_FILE_BASENAME,
-                         __LINE__, IGRAPH_EINVAL);
+            throw std::invalid_argument(
+                        "Fatal error in degree_sequence constructor: "
+                        "positive average degree must be specified.");
         }
         if (degmax < 0) {
             degmax = n - 1;

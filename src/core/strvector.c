@@ -60,12 +60,12 @@
 
 int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
     long int i;
-    sv->data = igraph_Calloc(len, char*);
+    sv->data = IGRAPH_CALLOC(len, char*);
     if (sv->data == 0) {
         IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
     }
     for (i = 0; i < len; i++) {
-        sv->data[i] = igraph_Calloc(1, char);
+        sv->data[i] = IGRAPH_CALLOC(1, char);
         if (sv->data[i] == 0) {
             igraph_strvector_destroy(sv);
             IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
@@ -96,10 +96,10 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
     if (sv->data != 0) {
         for (i = 0; i < sv->len; i++) {
             if (sv->data[i] != 0) {
-                igraph_Free(sv->data[i]);
+                IGRAPH_FREE(sv->data[i]);
             }
         }
-        igraph_Free(sv->data);
+        IGRAPH_FREE(sv->data);
     }
 }
 
@@ -144,15 +144,19 @@ void igraph_strvector_get(const igraph_strvector_t *sv, long int idx,
 
 int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
                          const char *value) {
+    size_t value_len;
+
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
-    if (sv->data[idx] == 0) {
-        sv->data[idx] = igraph_Calloc(strlen(value) + 1, char);
+
+    value_len = strlen(value);
+    if (sv->data[idx] == 0) {        
+        sv->data[idx] = IGRAPH_CALLOC(value_len + 1, char);
         if (sv->data[idx] == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
     } else {
-        char *tmp = igraph_Realloc(sv->data[idx], strlen(value) + 1, char);
+        char *tmp = IGRAPH_REALLOC(sv->data[idx], value_len + 1, char);
         if (tmp == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
@@ -166,7 +170,7 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
 /**
  * \ingroup strvector
  * \function igraph_strvector_set2
- * \brief Sets an element
+ * \brief Sets an element.
  *
  * This is almost the same as \ref igraph_strvector_set, but the new
  * value is not a zero terminated string, but its length is given.
@@ -181,15 +185,18 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
  */
 int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
                           const char *value, int len) {
+    if (idx < 0 || idx >= sv->len) {
+        IGRAPH_ERROR("String vector index out of bounds.", IGRAPH_EINVAL);
+    }
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
     if (sv->data[idx] == 0) {
-        sv->data[idx] = igraph_Calloc(len + 1, char);
+        sv->data[idx] = IGRAPH_CALLOC(len + 1, char);
         if (sv->data[idx] == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
     } else {
-        char *tmp = igraph_Realloc(sv->data[idx], (size_t) len + 1, char);
+        char *tmp = IGRAPH_REALLOC(sv->data[idx], (size_t) len + 1, char);
         if (tmp == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
         }
@@ -198,7 +205,7 @@ int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
     memcpy(sv->data[idx], value, (size_t) len * sizeof(char));
     sv->data[idx][len] = '\0';
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -218,7 +225,7 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
 
     for (i = from; i < to; i++) {
         if (v->data[i] != 0) {
-            igraph_Free(v->data[i]);
+            IGRAPH_FREE(v->data[i]);
         }
     }
     for (i = 0; i < v->len - to; i++) {
@@ -228,7 +235,7 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
     v->len -= (to - from);
 
     /* try to make it smaller */
-    /*   tmp=igraph_Realloc(v->data, v->len, char*); */
+    /*   tmp=IGRAPH_REALLOC(v->data, v->len, char*); */
     /*   if (tmp!=0) { */
     /*     v->data=tmp; */
     /*   } */
@@ -240,7 +247,7 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
  * \brief Removes a single element from a string vector.
  *
  * The string will be one shorter.
- * \param The string vector.
+ * \param v The string vector.
  * \param elem The index of the element to remove.
  *
  * Time complexity: O(n), the length of the string.
@@ -265,13 +272,13 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
     IGRAPH_ASSERT(v->data != 0);
     for (i = to; i < to + end - begin; i++) {
         if (v->data[i] != 0) {
-            igraph_Free(v->data[i]);
+            IGRAPH_FREE(v->data[i]);
         }
     }
     for (i = 0; i < end - begin; i++) {
         if (v->data[begin + i] != 0) {
             size_t len = strlen(v->data[begin + i]) + 1;
-            v->data[to + i] = igraph_Calloc(len, char);
+            v->data[to + i] = IGRAPH_CALLOC(len, char);
             memcpy(v->data[to + i], v->data[begin + i], sizeof(char)*len);
         }
     }
@@ -296,7 +303,7 @@ int igraph_strvector_copy(igraph_strvector_t *to,
     char *str;
     IGRAPH_ASSERT(from != 0);
     /*   IGRAPH_ASSERT(from->data != 0); */
-    to->data = igraph_Calloc(from->len, char*);
+    to->data = IGRAPH_CALLOC(from->len, char*);
     if (to->data == 0) {
         IGRAPH_ERROR("Cannot copy string vector", IGRAPH_ENOMEM);
     }
@@ -336,7 +343,7 @@ int igraph_strvector_append(igraph_strvector_t *to,
     IGRAPH_CHECK(igraph_strvector_resize(to, len1 + len2));
     for (i = 0; i < len2; i++) {
         if (from->data[i][0] != '\0') {
-            igraph_Free(to->data[len1 + i]);
+            IGRAPH_FREE(to->data[len1 + i]);
             to->data[len1 + i] = strdup(from->data[i]);
             if (!to->data[len1 + i]) {
                 error = 1;
@@ -367,11 +374,11 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
     char **tmp;
 
     for (i = 0; i < n; i++) {
-        igraph_Free(sv->data[i]);
+        IGRAPH_FREE(sv->data[i]);
     }
     sv->len = 0;
     /* try to give back some memory */
-    tmp = igraph_Realloc(sv->data, 1, char*);
+    tmp = IGRAPH_REALLOC(sv->data, 1, char*);
     if (tmp != 0) {
         sv->data = tmp;
     }
@@ -397,33 +404,30 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
     long int toadd = newsize - v->len, i, j;
     char **tmp;
     long int reallocsize = newsize;
-    if (reallocsize == 0) {
-        reallocsize = 1;
-    }
 
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
     /*   printf("resize %li to %li\n", v->len, newsize); */
     if (newsize < v->len) {
         for (i = newsize; i < v->len; i++) {
-            igraph_Free(v->data[i]);
+            IGRAPH_FREE(v->data[i]);
         }
         /* try to give back some space */
-        tmp = igraph_Realloc(v->data, (size_t) reallocsize, char*);
+        tmp = IGRAPH_REALLOC(v->data, (size_t) reallocsize, char*);
         /*     printf("resize %li to %li, %p\n", v->len, newsize, tmp); */
         if (tmp != 0) {
             v->data = tmp;
         }
     } else if (newsize > v->len) {
         igraph_bool_t error = 0;
-        tmp = igraph_Realloc(v->data, (size_t) reallocsize, char*);
+        tmp = IGRAPH_REALLOC(v->data, (size_t) reallocsize, char*);
         if (tmp == 0) {
             IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);
         }
         v->data = tmp;
 
         for (i = 0; i < toadd; i++) {
-            v->data[v->len + i] = igraph_Calloc(1, char);
+            v->data[v->len + i] = IGRAPH_CALLOC(1, char);
             if (v->data[v->len + i] == 0) {
                 error = 1;
                 break;
@@ -434,11 +438,11 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
             /* There was an error, free everything we've allocated so far */
             for (j = 0; j < i; j++) {
                 if (v->data[v->len + i] != 0) {
-                    igraph_Free(v->data[v->len + i]);
+                    IGRAPH_FREE(v->data[v->len + i]);
                 }
             }
             /* Try to give back space */
-            tmp = igraph_Realloc(v->data, (size_t) (v->len), char*);
+            tmp = IGRAPH_REALLOC(v->data, (size_t) (v->len), char*);
             if (tmp != 0) {
                 v->data = tmp;
             }
@@ -482,15 +486,16 @@ long int igraph_strvector_size(const igraph_strvector_t *sv) {
 
 int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     long int s = igraph_strvector_size(v);
+    long int value_len = strlen(value);
     char **tmp;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
-    tmp = igraph_Realloc(v->data, (size_t) s + 1, char*);
+    tmp = IGRAPH_REALLOC(v->data, (size_t) s + 1, char*);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
     v->data = tmp;
-    v->data[s] = igraph_Calloc(strlen(value) + 1, char);
+    v->data[s] = IGRAPH_CALLOC(value_len + 1, char);
     if (v->data[s] == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
@@ -517,11 +522,11 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *i
         if (VECTOR(*index)[i] != 0) {
             v->data[ (long int) VECTOR(*index)[i] - 1 ] = v->data[i];
         } else {
-            igraph_Free(v->data[i]);
+            IGRAPH_FREE(v->data[i]);
         }
     }
     /* Try to make it shorter */
-    tmp = igraph_Realloc(v->data, v->len - nremove ?
+    tmp = IGRAPH_REALLOC(v->data, v->len - nremove ?
                          (size_t) (v->len - nremove) : 1, char*);
     if (tmp != 0) {
         v->data = tmp;
@@ -545,11 +550,11 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
         if (VECTOR(*neg)[i] >= 0) {
             v->data[idx++] = v->data[i];
         } else {
-            igraph_Free(v->data[i]);
+            IGRAPH_FREE(v->data[i]);
         }
     }
     /* Try to give back some memory */
-    tmp = igraph_Realloc(v->data, v->len - nremove ?
+    tmp = IGRAPH_REALLOC(v->data, v->len - nremove ?
                          (size_t) (v->len - nremove) : 1, char*);
     if (tmp != 0) {
         v->data = tmp;
@@ -557,6 +562,16 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
     v->len -= nremove;
 }
 
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_print
+ * \brief Prints a string vector.
+ *
+ * \param v The string vector.
+ * \param file The file to write to.
+ * \param sep The separator to print between strings.
+ * \return Error code.
+ */
 int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                            const char *sep) {
 
@@ -567,8 +582,7 @@ int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
     for (i = 1; i < n; i++) {
         fprintf(file, "%s%s", sep, STR(*v, i));
     }
-    return 0;
-
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_strvector_index(const igraph_strvector_t *v,

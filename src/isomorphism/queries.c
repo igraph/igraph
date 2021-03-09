@@ -158,11 +158,15 @@ int igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
 
 /**
  * \function igraph_subisomorphic
- * Decide subgraph isomorphism
+ * \brief Decide subgraph isomorphism.
  *
  * Check whether \p graph2 is isomorphic to a subgraph of \p graph1.
  * Currently this function just calls \ref igraph_subisomorphic_vf2()
  * for all graphs.
+ *
+ * </para><para>
+ * Currently this function does not support non-simple graphs.
+ *
  * \param graph1 The first input graph, may be directed or
  *   undirected. This is supposed to be the bigger graph.
  * \param graph2 The second input graph, it must have the same
@@ -176,5 +180,5 @@ int igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
 int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                          igraph_bool_t *iso) {
 
-    return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0, 0, 0, 0);
+    return igraph_subisomorphic_vf2(graph1, graph2, NULL, NULL, NULL, NULL, iso, NULL, NULL, NULL, NULL, NULL);
 }

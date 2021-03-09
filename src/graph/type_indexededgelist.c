@@ -422,7 +422,7 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     int *mark;
     long int i, j;
 
-    mark = igraph_Calloc(no_of_edges, int);
+    mark = IGRAPH_CALLOC(no_of_edges, int);
     if (mark == 0) {
         IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM);
     }
@@ -486,7 +486,7 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     graph->oi = newoi;
     IGRAPH_FINALLY_CLEAN(3);
 
-    igraph_Free(mark);
+    IGRAPH_FREE(mark);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create start vectors, no memory is needed for this */
@@ -1034,6 +1034,7 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  * \return Error code. The current implementation always returns with
  * success.
  * \sa \ref igraph_get_eid() for the opposite operation;
+ *     \ref igraph_edges() to get the endpoints of several edges;
  *     \ref IGRAPH_TO(), \ref IGRAPH_FROM() and \ref IGRAPH_OTHER() for
  *     a faster but non-error-checked version.
  *
@@ -1055,6 +1056,25 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_edges
+ * \brief Gives the head and tail vertices of a series of edges.
+ *
+ * \param graph The graph object.
+ * \param eids  Edge selector, the series of edges.
+ * \param edges Pointer to an initialized vector. The start and endpoints of
+ *              each edge will be placed here.
+ * \return Error code.
+ * \sa \ref igraph_get_edgelist() to get the endpoints of all edges;
+ *     \ref igraph_get_eids() and \ref igraph_get_eids_multi()
+ *     for the opposite operation;
+ *     \ref igraph_edge() for getting the endpoints of a single edge;
+ *     \ref IGRAPH_TO(), \ref IGRAPH_FROM() and \ref IGRAPH_OTHER() for
+ *     a faster but non-error-checked method.
+ *
+ * Time complexity: O(k) where k is the number of edges in the selector.
+ */
 
 int igraph_edges(const igraph_t *graph, igraph_es_t eids,
                  igraph_vector_t *edges) {
@@ -1457,7 +1477,7 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
         IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
     }
 
-    seen = igraph_Calloc(no_of_edges, igraph_bool_t);
+    seen = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
     if (seen == 0) {
         IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
     }
@@ -1498,7 +1518,7 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
         }
     }
 
-    igraph_Free(seen);
+    IGRAPH_FREE(seen);
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }
@@ -1518,7 +1538,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
         IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
     }
 
-    seen = igraph_Calloc(no_of_edges, igraph_bool_t);
+    seen = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
     if (!seen) {
         IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
     }
@@ -1559,7 +1579,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
         }
     }
 
-    igraph_Free(seen);
+    IGRAPH_FREE(seen);
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }

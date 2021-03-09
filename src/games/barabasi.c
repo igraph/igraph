@@ -30,6 +30,8 @@
 #include "igraph_psumtree.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
                                       igraph_integer_t m,
                                       const igraph_vector_t *outseq,
@@ -94,7 +96,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
-    bag = igraph_Calloc(bagsize, long int);
+    bag = IGRAPH_CALLOC(bagsize, long int);
     if (bag == 0) {
         IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
     }
@@ -134,6 +136,9 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     for (i = (start_from ? start_nodes : 1), k = (start_from ? 0 : 1);
          i < no_of_nodes; i++, k++) {
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* draw edges */
         if (outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
@@ -155,7 +160,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     RNG_END();
 
-    igraph_Free(bag);
+    IGRAPH_FREE(bag);
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
     igraph_vector_destroy(&edges);
@@ -233,6 +238,9 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
          i < no_of_nodes; i++, k++) {
         igraph_real_t sum = igraph_psumtree_sum(&sumtree);
         long int to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         if (outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
         }
@@ -337,6 +345,9 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
          i < no_of_nodes; i++, k++) {
         igraph_real_t sum;
         long int to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         if (outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
         }
@@ -548,7 +559,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_barabasi_aging_game
- * \brief Preferential attachment with aging of vertices
+ * \brief Preferential attachment with aging of vertices.
  *
  * </para><para>
  * This game starts with one vertex (if \p nodes > 0). In each step
@@ -690,6 +701,9 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
         long int to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
         if (outseq != 0 && igraph_vector_size(outseq) != 0) {
             no_of_neighbors = (long int) VECTOR(*outseq)[i];
         }

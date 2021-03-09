@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <stdexcept>
 using namespace prpack;
 using namespace std;
 
@@ -235,7 +236,7 @@ prpack_result* prpack_solver::solve(
                 sccg->encoding,
                 sccg->decoding));
     } else {
-        // TODO: throw exception
+        throw invalid_argument("Unknown method specified for PRPACK: '" + m + "'.");
     }
     ret->method = m;
     ret->read_time = read_time;

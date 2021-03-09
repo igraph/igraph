@@ -38,7 +38,7 @@
  * cannot equal the old letter, so there are no loops.
  *
  * </para><para>
- * Kautz graphs have some interesting properties, see eg. Wikipedia
+ * Kautz graphs have some interesting properties, see e.g. Wikipedia
  * for details.
  *
  * </para><para>

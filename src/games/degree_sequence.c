@@ -61,7 +61,7 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
     no_of_nodes = igraph_vector_size(out_seq);
     no_of_edges = directed ? outsum : outsum / 2;
 
-    bag1 = igraph_Calloc(outsum, long int);
+    bag1 = IGRAPH_CALLOC(outsum, long int);
     if (bag1 == 0) {
         IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
@@ -73,7 +73,7 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
         }
     }
     if (directed) {
-        bag2 = igraph_Calloc(insum, long int);
+        bag2 = IGRAPH_CALLOC(insum, long int);
         if (bag2 == 0) {
             IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
         }
@@ -116,10 +116,10 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
 
     RNG_END();
 
-    igraph_Free(bag1);
+    IGRAPH_FREE(bag1);
     IGRAPH_FINALLY_CLEAN(1);
     if (directed) {
-        igraph_Free(bag2);
+        IGRAPH_FREE(bag2);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -349,7 +349,6 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
             igraph_vector_null(&residual_in_degrees);
             igraph_set_clear(&incomplete_out_vertices);
             igraph_set_clear(&incomplete_in_vertices);
-            outsum = 0;
 
             /* Shuffle the out-stubs in-place */
             igraph_vector_shuffle(&out_stubs);
@@ -464,7 +463,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
-        igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
+        igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
             IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
         }
@@ -583,7 +582,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
-        igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
+        igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
             IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
         }
@@ -668,7 +667,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
 /**
  * \ingroup generators
  * \function igraph_degree_sequence_game
- * \brief Generates a random graph with a given degree sequence
+ * \brief Generates a random graph with a given degree sequence.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param out_deg The degree sequence for an undirected graph (if
@@ -712,7 +711,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *          generated graph is not simple, it rejects it and re-starts the
  *          generation. It generates all simple graphs with the same probability.
  *          \cli IGRAPH_DEGSEQ_VL
- *          This method samples undirected connected graphs approximately
+ *          This method samples undirected \em connected graphs approximately
  *          uniformly. It is a Monte Carlo method based on degree-preserving
  *          edge swaps.
  *          This generator should be favoured if undirected and connected
