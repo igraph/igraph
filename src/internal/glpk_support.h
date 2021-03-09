@@ -58,13 +58,55 @@ void igraph_i_glp_delete_prob(glp_prob *p);
             return igraph_i_ret; \
         } } while (0)
 
-/* Notes:
+/**
+ * \ingroup internal
+ * \define IGRAPH_GLPK_SETUP
+ *
+ * Use this macro at the start of igraph functions that use GLPK routines
+ * directly.
+ *
  *  - IGRAPH_GLPK_SETUP() must be called in all top-level functions that
- *    use GLPK, before beginning to use any GLPK functins.
- *  - Do not call glp_term_out(OFF) as interruption support relies on
+ *    use GLPK, before beginning to use any GLPK functions.
+ *
+ *  - Do NOT call glp_term_out(OFF) as interruption support relies on
  *    the terminal hook being called.
+ *
  *  - This must be a macro and not a function, as jumping into a function
  *    that has already returned with longjmp() is not possible.
+ *
+ * This setup step is necessary in order to support interruption, as
+ * well as to handle fatal GLPK errors gracefully. See here for details:
+ *
+ * https://lists.gnu.org/archive/html/help-glpk/2019-10/msg00000.html
+ *
+ * Interruption support for GLPK is essential because it is practically
+ * impossible to predict how long it will take to solve a problem. It
+ * may take less than a second or it may never finish in practice.
+ *
+ * It does the following:
+ *
+ *  - Initialize the data structure where we keep track of GLPK's current
+ *    error and interruption state, \c igraph_i_glpk_error_info.
+ *  - Set an error hook and a terminal hook for GLPK.
+ *  - Provide a return point for the longjmp() called from the error hook.
+ *
+ * There are two interruption mechanisms we can use with GLPK. glp_intopt()
+ * supports a callback function which can signal a request for interruption.
+ * However, glp_intopt() internally calls glp_simplex(), which may again
+ * take a very long time.
+ *
+ * The recommended way to interrupt glp_simplex() is to check for interruption
+ * from the terminal hook, which is normally meant for intercepting output.
+ * This interruption is possible only as often as there is output, which may
+ * be at intervals of a few seconds in practice.
+ *
+ * Interruption is achieved by setting an error with glp_error(), which
+ * triggers a call to the error hook. From the error hook, we free all
+ * GLPK resources using glp_free_env() and do a longjmp().
+ *
+ * The use of these mechanisms makes it unsafe to use igraph's GLPK-reliant
+ * functions from a process which also uses GLPK for other purposes.
+ * To avoid this problem, GLPK should ideally be linked to igraph statically.
  */
 #define IGRAPH_GLPK_SETUP() \
     do { \

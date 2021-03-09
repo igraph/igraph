@@ -47,6 +47,10 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
         glp_error("GLPK was interrupted."); /* This dummy message is never printed */
     } else if (glp_at_error()) {
         /* Copy the error messages into a buffer for later reporting */
+        /* We must use glp_at_error() instead of igraph_i_glpk_error_info.is_error
+         * to determine if a message is an error message, as the reporting function is
+         * called before the error function. The vendored old GLPK is patched to add support
+         * for glp_at_error(). New GLPK versions have this functions. */
         const size_t n = sizeof(igraph_i_glpk_error_info.msg) / sizeof(char) - 1;
         while (*s != '\0' && igraph_i_glpk_error_info.msg_ptr < igraph_i_glpk_error_info.msg + n) {
             *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
@@ -67,7 +71,9 @@ void igraph_i_glpk_error_hook(void *info) {
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
     IGRAPH_UNUSED(info);
 
-    /* This is a special version of IGRAPH_ALLOW_INTERRUPTION().
+    /* This is a callback function meant to be used with glp_intopt(),
+       in order to support interruption. It is essentially a GLPK-compatible
+       replacement for IGRAPH_ALLOW_INTERRUPTION().
        Calling glp_ios_terminate() from glp_intopt()'s callback function
        signals to GLPK that it should terminate the optimization and return
        with the code GLP_ESTOP.
@@ -79,10 +85,22 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
     }
 }
 
-/* Only delete problem if GLPK is not at an error state.
- * If there is an error, glp_free_env() will be called instead.
- * We do not use glp_at_error() as igraph's old embedded GLPK
- * does not yet have this function. */
+/**
+ * \ingroup internal
+ * \function igraph_i_glp_delete_prob
+ * \brief Safe replacement for glp_delete_prob().
+ *
+ * This function is meant to be used with IGRAPH_FINALLY()
+ * in conjunction with glp_create_prob().
+ *
+ * When using GLPK, normally glp_delete_prob() is used to free
+ * problems created with glp_create_prob(). However, when GLPK
+ * encounters an error, the error handler installed by igraph
+ * will call glp_free_env() which invalidates all problems.
+ * Calling glp_delete_prob() would then lead to a crash.
+ * This replacement function avoids this situation by first
+ * checking if GLPK is at an error state.
+ */
 void igraph_i_glp_delete_prob(glp_prob *p) {
     if (! igraph_i_glpk_error_info.is_error) {
         glp_delete_prob(p);
