@@ -17,15 +17,15 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "core/interruption.h"
-
+#include "igraph_structural.h"
 #include "igraph_bipartite.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_operators.h"
-#include "igraph_structural.h"
 #include "igraph_topology.h"
+
+#include "core/interruption.h"
 
 /**
  * \function igraph_is_perfect
