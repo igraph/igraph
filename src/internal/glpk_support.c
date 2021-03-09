@@ -37,21 +37,24 @@ IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 int igraph_i_glpk_terminal_hook(void *info, const char *s) {
     IGRAPH_UNUSED(info);
 
-    if (igraph_i_interruption_handler) {
-        if (!igraph_i_glpk_error_info.is_interrupted && igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
-            /* If an interruption has already occurred, do not set another error. */
-            igraph_i_glpk_error_info.is_interrupted = 1;
-            glp_error("GLPK was interrupted.");
-        } else {
-            /* Copy the error messages into a buffer for later reporting */
-            const size_t n = sizeof(igraph_i_glpk_error_info.msg) / sizeof(char) - 1;
-            while (*s != '\0' && igraph_i_glpk_error_info.msg_ptr < igraph_i_glpk_error_info.msg + n) {
-                *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
-            }
-            *igraph_i_glpk_error_info.msg_ptr = '\0';
+    if (igraph_i_interruption_handler &&
+        !igraph_i_glpk_error_info.is_interrupted &&
+        igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        /* If an interruption has already occurred, do not set another error,
+           to avoid an infinite loop between the term_hook (this function)
+           and the error_hook. */
+        igraph_i_glpk_error_info.is_interrupted = 1;
+        glp_error("GLPK was interrupted."); /* This dummy message is never printed */
+    } else if (glp_at_error()) {
+        /* Copy the error messages into a buffer for later reporting */
+        const size_t n = sizeof(igraph_i_glpk_error_info.msg) / sizeof(char) - 1;
+        while (*s != '\0' && igraph_i_glpk_error_info.msg_ptr < igraph_i_glpk_error_info.msg + n) {
+            *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
         }
+        *igraph_i_glpk_error_info.msg_ptr = '\0';
     }
-    return 1; /* Do not print from GLPK */
+
+    return 1; /* Non-zero return value signals to GLPK not to print to the terminal */
 }
 
 void igraph_i_glpk_error_hook(void *info) {
