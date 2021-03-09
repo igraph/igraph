@@ -34,6 +34,9 @@
 
 #include "core/interruption.h"
 
+/* When vid_ecc is not NULL, only one vertex id should be passed in vids.*/
+/* vid_ecc will then return the id of the vertex farthest from the one in*/
+/* vids. */
 static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
@@ -50,12 +53,6 @@ static int igraph_i_eccentricity(const igraph_t *graph,
     igraph_vector_t vneis;
     igraph_vector_int_t *neis;
     igraph_integer_t min_degree = 0;
-    igraph_integer_t degree;
-    igraph_vector_t degrees;
-
-    if (vid_ecc) {
-        IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
-    }
 
     IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
     IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
@@ -91,23 +88,6 @@ static int igraph_i_eccentricity(const igraph_t *graph,
             long int dist = igraph_dqueue_long_pop(&q);
             int j, n;
 
-            if (vid_ecc) {
-                /* Return the vertex id of the vertex which has the lowest */
-                /* degree of the vertices most distant from the starting */
-                /* vertex. Assumes there is only 1 vid in vids. Used for */
-                /* pseudo_diameter calculations. */
-                IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_1(act), mode, IGRAPH_NO_LOOPS));
-                degree = VECTOR(degrees)[0];
-                if (dist > VECTOR(*res)[i] || (dist == VECTOR(*res)[i] && degree < min_degree)) {
-                    VECTOR(*res)[i] = dist;
-                    *vid_ecc = act;
-                    min_degree = degree;
-                }
-            }
-            if (dist > VECTOR(*res)[i]) {
-                VECTOR(*res)[i] = dist;
-            }
-
             if (adjlist) {
                 neis = igraph_adjlist_get(adjlist, act);
                 n = (int) igraph_vector_int_size(neis);
@@ -134,6 +114,19 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                     }
                 }
             }
+            if (vid_ecc) {
+                /* Return the vertex id of the vertex which has the lowest */
+                /* degree of the vertices most distant from the starting */
+                /* vertex. Assumes there is only 1 vid in vids. Used for */
+                /* pseudo_diameter calculations. */
+                if (dist > VECTOR(*res)[i] || (dist == VECTOR(*res)[i] && n < min_degree)) {
+                    VECTOR(*res)[i] = dist;
+                    *vid_ecc = act;
+                    min_degree = n;
+                }
+            } else if (dist > VECTOR(*res)[i]) {
+                VECTOR(*res)[i] = dist;
+            }
         } /* while !igraph_dqueue_long_empty(dqueue) */
 
         if (nodes_reached != no_of_nodes && !unconn && vid_ecc) {
@@ -146,10 +139,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
         igraph_vector_destroy(&vneis);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    if (vid_ecc) {
-        igraph_vector_destroy(&degrees);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
+
     igraph_vector_int_destroy(&counted);
     igraph_vit_destroy(&vit);
     igraph_dqueue_long_destroy(&q);
