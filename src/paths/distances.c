@@ -229,11 +229,11 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * is in.
  *
  * \param graph The input graph, if it is directed, its edge directions
- *   are ignored.
+ *        are ignored.
  * \param diameter Pointer to a real variable, the result is stored
- *   here.
+ *        here.
  * \param vid_start Id of the starting vertex. If this is negative, a
- *   random starting vertex is chosen.
+ *        random starting vertex is chosen.
  * \param from Pointer to an integer, if not \c NULL it will be set to the
  *        source vertex of the diameter path. If \p unconn is FALSE, and
  *        a disconnected graph is detected, this is set to -1.
@@ -265,7 +265,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex id out of range.\n", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
 
@@ -285,7 +285,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         if (from) {
             *from = vid_start;
         }
-        IGRAPH_VECTOR_INIT_FINALLY(&ecc_vec, igraph_vcount(graph));
+        IGRAPH_VECTOR_INIT_FINALLY(&ecc_vec, no_of_nodes);
 
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_start),
                                            &adjlist, &vid_ecc, unconn));
@@ -412,7 +412,6 @@ int igraph_pseudo_diameter(const igraph_t *graph,
     } else {
         *diameter = ecc_u;
     }
-
 
     return IGRAPH_SUCCESS;
 }
