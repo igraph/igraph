@@ -139,8 +139,8 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH = 0,
  * \typedef igraph_attribute_combination_type_t
  * The possible types of attribute combinations.
  *
- * \enumval IGRAPH_ATTRIBUTE_COMBINE_IGNORE   Ignore old attributes. TODO
- * \enumval IGRAPH_ATTRIBUTE_COMBINE_DEFAULT  Use the default way to combine attributes.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_IGNORE   Ignore old attributes, use an empty value.
+ * \enumval IGRAPH_ATTRIBUTE_COMBINE_DEFAULT  Use the default way to combine attributes (decided by the attribute handler implementation).
  * \enumval IGRAPH_ATTRIBUTE_COMBINE_FUNCTION Supply your own function to combine
  *                                            attributes.
  * \enumval IGRAPH_ATTRIBUTE_COMBINE_SUM      Take the sum of the attributes.
