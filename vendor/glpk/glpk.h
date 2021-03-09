@@ -766,6 +766,11 @@ typedef struct { int lo, hi; } glp_long;
 /* long integer data type */
 #endif
 
+/* igraph-specific hack;
+ * glp_at_error() is not present in this old GLPK version
+ * but we need it for proper error reporting */
+int glp_at_error(void);
+
 int glp_init_env(void);
 /* initialize GLPK environment */
 
