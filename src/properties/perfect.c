@@ -59,10 +59,6 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     long int i;
     igraph_t comp_graph, cycle;
 
-    if (!perfect) {
-        return IGRAPH_SUCCESS;
-    }
-
     // If the graph is directed return error.
     if (igraph_is_directed(graph)) {
         IGRAPH_ERROR("The concept of perfect graphs is only defined for undirected graphs.", IGRAPH_EINVAL);
