@@ -53,7 +53,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
     igraph_integer_t girth, comp_girth, num_of_vertices = igraph_vcount(graph);
     igraph_integer_t start;
-    long int i;
+    long int cycle_len;
     igraph_t comp_graph, cycle;
 
     // If the graph is directed return error.
@@ -114,30 +114,35 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     // Strong perfect graph theorem:
     // A graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
     // (i.e. an odd hole). TODO: Find a more efficient way to check for odd holes.
-    start = girth > comp_girth ? girth : comp_girth;
+    start = girth < comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start + 1 : start + 2;
-    for (i = start; i <= num_of_vertices; i += 2) {
+    for (cycle_len = start; cycle_len <= num_of_vertices; cycle_len += 2) {
+
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_ring(&cycle, i, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 1));
+        IGRAPH_CHECK(igraph_ring(&cycle, cycle_len, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 1));
         IGRAPH_FINALLY(igraph_destroy, &cycle);
 
-        IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
-        if ((i > girth) && iso) {
-            *perfect = 0;
-            igraph_destroy(&cycle);
-            igraph_destroy(&comp_graph);
-            IGRAPH_FINALLY_CLEAN(2);
-            return IGRAPH_SUCCESS;
+        if (cycle_len > girth) {
+            IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
+            if (iso) {
+                *perfect = 0;
+                igraph_destroy(&cycle);
+                igraph_destroy(&comp_graph);
+                IGRAPH_FINALLY_CLEAN(2);
+                return IGRAPH_SUCCESS;
+            }
         }
 
-        IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
-        if ((i > girth) && iso) {
-            *perfect = 0;
-            igraph_destroy(&cycle);
-            igraph_destroy(&comp_graph);
-            IGRAPH_FINALLY_CLEAN(2);
-            return IGRAPH_SUCCESS;
+        if (cycle_len > comp_girth) {
+            IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
+            if (iso) {
+                *perfect = 0;
+                igraph_destroy(&cycle);
+                igraph_destroy(&comp_graph);
+                IGRAPH_FINALLY_CLEAN(2);
+                return IGRAPH_SUCCESS;
+            }
         }
 
         igraph_destroy(&cycle);
