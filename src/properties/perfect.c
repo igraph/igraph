@@ -113,16 +113,17 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
     // Strong perfect graph theorem:
     // A graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
+    // (i.e. an odd hole). TODO: Find a more efficient way to check for odd holes.
     start = girth > comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start + 1 : start + 2;
     for (i = start; i <= num_of_vertices; i += 2) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_ring(&cycle, i, 0, 0, 1));
+        IGRAPH_CHECK(igraph_ring(&cycle, i, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 1));
         IGRAPH_FINALLY(igraph_destroy, &cycle);
 
         IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
-        if ((i > girth) && (iso)) {
+        if ((i > girth) && iso) {
             *perfect = 0;
             igraph_destroy(&cycle);
             igraph_destroy(&comp_graph);
