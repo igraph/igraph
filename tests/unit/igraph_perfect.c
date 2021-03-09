@@ -25,7 +25,7 @@ int main() {
     igraph_bool_t is_perfect;
     igraph_error_handler_t *ehandler;
 
-    igraph_rng_seed(igraph_rng_default(), 0);
+    igraph_rng_seed(igraph_rng_default(), 42);
 
     // Bipartite
     //==========================================================
