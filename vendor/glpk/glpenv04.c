@@ -45,7 +45,13 @@ static void error(const char *fmt, ...)
       va_list arg;
       env->term_out = GLP_ON;
       va_start(arg, fmt);
-      igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
+      xvprintf(fmt, arg);
+      va_end(arg);
+      xprintf("Error detected in file %s at line %d\n", env->err_file,
+         env->err_line);
+      if (env->err_hook != NULL)
+         env->err_hook(env->err_info);
+      IGRAPH_FATAL("Unexpected return from GLPK error hook.");
       /* no return */
 }
 
@@ -54,6 +60,15 @@ _glp_error glp_error_(const char *file, int line)
       env->err_file = file;
       env->err_line = line;
       return error;
+}
+
+
+/* igraph-specific hack;
+ * glp_at_error() is not present in this old GLPK version
+ * but we need it for proper error reporting */
+int glp_at_error(void) {
+    ENV *env = get_env_ptr();
+    return (env->err_line != 0);
 }
 
 /***********************************************************************

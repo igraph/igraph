@@ -251,8 +251,8 @@ int main() {
     /* Testing destructor */
     igraph_vector_ptr_init(&custom_destructor_stack, 0);
     igraph_vector_ptr_init(&v1, 2);
-    block1 = igraph_Calloc(32, char);
-    block2 = igraph_Calloc(64, char);
+    block1 = IGRAPH_CALLOC(32, char);
+    block2 = IGRAPH_CALLOC(64, char);
     VECTOR(v1)[0] = block1;
     VECTOR(v1)[1] = block2;
     if (igraph_vector_ptr_get_item_destructor(&v1) != 0) {

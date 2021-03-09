@@ -115,7 +115,7 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 %token EOFF
 %token ERROR
 
-%destructor { igraph_Free($$.s); } string key KEYWORD;
+%destructor { IGRAPH_FREE($$.s); } string key KEYWORD;
 %destructor { igraph_gml_tree_destroy($$); } list keyvalue;
 
 %%
@@ -159,7 +159,7 @@ int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
 
 void igraph_i_gml_get_keyword(char *s, int len, void *res) {
   struct { char *s; int len; } *p=res;
-  p->s=igraph_Calloc(len+1, char);
+  p->s=IGRAPH_CALLOC(len+1, char);
   if (!p->s) { 
     igraph_error("Cannot read GML file", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
   }
@@ -170,7 +170,7 @@ void igraph_i_gml_get_keyword(char *s, int len, void *res) {
 
 void igraph_i_gml_get_string(char *s, int len, void *res) {
   struct { char *s; int len; } *p=res;
-  p->s=igraph_Calloc(len-1, char);
+  p->s=IGRAPH_CALLOC(len-1, char);
   if (!p->s) { 
     igraph_error("Cannot read GML file", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
   }
@@ -189,7 +189,7 @@ double igraph_i_gml_get_real(char *s, int len) {
 } 
 
 igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
-  igraph_gml_tree_t *t = igraph_Calloc(1, igraph_gml_tree_t);
+  igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
@@ -213,7 +213,7 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
 
 igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
                                               char* v, int vlen) {
-  igraph_gml_tree_t *t = igraph_Calloc(1, igraph_gml_tree_t);
+  igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
   char tmp = v[vlen];
 
   if (!t) { 
@@ -255,7 +255,7 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
 
 igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len, 
                                             char *value, int valuelen) {
-  igraph_gml_tree_t *t = igraph_Calloc(1, igraph_gml_tree_t);
+  igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
@@ -277,7 +277,7 @@ igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
 igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
                                           igraph_gml_tree_t *list) {
   
-  igraph_gml_tree_t *t=igraph_Calloc(1, igraph_gml_tree_t);
+  igraph_gml_tree_t *t=IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
@@ -295,7 +295,7 @@ igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len,
 igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2) {
 
   igraph_gml_tree_mergedest(t1, t2);
-  igraph_Free(t2);
+  IGRAPH_FREE(t2);
 
   return t1;
 }

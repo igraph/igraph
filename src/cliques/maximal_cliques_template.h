@@ -26,7 +26,7 @@
 #define RESNAME res
 #define SUFFIX
 #define RECORD do {                         \
-        igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t);      \
+        igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
         int j;                              \
         if (!cl) {                              \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
@@ -73,7 +73,7 @@
 #define SUFFIX _subset
 #define RECORD do {                         \
         if (res) {                                \
-            igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t);      \
+            igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
             int j;                              \
             if (!cl) {                              \
                 IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
@@ -107,7 +107,7 @@
 #define RESNAME cliquehandler_fn, arg
 #define SUFFIX _callback
 #define RECORD do { \
-        igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t); \
+        igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t); \
         long j; \
         if (!cl) { \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
@@ -156,7 +156,7 @@ static void igraph_i_maximal_cliques_free(void *ptr) {
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*res)[i];
         if (v) {
-            igraph_Free(v);
+            IGRAPH_FREE(v);
             igraph_vector_destroy(v);
         }
     }
@@ -172,7 +172,7 @@ static void igraph_i_maximal_cliques_free_full(void *ptr) {
         for (i = 0; i < n; i++) {
             igraph_vector_t *v = VECTOR(*res)[i];
             if (v) {
-                igraph_Free(v);
+                IGRAPH_FREE(v);
                 igraph_vector_destroy(v);
             }
         }

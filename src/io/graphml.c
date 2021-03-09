@@ -179,27 +179,27 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     if (rec->record.type == IGRAPH_ATTRIBUTE_NUMERIC) {
         if (rec->record.value != 0) {
             igraph_vector_destroy((igraph_vector_t*)rec->record.value);
-            igraph_Free(rec->record.value);
+            IGRAPH_FREE(rec->record.value);
         }
     } else if (rec->record.type == IGRAPH_ATTRIBUTE_STRING) {
         if (rec->record.value != 0) {
             igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
             if (rec->default_value.as_string != 0) {
-                igraph_Free(rec->default_value.as_string);
+                IGRAPH_FREE(rec->default_value.as_string);
             }
-            igraph_Free(rec->record.value);
+            IGRAPH_FREE(rec->record.value);
         }
     } else if (rec->record.type == IGRAPH_ATTRIBUTE_BOOLEAN) {
         if (rec->record.value != 0) {
             igraph_vector_bool_destroy((igraph_vector_bool_t*)rec->record.value);
-            igraph_Free(rec->record.value);
+            IGRAPH_FREE(rec->record.value);
         }
     }
     if (rec->id != 0) {
-        igraph_Free(rec->id);
+        IGRAPH_FREE(rec->id);
     }
     if (rec->record.name != 0) {
-        igraph_Free(rec->record.name);
+        IGRAPH_FREE(rec->record.name);
     }
 }
 
@@ -242,7 +242,7 @@ static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ..
     va_start(ap, msg);
 
     if (state->error_message == 0) {
-        state->error_message = igraph_Calloc(4096, char);
+        state->error_message = IGRAPH_CALLOC(4096, char);
     }
 
     state->successful = 0;
@@ -578,7 +578,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         return 0;
     }
 
-    rec = igraph_Calloc(1, igraph_i_graphml_attribute_record_t);
+    rec = IGRAPH_CALLOC(1, igraph_i_graphml_attribute_record_t);
     if (rec == 0) {
         GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
         return 0;
@@ -720,7 +720,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         igraph_vector_bool_t *boolvec;
         igraph_strvector_t *strvec;
     case IGRAPH_ATTRIBUTE_BOOLEAN:
-        boolvec = igraph_Calloc(1, igraph_vector_bool_t);
+        boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (boolvec == 0) {
             GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
             return 0;
@@ -729,7 +729,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         igraph_vector_bool_init(boolvec, 0);
         break;
     case IGRAPH_ATTRIBUTE_NUMERIC:
-        vec = igraph_Calloc(1, igraph_vector_t);
+        vec = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vec == 0) {
             GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
             return 0;
@@ -738,7 +738,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         igraph_vector_init(vec, 0);
         break;
     case IGRAPH_ATTRIBUTE_STRING:
-        strvec = igraph_Calloc(1, igraph_strvector_t);
+        strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (strvec == 0) {
             GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
             return 0;
@@ -795,10 +795,10 @@ static void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_
 
     if (state->data_char) {
         data_char_new_start = (long int) strlen(state->data_char);
-        state->data_char = igraph_Realloc(state->data_char,
+        state->data_char = IGRAPH_REALLOC(state->data_char,
                                           (size_t)(data_char_new_start + len + 1), char);
     } else {
-        state->data_char = igraph_Calloc((size_t) len + 1, char);
+        state->data_char = IGRAPH_CALLOC((size_t) len + 1, char);
     }
     if (state->data_char == 0) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
@@ -846,7 +846,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
             IGRAPH_FILE_BASENAME, __LINE__, 0,
             key
         );
-        igraph_Free(state->data_char);
+        IGRAPH_FREE(state->data_char);
         return;
     }
 
@@ -858,7 +858,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
             IGRAPH_FILE_BASENAME, __LINE__, 0,
             key
         );
-        igraph_Free(state->data_char);
+        IGRAPH_FREE(state->data_char);
         return;
     }
 
@@ -929,7 +929,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
     }
 
     if (state->data_char) {
-        igraph_Free(state->data_char);
+        IGRAPH_FREE(state->data_char);
     }
 }
 
@@ -970,7 +970,7 @@ static void igraph_i_graphml_attribute_default_value_finish(
     }
 
     if (state->data_char) {
-        igraph_Free(state->data_char);
+        IGRAPH_FREE(state->data_char);
     }
 }
 
@@ -1327,7 +1327,7 @@ static int igraph_i_xml_escape(char* src, char** dest) {
             IGRAPH_ERROR(msg, IGRAPH_EINVAL);
         }
     }
-    *dest = igraph_Calloc(destlen + 1, char);
+    *dest = IGRAPH_CALLOC(destlen + 1, char);
     if (!*dest) {
         IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
     }
@@ -1571,7 +1571,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
         }
-        igraph_Free(name_escaped);
+        IGRAPH_FREE(name_escaped);
     }
 
     /* vertex attributes */
@@ -1595,7 +1595,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
         }
-        igraph_Free(name_escaped);
+        IGRAPH_FREE(name_escaped);
     }
 
     /* edge attributes */
@@ -1619,7 +1619,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
         }
-        igraph_Free(name_escaped);
+        IGRAPH_FREE(name_escaped);
     }
 
     ret = fprintf(outstream, "  <graph id=\"G\" edgedefault=\"%s\">\n", (igraph_is_directed(graph) ? "directed" : "undirected"));
@@ -1637,7 +1637,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
             if (!isnan(VECTOR(numv)[0])) {
                 IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                 ret = fprintf(outstream, "    <data key=\"%s%s\">", gprefix, name_escaped);
-                igraph_Free(name_escaped);
+                IGRAPH_FREE(name_escaped);
                 if (ret < 0) {
                     IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                 }
@@ -1656,12 +1656,12 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
             IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
             ret = fprintf(outstream, "    <data key=\"%s%s\">", gprefix,
                           name_escaped);
-            igraph_Free(name_escaped);
+            IGRAPH_FREE(name_escaped);
             IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
             igraph_strvector_get(&strv, 0, &s);
             IGRAPH_CHECK(igraph_i_xml_escape(s, &s_escaped));
             ret = fprintf(outstream, "%s", s_escaped);
-            igraph_Free(s_escaped);
+            IGRAPH_FREE(s_escaped);
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
@@ -1675,7 +1675,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
             IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
             ret = fprintf(outstream, "    <data key=\"%s%s\">%s</data>\n",
                           gprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
-            igraph_Free(name_escaped);
+            IGRAPH_FREE(name_escaped);
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
@@ -1700,7 +1700,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 if (!isnan(VECTOR(numv)[0])) {
                     IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                     ret = fprintf(outstream, "      <data key=\"%s%s\">", vprefix, name_escaped);
-                    igraph_Free(name_escaped);
+                    IGRAPH_FREE(name_escaped);
                     if (ret < 0) {
                         IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                     }
@@ -1719,13 +1719,13 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                 ret = fprintf(outstream, "      <data key=\"%s%s\">", vprefix,
                               name_escaped);
-                igraph_Free(name_escaped);
+                IGRAPH_FREE(name_escaped);
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                              igraph_vss_1(l), &strv));
                 igraph_strvector_get(&strv, 0, &s);
                 IGRAPH_CHECK(igraph_i_xml_escape(s, &s_escaped));
                 ret = fprintf(outstream, "%s", s_escaped);
-                igraph_Free(s_escaped);
+                IGRAPH_FREE(s_escaped);
                 if (ret < 0) {
                     IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                 }
@@ -1740,7 +1740,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                 ret = fprintf(outstream, "      <data key=\"%s%s\">%s</data>\n",
                               vprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
-                igraph_Free(name_escaped);
+                IGRAPH_FREE(name_escaped);
                 if (ret < 0) {
                     IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                 }
@@ -1775,7 +1775,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 if (!isnan(VECTOR(numv)[0])) {
                     IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                     ret = fprintf(outstream, "      <data key=\"%s%s\">", eprefix, name_escaped);
-                    igraph_Free(name_escaped);
+                    IGRAPH_FREE(name_escaped);
                     if (ret < 0) {
                         IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                     }
@@ -1794,13 +1794,13 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                 ret = fprintf(outstream, "      <data key=\"%s%s\">", eprefix,
                               name_escaped);
-                igraph_Free(name_escaped);
+                IGRAPH_FREE(name_escaped);
                 IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                              igraph_ess_1((igraph_integer_t) edge), &strv));
                 igraph_strvector_get(&strv, 0, &s);
                 IGRAPH_CHECK(igraph_i_xml_escape(s, &s_escaped));
                 ret = fprintf(outstream, "%s", s_escaped);
-                igraph_Free(s_escaped);
+                IGRAPH_FREE(s_escaped);
                 if (ret < 0) {
                     IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                 }
@@ -1815,7 +1815,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
                 ret = fprintf(outstream, "      <data key=\"%s%s\">%s</data>\n",
                               eprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
-                igraph_Free(name_escaped);
+                IGRAPH_FREE(name_escaped);
                 if (ret < 0) {
                     IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
                 }

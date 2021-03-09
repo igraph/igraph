@@ -71,7 +71,7 @@ void igraph_stack_ptr_free_all(igraph_stack_ptr_t* v) {
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
-        igraph_Free(*ptr);
+        IGRAPH_FREE(*ptr);
     }
 }
 

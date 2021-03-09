@@ -63,7 +63,7 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
     for (i = 0; i < n; i++) {
         if ( VECTOR(*v)[i] ) {
             igraph_sir_destroy( VECTOR(*v)[i]) ;
-            igraph_Free( VECTOR(*v)[i] ); /* this also sets the vector_ptr element to NULL */
+            IGRAPH_FREE( VECTOR(*v)[i] ); /* this also sets the vector_ptr element to NULL */
         }
     }
 }
@@ -156,7 +156,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     igraph_vector_ptr_null(result);
     IGRAPH_FINALLY(igraph_i_sir_destroy, result);
     for (i = 0; i < no_sim; i++) {
-        igraph_sir_t *sir = igraph_Calloc(1, igraph_sir_t);
+        igraph_sir_t *sir = IGRAPH_CALLOC(1, igraph_sir_t);
         if (!sir) {
             IGRAPH_ERROR("Cannot run SIR model", IGRAPH_ENOMEM);
         }

@@ -71,7 +71,7 @@
 /* helper to allocate an array of given size and free it using IGRAPH_FINALLY
  * when needed */
 #define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
-        VAR = igraph_Calloc(SIZE, TYPE);   \
+        VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
             IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
         }  \
@@ -81,7 +81,7 @@
 /* helper to allocate an array of given size and store its address in a
  * pointer array */
 #define ALLOC_ARRAY_IN_HISTORY(VAR, SIZE, TYPE, HISTORY) { \
-        VAR = igraph_Calloc(SIZE, TYPE);   \
+        VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
             IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
         }  \
@@ -565,12 +565,12 @@ static int igraph_i_lad_initDomains(bool initialDomains,
                 MATRIX(D->firstMatch, u, v) = matchingSize;
                 matchingSize += VECTOR(Gp->nbSucc)[u];
                 if (VECTOR(Gp->nbSucc)[u] <= VECTOR(Gt->nbSucc)[v]) {
-                    mu = igraph_Calloc((long int) VECTOR(Gp->nbSucc)[u], int);
+                    mu = IGRAPH_CALLOC((long int) VECTOR(Gp->nbSucc)[u], int);
                     if (mu == 0) {
                         igraph_free(val); igraph_free(dom);
                         IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
                     }
-                    mv = igraph_Calloc((long int) VECTOR(Gt->nbSucc)[v], int);
+                    mv = IGRAPH_CALLOC((long int) VECTOR(Gt->nbSucc)[v], int);
                     if (mv == 0) {
                         igraph_free(mu); igraph_free(val); igraph_free(dom);
                         IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
@@ -1413,7 +1413,7 @@ static int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
             }
         }
         if (maps) {
-            vec = igraph_Calloc(1, igraph_vector_t);
+            vec = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!vec) {
                 IGRAPH_ERROR("LAD failed", IGRAPH_ENOMEM);
             }

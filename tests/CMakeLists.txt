@@ -245,6 +245,7 @@ add_legacy_tests(
   igraph_count_multiple
   igraph_density
   igraph_diversity
+  igraph_eccentricity
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
@@ -513,6 +514,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_clique_size_hist
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
@@ -723,6 +725,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   error_macros
 )
+
+# GLPK
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  glpk_error
+)
+
 # regression and fuzzing tests
 
 add_legacy_tests(
@@ -731,7 +741,15 @@ add_legacy_tests(
 )
 
 # non-graph
+
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+)
+
+# memory allocation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  zero_allocs
 )

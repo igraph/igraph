@@ -126,7 +126,7 @@ int FUNCTION(igraph_vector, init)      (TYPE(igraph_vector)* v, int long size) {
     if (size < 0) {
         size = 0;
     }
-    v->stor_begin = igraph_Calloc(alloc_size, BASE);
+    v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
     }
@@ -377,7 +377,7 @@ int FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, int endmark, .
 void FUNCTION(igraph_vector, destroy)   (TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != 0);
     if (v->stor_begin != 0) {
-        igraph_Free(v->stor_begin);
+        IGRAPH_FREE(v->stor_begin);
         v->stor_begin = NULL;
     }
 }
@@ -440,7 +440,7 @@ int FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, long int size) {
         return 0;
     }
 
-    tmp = igraph_Realloc(v->stor_begin, (size_t) size, BASE);
+    tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, BASE);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
     }
@@ -878,7 +878,7 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     if (n == 0) {
         return 0;
     }
-    vind = igraph_Calloc(n, BASE*);
+    vind = IGRAPH_CALLOC(n, BASE*);
     if (vind == 0) {
         IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
     }
@@ -894,7 +894,7 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = vind[i] - first;
     }
-    igraph_Free(vind);
+    IGRAPH_FREE(vind);
     return 0;
 }
 
@@ -1053,7 +1053,7 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     }
 
     size = (size_t) (v->end - v->stor_begin);
-    tmp = igraph_Realloc(v->stor_begin, size, BASE);
+    tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot resize vector", IGRAPH_ENOMEM);
     } else {
@@ -1257,7 +1257,7 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
 
 int FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector) *v,
                                        const BASE *data, long int length) {
-    v->stor_begin = igraph_Calloc(length, BASE);
+    v->stor_begin = IGRAPH_CALLOC(length, BASE);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
     }
@@ -1317,7 +1317,7 @@ int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
     IGRAPH_ASSERT(from->stor_begin != NULL);
 
     from_size = FUNCTION(igraph_vector, size)(from);
-    to->stor_begin = igraph_Calloc(from_size, BASE);
+    to->stor_begin = IGRAPH_CALLOC(from_size, BASE);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
     }
@@ -2934,7 +2934,7 @@ int FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
     BASE *tmp;
     int i, n = igraph_vector_int_size(idx);
 
-    tmp = igraph_Calloc(n, BASE);
+    tmp = IGRAPH_CALLOC(n, BASE);
     if (!tmp) {
         IGRAPH_ERROR("Cannot index vector", IGRAPH_ENOMEM);
     }
@@ -2943,7 +2943,7 @@ int FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
         tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ];
     }
 
-    igraph_Free(v->stor_begin);
+    IGRAPH_FREE(v->stor_begin);
     v->stor_begin = tmp;
     v->stor_end = v->end = tmp + n;
 

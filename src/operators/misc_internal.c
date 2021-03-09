@@ -33,7 +33,7 @@ void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_destroy(VECTOR(*v)[i]);
-            igraph_Free(VECTOR(*v)[i]);
+            IGRAPH_FREE(VECTOR(*v)[i]);
         }
     }
     igraph_vector_ptr_destroy(v);
@@ -44,7 +44,7 @@ void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_long_destroy(VECTOR(*v)[i]);
-            igraph_Free(VECTOR(*v)[i]);
+            IGRAPH_FREE(VECTOR(*v)[i]);
         }
     }
     igraph_vector_ptr_destroy(v);
