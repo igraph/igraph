@@ -30,9 +30,10 @@
 
 #include "core/interruption.h"
 
-/* When vid_ecc is not NULL, only one vertex id should be passed in vids.*/
-/* vid_ecc will then return the id of the vertex farthest from the one in*/
-/* vids. */
+/* When vid_ecc is not NULL, only one vertex id should be passed in vids.
+ * vid_ecc will then return the id of the vertex farthest from the one in
+ * vids. If unconn == FALSE and not all other vertices were reachable from
+ * the single given vertex, -1 is returned n vid_ecc. */
 static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
@@ -40,12 +41,11 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_integer_t *vid_ecc,
                                  igraph_bool_t unconn) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_long_t q;
     igraph_vit_t vit;
     igraph_vector_int_t counted;
-    int i, mark = 1;
-    igraph_vector_int_t *neis;
+    long int i, mark = 1;
     igraph_integer_t min_degree = 0;
 
     IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
@@ -76,12 +76,12 @@ static int igraph_i_eccentricity(const igraph_t *graph,
         while (!igraph_dqueue_long_empty(&q)) {
             long int act = igraph_dqueue_long_pop(&q);
             long int dist = igraph_dqueue_long_pop(&q);
-            int j, n;
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(adjlist, act);
+            long int j, n;
 
-            neis = igraph_lazy_adjlist_get(adjlist, act);
-            n = (int) igraph_vector_int_size(neis);
+            n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                int nei = (int) VECTOR(*neis)[j];
+                long int nei = VECTOR(*neis)[j];
                 if (VECTOR(counted)[nei] != mark) {
                     VECTOR(counted)[nei] = mark;
                     nodes_reached++;
@@ -90,10 +90,10 @@ static int igraph_i_eccentricity(const igraph_t *graph,
                 }
             }
             if (vid_ecc) {
-                /* Return the vertex id of the vertex which has the lowest */
-                /* degree of the vertices most distant from the starting */
-                /* vertex. Assumes there is only 1 vid in vids. Used for */
-                /* pseudo_diameter calculations. */
+                /* Return the vertex id of the vertex which has the lowest
+                 * degree of the vertices most distant from the starting
+                 * vertex. Assumes there is only 1 vid in vids. Used for
+                 * pseudo_diameter calculations. */
                 if (dist > VECTOR(*res)[i] || (dist == VECTOR(*res)[i] && n < min_degree)) {
                     VECTOR(*res)[i] = dist;
                     *vid_ecc = act;
