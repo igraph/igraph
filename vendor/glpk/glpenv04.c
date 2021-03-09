@@ -62,6 +62,15 @@ _glp_error glp_error_(const char *file, int line)
       return error;
 }
 
+
+/* igraph-specific hack;
+ * glp_at_error() is not present in this old GLPK version
+ * but we need it for proper error reporting */
+int glp_at_error(void) {
+    ENV *env = get_env_ptr();
+    return (env->err_line != 0);
+}
+
 /***********************************************************************
 *  NAME
 *
