@@ -724,6 +724,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   error_macros
 )
+
+# GLPK
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  glpk_error
+)
+
 # regression and fuzzing tests
 
 add_legacy_tests(
@@ -732,11 +740,14 @@ add_legacy_tests(
 )
 
 # non-graph
+
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
 )
+
 # memory allocation
+
 add_legacy_tests(
   FOLDER tests/unit NAMES
   zero_allocs
