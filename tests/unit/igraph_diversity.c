@@ -61,6 +61,8 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    igraph_vector_destroy(&result);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

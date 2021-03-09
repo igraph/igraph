@@ -47,7 +47,7 @@
  */
 
 void igraph_free(void *p) {
-    igraph_Free(p);
+    IGRAPH_FREE(p);
 }
 
 

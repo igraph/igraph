@@ -121,7 +121,7 @@ int igraph_contract_vertices(igraph_t *graph,
         igraph_vector_t sizes;
         igraph_vector_t *vecs;
 
-        vecs = igraph_Calloc(no_new_vertices, igraph_vector_t);
+        vecs = IGRAPH_CALLOC(no_new_vertices, igraph_vector_t);
         if (!vecs) {
             IGRAPH_ERROR("Cannot combine attributes while contracting"
                          " vertices", IGRAPH_ENOMEM);

@@ -21,6 +21,7 @@
  - `igraph_transitivity_undirected()`, `igraph_transitivity_avglocal_undirected()` and `igraph_transitivity_barrat()` no longer trigger an assertion failure when used with the null graph (PRs #1709, #1710).
  - `igraph_(personalized_)pagerank()` would return incorrect results for weighted multigraphs with fewer than 128 vertices when using `IGRAPH_PAGERANK_ALGO_PRPACK`.
  - `igraph_diversity()` now checks its input more carefully, and throws an error when the input graph has multi-edges or is directed.
+ - GLPK internal errors no longer crash igraph.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
  - When compiling the development version (as opposed to the release tarball), the build would fail with newer versions of `bison` and `flex`.
@@ -31,6 +32,7 @@
  - Much faster documentation builds.
  - Allow using a pre-generated `arith.h` header for f2c when cross-compiling; see the Installation section of the documentation.
  - The following functions are now interruptible: `igraph_grg_game()`, `igraph_sbm_game()`, `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`.
+ - Functions that use GLPK, such as `igraph_feedback_arc_set()` and `igraph_community_optimal_modularity()` are now interruptible.
 
 ### Acknowledgments
 

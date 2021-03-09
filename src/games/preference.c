@@ -162,7 +162,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         IGRAPH_CHECK(igraph_vector_resize(node_type_vec, nodes));
         nodetypes = node_type_vec;
     } else {
-        nodetypes = igraph_Calloc(1, igraph_vector_t);
+        nodetypes = IGRAPH_CALLOC(1, igraph_vector_t);
         if (nodetypes == 0) {
             IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM);
         }
@@ -173,7 +173,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_type, types));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vids_by_type);
     for (i = 0; i < types; i++) {
-        VECTOR(vids_by_type)[i] = igraph_Calloc(1, igraph_vector_t);
+        VECTOR(vids_by_type)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
         if (VECTOR(vids_by_type)[i] == 0) {
             IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM);
         }
@@ -342,7 +342,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
     if (node_type_vec == 0) {
         igraph_vector_destroy(nodetypes);
-        igraph_Free(nodetypes);
+        IGRAPH_FREE(nodetypes);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -459,7 +459,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
         nodetypes_in = node_type_in_vec;
         IGRAPH_CHECK(igraph_vector_resize(nodetypes_in, nodes));
     } else {
-        nodetypes_in = igraph_Calloc(1, igraph_vector_t);
+        nodetypes_in = IGRAPH_CALLOC(1, igraph_vector_t);
         if (nodetypes_in == 0) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
@@ -470,7 +470,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
         nodetypes_out = node_type_out_vec;
         IGRAPH_CHECK(igraph_vector_resize(nodetypes_out, nodes));
     } else {
-        nodetypes_out = igraph_Calloc(1, igraph_vector_t);
+        nodetypes_out = IGRAPH_CALLOC(1, igraph_vector_t);
         if (nodetypes_out == 0) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
@@ -482,14 +482,14 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_outtype, out_types));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vids_by_outtype);
     for (i = 0; i < in_types; i++) {
-        VECTOR(vids_by_intype)[i] = igraph_Calloc(1, igraph_vector_t);
+        VECTOR(vids_by_intype)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
         if (! VECTOR(vids_by_intype)[i]) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
         IGRAPH_CHECK(igraph_vector_init(VECTOR(vids_by_intype)[i], 0));
     }
     for (i = 0; i < out_types; i++) {
-        VECTOR(vids_by_outtype)[i] = igraph_Calloc(1, igraph_vector_t);
+        VECTOR(vids_by_outtype)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
         if (! VECTOR(vids_by_outtype)[i]) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
@@ -613,13 +613,13 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
     if (node_type_out_vec == 0) {
         igraph_vector_destroy(nodetypes_out);
-        igraph_Free(nodetypes_out);
+        IGRAPH_FREE(nodetypes_out);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
     if (node_type_in_vec == 0) {
         igraph_vector_destroy(nodetypes_in);
-        igraph_Free(nodetypes_in);
+        IGRAPH_FREE(nodetypes_in);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

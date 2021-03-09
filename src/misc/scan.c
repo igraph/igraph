@@ -287,7 +287,7 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_inclist_destroy, &allinc);
     IGRAPH_CHECK(igraph_i_trans4_il_simplify(graph, &allinc, &rank));
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
         IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
     }

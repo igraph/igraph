@@ -53,17 +53,17 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
                 igraph_vector_t *value = (igraph_vector_t*)atrec->value;
                 if (value != 0) {
                     igraph_vector_destroy(value);
-                    igraph_Free(value);
+                    IGRAPH_FREE(value);
                 }
             } else {
                 igraph_strvector_t *value = (igraph_strvector_t*)atrec->value;
                 if (value != 0) {
                     igraph_strvector_destroy(value);
-                    igraph_Free(value);
+                    IGRAPH_FREE(value);
                 }
             }
-            igraph_Free(atrec->name);
-            igraph_Free(atrec);
+            IGRAPH_FREE(atrec->name);
+            IGRAPH_FREE(atrec);
         }
         igraph_vector_ptr_destroy(vec);
     }
@@ -277,7 +277,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 IGRAPH_CHECK(igraph_trie_get(&vattrnames, name, &trieid));
                 if (trieid == triesize) {
                     /* new attribute */
-                    igraph_attribute_record_t *atrec = igraph_Calloc(1, igraph_attribute_record_t);
+                    igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
                     int type = igraph_gml_tree_type(node, j);
                     if (!atrec) {
                         IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
@@ -341,7 +341,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     IGRAPH_CHECK(igraph_trie_get(&eattrnames, name, &trieid));
                     if (trieid == triesize) {
                         /* new attribute */
-                        igraph_attribute_record_t *atrec = igraph_Calloc(1, igraph_attribute_record_t);
+                        igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
                         int type = igraph_gml_tree_type(edge, j);
                         if (!atrec) {
                             IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
@@ -385,11 +385,11 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         igraph_attribute_record_t *atrec = VECTOR(vattrs)[i];
         int type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *p = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             atrec->value = p;
             IGRAPH_CHECK(igraph_vector_init(p, no_of_nodes));
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *p = igraph_Calloc(1, igraph_strvector_t);
+            igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
             atrec->value = p;
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_nodes));
         } else {
@@ -401,11 +401,11 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         igraph_attribute_record_t *atrec = VECTOR(eattrs)[i];
         int type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *p = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             atrec->value = p;
             IGRAPH_CHECK(igraph_vector_init(p, no_of_edges));
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *p = igraph_Calloc(1, igraph_strvector_t);
+            igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
             atrec->value = p;
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_edges));
         } else {
@@ -525,7 +525,7 @@ static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
             newlen++;
         }
     }
-    *key = igraph_Calloc(newlen + 1, char);
+    *key = IGRAPH_CALLOC(newlen + 1, char);
     if (! *key) {
         IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM);
     }
@@ -675,7 +675,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         } else {
             IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
         }
-        igraph_Free(newname);
+        IGRAPH_FREE(newname);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -715,7 +715,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             } else {
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
             }
-            igraph_Free(newname);
+            IGRAPH_FREE(newname);
             IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ]\n"));
@@ -763,7 +763,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             } else {
                 IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
             }
-            igraph_Free(newname);
+            IGRAPH_FREE(newname);
             IGRAPH_FINALLY_CLEAN(1);
         }
         CHECK(fprintf(outstream, "  ]\n"));

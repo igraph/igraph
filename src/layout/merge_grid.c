@@ -58,7 +58,7 @@ int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
     grid->stepsy = stepsy;
     grid->deltay = (maxy - miny) / stepsy;
 
-    grid->data = igraph_Calloc(stepsx * stepsy, long int);
+    grid->data = IGRAPH_CALLOC(stepsx * stepsy, long int);
     if (grid->data == 0) {
         IGRAPH_ERROR("Cannot create grid", IGRAPH_ENOMEM);
     }
@@ -66,7 +66,7 @@ int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
 }
 
 void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
-    igraph_Free(grid->data);
+    IGRAPH_FREE(grid->data);
 }
 
 #define MAT(i,j) (grid->data[(grid->stepsy)*(j)+(i)])

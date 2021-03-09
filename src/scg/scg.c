@@ -456,7 +456,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
         igraph_i_scg_groups_t *g;
         int gr_nb = 0;
         
-        g = igraph_Calloc(no_of_nodes, igraph_i_scg_groups_t);
+        g = IGRAPH_CALLOC(no_of_nodes, igraph_i_scg_groups_t);
         IGRAPH_FINALLY(igraph_free, g);
 
         IGRAPH_CHECK(igraph_matrix_int_transpose(&gr_mat));
@@ -476,7 +476,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
             VECTOR(*groups)[g[i].ind] = gr_nb;
         }
         
-        igraph_Free(g);
+        IGRAPH_FREE(g);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

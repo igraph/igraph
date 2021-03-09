@@ -207,14 +207,14 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *vec = (igraph_vector_t*) rec->value;
             igraph_vector_destroy(vec);
-            igraph_Free(vec);
+            IGRAPH_FREE(vec);
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
             igraph_strvector_destroy(strvec);
-            igraph_Free(strvec);
+            IGRAPH_FREE(strvec);
         }
         igraph_free( (char*)(rec->name));
-        igraph_Free(rec);
+        IGRAPH_FREE(rec);
     }
 
     for (i = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
@@ -222,14 +222,14 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *vec = (igraph_vector_t*) rec->value;
             igraph_vector_destroy(vec);
-            igraph_Free(vec);
+            IGRAPH_FREE(vec);
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
             igraph_strvector_destroy(strvec);
-            igraph_Free(strvec);
+            IGRAPH_FREE(strvec);
         }
         igraph_free( (char*)(rec->name));
-        igraph_Free(rec);
+        IGRAPH_FREE(rec);
     }
 
     igraph_vector_destroy(&edges);
@@ -326,7 +326,7 @@ static int igraph_i_pajek_escape(char* src, char** dest) {
          * reserved words in its format (like 'c' standing for color) and they
          * have to be quoted as well.
          */
-        *dest = igraph_Calloc(destlen + 3, char);
+        *dest = IGRAPH_CALLOC(destlen + 3, char);
         if (!*dest) {
             IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
         }
@@ -338,7 +338,7 @@ static int igraph_i_pajek_escape(char* src, char** dest) {
         return IGRAPH_SUCCESS;
     }
 
-    *dest = igraph_Calloc(destlen + 3, char);
+    *dest = IGRAPH_CALLOC(destlen + 3, char);
     if (!*dest) {
         IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
     }
@@ -604,7 +604,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
                 igraph_strvector_get(&strv, 0, &s);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
-                igraph_Free(escaped);
+                IGRAPH_FREE(escaped);
             } else {
                 fprintf(outstream, " \"%li\"", id + 1);
             }
@@ -635,7 +635,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
                 igraph_strvector_get(&strv, 0, &s);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
-                igraph_Free(escaped);
+                IGRAPH_FREE(escaped);
             }
 
             /* numeric parameters */
@@ -655,7 +655,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
                 igraph_strvector_get(&strv, 0, &s);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
-                igraph_Free(escaped);
+                IGRAPH_FREE(escaped);
             }
 
             /* trailing newline */
@@ -743,7 +743,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
             igraph_strvector_get(&strv, 0, &s);
             IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
             fprintf(outstream, " %s %s", estrnames2[idx], escaped);
-            igraph_Free(escaped);
+            IGRAPH_FREE(escaped);
         }
 
         /* trailing newline */

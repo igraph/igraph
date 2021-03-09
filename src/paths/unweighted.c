@@ -104,7 +104,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    already_counted = igraph_Calloc(no_of_nodes, long int);
+    already_counted = IGRAPH_CALLOC(no_of_nodes, long int);
     if (already_counted == 0) {
         IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
     }
@@ -179,7 +179,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_Free(already_counted);
+    IGRAPH_FREE(already_counted);
     igraph_dqueue_destroy(&q);
     igraph_vit_destroy(&fromvit);
     igraph_adjlist_destroy(&adjlist);
@@ -307,7 +307,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_ERROR("Size of the `edges' and the `to' should match", IGRAPH_EINVAL);
     }
 
-    father = igraph_Calloc(no_of_nodes, long int);
+    father = IGRAPH_CALLOC(no_of_nodes, long int);
     if (father == 0) {
         IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
     }
@@ -451,7 +451,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
     }
 
     /* Clean */
-    igraph_Free(father);
+    IGRAPH_FREE(father);
     igraph_dqueue_destroy(&q);
     igraph_vector_destroy(&tmp);
     igraph_vit_destroy(&vit);

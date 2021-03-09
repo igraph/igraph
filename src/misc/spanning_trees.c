@@ -218,12 +218,12 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
 
     igraph_vector_clear(res);
 
-    added_edges = igraph_Calloc(no_of_edges, char);
+    added_edges = IGRAPH_CALLOC(no_of_edges, char);
     if (added_edges == 0) {
         IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added_edges);
-    already_added = igraph_Calloc(no_of_nodes, char);
+    already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
         IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
     }
@@ -262,9 +262,9 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
     }
 
     igraph_dqueue_destroy(&q);
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_vector_destroy(&tmp);
-    igraph_Free(added_edges);
+    IGRAPH_FREE(added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -295,12 +295,12 @@ static int igraph_i_minimum_spanning_tree_prim(
         IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
     }
 
-    added_edges = igraph_Calloc(no_of_edges, char);
+    added_edges = IGRAPH_CALLOC(no_of_edges, char);
     if (added_edges == 0) {
         IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added_edges);
-    already_added = igraph_Calloc(no_of_nodes, char);
+    already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
         IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
     }
@@ -363,9 +363,9 @@ static int igraph_i_minimum_spanning_tree_prim(
     } /* for all nodes */
 
     igraph_d_indheap_destroy(&heap);
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_vector_destroy(&adj);
-    igraph_Free(added_edges);
+    IGRAPH_FREE(added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;

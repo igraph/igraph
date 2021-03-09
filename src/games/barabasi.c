@@ -96,7 +96,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
-    bag = igraph_Calloc(bagsize, long int);
+    bag = IGRAPH_CALLOC(bagsize, long int);
     if (bag == 0) {
         IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
     }
@@ -160,7 +160,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     RNG_END();
 
-    igraph_Free(bag);
+    IGRAPH_FREE(bag);
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
     igraph_vector_destroy(&edges);

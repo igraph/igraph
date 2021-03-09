@@ -32,10 +32,48 @@
 
 #include <stdio.h>
 
+IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
+
+int igraph_i_glpk_terminal_hook(void *info, const char *s) {
+    IGRAPH_UNUSED(info);
+
+    if (igraph_i_interruption_handler &&
+        !igraph_i_glpk_error_info.is_interrupted &&
+        igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        /* If an interruption has already occurred, do not set another error,
+           to avoid an infinite loop between the term_hook (this function)
+           and the error_hook. */
+        igraph_i_glpk_error_info.is_interrupted = 1;
+        glp_error("GLPK was interrupted."); /* This dummy message is never printed */
+    } else if (glp_at_error()) {
+        /* Copy the error messages into a buffer for later reporting */
+        /* We must use glp_at_error() instead of igraph_i_glpk_error_info.is_error
+         * to determine if a message is an error message, as the reporting function is
+         * called before the error function. The vendored old GLPK is patched to add support
+         * for glp_at_error(). New GLPK versions have this functions. */
+        const size_t n = sizeof(igraph_i_glpk_error_info.msg) / sizeof(char) - 1;
+        while (*s != '\0' && igraph_i_glpk_error_info.msg_ptr < igraph_i_glpk_error_info.msg + n) {
+            *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
+        }
+        *igraph_i_glpk_error_info.msg_ptr = '\0';
+    }
+
+    return 1; /* Non-zero return value signals to GLPK not to print to the terminal */
+}
+
+void igraph_i_glpk_error_hook(void *info) {
+    IGRAPH_UNUSED(info);
+    igraph_i_glpk_error_info.is_error = 1;
+    glp_free_env();
+    longjmp(igraph_i_glpk_error_info.jmp, 1);
+}
+
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
     IGRAPH_UNUSED(info);
 
-    /* This is a special version of IGRAPH_ALLOW_INTERRUPTION().
+    /* This is a callback function meant to be used with glp_intopt(),
+       in order to support interruption. It is essentially a GLPK-compatible
+       replacement for IGRAPH_ALLOW_INTERRUPTION().
        Calling glp_ios_terminate() from glp_intopt()'s callback function
        signals to GLPK that it should terminate the optimization and return
        with the code GLP_ESTOP.
@@ -44,6 +82,28 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
         if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
             glp_ios_terminate(tree);
         }
+    }
+}
+
+/**
+ * \ingroup internal
+ * \function igraph_i_glp_delete_prob
+ * \brief Safe replacement for glp_delete_prob().
+ *
+ * This function is meant to be used with IGRAPH_FINALLY()
+ * in conjunction with glp_create_prob().
+ *
+ * When using GLPK, normally glp_delete_prob() is used to free
+ * problems created with glp_create_prob(). However, when GLPK
+ * encounters an error, the error handler installed by igraph
+ * will call glp_free_env() which invalidates all problems.
+ * Calling glp_delete_prob() would then lead to a crash.
+ * This replacement function avoids this situation by first
+ * checking if GLPK is at an error state.
+ */
+void igraph_i_glp_delete_prob(glp_prob *p) {
+    if (! igraph_i_glpk_error_info.is_error) {
+        glp_delete_prob(p);
     }
 }
 
@@ -78,7 +138,7 @@ int igraph_i_glpk_check(int retval, const char* message) {
         HANDLE_CODE2(GLP_EITLIM);
 
     default:
-        IGRAPH_ERROR("unknown GLPK error", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Unknown GLPK error", IGRAPH_FAILURE);
     }
 #undef HANDLE_CODE
 #undef HANDLE_CODE2

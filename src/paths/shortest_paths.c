@@ -56,7 +56,7 @@ static int igraph_i_average_path_length_unweighted(
     igraph_adjlist_t allneis;
 
     *res = 0;
-    already_added = igraph_Calloc(no_of_nodes, long int);
+    already_added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (already_added == 0) {
         IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
     }
@@ -128,7 +128,7 @@ static int igraph_i_average_path_length_unweighted(
         *unconnected_pairs = no_of_pairs - no_of_conn_pairs;
 
     /* clean */
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_dqueue_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
@@ -734,7 +734,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         igraph_adjlist_t adjlist;
         igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
 
-        already_counted = igraph_Calloc(no_of_nodes, long int);
+        already_counted = IGRAPH_CALLOC(no_of_nodes, long int);
         if (already_counted == 0) {
             IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM);
         }
@@ -761,7 +761,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
 
         igraph_dqueue_destroy(&q);
         igraph_adjlist_destroy(&adjlist);
-        igraph_Free(already_counted);
+        IGRAPH_FREE(already_counted);
         IGRAPH_FINALLY_CLEAN(3);
     }
     else /* weighted case */
@@ -970,7 +970,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     } else {
         dirmode = IGRAPH_ALL;
     }
-    already_added = igraph_Calloc(no_of_nodes, long int);
+    already_added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (already_added == 0) {
         IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
     }
@@ -1051,7 +1051,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     }
 
     /* clean */
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_dqueue_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
