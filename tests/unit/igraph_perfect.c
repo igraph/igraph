@@ -23,6 +23,7 @@
 int main() {
     igraph_t graph, comp_graph;
     igraph_bool_t is_perfect;
+    igraph_error_handler_t *ehandler;
 
     igraph_rng_seed(igraph_rng_default(), 0);
 
@@ -82,8 +83,9 @@ int main() {
 
     // Test directed paths
     igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, IGRAPH_DIRECTED, IGRAPH_ALL);
-    igraph_set_error_handler(igraph_error_handler_ignore);
+    ehandler = igraph_set_error_handler(igraph_error_handler_printignore);
     IGRAPH_ASSERT(igraph_is_perfect(&graph, &is_perfect) == IGRAPH_EINVAL);
+    igraph_set_error_handler(ehandler);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
