@@ -268,6 +268,19 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
+    /* We will reach here when vid_start < 0 and the graph has no vertices. */
+    if (no_of_nodes == 0) {
+        if (diameter) {
+            *diameter = IGRAPH_NAN;
+        }
+        if (from) {
+            *from = -1;
+        }
+        if (to) {
+            *to = -1;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     if (vid_start < 0) {
         RNG_BEGIN();
