@@ -15,8 +15,10 @@ void prpack_preprocessed_ge_graph::initialize_weighted(const prpack_base_graph* 
     for (int i = 0, inum_vs = 0; i < num_vs; ++i, inum_vs += num_vs) {
         const int start_j = bg->tails[i];
         const int end_j = (i + 1 != num_vs) ? bg->tails[i + 1] : bg->num_es;
-        for (int j = start_j; j < end_j; ++j)
-            d[bg->heads[j]] -= matrix[inum_vs + bg->heads[j]] = bg->vals[j];
+        for (int j = start_j; j < end_j; ++j) {
+            matrix[inum_vs + bg->heads[j]] += bg->vals[j];
+            d[bg->heads[j]] -= bg->vals[j];
+        }
     }
 }
 

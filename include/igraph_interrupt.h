@@ -112,7 +112,7 @@ typedef int igraph_interruption_handler_t (void* data);
  * \function igraph_allow_interruption
  *
  * This is the function which is called (usually via the
- * \ref IGRAPH_INTERRUPTION macro) if \a igraph is checking for interruption
+ * \ref IGRAPH_ALLOW_INTERRUPTION macro) if \a igraph is checking for interruption
  * requests.
  *
  * \param data reserved for possible future use, now it is always \c NULL

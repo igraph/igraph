@@ -243,7 +243,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
             if (IGRAPH_UNLIKELY(! *cd)) {
                 long j;
 
-                *cd = igraph_malloc(sizeof(igraph_vector_t));
+                *cd = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (*cd == NULL) {
                     IGRAPH_ERROR("random edge walk failed", IGRAPH_ENOMEM);
                 }

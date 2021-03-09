@@ -59,7 +59,7 @@ int FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, long int size) {
     if (size <= 0 ) {
         size = 1;
     }
-    q->stor_begin = igraph_Calloc(size, BASE);
+    q->stor_begin = IGRAPH_CALLOC(size, BASE);
     if (q->stor_begin == 0) {
         IGRAPH_ERROR("dqueue init failed", IGRAPH_ENOMEM);
     }
@@ -83,7 +83,7 @@ int FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, long int size) {
 void FUNCTION(igraph_dqueue, destroy) (TYPE(igraph_dqueue)* q) {
     IGRAPH_ASSERT(q != 0);
     if (q->stor_begin != 0) {
-        igraph_Free(q->stor_begin);
+        IGRAPH_FREE(q->stor_begin);
         q->stor_begin = 0;
     }
 }
@@ -298,7 +298,7 @@ int FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem) {
 
         BASE *bigger = NULL, *old = q->stor_begin;
 
-        bigger = igraph_Calloc( 2 * (q->stor_end - q->stor_begin) + 1, BASE );
+        bigger = IGRAPH_CALLOC( 2 * (q->stor_end - q->stor_begin) + 1, BASE );
         if (bigger == 0) {
             IGRAPH_ERROR("dqueue push failed", IGRAPH_ENOMEM);
         }
@@ -323,7 +323,7 @@ int FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem) {
             q->end = q->stor_begin;
         }
 
-        igraph_Free(old);
+        IGRAPH_FREE(old);
     }
 
     return 0;

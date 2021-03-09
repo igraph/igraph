@@ -48,7 +48,7 @@ static int igraph_i_average_path_length_unweighted(
     long int no_of_nodes = igraph_vcount(graph);
     long int source, j, n;
     long int *already_added;
-    igraph_real_t no_of_pairs = no_of_nodes * (no_of_nodes - 1.0); /* no. of ordered vertex pairs */
+    igraph_real_t no_of_pairs = no_of_nodes > 0 ? no_of_nodes * (no_of_nodes - 1.0) : 0.0; /* no. of ordered vertex pairs */
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
@@ -56,7 +56,7 @@ static int igraph_i_average_path_length_unweighted(
     igraph_adjlist_t allneis;
 
     *res = 0;
-    already_added = igraph_Calloc(no_of_nodes, long int);
+    already_added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (already_added == 0) {
         IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
     }
@@ -128,7 +128,7 @@ static int igraph_i_average_path_length_unweighted(
         *unconnected_pairs = no_of_pairs - no_of_conn_pairs;
 
     /* clean */
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_dqueue_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
@@ -171,7 +171,7 @@ static int igraph_i_average_path_length_dijkstra(
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     long int source, j;
-    igraph_real_t no_of_pairs = no_of_nodes * (no_of_nodes - 1.0); /* no. of ordered vertex pairs */
+    igraph_real_t no_of_pairs;
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
     if (!weights) {
@@ -179,18 +179,25 @@ static int igraph_i_average_path_length_dijkstra(
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%ld) does not match the number of edges (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
-
+    
+    /* Avoid returning a negative zero, which would be printed as -0 in tests. */
+    if (no_of_nodes > 0) {
+        no_of_pairs = no_of_nodes * (no_of_nodes - 1.0);
+    } else {
+        no_of_pairs = 0;
+    }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
@@ -323,16 +330,19 @@ int igraph_average_path_length(const igraph_t *graph,
  * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c TRUE,
  * NaN is returned.
  *
- * \param weights The edge weights. All edge weights must be
- *       non-negative for Dijkstra's algorithm to work. Additionally, no
- *       edge weight may be NaN. If either case does not hold, an error
- *       is returned. If this is a null pointer, then the unweighted
- *       version, \ref igraph_average_path_length() is called.
+ * </para><para>
+ * All distinct ordered vertex pairs are taken into account.
+ *
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
  *    ordered vertex pairs where the second vertex is unreachable from the first one
  *    will be stored here.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_average_path_length() is called.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param unconn If \c TRUE, only those pairs are considered for the calculation
@@ -724,7 +734,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         igraph_adjlist_t adjlist;
         igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
 
-        already_counted = igraph_Calloc(no_of_nodes, long int);
+        already_counted = IGRAPH_CALLOC(no_of_nodes, long int);
         if (already_counted == 0) {
             IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM);
         }
@@ -751,7 +761,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
 
         igraph_dqueue_destroy(&q);
         igraph_adjlist_destroy(&adjlist);
-        igraph_Free(already_counted);
+        IGRAPH_FREE(already_counted);
         IGRAPH_FINALLY_CLEAN(3);
     }
     else /* weighted case */
@@ -954,7 +964,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     } else {
         dirmode = IGRAPH_ALL;
     }
-    already_added = igraph_Calloc(no_of_nodes, long int);
+    already_added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (already_added == 0) {
         IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
     }
@@ -1036,7 +1046,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     }
 
     /* clean */
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_dqueue_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);

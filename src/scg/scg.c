@@ -86,6 +86,8 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
+#include "misc/conversion_internal.h"
+
 #include "scg_headers.h"
 
 #include "math.h"
@@ -454,7 +456,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
         igraph_i_scg_groups_t *g;
         int gr_nb = 0;
         
-        g = igraph_Calloc(no_of_nodes, igraph_i_scg_groups_t);
+        g = IGRAPH_CALLOC(no_of_nodes, igraph_i_scg_groups_t);
         IGRAPH_FINALLY(igraph_free, g);
 
         IGRAPH_CHECK(igraph_matrix_int_transpose(&gr_mat));
@@ -474,7 +476,7 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
             VECTOR(*groups)[g[i].ind] = gr_nb;
         }
         
-        igraph_Free(g);
+        IGRAPH_FREE(g);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -1108,10 +1110,6 @@ static int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix,
 
     return 0;
 }
-
-/* TODO prototype; function is defined in conversion.c */
-int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
-                                 igraph_bool_t column_wise);
 
 static int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
                                          igraph_sparsemat_t *mysparse,

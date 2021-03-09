@@ -38,3 +38,15 @@ PRPACK: ( 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 )
 Test graph 3
 ARPACK: ( 0.143734 0.104639 0.045995 0.045995 0.155268 0.257112 0.045995 0.155268 0.045995 )
 PRPACK: ( 0.143734 0.104639 0.045995 0.045995 0.155268 0.257112 0.045995 0.155268 0.045995 )
+
+Small undirected multigraph (unweighted)
+ARPACK: ( 0.187838 0.486486 0.325676 )
+PRPACK: ( 0.187838 0.486486 0.325676 )
+
+Small undirected multigraph (unit weights)
+ARPACK: ( 0.187838 0.486486 0.325676 )
+PRPACK: ( 0.187838 0.486486 0.325676 )
+
+Large test graph, unweighted
+
+Large test graph, weighted

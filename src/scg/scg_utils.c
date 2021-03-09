@@ -85,7 +85,7 @@ int igraph_i_compare_int(const void *a, const void *b) {
 /* allocate a igraph_real_t symmetrix matrix with dimension size x size
    in vector format*/
 igraph_real_t *igraph_i_real_sym_matrix(int size)  {
-    igraph_real_t *S = igraph_Calloc(size * (size + 1) / 2, igraph_real_t);
+    igraph_real_t *S = IGRAPH_CALLOC(size * (size + 1) / 2, igraph_real_t);
     if (!S) {
         igraph_error("allocation failure in real_sym_matrix()",
                      IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);

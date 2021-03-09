@@ -73,10 +73,12 @@ add_legacy_tests(
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
+  igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
   spmatrix
+  spmatrix_clear
   stack
   strvector_set2_remove_print
   vector
@@ -235,11 +237,15 @@ add_legacy_tests(
   all_shortest_paths
   efficiency
   igraph_are_connected
+  igraph_average_path_length
+  igraph_average_path_length_dijkstra
   igraph_betweenness
   igraph_closeness
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
+  igraph_diversity
+  igraph_eccentricity
   igraph_edge_betweenness
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
@@ -247,6 +253,8 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_tree
   igraph_local_transitivity
+  igraph_neighborhood
+  igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
   igraph_shortest_paths_johnson
@@ -334,6 +342,7 @@ add_legacy_tests(
   simplify_and_colorize
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
+  igraph_get_subisomorphisms_vf2
   igraph_subisomorphic
   igraph_isomorphic_bliss
   isomorphism_test
@@ -421,6 +430,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
+  igraph_get_adjacency_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist
@@ -505,9 +515,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_clique_size_hist
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
+  igraph_maximal_cliques_file
   igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
@@ -714,6 +726,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   error_macros
 )
+
+# GLPK
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  glpk_error
+)
+
 # regression and fuzzing tests
 
 add_legacy_tests(
@@ -722,7 +742,15 @@ add_legacy_tests(
 )
 
 # non-graph
+
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+)
+
+# memory allocation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  zero_allocs
 )

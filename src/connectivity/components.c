@@ -98,7 +98,7 @@ static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *member
     long int i;
     igraph_vector_t neis = IGRAPH_VECTOR_NULL;
 
-    already_added = igraph_Calloc(no_of_nodes, char);
+    already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
         IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM);
     }
@@ -159,7 +159,7 @@ static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *member
         *no = (igraph_integer_t) no_of_clusters - 1;
     }
 
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_dqueue_destroy(&q);
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
@@ -411,7 +411,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
         return IGRAPH_SUCCESS;
     }
 
-    already_added = igraph_Calloc(no_of_nodes, char);
+    already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
         IGRAPH_ERROR("is connected (weak) failed", IGRAPH_ENOMEM);
     }
@@ -444,7 +444,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     /* Connected? */
     *res = (j == no_of_nodes);
 
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     igraph_dqueue_destroy(&q);
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
@@ -551,7 +551,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_decompose_destroy, components);
 
     /* already_added keeps track of what nodes made it into a graph already */
-    already_added = igraph_Calloc(no_of_nodes, char);
+    already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
         IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
     }
@@ -604,7 +604,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
             continue;
         }
 
-        newg = igraph_Calloc(1, igraph_t);
+        newg = IGRAPH_CALLOC(1, igraph_t);
         if (newg == 0) {
             IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
         }
@@ -619,7 +619,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&verts);
     igraph_dqueue_destroy(&q);
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     IGRAPH_FINALLY_CLEAN(5);  /* + components */
 
     return 0;
@@ -804,7 +804,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
             continue;
         }
 
-        newg = igraph_Calloc(1, igraph_t);
+        newg = IGRAPH_CALLOC(1, igraph_t);
         if (newg == 0) {
             IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
         }
@@ -862,7 +862,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
         igraph_vector_t *v = VECTOR(*list)[i];
         if (v) {
             igraph_vector_destroy(v);
-            igraph_Free(v);
+            IGRAPH_FREE(v);
         }
     }
     igraph_vector_ptr_destroy(list);
@@ -1047,7 +1047,7 @@ int igraph_biconnected_components(const igraph_t *graph,
                             igraph_vector_t *v = 0, *v2 = 0;
                             comps++;
                             if (tree_edges) {
-                                v = igraph_Calloc(1, igraph_vector_t);
+                                v = IGRAPH_CALLOC(1, igraph_vector_t);
                                 if (!v) {
                                     IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
                                 }
@@ -1055,7 +1055,7 @@ int igraph_biconnected_components(const igraph_t *graph,
                                 IGRAPH_FINALLY(igraph_vector_destroy, v);
                             }
                             if (mycomponents) {
-                                v2 = igraph_Calloc(1, igraph_vector_t);
+                                v2 = IGRAPH_CALLOC(1, igraph_vector_t);
                                 if (!v2) {
                                     IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
                                 }
@@ -1095,7 +1095,7 @@ int igraph_biconnected_components(const igraph_t *graph,
                             }
                             if (component_edges) {
                                 igraph_vector_t *nodes = VECTOR(*mycomponents)[comps - 1];
-                                igraph_vector_t *vv = igraph_Calloc(1, igraph_vector_t);
+                                igraph_vector_t *vv = IGRAPH_CALLOC(1, igraph_vector_t);
                                 long int ii, no_vert = igraph_vector_size(nodes);
                                 if (!vv) {
                                     IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
@@ -1319,7 +1319,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
         IGRAPH_ERROR("invalid mode argument", IGRAPH_EINVMODE);
     }
 
-    already_added = igraph_Calloc(no_of_nodes, char);
+    already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
         IGRAPH_ERROR("subcomponent failed", IGRAPH_ENOMEM);
     }
@@ -1356,7 +1356,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
 
     igraph_dqueue_destroy(&q);
     igraph_vector_destroy(&tmp);
-    igraph_Free(already_added);
+    IGRAPH_FREE(already_added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return 0;

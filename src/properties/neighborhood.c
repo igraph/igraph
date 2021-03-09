@@ -89,7 +89,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
                       IGRAPH_EINVAL, order, mindist);
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size.", IGRAPH_ENOMEM);
     }
@@ -151,7 +151,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -159,7 +159,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
 
 /**
  * \function igraph_neighborhood
- * Calculate the neighborhood of vertices.
+ * \brief Calculate the neighborhood of vertices.
  *
  * The neighborhood of a given order of a vertex includes all vertices
  * which are closer to the vertex than the order. I.e., order 0 is
@@ -167,8 +167,10 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
  * neighbors, order 2 is order 1 plus the immediate neighbors of the
  * vertices in order 1, etc.
  *
- * </para><para> This function calculates the vertices within the
+ * </para><para>
+ * This function calculates the vertices within the
  * neighborhood of the specified vertices.
+ *
  * \param graph The input graph.
  * \param res An initialized pointer vector. Note that the objects
  *    (pointers) in the vector will \em not be freed, but the pointer
@@ -184,8 +186,9 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
  *   \p order steps are included. \c IGRAPH_ALL ignores the direction
  *   of the edges. This argument is ignored for undirected graphs.
  * \param mindist The minimum distance to include a vertex in the counting.
+ *   Vertices reachable with a path shorter than this value are excluded.
  *   If this is one, then the starting vertex is not counted. If this is
- *   two, then its neighbors are not counted, either, etc.
+ *   two, then its neighbors are not counted either, etc.
  * \return Error code.
  *
  * \sa \ref igraph_neighborhood_size() to calculate the size of the
@@ -218,7 +221,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
                      IGRAPH_EINVAL);
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -277,7 +280,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
 
         } /* while q not empty */
 
-        newv = igraph_Calloc(1, igraph_vector_t);
+        newv = IGRAPH_CALLOC(1, igraph_vector_t);
         if (newv == 0) {
             IGRAPH_ERROR("Cannot calculate neighborhood", IGRAPH_ENOMEM);
         }
@@ -291,15 +294,15 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_neighborhood_graphs
- * Create graphs from the neighborhood(s) of some vertex/vertices.
+ * \brief Create graphs from the neighborhood(s) of some vertex/vertices.
  *
  * The neighborhood of a given order of a vertex includes all vertices
  * which are closer to the vertex than the order. Ie. order 0 is
@@ -307,11 +310,13 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
  * neighbors, order 2 is order 1 plus the immediate neighbors of the
  * vertices in order 1, etc.
  *
- * </para><para> This function finds every vertex in the neighborhood
- * of a given parameter vertex and creates a graph from these
+ * </para><para>
+ * This function finds every vertex in the neighborhood
+ * of a given parameter vertex and creates the induced subgraph from these
  * vertices.
  *
- * </para><para> The first version of this function was written by
+ * </para><para>
+ * The first version of this function was written by
  * Vincent Matossian, thanks Vincent.
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -328,8 +333,9 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
  *   \p order steps are counted. \c IGRAPH_ALL ignores the direction
  *   of the edges. This argument is ignored for undirected graphs.
  * \param mindist The minimum distance to include a vertex in the counting.
+ *   Vertices reachable with a path shorter than this value are excluded.
  *   If this is one, then the starting vertex is not counted. If this is
- *   two, then its neighbors are not counted, either, etc.
+ *   two, then its neighbors are not counted either, etc.
  * \return Error code.
  *
  * \sa \ref igraph_neighborhood_size() for calculating the neighborhood
@@ -362,7 +368,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
                      IGRAPH_EINVAL);
     }
 
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -421,7 +427,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 
         } /* while q not empty */
 
-        newg = igraph_Calloc(1, igraph_t);
+        newg = IGRAPH_CALLOC(1, igraph_t);
         if (newg == 0) {
             IGRAPH_ERROR("Cannot create neighborhood graph", IGRAPH_ENOMEM);
         }
@@ -441,8 +447,8 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

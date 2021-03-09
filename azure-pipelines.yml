@@ -104,6 +104,7 @@ jobs:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
+          vcpkg_target_triplet: x64-windows
 
   - job: documentation
     steps:

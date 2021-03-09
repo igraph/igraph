@@ -529,12 +529,12 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
 
 igraph_real_t igraph_pajek_get_number(const char *str, long int length) {
   igraph_real_t num;
-  char *tmp=igraph_Calloc(length+1, char);
+  char *tmp=IGRAPH_CALLOC(length+1, char);
   
   strncpy(tmp, str, length);
   tmp[length]='\0';
   sscanf(tmp, "%lf", &num);
-  igraph_Free(tmp);
+  IGRAPH_FREE(tmp);
   return num;
 } 
 
@@ -554,8 +554,8 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   igraph_trie_get(names, attrname, &id);
   if (id == attrsize) {
     /* add a new attribute */
-    rec=igraph_Calloc(1, igraph_attribute_record_t);
-    na=igraph_Calloc(1, igraph_vector_t);
+    rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    na=IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_vector_init(na, count);
     rec->name=strdup(attrname);
     rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
@@ -597,8 +597,8 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   igraph_trie_get(names, attrname, &id);
   if (id == attrsize) {
     /* add a new attribute */
-    rec=igraph_Calloc(1, igraph_attribute_record_t);
-    na=igraph_Calloc(1, igraph_strvector_t);
+    rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    na=IGRAPH_CALLOC(1, igraph_strvector_t);
     igraph_strvector_init(na, count);
     for (i=0; i<count; i++) {
       igraph_strvector_set(na, i, "");
@@ -629,7 +629,7 @@ int igraph_i_pajek_add_string_vertex_attribute(const char *name,
   char *tmp;
   int ret;
 
-  tmp=igraph_Calloc(len+1, char);
+  tmp=IGRAPH_CALLOC(len+1, char);
   if (tmp==0) {
     IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
   }
@@ -643,7 +643,7 @@ int igraph_i_pajek_add_string_vertex_attribute(const char *name,
 					  name, context->actvertex-1,
 					  tmp);
   
-  igraph_Free(tmp);
+  IGRAPH_FREE(tmp);
   IGRAPH_FINALLY_CLEAN(1);
   
   return ret;
@@ -656,7 +656,7 @@ int igraph_i_pajek_add_string_edge_attribute(const char *name,
   char *tmp;
   int ret;
 
-  tmp=igraph_Calloc(len+1, char);
+  tmp=IGRAPH_CALLOC(len+1, char);
   if (tmp==0) {
     IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
   }
@@ -670,7 +670,7 @@ int igraph_i_pajek_add_string_edge_attribute(const char *name,
 					  name, context->actedge-1,
 					  tmp);
 
-  igraph_Free(tmp);
+  IGRAPH_FREE(tmp);
   IGRAPH_FINALLY_CLEAN(1);
   
   return ret;
@@ -722,8 +722,8 @@ int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
   }
   
   /* add a new attribute */
-  rec=igraph_Calloc(1, igraph_attribute_record_t);
-  na=igraph_Calloc(1, igraph_vector_t);
+  rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
+  na=IGRAPH_CALLOC(1, igraph_vector_t);
   igraph_vector_init(na, n);
   rec->name=strdup(attrname);
   rec->type=IGRAPH_ATTRIBUTE_NUMERIC;

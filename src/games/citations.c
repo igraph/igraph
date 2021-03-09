@@ -134,13 +134,13 @@ int igraph_lastcit_game(igraph_t *graph,
     binwidth = no_of_nodes / agebins + 1;
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-    lastcit = igraph_Calloc(no_of_nodes, long int);
+    lastcit = IGRAPH_CALLOC(no_of_nodes, long int);
     if (!lastcit) {
         IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, lastcit);
 
-    index = igraph_Calloc(no_of_nodes + 1, long int);
+    index = IGRAPH_CALLOC(no_of_nodes + 1, long int);
     if (!index) {
         IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
     }
@@ -421,7 +421,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-    str.sumtrees = sumtrees = igraph_Calloc(no_of_types, igraph_psumtree_t);
+    str.sumtrees = sumtrees = IGRAPH_CALLOC(no_of_types, igraph_psumtree_t);
     if (!sumtrees) {
         IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM);
     }

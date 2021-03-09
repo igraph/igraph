@@ -31,6 +31,7 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
+#include "properties/properties_internal.h"
 
 /**
  * \function igraph_transitivity_avglocal_undirected
@@ -119,7 +120,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
         IGRAPH_ERROR("Undirected average local transitivity failed.",
                      IGRAPH_ENOMEM);
@@ -170,7 +171,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     *res = sum / count;
 
     igraph_vector_destroy(&triangles);
-    igraph_Free(neis);
+    IGRAPH_FREE(neis);
     igraph_adjlist_destroy(&allneis);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&order);
@@ -257,7 +258,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
         VECTOR(rank)[ (long int) VECTOR(order)[i] ] = affected_nodes - i - 1;
     }
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
         IGRAPH_ERROR("local transitivity calculation failed", IGRAPH_ENOMEM);
     }
@@ -517,15 +518,15 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     }
 }
 
-int igraph_adjacent_triangles1(const igraph_t *graph,
-                               igraph_vector_t *res,
-                               const igraph_vs_t vids) {
+static int igraph_adjacent_triangles1(const igraph_t *graph,
+                                      igraph_vector_t *res,
+                                      const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
     return 0;
 }
 
-int igraph_adjacent_triangles4(const igraph_t *graph,
-                               igraph_vector_t *res) {
+static int igraph_adjacent_triangles4(const igraph_t *graph,
+                                      igraph_vector_t *res) {
 # include "properties/triangles_template.h"
     return 0;
 }
@@ -665,7 +666,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
         IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
     }
@@ -700,7 +701,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
         }
     }
 
-    igraph_Free(neis);
+    IGRAPH_FREE(neis);
     igraph_adjlist_destroy(&allneis);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&order);

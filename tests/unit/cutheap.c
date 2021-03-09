@@ -44,10 +44,6 @@ int main() {
 
     igraph_i_cutheap_destroy(&ch);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-        return 1;
-    }
-
     VERIFY_FINALLY_STACK();
 
     return 0;
