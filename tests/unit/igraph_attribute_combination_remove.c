@@ -25,10 +25,11 @@ void print_comb(igraph_attribute_combination_t *comb) {
     for (i = 0; i < igraph_vector_ptr_size(&comb->list); i++) {
         r = VECTOR(comb->list)[i];
         if (r->name) {
-            printf("name: %s\n", r->name);
+            printf("name: %s", r->name);
         } else {
-            printf("name: NULL\n");
+            printf("name: NULL");
         }
+        printf(", type: %d\n", r->type);
     }
     printf("\n");
 }

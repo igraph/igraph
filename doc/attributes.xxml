@@ -31,7 +31,7 @@
 <title>Accessing attributes from C</title>
 <!-- doxrox-include cattributes -->
 
-<section id="query-attributes"><title>Query C attributes</title>
+<section id="query-attributes"><title>Query attributes</title>
 <!-- doxrox-include igraph_cattribute_list -->
 <!-- doxrox-include igraph_cattribute_has_attr -->
 <!-- doxrox-include igraph_cattribute_GAN -->
@@ -67,7 +67,7 @@
 </section>
 
 <section id="set-attributes">
-<title>Set C attributes</title>
+<title>Set attributes</title>
 <!-- doxrox-include igraph_cattribute_GAN_set -->
 <!-- doxrox-include SETGAN -->
 <!-- doxrox-include igraph_cattribute_GAB_set -->
@@ -100,7 +100,7 @@
 <!-- doxrox-include SETEASV -->
 </section>
 
-<section id="remove-attributes"><title>Remove C attributes</title>
+<section id="remove-attributes"><title>Remove attributes</title>
 <!-- doxrox-include igraph_cattribute_remove_g -->
 <!-- doxrox-include DELGA -->
 <!-- doxrox-include igraph_cattribute_remove_v -->
