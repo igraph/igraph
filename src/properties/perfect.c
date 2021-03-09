@@ -123,6 +123,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     start = girth > comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start + 1 : start + 2;
     for (i = start; i <= num_of_vertices; i += 2) {
+        IGRAPH_ALLOW_INTERRUPTION();
 
         IGRAPH_CHECK(igraph_ring(&cycle, i, 0, 0, 1));
         IGRAPH_FINALLY(igraph_destroy, &cycle);
@@ -149,7 +150,6 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_ALLOW_INTERRUPTION();
     *perfect = 1;
 
     igraph_destroy(&comp_graph);
