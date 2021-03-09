@@ -29,27 +29,24 @@
 
 /**
  * \function igraph_is_perfect
- * \brief Check if the graph is perfect.
+ * \brief Checks if the graph is perfect.
  *
  * </para><para>
- *
- * </para><para>
- * A perfect graph is a graph in which the chromatic number of every induced
+ * A perfect graph is an undirected graph in which the chromatic number of every induced
  * subgraph equals the order of the largest clique of that subgraph.
  * The chromatic number of a graph G is the smallest number of colors needed to
- * color the vertices of G so that no two adjacent vertices share the same color
+ * color the vertices of G so that no two adjacent vertices share the same color.
  *
  * </para><para>
  * This implementation is based on the strong perfect graph theorem which was
  * conjectured by Claude Berge and proved by Maria Chudnovsky, Neil Robertson,
  * Paul Seymour, and Robin Thomas.
  *
- * \param graph The input graph. The current implementation doesn't work with directed graphs
- *     or graphs with multi - edges.
- * \param perfect Pointer to an integer, if not \c NULL then the result
- *     will be stored here.
+ * \param graph The input graph. It is expected to be undirected and simple.
+ * \param perfect Pointer to an integer, the result will be stored here.
  * \return Error code.
  *
+ * Time complexity: exponential.
  */
 int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
