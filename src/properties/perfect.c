@@ -44,8 +44,8 @@
  * conjectured by Claude Berge and proved by Maria Chudnovsky, Neil Robertson,
  * Paul Seymour, and Robin Thomas.
  * 
- * \param graph The input graph. The current implementation works for undirected graphs only,
- *     directed graphs are treated as undirected graphs. Self-loops and multiple edges are ignored.
+ * \param graph The input graph. The current implementation doesn't work with directed graphs
+ *     or graphs with multi - edges.
  * \param perfect Pointer to an integer, if not \c NULL then the result
  *     will be stored here.
  * \return Error code.
@@ -53,7 +53,7 @@
  */
 int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     
-    igraph_bool_t is_bipartite, is_chordal, iso;
+    igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
     igraph_integer_t girth, comp_girth, num_of_vertices = igraph_vcount(graph);
     igraph_integer_t start;
     long int i;
@@ -68,13 +68,19 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         IGRAPH_ERROR("perfect graph function doesn't support directed graphs", IGRAPH_EINVAL);
     }
 
+    //If the graph isn't simple then return an error
+    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
+    if (!is_simple) {
+        IGRAPH_ERROR("perfect graph function doesn't support graphs with multi edges", IGRAPH_EINVAL);
+    }
+
     
     IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, NULL));
     IGRAPH_CHECK(igraph_is_chordal(graph, NULL, NULL, &is_chordal, NULL, NULL));
     // chordal and bipartite graph types are perfect. 
     // possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
 
-    if ((is_chordal) || (is_bipartite)) {
+    if (is_chordal || is_bipartite) {
         *perfect = 1;
         return IGRAPH_SUCCESS;
     }
@@ -87,6 +93,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     if (is_chordal || is_bipartite) {
         *perfect = 1;
         igraph_destroy(&comp_graph);
+        IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
 
@@ -107,10 +114,10 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         return IGRAPH_SUCCESS;
     }
 
-    // since bipartiteQ() also catches trees, at this point girth and comp_girth are both at least 3.
+    // since igraph_is_bipartite also catches trees, at this point girth and comp_girth are both at least 3.
     // for trees, their value would have been 0
 
-    //strong perfect graph theorem
+    // strong perfect graph theorem
     // a graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
     start = girth > comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start+1 : start+2;
@@ -136,10 +143,11 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
             return IGRAPH_SUCCESS;
         }
         igraph_destroy(&cycle);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     IGRAPH_ALLOW_INTERRUPTION();
     *perfect = 1;
     igraph_destroy(&comp_graph);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
