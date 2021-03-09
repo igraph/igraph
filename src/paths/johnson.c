@@ -89,14 +89,21 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+    /* If no edges, then we can just run the unweighted version */
+    if (no_of_edges == 0) {
+        return igraph_shortest_paths(graph, res, from, to, IGRAPH_OUT);
     }
 
     /* If no negative weights, then we can run Dijkstra's algorithm */
-    if (no_of_edges == 0 || igraph_vector_min(weights) >= 0) {
-        return igraph_shortest_paths_dijkstra(graph, res, from, to,
-                                              weights, IGRAPH_OUT);
+    {
+        igraph_real_t min_weight = igraph_vector_min(weights);
+        if (igraph_is_nan(min_weight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
+        if (min_weight >= 0) {
+            return igraph_shortest_paths_dijkstra(graph, res, from, to,
+                                                  weights, IGRAPH_OUT);
+        }
     }
 
     if (!igraph_is_directed(graph)) {
