@@ -179,6 +179,7 @@ add_legacy_tests(
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_grg_game
   igraph_growing_random_game
   igraph_k_regular_game
   igraph_lastcit_game
@@ -258,6 +259,7 @@ add_legacy_tests(
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
@@ -547,6 +549,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_attribute_combination_remove
   cattributes5
 )
 add_legacy_tests(

@@ -17,9 +17,18 @@
 <!-- doxrox-include igraph_attribute_type_t -->
 </section>
 
+<section id="attribute-combinations">
+<title>Handling attribute combination lists</title>
+<!-- doxrox-include about_attribute_combination -->
+<!-- doxrox-include igraph_attribute_combination_init -->
+<!-- doxrox-include igraph_attribute_combination_add -->
+<!-- doxrox-include igraph_attribute_combination_remove -->
+<!-- doxrox-include igraph_attribute_combination_destroy -->
+<!-- doxrox-include igraph_attribute_combination_type_t -->
+</section>
+
 <section id="accessing-attributes-from-c">
 <title>Accessing attributes from C</title>
-
 <!-- doxrox-include cattributes -->
 
 <section id="query-attributes"><title>Query attributes</title>
