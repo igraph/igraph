@@ -100,13 +100,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     // the graph isn't perfect.
     IGRAPH_CHECK(igraph_girth(graph, &girth, NULL));
     IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
-    if ((girth > 3) && (girth % 2 == 1)) {
-        *perfect = 0;
-        igraph_destroy(&comp_graph);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
-    }
-    if ((comp_girth > 3) && (comp_girth % 2 == 1)) {
+    if (((girth > 3) && (girth % 2 == 1)) || ((comp_girth > 3) && (comp_girth % 2 == 1))) {
         *perfect = 0;
         igraph_destroy(&comp_graph);
         IGRAPH_FINALLY_CLEAN(1);
