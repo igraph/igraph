@@ -18,19 +18,21 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_centrality.h"
-
-#include "igraph_memory.h"
-#include "igraph_adjlist.h"
-#include "igraph_interface.h"
-#include "igraph_progress.h"
-#include "igraph_stack.h"
-#include "igraph_dqueue.h"
-
 #include "core/indheap.h"
 #include "core/interruption.h"
 #include "core/math.h"
 
+#include "igraph_adjlist.h"
+#include "igraph_centrality.h"
+#include "igraph_dqueue.h"
+#include "igraph_interface.h"
+#include "igraph_memory.h"
+#include "igraph_progress.h"
+#include "igraph_stack.h"
+
+
+
+// internal function to calculate the single source shortest path for unweighted scenario
 static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_t *dist, 
     double *nrgeo,
     igraph_stack_t *S,
@@ -88,6 +90,7 @@ static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_
     return IGRAPH_SUCCESS; 
 }
 
+// internal function to calculate the single source shortest path for weighted scenario
 static int igraph_i_sspf_weighted(
     const igraph_t *graph, long int source, igraph_vector_t *dist, 
     double *nrgeo, 

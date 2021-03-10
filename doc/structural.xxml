@@ -108,6 +108,11 @@
 <!-- doxrox-include igraph_edge_betweenness_cutoff -->
 </section>
 
+<section id="subset-limited-centrality-measures"><title>subset centrality measures</title>
+<!-- doxrox-include igraph_betweenness_subset-->
+<!-- doxrox-include igraph_edge_betweenness_subset-->
+</section>
+
 <section id="centralization"><title>Centralization</title>
 <!-- doxrox-include igraph_centralization -->
 <!-- doxrox-include igraph_centralization_degree -->
