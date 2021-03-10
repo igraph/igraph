@@ -779,10 +779,10 @@ int igraph_get_incidence(const igraph_t *graph,
  * Check whether a graph is bipartite
  *
  * </para><para>
- * This function simply checks whether a graph \emph{could} be
- * bipartite. It tries to find a mapping that gives a possible division
- * of the vertices into two classes, such that no two vertices of the
- * same class are connected by an edge.
+ * This function simply checks whether a graph \em could be bipartite. It tries
+ * to find a mapping that gives a possible division of the vertices into two
+ * classes, such that no two vertices of the same class are connected by an
+ * edge.
  *
  * </para><para>
  * The existence of such a mapping is equivalent of having no circuits of
