@@ -33,6 +33,7 @@ target_include_directories(
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_BINARY_DIR}/include
+  ${CMAKE_BINARY_DIR}/src # config.h for TLS
 )
 
 if (BUILD_SHARED_LIBS)

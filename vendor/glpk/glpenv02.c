@@ -23,8 +23,9 @@
 ***********************************************************************/
 
 #include "glpenv.h"
+#include "config.h"
 
-static void *tls = NULL;
+IGRAPH_THREAD_LOCAL static void *tls = NULL;
 /* in a re-entrant version of the package this variable must be placed
    in the Thread Local Storage (TLS) */
 
