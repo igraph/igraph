@@ -38,7 +38,6 @@
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
  *
- * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the
@@ -270,7 +269,6 @@ static int igraph_i_betweenness_cutoff_weighted(
  * \function igraph_betweenness_cutoff
  * \brief Range-limited betweenness centrality.
  *
- * </para><para>
  * This function computes a range-limited version of betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -736,11 +734,11 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
  * \function igraph_edge_betweenness
  * \brief Betweenness centrality of the edges.
  *
- * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
+ *
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
  *        betweenness scores for the edges.
@@ -775,8 +773,6 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \function igraph_edge_betweenness_cutoff
  * \brief Range-limited betweenness centrality of the edges.
  *
- * </para><para>
- * </para><para>
  * This function computes a range-limited version of edge betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
