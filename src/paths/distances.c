@@ -371,6 +371,9 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             while (1) {
                 vid_end = vid_ecc;
 
+                /* TODO: In the undirected case, we break ties between vertices at the
+                 * same distance based on their degree. In te directed case, should we
+                 * use in-, out- or total degree? */
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_ecc),
                                                    &adjlist_out, &vid_ecc_out, 1));
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_ecc),
