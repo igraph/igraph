@@ -43,7 +43,6 @@ int main() {
     igraph_destroy(&graph);
     igraph_destroy(&comp_graph);
 
-
     // A cycle of size 5
     //==========================================================
     igraph_ring(&graph, 5, IGRAPH_UNDIRECTED, 0, 1);
@@ -51,11 +50,53 @@ int main() {
     IGRAPH_ASSERT(!is_perfect);
     igraph_destroy(&graph);
 
+    // A complement cycle of size 7
+    //==========================================================
+    igraph_ring(&graph, 7, IGRAPH_UNDIRECTED, 0, 1);
+    igraph_complementer(&comp_graph, &graph, 0);
+    igraph_is_perfect(&comp_graph, &is_perfect);
+    IGRAPH_ASSERT(!is_perfect);
+    igraph_destroy(&graph);
+    igraph_destroy(&comp_graph);
+
+    // A random tree
+    //==========================================================
+    igraph_tree_game(&graph, 10, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER);
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(is_perfect);
+    igraph_destroy(&graph);
+
+    // 4X4 grid
+    //==========================================================
+    igraph_vector_t dims;
+    igraph_vector_init(&dims, 2);
+    VECTOR(dims)[0] = 4;
+    VECTOR(dims)[1] = 4;
+    igraph_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(is_perfect);
+    igraph_destroy(&graph);
+    igraph_vector_destroy(&dims);
+
     // Paley graph of order 9
     //==========================================================
     igraph_small(&graph, 9, IGRAPH_UNDIRECTED,
                  0, 1, 0, 3, 0, 6, 0, 2, 1, 2, 1, 4, 1, 7, 2, 5, 2, 8,
                  3, 4, 3, 5, 3, 6, 4, 5, 4, 7, 5, 8, 6, 7, 7, 8, 6, 8, -1);
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(is_perfect);
+    igraph_destroy(&graph);
+
+    // famous graph - chvatal
+    //==========================================================
+    igraph_famous(&graph, "Chvatal");
+    igraph_is_perfect(&graph, &is_perfect);
+    IGRAPH_ASSERT(!is_perfect);
+    igraph_destroy(&graph);
+
+    // famous graph - house
+    //==========================================================
+    igraph_famous(&graph, "House");
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);

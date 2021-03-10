@@ -75,9 +75,13 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     // Chordal and bipartite graph types are perfect.
     // possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
     IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, NULL));
-    IGRAPH_CHECK(igraph_is_chordal(graph, NULL, NULL, &is_chordal, NULL, NULL));
+    if (is_bipartite) {
+        *perfect = 1;
+        return IGRAPH_SUCCESS;
+    }
 
-    if (is_chordal || is_bipartite) {
+    IGRAPH_CHECK(igraph_is_chordal(graph, NULL, NULL, &is_chordal, NULL, NULL));
+    if (is_chordal) {
         *perfect = 1;
         return IGRAPH_SUCCESS;
     }
@@ -88,23 +92,29 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     IGRAPH_FINALLY(igraph_destroy, &comp_graph);
 
     IGRAPH_CHECK(igraph_is_bipartite(&comp_graph, &is_bipartite, NULL));
-    IGRAPH_CHECK(igraph_is_chordal(&comp_graph, NULL, NULL, &is_chordal, NULL, NULL));
-    if (is_chordal || is_bipartite) {
+    if (is_bipartite) {
         *perfect = 1;
-        igraph_destroy(&comp_graph);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
+        goto clean1;
+    }
+
+    IGRAPH_CHECK(igraph_is_chordal(&comp_graph, NULL, NULL, &is_chordal, NULL, NULL));
+    if (is_chordal) {
+        *perfect = 1;
+        goto clean1;
     }
 
     // If the girth (or the smallest circle in the graph) is bigger than 3 and have odd number of vertices then
     // the graph isn't perfect.
     IGRAPH_CHECK(igraph_girth(graph, &girth, NULL));
-    IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
-    if (((girth > 3) && (girth % 2 == 1)) || ((comp_girth > 3) && (comp_girth % 2 == 1))) {
+    if ((girth > 3) && (girth % 2 == 1)) {
         *perfect = 0;
-        igraph_destroy(&comp_graph);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
+        goto clean1;
+    }
+
+    IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
+    if ((comp_girth > 3) && (comp_girth % 2 == 1)) {
+        *perfect = 0;
+        goto clean1;
     }
 
     // Since igraph_is_bipartite also catches trees, at this point girth and comp_girth are both at least 3.
@@ -126,10 +136,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
             IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
             if (iso) {
                 *perfect = 0;
-                igraph_destroy(&cycle);
-                igraph_destroy(&comp_graph);
-                IGRAPH_FINALLY_CLEAN(2);
-                return IGRAPH_SUCCESS;
+                goto clean2;
             }
         }
 
@@ -137,10 +144,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
             IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
             if (iso) {
                 *perfect = 0;
-                igraph_destroy(&cycle);
-                igraph_destroy(&comp_graph);
-                IGRAPH_FINALLY_CLEAN(2);
-                return IGRAPH_SUCCESS;
+                goto clean2;
             }
         }
 
@@ -149,9 +153,15 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     }
 
     *perfect = 1;
-
-    igraph_destroy(&comp_graph);
-    IGRAPH_FINALLY_CLEAN(1);
+    clean1:
+        igraph_destroy(&comp_graph);
+        IGRAPH_FINALLY_CLEAN(1);
+        return IGRAPH_SUCCESS;
+    clean2:
+        igraph_destroy(&cycle);
+        igraph_destroy(&comp_graph);
+        IGRAPH_FINALLY_CLEAN(2);
+        return IGRAPH_SUCCESS;
 
     return IGRAPH_SUCCESS;
 }
