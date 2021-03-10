@@ -825,7 +825,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
 /**
  * \function igraph_hub_score
- * Kleinberg's hub scores
+ * \brief Kleinberg's hub scores.
  *
  * The hub scores of the vertices are defined as the principal
  * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
@@ -871,7 +871,7 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 
 /**
  * \function igraph_authority_score
- * Kleinerg's authority scores
+ * \brief Kleinerg's authority scores.
  *
  * The authority scores of the vertices are defined as the principal
  * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency

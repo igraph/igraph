@@ -1,0 +1,16 @@
+No vertices, not directed:
+No vertices, directed:
+Directed graph with loops and multi-edges with negative loop:
+Directed graph with loops and multi-edges:
+[        0       -1       -3        1        6      Inf
+         1        0       -2        2        7      Inf
+         3        2        0        4        9      Inf
+       Inf      Inf      Inf        0        5      Inf
+       Inf      Inf      Inf      Inf        0      Inf
+       Inf      Inf      Inf      Inf      Inf        0 ]
+Directed graph with loops and multi-edges, select vertices 1 and 2:
+[        0       -2
+         2        0 ]
+Directed graph with loops and multi-edges, select 0 -> 2:
+[       -3 ]
+Directed graph with loops and multi-edges, select none:
