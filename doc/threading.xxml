@@ -6,13 +6,16 @@
 
 <section id="using-igraph-in-multi-threaded-programs"><title>Using igraph in multi-threaded programs</title>
 <para>
-  The igraph library is considered thread-safe on platforms that 
-  support thread-local storage. This currently includes Linux and MS
-  Windows operating systems, but not Mac OSX. The best way to check 
-  whether an igraph build is thread-safe is checking the 
+  The igraph library is considered thread-safe if it has been compiled
+  with thread-local storage enabled, i.e. the <literal>IGRAPH_ENABLE_TLS</literal>
+  setting was toggled to <literal>ON</literal> and the current platform
+  supports this feature. To check whether an igraph build is thread-safe, use the
   <link linkend="IGRAPH_THREAD_SAFE">
     <function>IGRAPH_THREAD_SAFE</function>
-  </link> macro.
+  </link> 
+  macro. When linking to external versions of igraph's dependencies, it is
+  the responsibility of the user to check that these dependencies were also
+  compiled to be thread-safe.
 </para>
 
 <!-- doxrox-include IGRAPH_THREAD_SAFE -->
