@@ -118,6 +118,8 @@ int main() {
     print_vector(&eb);
     igraph_destroy(&g);
 
+    igraph_vector_destroy(&eb);
+
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
            will choke on an overlong argument list with "internal error C1001". */
@@ -148,9 +150,9 @@ int main() {
         print_vector(&eb);
 
         printf("\nNo cutoff, undirected, unit weighted\n");
+        igraph_vector_init(&eb2, 0);
         igraph_vector_init(&weights, igraph_ecount(&g));
         igraph_vector_fill(&weights, 1.0);
-        igraph_vector_init(&eb2, 0);
         igraph_edge_betweenness(&g, &eb2, IGRAPH_UNDIRECTED, &weights);
         print_vector(&eb2);
 
@@ -160,6 +162,7 @@ int main() {
         igraph_vector_abs(&eb);
         IGRAPH_ASSERT(igraph_vector_max(&eb) < 1e-13);
 
+        igraph_vector_destroy(&weights);
         igraph_vector_destroy(&eb2);
         igraph_vector_destroy(&eb);
         igraph_destroy(&g);
