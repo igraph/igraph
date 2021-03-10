@@ -1,6 +1,6 @@
 include(helpers)
 
-tristate(IGRAPH_ENABLE_LTO "Enable link-time optimization" AUTO)
+tristate(IGRAPH_ENABLE_LTO "Enable link-time optimization" OFF)
 
 include(CheckIPOSupported)
 
