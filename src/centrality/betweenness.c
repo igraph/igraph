@@ -30,7 +30,7 @@
 
 
 
-// internal function to calculate the single source shortest path for unweighted scenario
+// Internal function to calculate the single source shortest path for unweighted scenario.
 static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_t *dist, 
     double *nrgeo,
     igraph_stack_t *S,
@@ -88,7 +88,7 @@ static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_
     return IGRAPH_SUCCESS; 
 }
 
-// internal function to calculate the single source shortest path for weighted scenario
+// Internal function to calculate the single source shortest path for weighted scenario.
 static int igraph_i_sspf_weighted(
     const igraph_t *graph, long int source, igraph_vector_t *dist, 
     double *nrgeo, 
