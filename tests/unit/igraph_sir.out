@@ -1,0 +1,50 @@
+Only one person, low recovery rate:
+times: ( 0 5930.86 )
+susceptibles: ( 0 0 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
+times: ( 0 4639.88 )
+susceptibles: ( 0 0 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
+
+Two people, not connected, only one infection expected:
+times: ( 0 0.1937 )
+susceptibles: ( 1 1 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
+times: ( 0 1.63425 )
+susceptibles: ( 1 1 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
+
+Line:
+times: ( 0 0.462228 0.971971 1.04742 2.13843 2.13856 2.18094 2.23045 )
+susceptibles: ( 4 3 2 2 1 1 1 1 )
+infected: ( 1 2 3 2 3 2 1 0 )
+recovered: ( 0 0 0 1 1 2 3 4 )
+times: ( 0 1.31391 1.3263 1.97259 3.60554 3.76688 )
+susceptibles: ( 4 3 3 2 2 2 )
+infected: ( 1 2 1 2 1 0 )
+recovered: ( 0 0 1 1 2 3 )
+
+Line, low infection rate, few infections expected:
+times: ( 0 0.236725 )
+susceptibles: ( 4 4 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
+times: ( 0 0.0284632 )
+susceptibles: ( 4 4 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
+
+Full graph, more infections expected than line with same rates:
+times: ( 0 0.145069 0.190146 0.268184 0.316989 0.522791 1.39469 1.91247 2.09574 2.31573 )
+susceptibles: ( 4 3 2 1 1 0 0 0 0 0 )
+infected: ( 1 2 3 4 3 4 3 2 1 0 )
+recovered: ( 0 0 0 0 1 1 2 3 4 5 )
+times: ( 0 0.574604 0.597026 0.633142 0.750641 0.758668 0.782023 1.40373 1.55961 2.83335 )
+susceptibles: ( 4 3 2 1 0 0 0 0 0 0 )
+infected: ( 1 2 3 4 5 4 3 2 1 0 )
+recovered: ( 0 0 0 0 0 1 2 3 4 5 )
+

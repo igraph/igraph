@@ -756,3 +756,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   zero_allocs
 )
+
+# simulation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sir
+)
+
