@@ -31,6 +31,7 @@ int main() {
 
         VECTOR(weights)[e] = hypot(VECTOR(x)[u] - VECTOR(x)[v], VECTOR(y)[u] - VECTOR(y)[v]);
     }
+    igraph_eit_destroy(&eit);
 
     /* Compute average path length */
 
