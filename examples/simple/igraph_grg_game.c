@@ -24,7 +24,7 @@ int main() {
 
     igraph_vector_init(&weights, igraph_ecount(&graph));
     igraph_eit_create(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
-    for (; IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+    for (; ! IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         long int e = IGRAPH_EIT_GET(eit);
         long int u = IGRAPH_FROM(&graph, e);
         long int v = IGRAPH_TO(&graph, e);
@@ -36,7 +36,7 @@ int main() {
 
     igraph_average_path_length_dijkstra(&graph, &avg_dist, NULL, &weights, IGRAPH_UNDIRECTED, /* unconn */ 1);
 
-    printf("Average distance in the geometric graph: %f.\n", avg_dist);
+    printf("Average distance in the geometric graph: %g.\n", avg_dist);
 
     /* Destroy data structures when no longer needed */
 
