@@ -680,7 +680,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
 /**
  * \ingroup structural
  * \function igraph_betweenness_subset
- * \brief betweenness centrality for subset of vertices.
+ * \brief betweenness centrality for subset of source and target vertices.
  *
  * </para><para>
  * This function computes the subset version of betweenness centrality
@@ -709,13 +709,13 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  *        \c IGRAPH_EINVVID, invalid vertex id passed in
  *        \p vids.
  *
- * Time complexity: O(|V||E|),
- * |S| The number of vertices in the group
+ * Time complexity: O(|S||E|),
+ * |S| The number of vertices in the subset
  * |E| The number of edges in the graph
  *
- * \sa \ref igraph_betweenness() to calculate the exact betweenness and
- * \ref igraph_edge_betweenness_cutoff() to calculate the range-limited
- * edge betweenness.
+ * \sa \ref igraph_betweenness() to calculate the exact vertex betweenness and
+ * \ref igraph_betweenness_cutoff() to calculate the range-limited vertex
+ * betweenness.
  */
 int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_bool_t directed,
@@ -877,9 +877,9 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 /**
  * \ingroup structural
  * \function igraph_edge_betweenness_subset
- * \brief Find the shortest path edge betweenness centrality for subset of vertices
+ * \brief Find the shortest path edge betweenness centrality for subset of source
+ * and target vertices
  *
- * </para><para>
  * </para><para>
  * This function computes a subset version of edge betweenness centrality
  * by considering only those shortest paths betweenn two vertices in a subset.
@@ -904,13 +904,12 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
  *
- * Time complexity: O(|V||E|),
- * |V| and
- * |E| are the number of vertices and
- * edges in the graph.
+ * Time complexity: O(|S||E|),
+ * |S| The number of vertices in the subset
+ * |E| The number of edges in the graph
  *
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
- * \ref igraph_betweenness_cutoff() to compute the range-limited vertex betweenness.
+ * \ref igraph_edge_betweenness_cutoff() to compute the range-limited edge betweenness.
  */
 int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                                    const igraph_es_t eids, igraph_bool_t directed,
