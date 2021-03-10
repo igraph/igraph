@@ -179,6 +179,7 @@ add_legacy_tests(
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_grg_game
   igraph_growing_random_game
   igraph_k_regular_game
   igraph_lastcit_game

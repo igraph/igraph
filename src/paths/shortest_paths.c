@@ -359,8 +359,9 @@ int igraph_average_path_length(const igraph_t *graph,
  * Time complexity: O(|V| |E| log|E| + |V|), where |V| is the number of
  * vertices and |E| is the number of edges.
  *
- * * \sa \ref igraph_average_path_length() for a slightly faster unweighted version.
+ * \sa \ref igraph_average_path_length() for a slightly faster unweighted version.
  *
+ * \example examples/simple/igraph_grg_game.c
  */
 
 int igraph_average_path_length_dijkstra(const igraph_t *graph,
