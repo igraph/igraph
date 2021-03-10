@@ -103,6 +103,7 @@ int main() {
     igraph_t g;
     igraph_vector_t eb;
 
+    printf("No cutoff\n");
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
            will choke on an overlong argument list with "internal error C1001". */
@@ -134,6 +135,7 @@ int main() {
         igraph_destroy(&g);
     }
 
+    printf("\nSmall undirected unweighted graph 1, cutoff=2\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, 0);
@@ -142,6 +144,7 @@ int main() {
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
+    printf("\nSmall undirected unweighted graph 2, cutoff=2\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
                  6, 7, 7, 8, -1);
@@ -151,8 +154,10 @@ int main() {
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
+    printf("\nTesting bug 950, tolerances\n");
     test_bug950();
 
+    printf("\nTesting bug 1050, cutoff values\n");
     test_bug1050();
 
     VERIFY_FINALLY_STACK();
