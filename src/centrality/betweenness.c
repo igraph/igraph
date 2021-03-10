@@ -309,13 +309,13 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_destroy, &S);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
-
     nrgeo = igraph_Calloc(no_of_nodes, double);
+
     if (nrgeo == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
-    tmpscore = igraph_Calloc(no_of_nodes, double);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
@@ -777,11 +777,12 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     nrgeo = igraph_Calloc(no_of_nodes, double);
+
     if (nrgeo == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
-    tmpscore = igraph_Calloc(no_of_nodes, double);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }

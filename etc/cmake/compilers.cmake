@@ -18,11 +18,11 @@ macro(use_all_warnings TARGET_NAME)
     target_compile_options(${TARGET_NAME} PRIVATE 
       # GCC-style compilers:
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-sign-compare -Wno-varargs
+        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare -Wno-varargs
       >
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-sign-compare
+        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
         # disable #188: enumerated type mixed with another type; affecting IGRAPH_CHECK
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED

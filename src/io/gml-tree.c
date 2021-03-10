@@ -47,7 +47,7 @@ int igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
     VECTOR(t->types)[0] = IGRAPH_I_GML_TREE_INTEGER;
 
     /* children */
-    p = igraph_Calloc(1, igraph_integer_t);
+    p = IGRAPH_CALLOC(1, igraph_integer_t);
     if (!p) {
         IGRAPH_ERROR("Cannot create integer GML tree node", IGRAPH_ENOMEM);
     }
@@ -78,7 +78,7 @@ int igraph_gml_tree_init_real(igraph_gml_tree_t *t,
     VECTOR(t->types)[0] = IGRAPH_I_GML_TREE_REAL;
 
     /* children */
-    p = igraph_Calloc(1, igraph_real_t);
+    p = IGRAPH_CALLOC(1, igraph_real_t);
     if (!p) {
         IGRAPH_ERROR("Cannot create real GML tree node", IGRAPH_ENOMEM);
     }
@@ -163,19 +163,19 @@ void igraph_gml_tree_destroy(igraph_gml_tree_t *t) {
         switch (type) {
         case IGRAPH_I_GML_TREE_TREE:
             igraph_gml_tree_destroy(VECTOR(t->children)[i]);
-            igraph_Free(VECTOR(t->names)[i]);
+            IGRAPH_FREE(VECTOR(t->names)[i]);
             break;
         case IGRAPH_I_GML_TREE_INTEGER:
-            igraph_Free(VECTOR(t->children)[i]);
-            igraph_Free(VECTOR(t->names)[i]);
+            IGRAPH_FREE(VECTOR(t->children)[i]);
+            IGRAPH_FREE(VECTOR(t->names)[i]);
             break;
         case IGRAPH_I_GML_TREE_REAL:
-            igraph_Free(VECTOR(t->children)[i]);
-            igraph_Free(VECTOR(t->names)[i]);
+            IGRAPH_FREE(VECTOR(t->children)[i]);
+            IGRAPH_FREE(VECTOR(t->names)[i]);
             break;
         case IGRAPH_I_GML_TREE_STRING:
-            igraph_Free(VECTOR(t->children)[i]);
-            igraph_Free(VECTOR(t->names)[i]);
+            IGRAPH_FREE(VECTOR(t->children)[i]);
+            IGRAPH_FREE(VECTOR(t->names)[i]);
             break;
         case IGRAPH_I_GML_TREE_DELETED:
             break;
@@ -184,7 +184,7 @@ void igraph_gml_tree_destroy(igraph_gml_tree_t *t) {
     igraph_vector_ptr_destroy(&t->names);
     igraph_vector_char_destroy(&t->types);
     igraph_vector_ptr_destroy(&t->children);
-    igraph_Free(t);
+    IGRAPH_FREE(t);
 }
 
 long int igraph_gml_tree_length(const igraph_gml_tree_t *t) {
@@ -252,8 +252,8 @@ void igraph_gml_tree_delete(igraph_gml_tree_t *t, long int pos) {
     if (VECTOR(t->types)[pos] == IGRAPH_I_GML_TREE_TREE) {
         igraph_gml_tree_destroy(VECTOR(t->children)[pos]);
     }
-    igraph_Free(VECTOR(t->names)[pos]);
-    igraph_Free(VECTOR(t->children)[pos]);
+    IGRAPH_FREE(VECTOR(t->names)[pos]);
+    IGRAPH_FREE(VECTOR(t->children)[pos]);
     VECTOR(t->children)[pos] = 0;
     VECTOR(t->names)[pos] = 0;
     VECTOR(t->types)[pos] = IGRAPH_I_GML_TREE_DELETED;

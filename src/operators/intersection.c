@@ -148,7 +148,7 @@ int igraph_intersection_many(igraph_t *res,
 
     if (edgemaps) {
         for (i = 0; i < no_of_graphs; i++) {
-            VECTOR(*edgemaps)[i] = igraph_Calloc(1, igraph_vector_t);
+            VECTOR(*edgemaps)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!VECTOR(*edgemaps)[i]) {
                 IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
             }
@@ -166,8 +166,8 @@ int igraph_intersection_many(igraph_t *res,
         IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vector_longs, &order_vects);
     }
     for (i = 0; i < no_of_graphs; i++) {
-        VECTOR(edge_vects)[i] = igraph_Calloc(1, igraph_vector_t);
-        VECTOR(order_vects)[i] = igraph_Calloc(1, igraph_vector_long_t);
+        VECTOR(edge_vects)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
+        VECTOR(order_vects)[i] = IGRAPH_CALLOC(1, igraph_vector_long_t);
         if (! VECTOR(edge_vects)[i] || ! VECTOR(order_vects)[i]) {
             IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
         }

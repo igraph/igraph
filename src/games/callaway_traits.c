@@ -44,6 +44,15 @@
  * \p pref_matrix. Then another two vertices are selected and this is
  * repeated \p edges_per_step times in each time step.
  *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * D. S. Callaway, J. E. Hopcroft, J. M. Kleinberg, M. E. J. Newman, and S. H. Strogatz,
+ * Are randomly grown graphs really random?
+ * Phys. Rev. E 64, 041902 (2001).
+ * https://doi.org/10.1103/PhysRevE.64.041902
+ *
  * \param graph Pointer to an uninitialized graph.
  * \param nodes The number of nodes in the graph.
  * \param types Number of node types.
@@ -143,7 +152,7 @@ int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
         nodetypes = node_type_vec;
         IGRAPH_CHECK(igraph_vector_resize(nodetypes, nodes));
     } else {
-        nodetypes = igraph_Calloc(1, igraph_vector_t);
+        nodetypes = IGRAPH_CALLOC(1, igraph_vector_t);
         if (! nodetypes) {
             IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM);
         }
@@ -178,7 +187,7 @@ int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
 
     if (! node_type_vec) {
         igraph_vector_destroy(nodetypes);
-        igraph_Free(nodetypes);
+        IGRAPH_FREE(nodetypes);
         IGRAPH_FINALLY_CLEAN(2);
     }
     igraph_vector_destroy(&cumdist);

@@ -3,7 +3,7 @@
 [igraph](https://igraph.org) includes or links to code from the following sources.
 
 
-#### [bliss 0.74](https://users.aalto.fi/~tjunttil/bliss/)
+#### [bliss 0.75](https://users.aalto.fi/~tjunttil/bliss/)
 
 Copyright (c) 2003-2021 Tommi Junttila.
 

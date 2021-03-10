@@ -526,10 +526,10 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
 /***** Harmonic centrality *****/
 
-int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_vs_t vids, igraph_neimode_t mode,
-                                            igraph_bool_t normalized,
-                                            igraph_real_t cutoff) {
+static int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
+                                                   const igraph_vs_t vids, igraph_neimode_t mode,
+                                                   igraph_bool_t normalized,
+                                                   igraph_real_t cutoff) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t already_counted;

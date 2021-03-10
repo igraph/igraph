@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 
-#   IGraph R package
-#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-#   334 Harvard street, Cambridge, MA 02139 USA
+#   IGraph library
+#   Copyright (C) 2005-2021  The igraph development team
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -40,19 +39,26 @@ import sys
 import re
 
 from argparse import ArgumentParser
+from collections import defaultdict, namedtuple
 from contextlib import contextmanager
+from hashlib import sha1
+from operator import itemgetter
+from pathlib import Path
 from pickle import dump, load
+from time import time
 
-#################
-# constants, these might turn to parameters some time
-#################
-doxhead = r"/\*\*"
+#: Constant indicating the start of a comment that doxrox.py will process
+DOXHEAD = r"/\*\*"
 
-#################
-# global variables
-#################
+#: Stores whether we want verbose output
 verbose = False
-cutit = False
+
+
+def fatal(message, code = 1):
+    """Prints an error message and exits the program with the given error code."""
+    print(message, file=sys.stderr)
+    sys.exit(code)
+
 
 #########################################################################
 # The main function
@@ -60,8 +66,9 @@ cutit = False
 
 
 def main():
+    """Main entry point of the script."""
 
-    global verbose, cutit
+    global verbose
 
     # get command line arguments
     parser = create_argument_parser()
@@ -69,25 +76,25 @@ def main():
 
     outputfile = arguments.output_file
     verbose = arguments.verbose
-    cutit = arguments.cut_it
-    args = arguments.inputs
+    inputs = arguments.inputs
 
     if (
-        arguments.template_file in args
-        or arguments.rules_file in args
-        or outputfile in args
+        arguments.template_file in inputs
+        or arguments.rules_file in inputs
+        or outputfile in inputs
     ):
-        print("Error, special file is also used as an input file")
-        parser.print_help()
-        sys.exit(2)
+        fatal("Special file is also used as an input file", 2)
+
+    # open the cache file if needed
+    cache = ChunkCache(arguments.cache_file) if arguments.cache_file else None
 
     # get all regular expressions
     if arguments.rules_file:
         with operation("Reading regular expressions...") as op:
-            regexlist = readregex(arguments.rules_file)
-            op("{0} rules read".format(len(regexlist)))
+            rules = read_regex_rules_file(arguments.rules_file)
+            op("{0} rules read".format(len(rules)))
     else:
-        regexlist = []
+        rules = []
 
     # parse all input files and extract chunks, apply rules
     if arguments.chunk_file:
@@ -96,25 +103,48 @@ def main():
                 with open(arguments.chunk_file, "rb") as f:
                     all_chunks = load(f)
             except IOError:
-                print("Error reading chunk file: " + arguments.chunk_file)
-                sys.exit(9)
+                fatal("Error reading chunk file: " + arguments.chunk_file, 9)
             op("{0} chunks read".format(len(all_chunks)))
     else:
-        all_chunks = dict()
+        all_chunks = {}
 
-    for ifile in args:
+    rule_timings = defaultdict(list)
+
+    for ifile in inputs:
         with operation("Parsing input file {0}...".format(ifile)) as op:
             try:
                 with open(ifile, "r") as f:
-                    strinput = f.read()
+                    contents = f.read()
             except IOError:
-                print("Error reading input file: " + ifile)
-                sys.exit(3)
+                fatal("Error reading input file: " + ifile, 3)
 
-            num_new_chunks = collect_chunks_from_input_file(
-                strinput, regexlist, all_chunks
-            )
-            op("{0} chunks read".format(num_new_chunks))
+            if cache:
+                key = cache.key_of(contents)
+                chunks = cache.get(key)
+            else:
+                key, chunks = None, None
+            
+            if chunks is not None:
+                op("{0} chunks read from cache".format(len(chunks)))
+            else:
+                chunks = collect_chunks_from_input_file(contents, rules, rule_timings)
+                op("{0} chunks parsed".format(len(chunks)))
+                if key:
+                    cache.put(key, chunks)
+
+            for name, chunk in chunks.items():
+                if name in all_chunks:
+                    fatal("Multiple files provide chunks for {0!r}".format(name), code=4)
+                all_chunks[name] = chunk
+
+    if arguments.timing_stats and rule_timings:
+        rule_timings = {name: sum(dts) / len(dts) for name, dts in rule_timings.items()}
+        for name, dt in sorted(rule_timings.items(), key=itemgetter(1), reverse=True):
+            print("{0}: {1:.3f}us".format(name, dt))
+        print("======")
+
+    if cache:
+        cache.close()
 
     if arguments.template_file:
         # substitute the template file
@@ -123,12 +153,11 @@ def main():
                 with open(arguments.template_file, "r") as tfile:
                     tstring = tfile.read()
             except IOError:
-                print("Error reading the template file: " + arguments.template_file)
-                sys.exit(7)
+                fatal("Error reading the template file: " + arguments.template_file, 7)
 
         with operation("Substituting template file..."):
             chunk_iterator = re.finditer(
-                r"<!--\s*doxrox-include\s+(\w+)\s+-->", tstring
+                r"<!--\s*doxrox-include\s+(\w+)\s*-->", tstring
             )
             outstring = []
             last = 0
@@ -136,8 +165,7 @@ def main():
                 try:
                     chunk = all_chunks[match.group(1)]
                 except KeyError:
-                    print("Chunk not found: {0}".format(match.group(1)))
-                    sys.exit(4)
+                    fatal("Chunk not found: {0}".format(match.group(1)), code=4)
                 outstring.append(tstring[last : match.start()])
                 outstring.append(chunk)
                 last = match.end()
@@ -150,8 +178,7 @@ def main():
                 with open(outputfile, "w") as ofile:
                     ofile.write(outstring)
             except IOError:
-                print("Error writing output file:" + outputfile)
-                sys.exit(8)
+                fatal("Error writing output file:" + outputfile, 8)
     else:
         # no template file given so just save the chunks as a pickle into the
         # output file
@@ -160,8 +187,7 @@ def main():
                 with open(outputfile, "wb") as ofile:
                     dump(all_chunks, ofile)
             except IOError:
-                print("Error writing output file:" + outputfile)
-                sys.exit(5)
+                fatal("Error writing output file:" + outputfile, 5)
 
 
 #########################################################################
@@ -170,8 +196,14 @@ def main():
 
 
 def create_argument_parser():
+    """Creates the command line argument parser that the script uses."""
     parser = ArgumentParser(description=sys.modules[__name__].__doc__.strip())
 
+    parser.add_argument(
+        "--cache", metavar="FILE",
+        dest="cache_file",
+        help="optional cache file to store chunks from already processed files"
+    )
     parser.add_argument(
         "-t",
         "--template",
@@ -203,13 +235,17 @@ def create_argument_parser():
         help="enable verbose output",
     )
     parser.add_argument(
-        "-c", "--cut", action="store_true", default=False, dest="cut_it"
-    )
-    parser.add_argument(
         "--chunks",
         dest="chunk_file",
         metavar="FILE",
         help="name of a previously saved chunk file",
+    )
+    parser.add_argument(
+        "--timing-stats",
+        dest="timing_stats",
+        action="store_true",
+        default=False,
+        help="print the average time it takes to process regex rules from the rules file"
     )
     parser.add_argument(
         "inputs", metavar="INPUT", nargs="*", help="input files to process"
@@ -219,128 +255,145 @@ def create_argument_parser():
 
 
 #################
-# read the regular expressions
+# classes and functions to read the regular expression rules
 #################
-def readregex(regexfile):
-    lines = []
+
+
+Rule = namedtuple("Rule", "regex replacement name type")
+
+
+def read_regex_rules_file(filename):
+    """Parses the file containing the regex-based rules that we use to chop
+    up the input source files into chunks that can later be fed into a
+    DocBook document.
+
+    Parameters:
+        filename: name of the input file
+
+    Returns:
+        the rules that were parsed from the input file
+    """
+
+    rules = []
+
+    def parse_error(lineno):
+        """Helper function to indicate a parse error at the given line."""
+        fatal(
+            "Parse error in regex file ({0}), line {1}".format(regexfile, lineno),
+            code = 4
+        )
+
+    def store(rule, replacement, rule_name, rule_type):
+        """Helper function to append the current rule to the result."""
+        regex = re.compile("".join(rule), re.VERBOSE | re.MULTILINE | re.DOTALL)
+        replacement = "".join(replacement)[:-1]
+        rules.append(Rule(regex, replacement, rule_name, rule_type))
+
     mode = "empty"
-    actreplace = ""
-    actwith = ""
-    acttype = ""
-    lineno = 1
+    regex, replacement = [], []
+    rule_name, rule_type = None, ""
+
     try:
-        with open(regexfile, "r") as f:
-            for line in f:
-                # a new pattern block starts
-                if line[0:7] == "REPLACE":
+        with open(filename, "r") as f:
+            for lineno, line in enumerate(f, 1):
+                if line.startswith("REPLACE"):
+                    # a new pattern block starts
                     if mode not in ("empty", "with"):
-                        print(
-                            "Parse error in regex file ("
-                            + regexfile
-                            + "), line "
-                            + str(lineno)
-                        )
-                        sys.exit(4)
+                        parse_error(lineno)
                     else:
-                        if actreplace != "":
-                            readregexappend(lines, actreplace, actwith, acttype)
-                        actreplace = actwith = ""
+                        if regex:
+                            store(regex, replacement, rule_name, rule_type)
+                        regex.clear()
+                        replacement.clear()
                         mode = "replace"
-                # the second half of the pattern block starts
-                elif line[0:4] == "WITH" or line[0:3] == "RUN":
+
+                        match = re.match(r"^REPLACE\s+-+\s+(?P<name>.*)\s+-", line)
+                        rule_name = match.group("name") if match else None
+                
+                elif line.startswith("WITH") or line.startswith("RUN"):
+                    # the second half of the pattern block starts
                     if mode != "replace":
-                        print(
-                            "Parse error in regex file ("
-                            + regexfile
-                            + "), line "
-                            + str(lineno)
-                        )
-                        sys.exit(4)
+                        parse_error(lineno)
                     else:
                         mode = "with"
-                    if line[0:4] == "WITH":
-                        acttype = "with"
-                    else:
-                        acttype = "run"
-                # empty line, do nothing
+                    rule_type = "with" if line.startswith("WITH") else "run"
+                    
                 elif re.match(r"^\s*$", line):
+                    # empty line, do nothing
                     pass
-                # normal line, append
+
                 else:
+                    # normal line, append
                     if mode == "replace":
-                        actreplace = actreplace + line
+                        regex.append(line)
                     elif mode == "with":
-                        actwith = actwith + line
+                        replacement.append(line)
                     else:
-                        print(
-                            "Parse error in regex file ("
-                            + regexfile
-                            + "), line "
-                            + str(lineno)
-                        )
-                        sys.exit(4)
-                lineno = lineno + 1
+                        parse_error(lineno)
 
-            if actreplace != "":
-                readregexappend(lines, actreplace, actwith, acttype)
+            if regex != "":
+                store(regex, replacement, rule_name, rule_type)
+
     except IOError:
-        print("Error reading regex file: " + regexfile)
-        sys.exit(4)
-    return lines
+        fatal("Error reading regex file: " + regexfile, code = 4)
 
-
-def readregexappend(lines, actreplace, actwith, acttype):
-    compactreplace = re.compile(actreplace, re.VERBOSE | re.MULTILINE | re.DOTALL)
-    actwith = actwith[: (len(actwith) - 1)]
-    lines.append((compactreplace, actwith, acttype))
+    return rules
 
 
 #################
 # parse an input file string
 #################
-def collect_chunks_from_input_file(strinput, regexlist, all_chunks):
-    global cutit
-
-    num_new_chunks = 0
+def collect_chunks_from_input_file(strinput, rules, rule_timings):
+    result = {}
 
     # split the file
-    chunks = re.split(doxhead, strinput)
+    chunks = re.split(DOXHEAD, strinput)
     chunks = chunks[1:]
 
     # apply all rules to the chunks
-    for ch in chunks:
-        if cutit:
-            ch = ch.split("/*")[0]
-        actch = ch
-        name = ""
-        for reg in regexlist:
-            matched = reg[0].match(actch)
-            if name == "" and matched is not None:
+    for chunk in chunks:
+        name = None
+
+        for index, rule in enumerate(rules):
+            start = time()
+
+            if not name and "name" in rule.regex.groupindex:
+                # The regex might provide us with a chunk name so try figuring
+                # out what the "name" group might match to
+                matched = rule.regex.search(chunk)
+                if matched:
+                    try:
+                        name = matched.group("name")
+                    except IndexError:
+                        name = ""
+
+            if rule.type == "with":
+                # This is a simple regex replacement rule
                 try:
-                    name = matched.group("name")
-                except IndexError:
-                    name = ""
-            if reg[2] == "with":
-                try:
-                    actch = reg[0].sub(reg[1], actch)
+                    chunk = rule.regex.sub(rule.replacement, chunk)
                 except IndexError:
                     print("Index error:" + ch[0:60] + "...")
-                    print("Pattern:\n" + reg[0].pattern)
-                    print("Current state:" + actch[0:60] + "...")
-                    sys.exit(6)
-            elif reg[2] == "run":
-                exec(reg[1])
-        if name == "":
+                    print("Pattern:\n" + rule.regex.pattern)
+                    print("Current state:" + chunk[0:60] + "...")
+                    fatal(code=6)
+            elif rule.type == "run":
+                # This is a piece of Python code that has to be executed on
+                # the part that matched
+                matched = rule.regex.search(chunk)
+                if matched:
+                    exec(rule.replacement)
+            else:
+                fatal("Invalid rule type: {0!r}".format(rule.type), code=6)
+
+            rule_timings[rule.name].append((time() - start) * 1000000)
+
+        if not name:
             # print("Chunk without a name ignored:" + ch[0:60] + "...")
             continue
 
-        if name in all_chunks:
-            print("Multiple defined name: " + name)
-            sys.exit(6)
+        result[name] = chunk.strip()
 
-        all_chunks[name] = actch.strip()
-        num_new_chunks += 1
-    return num_new_chunks
+    return result
 
 
 @contextmanager
@@ -371,6 +424,74 @@ def operation(message):
                 print(" done.")
             else:
                 print(" done, {0}.".format(result[0]))
+
+
+class ChunkCache:
+    """Simple on-disk cache that stores SHA256 hashes of files along with the
+    DocBook documentation chunks that were parsed from them.
+    """
+
+    def __init__(self, filename, hash=sha1):
+        """Constructor.
+
+        Parameters:
+            filename: name of the file on the disk where the cache resides
+            hash: the hash function to use
+        """
+        self._data = None
+        self._dirty = False
+        self._hash = hash
+        self._path = Path(filename)
+        
+    def _load(self):
+        """Populates the in-memory copy of the cache from the disk."""
+        if self._path.exists():
+            try:
+                with self._path.open("rb") as fp:
+                    self._data = load(fp)
+            except (IOError, EOFError):
+                # cache corrupted
+                self._data = {}
+        else:
+            self._data = {}
+        self._dirty = False
+
+    def close(self):
+        """Closes the cache and flushes its contents back to the disk if it
+        changed recently.
+        """
+        if self._dirty:
+            self.flush()
+
+    def flush(self):
+        """Flushes the contents of the cache back to the disk."""
+        with self._path.open("wb") as fp:
+            dump(self._data, fp)
+        self._dirty = False
+
+    def get(self, key):
+        """Returns the chunks associated to the file with the given key, or
+        `None` if the key is not in the cache.
+        """
+        if self._data is None:
+            self._load()
+        return self._data.get(key)
+
+    def key_of(self, contents, encoding = "utf-8"):
+        """Returns the hash key corresponding to the file with the given
+        contents.
+        """
+        if not isinstance(contents, bytes):
+            contents = contents.encode("utf-8")
+        
+        key = self._hash()
+        key.update(contents)
+        return key.hexdigest()
+
+    def put(self, key, chunks):
+        """Stores some chunks associated to the file with the given key."""
+        self._data[key] = chunks
+        self._dirty = True
 
 
 if __name__ == "__main__":

@@ -32,13 +32,14 @@
 #include "scg_headers.h"
 
 #include "igraph_memory.h"
+#include "igraph_qsort.h"
 
 #include <math.h>
 
 int igraph_i_exact_coarse_graining(const igraph_real_t *v,
                                    int *gr, int n) {
     int i, gr_nb;
-    igraph_i_scg_indval_t *w = igraph_Calloc(n, igraph_i_scg_indval_t);
+    igraph_i_scg_indval_t *w = IGRAPH_CALLOC(n, igraph_i_scg_indval_t);
 
     if (!w) {
         IGRAPH_ERROR("SCG error", IGRAPH_ENOMEM);
@@ -50,7 +51,7 @@ int igraph_i_exact_coarse_graining(const igraph_real_t *v,
         w[i].ind = i;
     }
 
-    qsort(w, (size_t) n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
+    igraph_qsort(w, (size_t) n, sizeof(igraph_i_scg_indval_t), igraph_i_compare_ind_val);
 
     gr_nb = 0;
     gr[w[0].ind] = gr_nb;
@@ -61,7 +62,7 @@ int igraph_i_exact_coarse_graining(const igraph_real_t *v,
         gr[w[i].ind] = gr_nb;
     }
 
-    igraph_Free(w);
+    IGRAPH_FREE(w);
     IGRAPH_FINALLY_CLEAN(1);
 
     return 0;

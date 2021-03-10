@@ -304,7 +304,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &components);
 
     /* Put the input graph in the queue */
-    graph_copy = igraph_Calloc(1, igraph_t);
+    graph_copy = IGRAPH_CALLOC(1, igraph_t);
     if (!graph_copy) {
         IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
     }
@@ -391,13 +391,13 @@ int igraph_cohesive_blocks(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_push_back(&compvertices, v));
             }
 
-            newmapping = igraph_Calloc(1, igraph_vector_t);
+            newmapping = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!newmapping) {
                 IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
             }
             IGRAPH_FINALLY(igraph_free, newmapping);
             IGRAPH_VECTOR_INIT_FINALLY(newmapping, 0);
-            newgraph = igraph_Calloc(1, igraph_t);
+            newgraph = IGRAPH_CALLOC(1, igraph_t);
             if (!newgraph) {
                 IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
             }
@@ -563,7 +563,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
         /* Plus the original graph */
         if (blocks) {
-            igraph_vector_t *orig = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *orig = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!orig) {
                 IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
             }

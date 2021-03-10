@@ -197,7 +197,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
     long int order_next_pos = 0, order_next_neg = -1;
     igraph_real_t diff, maxdiff;
 
-    ordering = igraph_Calloc(no_of_nodes, long int);
+    ordering = IGRAPH_CALLOC(no_of_nodes, long int);
     IGRAPH_FINALLY(igraph_free, ordering);
 
     IGRAPH_VECTOR_INIT_FINALLY(&indegrees, no_of_nodes);
@@ -468,7 +468,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &edges_by_components);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_t* vptr;
-        vptr = igraph_Calloc(1, igraph_vector_t);
+        vptr = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
@@ -480,7 +480,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_destroy);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_t* vptr;
-        vptr = igraph_Calloc(1, igraph_vector_t);
+        vptr = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
@@ -502,7 +502,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
 #define VAR2IDX(i, j) (i*(n-1)+j-(i+1)*i/2)
 
     /* Configure GLPK */
-    glp_term_out(GLP_OFF);
+    IGRAPH_GLPK_SETUP();
     glp_init_iocp(&parm);
     parm.br_tech = GLP_BR_DTH;
     parm.bt_tech = GLP_BT_BLB;
@@ -542,7 +542,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
          */
         n = igraph_vector_size(vertices_in_comp);
         ip = glp_create_prob();
-        IGRAPH_FINALLY(glp_delete_prob, ip);
+        IGRAPH_FINALLY(igraph_i_glp_delete_prob, ip);
         glp_set_obj_dir(ip, GLP_MAX);
 
         /* Construct a mapping from vertex IDs to the [0; n-1] range */

@@ -33,6 +33,7 @@
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
+#include "misc/conversion_internal.h"
 
 /**
  * \ingroup conversion
@@ -173,12 +174,12 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 /**
  * \ingroup conversion
  * \function igraph_get_adjacency_sparse
- * \brief Returns the adjacency matrix of a graph in sparse matrix format
+ * \brief Returns the adjacency matrix of a graph in sparse matrix format.
  *
  * </para><para>
  * The result is an adjacency matrix. Entry i, j of the matrix
  * contains the number of edges connecting vertex i to vertex j.
- * \param graph Pointer to the graph to convert
+ * \param graph Pointer to the graph to convert.
  * \param res Pointer to an initialized sparse matrix object, it will be
  *        resized if needed.
  * \param type Constant giving the type of the adjacency matrix to
@@ -209,7 +210,6 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
     igraph_eit_t edgeit;
     long int no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    int retval = 0;
     long int from, to;
     igraph_integer_t ffrom, fto;
 
@@ -262,12 +262,12 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
             IGRAPH_EIT_NEXT(edgeit);
         }
     } else {
-        IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid type argument.", IGRAPH_EINVAL);
     }
 
     igraph_eit_destroy(&edgeit);
     IGRAPH_FINALLY_CLEAN(1);
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -280,10 +280,12 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
  * \param bycol Logical, if true, the edges will be returned
- *        columnwise, eg. the first edge is
+ *        columnwise, e.g. the first edge is
  *        <code>res[0]->res[|E|]</code>, the second is
  *        <code>res[1]->res[|E|+1]</code>, etc.
  * \return Error code.
+ *
+ * \sa \ref igraph_edges() to return the result only for some edge ids.
  *
  * Time complexity: O(|E|), the
  * number of edges in the graph.

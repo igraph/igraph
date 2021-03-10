@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2011-2016  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge, MA, 02138 USA
+   Copyright (C) 2011-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_PROPERTIES_INTERNAL_H
@@ -28,22 +24,6 @@
 #include "igraph_constants.h"
 #include "igraph_iterators.h"
 #include "igraph_types.h"
-
-int igraph_i_induced_subgraph_suggest_implementation(
-    const igraph_t *graph, const igraph_vs_t vids,
-    igraph_subgraph_implementation_t* result
-);
-
-int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
-                                      const igraph_vs_t vids,
-                                      igraph_vector_t *map,
-                                      igraph_vector_t *invmap);
-
-int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
-        igraph_t *res,
-        const igraph_vs_t vids,
-        igraph_vector_t *map,
-        igraph_vector_t *invmap);
 
 int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_int_t *rank);

@@ -951,7 +951,7 @@ int igraph_provan_shier_list(const igraph_t *graph,
     if (igraph_vector_size(&Isv) == 0) {
         if (igraph_marked_queue_size(S) != 0 &&
             igraph_marked_queue_size(S) != no_of_nodes) {
-            igraph_vector_t *vec = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *vec = IGRAPH_CALLOC(1, igraph_vector_t);
             igraph_vector_init(vec, igraph_marked_queue_size(S));
             igraph_marked_queue_as_vector(S, vec);
             IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
@@ -1100,7 +1100,7 @@ int igraph_all_st_cuts(const igraph_t *graph,
                 }
             }
             /* Add the edges */
-            cut = igraph_Calloc(1, igraph_vector_t);
+            cut = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!cut) {
                 IGRAPH_ERROR("Cannot calculate s-t cuts", IGRAPH_ENOMEM);
             }
@@ -1509,7 +1509,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     for (i = 0; i < nocuts; i++) {
         igraph_vector_t *supercut = VECTOR(closedsets)[i];
         long int j, supercutsize = igraph_vector_size(supercut);
-        igraph_vector_t *cut = igraph_Calloc(1, igraph_vector_t);
+        igraph_vector_t *cut = IGRAPH_CALLOC(1, igraph_vector_t);
         IGRAPH_VECTOR_INIT_FINALLY(cut, 0); /* TODO: better allocation */
         for (j = 0; j < supercutsize; j++) {
             long int vtx = (long int) VECTOR(*supercut)[j];
@@ -1543,7 +1543,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
             igraph_vector_t *part = VECTOR(*mypartition1s)[i];
             long int j, n = igraph_vector_size(part);
             igraph_vector_t *v;
-            v = igraph_Calloc(1, igraph_vector_t);
+            v = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!v) {
                 IGRAPH_ERROR("Cannot list minimum s-t cuts", IGRAPH_ENOMEM);
             }

@@ -41,13 +41,14 @@
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
 #include "igraph_vector.h"
+#include "igraph_qsort.h"
 
 int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
                                int nt, int matrix, const igraph_real_t *p,
                                igraph_real_t *value) {
 
     int i, non_ties, q, j, l, part_ind, col;
-    igraph_i_scg_indval_t *vs = igraph_Calloc(n, igraph_i_scg_indval_t);
+    igraph_i_scg_indval_t *vs = IGRAPH_CALLOC(n, igraph_i_scg_indval_t);
     igraph_real_t *Cv, temp, sumOfSquares;
     igraph_vector_t ps;
     igraph_matrix_t F;
@@ -67,7 +68,7 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
         vs[i].ind = i;
     }
 
-    qsort(vs, (size_t) n, sizeof(igraph_i_scg_indval_t),
+    igraph_qsort(vs, (size_t) n, sizeof(igraph_i_scg_indval_t),
           igraph_i_compare_ind_val);
 
     non_ties = 1;
@@ -173,7 +174,7 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
 
     igraph_matrix_destroy(&F);
     igraph_matrix_int_destroy(&Q);
-    igraph_Free(vs);
+    IGRAPH_FREE(vs);
     IGRAPH_FINALLY_CLEAN(3);
 
     if (value) {

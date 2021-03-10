@@ -97,8 +97,8 @@ __BEGIN_DECLS
  * amount of data. For functions with quadratic or higher time
  * complexity make sure that the time complexity of the progress
  * reporting is constant or at least linear. In practice this means
- * having at most O(n) progress checks and at most 100 \reg
- * igraph_progress() calls.
+ * having at most O(n) progress checks and at most 100
+ * \ref igraph_progress() calls.
  * </para>
  */
 
@@ -136,7 +136,7 @@ __BEGIN_DECLS
  *     write their own progress handlers and functions with progress
  *     reporting, and then pass some meaningfull context here.
  * \return If the return value of the progress handler is not
- *     IGRAPH_SUCCESS (=0), then \ref igraph_progress() returns the
+ *     \c IGRAPH_SUCCESS, then \ref igraph_progress() returns the
  *     error code \c IGRAPH_INTERRUPTED. The \ref IGRAPH_PROGRESS()
  *     macro frees all memory and finishes the igraph function with
  *     error code \c IGRAPH_INTERRUPTED in this case.
@@ -145,7 +145,7 @@ __BEGIN_DECLS
 typedef int igraph_progress_handler_t(const char *message, igraph_real_t percent,
                                       void *data);
 
-extern igraph_progress_handler_t igraph_progress_handler_stderr;
+IGRAPH_EXPORT extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
 IGRAPH_EXPORT igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 

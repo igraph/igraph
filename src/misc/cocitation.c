@@ -456,7 +456,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
     if (loops) {
         /* Add the loop edges */
         i = igraph_vcount(graph);
-        seen = igraph_Calloc(i, igraph_bool_t);
+        seen = IGRAPH_CALLOC(i, igraph_bool_t);
         if (seen == 0) {
             IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM);
         }
@@ -474,7 +474,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
             }
         }
 
-        igraph_Free(seen);
+        IGRAPH_FREE(seen);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

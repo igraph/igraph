@@ -297,7 +297,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                         igraph_vector_ptr_t *vertices,
                                         igraph_vector_ptr_t *edges,
-                                        const igraph_integer_t from,
+                                        igraph_integer_t from,
                                         igraph_vs_t to,
                                         const igraph_vector_t *weights,
                                         igraph_neimode_t mode,
@@ -308,13 +308,11 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     long int *parents;
     igraph_lazy_inclist_t inclist;
     long int i, j, k;
-    long int no_of_to;
     igraph_dqueue_t Q;
     igraph_vector_t clean_vertices;
     igraph_vector_t num_queued;
     igraph_vit_t tovit;
     igraph_real_t my_infinity = IGRAPH_INFINITY;
-    igraph_bool_t all_to;
     igraph_vector_t dist;
 
     if (!weights) {
@@ -332,13 +330,8 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-    if ( (all_to = igraph_vs_is_all(&to)) ) {
-        no_of_to = no_of_nodes;
-    } else {
-        IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
-        IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
-        no_of_to = IGRAPH_VIT_SIZE(tovit);
-    }
+    IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
 
     if (vertices && IGRAPH_VIT_SIZE(tovit) != igraph_vector_ptr_size(vertices)) {
         IGRAPH_ERROR("Size of `vertices' and `to' should match.", IGRAPH_EINVAL);
@@ -347,7 +340,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
     }
 
-    parents = igraph_Calloc(no_of_nodes, long int);
+    parents = IGRAPH_CALLOC(no_of_nodes, long int);
     if (parents == 0) {
         IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM);
     }
@@ -481,12 +474,10 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vector_destroy(&dist);
     IGRAPH_FINALLY_CLEAN(1);
 
-    if (!all_to) {
-        igraph_vit_destroy(&tovit);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
+    igraph_vit_destroy(&tovit);
+    IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_Free(parents);
+    IGRAPH_FREE(parents);
     igraph_dqueue_destroy(&Q);
     igraph_vector_destroy(&clean_vertices);
     igraph_vector_destroy(&num_queued);

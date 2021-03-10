@@ -1,0 +1,39 @@
+No vertices:
+
+No edges:
+        0        0        0
+        0        0        0
+        0        0        0
+
+Disconnected graph with loops and multiple edges:
+        0        1        1        0        0        0
+        0        1        0        1        0        0
+        1        0        0        1        0        0
+        0        0        0        0        2        0
+        0        0        0        0        0        0
+        0        0        0        0        0        0
+
+Same graph, undirected, symmetric matrix:
+        0        1        2        0        0        0
+        1        1        0        1        0        0
+        2        0        0        1        0        0
+        0        1        1        0        2        0
+        0        0        0        2        0        0
+        0        0        0        0        0        0
+
+Same graph, undirected, upper triangular matrix:
+        0        1        2        0        0        0
+        0        1        0        1        0        0
+        0        0        0        1        0        0
+        0        0        0        0        2        0
+        0        0        0        0        0        0
+        0        0        0        0        0        0
+
+Same graph, undirected, lower triangular matrix:
+        0        0        0        0        0        0
+        1        1        0        0        0        0
+        2        0        0        0        0        0
+        0        1        1        0        0        0
+        0        0        0        2        0        0
+        0        0        0        0        0        0
+

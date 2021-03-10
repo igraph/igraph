@@ -44,7 +44,7 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
     igraph_vector_t sizes;
     long int i, no = igraph_vector_size(from);
 
-    l->vecs = igraph_Calloc(size, igraph_vector_t);
+    l->vecs = IGRAPH_CALLOC(size, igraph_vector_t);
     if (!l->vecs) {
         IGRAPH_ERROR("Cannot merge attributes for simplify",
                      IGRAPH_ENOMEM);

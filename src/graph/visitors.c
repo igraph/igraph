@@ -346,7 +346,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
     }
 
     /* temporary storage */
-    added = igraph_Calloc(no_of_nodes, char);
+    added = IGRAPH_CALLOC(no_of_nodes, char);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM);
     }
@@ -413,7 +413,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
 
     igraph_vector_destroy(&neis);
     igraph_dqueue_destroy(&q);
-    igraph_Free(added);
+    IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return 0;

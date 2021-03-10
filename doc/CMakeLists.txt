@@ -79,6 +79,7 @@ file(
   LIST_DIRECTORIES FALSE
   RELATIVE ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/examples/simple/*.c
+  ${CMAKE_SOURCE_DIR}/examples/tutorial/*.c
 )
 
 # You should not need to change anything below this line if you are simply
@@ -118,6 +119,7 @@ if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
   set(DOXROX_RULES ${CMAKE_CURRENT_SOURCE_DIR}/c-docbook.re)
   set(DOXROX_CHUNKS ${CMAKE_CURRENT_BINARY_DIR}/chunks.pickle)
+  set(DOXROX_CACHE ${CMAKE_CURRENT_BINARY_DIR}/doxrox.cache)
 
   set(DOCBOOK_INPUTS "")
   set(DOCBOOK_GENERATED_INPUTS "")
@@ -203,11 +205,12 @@ if(DOC_BUILD_SUPPORTED)
   endforeach()
 
   add_custom_command(
-    OUTPUT ${DOXROX_CHUNKS}
+    OUTPUT ${DOXROX_CHUNKS} ${DOXROX_CACHE}
     COMMAND ${DOXROX_COMMAND}
     ARGS
     -e ${DOXROX_RULES}
     -o ${DOXROX_CHUNKS}
+    --cache ${DOXROX_CACHE}
     ${IGRAPH_SOURCES_FOR_DOXROX}
     MAIN_DEPENDENCY ${DOXROX_RULES}
     DEPENDS ${IGRAPH_SOURCES_FOR_DOXROX}
@@ -241,7 +244,7 @@ if(DOC_BUILD_SUPPORTED)
       --xinclude
       --output igraph-docs-with-resolved-includes-tmp.xml
       igraph-docs.xml
-      COMMAND ${PYTHON3}
+      COMMAND ${Python3_EXECUTABLE}
       ARGS
       ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
       igraph-docs-with-resolved-includes-tmp.xml

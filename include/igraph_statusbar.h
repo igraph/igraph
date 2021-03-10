@@ -64,7 +64,7 @@ __BEGIN_DECLS
 
 typedef int igraph_status_handler_t(const char *message, void *data);
 
-extern igraph_status_handler_t igraph_status_handler_stderr;
+IGRAPH_EXPORT extern igraph_status_handler_t igraph_status_handler_stderr;
 
 IGRAPH_EXPORT igraph_status_handler_t * igraph_set_status_handler(igraph_status_handler_t new_handler);
 
