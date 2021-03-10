@@ -104,6 +104,20 @@ int main() {
     igraph_vector_t eb, eb2;
     igraph_vector_t weights;
 
+    igraph_vector_init(&eb, 0);
+
+    printf("Null graph\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, NULL);
+    print_vector(&eb);
+    igraph_destroy(&g);
+
+    printf("\nEdgeless graph on 3 vertices\n");
+    igraph_empty(&g, 3, IGRAPH_DIRECTED);
+    igraph_edge_betweenness(&g, &eb, IGRAPH_DIRECTED, NULL);
+    print_vector(&eb);
+    igraph_destroy(&g);
+
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
            will choke on an overlong argument list with "internal error C1001". */
@@ -127,7 +141,7 @@ int main() {
         };
         igraph_vector_t edges;
 
-        printf("No cutoff, undirected, unweighted\n");
+        printf("\nNo cutoff, undirected, unweighted\n");
         igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
         igraph_vector_init(&eb, 0);
         igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
