@@ -51,6 +51,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
     igraph_integer_t girth, comp_girth, no_of_vertices = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t start;
     long int cycle_len;
     igraph_t comp_graph, cycle;
@@ -64,6 +65,11 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
     if (!is_simple) {
         IGRAPH_ERROR("Perfect graph testing is implemented for simple graphs only. Simplify the graph.", IGRAPH_EINVAL);
+    }
+
+    if (no_of_edges < 5) {
+        *perfect = 1;
+        return IGRAPH_SUCCESS;
     }
 
     // Chordal and bipartite graph types are perfect.
