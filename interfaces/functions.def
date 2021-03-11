@@ -857,6 +857,11 @@ igraph_radius:
         PARAMS: GRAPH graph, OUT REALPTR radius, NEIMODE mode=ALL
         NAME-R: radius
 
+igraph_pseudo_diameter:
+        PARAMS: GRAPH graph, OUT REALPTR diameter, INTEGER start_vid, \
+                OUT INTEGERPTR from=NULL, OUT INTEGERPTR to=NULL
+        NAME-R: pseudo_diameter
+
 igraph_diversity:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXINDEX res, \
                 VERTEXSET vids=ALL
