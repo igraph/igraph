@@ -615,10 +615,51 @@ void preprocess(AP *p) {
     }
 }
 
+/**
+ * \function igraph_solve_lsap
+ * \brief Solve a balanced linear assignment problem.
+ *
+ * This functions solves a linear assinment problem using the Hungarian
+ * method. A number of tasks, an equal number of agents, and the cost
+ * of each agent to perform the tasks is given. This function then
+ * assigns one task to each agent in such a way that the total cost is
+ * minimized.
+ *
+ * </param><param>
+ * If the cost should be maximized instead of minimized, the cost matrix
+ * should be negated.
+ *
+ * </param><param>
+ * To solve an unbalanced assignment problem, where the number of agents
+ * is greater than the number of tasks, an extra task with zero cost
+ * should be added.
+ *
+ * \param c The assignment problem, where the number of rows is the
+ *          number of agents, the number of columns is the number of
+ *          tasks, and each element is the cost of an agent to perform
+ *          the task.
+ * \param n The number of rows and columns of \p c.
+ * \param p An initialized vector which will store the result. The nth
+ *          entry gives the task the nth agent is assigned to minimize
+ *          the total cost.
+ * \return Error code.
+ *
+ * Time complexity: O(n^3), where n is the number of agents.
+ */
 int igraph_solve_lsap(igraph_matrix_t *c, igraph_integer_t n,
                       igraph_vector_int_t *p) {
     AP *ap;
 
+    if(n != igraph_matrix_nrow(c)) {
+        IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
+                      "not equal to number of agents(%ld)", IGRAPH_EINVAL,
+                      n, igraph_matrix_nrow(c));
+    }
+    if(n != igraph_matrix_ncol(c)) {
+        IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
+                      "not equal to number of tasks(%ld)", IGRAPH_EINVAL,
+                      n, igraph_matrix_ncol(c));
+    }
     IGRAPH_CHECK(igraph_vector_int_resize(p, n));
     igraph_vector_int_null(p);
 
@@ -627,5 +668,5 @@ int igraph_solve_lsap(igraph_matrix_t *c, igraph_integer_t n,
     ap_assignment(ap, VECTOR(*p));
     ap_free(ap);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
