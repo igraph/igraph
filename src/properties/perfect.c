@@ -45,7 +45,7 @@
  * \param perfect Pointer to an integer, the result will be stored here.
  * \return Error code.
  *
- * Time complexity: exponential.
+ * Time complexity: worst case exponenital, often faster in practice.
  */
 int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
