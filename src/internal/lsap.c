@@ -652,12 +652,12 @@ int igraph_solve_lsap(igraph_matrix_t *c, igraph_integer_t n,
 
     if(n != igraph_matrix_nrow(c)) {
         IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
-                      "not equal to number of agents(%ld)", IGRAPH_EINVAL,
+                      "not equal to number of agents (%ld).", IGRAPH_EINVAL,
                       n, igraph_matrix_nrow(c));
     }
     if(n != igraph_matrix_ncol(c)) {
         IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
-                      "not equal to number of tasks(%ld)", IGRAPH_EINVAL,
+                      "not equal to number of tasks (%ld).", IGRAPH_EINVAL,
                       n, igraph_matrix_ncol(c));
     }
     IGRAPH_CHECK(igraph_vector_int_resize(p, n));
