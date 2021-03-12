@@ -229,10 +229,10 @@ add_library(
   properties/dag.c
   properties/degrees.c
   properties/girth.c
-  properties/perfect.c
   properties/loops.c
   properties/multiplicity.c
   properties/neighborhood.c
+  properties/perfect.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
