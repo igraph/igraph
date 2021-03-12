@@ -24,9 +24,6 @@ if(USE_CCACHE)
   endif()
 endif()
 
-# Include some compiler-related helpers and set global compiler options
-include(compilers)
-
 # Figure out the version number from Git
 include(version)
 
@@ -38,6 +35,9 @@ project(
   HOMEPAGE_URL https://igraph.org
   LANGUAGES C CXX
 )
+
+# Include some compiler-related helpers and set global compiler options
+include(compilers)
 
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
