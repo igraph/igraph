@@ -37,6 +37,12 @@
  * color the vertices of G so that no two adjacent vertices share the same color.
  *
  * </para><para>
+ * Warning: This function may create the complement of the graph internally,
+ * which consumes a lot of memory. For moderately sized graphs, consider
+ * decomposing them into biconnected components and running the check separately
+ * on each component.
+ *
+ * </para><para>
  * This implementation is based on the strong perfect graph theorem which was
  * conjectured by Claude Berge and proved by Maria Chudnovsky, Neil Robertson,
  * Paul Seymour, and Robin Thomas.
@@ -50,7 +56,8 @@
 int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
-    igraph_integer_t girth, comp_girth, no_of_vertices = igraph_vcount(graph);
+    igraph_integer_t girth, comp_girth;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t start;
     long int cycle_len;
@@ -67,13 +74,26 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
         IGRAPH_ERROR("Perfect graph testing is implemented for simple graphs only. Simplify the graph.", IGRAPH_EINVAL);
     }
 
-    if (no_of_edges < 5) {
+    // All graphs with less than 5 vertices are perfect.
+    if (no_of_nodes < 5) {
+        *perfect = 1;
+        return IGRAPH_SUCCESS;
+    }
+
+    // Graphs with less than 5 edges or a complement with less than 5 edges
+    // are also perfect. The following check handles most 5-vertex graphs,
+    // but its usefulness quickly diminishes, with only 0.3% of unlabelled
+    // 8-vertex graphs handled.
+    // In order to avoid bad results due to integer overflow with large graphs,
+    // we limit this check for small graphs only.
+    if ( no_of_nodes < 10000 &&
+         (no_of_edges < 5 || no_of_edges > (no_of_nodes - 1) * no_of_nodes / 2 - 5)) {
         *perfect = 1;
         return IGRAPH_SUCCESS;
     }
 
     // Chordal and bipartite graph types are perfect.
-    // possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
+    // Possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
     IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, NULL));
     if (is_bipartite) {
         *perfect = 1;
@@ -125,7 +145,7 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     // (i.e. an odd hole). TODO: Find a more efficient way to check for odd holes.
     start = girth < comp_girth ? girth : comp_girth;
     start = start % 2 == 0 ? start + 1 : start + 2;
-    for (cycle_len = start; cycle_len <= no_of_vertices; cycle_len += 2) {
+    for (cycle_len = start; cycle_len <= no_of_nodes ; cycle_len += 2) {
 
         IGRAPH_ALLOW_INTERRUPTION();
 
