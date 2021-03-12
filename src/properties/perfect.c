@@ -153,15 +153,16 @@ int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
     }
 
     *perfect = 1;
-    clean1:
-        igraph_destroy(&comp_graph);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
-    clean2:
-        igraph_destroy(&cycle);
-        igraph_destroy(&comp_graph);
-        IGRAPH_FINALLY_CLEAN(2);
-        return IGRAPH_SUCCESS;
-
+    
+clean1:
+    /* normal exit route */
+    igraph_destroy(&comp_graph);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
+    
+clean2:
+    /* exit route if we also have a cycle to destroy */
+    igraph_destroy(&cycle);
+    IGRAPH_FINALLY_CLEAN(1);
+    goto clean1;
 }
