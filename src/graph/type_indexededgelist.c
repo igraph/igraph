@@ -712,7 +712,8 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  * \param neis This vector will contain the result. The vector should
  *        be initialized beforehand and will be resized. Starting from igraph
  *        version 0.4 this vector is always sorted, the vertex ids are
- *        in increasing order.
+ *        in increasing order. If one neighbor is connected with multiple
+ *        edges, the neighbor will be returned multiple times.
  * \param pnode The id of the node for which the adjacent vertices are
  *        to be searched.
  * \param mode Defines the way adjacent vertices are searched in

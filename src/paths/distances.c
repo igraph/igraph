@@ -433,3 +433,262 @@ int igraph_pseudo_diameter(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * This function finds the weighted eccentricity and returns it via \p ecc.
+ * It's used for igraph_pseudo_diameter_dijkstra. \p vid_ecc returns the vertex
+ * id of the ecc with the greatest
+ * distance from \p vid_start. If two vertices have the same greatest distance,
+ * the one with the lowest degree is chosen.
+ * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
+ * wil be set to infinity, and \p vid_ecc to -1;
+ *
+ */
+int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_neimode_t mode) {
+    long int no_of_nodes = igraph_vcount(graph);
+    igraph_matrix_t dist_mat;
+    igraph_lazy_adjlist_t adjlist;
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
+                                          IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+    IGRAPH_MATRIX_INIT_FINALLY(&dist_mat, 1, no_of_nodes);
+    IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph,
+                &dist_mat,
+                igraph_vss_1(vid_start),
+                igraph_vss_all(),
+                weights,
+                mode));
+
+    *ecc = 0;
+    *vid_ecc = vid_start;
+    double degree_ecc = 0;
+    long int degree_i;
+    for (int i = 0; i < no_of_nodes; i++) {
+        if (i == vid_start) {
+            continue;
+        }
+        igraph_real_t dist = MATRIX(dist_mat, i, 0);
+        /* adjlist is used to ignore multiple edges when finding the degree */
+        degree_i  = igraph_vector_int_size(igraph_lazy_adjlist_get(&adjlist, i));
+
+        if (dist > *ecc) {
+            if (!IGRAPH_FINITE(dist)) {
+                if (!unconn) {
+                    *ecc = IGRAPH_INFINITY;
+                    *vid_ecc = -1;
+                    break;
+                }
+            } else {
+                *ecc = dist;
+                *vid_ecc = i;
+                degree_ecc = degree_i;
+            }
+        } else if (dist == *ecc) {
+            if (degree_i < degree_ecc) {
+                degree_ecc = degree_i;
+                *vid_ecc = i;
+            }
+        }
+    }
+    igraph_matrix_destroy(&dist_mat);
+    igraph_lazy_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(2);
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_pseudo_diameter_dijkstra
+ * \brief Approximation and lower bound of the diameter of a weighted graph.
+ *
+ * This algorithm finds a pseudo-peripheral vertex and returns its
+ * weighted eccentricity. This value can be used as an approximation
+ * and lower bound of the diameter of a graph.
+ *
+ * </para><para>
+ * A pseudo-peripheral vertex is a vertex v, such that for every
+ * vertex u which is as far away from v as possible, v is also as
+ * far away from u as possible. The process of finding one depends
+ * on where the search starts, and for a disconnected graph the
+ * maximum diameter found will be that of the component \p vid_start
+ * is in.
+ *
+ * </para><para>
+ * If the graph has no vertices, \c IGRAPH_NAN is returned.
+ *
+ * \param graph The input graph, can be directed or undirected.
+ * \param weights The edge weights of the graph. Can be \c NULL for an
+ *        unweighted graph. All weights should be non-negative.
+ * \param diameter This will contain the weighted pseudo-diameter.
+ * \param vid_start Id of the starting vertex. If this is negative, a
+ *        random starting vertex is chosen.
+ * \param from If not \c NULL this will be set to the
+ *        source vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
+ * \param to If not \c NULL this will be set to the
+ *        target vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
+ * \param directed Boolean, whether to consider directed
+ *        paths. Ignored for undirected graphs.
+ * \param unconn What to do if the graph is not connected. If
+ *        \c TRUE the longest geodesic within a component
+ *        will be returned, otherwise \c IGRAPH_INFINITY is
+ *        returned.
+ * \return Error code.
+ *
+ * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
+ * |E| is the number of edges.
+ *
+ * \sa \ref igraph_diameter_dijkstra()
+ */
+
+int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
+                                    const igraph_vector_t *weights,
+                                    igraph_real_t *diameter,
+                                    igraph_integer_t vid_start,
+                                    igraph_integer_t *from,
+                                    igraph_integer_t *to,
+                                    igraph_bool_t directed,
+                                    igraph_bool_t unconn) {
+
+
+    long int no_of_nodes = igraph_vcount(graph);
+    igraph_real_t ecc_v;
+    igraph_real_t ecc_u;
+    igraph_integer_t vid_ecc;
+    igraph_bool_t inf = 0;
+
+    if (vid_start >= no_of_nodes) {
+        IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
+    }
+
+    /* We will reach here when vid_start < 0 and the graph has no vertices. */
+    if (no_of_nodes == 0) {
+        if (diameter) {
+            *diameter = IGRAPH_NAN;
+        }
+        if (from) {
+            *from = -1;
+        }
+        if (to) {
+            *to = -1;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    if (vid_start < 0) {
+        RNG_BEGIN();
+        vid_start = RNG_INTEGER(0, no_of_nodes - 1);
+        RNG_END();
+    }
+
+    if (!igraph_is_directed(graph) || !directed) {
+
+        if (from) {
+            *from = vid_start;
+        }
+
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_u, vid_start, &vid_ecc, unconn, IGRAPH_ALL));
+
+        inf = !IGRAPH_FINITE(ecc_u);
+
+        if (!inf) {
+            while (1) {
+                if (to) {
+                    *to = vid_ecc;
+                }
+                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_v, vid_ecc, &vid_ecc, unconn, IGRAPH_ALL));
+
+                if (ecc_u < ecc_v) {
+                    ecc_u = ecc_v;
+                    if (from) {
+                        *from = *to;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    } else {
+        igraph_real_t ecc_out;
+        igraph_real_t ecc_in;
+        igraph_integer_t vid_ecc_in;
+        igraph_integer_t vid_ecc_out;
+        igraph_integer_t vid_end;
+        igraph_bool_t direction;
+
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_out, vid_start, &vid_ecc_out, unconn, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_in, vid_start, &vid_ecc_in, unconn, IGRAPH_IN));
+
+        /* A directed graph is strongly connected iff all vertices are reachable
+         * from vid_start both when moving along or moving opposite the edge directions. */
+        if (!unconn && (vid_ecc_out == -1 || vid_ecc_in == -1)) {
+            inf = 1;
+        } else {
+            if (ecc_out > ecc_in) {
+                vid_ecc = vid_ecc_out;
+                ecc_u = ecc_out;
+            } else {
+                vid_ecc = vid_ecc_in;
+                ecc_u = ecc_in;
+            }
+
+            while (1) {
+                vid_end = vid_ecc;
+
+                /* TODO: In the undirected case, we break ties between vertices at the
+                 * same distance based on their degree. In te directed case, should we
+                 * use in-, out- or total degree? */
+                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_out, vid_ecc, &vid_ecc_out, unconn, IGRAPH_OUT));
+                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_in, vid_ecc, &vid_ecc_in, unconn, IGRAPH_IN));
+
+                if (ecc_out > ecc_in) {
+                    vid_ecc = vid_ecc_out;
+                    ecc_v = ecc_out;
+                    direction = 1;
+                } else {
+                    vid_ecc = vid_ecc_in;
+                    ecc_v = ecc_in;
+                    direction = 0;
+                }
+
+                if (ecc_u < ecc_v) {
+                    ecc_u = ecc_v;
+                    vid_start = vid_end;
+                } else {
+                    break;
+                }
+            }
+
+            if (from) {
+                if (direction) {
+                    *from = vid_end;
+                } else {
+                    *from = vid_start;
+                }
+            }
+            if (to) {
+                if (direction) {
+                    *to = vid_start;
+                } else {
+                    *to = vid_end;
+                }
+            }
+        }
+    }
+
+    if (inf) {
+        *diameter = IGRAPH_INFINITY;
+        if (from) {
+            *from = -1;
+        }
+        if (to) {
+            *to = -1;
+        }
+    } else {
+        *diameter = ecc_u;
+    }
+
+    return IGRAPH_SUCCESS;
+}
