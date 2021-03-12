@@ -59,22 +59,14 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
      * the values are relatively large negative numbers, in which case we should
      * negate the eigenvector.
      */
-    long int i, n = igraph_vector_size(vector);
+    long int n = igraph_vector_size(vector);
     igraph_real_t mi, ma;
 
     if (n == 0) {
         return 0;
     }
 
-    mi = ma = VECTOR(*vector)[0];
-    for (i = 1; i < n; i++) {
-        if (VECTOR(*vector)[i] < mi) {
-            mi = VECTOR(*vector)[i];
-        }
-        if (VECTOR(*vector)[i] > ma) {
-            ma = VECTOR(*vector)[i];
-        }
-    }
+    igraph_vector_minmax(vector, &mi, &ma);
 
     if (mi >= 0) {
         return 0;
@@ -83,8 +75,8 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
         return 1;
     }
 
-    mi /= ma;
-    return (mi < 1e-5) ? 1 : 0;
+    /* is the most negative value larger in magnitude than the most positive? */
+    return (-mi/ma > 1);
 }
 
 static int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,

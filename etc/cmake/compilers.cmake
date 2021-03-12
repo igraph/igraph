@@ -1,6 +1,10 @@
+include(CheckCCompilerFlag)
+
 if(MSVC)
   add_compile_options(/FS)
 endif()
+
+check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
@@ -17,12 +21,12 @@ macro(use_all_warnings TARGET_NAME)
   else()
     target_compile_options(${TARGET_NAME} PRIVATE 
       # GCC-style compilers:
-      $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare -Wno-varargs
+      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
+        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
       >
+      $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
         # disable #188: enumerated type mixed with another type; affecting IGRAPH_CHECK
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED

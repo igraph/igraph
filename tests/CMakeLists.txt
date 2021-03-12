@@ -750,6 +750,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+  igraph_solve_lsap
 )
 
 # memory allocation
@@ -758,3 +759,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   zero_allocs
 )
+
+# simulation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sir
+)
+
