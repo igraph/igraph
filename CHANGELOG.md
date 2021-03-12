@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_vector_lex_cmp()` and `igrapg_vector_colex_cmp()` for lexicographic
+   and colexicographic comparison of vectors. These functions may also be used
+   for sorting.
+
 ### Changed
 
  - `igraph_community_multilevel()` is now randomized (PR #1696, thanks to Daniel Noom).
@@ -35,6 +41,7 @@
  - The `IGRAPH_ENABLE_LTO` build option now supports the `AUTO` value, which uses LTO only if the compiler supports it. Warning: CMake may not always be able to detect that LTO is not fully supported. Therefore, the default setting is `OFF`.
  - The following functions are now interruptible: `igraph_grg_game()`, `igraph_sbm_game()`, `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`.
  - Functions that use GLPK, such as `igraph_feedback_arc_set()` and `igraph_community_optimal_modularity()` are now interruptible.
+ - Add support for older versions of Clang that do not recognize the `-Wno-varargs` flag.
 
 ### Acknowledgments
 
