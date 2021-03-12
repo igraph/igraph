@@ -1,10 +1,10 @@
-include(CheckCXXCompilerFlag)
+include(CheckCCompilerFlag)
 
 if(MSVC)
   add_compile_options(/FS)
 endif()
 
-CHECK_CXX_COMPILER_FLAG("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
+check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
