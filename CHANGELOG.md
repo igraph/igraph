@@ -28,6 +28,7 @@
  - `igraph_(personalized_)pagerank()` would return incorrect results for weighted multigraphs with fewer than 128 vertices when using `IGRAPH_PAGERANK_ALGO_PRPACK`.
  - `igraph_diversity()` now checks its input more carefully, and throws an error when the input graph has multi-edges or is directed.
  - `igraph_shortest_paths_johnson()` would return incorrect results when the `to` argument differed from `from` (thanks to Daniel Noom).
+ - `igraph_is_graphical()` would fail to set the result variable for certain special degree sequences in the undirected simple graph case.
  - GLPK internal errors no longer crash igraph.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
