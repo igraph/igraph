@@ -49,6 +49,12 @@ simple: false, loops: false, multi: false, multiloops:  true
 ( 1 1 4 )
 simple: false, loops:  true, multi: false, multiloops:  true
 
+( 2 2 2 2 4 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 3 0 5 3 5 3 3 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
 ( )
 ( )
 simple:  true, loops:  true, multi:  true, multiloops:  true

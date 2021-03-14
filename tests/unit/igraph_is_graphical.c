@@ -137,6 +137,16 @@ int main() {
     igraph_vector_init_int_end(&ds, -1, 1, 1, 4, -1);
     graphical_print_destroy(&ds);
 
+    /* The following two sequences are realizable as simple graphs.
+     * The algorithm that checks this exits the last loop with these
+     * two sequences. An earlier buggy version of the function failed
+     * to set the result in this case. */
+    igraph_vector_init_int_end(&ds, -1, 2, 2, 2, 2, 4, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_init_int_end(&ds, -1, 3, 0, 5, 3, 5, 3, 3, -1);
+    graphical_print_destroy(&ds);
+
 
     /* Directed case: */
 
