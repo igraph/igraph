@@ -129,6 +129,7 @@
 <!-- doxrox-include igraph_vector_ptr_size -->
 <!-- doxrox-include igraph_vector_ptr_clear -->
 <!-- doxrox-include igraph_vector_ptr_push_back -->
+<!-- doxrox-include igraph_vector_ptr_insert -->
 <!-- doxrox-include igraph_vector_ptr_e -->
 <!-- doxrox-include igraph_vector_ptr_set -->
 <!-- doxrox-include igraph_vector_ptr_resize -->
