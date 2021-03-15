@@ -246,8 +246,10 @@ void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
 void IGRAPH_FINALLY_CLEAN(int minus) {
     igraph_i_finally_stack[0].all -= minus;
     if (igraph_i_finally_stack[0].all < 0) {
-        /* fprintf(stderr, "corrupt finally stack, popping %d elements when only %d left\n", minus, igraph_i_finally_stack[0].all+minus); */
+        int left = igraph_i_finally_stack[0].all + minus;
+        /* Set to zero in case fatal error handler does a longjmp instead of terminating the process: */
         igraph_i_finally_stack[0].all = 0;
+        IGRAPH_FATALF("Corrupt finally stack: trying to pop %d element(s) when only %d left.", minus, left);
     }
     /* printf("<-- Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
 }
