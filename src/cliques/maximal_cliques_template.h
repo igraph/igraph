@@ -39,6 +39,7 @@
         igraph_vector_ptr_clear(res);           \
         IGRAPH_FINALLY(igraph_i_maximal_cliques_free, res); \
     } while (0)
+#define CLEANUP do { IGRAPH_FINALLY_CLEAN(1); } while (0) /* res */
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
@@ -49,6 +50,7 @@
     #define SUFFIX _count
     #define RECORD (*res)++
     #define FINALLY *res=0;
+    #define CLEANUP
     #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
     #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
@@ -59,6 +61,7 @@
     #define SUFFIX _file
     #define RECORD igraph_vector_int_fprint(R, res)
     #define FINALLY
+    #define CLEANUP
     #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
     #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
@@ -92,6 +95,7 @@
         }                             \
         if (no) { *no=0; }                        \
     } while (0)
+#define CLEANUP do { IGRAPH_FINALLY_CLEAN(1); } while (0) /* res */
 #define FOR_LOOP_OVER_VERTICES                  \
     nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;    \
     for (ii=0; ii<nn; ii++)
@@ -118,6 +122,7 @@
             return IGRAPH_STOP; \
     } while (0)
 #define FINALLY
+#define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
@@ -145,6 +150,7 @@
 #define FINALLY \
     igraph_vector_clear(hist); \
     igraph_vector_reserve(hist, 50); /* initially reserve space for 50 elements */
+#define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
@@ -395,7 +401,9 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&rank);
     igraph_vector_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(10); /* + res */
+    IGRAPH_FINALLY_CLEAN(9);
+
+    CLEANUP;
 
     return IGRAPH_SUCCESS;
 }
@@ -405,5 +413,6 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
 #undef SUFFIX
 #undef RECORD
 #undef FINALLY
+#undef CLEANUP
 #undef FOR_LOOP_OVER_VERTICES
 #undef FOR_LOOP_OVER_VERTICES_PREPARE
