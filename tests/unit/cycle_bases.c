@@ -20,31 +20,38 @@ int main() {
     igraph_t graph;
     igraph_vector_t dimvec;
     igraph_vector_ptr_t result;
-    long int rank, ecount, vcount;
+    long int rank;
 
     igraph_vector_ptr_init(&result, 0);
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&result, igraph_vector_destroy);
 
     printf("Null graph\n");
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
-    igraph_minimum_cycle_basis(&graph, -1, &result);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
     print_check_destroy(&graph, &result);
 
     printf("\nSingleton graph\n");
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
-    igraph_minimum_cycle_basis(&graph, -1, &result);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\nSingle vertex with loop\n");
+    igraph_small(&graph, 1, IGRAPH_UNDIRECTED,
+                 0,0,
+                 -1);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
     print_check_destroy(&graph, &result);
 
     printf("\nTree\n");
     igraph_tree(&graph, 3, 2, IGRAPH_TREE_UNDIRECTED);
-    igraph_minimum_cycle_basis(&graph, -1, &result);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
     print_check_destroy(&graph, &result);
 
     printf("\n2-cycle\n");
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
                  0,1, 0,1,
                  -1);
-    igraph_minimum_cycle_basis(&graph, -1, &result);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
     print_check_destroy(&graph, &result);
 
     printf("\nDisconnected\n");
@@ -55,19 +62,20 @@ int main() {
                  10,10, 10,11,
                  12,12,
                  -1);
-    igraph_minimum_cycle_basis(&graph, -1, &result);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
     print_check_destroy(&graph, &result);
 
     printf("\nPeriodic (5,6)-grid\n");
-    igraph_vector_init_int_end(&dimvec, -1, 5, 6, -1);
-    igraph_lattice(&graph, &dimvec, 1, IGRAPH_ADJ_UNDIRECTED, 0, 1);
-    vcount = igraph_vcount(&graph);
-    ecount = igraph_ecount(&graph);
 
-    igraph_minimum_cycle_basis(&graph, -1, &result);
+    igraph_vector_init_int_end(&dimvec, /* cutoff */ -1, /* complete */ 1, 5, 6, -1);
+    igraph_lattice(&graph, &dimvec, 1, IGRAPH_ADJ_UNDIRECTED, 0, 1);
+
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
 
     rank = igraph_vector_ptr_size(&result);
-    IGRAPH_ASSERT(rank == ecount - vcount + 1);
+
+    /* In a periodic grid graph, all elements in the minimum basis have size 4,
+     * except two, which have size equal to the grid dimensions. */
 
     IGRAPH_ASSERT(igraph_vector_size(VECTOR(result)[0]) == 4);
     IGRAPH_ASSERT(igraph_vector_size(VECTOR(result)[rank-1]) == 6);
@@ -77,6 +85,14 @@ int main() {
     print_check_destroy(&graph, &result);
 
     igraph_vector_destroy(&dimvec);
+
+#if 0
+    /* This is for benchmarking */
+    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_watts_strogatz_game(&graph, 3, 10, 2, 0.1, 0, 0);
+    igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, &result);
+    print_check_destroy(&graph, &result);
+#endif
 
     igraph_vector_ptr_destroy_all(&result);
 
