@@ -392,6 +392,8 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
     IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
 
+    CLEANUP;
+
     igraph_vector_int_destroy(&nextv);
     igraph_vector_int_destroy(&pos);
     igraph_vector_int_destroy(&H);
@@ -402,8 +404,6 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_vector_int_destroy(&rank);
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(9);
-
-    CLEANUP;
 
     return IGRAPH_SUCCESS;
 }
