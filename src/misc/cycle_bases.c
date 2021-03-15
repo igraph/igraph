@@ -67,9 +67,9 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
     igraph_dqueue_int_push(&q, start_vid); /* vertex id */
-    igraph_dqueue_int_push(&q, 0);         /* distance from start_vid*/
-    VECTOR(pred_edge)[start_vid] = -1;
-    VECTOR(*visited)[start_vid] = mark + 1;
+    igraph_dqueue_int_push(&q, 0); /* distance from start_vid*/
+    VECTOR(*visited)[start_vid] = mark + 1; /* mark as seen */
+    VECTOR(pred_edge)[start_vid] = -1; /* non-valid predecessor edge id for root vertex */
 
     while (! igraph_dqueue_int_empty(&q)) {
         long int v = igraph_dqueue_int_pop(&q);
@@ -86,6 +86,7 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
             long int u = IGRAPH_OTHER(graph, e, v);
 
             if (e == VECTOR(pred_edge)[v]) {
+                /* do not follow the edge through which we came to v */
                 continue;
             }
 
@@ -427,7 +428,7 @@ static void remove_duplicate_candidates(igraph_vector_ptr_t *candidates) {
  * \function igraph_minimum_cycle_basis
  * \brief Computes a minimum weight cycle basis.
  *
- * \param graph
+ * \param graph The graph object.
  * \param cutoff If negative, an exact minimum cycle basis is returned. Otherwise
  *   only those cycles in the result will be part of some minimum cycle basis which
  *   are of size <code>2*cutoff + 1</code> or smaller. Cycles longer than this limit
@@ -504,7 +505,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
         igraph_inclist_destroy(&inclist);
         igraph_vector_int_destroy(&visited);
         igraph_vector_destroy(&degrees);
-        IGRAPH_FINALLY_CLEAN(5);
+        IGRAPH_FINALLY_CLEAN(3);
     }
 
     /* Sort candidates by size (= weight) and remove duplicates. */
