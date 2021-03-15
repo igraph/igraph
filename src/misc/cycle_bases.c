@@ -449,25 +449,28 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
         mark = 0;
         for (i=0; i < no_of_nodes; ++i) {
-            long int degree    = VECTOR(degrees)[i];
-            long int comp_size = VECTOR(csize)[(long) VECTOR(membership)[i]];
+            long int degree = VECTOR(degrees)[i];
+            igraph_bool_t vis = VECTOR(visited)[i] % 3;
 
-            /* The BFS is only necessary from vertices of degree 3 or greater, except for components
-             * of size 2, which may be a 2-cycle, or components of size 1, whih may have a self-loop. */
-            /* TODO: BFS is only necessary from a feedback vertex set, find fast FVS approximation algorithm. */
-            if (degree >= 3 || (comp_size <= 2 && degree > 0)) {
-                /* From unvisited vertices, we do a full BFS, in order to obtain a complete basis.
-                 * From already visited vertices, we do a range-limited BFS with 'cutoff'. */
-                igraph_integer_t cut = VECTOR(visited)[i] % 3 ? cutoff : -1;
-                IGRAPH_CHECK(igraph_i_fundamental_cycles(graph, i, &inclist, &visited, mark, cut, &candidates));
-                mark += 3;
+            /* Generally, we only need to run a BFS from vertices of degree 3 or greater.
+             * The exception is a connected component which is itself a cycle, and therefore
+             * only contains vertices of degree 2. Thus from unvisited vertices we always run
+             * a full BFS while from already visited ones only if their degree is at least 3. */
+
+            /* TODO: mark entire component as visited, not just vertex. */
+            if (degree <= 1 || (vis && degree < 3)) {
+                continue;
             }
+
+            /* TODO: BFS is only necessary from a feedback vertex set, find fast FVS approximation algorithm. */
+
+            IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(
+                             graph, i, &inclist, &visited, mark, (vis || !complete) ? cutoff : -1, &candidates));
+            mark += 3;
         }
 
         igraph_inclist_destroy(&inclist);
         igraph_vector_int_destroy(&visited);
-        igraph_vector_destroy(&csize);
-        igraph_vector_destroy(&membership);
         igraph_vector_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(5);
     }
