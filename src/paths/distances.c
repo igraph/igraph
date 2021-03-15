@@ -29,6 +29,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "core/indheap.h"
 
 /* When vid_ecc is not NULL, only one vertex id should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
@@ -240,6 +241,8 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * \param to Pointer to an integer, if not \c NULL it will be set to the
  *        target vertex of the diameter path. If \p unconn is FALSE, and
  *        a disconnected graph is detected, this is set to -1.
+ * \param directed Boolean, whether to consider directed
+ *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
  *        \c TRUE the longest geodesic within a component
  *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
@@ -256,6 +259,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_integer_t vid_start,
                            igraph_integer_t *from,
                            igraph_integer_t *to,
+                           igraph_bool_t directed,
                            igraph_bool_t unconn) {
 
     int no_of_nodes = igraph_vcount(graph);
@@ -288,7 +292,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         RNG_END();
     }
 
-    if (!igraph_is_directed(graph)) {
+    if (!igraph_is_directed(graph) || !directed) {
         igraph_lazy_adjlist_t adjlist;
         igraph_vector_t ecc_vec;
 
@@ -444,34 +448,59 @@ int igraph_pseudo_diameter(const igraph_t *graph,
  * wil be set to infinity, and \p vid_ecc to -1;
  *
  */
-int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_neimode_t mode) {
+int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_lazy_inclist_t *inclist) {
     long int no_of_nodes = igraph_vcount(graph);
-    igraph_matrix_t dist_mat;
-    igraph_lazy_adjlist_t adjlist;
+    igraph_2wheap_t Q;
+    igraph_vector_t vec_dist;
+    long int i;
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
-                                          IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+    IGRAPH_VECTOR_INIT_FINALLY(&vec_dist, no_of_nodes);
+    igraph_vector_fill(&vec_dist, IGRAPH_INFINITY);
+    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
-    IGRAPH_MATRIX_INIT_FINALLY(&dist_mat, 1, no_of_nodes);
-    IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph,
-                &dist_mat,
-                igraph_vss_1(vid_start),
-                igraph_vss_all(),
-                weights,
-                mode));
+    igraph_2wheap_clear(&Q);
+    igraph_2wheap_push_with_index(&Q, vid_start, -1.0);
+
+    while (!igraph_2wheap_empty(&Q)) {
+        long int minnei = igraph_2wheap_max_index(&Q);
+        igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
+        igraph_vector_int_t *neis;
+        long int nlen;
+
+        VECTOR(vec_dist)[minnei] = mindist - 1.0;
+
+        /* Now check all neighbors of 'minnei' for a shorter path */
+        neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
+        nlen = igraph_vector_int_size(neis);
+        for (i = 0; i < nlen; i++) {
+            long int edge = (long int) VECTOR(*neis)[i];
+            long int tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
+            igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
+            igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
+            igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
+            if (!has) {
+                /* This is the first non-infinite distance */
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+            } else if (altdist < curdist) {
+                /* This is a shorter path */
+                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+            }
+        }
+    }
 
     *ecc = 0;
     *vid_ecc = vid_start;
     double degree_ecc = 0;
     long int degree_i;
-    for (int i = 0; i < no_of_nodes; i++) {
+    for (i = 0; i < no_of_nodes; i++) {
         if (i == vid_start) {
             continue;
         }
-        igraph_real_t dist = MATRIX(dist_mat, i, 0);
+        igraph_real_t dist = VECTOR(vec_dist)[i];
         /* adjlist is used to ignore multiple edges when finding the degree */
-        degree_i  = igraph_vector_int_size(igraph_lazy_adjlist_get(&adjlist, i));
+        degree_i  = igraph_vector_int_size(igraph_lazy_inclist_get(inclist, i));
 
         if (dist > *ecc) {
             if (!IGRAPH_FINITE(dist)) {
@@ -492,8 +521,8 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
             }
         }
     }
-    igraph_matrix_destroy(&dist_mat);
-    igraph_lazy_adjlist_destroy(&adjlist);
+    igraph_2wheap_destroy(&Q);
+    igraph_vector_destroy(&vec_dist);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
@@ -542,7 +571,6 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
  *
  * \sa \ref igraph_diameter_dijkstra()
  */
-
 int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                                     const igraph_vector_t *weights,
                                     igraph_real_t *diameter,
@@ -554,6 +582,7 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
 
     long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
@@ -561,6 +590,25 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
     if (vid_start >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
+    }
+
+    if (!weights) {
+        return igraph_pseudo_diameter(graph, diameter, vid_start, from, to, directed, unconn);
+    }
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
+                      " of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
+        }
+        else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
     }
 
     /* We will reach here when vid_start < 0 and the graph has no vertices. */
@@ -584,12 +632,15 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (!igraph_is_directed(graph) || !directed) {
+        igraph_lazy_inclist_t inclist;
+        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_NO_LOOPS));
+        IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
         if (from) {
             *from = vid_start;
         }
 
-        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_u, vid_start, &vid_ecc, unconn, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_u, vid_start, &vid_ecc, unconn, &inclist));
 
         inf = !IGRAPH_FINITE(ecc_u);
 
@@ -598,7 +649,7 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                 if (to) {
                     *to = vid_ecc;
                 }
-                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_v, vid_ecc, &vid_ecc, unconn, IGRAPH_ALL));
+                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_v, vid_ecc, &vid_ecc, unconn, &inclist));
 
                 if (ecc_u < ecc_v) {
                     ecc_u = ecc_v;
@@ -610,6 +661,8 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                 }
             }
         }
+        igraph_lazy_inclist_destroy(&inclist);
+        IGRAPH_FINALLY_CLEAN(1);
     } else {
         igraph_real_t ecc_out;
         igraph_real_t ecc_in;
@@ -617,9 +670,17 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         igraph_integer_t vid_ecc_out;
         igraph_integer_t vid_end;
         igraph_bool_t direction;
+        igraph_lazy_inclist_t inclist_out;
+        igraph_lazy_inclist_t inclist_in;
 
-        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_out, vid_start, &vid_ecc_out, unconn, IGRAPH_OUT));
-        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_in, vid_start, &vid_ecc_in, unconn, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist_out, IGRAPH_OUT, IGRAPH_NO_LOOPS));
+        IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist_out);
+        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist_in, IGRAPH_IN, IGRAPH_NO_LOOPS));
+        IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist_in);
+
+
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_out, vid_start, &vid_ecc_out, unconn, &inclist_out));
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_in, vid_start, &vid_ecc_in, unconn, &inclist_in));
 
         /* A directed graph is strongly connected iff all vertices are reachable
          * from vid_start both when moving along or moving opposite the edge directions. */
@@ -640,8 +701,8 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                 /* TODO: In the undirected case, we break ties between vertices at the
                  * same distance based on their degree. In te directed case, should we
                  * use in-, out- or total degree? */
-                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_out, vid_ecc, &vid_ecc_out, unconn, IGRAPH_OUT));
-                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_in, vid_ecc, &vid_ecc_in, unconn, IGRAPH_IN));
+                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_out, vid_ecc, &vid_ecc_out, unconn, &inclist_out));
+                IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_in, vid_ecc, &vid_ecc_in, unconn, &inclist_in));
 
                 if (ecc_out > ecc_in) {
                     vid_ecc = vid_ecc_out;
@@ -676,6 +737,9 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                 }
             }
         }
+        igraph_lazy_inclist_destroy(&inclist_out);
+        igraph_lazy_inclist_destroy(&inclist_in);
+        IGRAPH_FINALLY_CLEAN(2);
     }
 
     if (inf) {

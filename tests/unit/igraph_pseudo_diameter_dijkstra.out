@@ -16,12 +16,12 @@ result: 0, from 0 to 0
 2 vertices, directed, unconn = false:
 result: Inf, from -1 to -1
 
-Undirected disconnected graph with loops and multiple edges.
+Undirected disconnected graph with loops and multiple edges, all weights equal.
 result: 3, from 0 to 4
 
 result: 3, from 4 to 0
 
-result: 3, from 4 to 0
+result: 2, from 2 to 1
 
 result: 3, from 0 to 4
 
@@ -34,7 +34,7 @@ result: 3, from 0 to 4
 
 result: 3, from 4 to 0
 
-result: 3, from 4 to 0
+result: 2, from 2 to 1
 
 result: 3, from 0 to 4
 

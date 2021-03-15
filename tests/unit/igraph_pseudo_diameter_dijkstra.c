@@ -37,52 +37,56 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     printf("Null graph without explicit start vertex:\n");
+    igraph_vector_init_int(&weights, 0);
     igraph_small(&g, 0, 0, -1);
-    print_result(&g, NULL, -1, 1, 1);
+    print_result(&g, &weights, -1, 1, 1);
     igraph_destroy(&g);
 
     printf("1 vertex:\n");
     igraph_small(&g, 1, 0, -1);
-    print_result(&g, NULL, 0, 1, 1);
+    print_result(&g, &weights, 0, 1, 1);
     igraph_destroy(&g);
 
     printf("2 vertices unconn = true:\n");
     igraph_small(&g, 2, 0, -1);
-    print_result(&g, NULL, 0, 1, 1);
+    print_result(&g, &weights, 0, 1, 1);
     igraph_destroy(&g);
 
     printf("2 vertices unconn = false:\n");
     igraph_small(&g, 2, 0, -1);
-    print_result(&g, NULL, 0, 1, 0);
+    print_result(&g, &weights, 0, 1, 0);
     igraph_destroy(&g);
 
     printf("2 vertices, directed, unconn = true:\n");
     igraph_small(&g, 2, 1, -1);
-    print_result(&g, NULL, 0, 1, 1);
+    print_result(&g, &weights, 0, 1, 1);
     igraph_destroy(&g);
 
     printf("2 vertices, directed, unconn = false:\n");
     igraph_small(&g, 2, 1, -1);
-    print_result(&g, NULL, 0, 1, 0);
+    print_result(&g, &weights, 0, 1, 0);
     igraph_destroy(&g);
+    igraph_vector_destroy(&weights);
 
-    printf("Undirected disconnected graph with loops and multiple edges.\n");
+    printf("Undirected disconnected graph with loops and multiple edges, all weights equal.\n");
+    igraph_vector_init_int(&weights, 8, 1, 1, 1, 1, 1, 1, 1, 1);
     igraph_small(&g, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
     for (i = 0; i < 6; i ++) {
-        print_result(&g, NULL, i, 1, 1);
+        print_result(&g, &weights, i, 1, 1);
     }
     igraph_destroy(&g);
 
     printf("Same graph, directed, direction ignored.\n");
     igraph_small(&g, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
     for (i = 0; i < 6; i ++) {
-        print_result(&g, NULL, i, 0, 1);
+        print_result(&g, &weights, i, 0, 1);
     }
 
     printf("Same graph, direction not ignored.\n");
     for (i = 0; i < 6; i ++) {
-        print_result(&g, NULL, i, 1, 1);
+        print_result(&g, &weights, i, 1, 1);
     }
+    igraph_vector_destroy(&weights);
 
     printf("Same graph, weighted.\n");
     igraph_vector_init_int(&weights, 8, 0, 1, 2, 3, 4, 5, 6, 7);
