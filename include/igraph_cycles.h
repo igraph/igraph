@@ -16,6 +16,7 @@ IGRAPH_EXPORT int igraph_fundamental_cycles(const igraph_t *graph,
 
 IGRAPH_EXPORT int igraph_minimum_cycle_basis(const igraph_t *graph,
                                              igraph_integer_t cutoff,
+                                             igraph_bool_t complete,
                                              igraph_vector_ptr_t *result);
 
 __END_DECLS

@@ -27,13 +27,28 @@
 
 #include "core/interruption.h"
 
-static int igraph_i_fundamental_cycles(const igraph_t *graph,
-                                       igraph_integer_t start_vid,
-                                       const igraph_inclist_t *inclist,
-                                       igraph_vector_int_t *visited,
-                                       igraph_integer_t mark, /* mark used in 'visited' */
-                                       igraph_integer_t cutoff,
-                                       igraph_vector_ptr_t *result) {
+/**** Fundamental cycles *****/
+
+/* Computes fundamental cycles for the connected component containing 'start_vid',
+ * and appends them to 'result'.
+ *
+ * 'visited' must be a vector of length vertex_count.
+ * visited[u] will be set to mark+1 or mark+2 for each visited vertex 'u'.
+ * No elements of 'visited' must have these values when calling this function.
+ * 'mark' can be specified in order to be able to re-use a 'visited' vector
+ * multiple times without having to re-set all its elements.
+ *
+ * During the operation of the function, mark+1 indicates that a vertex has been
+ * queued for processing, but not processed yet. mark+2 indicates that it has
+ * been processed.
+ */
+static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
+                                           igraph_integer_t start_vid,
+                                           const igraph_inclist_t *inclist,
+                                           igraph_vector_int_t *visited,
+                                           igraph_integer_t mark, /* mark used in 'visited' */
+                                           igraph_integer_t cutoff,
+                                           igraph_vector_ptr_t *result) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -54,6 +69,7 @@ static int igraph_i_fundamental_cycles(const igraph_t *graph,
     igraph_dqueue_int_push(&q, start_vid); /* vertex id */
     igraph_dqueue_int_push(&q, 0);         /* distance from start_vid*/
     VECTOR(pred_edge)[start_vid] = -1;
+    VECTOR(*visited)[start_vid] = mark + 1;
 
     while (! igraph_dqueue_int_empty(&q)) {
         long int v = igraph_dqueue_int_pop(&q);
@@ -81,8 +97,8 @@ static int igraph_i_fundamental_cycles(const igraph_t *graph,
 
                 /* Found cycle edge u-v. Now we walk back up the BFS tree
                  * in order to find the common ancestor of u and v. We exploit
-                 * that the distance of 'u' from the start vertex is either the
-                 * same as that of 'v', or one greater. */
+                 * that the distance of u from the start vertex is either the
+                 * same as that of v, or one greater. */
 
                 long int up = u, vp = v;
                 long int u_back_len, v_back_len;
@@ -177,19 +193,26 @@ static void free_cycle_list(igraph_vector_ptr_t *list) {
  * \function igraph_fundamental_cycles
  * \brief Finds a fundamental cycle basis.
  *
+ * This function computes a fundamental cycle basis associated with a breadth-first
+ * search tree of the graph.
+ *
+ * </para><para>
  * Edge directions are ignored. Multi-edges and self-loops are supported.
  *
- * \param graph
- * \param start_vid If negative, an arbitrary fundamental cycle basis is returned.
+ * \param graph The graph object.
+ * \param start_vid If negative, a complete fundamental cycle basis is returned.
  *   If a vertex id, the fundamental cycles associated with the BFS tree rooted
  *   in that vertex will be returned, only for the weakly connected component
  *   containing that vertex.
  * \param cutoff If negative, a complete cycle basis is returned. Otherwise, only
- *   cycles of length 2*cutoff + 1 or shorter are included. \p cutoff is the maximum
- *   depth of the breadth-fist search tree that generates the basis.
- * \param result The result, a list of \type igraph_vector_t objects containing the
- *   edge ids for cycles.
- * \return Error code
+ *   cycles of length <code>2*cutoff + 1</code> or shorter are included. \p cutoff
+ *   is used to limit the depth of the BFS tree when searching for cycle edges.
+ * \param result An initialized pointer vector. The result will be stored here as
+ *   a list of \type igraph_vector_t objects, each containing the edge ids of a
+ *   basis element.
+ * \return Error code.
+ *
+ * Time complexity: O(|V| + |E|).
  */
 int igraph_fundamental_cycles(const igraph_t *graph,
                               igraph_integer_t start_vid,
@@ -212,22 +235,22 @@ int igraph_fundamental_cycles(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);
 
-    /* compute cycle rank assuming that the graph is connected */
+    /* Compute cycle rank assuming that the graph is connected. */
     estimated_rank = no_of_edges - no_of_nodes + 1;
     estimated_rank = estimated_rank < 0 ? 0 : estimated_rank;
 
     igraph_vector_ptr_clear(result);
     IGRAPH_CHECK(igraph_vector_ptr_reserve(result, estimated_rank));
-    IGRAPH_FINALLY(free_cycle_list, result);
+    IGRAPH_FINALLY(free_cycle_list, result); /* Free 'result' elements if computation fails. */
 
     if (start_vid < 0) {
         for (i=0; i < no_of_nodes; ++i) {
             if (! VECTOR(visited)[i]) {
-                igraph_i_fundamental_cycles(graph, i, &inclist, &visited, /* mark */ 0, cutoff, result);
+                IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, i, &inclist, &visited, /* mark */ 0, cutoff, result));
             }
         }
     } else {
-        igraph_i_fundamental_cycles(graph, start_vid, &inclist, &visited, /* mark */ 0, cutoff, result);
+        IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, start_vid, &inclist, &visited, /* mark */ 0, cutoff, result));
     }
 
     igraph_vector_int_destroy(&visited);
@@ -245,7 +268,8 @@ int igraph_fundamental_cycles(const igraph_t *graph,
 
 
 /* qsort-compatible comparison for sparse cycle vectors: shorter ones come first, use lexicographic
- * order for equal length ones. */
+ * order for equal length ones. Lexicographic order helps keep row insertion into the reduced matrix
+ * efficient during Gaussian elimination, by ensuring that insertions usually happen near the end. */
 static int cycle_cmp(const void *c1, const void *c2) {
     const igraph_vector_t *v1 = * (igraph_vector_t **) c1, *v2 = * (igraph_vector_t **) c2;
     long int n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
@@ -404,13 +428,22 @@ static void remove_duplicate_candidates(igraph_vector_ptr_t *candidates) {
  * \brief Computes a minimum weight cycle basis.
  *
  * \param graph
- * \param cutoff
- * \param complete
+ * \param cutoff If negative, an exact minimum cycle basis is returned. Otherwise
+ *   only those cycles in the result will be part of some minimum cycle basis which
+ *   are of size <code>2*cutoff + 1</code> or smaller. Cycles longer than this limit
+ *   may not be of the smallest possible size.
+ *   \p cutoff is used to limit the depth of the BFS tree when computing candidate
+ *   cycles. Specifying a cutoff can speed up the computation substantially.
+ * \param complete Boolean value. Used only when \p cutoff was given.
+ *   If true, a complete basis is returned. If false, only cycles not greater
+ *   than <code>2*cutoff + 1</code> are returned. This may save computation
+ *   time, however, the result will not span the entire cycle space.
  * \param result
  * \return Error code.
  */
 int igraph_minimum_cycle_basis(const igraph_t *graph,
                                igraph_integer_t cutoff,
+                               igraph_bool_t complete,
                                igraph_vector_ptr_t *result) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -423,7 +456,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     {
         igraph_inclist_t inclist;
         igraph_vector_int_t visited;
-        igraph_vector_t degrees, membership, csize;
+        igraph_vector_t degrees;
         igraph_integer_t no_of_comps;
         igraph_integer_t mark;
 
@@ -432,9 +465,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
-        IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
-        IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
-        IGRAPH_CHECK(igraph_clusters(graph, &membership, &csize, &no_of_comps, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_clusters(graph, NULL, NULL, &no_of_comps, IGRAPH_WEAK));
         rank = no_of_edges - no_of_nodes + no_of_comps;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);
@@ -443,7 +474,8 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&candidates, 0));
-        /* TODO reserve space */
+         /* TODO: estimate space to reserve. 'rank' is a lower bound only. */
+        IGRAPH_CHECK(igraph_vector_ptr_reserve(&candidates, rank));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &candidates);
         IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&candidates, igraph_vector_destroy);
 
@@ -491,6 +523,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     IGRAPH_FINALLY(free_cycle_list, result);
 
     /* Find a complete basis, starting with smallest elements. */
+    /* This is typically the slowest part of the algorithm. */
     {
         long int cand_len = igraph_vector_ptr_size(&candidates);
         igraph_vector_ptr_t reduced_matrix;
