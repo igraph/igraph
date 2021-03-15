@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_vector_lex_cmp()` and `igrapg_vector_colex_cmp()` for lexicographic
+   and colexicographic comparison of vectors. These functions may also be used
+   for sorting.
+
 ### Changed
 
  - `igraph_community_multilevel()` is now randomized (PR #1696, thanks to Daniel Noom).
@@ -22,6 +28,7 @@
  - `igraph_(personalized_)pagerank()` would return incorrect results for weighted multigraphs with fewer than 128 vertices when using `IGRAPH_PAGERANK_ALGO_PRPACK`.
  - `igraph_diversity()` now checks its input more carefully, and throws an error when the input graph has multi-edges or is directed.
  - `igraph_shortest_paths_johnson()` would return incorrect results when the `to` argument differed from `from` (thanks to Daniel Noom).
+ - `igraph_is_graphical()` would fail to set the result variable for certain special degree sequences in the undirected simple graph case.
  - GLPK internal errors no longer crash igraph.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
@@ -35,6 +42,7 @@
  - The `IGRAPH_ENABLE_LTO` build option now supports the `AUTO` value, which uses LTO only if the compiler supports it. Warning: CMake may not always be able to detect that LTO is not fully supported. Therefore, the default setting is `OFF`.
  - The following functions are now interruptible: `igraph_grg_game()`, `igraph_sbm_game()`, `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`.
  - Functions that use GLPK, such as `igraph_feedback_arc_set()` and `igraph_community_optimal_modularity()` are now interruptible.
+ - Add support for older versions of Clang that do not recognize the `-Wno-varargs` flag.
 
 ### Acknowledgments
 

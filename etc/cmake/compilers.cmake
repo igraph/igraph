@@ -4,7 +4,9 @@ if(MSVC)
   add_compile_options(/FS)
 endif()
 
-check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
+if (NOT MSVC)
+  check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
+endif()
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
