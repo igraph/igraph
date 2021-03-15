@@ -765,6 +765,7 @@ int igraph_moran_process(const igraph_t *graph,
                  /*is local?*/ 0,
                  /*vid*/ -1,
                  /*mode*/ IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_vector_destroy, &V);
 
     /* Choose a vertex for reproduction from among all vertices in the graph. */
     /* The vertex is chosen proportionate to its quantity and such that its */
@@ -810,9 +811,11 @@ int igraph_moran_process(const igraph_t *graph,
     /* still might happen that the edge weights of interest would sum to zero. */
     /* An error would be raised in that case. */
     igraph_vector_destroy(&V);
+    IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_CHECK(igraph_i_ecumulative_proportionate_values(graph, weights, &V,
                  /*is local?*/ 1,
                  /*vertex*/ a, mode));
+    IGRAPH_FINALLY(igraph_vector_destroy, &V);
 
     /* Choose a vertex for death from among all vertices in a's perspective. */
     /* Let E be all the edges in the perspective of a. If (u,v) \in E is any */
@@ -997,6 +1000,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_i_vcumulative_proportionate_values(graph, quantities, &V,
                  islocal, vid, mode));
+    IGRAPH_FINALLY(igraph_vector_destroy, &V);
 
     /* Finally, choose a vertex u to imitate. The vertex u is chosen */
     /* proportionate to its quantity. In the case of a local perspective, we */
