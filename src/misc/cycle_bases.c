@@ -1,0 +1,536 @@
+/*
+   IGraph library.
+   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "igraph_cycles.h"
+#include "igraph_components.h"
+#include "igraph_adjlist.h"
+#include "igraph_dqueue.h"
+#include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_memory.h"
+#include "igraph_vector_ptr.h"
+
+#include "core/interruption.h"
+
+static int igraph_i_fundamental_cycles(const igraph_t *graph,
+                                       igraph_integer_t start_vid,
+                                       const igraph_inclist_t *inclist,
+                                       igraph_vector_int_t *visited,
+                                       igraph_integer_t mark, /* mark used in 'visited' */
+                                       igraph_integer_t cutoff,
+                                       igraph_vector_ptr_t *result) {
+
+    long int no_of_nodes = igraph_vcount(graph);
+    igraph_dqueue_int_t q;
+    igraph_vector_int_t pred_edge;
+    igraph_vector_int_t u_back, v_back;
+
+    if (start_vid < 0 || start_vid >= no_of_nodes) {
+        IGRAPH_ERROR("Invalid starting vertex id.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&pred_edge, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&u_back, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&v_back, 0);
+
+    igraph_dqueue_int_init(&q, 0);
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
+
+    igraph_dqueue_int_push(&q, start_vid); /* vertex id */
+    igraph_dqueue_int_push(&q, 0);         /* distance from start_vid*/
+    VECTOR(pred_edge)[start_vid] = -1;
+
+    while (! igraph_dqueue_int_empty(&q)) {
+        long int v = igraph_dqueue_int_pop(&q);
+        long int vdist = igraph_dqueue_int_pop(&q);
+
+        igraph_vector_int_t *incs = igraph_inclist_get(inclist, v);
+        long int n = igraph_vector_int_size(incs);
+        long int i, j;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        for (i=0; i < n; ++i) {
+            long int e = VECTOR(*incs)[i];
+            long int u = IGRAPH_OTHER(graph, e, v);
+
+            if (e == VECTOR(pred_edge)[v]) {
+                continue;
+            }
+
+            if (VECTOR(*visited)[u] == mark + 2) {
+                /* u has already been processed */
+                continue;
+            } else if (VECTOR(*visited)[u] == mark + 1) {
+                /* u has been seen but not yet processed */
+
+                /* Found cycle edge u-v. Now we walk back up the BFS tree
+                 * in order to find the common ancestor of u and v. We exploit
+                 * that the distance of 'u' from the start vertex is either the
+                 * same as that of 'v', or one greater. */
+
+                long int up = u, vp = v;
+                long int u_back_len, v_back_len;
+                igraph_vector_t *cycle;
+
+                IGRAPH_CHECK(igraph_vector_int_push_back(&v_back, e));
+                for (;;) {
+                    long int upe, vpe;
+
+                    if (up == vp) {
+                        break;
+                    }
+
+                    upe = VECTOR(pred_edge)[up];
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&u_back, upe));
+                    up = IGRAPH_OTHER(graph, upe, up);
+
+                    if (up == vp) {
+                        break;
+                    }
+
+                    vpe = VECTOR(pred_edge)[vp];
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&v_back, vpe));                    
+                    vp = IGRAPH_OTHER(graph, vpe, vp);
+                }
+
+                cycle = IGRAPH_CALLOC(1, igraph_vector_t);
+                if (! cycle) {
+                    IGRAPH_ERROR("Insufficient memory for fundamental cycles.", IGRAPH_ENOMEM);
+                }
+                IGRAPH_FINALLY(igraph_free, cycle);
+
+                u_back_len = igraph_vector_int_size(&u_back);
+                v_back_len = igraph_vector_int_size(&v_back);
+                IGRAPH_CHECK(igraph_vector_init(cycle, u_back_len + v_back_len));
+                IGRAPH_FINALLY(igraph_vector_destroy, cycle);
+
+                for (j=0; j < v_back_len; ++j) {
+                    VECTOR(*cycle)[j] = VECTOR(v_back)[j];
+                }
+                for (j=0; j < u_back_len; ++j) {
+                    VECTOR(*cycle)[v_back_len + j] = VECTOR(u_back)[u_back_len - j - 1];
+                }
+
+                igraph_vector_int_clear(&v_back);
+                igraph_vector_int_clear(&u_back);
+
+                IGRAPH_CHECK(igraph_vector_ptr_push_back(result, cycle));
+                IGRAPH_FINALLY_CLEAN(2); /* pass ownership of 'elem' to 'result' */
+            } else {
+                /* encountering u for the first time, queue it for processing */
+
+                /* Only queue vertices with distance at most 'cutoff' from the root. */
+                /* Negative 'cutoff' indicates no cutoff. */
+                if (cutoff < 0 || vdist < cutoff) {
+                    igraph_dqueue_int_push(&q, u);
+                    igraph_dqueue_int_push(&q, vdist + 1);
+                    VECTOR(*visited)[u] = mark + 1;
+                    VECTOR(pred_edge)[u] = e;
+                }
+            }            
+        }
+
+        VECTOR(*visited)[v] = mark + 2; /* mark v as processed */
+    } /* ! igraph_dqueue_int_empty(&q) */
+
+    igraph_dqueue_int_destroy(&q);
+    igraph_vector_int_destroy(&v_back);
+    igraph_vector_int_destroy(&u_back);
+    igraph_vector_int_destroy(&pred_edge);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+static void free_cycle_list(igraph_vector_ptr_t *list) {
+    long int n = igraph_vector_ptr_size(list);
+    long int i;
+    igraph_vector_t **l = (igraph_vector_t **) VECTOR(*list);
+
+    for (i=0; i < n; ++i) {
+        if (l[i]) {
+            igraph_vector_destroy(l[i]);
+            IGRAPH_FREE(l[i]); /* also sets it to NULL */
+        }
+    }
+}
+
+
+/**
+ * \function igraph_fundamental_cycles
+ * \brief Finds a fundamental cycle basis.
+ *
+ * Edge directions are ignored. Multi-edges and self-loops are supported.
+ *
+ * \param graph
+ * \param start_vid If negative, an arbitrary fundamental cycle basis is returned.
+ *   If a vertex id, the fundamental cycles associated with the BFS tree rooted
+ *   in that vertex will be returned, only for the weakly connected component
+ *   containing that vertex.
+ * \param cutoff If negative, a complete cycle basis is returned. Otherwise, only
+ *   cycles of length 2*cutoff + 1 or shorter are included. \p cutoff is the maximum
+ *   depth of the breadth-fist search tree that generates the basis.
+ * \param result The result, a list of \type igraph_vector_t objects containing the
+ *   edge ids for cycles.
+ * \return Error code
+ */
+int igraph_fundamental_cycles(const igraph_t *graph,
+                              igraph_integer_t start_vid,
+                              igraph_integer_t cutoff,
+                              igraph_vector_ptr_t *result) {
+
+    long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
+    long int estimated_rank;
+    long int i;
+    igraph_inclist_t inclist;
+    igraph_vector_int_t visited;
+
+    if (start_vid >= no_of_nodes) {
+        IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
+    }
+
+    igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);
+
+    /* compute cycle rank assuming that the graph is connected */
+    estimated_rank = no_of_edges - no_of_nodes + 1;
+    estimated_rank = estimated_rank < 0 ? 0 : estimated_rank;
+
+    igraph_vector_ptr_clear(result);
+    IGRAPH_CHECK(igraph_vector_ptr_reserve(result, estimated_rank));
+    IGRAPH_FINALLY(free_cycle_list, result);
+
+    if (start_vid < 0) {
+        for (i=0; i < no_of_nodes; ++i) {
+            if (! VECTOR(visited)[i]) {
+                igraph_i_fundamental_cycles(graph, i, &inclist, &visited, /* mark */ 0, cutoff, result);
+            }
+        }
+    } else {
+        igraph_i_fundamental_cycles(graph, start_vid, &inclist, &visited, /* mark */ 0, cutoff, result);
+    }
+
+    igraph_vector_int_destroy(&visited);
+    igraph_inclist_destroy(&inclist);
+    IGRAPH_FINALLY_CLEAN(3); /* +1 for 'free_cycle_list' */
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/***** Minimum weight cycle basis *****/
+
+/* In this implementation, the cycle vectors (basis elements) are stored as a sparse representation:
+ * a sorted list of edge indices. */
+
+
+/* qsort-compatible comparison for sparse cycle vectors: shorter ones come first, use lexicographic
+ * order for equal length ones. */
+static int cycle_cmp(const void *c1, const void *c2) {
+    const igraph_vector_t *v1 = * (igraph_vector_t **) c1, *v2 = * (igraph_vector_t **) c2;
+    long int n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
+
+    if (n1 < n2) {
+        return -1;
+    } else if (n1 > n2) {
+        return 1;
+    } else {
+        return igraph_vector_lex_cmp(v1, v2);
+    }
+}
+
+/* Adding cycle vectors produces the symmetric difference of the corresponding edge sets. */
+static int cycle_add(const igraph_vector_t *a, const igraph_vector_t *b, igraph_vector_t *res) {
+    long int na = igraph_vector_size(a), nb = igraph_vector_size(b);
+    const igraph_real_t *pa = VECTOR(*a), *pb = VECTOR(*b);
+    const igraph_real_t *pa_end = pa + na, *pb_end = pb + nb;
+
+    igraph_vector_clear(res);
+    for (;;) {
+        while (pa != pa_end && pb != pb_end && *pa < *pb) {
+            IGRAPH_CHECK(igraph_vector_push_back(res, *pa));
+            pa++;
+        }
+        while (pa != pa_end && pb != pb_end && *pa == *pb) {
+            pa++; pb++;
+        }
+        while (pa != pa_end && pb != pb_end && *pb < *pa) {
+            IGRAPH_CHECK(igraph_vector_push_back(res, *pb));
+            pb++;
+        }
+        if (pa == pa_end) {
+            while (pb != pb_end) {
+                IGRAPH_CHECK(igraph_vector_push_back(res, *pb));
+                pb++;
+            }
+            break;
+        }
+        if (pb == pb_end) {
+            while (pa != pa_end) {
+                IGRAPH_CHECK(igraph_vector_push_back(res, *pa));
+                pa++;
+            }
+            break;
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+#define MATROW(m, i) ((igraph_vector_t *) VECTOR(m)[i])
+#define MATEL(m, i, j) VECTOR(*MATROW(m, i))[j]
+#define SWAPVECS(p1, p2) \
+    do { \
+        igraph_vector_t *t = p1; \
+        p1 = p2; \
+        p2 = t; \
+    } while (0)
+
+static void destroy_work_ptr(igraph_vector_t **ptr) {
+    igraph_vector_destroy(*ptr);
+    IGRAPH_FREE(*ptr);
+}
+
+/* Gaussian elimination for sparse cycle vectors. 'reduced_matrix' is always maintained
+ * in row-echelon form. This function decides if 'cycle' is linearly independent of this
+ * matrix, and if not, it adds it to the matrix. */
+static int gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
+                                const igraph_vector_t *cycle,
+                                igraph_bool_t *independent) {
+
+    long int nrow = igraph_vector_ptr_size(reduced_matrix);
+    long int i;
+
+    igraph_vector_t *work, *tmp;
+
+    work = IGRAPH_CALLOC(1, igraph_vector_t);
+    if (! work) {
+        IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, work);
+    IGRAPH_CHECK(igraph_vector_copy(work, cycle));
+    IGRAPH_FINALLY(destroy_work_ptr, &work);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    tmp = IGRAPH_CALLOC(1, igraph_vector_t);
+    if (! tmp) {
+        IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, tmp);
+    IGRAPH_CHECK(igraph_vector_init(tmp, 0));
+    IGRAPH_FINALLY(destroy_work_ptr, &tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    for (i=0; i < nrow; ++i) {
+        igraph_vector_t *row = MATROW(*reduced_matrix, i);
+
+        if ( VECTOR(*row)[0] < VECTOR(*work)[0] ) {
+            continue;
+        } else if ( VECTOR(*row)[0] == VECTOR(*work)[0] ) {
+            IGRAPH_CHECK(cycle_add(row, work, tmp));
+            if (igraph_vector_empty(tmp)) {
+                *independent = 0;
+                destroy_work_ptr(&work);
+                destroy_work_ptr(&tmp);
+                IGRAPH_FINALLY_CLEAN(2);
+                return IGRAPH_SUCCESS;
+            }
+            SWAPVECS(work, tmp);
+        } else { /* VECTOR(*row)[0] > VECTOR(*work)[0] */
+            break;
+        }
+    }
+
+    /* 'cycle' was linearly independent, insert new row into matrix */
+    *independent = 1;
+    IGRAPH_CHECK(igraph_vector_ptr_insert(reduced_matrix, i, work));
+
+    destroy_work_ptr(&tmp);
+    IGRAPH_FINALLY_CLEAN(2); /* +1, transferring ownership of 'work' to 'reduced_matrix' */
+
+    return IGRAPH_SUCCESS;
+}
+
+#undef MATEL
+#undef MATROW
+#undef SWAPVECS
+
+/* Remove duplicates from the list of candidate elements.
+ * The list is assumed to be sorted. */
+static void remove_duplicate_candidates(igraph_vector_ptr_t *candidates) {
+    long int i, j, n = igraph_vector_ptr_size(candidates);
+    igraph_vector_t **c = (igraph_vector_t **) VECTOR(*candidates);
+
+    if (n < 2) {
+        return;
+    }
+
+    for (i=0, j=0; i < n-1; ++i) {
+        if (igraph_vector_all_e(c[i], c[i+1])) {
+            igraph_vector_destroy(c[i]);
+            IGRAPH_FREE(c[i]);
+        } else {
+            c[j++] = c[i];
+        }
+    }
+    c[j++] = c[n-1];
+
+    igraph_vector_ptr_resize(candidates, j);
+}
+
+/**
+ * \function igraph_minimum_cycle_basis
+ * \brief Computes a minimum weight cycle basis.
+ *
+ * \param graph
+ * \param cutoff
+ * \param complete
+ * \param result
+ * \return Error code.
+ */
+int igraph_minimum_cycle_basis(const igraph_t *graph,
+                               igraph_integer_t cutoff,
+                               igraph_vector_ptr_t *result) {
+
+    long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
+    long int i;
+    igraph_integer_t rank;
+    igraph_vector_ptr_t candidates;
+
+    /* Compute candidate elements for the minimum weight basis. */
+    {
+        igraph_inclist_t inclist;
+        igraph_vector_int_t visited;
+        igraph_vector_t degrees, membership, csize;
+        igraph_integer_t no_of_comps;
+        igraph_integer_t mark;
+
+        /* We use the degrees to avoid doing a BFS from vertices with d < 3, except in special cases.
+         * Degrees cannot be computed from the inclist because there we use IGRAPH_LOOPS_ONCE. */
+        IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
+
+        IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
+        IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
+        IGRAPH_CHECK(igraph_clusters(graph, &membership, &csize, &no_of_comps, IGRAPH_WEAK));
+        rank = no_of_edges - no_of_nodes + no_of_comps;
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);
+
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+        IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+
+        IGRAPH_CHECK(igraph_vector_ptr_init(&candidates, 0));
+        /* TODO reserve space */
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &candidates);
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&candidates, igraph_vector_destroy);
+
+        mark = 0;
+        for (i=0; i < no_of_nodes; ++i) {
+            long int degree    = VECTOR(degrees)[i];
+            long int comp_size = VECTOR(csize)[(long) VECTOR(membership)[i]];
+
+            /* The BFS is only necessary from vertices of degree 3 or greater, except for components
+             * of size 2, which may be a 2-cycle, or components of size 1, whih may have a self-loop. */
+            /* TODO: BFS is only necessary from a feedback vertex set, find fast FVS approximation algorithm. */
+            if (degree >= 3 || (comp_size <= 2 && degree > 0)) {
+                /* From unvisited vertices, we do a full BFS, in order to obtain a complete basis.
+                 * From already visited vertices, we do a range-limited BFS with 'cutoff'. */
+                igraph_integer_t cut = VECTOR(visited)[i] % 3 ? cutoff : -1;
+                IGRAPH_CHECK(igraph_i_fundamental_cycles(graph, i, &inclist, &visited, mark, cut, &candidates));
+                mark += 3;
+            }
+        }
+
+        igraph_inclist_destroy(&inclist);
+        igraph_vector_int_destroy(&visited);
+        igraph_vector_destroy(&csize);
+        igraph_vector_destroy(&membership);
+        igraph_vector_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(5);
+    }
+
+    /* Sort candidates by size (= weight) and remove duplicates. */
+    {
+        long int cand_count = igraph_vector_ptr_size(&candidates);
+
+        for (i=0; i < cand_count; ++i) {
+            igraph_vector_t *cand = VECTOR(candidates)[i];
+            igraph_vector_sort(cand);
+        }
+        igraph_vector_ptr_sort(&candidates, &cycle_cmp);
+        remove_duplicate_candidates(&candidates);
+    }
+
+    IGRAPH_CHECK(igraph_vector_ptr_reserve(result, rank));
+    IGRAPH_FINALLY(free_cycle_list, result);
+
+    /* Find a complete basis, starting with smallest elements. */
+    {
+        long int cand_len = igraph_vector_ptr_size(&candidates);
+        igraph_vector_ptr_t reduced_matrix;
+        igraph_bool_t independent;
+
+        igraph_vector_ptr_clear(result);
+
+        IGRAPH_CHECK(igraph_vector_ptr_init(&reduced_matrix, 0));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &reduced_matrix);
+        IGRAPH_CHECK(igraph_vector_ptr_reserve(&reduced_matrix, rank));
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&reduced_matrix, igraph_vector_destroy);
+
+        for (i=0; i < cand_len; ++i) {
+            const igraph_vector_t *cycle = VECTOR(candidates)[i];
+
+            IGRAPH_ALLOW_INTERRUPTION();
+
+            IGRAPH_CHECK(gaussian_elimination(&reduced_matrix, cycle, &independent));
+            if (independent) {
+                igraph_vector_t *v;
+                v = IGRAPH_CALLOC(1, igraph_vector_t);
+                if (! v) {
+                    IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
+                }
+                IGRAPH_FINALLY(igraph_free, v);
+                IGRAPH_CHECK(igraph_vector_copy(v, cycle));
+                IGRAPH_FINALLY(igraph_vector_destroy, v);
+                IGRAPH_CHECK(igraph_vector_ptr_push_back(result, v));
+                IGRAPH_FINALLY_CLEAN(2); /* pass ownership of 'v' to 'result' */
+            }
+
+            if (igraph_vector_ptr_size(&reduced_matrix) == rank) {
+                /* We have a complete basis. */
+                break;
+            }
+        }
+
+        igraph_vector_ptr_destroy_all(&reduced_matrix);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    igraph_vector_ptr_destroy_all(&candidates);
+    IGRAPH_FINALLY_CLEAN(2); /* +1 for 'free_cycle_list' */
+
+    return IGRAPH_SUCCESS;
+}

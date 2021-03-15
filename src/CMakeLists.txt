@@ -271,6 +271,7 @@ add_library(
   misc/cocitation.c
   misc/coloring.c
   misc/conversion.c
+  misc/cycle_bases.c
   misc/degree_sequence.cpp
   misc/embedding.c
   misc/feedback_arc_set.c

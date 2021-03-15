@@ -771,6 +771,12 @@ add_legacy_tests(
   igraph_is_bigraphical
 )
 
+# cycle bases
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  cycle_bases
+)
+
 # handlers
 
 add_legacy_tests(
