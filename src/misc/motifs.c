@@ -48,10 +48,10 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
 
 /**
  * \function igraph_motifs_randesu
- * \brief Count the number of motifs in a graph
+ * \brief Count the number of motifs in a graph.
  *
  * </para><para>
- * Motifs are small connected subgraphs of a given structure in a
+ * Motifs are small connected induced subgraphs of a given structure in a
  * graph. It is argued that the motif profile (i.e. the number of
  * different motifs in the graph) is characteristic for different
  * types of networks and network function is related to the motifs in
@@ -424,11 +424,18 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 
 /**
  * \function igraph_motifs_randesu_estimate
- * \brief Estimate the total number of motifs in a graph
+ * \brief Estimate the total number of motifs in a graph.
+ *
+ * This function estimates the total number of connected induced
+ * subgraphs, called motifs, of a fixed number of vertices. For
+ * example, an undirected full graph of \c n vertices
+ * will have one motif of \p size \c n, and \c n motifs
+ * of \p size <code>n - 1</code>. As another example, one triangle
+ * and a separate vertex will have zero motifs of size four.
  *
  * </para><para>
  * This function is useful for large graphs for which it is not
- * feasible to count all the different motifs, because there is very
+ * feasible to count all the different motifs, because there are very
  * many of them.
  *
  * </para><para>
@@ -479,9 +486,28 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     long int sam;
     long int i;
 
+    if (no_of_nodes == 0) {
+        *est = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    if (igraph_vector_size(cut_prob) < size) {
+        IGRAPH_ERRORF("Vector size of cut probability (%ld) less than motif"
+                      " size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
+
+    if (parsample && igraph_vector_size(parsample) != 0) {
+        igraph_real_t min, max;
+        igraph_vector_minmax(parsample, &min, &max);
+        if (min < 0 || max > no_of_nodes) {
+            IGRAPH_ERROR("Sample vertex id out of range.", IGRAPH_EINVAL);
+        }
+    }
+
     added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
 
@@ -491,10 +517,10 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     IGRAPH_FINALLY(igraph_stack_destroy, &stack);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
-    if (parsample == 0) {
+    if (parsample == NULL) {
         sample = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (sample == 0) {
-            IGRAPH_ERROR("Cannot estimate motifs", IGRAPH_ENOMEM);
+        if (sample == NULL) {
+            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, sample);
         IGRAPH_VECTOR_INIT_FINALLY(sample, 0);
