@@ -114,6 +114,10 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
         IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
                      IGRAPH_EINVAL);
     }
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
     if (size == 3) {
         histlen = igraph_is_directed(graph) ? 16 : 4;
     } else {
@@ -152,7 +156,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 
 /**
  * \function igraph_motifs_randesu_callback
- * \brief Finds motifs in a graph and calls a function for each of them
+ * \brief Finds motifs in a graph and calls a function for each of them.
  *
  * </para><para>
  * Similarly to \ref igraph_motifs_randesu(), this function is able to find the
@@ -208,13 +212,13 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_bool_t terminate = 0;
 
     if (size != 3 && size != 4) {
-        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
+        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented.",
                      IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_size(cut_prob) < size) {
-        IGRAPH_ERROR("The size of the cut probability vector must not be smaller than the motif size.",
-                     IGRAPH_EINVAL);
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
     if (size == 3) {
@@ -419,7 +423,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_adjlist_destroy(&allneis);
     igraph_stack_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(7);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -498,7 +502,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
             IGRAPH_ERROR("Sample vertex id out of range.", IGRAPH_EINVAL);
         }
     }
-    
+
     if (no_of_nodes == 0) {
         *est = 0;
         return IGRAPH_SUCCESS;
