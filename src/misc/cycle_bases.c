@@ -176,7 +176,7 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
 }
 
 
-static void free_cycle_list(igraph_vector_ptr_t *list) {
+static void destroy_and_free_cycles(igraph_vector_ptr_t *list) {
     long int n = igraph_vector_ptr_size(list);
     long int i;
     igraph_vector_t **l = (igraph_vector_t **) VECTOR(*list);
@@ -240,9 +240,10 @@ int igraph_fundamental_cycles(const igraph_t *graph,
     estimated_rank = no_of_edges - no_of_nodes + 1;
     estimated_rank = estimated_rank < 0 ? 0 : estimated_rank;
 
-    igraph_vector_ptr_clear(result);
+    destroy_and_free_cycles(result);
+    igraph_vector_ptr_resize(result, 0);
     IGRAPH_CHECK(igraph_vector_ptr_reserve(result, estimated_rank));
-    IGRAPH_FINALLY(free_cycle_list, result); /* Free 'result' elements if computation fails. */
+    IGRAPH_FINALLY(destroy_and_free_cycles, result); /* Free 'result' elements if computation fails. */
 
     if (start_vid < 0) {
         for (i=0; i < no_of_nodes; ++i) {
@@ -256,7 +257,7 @@ int igraph_fundamental_cycles(const igraph_t *graph,
 
     igraph_vector_int_destroy(&visited);
     igraph_inclist_destroy(&inclist);
-    IGRAPH_FINALLY_CLEAN(3); /* +1 for 'free_cycle_list' */
+    IGRAPH_FINALLY_CLEAN(3); /* +1 for 'destroy_and_free_cycles' on 'result' */
 
     return IGRAPH_SUCCESS;
 }
@@ -520,17 +521,17 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
         remove_duplicate_candidates(&candidates);
     }
 
+    destroy_and_free_cycles(result);
+    igraph_vector_ptr_resize(result, 0);
     IGRAPH_CHECK(igraph_vector_ptr_reserve(result, rank));
-    IGRAPH_FINALLY(free_cycle_list, result);
+    IGRAPH_FINALLY(destroy_and_free_cycles, result);
 
     /* Find a complete basis, starting with smallest elements. */
     /* This is typically the slowest part of the algorithm. */
     {
         long int cand_len = igraph_vector_ptr_size(&candidates);
         igraph_vector_ptr_t reduced_matrix;
-        igraph_bool_t independent;
-
-        igraph_vector_ptr_clear(result);
+        igraph_bool_t independent;        
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&reduced_matrix, 0));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &reduced_matrix);
@@ -567,7 +568,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     }
 
     igraph_vector_ptr_destroy_all(&candidates);
-    IGRAPH_FINALLY_CLEAN(2); /* +1 for 'free_cycle_list' */
+    IGRAPH_FINALLY_CLEAN(2); /* +1 for 'destroy_and_free_cycles' on 'result' */
 
     return IGRAPH_SUCCESS;
 }
