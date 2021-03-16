@@ -671,7 +671,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 
 /**
  * \function igraph_motifs_randesu_no
- * \brief Count the total number of motifs in a graph
+ * \brief Count the total number of motifs in a graph.
  *
  * </para><para>
  * This function counts the total number of motifs in a graph,
@@ -704,9 +704,13 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     long int father;
     long int i;
 
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
     added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
 
@@ -840,7 +844,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     igraph_stack_destroy(&stack);
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
