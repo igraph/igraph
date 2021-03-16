@@ -23,8 +23,8 @@ void call_and_print(igraph_t *graph) {
     igraph_vector_int_t result;
     igraph_vector_int_init(&result, 0);
     IGRAPH_ASSERT(igraph_list_triangles(graph, &result) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(igraph_vector_int_size(&result) % 3 == 0);
     print_vector_int(&result);
+    IGRAPH_ASSERT(igraph_vector_int_size(&result) % 3 == 0);
     igraph_vector_int_destroy(&result);
     printf("\n");
 }
