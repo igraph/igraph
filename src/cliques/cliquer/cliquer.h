@@ -4,6 +4,16 @@
 
 #include <string.h>
 
+/* This is an igraph-specific modification to cliquer.
+ * We use a 64-bit CLIQUER_LARGE_INT (even on 32-bit systems) in places
+ * which are prone to overflow. Since cliquer indicates interruption by
+ * returning -1 times the clique count, the effect of overflow is that
+ * it returns a partial (i.e. incorrect) result without warning. */
+#include <stdint.h>
+#ifndef CLIQUER_LARGE_INT
+#define CLIQUER_LARGE_INT int64_t
+#endif
+
 #include "set.h"
 #include "graph.h"
 #include "reorder.h"
@@ -37,8 +47,8 @@ extern int clique_unweighted_max_weight(graph_t *g, clique_options *opts);
 extern set_t clique_unweighted_find_single(graph_t *g,int min_size,
 					   int max_size,boolean maximal,
 					   clique_options *opts);
-extern int clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
-				      boolean maximal, clique_options *opts);
+extern CLIQUER_LARGE_INT clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
+                                                    boolean maximal, clique_options *opts);
 
 /* Time printing functions */
 /*
