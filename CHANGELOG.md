@@ -1,5 +1,11 @@
 # igraph C library changelog
 
+## [Unreleased]
+
+### Fixed
+
+ - igraph can now be used as a CMake subproject in other CMake-based projects
+
 ## [0.9.1] - 2021-03-23
 
 ### Added
