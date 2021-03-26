@@ -73,10 +73,10 @@ add_library(
 target_include_directories(
   f2c_vendored
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_BINARY_DIR}/include
-  ${CMAKE_SOURCE_DIR}/src
-  ${CMAKE_BINARY_DIR}/src
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
+  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_BINARY_DIR}/src
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -90,7 +90,7 @@ if (MSVC)
   target_include_directories(
     f2c_vendored
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/msvc/include
+	${PROJECT_SOURCE_DIR}/msvc/include
   )
 endif()
 

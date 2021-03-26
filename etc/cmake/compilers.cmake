@@ -58,8 +58,8 @@ function(define_file_basename_for_sources targetname)
 
     # Figure out whether the relative path from the source or the build folder
     # is shorter
-    file(RELATIVE_PATH source_rel_path "${CMAKE_SOURCE_DIR}" "${source_full_path}")
-    file(RELATIVE_PATH binary_rel_path "${CMAKE_BINARY_DIR}" "${source_full_path}")
+	file(RELATIVE_PATH source_rel_path "${PROJECT_SOURCE_DIR}" "${source_full_path}")
+	file(RELATIVE_PATH binary_rel_path "${PROJECT_BINARY_DIR}" "${source_full_path}")
     string(LENGTH "${source_rel_path}" source_rel_path_length)
     string(LENGTH "${binary_rel_path}" binary_rel_path_length)
     if(binary_rel_path_length LESS source_rel_path_length)
