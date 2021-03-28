@@ -432,6 +432,10 @@ endif()
 if(NOT IGRAPH_USE_INTERNAL_ARPACK)
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
 endif()
+
+include(JoinPaths)
+join_paths(PKGCONFIG_LIBDIR "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
+join_paths(PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
 configure_file(${PROJECT_SOURCE_DIR}/igraph.pc.in ${PROJECT_BINARY_DIR}/igraph.pc @ONLY)
 
 include(GenerateExportHeader)
