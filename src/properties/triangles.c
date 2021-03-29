@@ -558,9 +558,10 @@ int igraph_adjacent_triangles(const igraph_t *graph,
 
 /**
  * \function igraph_list_triangles
- * Find all triangles in a graph
+ * \brief Find all triangles in a graph.
  *
  * \param graph The input graph, edge directions are ignored.
+ *        Multiple edges are ignored.
  * \param res Pointer to an initialized integer vector, the result
  *        is stored here, in a long list of triples of vertex ids.
  *        Each triple is a triangle in the graph. Each triangle is
@@ -580,7 +581,7 @@ int igraph_list_triangles(const igraph_t *graph,
 # define TRIANGLES
 # include "properties/triangles_template.h"
 # undef TRIANGLES
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

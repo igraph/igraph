@@ -1,0 +1,27 @@
+No vertices:
+Estimate: 0
+
+One vertex:
+Estimate: 0
+
+Full graph of 50 vertices, motif size 3, sample all, (50 choose 3 = 19600):
+Estimate: 19600
+
+Full graph of 50 vertices, motif size 3, sample all, cut_prob 0.1 at each level:
+Estimate: 14030
+
+Full graph of 50 vertices, motif size 3, sample 20:
+Estimate: 18192
+
+Full graph of 50 vertices, motif size 3, sample first 40:
+Estimate: 23800
+
+Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300:
+Estimate: 318737
+
+Triangle and a vertex, motif size 4, sample all:
+Estimate: 0
+
+Cut prob too short.
+Too many samples.
+Too many parsamples.

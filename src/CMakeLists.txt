@@ -310,13 +310,13 @@ define_file_basename_for_sources(igraph)
 target_include_directories(
   igraph
   PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/igraph>
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/vendor
+  ${PROJECT_SOURCE_DIR}/vendor
 
   # Vendored library include paths
   $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
@@ -383,7 +383,7 @@ endif()
 
 if(MSVC)
   # Add MSVC-specific include path for some headers that are missing on Windows
-  target_include_directories(igraph PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
+  target_include_directories(igraph PRIVATE ${PROJECT_SOURCE_DIR}/msvc/include)
 endif()
 
 # Turn on all warnings for GCC, clang and MSVC
@@ -433,12 +433,16 @@ endif()
 if(NOT IGRAPH_USE_INTERNAL_ARPACK)
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
 endif()
-configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
+
+include(JoinPaths)
+join_paths(PKGCONFIG_LIBDIR "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
+join_paths(PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+configure_file(${PROJECT_SOURCE_DIR}/igraph.pc.in ${PROJECT_BINARY_DIR}/igraph.pc @ONLY)
 
 include(GenerateExportHeader)
 generate_export_header(igraph
   STATIC_DEFINE IGRAPH_STATIC
-  EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/igraph_export.h
+  EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/igraph_export.h
 )
 
 # Define how to install the library
@@ -448,16 +452,16 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(
-  DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+  DIRECTORY ${PROJECT_SOURCE_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph
   FILES_MATCHING PATTERN "*.h"
 )
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/include/
+  DIRECTORY ${PROJECT_BINARY_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph
   FILES_MATCHING PATTERN "*.h"
 )
 install(
-  FILES ${CMAKE_BINARY_DIR}/igraph.pc
+  FILES ${PROJECT_BINARY_DIR}/igraph.pc
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
