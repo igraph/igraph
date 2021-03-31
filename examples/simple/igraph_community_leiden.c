@@ -42,7 +42,7 @@ int main() {
     igraph_vector_init(&membership, igraph_vcount(&graph));
     igraph_community_leiden(&graph, NULL, NULL, 0.05, 0.01, 0, &membership, &nb_clusters, &quality);
 
-    printf("Leiden found %i clusters using CPM (resolution parameter 0.05), quality is %.4f.\n", nb_clusters, quality);
+    printf("Leiden found %" IGRAPH_PRId " clusters using CPM (resolution parameter 0.05), quality is %.4f.\n", nb_clusters, quality);
     printf("Membership: ");
     igraph_vector_print(&membership);
     printf("\n");
@@ -62,7 +62,7 @@ int main() {
     /* Perform Leiden algorithm using modularity */
     igraph_community_leiden(&graph, NULL, &degree, 1.0 / (2 * igraph_ecount(&graph)), 0.01, 0, &membership, &nb_clusters, &quality);
 
-    printf("Leiden found %i clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
+    printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
     printf("Membership: ");
     igraph_vector_print(&membership);
     printf("\n");

@@ -1,4 +1,5 @@
 include(test_helpers)
+include(benchmark_helpers)
 
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
@@ -9,6 +10,16 @@ add_custom_target(
   COMMENT "Executing unit tests..."
 )
 add_dependencies(check build_tests)
+
+# Add a custom target for benchmarks and another one for building them
+# TODO(ntamas)
+add_custom_target(build_benchmarks)
+add_custom_target(
+  benchmark
+  COMMAND true
+  COMMENT "Running benchmarks..."
+)
+add_dependencies(benchmark build_benchmarks)
 
 # Some newer gcc version have --enable-new-dtags on by default. This then leads
 # to using RUNPATH instead of RPATH. Since RUNPATH is only considered after
@@ -770,3 +781,13 @@ add_legacy_tests(
   igraph_sir
 )
 
+
+# benchmarks
+add_benchmarks(
+  NAMES
+  igraph_cliques
+  igraph_coloring
+  igraph_maximal_cliques
+  igraph_random_walk
+  igraph_transitivity
+)

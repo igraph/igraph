@@ -607,9 +607,7 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
     return 0;
 }
 
-static
-igraph_bool_t
-igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A) {
+static int igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     igraph_sparsemat_t t, tt;
     igraph_bool_t res;
     int nz;
@@ -634,33 +632,41 @@ igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A) {
     igraph_sparsemat_destroy(&tt);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return res;
+    *result = res;
+
+    return IGRAPH_SUCCESS;
 }
 
-static
-igraph_bool_t
-igraph_i_sparsemat_is_symmetric_triplet(const igraph_sparsemat_t *A) {
+static int igraph_i_sparsemat_is_symmetric_triplet(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     igraph_sparsemat_t tmp;
-    igraph_bool_t res;
+
     IGRAPH_CHECK(igraph_sparsemat_compress(A, &tmp));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
-    res = igraph_i_sparsemat_is_symmetric_cc(&tmp);
+    IGRAPH_CHECK(igraph_i_sparsemat_is_symmetric_cc(&tmp, result));
     igraph_sparsemat_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
-    return res;
+
+    return IGRAPH_SUCCESS;
 }
 
 igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
+    igraph_bool_t res = 0;
 
     if (A->cs->m != A->cs->n) {
         return 0;
     }
 
+    /* TODO(ntamas): return values from igraph_i_sparsemat_is_symmetric_... are
+     * ignored here; this should be fixed. Right now these functions don't
+     * change 'res' if they fail so we will report matrices as not being
+     * symmetric if an error happens */
     if (A->cs->nz < 0) {
-        return igraph_i_sparsemat_is_symmetric_cc(A);
+        igraph_i_sparsemat_is_symmetric_cc(A, &res);
     } else {
-        return igraph_i_sparsemat_is_symmetric_triplet(A);
+        igraph_i_sparsemat_is_symmetric_triplet(A, &res);
     }
+
+    return res;
 }
 
 /**

@@ -1,7 +1,7 @@
 include(GetGitRevisionDescription)
 
-set(VERSION_FILE "${PROJECT_SOURCE_DIR}/IGRAPH_VERSION")
-set(NEXT_VERSION_FILE "${PROJECT_SOURCE_DIR}/NEXT_VERSION")
+set(VERSION_FILE "${CMAKE_SOURCE_DIR}/IGRAPH_VERSION")
+set(NEXT_VERSION_FILE "${CMAKE_SOURCE_DIR}/NEXT_VERSION")
 
 find_package(Git QUIET)
 if(Git_FOUND)
@@ -61,7 +61,7 @@ else()
     message(STATUS "Git was found at: ${GIT_EXECUTABLE}")
     message(STATUS "The version number detection failed with: ${PACKAGE_VERSION}")
     message(STATUS "")
-	message(STATUS "Most frequently this is caused by a shallow Git checkout that contains no tags in the history.")
+    message(STATUS "Most frequently this is caused by a shallow Git checkout that contains no tags in the history.")
   else()
     message(STATUS "Please install Git, make sure it is in your path, and then try again.")
   endif()
@@ -90,10 +90,10 @@ endif()
 # folder, for the sake of creating a tarball
 add_custom_target(
   versionfile
-  BYPRODUCTS "${PROJECT_BINARY_DIR}/IGRAPH_VERSION"
+  BYPRODUCTS "${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
   COMMAND "${CMAKE_COMMAND}"
     -DIGRAPH_VERSION="${PACKAGE_VERSION}"
-    -DVERSION_FILE_PATH="${PROJECT_BINARY_DIR}/IGRAPH_VERSION"
-    -P "${PROJECT_SOURCE_DIR}/etc/cmake/create_igraph_version_file.cmake"
+    -DVERSION_FILE_PATH="${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
+    -P "${CMAKE_SOURCE_DIR}/etc/cmake/create_igraph_version_file.cmake"
   COMMENT "Generating IGRAPH_VERSION file in build folder"
 )
