@@ -9,7 +9,12 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
 # Set a default build type if none was specified
 # This must precede the project() line, which would set the CMAKE_BUILD_TYPE
 # to 'Debug' with single-config generators on Windows.
-include(BuildType)
+# Note that we must do this only if PROJECT_NAME is not set at this point. If
+# it is set, it means that igraph is being used as a subproject of another
+# project.
+if(NOT PROJECT_NAME)
+  include(BuildType)
+endif()
 
 # Prevent in-source builds
 include(PreventInSourceBuilds)
