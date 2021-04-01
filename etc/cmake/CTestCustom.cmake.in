@@ -1,0 +1,2 @@
+# Ask CTest to run the build_tests target before running the tests
+set(CTEST_CUSTOM_PRE_TEST "@CMAKE_COMMAND@ --build @PROJECT_BINARY_DIR@ --target build_tests")
