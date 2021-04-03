@@ -288,6 +288,7 @@ add_library(
 )
 
 # Set soname for the library
+set_target_properties(igraph PROPERTIES VERSION "0.0.0")
 set_target_properties(igraph PROPERTIES SOVERSION 0)
 
 # Add extra compiler definitions if needed
