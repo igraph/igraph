@@ -74,6 +74,11 @@ int main() {
     for (i = 0; i < 6; i ++) {
         print_result(&g, &weights, i, 1, 1);
     }
+
+    printf("Undirected disconnected graph with loops and multiple edges, NULL weights.\n");
+    for (i = 0; i < 6; i ++) {
+        print_result(&g, NULL, i, 1, 1);
+    }
     igraph_destroy(&g);
 
     printf("Same graph, directed, direction ignored.\n");
@@ -107,6 +112,9 @@ int main() {
     for (i = 0; i < 5; i ++) {
         print_result(&g, &weights, i, 1, 1);
     }
+
+    printf("Same graph, random starting vertex.\n");
+    print_result(&g, &weights, -1, 1, 1);
 
     printf("Same graph, unconn = false.\n");
     print_result(&g, &weights, 0, 1, 0);

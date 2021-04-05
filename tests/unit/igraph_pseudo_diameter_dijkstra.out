@@ -29,6 +29,19 @@ result: 3, from 4 to 0
 
 result: 0, from 5 to 5
 
+Undirected disconnected graph with loops and multiple edges, NULL weights.
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 3, from 4 to 0
+
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 0, from 5 to 5
+
 Same graph, directed, direction ignored.
 result: 3, from 0 to 4
 
@@ -90,6 +103,9 @@ result: 5, from 2 to 4
 
 result: 5, from 2 to 4
 
+result: 5, from 2 to 4
+
+Same graph, random starting vertex.
 result: 5, from 2 to 4
 
 Same graph, unconn = false.
