@@ -15,6 +15,7 @@
 
 <section id="shortest-path-related-functions"><title>(Shortest) Path Related Functions</title>
 <!-- doxrox-include igraph_shortest_paths -->
+<!-- doxrox-include igraph_k_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_shortest_paths_bellman_ford -->
 <!-- doxrox-include igraph_shortest_paths_johnson -->

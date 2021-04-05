@@ -179,6 +179,14 @@ IGRAPH_EXPORT int igraph_random_edge_walk(const igraph_t *graph,
                                           igraph_integer_t steps,
                                           igraph_random_walk_stuck_t stuck);
 
-__END_DECLS
+IGRAPH_EXPORT int igraph_k_shortest_paths(const igraph_t *graph,
+                                          igraph_vector_t *weights,
+                                          igraph_vector_ptr_t *paths,
+                                          igraph_integer_t k,
+                                          igraph_integer_t from,
+                                          igraph_integer_t to,
+                                          igraph_neimode_t mode);
+
+    __END_DECLS
 
 #endif
