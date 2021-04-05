@@ -13,6 +13,10 @@
 <!-- doxrox-include igraph_are_connected -->
 </section>
 
+<section id="sparsifiers"><title>sparsifiers</title>
+<!-- doxrox-include igraph_spanner -->
+</section>
+
 <section id="shortest-path-related-functions"><title>(Shortest) Path Related Functions</title>
 <!-- doxrox-include igraph_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
@@ -36,7 +40,6 @@
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_radius -->
 <!-- doxrox-include igraph_pseudo_diameter -->
-<!-- doxrox-include igraph_spanner -->
 </section>
 
 <section id="efficiency-measures"><title>Efficiency Measures</title>
