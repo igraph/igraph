@@ -222,6 +222,7 @@ add_library(
   paths/shortest_paths.c
   paths/simple_paths.c
   paths/unweighted.c
+  paths/sparsifier.c
 
   properties/basic.c
   properties/constraint.c

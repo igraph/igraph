@@ -504,6 +504,13 @@ igraph_get_all_simple_paths:
         PP-R: get.all.simple.paths.pp
         IGNORE: RR
 
+igraph_spanner:
+        PARAMS: GRAPH graph, OUT GRAPH spanner, INT stretch, \
+                EDGEWEIGHTS weights=NULL, OUT EDGEWEIGHTS spanner_weight=NULL
+                INT seed
+        DEPS: from ON graph, to ON graph, res ON graph
+        IGNORE: RR
+
 igraph_subcomponent:
         PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
         DEPS: vid ON graph, res ON graph

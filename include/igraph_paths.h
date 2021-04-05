@@ -179,6 +179,13 @@ IGRAPH_EXPORT int igraph_random_edge_walk(const igraph_t *graph,
                                           igraph_integer_t steps,
                                           igraph_random_walk_stuck_t stuck);
 
+IGRAPH_EXPORT int igraph_spanner(const igraph_t *graph,
+                                igraph_t *spanner,
+                                int stretch,
+                                igraph_vector_t *weights,
+                                igraph_vector_t *spanner_weight,
+                                unsigned long int *seed);
+
 __END_DECLS
 
 #endif
