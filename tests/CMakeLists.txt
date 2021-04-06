@@ -263,6 +263,7 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
+  igraph_is_mutual
   igraph_is_tree
   igraph_list_triangles
   igraph_local_transitivity
