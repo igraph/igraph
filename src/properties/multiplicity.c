@@ -291,6 +291,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * <para>Edge multiplicity is not considered here, e.g. if there are two
  * (A,B) edges and one (B,A) edge, then all three are considered to be
  * mutual.
+ * </para>
  *
  * <para>Loops are always mutual.
  *
