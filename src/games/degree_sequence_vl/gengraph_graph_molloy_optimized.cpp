@@ -1406,9 +1406,9 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
                 while (t_index--) if (dist[v = *(dst++)] == 0) {
                         nopath++;
                     } else {
-#ifdef _DEBUG
+#ifdef DEGSEQ_VL_DEBUG
                         igraph_statusf("Sampling path %d -> %d\n", 0, s, v);
-#endif //_DEBUG
+#endif // DEGSEQ_VL_DEBUG
                         nb_paths++;
                         // while we haven't reached the source..
                         while (v != s) {

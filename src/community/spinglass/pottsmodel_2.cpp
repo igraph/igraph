@@ -1584,7 +1584,7 @@ PottsModelN::~PottsModelN() {
 }
 
 void PottsModelN::assign_initial_conf(bool init_spins) {
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Start assigning.\n");
 #endif
     unsigned int s;
@@ -1595,7 +1595,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 
 
     if (init_spins) {
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
         printf("Initializing spin.\n");
 #endif
         // Free the arrays before (re-)allocating them
@@ -1659,7 +1659,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
             degree_pos_out[i]   = 0.0;
             degree_neg_out[i]   = 0.0;
 
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
             printf("Initializing spin %d", i);
 #endif
             spin[i] = 0;
@@ -1673,7 +1673,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
     double sum_weight_pos_in, sum_weight_pos_out, sum_weight_neg_in, sum_weight_neg_out;
     //double av_w = 0.0, av_k=0.0;
     //int l = 0;
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Visiting each node.\n");
 #endif
     for (unsigned int v = 0; v < num_nodes; v++) {
@@ -1684,7 +1684,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
             s = spin[v];
         }
 
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
         printf("Spin %d assigned to node %d.\n", s, v);
 #endif
 
@@ -1748,7 +1748,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
         m_n += sum_weight_neg_in;
     }
 
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Done assigning.\n");
 #endif
 }
@@ -1757,7 +1757,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 // as the parallel update has its flaws, due to the cyclic attractors
 //##############################################################
 double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsigned int max_sweeps) {
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Starting sweep at temperature %f.\n", t);
 #endif
     DLList_Iter<NNode*> iter;
@@ -1955,9 +1955,9 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 
         } // for n
     }  // while sweep
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Done %d sweeps.\n", max_sweeps);
-    printf("%d changes made for %d nodes.\n", changes, num_nodes);
+    printf("%ld changes made for %d nodes.\n", changes, num_nodes);
     printf("Last node is %d and last random number is %f with sum of weights %f with spin %d.\n", v, r, sum_weights, old_spin);
 #endif
 
@@ -1997,7 +1997,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
                                 double lambda) {
     IGRAPH_UNUSED(gamma);
     IGRAPH_UNUSED(lambda);
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Start writing clusters.\n");
 #endif
     //Reassign each community so that we retrieve a community assignment 1 through num_communities
@@ -2014,7 +2014,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         if (cluster_assign[s] == 0) {
             num_clusters++;
             cluster_assign[s] = num_clusters;
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
             printf("Setting cluster %d to %d.\n", s, num_clusters);
 #endif
         }
@@ -2030,12 +2030,12 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
     //And now assign each node to its new community
     q = num_clusters;
     for (unsigned int i = 0; i < num_nodes; i++) {
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
         printf("Setting node %d to %d.\n", i, cluster_assign[spin[i]]);
 #endif
         unsigned int s = cluster_assign[spin[i]];
         spin[i] = s;
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
         printf("Have set node %d to %d.\n", i, s);
 #endif
     }
@@ -2115,7 +2115,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
             l_cur = iter_l.Next();
         } //while links
 
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
         printf("d_p: %f\n", d_p);
         printf("d_n: %f\n", d_n);
 #endif
@@ -2226,7 +2226,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         }
         *polarization = sum_ad / (q * q - q);
     }
-#ifdef DEBUG
+#ifdef SPINGLASS_DEBUG
     printf("Finished writing cluster.\n");
 #endif
     return num_nodes;
