@@ -68,6 +68,8 @@ igraph_bool_t _test_spanner (igraph_t *graph, igraph_t *spanner, double stretch,
             IGRAPH_ASSERT(MATRIX(res_spanner, x, y) < MATRIX(res_graph, x, y) * stretch);
         }
     }
+    igraph_matrix_destroy(&res_graph);
+    igraph_matrix_destroy(&res_spanner);
 
     return IGRAPH_SUCCESS;
 }

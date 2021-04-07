@@ -287,6 +287,8 @@ int igraph_spanner (const igraph_t *graph,
 
         // check if this itteration added to many edges to the spanner
         if (num_edges_to_add > size_limit) {
+            igraph_inclist_destroy(&inclist);
+            IGRAPH_FINALLY_CLEAN(1);
             continue;
         }
         i = i+1;
