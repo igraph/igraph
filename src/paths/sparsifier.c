@@ -69,7 +69,7 @@ int _igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
 /**
  * \ingroup structural
  * \function igraph_spanner
- * \brief Retrun a spanner of a graph with a given stretch factor
+ * \brief Retrun a spanner of a graph with a given stretch factor.
  * 
  * A spanner of a graph G = (V,E) with a stretch t is a subgraph
  * H = (V,Es) such that Es is a subset of E and the distance 
@@ -104,7 +104,7 @@ int _igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
  *           not enough memory for temporary data.
  *
  * Time complexity: The algorithm is a randomized las vegas algorithm. The expected
- *                  running time is O(km) which .
+ *                  running time is O(km) where k is the value mentiened above.
  *
  */
 int igraph_spanner (const igraph_t *graph,
@@ -112,7 +112,7 @@ int igraph_spanner (const igraph_t *graph,
         int stretch,
         igraph_vector_t *weights,
         igraph_vector_t *spanner_weight,
-        unsigned long int *seed) {
+        unsigned long int *seed) { 
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
