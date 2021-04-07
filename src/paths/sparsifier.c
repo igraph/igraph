@@ -399,5 +399,3 @@ int igraph_spanner (const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(14);
     return IGRAPH_SUCCESS;
 }
-
-    
