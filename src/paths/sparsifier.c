@@ -102,6 +102,7 @@ int _igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
  *        \clist
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
+ *        \endclist
  *
  * Time complexity: The algorithm is a randomized las vegas algorithm. The expected
  *                  running time is O(km) where k is the value mentiened above.
