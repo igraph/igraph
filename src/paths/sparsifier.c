@@ -39,7 +39,7 @@ int _igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
                                     const igraph_vector_t *sample_clustering,
                                     igraph_vector_t *lightest_neighbor,
                                     igraph_vector_t *lightest_weight) {
-    // This internal function get the residual graph, the clustering, the sampled clustering and
+    // This internal function gets the residual graph, the clustering, the sampled clustering and
     // the vector and return the lightest edge to each neighboring cluster and the index of the lightest 
     // sampled cluster (if any)
     float lightest_weight_to_sampled = INFINITY;
