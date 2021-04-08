@@ -291,11 +291,30 @@ igraph_bool_t igraph_has_attribute_table() {
     return igraph_i_attribute_table != 0;
 }
 
+
+/**
+ * \function igraph_attribute_combination_init
+ * \brief Initialize attribute combination list.
+ *
+ * \param comb The uninitialized attribute combination list.
+ * \return Error code.
+ *
+ * Time complexity: O(1)
+ */
 int igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&comb->list, 0));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_attribute_combination_destroy
+ * \brief Destroy attribute combination list.
+ *
+ * \param comb The attribute combination list.
+ *
+ * Time complexity: O(n), where n is the number of records in the
+                    attribute combination list.
+ */
 void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) {
     long int i, n = igraph_vector_ptr_size(&comb->list);
     for (i = 0; i < n; i++) {
@@ -308,6 +327,24 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
     igraph_vector_ptr_destroy(&comb->list);
 }
 
+/**
+ * \function igraph_attribute_combination_add
+ * \brief Add combination record to attribute combination list.
+ *
+ * \param comb The attribute combination list.
+ * \param name The name of the attribute. If the name already exists
+ *             the attribute combination record will be replaced.
+ *             Use NULL to add a default combination record for all
+ *             atributes not in the list.
+ * \param type The type of the attribute combination. See \ref
+ *             igraph_attribute_combination_type_t for the options.
+ * \param func Function to be used if \p type is
+ *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * \return Error code.
+ *
+ * Time complexity: O(n), where n is the number of current attribute
+ *                  combinations.
+ */
 int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
                                      const char *name,
                                      igraph_attribute_combination_type_t type,
@@ -336,7 +373,7 @@ int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
                          IGRAPH_ENOMEM);
         }
         if (!name) {
-            rec->name = 0;
+            rec->name = NULL;
         } else {
             rec->name = strdup(name);
         }
@@ -347,9 +384,23 @@ int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
 
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_attribute_combination_remove
+ * \brief Remove a record from an attribute combination list.
+ *
+ * \param comb The attribute combination list.
+ * \param name The attribute name of the attribute combination record
+ *             to remove. It will be ignored if the named attribute
+ *             does not exist. It can be NULL to remove the default
+ *             combination record.
+ * \return Error code. This currently always returns IGRAPH_SUCCESS.
+ *
+ * Time complexity: O(n), where n is the number of records in the attribute
+                    combination list.
+ */
 int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
                                         const char *name) {
     long int i, n = igraph_vector_ptr_size(&comb->list);
@@ -375,7 +426,7 @@ int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
         /* It is not there, we don't do anything */
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,

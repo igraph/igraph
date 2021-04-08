@@ -702,6 +702,10 @@ igraph_girth:
         DEPS: circle ON graph
         IGNORE: RR, RC, RNamespace
 
+igraph_is_perfect:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res
+        IGNORE: RR, RC, RNamespace
+
 igraph_add_edge:
         PARAMS: INOUT GRAPH graph, INTEGER from, INTEGER to
         IGNORE: RR, RC, RNamespace
@@ -871,6 +875,11 @@ igraph_eccentricity:
 igraph_radius:
         PARAMS: GRAPH graph, OUT REALPTR radius, NEIMODE mode=ALL
         NAME-R: radius
+
+igraph_pseudo_diameter:
+        PARAMS: GRAPH graph, OUT REALPTR diameter, INTEGER start_vid, \
+                OUT INTEGERPTR from=NULL, OUT INTEGERPTR to=NULL
+        NAME-R: pseudo_diameter
 
 igraph_diversity:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXINDEX res, \

@@ -182,7 +182,6 @@ static int igraph_i_sspf_weighted(
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
  *
- * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the
@@ -226,7 +225,6 @@ int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_betweenness_cutoff
  * \brief Range-limited betweenness centrality.
  *
- * </para><para>
  * This function computes a range-limited version of betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -635,7 +633,6 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
  *
  * \deprecated-by igraph_edge_betweenness_cutoff 0.9
  *
- * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the
@@ -675,39 +672,34 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     return igraph_edge_betweenness_cutoff(graph, result, directed, weights, cutoff);
 }
 
-/* vertex subset*/
-
 /**
  * \ingroup structural
  * \function igraph_betweenness_subset
- * \brief betweenness centrality for subset of source and target vertices.
+ * \brief Betweenness centrality for a subset of source and target vertices.
  *
  * </para><para>
- * This function computes the subset version of betweenness centrality
- * by considering only those shortest paths between vertices in a given
- * subset.
+ * This function computes the subset-limited version of betweenness centrality
+ * by considering only those shortest paths that lie between vertices in a given
+ * source and target subset.
  *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *         betweenness score for the subset of vertices.
- * \param vids The vertices for which the range-limited betweenness centrality
+ * \param vids The vertices for which the subset-limited betweenness centrality
  *        scores will be computed.
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. No edge weight may be NaN.
  *        Supply a null pointer here for unweighted betweenness.
- * \param sources A vector selector of the vertices which will be the sources
- *        of the shortest paths taken into considuration in the betweenness
- *        calculation.
- * \param targetes A vector selector of the vertices which will be the targets
- *        of the shortest paths taken into considuration in the betweenness
- *        calculation.
+ * \param sources A vertex selector for the sources of the shortest paths taken
+ *        into considuration in the betweenness calculation.
+ * \param targets A vertex selector for the targets of the shortest paths taken
+ *        into considuration in the betweenness calculation.
  * \return Error code:
- *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex id passed in
- *        \p vids.
+ *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids,
+ *        \p sources or \p targets
  *
  * Time complexity: O(|S||E|),
  * |S| The number of vertices in the subset
@@ -872,37 +864,33 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     return IGRAPH_SUCCESS;
 }
 
-/***** Edge betweenness subset*****/
-
 /**
  * \ingroup structural
  * \function igraph_edge_betweenness_subset
- * \brief Find the shortest path edge betweenness centrality for subset of source
- * and target vertices
+ * \brief Edge betweenness centrality for a subset of source and target vertices.
  *
  * </para><para>
- * This function computes a subset version of edge betweenness centrality
- * by considering only those shortest paths betweenn two vertices in a subset.
+ * This function computes the subset-limited version of edge betweenness centrality
+ * by considering only those shortest paths that lie between vertices in a given
+ * source and target subset.
  *
  * \param graph The graph object.
  * \param res The result of the computation, vector containing the
  *        betweenness scores for the edges.
- * \param eids The edges for which the range-limited betweenness centrality
+ * \param eids The edges for which the subset-limited betweenness centrality
  *        scores will be computed.
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted
  *        betweenness. No edge weight may be NaN. Supply a null
  *        pointer here for unweighted betweenness.
- * \param sources A vector selector of the vertices which will be the sources
- *        of the shortest paths taken into considuration in the betweenness
- *        calculation.
- * \param targetes A vector selector of the vertices which will be the targets
- *        of the shortest paths taken into considuration in the betweenness
- *        calculation.
+ * \param sources A vertex selector for the sources of the shortest paths taken
+ *        into considuration in the betweenness calculation.
+ * \param targets A vertex selector for the targets of the shortest paths taken
+ *        into considuration in the betweenness calculation.
  * \return Error code:
- *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
+ *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p sources or \p targets
  *
  * Time complexity: O(|S||E|),
  * |S| The number of vertices in the subset

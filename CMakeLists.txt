@@ -9,7 +9,12 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
 # Set a default build type if none was specified
 # This must precede the project() line, which would set the CMAKE_BUILD_TYPE
 # to 'Debug' with single-config generators on Windows.
-include(BuildType)
+# Note that we must do this only if PROJECT_NAME is not set at this point. If
+# it is set, it means that igraph is being used as a subproject of another
+# project.
+if(NOT PROJECT_NAME)
+  include(BuildType)
+endif()
 
 # Prevent in-source builds
 include(PreventInSourceBuilds)
@@ -24,9 +29,6 @@ if(USE_CCACHE)
   endif()
 endif()
 
-# Include some compiler-related helpers and set global compiler options
-include(compilers)
-
 # Figure out the version number from Git
 include(version)
 
@@ -38,6 +40,9 @@ project(
   HOMEPAGE_URL https://igraph.org
   LANGUAGES C CXX
 )
+
+# Include some compiler-related helpers and set global compiler options
+include(compilers)
 
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
@@ -94,12 +99,12 @@ check_symbol_exists(_stricmp string.h HAVE__STRICMP)
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
-if(IGRAPH_ENABLE_CODE_COVERAGE)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
   include(CodeCoverage)
   append_coverage_compiler_flags()
   setup_target_for_coverage_lcov(
     NAME coverage
-    EXECUTABLE "${CMAKE_COMMAND}" "--build" "${CMAKE_BINARY_DIR}" "--target" "check"
+	EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
     # Generated files are excluded; apparently the CodeCoverage script has some
 	# problems with them. Yes, the exclusion is correct, it refers to a nonexistent
 	# directory that somehow gets into the coverage resolts. /Applications is for
@@ -130,10 +135,15 @@ add_subdirectory(vendor)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()
-add_subdirectory(doc)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  add_subdirectory(doc)
+endif()
 
-# Configure packaging
-include(packaging)
+# Configure packaging -- only if igraph is the top-level project and not a
+# subproject
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  include(packaging)
+endif()
 
 # Show result of configuration
 include(summary)

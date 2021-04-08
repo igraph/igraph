@@ -1,4 +1,5 @@
 include(test_helpers)
+include(benchmark_helpers)
 
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
@@ -9,6 +10,16 @@ add_custom_target(
   COMMENT "Executing unit tests..."
 )
 add_dependencies(check build_tests)
+
+# Add a custom target for benchmarks and another one for building them
+# TODO(ntamas)
+add_custom_target(build_benchmarks)
+add_custom_target(
+  benchmark
+  COMMAND true
+  COMMENT "Running benchmarks..."
+)
+add_dependencies(benchmark build_benchmarks)
 
 # Some newer gcc version have --enable-new-dtags on by default. This then leads
 # to using RUNPATH instead of RPATH. Since RUNPATH is only considered after
@@ -179,6 +190,7 @@ add_legacy_tests(
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_grg_game
   igraph_growing_random_game
   igraph_k_regular_game
   igraph_lastcit_game
@@ -186,6 +198,7 @@ add_legacy_tests(
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
+  igraph_perfect
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
@@ -253,11 +266,14 @@ add_legacy_tests(
   igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
   igraph_is_tree
+  igraph_list_triangles
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_pseudo_diameter
+  igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
@@ -364,6 +380,8 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_motifs_randesu_estimate
+  igraph_motifs_randesu_no
   triad_census
 )
 
@@ -547,6 +565,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_attribute_combination_remove
   cattributes5
 )
 add_legacy_tests(
@@ -746,6 +765,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+  igraph_solve_lsap
 )
 
 # memory allocation
@@ -753,4 +773,22 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   zero_allocs
+)
+
+# simulation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sir
+)
+
+
+# benchmarks
+add_benchmarks(
+  NAMES
+  igraph_cliques
+  igraph_coloring
+  igraph_maximal_cliques
+  igraph_random_walk
+  igraph_transitivity
 )

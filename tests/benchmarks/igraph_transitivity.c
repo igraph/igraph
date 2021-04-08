@@ -33,11 +33,14 @@ int main() {
     igraph_t g;
     igraph_vector_t trans;
 
+    igraph_rng_seed(igraph_rng_default(), 42);
+    BENCH_INIT();
+
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, N, M,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_init(&trans, igraph_vcount(&g));
 
-    BENCH("1 Transitivity GNM   ",
+    BENCH(" 1 Transitivity GNM",
           igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
                   IGRAPH_TRANSITIVITY_NAN);
          );
@@ -47,7 +50,7 @@ int main() {
                          /*outpref=*/ 0, /*A=*/ 1, IGRAPH_UNDIRECTED,
                          IGRAPH_BARABASI_PSUMTREE, /*start_from=*/ 0);
 
-    BENCH("2 Transitivity Skewed",
+    BENCH(" 2 Transitivity preferential attachment",
           igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
                   IGRAPH_TRANSITIVITY_NAN);
          );

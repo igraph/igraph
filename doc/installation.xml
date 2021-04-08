@@ -466,14 +466,14 @@ pacman -S \
   <para>
 <programlisting>
 $ cmake .. \
-    -DIGRAPH_USE_INTERNAL_BLAS=0 \
-    -DIGRAPH_USE_INTERNAL_LAPACK=0 \
-    -DIGRAPH_USE_INTERNAL_ARPACK=0 \
-    -DIGRAPH_USE_INTERNAL_GLPK=0 \
-    -DIGRAPH_USE_INTERNAL_CXSPARSE=0 \
-    -DIGRAPH_USE_INTERNAL_GMP=0 \
+    -DIGRAPH_USE_INTERNAL_BLAS=OFF \
+    -DIGRAPH_USE_INTERNAL_LAPACK=OFF \
+    -DIGRAPH_USE_INTERNAL_ARPACK=OFF \
+    -DIGRAPH_USE_INTERNAL_GLPK=OFF \
+    -DIGRAPH_USE_INTERNAL_CXSPARSE=OFF \
+    -DIGRAPH_USE_INTERNAL_GMP=OFF \
     -DBLA_VENDOR=OpenBLAS \
-    -DIGRAPH_GRAPHML_SUPPORT=1
+    -DIGRAPH_GRAPHML_SUPPORT=ON
 </programlisting>
   </para>
   <para>
@@ -516,7 +516,11 @@ $ cmake .. \
       <para>
         Link-time optimizaton noticeably improves the performance of
         some igraph functions. To enable it, use
-        <literal>-DIGRAPH_ENABLE_LTO=1</literal>.
+        <literal>-DIGRAPH_ENABLE_LTO=ON</literal>.
+        The <literal>AUTO</literal> setting is also supported, and will
+        enable link-time optimization only if the current compiler
+        supports it. Note that this is detected by CMake, and the
+        detection is not always accurate.
       </para>
     </listitem>
     <listitem>

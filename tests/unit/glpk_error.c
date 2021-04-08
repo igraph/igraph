@@ -23,6 +23,19 @@ int main() {
     igraph_error_handler_t *ehandler;
 
     igraph_vector_init(&res, 0);
+
+    /* Skip test when igraph does not have GLPK support. */
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1, -1);
+    ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
+    if (igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP) == IGRAPH_UNIMPLEMENTED) {
+        igraph_destroy(&graph);
+        igraph_vector_destroy(&res);
+        return 77;
+    }
+    igraph_set_error_handler(ehandler);
+    igraph_destroy(&graph);
+
+
     /* Current versions of GLPK will error if more than 100 million rows (MAX_M) are added.
        The graph size of 700 is chosen to just exceed this size. If future GLPK
        versions relax this restriction, the test will need to be updated accordinly. */

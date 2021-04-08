@@ -42,11 +42,11 @@ extern boolean graph_write_dimacs_ascii_file(graph_t *g,char *comment,
 extern boolean graph_write_dimacs_binary(graph_t *g, char *comment,FILE *fp);
 extern boolean graph_write_dimacs_binary_file(graph_t *g, char *comment,
 					      char *file);
-*/
 
 extern void graph_print(graph_t *g);
 extern boolean graph_test(graph_t *g, FILE *output);
 extern int graph_test_regular(graph_t *g);
+*/
 
 UNUSED_FUNCTION INLINE
 static int graph_subgraph_weight(graph_t *g,set_t s) {

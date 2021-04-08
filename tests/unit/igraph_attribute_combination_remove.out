@@ -1,0 +1,18 @@
+starting combinations:
+name: weight, type: 3
+name: type, type: 8
+name: NULL, type: 0
+
+Removing nonexistent combination:
+name: weight, type: 3
+name: type, type: 8
+name: NULL, type: 0
+
+Removing weight:
+name: type, type: 8
+name: NULL, type: 0
+
+Removing type and NULL:
+
+Removing nonexistent combination again:
+

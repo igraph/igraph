@@ -213,6 +213,8 @@ int moran_one_test() {
 
 int main() {
 
+    igraph_rng_seed(igraph_rng_default(), 1298);
+
     IGRAPH_ASSERT(error_tests() == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(moran_one_test() == IGRAPH_SUCCESS);
 

@@ -12,14 +12,15 @@
 
 /* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
 void print_real(FILE *f, igraph_real_t x, const char *format) {
+    igraph_bool_t g8 = !strcmp(format, "%8g");
     if (igraph_finite(x)) {
         fprintf(f, format, x);
     } else if (igraph_is_nan(x)) {
-        fprintf(f, "NaN");
+        fprintf(f, g8 ? "     NaN" : "NaN");
     } else if (igraph_is_posinf(x)) {
-        fprintf(f, "Inf");
+        fprintf(f, g8 ? "     Inf" : "Inf");
     } else if (igraph_is_neginf(x)) {
-        fprintf(f, "-Inf");
+        fprintf(f, g8 ? "    -Inf" : "-Inf");
     }
 }
 
@@ -106,7 +107,7 @@ void print_graph(const igraph_t *graph) {
     printf("vcount: %ld\n", vcount);
     printf("edges: {\n");
     for (i=0; i < ecount; ++i)
-        printf("%d %d\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
     printf("}\n");
 }
 

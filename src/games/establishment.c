@@ -177,7 +177,7 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
     }
     igraph_vector_destroy(&potneis);
     igraph_vector_destroy(&cumdist);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

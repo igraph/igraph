@@ -35,6 +35,7 @@
 <!-- doxrox-include igraph_girth -->
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_radius -->
+<!-- doxrox-include igraph_pseudo_diameter -->
 </section>
 
 <section id="efficiency-measures"><title>Efficiency Measures</title>

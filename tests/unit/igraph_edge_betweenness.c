@@ -102,7 +102,24 @@ void test_bug1050() {
 
 int main() {
     igraph_t g;
-    igraph_vector_t eb;
+    igraph_vector_t eb, eb2;
+    igraph_vector_t weights;
+
+    igraph_vector_init(&eb, 0);
+
+    printf("Null graph\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, NULL);
+    print_vector(&eb);
+    igraph_destroy(&g);
+
+    printf("\nEdgeless graph on 3 vertices\n");
+    igraph_empty(&g, 3, IGRAPH_DIRECTED);
+    igraph_edge_betweenness(&g, &eb, IGRAPH_DIRECTED, NULL);
+    print_vector(&eb);
+    igraph_destroy(&g);
+
+    igraph_vector_destroy(&eb);
 
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
@@ -127,15 +144,43 @@ int main() {
         };
         igraph_vector_t edges;
 
+        printf("\nNo cutoff, undirected, unweighted\n");
         igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
         igraph_vector_init(&eb, 0);
         igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
         printf("\nBetweenness test for unweighted graph\n");
         print_vector(&eb);
+
+        printf("\nNo cutoff, undirected, unit weighted\n");
+        igraph_vector_init(&eb2, 0);
+        igraph_vector_init(&weights, igraph_ecount(&g));
+        igraph_vector_fill(&weights, 1.0);
+        igraph_edge_betweenness(&g, &eb2, IGRAPH_UNDIRECTED, &weights);
+        print_vector(&eb2);
+
+        /* check that weighted and unweighted calculations give the same result */
+        igraph_vector_scale(&eb2, -1);
+        igraph_vector_add(&eb, &eb2);
+        igraph_vector_abs(&eb);
+        IGRAPH_ASSERT(igraph_vector_max(&eb) < 1e-13);
+
+        igraph_vector_destroy(&weights);
+        igraph_vector_destroy(&eb2);
         igraph_vector_destroy(&eb);
         igraph_destroy(&g);
     }
 
+    printf("\nSmall directed graph, unweighted\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 1,0, 2,0, 0,3, 3,4, 4,5, 5,0, 5,6,
+                 -1);
+    igraph_vector_init(&eb, 0);
+    igraph_edge_betweenness(&g, &eb, IGRAPH_DIRECTED, /* weights */ NULL);
+    print_vector(&eb);
+    igraph_vector_destroy(&eb);
+    igraph_destroy(&g);
+
+    printf("\nSmall undirected graph 1, unweighted, cutoff=2\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, 0);
@@ -145,6 +190,7 @@ int main() {
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
+    printf("\nSmall undirected graph 2, unweighted, cutoff=2\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
                  6, 7, 7, 8, -1);
@@ -154,8 +200,10 @@ int main() {
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
+    printf("\nTesting bug 950, tolerances\n");
     test_bug950();
 
+    printf("\nTesting bug 1050, cutoff values\n");
     test_bug1050();
 
     VERIFY_FINALLY_STACK();
