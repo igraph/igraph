@@ -2,14 +2,17 @@
 /*
    IGraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -45,7 +48,7 @@ void test_bug950() {
     igraph_vector_init(&eb, 0);
 
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
-    printf("bug 950");
+    printf("\nBug 950\n");
     print_vector(&eb);
 
     igraph_vector_destroy(&eb);
@@ -101,7 +104,6 @@ int main() {
     igraph_t g;
     igraph_vector_t eb;
 
-
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
            will choke on an overlong argument list with "internal error C1001". */
@@ -128,7 +130,7 @@ int main() {
         igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
         igraph_vector_init(&eb, 0);
         igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
-        printf("\n betweenness test for unweighted graph \n");
+        printf("\nBetweenness test for unweighted graph\n");
         print_vector(&eb);
         igraph_vector_destroy(&eb);
         igraph_destroy(&g);
@@ -138,11 +140,10 @@ int main() {
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, 0);
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
-    printf("\n unweighted small graphs \n");
+    printf("\nUnweighted small graphs\n");
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
-
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
