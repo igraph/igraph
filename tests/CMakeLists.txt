@@ -8,6 +8,7 @@ add_custom_target(
   check
   COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C $<CONFIG>
   COMMENT "Executing unit tests..."
+  USES_TERMINAL
 )
 add_dependencies(check build_tests)
 
