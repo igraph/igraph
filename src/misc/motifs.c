@@ -32,6 +32,7 @@
 
 #include "core/interruption.h"
 #include "isomorphism/isoclasses.h"
+#include "graph/neighbors.h"
 
 /**
  * Callback function for igraph_motifs_randesu that counts the motifs by
@@ -849,7 +850,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 
 /**
  * \function igraph_dyad_census
- * \brief Calculating the dyad census as defined by Holland and Leinhardt
+ * \brief Calculating the dyad census as defined by Holland and Leinhardt.
  *
  * </para><para>
  * Dyad census means classifying each pair of vertices of a directed
@@ -862,8 +863,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
  * Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
  * Structure in Sociometric Data.  American Journal of Sociology,
  * 70, 492-513.
- * \param graph The input graph, a warning is given if undirected as
- *    the results are undefined for undirected graphs.
+ * \param graph The input graph. For an undirected graph, there are no
+ *    asymmetric connections.
  * \param mut Pointer to an integer, the number of mutual dyads is
  *    stored here.
  * \param asym Pointer to an integer, the number of asymmetric dyads
@@ -878,7 +879,6 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-
 int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                        igraph_integer_t *asym, igraph_integer_t *null) {
 
@@ -887,17 +887,13 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     igraph_integer_t vc = igraph_vcount(graph);
     long int i;
 
-    if (!igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Dyad census called on undirected graph");
-    }
-
     IGRAPH_VECTOR_INIT_FINALLY(&inneis, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < vc; i++) {
         long int ip, op;
-        igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
-        igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
+        igraph_i_neighbors(graph, &inneis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+        igraph_i_neighbors(graph, &outneis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
         ip = op = 0;
         while (ip < igraph_vector_size(&inneis) &&
@@ -929,14 +925,14 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     } else {
         *null = (vc / 2) * (vc - 1);
     }
-    if (*null < vc) {
-        IGRAPH_WARNING("Integer overflow, returning -1");
+    if (*null < vc && vc > 1) {
+        IGRAPH_WARNING("Integer overflow, returning -1.");
         *null = -1;
     } else {
         *null = *null - (*mut) - (*asym);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
