@@ -92,7 +92,7 @@ IGRAPH_EXPORT int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
 IGRAPH_EXPORT igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A);
 IGRAPH_EXPORT int igraph_sparsemat_dupl(igraph_sparsemat_t *A);
 IGRAPH_EXPORT int igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
-                                         int (*fkeep)(int, int, igraph_real_t, void*),
+                                         igraph_integer_t (*fkeep)(igraph_integer_t, igraph_integer_t, igraph_real_t, void*),
                                          void *other);
 IGRAPH_EXPORT int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A);
 IGRAPH_EXPORT int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol);
