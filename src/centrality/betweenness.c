@@ -614,7 +614,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     }
 
     igraph_stack_destroy(&S);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     igraph_inclist_destroy(&inclist);
     igraph_inclist_destroy(&fathers);

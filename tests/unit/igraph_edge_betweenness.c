@@ -48,7 +48,6 @@ void test_bug950() {
     igraph_vector_init(&eb, 0);
 
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
-    printf("\nBug 950\n");
     print_vector(&eb);
 
     igraph_vector_destroy(&eb);
@@ -148,7 +147,6 @@ int main() {
         igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
         igraph_vector_init(&eb, 0);
         igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
-        printf("\nBetweenness test for unweighted graph\n");
         print_vector(&eb);
 
         printf("\nNo cutoff, undirected, unit weighted\n");
@@ -185,7 +183,6 @@ int main() {
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, 0);
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
-    printf("\nUnweighted small graphs\n");
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
