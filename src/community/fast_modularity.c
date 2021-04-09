@@ -841,7 +841,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
         /* Some debug info if needed */
         /* igraph_i_fastgreedy_community_list_check_heap(&communities); */
-#ifdef DEBUG
+#ifdef IGRAPH_FASTCOMM_DEBUG
         debug("===========================================\n");
         for (i = 0; i < communities.n; i++) {
             if (communities.e[i].maxdq == 0) {
@@ -875,7 +875,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         debug("Q[%ld] = %.7f\tdQ = %.7f\t |H| = %ld\n",
               no_of_joins, q, *communities.heap[0]->maxdq->dq, no_of_nodes - no_of_joins - 1);
 
-        /* DEBUG */
+        /* IGRAPH_FASTCOMM_DEBUG */
         /* from=join_order[no_of_joins*2]; to=join_order[no_of_joins*2+1];
         if (to == -1) break;
         for (i=0; i<igraph_vector_ptr_size(&communities.e[to].neis); i++) {

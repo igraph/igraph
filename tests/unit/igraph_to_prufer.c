@@ -28,7 +28,7 @@
 
 int test_from_prufer_back_to_prufer() {
     igraph_t graph;
-    int prufer[] = {2, 3, 2, 3};
+    igraph_integer_t prufer[] = {2, 3, 2, 3};
 
     igraph_vector_int_t expected_prufer, output_prufer;
 
@@ -50,7 +50,7 @@ int test_from_prufer_back_to_prufer() {
 
 int test_from_prufer_back_to_prufer_with_resize() {
     igraph_t graph;
-    int prufer[] = {0, 2, 4, 1, 1, 0};
+    igraph_integer_t prufer[] = {0, 2, 4, 1, 1, 0};
 
     igraph_vector_int_t expected_prufer, output_prufer;
 
@@ -72,7 +72,7 @@ int test_from_prufer_back_to_prufer_with_resize() {
 
 int test_from_prufer_back_to_prufer_with_resize2() {
     igraph_t graph;
-    int prufer[] = {2, 4, 5, 1, 3};
+    igraph_integer_t prufer[] = {2, 4, 5, 1, 3};
 
     igraph_vector_int_t expected_prufer, output_prufer;
 

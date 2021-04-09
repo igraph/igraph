@@ -8,6 +8,7 @@ add_custom_target(
   check
   COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C $<CONFIG>
   COMMENT "Executing unit tests..."
+  USES_TERMINAL
 )
 add_dependencies(check build_tests)
 
@@ -84,6 +85,7 @@ add_legacy_tests(
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
+  igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
@@ -264,6 +266,8 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
+  igraph_is_chordal
+  igraph_is_mutual
   igraph_is_tree
   igraph_list_triangles
   igraph_local_transitivity

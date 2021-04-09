@@ -256,7 +256,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  * \param alpham1 Either an inverse alpha vector coming from \ref
  *    igraph_maximum_cardinality_search() (on the same graph) or a \c NULL
  *    pointer.
- * \param chordal Pointer to a boolean, the result is stored here.
+ * \param chordal Pointer to a boolean. If not NULL the result is stored here.
  * \param fill_in Pointer to an initialized vector, or a \c NULL
  *    pointer. If not a \c NULL pointer, then the fill-in of the graph is
  *    stored here. The fill-in is the set of edges that are needed to
@@ -294,6 +294,16 @@ int igraph_is_chordal(const igraph_t *graph,
     /*****************/
 
     long int v, w, x;
+
+    if (alpha && (igraph_vector_size(alpha) != no_of_nodes)) {
+        IGRAPH_ERRORF("Alpha vector size (%ld) not equal to number of nodes (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_size(alpha), no_of_nodes);
+    }
+
+    if (alpham1 && (igraph_vector_size(alpham1) != no_of_nodes)) {
+        IGRAPH_ERRORF("Inverse alpha vector size (%ld) not equal to number of nodes (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_size(alpham1), no_of_nodes);
+    }
 
     if (!chordal && !calc_edges) {
         /* Nothing to calculate */
