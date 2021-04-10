@@ -400,7 +400,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     no_of_types = nodes == 0 ? 0 : igraph_vector_max(types) + 1;
 
     if (igraph_matrix_ncol(pref) != no_of_types) {
-        IGRAPH_ERRORF("Number of preference matrix colums (%ld) not "
+        IGRAPH_ERRORF("Number of preference matrix columns (%ld) not "
                       "equal to number of types (%g).",
                       IGRAPH_EINVAL,
                       igraph_matrix_ncol(pref),
