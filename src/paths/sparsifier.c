@@ -290,10 +290,10 @@ int igraph_spanner (const igraph_t *graph,
             igraph_inclist_destroy(&inclist);
             IGRAPH_FINALLY_CLEAN(1);
             // free the heaps
-            while (igraph_heap_empty(&edges_to_add)) {
+            while (!igraph_heap_empty(&edges_to_add)) {
                 igraph_heap_delete_top(&edges_to_add);
             }
-            while (igraph_heap_empty(&edges_to_remove)) {
+            while (!igraph_heap_empty(&edges_to_remove)) {
                 igraph_heap_delete_top(&edges_to_remove);
             }
             continue;
