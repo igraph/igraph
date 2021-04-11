@@ -454,39 +454,33 @@ $ cmake --build . --target html
   </para>
 </section>
 
-<section id="igraph-Installation-compiling-programs-that-use-igraph">
-  <title>Compiling programs that use igraph</title>
-  <para>
-    If igraph was built as a static library on Windows, it is necessary
-    to define <literal>IGRAPH_STATIC</literal> when building programs
-    that will link to igraph.
-  </para>
-</section>
-
 <section id="igraph-Installation-notes-for-package-maintainers">
   <title>Notes for package maintainers</title>
   <para>
     This section is for people who package igraph for Linux distros or
-    other package managers.
+    other package managers. Please read it carefully before packaging
+    igraph.
   </para>
-  <para>
-    igraph bundles several of its dependencies (or simplified versions
-    of its dependencies). During configuration time, it checks whether
-    each dependency is present on the system. If yes, it uses it.
-    Otherwise, it falls back to the bundled (<quote>vendored</quote>)
-    version. In order to make configuration as deterministic as
-    possible, you may want to disable this auto-detection. To do so, set
-    each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> option
-    described above. Additionally, set <literal>BLA_VENDOR</literal> to
-    use the BLAS and LAPACK implementations of your choice. This should
-    be the same BLAS and LAPACK library that igraph's other dependencies,
-    such as ARPACK and CXSparse are linked against.
-  </para>
-  <para>
-    For example, to force igraph to use external versions of all
-    dependencies, and to use OpenBLAS for BLAS/LAPACK, use
-  </para>
-  <para>
+  <section>
+    <title>Auto-detection of dependencies</title>
+    <para>
+      igraph bundles several of its dependencies (or simplified versions
+      of its dependencies). During configuration time, it checks whether
+      each dependency is present on the system. If yes, it uses it.
+      Otherwise, it falls back to the bundled (<quote>vendored</quote>)
+      version. In order to make configuration as deterministic as
+      possible, you may want to disable this auto-detection. To do so, set
+      each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> option
+      described above. Additionally, set <literal>BLA_VENDOR</literal> to
+      use the BLAS and LAPACK implementations of your choice. This should
+      be the same BLAS and LAPACK library that igraph's other dependencies,
+      such as ARPACK and CXSparse are linked against.
+    </para>
+    <para>
+      For example, to force igraph to use external versions of all
+      dependencies, and to use OpenBLAS for BLAS/LAPACK, use
+    </para>
+    <para>
 <programlisting>
 $ cmake .. \
     -DIGRAPH_USE_INTERNAL_BLAS=OFF \
@@ -498,20 +492,38 @@ $ cmake .. \
     -DBLA_VENDOR=OpenBLAS \
     -DIGRAPH_GRAPHML_SUPPORT=ON
 </programlisting>
-  </para>
-  <para>
-    When building igraph with an internal ARPACK, LAPACK or BLAS, it
-    makes use of f2c, which compiles and runs the <literal>arithchk</literal>
-    program at build time to detect the floating point characteristics of the
-    current system. It writes the results into the <literal>arith.h</literal>
-    header. Since running this program is not possible when cross-compiling,
-    igraph's build system allows specifying a pre-generated version of this
-    header file through the <literal>F2C_EXTERNAL_ARITH_HEADER</literal>
-    CMake option. An example version of this header follows for the
-    x86_64 and arm64 target architecures on macOS. Warning: Do not use this
-    version of <literal>arith.h</literal> on other systems or architectures.
-  </para>
-  <para>
+    </para>
+  </section>
+  <section>
+    <title>Shared and static builds</title>
+    <para>
+      On Windows, shared and static builds should not be installed in the same
+      location. If you decide to do so anyway, keep in mind the following: 
+      Both builds contain an <literal>igraph.lib</literal> file. The static one
+      should be renamed to avoid conflict. The headers from the static build
+      are incompatible with the shared library. The headers from the shared build
+      may be used with the static library, but <literal>IGRAPH_STATIC</literal>
+      must be defined when compiling programs that will link to igraph statically.
+    </para>
+    <para>
+      These issues do not affect Unix-like systems.
+    </para>
+  </section>
+  <section>
+    <title>Cross-compiling</title>
+    <para>
+      When building igraph with an internal ARPACK, LAPACK or BLAS, it
+      makes use of f2c, which compiles and runs the <literal>arithchk</literal>
+      program at build time to detect the floating point characteristics of the
+      current system. It writes the results into the <literal>arith.h</literal>
+      header. Since running this program is not possible when cross-compiling,
+      igraph's build system allows specifying a pre-generated version of this
+      header file through the <literal>F2C_EXTERNAL_ARITH_HEADER</literal>
+      CMake option. An example version of this header follows for the
+      x86_64 and arm64 target architecures on macOS. Warning: Do not use this
+      version of <literal>arith.h</literal> on other systems or architectures.
+    </para>
+    <para>
 <programlisting>
 #define IEEE_8087
 #define Arith_Kind_ASL 1
@@ -523,39 +535,40 @@ $ cmake .. \
 #define QNaN0 0x0
 #define QNaN1 0x7ff80000
 </programlisting>
-  </para>
-  <para>
-    Additional notes:
-  </para>
-  <itemizedlist>
-    <listitem>
-      <para>
-        As of igraph 0.9, there is no tangible benefit to using an
-        external GMP, as igraph does not yet use GMP in any
-        performance-critical way. The bundled Mini-GMP is sufficient.
-      </para>
-    </listitem>
-    <listitem>
-      <para>
-        Link-time optimizaton noticeably improves the performance of
-        some igraph functions. To enable it, use
-        <literal>-DIGRAPH_ENABLE_LTO=ON</literal>.
-        The <literal>AUTO</literal> setting is also supported, and will
-        enable link-time optimization only if the current compiler
-        supports it. Note that this is detected by CMake, and the
-        detection is not always accurate.
-      </para>
-    </listitem>
-    <listitem>
-      <para>
-        We saw occasional hangs on Windows when igraph was built for a
-        32-bit target with MinGW and linked to OpenBLAS. We believe this
-        to be an issue with OpenBLAS, not igraph. On this platform, you
-        may want to opt for a different BLAS/LAPACK or the bundled
-        BLAS/LAPACK.
-      </para>
-    </listitem>
-  </itemizedlist>
+    </para>
+  </section>
+  <section>
+    <title>Additional notes</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          As of igraph 0.9, there is no tangible benefit to using an
+          external GMP, as igraph does not yet use GMP in any
+          performance-critical way. The bundled Mini-GMP is sufficient.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Link-time optimizaton noticeably improves the performance of
+          some igraph functions. To enable it, use
+          <literal>-DIGRAPH_ENABLE_LTO=ON</literal>.
+          The <literal>AUTO</literal> setting is also supported, and will
+          enable link-time optimization only if the current compiler
+          supports it. Note that this is detected by CMake, and the
+          detection is not always accurate.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          We saw occasional hangs on Windows when igraph was built for a
+          32-bit target with MinGW and linked to OpenBLAS. We believe this
+          to be an issue with OpenBLAS, not igraph. On this platform, you
+          may want to opt for a different BLAS/LAPACK or the bundled
+          BLAS/LAPACK.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </section>
 </section>
 
 </chapter>
