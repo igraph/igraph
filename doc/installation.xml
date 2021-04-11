@@ -431,6 +431,29 @@ pacman -S \
   </section>
 </section>
 
+<section id="igraph-Installation-building-the-documentation">
+  <title>Building the documentation</title>
+  <para>
+    Most users will not need to build the documentation, as the release
+    tarball contains pre-built HTML documentation in the <literal>doc</literal>
+    directory.
+  </para>
+  <para>
+    To build the documentation for the development version, simply build
+    the <literal>html</literal> or <literal>pdf</literal> targets for the
+    HTML and PDF versions of the documentation, respectively.
+  </para>
+<programlisting>
+$ cmake --build . --target html
+</programlisting>
+  <para>
+    Building the HTML documentation requires Python 3, <literal>xmlto</literal>
+    and <literal>source-highlight</literal>. Building the PDF documentation
+    also requires <literal>xsltproc</literal>, <literal>xmllint</literal>
+    and <literal>fop</literal>.
+  </para>
+</section>
+
 <section id="igraph-Installation-compiling-programs-that-use-igraph">
   <title>Compiling programs that use igraph</title>
   <para>
