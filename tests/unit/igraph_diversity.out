@@ -1,0 +1,6 @@
+Null graph:
+( )
+Empty graph:
+( NaN NaN NaN NaN NaN )
+Graph with 4 nodes and 5 edges:
+( 0.970951 0.75 0.69137 1 )

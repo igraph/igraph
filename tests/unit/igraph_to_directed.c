@@ -32,7 +32,7 @@ int main() {
     igraph_copy(&dg, &ug);
     printf("\nRANDOM (edge count only):\n");
     igraph_to_directed(&dg, IGRAPH_TO_DIRECTED_RANDOM);
-    printf("%d\n", igraph_ecount(&dg));
+    printf("%" IGRAPH_PRId "\n", igraph_ecount(&dg));
     igraph_destroy(&dg);
 
     igraph_destroy(&ug);

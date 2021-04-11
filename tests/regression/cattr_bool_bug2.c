@@ -14,7 +14,7 @@ int main() {
     FILE* ifile = fopen("cattr_bool_bug2.graphml", "r");
 
     if (!ifile) {
-        printf("Cannot open input file");
+        printf("Cannot open input file\n");
         return 1;
     }
 
@@ -26,19 +26,17 @@ int main() {
         if (result == IGRAPH_UNIMPLEMENTED) {
             return 77;
         }
+        printf("Failed to read GraphML file\n");
         return 1;
     }
     igraph_set_error_handler(oldhandler);
 
     fclose(ifile);
 
-    if (!igraph_cattribute_has_attr(&graph, IGRAPH_ATTRIBUTE_GRAPH, "mybool")) {
-        printf("boolean value mybool not found\n");
-        return 2;
-    } else {
-        igraph_bool_t value = igraph_cattribute_GAB(&graph, "mybool");
-        printf("found boolean value %d\n", value);
-    }
+    IGRAPH_ASSERT(igraph_cattribute_has_attr(&graph, IGRAPH_ATTRIBUTE_GRAPH, "mybool"));
+
+    /* Boolean attribute value is expected to be true */
+    IGRAPH_ASSERT(igraph_cattribute_GAB(&graph, "mybool"));
 
     igraph_destroy(&graph);
 

@@ -5,30 +5,12 @@
 
 #include "../unit/test_utilities.inc"
 
-void check_attr(igraph_t *graph, int offset) {
-
-    if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "name")) {
-        printf("No graph attribute `name`\n");
-        exit(offset + 2);
-    }
-    if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "type")) {
-        printf("No graph attribute `type`\n");
-        exit(offset + 3);
-    }
-    if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "p")) {
-        printf("No graph attribute `p`\n");
-        exit(offset + 4);
-    }
-    if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
-                                    "name")) {
-        printf("No vertex attribute `id`\n");
-        exit(offset + 5);
-    }
-    if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-                                    "weight")) {
-        printf("No edge attribute `weight'\n");
-        exit(offset + 6);
-    }
+void check_attr(igraph_t *graph) {
+    IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "name"));
+    IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "type"));
+    IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "p"));
+    IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "name"));
+    IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, "weight"));
 }
 
 int main() {
@@ -39,7 +21,7 @@ int main() {
     FILE *ifile = fopen("cattr_bool_bug.graphml", "r");
 
     if (!ifile) {
-        printf("Cannot open input file");
+        printf("Cannot open input file\n");
         return 1;
     }
 
@@ -47,25 +29,25 @@ int main() {
 
     oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
     if ((result = igraph_read_graph_graphml(&graph, ifile, 0))) {
-        /* maybe it is simply disabled at compile-time */
+        /* Maybe it is simply disabled at compile-time. If so, skip test. */
         if (result == IGRAPH_UNIMPLEMENTED) {
             return 77;
         }
+        printf("Failed to read GraphML file\n");
         return 1;
     }
     igraph_set_error_handler(oldhandler);
 
     fclose(ifile);
 
-    check_attr(&graph, 10);
+    printf("Checkng attributes of original graph\n");
+    check_attr(&graph);
 
+    printf("Checkng attributes of directed version\n");
     igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_ARBITRARY);
+    check_attr(&graph);
 
-    check_attr(&graph, 20);
-
-    if (GAB(&graph, "loops")) {
-        return 2;
-    }
+    IGRAPH_ASSERT(! GAB(&graph, "loops"));
 
     igraph_destroy(&graph);
 

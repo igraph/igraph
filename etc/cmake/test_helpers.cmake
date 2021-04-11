@@ -9,7 +9,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   set(TARGET_NAME ${NAMESPACE}_${NAME})
   set(TEST_NAME "${NAMESPACE}::${NAME}")
 
-  add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/${FOLDER}/${NAME})
+  add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/${FOLDER}/${NAME}.c)
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
@@ -64,14 +64,26 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
 
     # The next line is necessitated by MinGW on Windows. MinGW uses forward slashes in
     # IGRAPH_LIBDIR, but we need to supply CTest with backslashes because CTest is executed
-    # in a cmd.exe shell. So we simply replace forward slashes with backslases in
-    # IGRAPH_LIBDIR.
-    string(REPLACE "/" "\\" IGRAPH_LIBDIR ${IGRAPH_LIBDIR})
+    # in a cmd.exe shell. We therefore explicitly ensure that that path is transformed to a
+    # native path.
+    file(TO_NATIVE_PATH "${IGRAPH_LIBDIR}" IGRAPH_LIBDIR)
 
     # Semicolons are used as list separators in CMake so we need to escape them in the PATH,
     # otherwise the PATH envvar gets split by CMake before it passes the PATH on to CTest.
-    string(JOIN "\;" CORRECT_PATH $ENV{PATH})
-    SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES ENVIRONMENT "PATH=${IGRAPH_LIBDIR}\;${CORRECT_PATH}" )
+    # We process each path separately to ensure it is a proper path. In particular, we need
+    # to ensure that a trailing backslash is not incorrectly interpreted as an escape
+    # character. Presumably, with cmake 3.20, this can be changed to using TO_NATIVE_PATH_LIST.
+    SET(TEST_PATHS)
+    foreach (PATH $ENV{PATH})
+      file(TO_NATIVE_PATH "${PATH}" CORRECT_PATH)
+      # Remove trailing backslash
+      STRING(REGEX REPLACE "\\$" "" CORRECT_PATH ${CORRECT_PATH})
+      list(APPEND TEST_PATHS ${CORRECT_PATH})
+    endforeach()
+
+    # Join all paths in a single string, separated by an escaped semi-colon.
+    string(JOIN "\;" CORRECT_PATHS ${TEST_PATHS})
+    SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES ENVIRONMENT "PATH=${IGRAPH_LIBDIR}\;${CORRECT_PATHS}" )
   endif()
 endfunction()
 

@@ -1,0 +1,39 @@
+name: Codecov.io
+
+on: [push, pull_request]
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install dependencies
+      run: sudo apt-get install lcov libglpk-dev libarpack2-dev
+
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Create build environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_ENABLE_CODE_COVERAGE=ON 
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cmake --build . --parallel
+
+    - name: Coverage
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cmake --build . --target coverage --parallel
+      
+    - name: Codecov.io
+      uses: codecov/codecov-action@v1.2.1

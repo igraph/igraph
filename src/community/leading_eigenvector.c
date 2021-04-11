@@ -594,7 +594,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, IGRAPH_NAN));
         }
         if (eigenvectors) {
-            igraph_vector_t *v = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!v) {
                 IGRAPH_ERROR("Cannot do leading eigenvector community detection",
                              IGRAPH_ENOMEM);
@@ -813,7 +813,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
         }
 
         if (eigenvectors) {
-            igraph_vector_t *v = igraph_Calloc(1, igraph_vector_t);
+            igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!v) {
                 IGRAPH_ERROR("Cannot do leading eigenvector community detection",
                              IGRAPH_ENOMEM);

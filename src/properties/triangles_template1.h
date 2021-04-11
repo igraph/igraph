@@ -41,7 +41,7 @@ if (nodes_to_calc == 0) {
     return IGRAPH_SUCCESS;
 }
 
-neis = igraph_Calloc(no_of_nodes, long int);
+neis = IGRAPH_CALLOC(no_of_nodes, long int);
 if (neis == 0) {
     IGRAPH_ERROR("local undirected transitivity failed", IGRAPH_ENOMEM);
 }
@@ -88,6 +88,6 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
 }
 
 igraph_lazy_adjlist_destroy(&adjlist);
-igraph_Free(neis);
+IGRAPH_FREE(neis);
 igraph_vit_destroy(&vit);
 IGRAPH_FINALLY_CLEAN(3);

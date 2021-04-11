@@ -1,0 +1,66 @@
+Two empty graphs:
+( )
+
+Two singleton graphs:
+( 0 )
+
+Empty and singleton graphs:
+
+Two rings:
+( 0 1 2 3 4 )
+( 0 4 3 2 1 )
+( 1 0 4 3 2 )
+( 1 2 3 4 0 )
+( 2 1 0 4 3 )
+( 2 3 4 0 1 )
+( 3 2 1 0 4 )
+( 3 4 0 1 2 )
+( 4 0 1 2 3 )
+( 4 3 2 1 0 )
+
+Two directed rings:
+( 0 1 2 3 4 )
+( 1 2 3 4 0 )
+( 2 3 4 0 1 )
+( 3 4 0 1 2 )
+( 4 0 1 2 3 )
+
+Two rings where node parity should be equal:
+( 0 1 2 3 4 )
+( 4 3 2 1 0 )
+
+Two rings where edge parity should be equal:
+( 0 1 2 3 4 )
+( 0 4 3 2 1 )
+
+Two rings with only one vertex coloring:
+( 0 1 2 3 4 )
+( 0 4 3 2 1 )
+( 1 0 4 3 2 )
+( 1 2 3 4 0 )
+( 2 1 0 4 3 )
+( 2 3 4 0 1 )
+( 3 2 1 0 4 )
+( 3 4 0 1 2 )
+( 4 0 1 2 3 )
+( 4 3 2 1 0 )
+
+Two rings with vertex coloring:
+( 0 1 2 3 4 )
+( 4 3 2 1 0 )
+
+Two rings with edge coloring:
+( 0 1 2 3 4 )
+( 0 4 3 2 1 )
+
+Two rings where node of graph 1 should not be 3 higher than node of graph 2:
+( 0 1 2 3 4 )
+( 1 0 4 3 2 )
+( 1 2 3 4 0 )
+( 2 1 0 4 3 )
+( 2 3 4 0 1 )
+( 4 0 1 2 3 )
+( 4 3 2 1 0 )
+
+Two rings with different directedness.
+

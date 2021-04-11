@@ -399,7 +399,7 @@ int igraph_maximal_cliques_count(const igraph_t *graph,
 
 /**
  * \function igraph_maximal_cliques_file
- * Find maximal cliques and write them to a file
+ * \brief Find maximal cliques and write them to a file.
  *
  * This function enumerates all maximal cliques and writes them to file.
  *

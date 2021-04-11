@@ -267,6 +267,8 @@ int retain_strategy_test() {
 int main() {
     int ret;
 
+    igraph_rng_seed(igraph_rng_default(), 3241);
+
     ret = error_tests();
     if (ret) {
         return IGRAPH_FAILURE;

@@ -33,10 +33,10 @@
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
-                                      const igraph_vs_t vids,
-                                      igraph_vector_t *map,
-                                      igraph_vector_t *invmap) {
+static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+                                             const igraph_vs_t vids,
+                                             igraph_vector_t *map,
+                                             igraph_vector_t *invmap) {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *remain;
@@ -47,7 +47,7 @@ int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     IGRAPH_VECTOR_INIT_FINALLY(&delete, 0);
-    remain = igraph_Calloc(no_of_nodes, char);
+    remain = IGRAPH_CALLOC(no_of_nodes, char);
     if (remain == 0) {
         IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
     }
@@ -67,7 +67,7 @@ int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
         }
     }
 
-    igraph_Free(remain);
+    IGRAPH_FREE(remain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* must set res->attr to 0 before calling igraph_copy */
@@ -87,11 +87,11 @@ int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
  * Subgraph creation, new version: creates the new graph instead of
  * copying the old one.
  */
-int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
-        igraph_t *res,
-        const igraph_vs_t vids,
-        igraph_vector_t *map,
-        igraph_vector_t *invmap) {
+static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
+                                                 igraph_t *res,
+                                                 const igraph_vs_t vids,
+                                                 igraph_vector_t *map,
+                                                 igraph_vector_t *invmap) {
     igraph_bool_t directed = igraph_is_directed(graph);
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_new_nodes = 0;
@@ -300,9 +300,9 @@ int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                        /* invmap= */ 0);
 }
 
-int igraph_i_induced_subgraph_suggest_implementation(
-    const igraph_t *graph, const igraph_vs_t vids,
-    igraph_subgraph_implementation_t *result) {
+static int igraph_i_induced_subgraph_suggest_implementation(
+        const igraph_t *graph, const igraph_vs_t vids,
+        igraph_subgraph_implementation_t *result) {
     double ratio;
     igraph_integer_t num_vs;
 
@@ -395,12 +395,12 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_VECTOR_INIT_FINALLY(&delete, 0);
-    vremain = igraph_Calloc(no_of_nodes, char);
+    vremain = IGRAPH_CALLOC(no_of_nodes, char);
     if (vremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vremain);
-    eremain = igraph_Calloc(no_of_edges, char);
+    eremain = IGRAPH_CALLOC(no_of_edges, char);
     if (eremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
@@ -423,7 +423,7 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
         }
     }
 
-    igraph_Free(eremain);
+    IGRAPH_FREE(eremain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Delete the unnecessary edges */
@@ -444,7 +444,7 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
         }
     }
 
-    igraph_Free(vremain);
+    IGRAPH_FREE(vremain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Delete the unnecessary vertices */

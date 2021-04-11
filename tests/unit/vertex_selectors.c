@@ -24,7 +24,7 @@ void check(igraph_t *graph, igraph_vs_t *vs) {
     igraph_integer_t vertex;
     IGRAPH_ASSERT(igraph_vit_create(graph, *vs, &vit) == IGRAPH_SUCCESS);
     for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        printf("%d\n", IGRAPH_VIT_GET(vit));
+        printf("%" IGRAPH_PRId "\n", IGRAPH_VIT_GET(vit));
     }
 }
 

@@ -424,9 +424,15 @@ bool graph_molloy_opt::havelhakimi() {
             delete[] nb;
             delete[] sorted;
             compute_neigh();
-            igraph_errorf("Error in graph_molloy_opt::havelhakimi():"
-                          " Couldn't bind vertex %d entirely "
-                          "(%d edges remaining)", IGRAPH_FILE_BASENAME, __LINE__,
+
+            /* Cannot use IGRAPH_ERRORF() as this function does not return
+             * an error code. This situation should only occur when the degree
+             * sequence is not graphical, but that is already checked at the top
+             * level. Therefore, we report EINTERNAL, as triggering this
+             * indicates a bug. */
+            igraph_errorf("Error in graph_molloy_opt::havelhakimi(): "
+                          "Couldn't bind vertex %d entirely (%d edges remaining)",
+                          IGRAPH_FILE_BASENAME, __LINE__,
                           IGRAPH_EINTERNAL, v, dv);
             return false;
         }
@@ -498,9 +504,11 @@ bool graph_molloy_opt::make_connected() {
             if (deg[v0] == 0) {
                 delete[] dist;
                 delete[] buff;
-                igraph_errorf("graph_molloy_opt::make_connected() returned FALSE : "
-                              "vertex %d has degree 0", IGRAPH_FILE_BASENAME, __LINE__,
-                              IGRAPH_EINTERNAL, v0);
+                /* Cannot use IGRAPH_ERROR() as this function does not return an error code. */
+                igraph_error("Cannot create connected graph from degree sequence: "
+                              "vertex with degree 0 found.",
+                              IGRAPH_FILE_BASENAME, __LINE__,
+                              IGRAPH_EINVAL);
                 return false;
             }
             dist[v0] = 0; // root
@@ -997,10 +1005,12 @@ int graph_molloy_opt::breadth_path_search(int src, int *buff, double *paths, uns
                 if (++nb_visited == n) {
                     last_dist = nd;
                 }
-            } else if (d == nd) if ((paths[w] += p) == numeric_limits<double>::infinity()) {
+            } else if (d == nd) {
+                if ((paths[w] += p) == numeric_limits<double>::infinity()) {
                     IGRAPH_ERROR("Fatal error : too many (>MAX_DOUBLE) possible"
                                  " paths in graph", IGRAPH_EOVERFLOW);
                 }
+            }
         }
     }
     assert(to_visit == buff + nb_visited);
@@ -1396,9 +1406,9 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
                 while (t_index--) if (dist[v = *(dst++)] == 0) {
                         nopath++;
                     } else {
-#ifdef _DEBUG
+#ifdef DEGSEQ_VL_DEBUG
                         igraph_statusf("Sampling path %d -> %d\n", 0, s, v);
-#endif //_DEBUG
+#endif // DEGSEQ_VL_DEBUG
                         nb_paths++;
                         // while we haven't reached the source..
                         while (v != s) {

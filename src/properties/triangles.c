@@ -31,6 +31,7 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
+#include "properties/properties_internal.h"
 
 /**
  * \function igraph_transitivity_avglocal_undirected
@@ -93,6 +94,15 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     igraph_vector_t degree;
     igraph_vector_t triangles;
 
+    if (no_of_nodes == 0) {
+        if (mode == IGRAPH_TRANSITIVITY_ZERO) {
+            *res = 0;
+        } else {
+            *res = IGRAPH_NAN;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
@@ -110,9 +120,9 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
-        IGRAPH_ERROR("undirected average local transitivity failed",
+        IGRAPH_ERROR("Undirected average local transitivity failed.",
                      IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, neis);
@@ -161,12 +171,12 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     *res = sum / count;
 
     igraph_vector_destroy(&triangles);
-    igraph_Free(neis);
+    IGRAPH_FREE(neis);
     igraph_adjlist_destroy(&allneis);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_local_undirected1(const igraph_t *graph,
@@ -178,7 +188,7 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
 #include "properties/triangles_template1.h"
 #undef TRANSIT
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_local_undirected2(const igraph_t *graph,
@@ -248,7 +258,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
         VECTOR(rank)[ (long int) VECTOR(order)[i] ] = affected_nodes - i - 1;
     }
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
         IGRAPH_ERROR("local transitivity calculation failed", IGRAPH_ENOMEM);
     }
@@ -508,15 +518,15 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     }
 }
 
-int igraph_adjacent_triangles1(const igraph_t *graph,
-                               igraph_vector_t *res,
-                               const igraph_vs_t vids) {
+static int igraph_adjacent_triangles1(const igraph_t *graph,
+                                      igraph_vector_t *res,
+                                      const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
     return 0;
 }
 
-int igraph_adjacent_triangles4(const igraph_t *graph,
-                               igraph_vector_t *res) {
+static int igraph_adjacent_triangles4(const igraph_t *graph,
+                                      igraph_vector_t *res) {
 # include "properties/triangles_template.h"
     return 0;
 }
@@ -548,9 +558,10 @@ int igraph_adjacent_triangles(const igraph_t *graph,
 
 /**
  * \function igraph_list_triangles
- * Find all triangles in a graph
+ * \brief Find all triangles in a graph.
  *
  * \param graph The input graph, edge directions are ignored.
+ *        Multiple edges are ignored.
  * \param res Pointer to an initialized integer vector, the result
  *        is stored here, in a long list of triples of vertex ids.
  *        Each triple is a triangle in the graph. Each triangle is
@@ -570,7 +581,7 @@ int igraph_list_triangles(const igraph_t *graph,
 # define TRIANGLES
 # include "properties/triangles_template.h"
 # undef TRIANGLES
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -590,11 +601,14 @@ int igraph_list_triangles(const igraph_t *graph,
  * value for the whole graph. See the following reference for more details:
  *
  * </para><para>
- * S. Wasserman and K. Faust: Social Network Analysis: Methods and
- * Applications. Cambridge: Cambridge University Press, 1994.
+ * Clustering coefficient is an alternative name for transitivity.
  *
  * </para><para>
- * Clustering coefficient is an alternative name for transitivity.
+ * References:
+ *
+ * </para><para>
+ * S. Wasserman and K. Faust: Social Network Analysis: Methods and
+ * Applications. Cambridge: Cambridge University Press, 1994.
  *
  * \param graph The graph object.
  * \param res Pointer to a real variable, the result will be stored here.
@@ -614,7 +628,6 @@ int igraph_list_triangles(const igraph_t *graph,
  * \example examples/simple/igraph_transitivity.c
  */
 
-
 int igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
@@ -631,6 +644,11 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis1, *neis2;
     long int i, j, neilen1, neilen2;
+
+    if (no_of_nodes == 0) {
+        *res = mode == IGRAPH_TRANSITIVITY_ZERO ? 0.0 : IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
@@ -649,7 +667,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
-    neis = igraph_Calloc(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
         IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
     }
@@ -684,7 +702,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
         }
     }
 
-    igraph_Free(neis);
+    IGRAPH_FREE(neis);
     igraph_adjlist_destroy(&allneis);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&order);
@@ -729,12 +747,20 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     igraph_vector_t strength;
 
     if (!weights) {
-        IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
+        if (no_of_edges != 0) {
+            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
+        }
         return igraph_transitivity_local_undirected(graph, res, vids, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
+                      "number of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+    if (no_of_nodes == 0) {
+        igraph_vector_clear(res);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -802,7 +828,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_barrat4(const igraph_t *graph,
@@ -822,12 +848,19 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     long int i, nn;
 
     if (!weights) {
-        IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
+        if (no_of_edges != 0) {
+            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
+        }
         return igraph_transitivity_local_undirected(graph, res, vids, mode);
     }
-
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
+                      "number of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+    if (no_of_nodes == 0) {
+        igraph_vector_clear(res);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
@@ -914,7 +947,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

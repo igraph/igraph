@@ -340,7 +340,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
     }
 
-    parents = igraph_Calloc(no_of_nodes, long int);
+    parents = IGRAPH_CALLOC(no_of_nodes, long int);
     if (parents == 0) {
         IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM);
     }
@@ -477,7 +477,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vit_destroy(&tovit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_Free(parents);
+    IGRAPH_FREE(parents);
     igraph_dqueue_destroy(&Q);
     igraph_vector_destroy(&clean_vertices);
     igraph_vector_destroy(&num_queued);

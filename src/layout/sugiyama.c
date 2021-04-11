@@ -175,7 +175,7 @@ static int igraph_i_layering_init(igraph_i_layering_t* layering,
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layering->layers);
 
     for (i = 0; i < num_layers; i++) {
-        igraph_vector_t* vec = igraph_Calloc(1, igraph_vector_t);
+        igraph_vector_t* vec = IGRAPH_CALLOC(1, igraph_vector_t);
         IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
         VECTOR(layering->layers)[i] = vec;
         IGRAPH_FINALLY_CLEAN(1);
@@ -762,7 +762,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
     /* The first column of the matrix will serve as the ordering */
     /* Start with a first-seen ordering within each layer */
     {
-        long int *xs = igraph_Calloc(no_of_layers, long int);
+        long int *xs = IGRAPH_CALLOC(no_of_layers, long int);
         if (xs == 0) {
             IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM);
         }

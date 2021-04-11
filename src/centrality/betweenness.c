@@ -38,7 +38,6 @@
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
  *
- * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the
@@ -270,7 +269,6 @@ static int igraph_i_betweenness_cutoff_weighted(
  * \function igraph_betweenness_cutoff
  * \brief Range-limited betweenness centrality.
  *
- * </para><para>
  * This function computes a range-limited version of betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -366,17 +364,17 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
         igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, j));
     }
 
-    distance = igraph_Calloc(no_of_nodes, long int);
+    distance = IGRAPH_CALLOC(no_of_nodes, long int);
     if (distance == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
-    nrgeo = igraph_Calloc(no_of_nodes, double);
+    nrgeo = IGRAPH_CALLOC(no_of_nodes, double);
     if (nrgeo == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
-    tmpscore = igraph_Calloc(no_of_nodes, double);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
@@ -457,9 +455,9 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
 
     /* clean  */
-    igraph_Free(distance);
-    igraph_Free(nrgeo);
-    igraph_Free(tmpscore);
+    IGRAPH_FREE(distance);
+    IGRAPH_FREE(nrgeo);
+    IGRAPH_FREE(tmpscore);
 
     igraph_dqueue_destroy(&q);
     igraph_stack_destroy(&stack);
@@ -736,11 +734,11 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
  * \function igraph_edge_betweenness
  * \brief Betweenness centrality of the edges.
  *
- * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
+ *
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
  *        betweenness scores for the edges.
@@ -775,8 +773,6 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \function igraph_edge_betweenness_cutoff
  * \brief Range-limited betweenness centrality of the edges.
  *
- * </para><para>
- * </para><para>
  * This function computes a range-limited version of edge betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -842,17 +838,17 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
         elist_out_p = elist_in_p = &elist_out;
     }
 
-    distance = igraph_Calloc(no_of_nodes, long int);
+    distance = IGRAPH_CALLOC(no_of_nodes, long int);
     if (distance == 0) {
         IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
-    nrgeo = igraph_Calloc(no_of_nodes, double);
+    nrgeo = IGRAPH_CALLOC(no_of_nodes, double);
     if (nrgeo == 0) {
         IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
-    tmpscore = igraph_Calloc(no_of_nodes, double);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
@@ -946,9 +942,9 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
 
     /* clean and return */
-    igraph_Free(distance);
-    igraph_Free(nrgeo);
-    igraph_Free(tmpscore);
+    IGRAPH_FREE(distance);
+    IGRAPH_FREE(nrgeo);
+    IGRAPH_FREE(tmpscore);
     igraph_dqueue_destroy(&q);
     igraph_stack_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(5);

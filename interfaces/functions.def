@@ -687,6 +687,10 @@ igraph_girth:
         DEPS: circle ON graph
         IGNORE: RR, RC, RNamespace
 
+igraph_is_perfect:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res
+        IGNORE: RR, RC, RNamespace
+
 igraph_add_edge:
         PARAMS: INOUT GRAPH graph, INTEGER from, INTEGER to
         IGNORE: RR, RC, RNamespace
@@ -856,6 +860,11 @@ igraph_eccentricity:
 igraph_radius:
         PARAMS: GRAPH graph, OUT REALPTR radius, NEIMODE mode=ALL
         NAME-R: radius
+
+igraph_pseudo_diameter:
+        PARAMS: GRAPH graph, OUT REALPTR diameter, INTEGER start_vid, \
+                OUT INTEGERPTR from=NULL, OUT INTEGERPTR to=NULL
+        NAME-R: pseudo_diameter
 
 igraph_diversity:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXINDEX res, \
@@ -1364,8 +1373,7 @@ igraph_community_leading_eigenvector:
 igraph_community_fluid_communities:
         PARAMS: GRAPH graph, INTEGER no_of_communities, \
 		            OUT VECTOR membership, OUT REALPTR modularity
-        NAME-R: cluster_fluid_com
-        IGNORE: RR
+        NAME-R: cluster_fluid_communities
 
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \

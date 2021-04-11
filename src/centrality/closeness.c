@@ -36,7 +36,6 @@
  * \function igraph_closeness
  * \brief Closeness centrality calculations for some vertices.
  *
- * </para><para>
  * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
  * can be reached from the other vertices). It is defined as
@@ -348,7 +347,6 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_closeness_cutoff
  * \brief Range limited closeness centrality.
  *
- * </para><para>
  * This function computes a range-limited version of closeness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -526,10 +524,10 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
 /***** Harmonic centrality *****/
 
-int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_vs_t vids, igraph_neimode_t mode,
-                                            igraph_bool_t normalized,
-                                            igraph_real_t cutoff) {
+static int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
+                                                   const igraph_vs_t vids, igraph_neimode_t mode,
+                                                   igraph_bool_t normalized,
+                                                   igraph_real_t cutoff) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t already_counted;
@@ -744,7 +742,6 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
  * \function igraph_harmonic_centrality_cutoff
  * \brief Range limited harmonic centrality.
  *
- * </para><para>
  * This function computes the range limited version of harmonic centrality:
  * only those shortest paths are considered whose length is not above the given cutoff.
  * The inverse distance to vertices not reachable within the cutoff is considered
@@ -813,7 +810,6 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
  * \function igraph_harmonic_centrality
  * \brief Harmonic centrality for some vertices.
  *
- * </para><para>
  * The harmonic centrality of a vertex is the mean inverse distance to
  * all other vertices. The inverse distance to an unreachable vertex
  * is considered to be zero.

@@ -37,7 +37,7 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
     for (i = 0; i < igraph_vector_ptr_size(v); i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_destroy(VECTOR(*v)[i]);
-            igraph_Free(VECTOR(*v)[i]);
+            IGRAPH_FREE(VECTOR(*v)[i]);
         }
     }
     igraph_vector_ptr_destroy(v);
@@ -151,7 +151,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
      * is in the target vertex sequence. Otherwise it is
      * one larger than the length of the shortest path from the
      * source */
-    geodist = igraph_Calloc(no_of_nodes, long int);
+    geodist = IGRAPH_CALLOC(no_of_nodes, long int);
     if (geodist == 0) {
         IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM);
     }
@@ -358,7 +358,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
         }
     }
 
-    igraph_Free(geodist);
+    IGRAPH_FREE(geodist);
     igraph_vector_destroy(&ptrlist);
     igraph_vector_destroy(&ptrhead);
     igraph_vector_destroy(&neis);

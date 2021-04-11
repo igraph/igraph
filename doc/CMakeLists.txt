@@ -79,6 +79,7 @@ file(
   LIST_DIRECTORIES FALSE
   RELATIVE ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/examples/simple/*.c
+  ${CMAKE_SOURCE_DIR}/examples/tutorial/*.c
 )
 
 # You should not need to change anything below this line if you are simply

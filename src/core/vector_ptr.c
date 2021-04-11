@@ -92,7 +92,7 @@ int igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
     if (size < 0) {
         size = 0;
     }
-    v->stor_begin = igraph_Calloc(alloc_size, void*);
+    v->stor_begin = IGRAPH_CALLOC(alloc_size, void*);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM);
     }
@@ -134,7 +134,7 @@ const igraph_vector_ptr_t *igraph_vector_ptr_view(const igraph_vector_ptr_t *v, 
 void igraph_vector_ptr_destroy(igraph_vector_ptr_t* v) {
     IGRAPH_ASSERT(v != 0);
     if (v->stor_begin != 0) {
-        igraph_Free(v->stor_begin);
+        IGRAPH_FREE(v->stor_begin);
         v->stor_begin = NULL;
     }
 }
@@ -176,7 +176,7 @@ void igraph_vector_ptr_free_all(igraph_vector_ptr_t* v) {
 
     igraph_i_vector_ptr_call_item_destructor_all(v);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
-        igraph_Free(*ptr);
+        IGRAPH_FREE(*ptr);
     }
 }
 
@@ -224,7 +224,7 @@ int igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) {
         return 0;
     }
 
-    tmp = igraph_Realloc(v->stor_begin, (size_t) size, void*);
+    tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, void*);
     if (tmp == 0) {
         IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM);
     }
@@ -445,7 +445,7 @@ int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
  */
 
 int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int length) {
-    v->stor_begin = igraph_Calloc(length, void*);
+    v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
     }
@@ -498,9 +498,14 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  */
 
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+    long int from_size;
+
     IGRAPH_ASSERT(from != NULL);
     /*   IGRAPH_ASSERT(from->stor_begin != NULL); */ /* TODO */
-    to->stor_begin = igraph_Calloc(igraph_vector_ptr_size(from), void*);
+
+    from_size = igraph_vector_ptr_size(from);
+
+    to->stor_begin = IGRAPH_CALLOC(from_size, void*);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
     }
@@ -552,7 +557,7 @@ int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
     void **tmp;
     int i, n = igraph_vector_int_size(idx);
 
-    tmp = igraph_Calloc(n, void*);
+    tmp = IGRAPH_CALLOC(n, void*);
     if (!tmp) {
         IGRAPH_ERROR("Cannot index pointer vector", IGRAPH_ENOMEM);
     }
@@ -561,7 +566,7 @@ int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
         tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ];
     }
 
-    igraph_Free(v->stor_begin);
+    IGRAPH_FREE(v->stor_begin);
     v->stor_begin = tmp;
     v->stor_end = v->end = tmp + n;
 

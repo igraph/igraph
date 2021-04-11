@@ -93,7 +93,7 @@ int igraph_i_intervals_method(const igraph_vector_t *v, int *gr,
 
 int igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs,
                          int n, int matrix, const igraph_vector_t *ps);
-int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n, int nt,
+int igraph_i_optimal_partition(const igraph_real_t *v, igraph_integer_t *gr, int n, int nt,
                                int matrix, const igraph_real_t *p,
                                igraph_real_t *value);
 
@@ -123,6 +123,6 @@ int igraph_i_compare_int(const void *a, const void *b);
 igraph_real_t *igraph_i_real_sym_matrix(int size);
 #define igraph_i_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
 #define igraph_i_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
-#define igraph_i_free_real_sym_matrix(S) igraph_Free(S)
+#define igraph_i_free_real_sym_matrix(S) IGRAPH_FREE(S)
 
 #endif

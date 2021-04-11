@@ -82,7 +82,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    added = igraph_Calloc(no_of_nodes, long int);
+    added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
         IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM);
     }

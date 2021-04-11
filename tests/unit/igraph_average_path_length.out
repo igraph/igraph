@@ -1,0 +1,35 @@
+Null graph:
+Average shortest path length: NaN
+No. of unconnected pairs: 0
+
+Singleton graph:
+Average shortest path length: NaN
+No. of unconnected pairs: 0
+
+2-vertex empty graph, unconn=true:
+Average shortest path length: NaN
+No. of unconnected pairs: 2
+
+2-vertex empty graph, unconn=false:
+Average shortest path length: Inf
+No. of unconnected pairs: 2
+
+Smallest bifurcating directed tree, unconn=true:
+Average shortest path length: 1
+No. of unconnected pairs: 4
+
+Smallest bifurcating directed tree, unconn=false:
+Average shortest path length: 1
+No. of unconnected pairs: 4
+
+Undirected 11-cycle:
+Average shortest path length: 3
+No. of unconnected pairs: 0
+
+Directed 6-cycle:
+Average shortest path length: 5.5
+No. of unconnected pairs: 0
+
+De Bruijn graph, n=3 and m=5:
+Average shortest path length: 4.34405
+No. of unconnected pairs: 0

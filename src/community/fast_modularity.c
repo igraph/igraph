@@ -148,12 +148,12 @@ static void igraph_i_fastgreedy_community_list_destroy(
     for (i = 0; i < list->n; i++) {
         igraph_vector_ptr_destroy(&list->e[i].neis);
     }
-    igraph_Free(list->e);
+    IGRAPH_FREE(list->e);
     if (list->heapindex != 0) {
-        igraph_Free(list->heapindex);
+        IGRAPH_FREE(list->heapindex);
     }
     if (list->heap != 0) {
-        igraph_Free(list->heap);
+        IGRAPH_FREE(list->heap);
     }
 }
 
@@ -841,7 +841,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
         /* Some debug info if needed */
         /* igraph_i_fastgreedy_community_list_check_heap(&communities); */
-#ifdef DEBUG
+#ifdef IGRAPH_FASTCOMM_DEBUG
         debug("===========================================\n");
         for (i = 0; i < communities.n; i++) {
             if (communities.e[i].maxdq == 0) {
@@ -875,7 +875,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         debug("Q[%ld] = %.7f\tdQ = %.7f\t |H| = %ld\n",
               no_of_joins, q, *communities.heap[0]->maxdq->dq, no_of_nodes - no_of_joins - 1);
 
-        /* DEBUG */
+        /* IGRAPH_FASTCOMM_DEBUG */
         /* from=join_order[no_of_joins*2]; to=join_order[no_of_joins*2+1];
         if (to == -1) break;
         for (i=0; i<igraph_vector_ptr_size(&communities.e[to].neis); i++) {
@@ -1030,7 +1030,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
      * the excess rows from the merge matrix */
     if (no_of_joins < total_joins) {
         long int *ivec;
-        ivec = igraph_Calloc(igraph_matrix_nrow(merges), long int);
+        long int merges_nrow = igraph_matrix_nrow(merges);
+        ivec = IGRAPH_CALLOC(merges_nrow, long int);
         if (ivec == 0) {
             IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
         }
@@ -1039,7 +1040,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
             ivec[i] = i + 1;
         }
         igraph_matrix_permdelete_rows(merges, ivec, total_joins - no_of_joins);
-        igraph_Free(ivec);
+        IGRAPH_FREE(ivec);
         IGRAPH_FINALLY_CLEAN(1);
     }
     IGRAPH_PROGRESS("Fast greedy community detection", 100.0, 0);
@@ -1050,8 +1051,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     }
 
     debug("Freeing memory\n");
-    igraph_Free(pairs);
-    igraph_Free(dq);
+    IGRAPH_FREE(pairs);
+    IGRAPH_FREE(dq);
     igraph_i_fastgreedy_community_list_destroy(&communities);
     igraph_vector_destroy(&a);
     IGRAPH_FINALLY_CLEAN(4);
