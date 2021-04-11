@@ -1086,8 +1086,6 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * \sa \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
- *
- * \example examples/simple/igraph_es_fromto.c
  */
 
 int igraph_es_fromto(igraph_es_t *es,
