@@ -85,8 +85,7 @@ int main () {
 
     // trevial spanner with stretch of one
     igraph_full(&graph, 20, IGRAPH_UNDIRECTED, 0);
-    unsigned long seed = (unsigned long) time(0);
-    igraph_spanner(&graph, &spanner, 1, NULL, NULL, &seed);
+    igraph_spanner(&graph, &spanner, 1, NULL, NULL);
     no_of_edges = igraph_ecount(&graph);
     no_of_edges_spanner = igraph_ecount(&spanner);
     IGRAPH_ASSERT(no_of_edges_spanner == no_of_edges);
@@ -99,14 +98,14 @@ int main () {
         double generated_number = igraph_rng_get_unif(&rng, 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
-    igraph_spanner(&graph, &spanner, 10, &weights, &spanner_weight, NULL);
+    igraph_spanner(&graph, &spanner, 10, &weights, &spanner_weight);
     check_spanner = _test_spanner(&graph, &spanner, 10, &weights, &spanner_weight);
     igraph_vector_destroy(&spanner_weight);
     igraph_vector_destroy(&weights);
     igraph_destroy(&spanner);
 
     // Test spanner for unweighted complete graph
-    igraph_spanner(&graph, &spanner, 5, NULL, NULL, &seed);
+    igraph_spanner(&graph, &spanner, 5, NULL, NULL);
     int spanner_no_of_edges = igraph_ecount(&spanner);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
@@ -127,7 +126,7 @@ int main () {
         double generated_number = igraph_rng_get_unif(&rng, 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
-    igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight, NULL);
+    igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight);
     _test_spanner(&graph, &spanner, 5, &weights, &spanner_weight);
     igraph_vector_destroy(&spanner_weight);
     igraph_vector_destroy(&weights);
@@ -136,7 +135,7 @@ int main () {
 
     // Singlton graph
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
-    igraph_spanner(&graph, &spanner, 2, NULL, NULL, NULL);
+    igraph_spanner(&graph, &spanner, 2, NULL, NULL);
     int no_of_nodes = igraph_vcount(&spanner);
     IGRAPH_ASSERT(no_of_nodes == 1);
     igraph_destroy(&spanner);

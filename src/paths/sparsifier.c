@@ -31,7 +31,7 @@
 
 #include "config.h"
 
-int _igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
+static int igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
                                     const igraph_inclist_t *inclist, 
                                     long int v, 
                                     long int *lightest_sample_clustering_index,
@@ -111,16 +111,14 @@ int _igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
  */
 int igraph_spanner (const igraph_t *graph,
         igraph_t *spanner,
-        int stretch,
+        igraph_real_t stretch,
         igraph_vector_t *weights,
-        igraph_vector_t *spanner_weight,
-        unsigned long int *seed) { 
+        igraph_vector_t *spanner_weight) { 
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph), edge;
     long int i = 0, nlen, neighbor, v_center;
     double sample_prob, size_limit, k = (stretch + 1) / 2, weight;
-    igraph_rng_t rng;
     igraph_t residual_graph;
     igraph_vector_t clustering, centers, sampled_centers, lightest_neighbor, lightest_weight, residual_weight;
     igraph_vector_t new_clustering, eids, spanner_weight_temp;
@@ -160,12 +158,6 @@ int igraph_spanner (const igraph_t *graph,
     IGRAPH_CHECK(igraph_empty(spanner, no_of_nodes, IGRAPH_UNDIRECTED));
     IGRAPH_VECTOR_INIT_FINALLY(&spanner_weight_temp, 0);
 
-    // Defining the random number generator
-    IGRAPH_CHECK(igraph_rng_init(&rng, &igraph_rngtype_mt19937));
-    IGRAPH_FINALLY(igraph_rng_destroy, &rng);
-    if (seed) {
-        IGRAPH_CHECK(igraph_rng_seed(&rng, *seed));
-    }
     // Phase 1: forming the clusters
     // Create a residual graph with V' = V and E' = E. If the graph is unweighted than each edge has
     // weight of 1.
@@ -200,18 +192,20 @@ int igraph_spanner (const igraph_t *graph,
 
     while (i < k-1) {
         //step 1: sample centers
+        RNG_BEGIN();
         IGRAPH_CHECK(igraph_inclist_init(&residual_graph, &inclist, IGRAPH_OUT, IGRAPH_NO_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
         igraph_vector_fill(&new_clustering, -1);
         igraph_vector_fill(&sampled_centers, 0);
         int size_centers = igraph_vector_size(&centers);
         for (int j = 0; j < size_centers; j++) {
-            generated_number = igraph_rng_get_unif(&rng, 0, 1);
+            generated_number = RNG_UNIF01();
             long int center = VECTOR(centers)[j];
             if (generated_number < sample_prob) {
                 VECTOR(sampled_centers)[center] = 1;
             }
         }
+        RNG_END();
 
         //step 2 and 3
         for (long int v = 0; v < no_of_nodes; v++) {
@@ -233,7 +227,7 @@ int igraph_spanner (const igraph_t *graph,
             
             // step 2: find the neighboring clusters and lightest edges to them
             long int lightest_sample_clustering_index = -1;
-            IGRAPH_CHECK(_igraph_i_lightest_edge_cluster(&residual_graph, 
+            IGRAPH_CHECK(igraph_i_lightest_edge_cluster(&residual_graph, 
                                                         &inclist, 
                                                         v, 
                                                         &lightest_sample_clustering_index,
@@ -369,7 +363,7 @@ int igraph_spanner (const igraph_t *graph,
         if (VECTOR(clustering)[v] != -1) {
             igraph_vector_fill(&lightest_neighbor, -1);
             igraph_vector_fill(&lightest_weight, INFINITY);
-            IGRAPH_CHECK(_igraph_i_lightest_edge_cluster(&residual_graph, 
+            IGRAPH_CHECK(igraph_i_lightest_edge_cluster(&residual_graph, 
                                                         &inclist, 
                                                         v, 
                                                         NULL,
@@ -404,7 +398,6 @@ int igraph_spanner (const igraph_t *graph,
     }
     // Free memory
     igraph_vector_destroy(&residual_weight);
-    igraph_rng_destroy(&rng);
     igraph_destroy(&residual_graph);
     igraph_vector_destroy(&clustering);
     igraph_vector_destroy(&centers);
@@ -417,6 +410,6 @@ int igraph_spanner (const igraph_t *graph,
     igraph_heap_destroy(&edges_to_remove);
     igraph_heap_destroy(&edges_to_add);
     igraph_vector_destroy(&eids);
-    IGRAPH_FINALLY_CLEAN(14);
+    IGRAPH_FINALLY_CLEAN(13);
     return IGRAPH_SUCCESS;
 }

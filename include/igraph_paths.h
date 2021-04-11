@@ -181,10 +181,9 @@ IGRAPH_EXPORT int igraph_random_edge_walk(const igraph_t *graph,
 
 IGRAPH_EXPORT int igraph_spanner(const igraph_t *graph,
                                 igraph_t *spanner,
-                                int stretch,
+                                igraph_real_t stretch,
                                 igraph_vector_t *weights,
-                                igraph_vector_t *spanner_weight,
-                                unsigned long int *seed);
+                                igraph_vector_t *spanner_weight);
 
 __END_DECLS
 

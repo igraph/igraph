@@ -13,7 +13,7 @@
 <!-- doxrox-include igraph_are_connected -->
 </section>
 
-<section id="sparsifiers"><title>sparsifiers</title>
+<section id="Sparsifiers"><title>Sparsifiers</title>
 <!-- doxrox-include igraph_spanner -->
 </section>
 
