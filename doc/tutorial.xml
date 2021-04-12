@@ -2,13 +2,12 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
-<!ENTITY tut_simple SYSTEM "../examples/doc/tut_simple.c">
 ]>
 
 <chapter id="igraph-Tutorial">
 <title>Tutorial</title>
 
-<section id="tut-lesson-1"><title>Lesson 1. Compiling programs using igraph</title>
+<section id="tut-lesson-1"><title>Compiling programs using igraph</title>
 
 <para>
 The following short example program demonstrates the basic usage of 
@@ -32,59 +31,121 @@ destroys it, i.e. deallocates the memory associated to it.
 </para>
 
 <para>
-For compiling this program you need a C compiler, if this is called 
-<command>gcc</command> and the previous code is saved in file
-<filename>igraph_test.c</filename>, you will need a command like this:
+For compiling this program you need a C compiler. Optionally,
+<ulink url="https://cmake.org">CMake</ulink> can be used to automate the compilation.
+</para>
+
+<section id="tut-lesson-1-compiling-with-cmake">
+<title>Compiling with CMake</title>
+
+<para>
+It is convenient to use CMake because it can automatically discover the
+necessary compilation flags on all operating systems. Many IDEs support
+CMake, and can work with CMake projects directly. To create a CMake project
+for this example program, create a file name <filename>CMakeLists.txt</filename> with the
+following contents:
+
 <programlisting>
-gcc igraph_test.c -I/usr/local/include/igraph -L/usr/local/lib -ligraph -o igraph_test
+cmake_minimum_required(VERSION 3.16)
+project(igraph_test C)
+
+find_package(igraph REQUIRED)
+
+add_executable(igraph_test igraph_test.c)
+target_link_libraries(igraph_test PUBLIC igraph::igraph)
+</programlisting>
+</para>
+
+<para>
+To compile the project, create a new directory called build, and switch to it:
+<programlisting>
+mkdir build
+cd build
+</programlisting>
+</para>
+
+<para>
+Run CMake to configure the project:
+<programlisting>
+cmake ..
+</programlisting>
+</para>
+
+<para>
+If igraph was installed at a non-standard location, specify its prefix
+using the <option>-DCMAKE_PREFIX_PATH=...</option> option. The prefix must be
+the same directory that was specified as the <option>CMAKE_INSTALL_PREFIX</option>
+when compiling igraph.
+</para>
+
+<para>
+If configuration has succeeded, build the program using
+<programlisting>
+cmake --build .
+</programlisting>
+</para>
+
+</section>
+
+<section id="tut-lesson-1-compiling-without-cmake">
+<title>Compiling without CMake</title>
+
+<para>
+On most Unix-like systems, the default C compiler is called <command>cc</command>.
+To compile the test program, you will need a command similar to the following:
+<programlisting>
+cc igraph_test.c -I/usr/local/include/igraph -L/usr/local/lib -ligraph -o igraph_test
 </programlisting>
 </para>
 
 <para>
 The exact form depends on where <command>igraph</command> was installed on your
-system. The directory after the <option>-I</option> switch is the one
-containing the <filename>igraph.h</filename> file, while the one
-following <option>-L</option> should contain the 
-library file itself, usually a file called
-<filename>libigraph.so</filename>, <filename>libigraph.a</filename> or
-<filename>igraph.dll</filename>. 
-It your system has the <command>pkg-config</command> utility you are
+system, whether it was compiled as a shared or static library, and the external
+libraries it was linked to. The directory after the <option>-I</option> switch
+is the one containing the <filename>igraph.h</filename> file, while the one
+following <option>-L</option> should contain the library file itself, usually a
+file called <filename>libigraph.a</filename> (static library on macOS and
+Linux), <filename>libigraph.so</filename> (shared library on Linux),
+<filename>libigraph.dylib</filename> (shared library on macOS),
+<filename>igraph.lib</filename> (static library on Windows) or
+<filename>igraph.dll</filename> (shared library on Windows). If
+<command>igraph</command> was compiled as a static library, it is also
+necessary to manually link to all of its dependencies.
+</para>
+
+<para>
+If your system has the <command>pkg-config</command> utility you are
 likely to get the necessary compile options by issuing the command
 <programlisting>
 pkg-config --libs --cflags igraph
 </programlisting>
-</para>
-
-<para>
-The executable can be run by simply typing its name like this:
+(if <command>igraph</command> was built as a shared library) or
 <programlisting>
-./igraph_test
+pkg-config --static --libs --cflags igraph
 </programlisting>
-on most systems. If you use dynamic linking and the <command>igraph</command>
-libraries are not at a standard place, you may need to set the
-<envar>LD_LIBRARY_PATH</envar> variable, the syntax depends on the
-shell use are using. In <command>bash</command> it goes like this:
-<programlisting>
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libs/igraph
-./igraph_test
-</programlisting>
-Here we assumed that the <command>igraph</command> library is installed in 
-<filename>/home/user/libs/igraph</filename>. Alternatively, you can use
-the <envar>LD_PRELOAD</envar> variable to preload the
-<command>igraph</command> library before invoking your program:
-<programlisting>
-LD_PRELOAD=/home/user/libs/igraph/libigraph.so ./igraph_test
-</programlisting>
-Note that <envar>LD_PRELOAD</envar> and
-<envar>LD_LIBRARY_PATH</envar> are specific to Linux and a few other Unix-like
-systems. On Windows, it is usually enough to set the
-<envar>PATH</envar> environment variable to include the folder in which
-the <command>igraph</command> library is installed, look for the 
-<filename>igraph.dll</filename> or similar file.
+(if <command>igraph</command> was built as a static library).
 </para>
 
 </section>
-<section id="tut-lesson-2"><title>Lesson 2. Creating your first graphs</title>
+
+<section id="tut-lesson-1-running-the-program">
+<title>Running the program</title>
+
+<para>
+On most systems, the executable can be run by simply typing its name like this:
+<programlisting>
+./igraph_test
+</programlisting>
+If you use dynamic linking and the <command>igraph</command>
+library is not in a standard place, you may need to add its location to the
+<envar>LD_LIBRARY_PATH</envar> (Linux), <envar>DYLD_LIBRARY_PATH</envar> (macOS)
+or <envar>PATH</envar> (Windows) environment variables.
+</para>
+
+</section>
+
+</section>
+<section id="tut-lesson-2"><title>Creating your first graphs</title>
 
 <para>
 The functions generating graph objects are called graph
@@ -176,7 +237,7 @@ edges can be removed by calling
 </para>
 
 </section>
-<section id="tut-lesson-3"><title>Lesson 3. Calculating various properties of graphs</title>
+<section id="tut-lesson-3"><title>Calculating various properties of graphs</title>
 <para>
 In our next example we will calculate various centrality measures in a
 friendship graph. The friendship graph is from the famous Zachary karate
