@@ -74,6 +74,22 @@
 
 #include "core/indheap.h"
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_floor
+ * \brief Transform a real vector to a long vector by flooring each element.
+ *
+ * </para><para>
+ * Flooring means rounding down to the nearest integer.
+ *
+ * \param from The original real vector object.
+ * \param to Pointer to an initialized long vector. The result will
+ *           be stored here.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory
+ *
+ * Time complexity: O(n), where n is the number of elements in the vector.
+ */
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
     long int i, n = igraph_vector_size(from);
 
@@ -81,7 +97,7 @@ int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
     for (i = 0; i < n; i++) {
         VECTOR(*to)[i] = (long int) floor(VECTOR(*from)[i]);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
@@ -486,7 +502,7 @@ int igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool_t *is_nan)
     IGRAPH_ASSERT(is_nan->stor_begin != NULL);
     IGRAPH_CHECK(igraph_vector_bool_resize(is_nan, igraph_vector_size(v)));
     for (ptr = v->stor_begin, ptr_nan = is_nan->stor_begin; ptr < v->end; ptr++, ptr_nan++) {
-        *ptr_nan = igraph_is_nan(*ptr);
+        *ptr_nan = igraph_is_nan(*ptr) ? 1 : 0;
     }
     return IGRAPH_SUCCESS;
 }

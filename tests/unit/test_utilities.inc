@@ -51,7 +51,7 @@ void print_vector_int(const igraph_vector_int_t *v) {
     long i, n = igraph_vector_int_size(v);
     printf("(");
     for (i=0; i < n; i++) {
-        printf(" %d", VECTOR(*v)[i]);
+        printf(" %" IGRAPH_PRId, VECTOR(*v)[i]);
     }
     printf(" )\n");
 }
