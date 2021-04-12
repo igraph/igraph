@@ -81,7 +81,9 @@ jobs:
     pool:
       vmImage: macos-latest
     steps:
-      - script: brew install ninja ccache
+      - script: |
+          brew update
+          brew install ninja ccache
         displayName: Install dependencies
 
       - template: .azure/build.yml
