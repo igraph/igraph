@@ -56,15 +56,11 @@
 #include "io/gml-header.h"
 #include "io/gml-tree.h"
 #include "io/parsers/gml-parser.h"
+#include "io/parsers/gml-lexer.h"
 #include "internal/hacks.h" /* strcasecmp */
 
-#define yyscan_t void*
-
-int igraph_gml_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, void *scanner);
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
                        const char *s);
-char *igraph_gml_yyget_text (yyscan_t yyscanner );
-size_t igraph_gml_yyget_leng (yyscan_t yyscanner );
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
 void igraph_i_gml_get_string(char *s, int len, void *res);
 double igraph_i_gml_get_real(char *s, int len);
