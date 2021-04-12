@@ -787,6 +787,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  igraph_betweenness
   igraph_cliques
   igraph_coloring
   igraph_maximal_cliques
