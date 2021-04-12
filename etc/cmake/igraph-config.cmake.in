@@ -1,0 +1,6 @@
+set(IGRAPH_VERSION "@PACKAGE_VERSION_BASE@")
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/igraph-targets.cmake")
+
+check_required_components(igraph)
