@@ -549,7 +549,7 @@ $ cmake .. \
       </listitem>
       <listitem>
         <para>
-          Link-time optimizaton noticeably improves the performance of
+          Link-time optimization noticeably improves the performance of
           some igraph functions. To enable it, use
           <literal>-DIGRAPH_ENABLE_LTO=ON</literal>.
           The <literal>AUTO</literal> setting is also supported, and will
