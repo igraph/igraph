@@ -186,8 +186,7 @@ int igraph_i_merge(igraph_t *res, int mode,
         l = idx1 < no_edges_left && idx2 < no_edges_right;   \
         break;                                               \
     default:                                                 \
-        l = 0;  /* should not happen */                      \
-        break;                                               \
+        IGRAPH_ASSERT(! "Invalid merge mode.");              \
     }
 
     CONT();
