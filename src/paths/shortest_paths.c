@@ -1375,13 +1375,13 @@ int igraph_k_shortest_paths(const igraph_t *graph,
                             igraph_neimode_t mode) {
     igraph_vector_ptr_t paths_pot; /* potential shortest paths */
     igraph_integer_t vertex_spur;
-    igraph_vector_t path_root, path_spur;
-    igraph_vector_t *path_total;
+    igraph_vector_t path_spur;
+    igraph_vector_t *path_root, *path_total;
     igraph_integer_t nr_edges_root, i_path_current, i_path, i, edge_path_root, vertex_root_del;
     igraph_vector_t weights_old;
     igraph_vector_t edges_removed;
+    igraph_bool_t added_path;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&path_root, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&path_spur, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&weights_old, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&edges_removed, 0);
@@ -1406,11 +1406,13 @@ int igraph_k_shortest_paths(const igraph_t *graph,
         printf("\nsmall k: %d\n", i_path_current);
         igraph_vector_t *path_previous = VECTOR(*paths)[i_path_current - 1];
         for (nr_edges_root = 0; nr_edges_root < igraph_vector_size(path_previous) - 1; nr_edges_root ++) {
+            path_root = IGRAPH_CALLOC(1, igraph_vector_t);
+            IGRAPH_FINALLY(igraph_free, path_root);
             vertex_spur = IGRAPH_FROM(graph, VECTOR(*path_previous)[nr_edges_root]);
 
-            igraph_vector_resize(&path_root, nr_edges_root);
+            IGRAPH_VECTOR_INIT_FINALLY(path_root, nr_edges_root);
             for (i = 0; i < nr_edges_root; i++) {
-                VECTOR(path_root)[i] = VECTOR(*path_previous)[i];
+                VECTOR(*path_root)[i] = VECTOR(*path_previous)[i];
             }
 
             //printf("root path:\n");
@@ -1422,7 +1424,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
                 igraph_bool_t equal = 1;
                 igraph_vector_t *path_check = VECTOR(*paths)[i_path];
                 for (i = 0; i < nr_edges_root; i++) {
-                    if (IGRAPH_FROM(graph, VECTOR(path_root)[i]) != IGRAPH_FROM(graph, VECTOR(*path_check)[i])) {
+                    if (IGRAPH_FROM(graph, VECTOR(*path_root)[i]) != IGRAPH_FROM(graph, VECTOR(*path_check)[i])) {
                         equal = 0;
                         break;
                     }
@@ -1442,7 +1444,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             //        remove rootPathNode from Graph;
 
             for (edge_path_root = 0; edge_path_root < nr_edges_root; edge_path_root++) {
-                vertex_root_del = IGRAPH_FROM(graph, VECTOR(path_root)[edge_path_root]);
+                vertex_root_del = IGRAPH_FROM(graph, VECTOR(*path_root)[edge_path_root]);
                 igraph_i_semidelete_vertex(graph, weights, vertex_root_del, &edges_removed, &weights_old);
             }
 
@@ -1466,17 +1468,23 @@ int igraph_k_shortest_paths(const igraph_t *graph,
                 }
             }
 
+            added_path = 0;
             if (!path_infinite) {
-                path_total = &path_root;
+                path_total = path_root;
                 igraph_vector_append(path_total, &path_spur);
 
                 if (!path_in(path_total, &paths_pot)) {
                     int pot_path_new_index = igraph_vector_ptr_size(&paths_pot);
                     igraph_vector_ptr_resize(&paths_pot, pot_path_new_index + 1);
-                    VECTOR(paths_pot)[pot_path_new_index] = IGRAPH_CALLOC(1, igraph_vector_t);
-                    igraph_vector_copy(VECTOR(paths_pot)[pot_path_new_index], path_total);
+                    VECTOR(paths_pot)[pot_path_new_index] = path_total;
+                    added_path = 1;
                 }
             }
+            if (!added_path) {
+                igraph_vector_destroy(path_root);
+                IGRAPH_FREE(path_root);
+            }
+            IGRAPH_FINALLY_CLEAN(2);
             for (i = 0; i < igraph_vector_size(&edges_removed); i++) {
                 VECTOR(*weights)[(int)VECTOR(edges_removed)[i]] = VECTOR(weights_old)[i];
             }
@@ -1500,12 +1508,11 @@ int igraph_k_shortest_paths(const igraph_t *graph,
         igraph_vector_ptr_remove(&paths_pot, 0);
     }
 
-    igraph_vector_destroy(&path_root);
     igraph_vector_destroy(&path_spur);
     igraph_vector_destroy(&weights_old);
     igraph_vector_destroy(&edges_removed);
     igraph_vector_ptr_destroy_all(&paths_pot);
-    IGRAPH_FINALLY_CLEAN(5);
+    IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
 }
