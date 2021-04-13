@@ -185,6 +185,8 @@ int igraph_i_merge(igraph_t *res, int mode,
     case IGRAPH_MERGE_MODE_INTERSECTION:                     \
         l = idx1 < no_edges_left && idx2 < no_edges_right;   \
         break;                                               \
+    default:                                                 \
+        IGRAPH_ASSERT(! "Invalid merge mode.");              \
     }
 
     CONT();
