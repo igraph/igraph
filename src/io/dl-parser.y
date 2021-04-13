@@ -45,8 +45,8 @@
 */
 
 #include "config.h"
-#include "core/math.h"
 
+#include "core/math.h"
 #include "internal/hacks.h"
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"

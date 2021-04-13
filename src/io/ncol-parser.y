@@ -48,11 +48,11 @@
 #include <string.h>
 
 #include "igraph_types.h" 
-#include "core/math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
 
+#include "core/math.h"
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
 #include "io/parsers/ncol-lexer.h"
