@@ -1382,10 +1382,16 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     igraph_vector_t edges_removed;
     igraph_bool_t added_path;
 
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(paths, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_pot, igraph_vector_destroy);
     IGRAPH_VECTOR_INIT_FINALLY(&path_spur, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&weights_old, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&edges_removed, 0);
 
+    igraph_vector_ptr_init(&paths_pot, 0);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &paths_pot);
+
+    VECTOR(*paths)[0] = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_vector_init(VECTOR(*paths)[0], 0);
 
     IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
@@ -1398,9 +1404,6 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     //printf("first path:\n");
     //print_vector(VECTOR(*paths)[0]);
 
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_pot, igraph_vector_destroy);
-    igraph_vector_ptr_init(&paths_pot, 0);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &paths_pot);
 
     for (i_path_current = 1; i_path_current < k; i_path_current++) {
         printf("\nsmall k: %d\n", i_path_current);
@@ -1500,12 +1503,11 @@ int igraph_k_shortest_paths(const igraph_t *graph,
         for (i = 0; i < igraph_vector_ptr_size(&paths_pot); i++) {
             //print_vector(VECTOR(paths_pot)[i]);
         }
-        //VECTOR(*paths)[i_path_current] = VECTOR(paths_pot)[0];
-        igraph_vector_copy(VECTOR(*paths)[i_path_current], VECTOR(paths_pot)[0]);
-
-        igraph_vector_destroy(VECTOR(paths_pot)[0]);
-        IGRAPH_FREE(VECTOR(paths_pot)[0]);
+        VECTOR(*paths)[i_path_current] = VECTOR(paths_pot)[0];
         igraph_vector_ptr_remove(&paths_pot, 0);
+    }
+    if (i_path_current != k) {
+        igraph_vector_ptr_resize(paths, i_path_current);
     }
 
     igraph_vector_destroy(&path_spur);

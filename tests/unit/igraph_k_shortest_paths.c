@@ -22,17 +22,11 @@
 void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_integer_t k, igraph_integer_t from, igraph_integer_t to, igraph_neimode_t mode) {
     igraph_vector_ptr_t paths;
     igraph_vector_ptr_init(&paths, k);
-    for (int i = 0; i < igraph_vector_ptr_size(&paths); i++) {
-        VECTOR(paths)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
-        //igraph_vector_init(VECTOR(paths)[i], 0);
-    }
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
     IGRAPH_ASSERT(igraph_k_shortest_paths(graph, weights, &paths, k, from, to, mode) == IGRAPH_SUCCESS);
     printf("result: \n");
     for (int i = 0; i < igraph_vector_ptr_size(&paths); i++) {
-        if (((igraph_vector_t *)VECTOR(paths)[i])->stor_begin != NULL) {
-            print_vector(VECTOR(paths)[i]);
-        }
+        print_vector(VECTOR(paths)[i]);
     }
     igraph_vector_ptr_destroy_all(&paths);
     printf("\n");
