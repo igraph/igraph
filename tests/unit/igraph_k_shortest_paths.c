@@ -22,7 +22,6 @@
 void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_integer_t k, igraph_integer_t from, igraph_integer_t to, igraph_neimode_t mode) {
     igraph_vector_ptr_t paths;
     igraph_vector_ptr_init(&paths, k);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
     IGRAPH_ASSERT(igraph_k_shortest_paths(graph, weights, &paths, k, from, to, mode) == IGRAPH_SUCCESS);
     printf("result: \n");
     for (int i = 0; i < igraph_vector_ptr_size(&paths); i++) {
@@ -34,18 +33,21 @@ void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_integer_t 
 
 
 int main() {
-    igraph_t g_1, g_wiki, g_4_3_1;
+    igraph_t g_1, g_2, g_wiki;
     igraph_vector_t weights, weights_wiki;
 
     igraph_small(&g_1, 1, 0, -1);
-    igraph_small(&g_4_3_1, 4, 0, 0,1, 1,2, 2,0, -1);
+    igraph_small(&g_2, 2, 0, -1);
     igraph_small(&g_wiki, 6, 1, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
 
     igraph_vector_init(&weights, 0);
     igraph_vector_init_int(&weights_wiki, 9, 3, 2, 4, 1, 2, 3, 2, 1, 2);
 
     printf("One vertex:\n");
-    call_and_print(&g_1, &weights, 1, 0, 0, IGRAPH_ALL);
+    call_and_print(&g_1, &weights, 2, 0, 0, IGRAPH_ALL);
+
+    printf("Two disconnected vertices:\n");
+    call_and_print(&g_2, &weights, 2, 0, 1, IGRAPH_ALL);
 
     printf("wiki example:\n");
     call_and_print(&g_wiki, &weights_wiki, 10, 0, 5, IGRAPH_OUT);
@@ -53,8 +55,8 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     igraph_destroy(&g_1);
+    igraph_destroy(&g_2);
     igraph_destroy(&g_wiki);
-    igraph_destroy(&g_4_3_1);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&weights_wiki);
 
