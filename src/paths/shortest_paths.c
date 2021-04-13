@@ -1442,8 +1442,26 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             IGRAPH_FINALLY(igraph_free, path_root);
             if (mode == IGRAPH_OUT) {
                 vertex_spur = IGRAPH_FROM(graph, VECTOR(*path_previous)[nr_edges_root]);
-            } else {
+            } else if (mode == IGRAPH_IN) {
                 vertex_spur = IGRAPH_TO(graph, VECTOR(*path_previous)[nr_edges_root]);
+            } else {
+                igraph_real_t eid = VECTOR(*path_previous)[nr_edges_root];
+                igraph_real_t vertex_spur_1 = IGRAPH_FROM(graph, eid);
+                igraph_real_t vertex_spur_2 = IGRAPH_TO(graph, eid);
+                igraph_real_t vertex_spur_3;
+                igraph_real_t vertex_spur_4;
+                if (nr_edges_root < igraph_vector_size(path_previous) -1) {
+                    igraph_real_t eid_next = VECTOR(*path_previous)[nr_edges_root + 1];
+                    vertex_spur_3 = IGRAPH_FROM(graph, eid_next);
+                    vertex_spur_4 = IGRAPH_TO(graph, eid_next);
+                } else {
+                    vertex_spur_3 = vertex_spur_4 = to;
+                }
+                if (vertex_spur_1 == vertex_spur_3 || vertex_spur_1 == vertex_spur_4) {
+                    vertex_spur = vertex_spur_2;
+                } else {
+                    vertex_spur = vertex_spur_1;
+                }
             }
 
             IGRAPH_VECTOR_INIT_FINALLY(path_root, nr_edges_root);
@@ -1479,14 +1497,26 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             for (edge_path_root = 0; edge_path_root < nr_edges_root; edge_path_root++) {
                 if (mode == IGRAPH_OUT) {
                     vertex_root_del = IGRAPH_FROM(graph, VECTOR(*path_root)[edge_path_root]);
-                } else {
+                } else if (mode == IGRAPH_IN) {
                     vertex_root_del = IGRAPH_TO(graph, VECTOR(*path_root)[edge_path_root]);
+                } else {
+                    igraph_real_t eid = VECTOR(*path_previous)[edge_path_root];
+                    igraph_real_t eid_next = VECTOR(*path_previous)[edge_path_root + 1];
+                    igraph_real_t vertex_root_del_1 = IGRAPH_FROM(graph, eid);
+                    igraph_real_t vertex_root_del_2 = IGRAPH_TO(graph, eid);
+                    igraph_real_t vertex_root_del_3 = IGRAPH_FROM(graph, eid_next);
+                    igraph_real_t vertex_root_del_4 = IGRAPH_TO(graph, eid_next);
+                    if (vertex_root_del_1 == vertex_root_del_3 || vertex_root_del_1 == vertex_root_del_4) {
+                        vertex_root_del = vertex_root_del_2;
+                    } else {
+                        vertex_root_del = vertex_root_del_1;
+                    }
                 }
                 igraph_i_semidelete_vertex(graph, weights, vertex_root_del, &edges_removed, &weights_old);
             }
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
-                                                           NULL,
+                        NULL,
                                                            &path_spur,
                                                            vertex_spur,
                                                            to,
