@@ -56,8 +56,8 @@ int main() {
     printf("wiki example:\n");
     call_and_print(&g_wiki, &weights_wiki, 10, 0, 5, IGRAPH_OUT);
 
-    //printf("wiki example, other direction:\n");
-    //call_and_print(&g_wiki, &weights_wiki, 10, 5, 0, IGRAPH_IN);
+    printf("wiki example, other direction:\n");
+    call_and_print(&g_wiki, &weights_wiki, 10, 5, 0, IGRAPH_IN);
 
     //printf("wiki example, direction ignored:\n");
     //call_and_print(&g_wiki, &weights_wiki, 10, 5, 0, IGRAPH_ALL);

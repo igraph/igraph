@@ -1365,7 +1365,7 @@ static int igraph_i_semidelete_vertex(const igraph_t *graph,
  *
  * Time complexity: TODO 
  */
-
+//void print_vector(igraph_vector_t *v);
 int igraph_k_shortest_paths(const igraph_t *graph,
                             igraph_vector_t *weights,
                             igraph_vector_ptr_t *paths,
@@ -1435,12 +1435,16 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     }
 
     for (i_path_current = 1; i_path_current < k; i_path_current++) {
-        printf("\nsmall k: %d\n", i_path_current);
+        //printf("\nsmall k: %d\n", i_path_current);
         igraph_vector_t *path_previous = VECTOR(*paths)[i_path_current - 1];
-        for (nr_edges_root = 0; nr_edges_root < igraph_vector_size(path_previous) - 1; nr_edges_root ++) {
+        for (nr_edges_root = 0; nr_edges_root < igraph_vector_size(path_previous); nr_edges_root ++) {
             path_root = IGRAPH_CALLOC(1, igraph_vector_t);
             IGRAPH_FINALLY(igraph_free, path_root);
-            vertex_spur = IGRAPH_FROM(graph, VECTOR(*path_previous)[nr_edges_root]);
+            if (mode == IGRAPH_OUT) {
+                vertex_spur = IGRAPH_FROM(graph, VECTOR(*path_previous)[nr_edges_root]);
+            } else {
+                vertex_spur = IGRAPH_TO(graph, VECTOR(*path_previous)[nr_edges_root]);
+            }
 
             IGRAPH_VECTOR_INIT_FINALLY(path_root, nr_edges_root);
             for (i = 0; i < nr_edges_root; i++) {
@@ -1456,13 +1460,10 @@ int igraph_k_shortest_paths(const igraph_t *graph,
                 igraph_bool_t equal = 1;
                 igraph_vector_t *path_check = VECTOR(*paths)[i_path];
                 for (i = 0; i < nr_edges_root; i++) {
-                    if (IGRAPH_FROM(graph, VECTOR(*path_root)[i]) != IGRAPH_FROM(graph, VECTOR(*path_check)[i])) {
+                    if (VECTOR(*path_root)[i] != VECTOR(*path_check)[i]) {
                         equal = 0;
                         break;
                     }
-                }
-                if (vertex_spur != IGRAPH_FROM(graph, VECTOR(*path_check)[nr_edges_root])) {
-                    equal = 0;
                 }
                 if (equal) {
                     igraph_vector_push_back(&edges_removed, VECTOR(*path_check)[nr_edges_root]);
@@ -1476,7 +1477,11 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             //        remove rootPathNode from Graph;
 
             for (edge_path_root = 0; edge_path_root < nr_edges_root; edge_path_root++) {
-                vertex_root_del = IGRAPH_FROM(graph, VECTOR(*path_root)[edge_path_root]);
+                if (mode == IGRAPH_OUT) {
+                    vertex_root_del = IGRAPH_FROM(graph, VECTOR(*path_root)[edge_path_root]);
+                } else {
+                    vertex_root_del = IGRAPH_TO(graph, VECTOR(*path_root)[edge_path_root]);
+                }
                 igraph_i_semidelete_vertex(graph, weights, vertex_root_del, &edges_removed, &weights_old);
             }
 
@@ -1494,7 +1499,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             for (i = 0; i < igraph_vector_size(&path_spur); i++) {
                 int edge = VECTOR(path_spur)[i];
                 if (!IGRAPH_FINITE(VECTOR(*weights)[edge])) {
-                    printf("spur path infinite\n");
+                    //printf("spur path infinite\n");
                     path_infinite = 1;
                     break;
                 }
@@ -1525,6 +1530,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
         }
 
         if (igraph_vector_ptr_size(&paths_pot) == 0) {
+            //printf("no more potential paths\n");
             break;
         }
         igraph_qsort_r(&VECTOR(paths_pot)[0], igraph_vector_ptr_size(&paths_pot), sizeof(void *), (void*)weights, &compare_vectors);
