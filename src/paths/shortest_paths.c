@@ -1429,7 +1429,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
         weights = IGRAPH_CALLOC(1, igraph_vector_t);
         IGRAPH_FINALLY(igraph_free, weights);
         IGRAPH_VECTOR_INIT_FINALLY(weights, nr_edges);
-        for (i = 0; i < nr_vertices; i++) {
+        for (i = 0; i < nr_edges; i++) {
             VECTOR(*weights)[i] = 1;
         }
     }
