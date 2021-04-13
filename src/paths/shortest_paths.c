@@ -1380,9 +1380,23 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     igraph_integer_t nr_edges_root, i_path_current, i_path, i, edge_path_root, vertex_root_del;
     igraph_vector_t weights_old;
     igraph_vector_t edges_removed;
-    igraph_bool_t added_path;
+    igraph_bool_t added_path, null_weights;
+    long int nr_vertices = igraph_vcount(graph);
+    long int nr_edges = igraph_ecount(graph);
+
+    if (from < 0 || from >= nr_vertices) {
+        IGRAPH_ERROR("From vertex not a valid vertex of the graph.", IGRAPH_EINVAL);
+    }
+    if (to < 0 || to >= nr_vertices) {
+        IGRAPH_ERROR("To vertex not a valid vertex of the graph.", IGRAPH_EINVAL);
+    }
+    if (weights && igraph_vector_size(weights) != nr_edges) {
+        IGRAPH_ERRORF("Weights vector size (%ld) not equal to number of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), nr_edges);
+    }
 
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(paths, igraph_vector_destroy);
+    igraph_vector_ptr_resize(paths, k);
     VECTOR(*paths)[0] = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_vector_init(VECTOR(*paths)[0], 0);
 
@@ -1410,6 +1424,15 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     igraph_vector_ptr_init(&paths_pot, 0);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &paths_pot);
 
+    null_weights = !weights;
+    if (null_weights) {
+        weights = IGRAPH_CALLOC(1, igraph_vector_t);
+        IGRAPH_FINALLY(igraph_free, weights);
+        IGRAPH_VECTOR_INIT_FINALLY(weights, nr_edges);
+        for (i = 0; i < nr_vertices; i++) {
+            VECTOR(*weights)[i] = 1;
+        }
+    }
 
     for (i_path_current = 1; i_path_current < k; i_path_current++) {
         printf("\nsmall k: %d\n", i_path_current);
@@ -1425,7 +1448,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             }
 
             //printf("root path:\n");
-            //print_vector(&path_root);
+            //print_vector(path_root);
 
             //printf("vertex spur: %d\n", vertex_spur);
 
@@ -1494,7 +1517,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
                 IGRAPH_FREE(path_root);
             }
             IGRAPH_FINALLY_CLEAN(2);
-            for (i = 0; i < igraph_vector_size(&edges_removed); i++) {
+            for (i = igraph_vector_size(&edges_removed) -1; i >= 0; i--) {
                 VECTOR(*weights)[(int)VECTOR(edges_removed)[i]] = VECTOR(weights_old)[i];
             }
             igraph_vector_clear(&edges_removed);
@@ -1521,6 +1544,12 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     igraph_vector_destroy(&edges_removed);
     igraph_vector_ptr_destroy_all(&paths_pot);
     IGRAPH_FINALLY_CLEAN(4);
+
+    if (null_weights) {
+        igraph_vector_destroy(weights);
+        IGRAPH_FREE(weights);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
 
     return IGRAPH_SUCCESS;
 }
