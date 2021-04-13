@@ -56,8 +56,8 @@ int main() {
     printf("wiki example:\n");
     call_and_print(&g_wiki, &weights_wiki, 10, 0, 5, IGRAPH_OUT);
 
-    //printf("wiki example, 0 shortest paths:\n"); //returns 1 path 
-    //call_and_print(&g_wiki, &weights_wiki, 0, 0, 5, IGRAPH_OUT);
+    printf("wiki example, 0 shortest paths:\n");
+    call_and_print(&g_wiki, &weights_wiki, 0, 0, 5, IGRAPH_OUT);
 
     //printf("wiki example, 2 shortest paths:\n"); //memory leak
     //call_and_print(&g_wiki, &weights_wiki, 2, 0, 5, IGRAPH_OUT);

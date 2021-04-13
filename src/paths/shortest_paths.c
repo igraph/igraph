@@ -1397,6 +1397,9 @@ int igraph_k_shortest_paths(const igraph_t *graph,
 
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(paths, igraph_vector_destroy);
     igraph_vector_ptr_resize(paths, k);
+    if (k == 0) {
+        return IGRAPH_SUCCESS;
+    }
     VECTOR(*paths)[0] = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_vector_init(VECTOR(*paths)[0], 0);
 
