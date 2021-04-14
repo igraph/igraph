@@ -33,7 +33,8 @@ void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_integer_t 
 
 
 int main() {
-    igraph_t g_0, g_1, g_2, g_2c, g_wiki;
+    /* Wiki example taken from https://en.wikipedia.org/wiki/Yen's_algorithm */
+    igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u;
     igraph_vector_t weights, weights_wiki, weights_inf;
     igraph_vector_ptr_t paths;
 
@@ -44,6 +45,7 @@ int main() {
     igraph_small(&g_2, 2, 0, -1);
     igraph_small(&g_2c, 2, 0, 0,1, -1);
     igraph_small(&g_wiki, 6, 1, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
+    igraph_small(&g_wiki_u, 6, 0, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
 
     igraph_vector_init(&weights, 0);
     igraph_vector_init_int(&weights_wiki, 9, 3, 2, 4, 1, 2, 3, 2, 1, 2);
@@ -73,6 +75,9 @@ int main() {
     printf("wiki example, direction ignored:\n");
     call_and_print(&g_wiki, &weights_wiki, 20, 5, 0, IGRAPH_ALL);
 
+    printf("wiki example, undirected:\n");
+    call_and_print(&g_wiki_u, &weights_wiki, 20, 5, 0, IGRAPH_ALL);
+
     printf("wiki example, no weights:\n");
     call_and_print(&g_wiki, NULL, 10, 0, 5, IGRAPH_OUT);
 
@@ -92,6 +97,7 @@ int main() {
     igraph_destroy(&g_2);
     igraph_destroy(&g_2c);
     igraph_destroy(&g_wiki);
+    igraph_destroy(&g_wiki_u);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&weights_wiki);
     igraph_vector_destroy(&weights_inf);
