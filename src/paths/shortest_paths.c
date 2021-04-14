@@ -1336,8 +1336,8 @@ static int igraph_i_semidelete_vertex(const igraph_t *graph,
  *        edges.
  * \param paths Pointer to an initialized pointer vector, the result
  *        will be stored here in \ref igraph_vector_t objects. Each vector
- *        object contains the vertices along the k-th shortest path between the
- *         \p from and \p to vertex.
+ *        object contains the edges along the k-th shortest path between the
+ *         \p from and \p to vertex, where k is the pointer vector index.
  * \param k The number of paths. 
  * \param from The id of the vertex from which the geodesics are
  *        calculated.
@@ -1361,9 +1361,11 @@ static int igraph_i_semidelete_vertex(const igraph_t *graph,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id.
+ *           \p from or \p to is an invalid vertex id.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
+ *        \cli IGRAPH_EINVAL
+ *           invalid argument.
  *        \endclist
  *
  * Time complexity: TODO 
@@ -1384,24 +1386,16 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     igraph_vector_t weights_old;
     igraph_vector_t edges_removed;
     igraph_bool_t added_path, null_weights;
-    long int nr_vertices = igraph_vcount(graph);
     long int nr_edges = igraph_ecount(graph);
 
-    if (from < 0 || from >= nr_vertices) {
-        IGRAPH_ERROR("From vertex not a valid vertex of the graph.", IGRAPH_EINVAL);
-    }
-    if (to < 0 || to >= nr_vertices) {
-        IGRAPH_ERROR("To vertex not a valid vertex of the graph.", IGRAPH_EINVAL);
-    }
-    if (weights && igraph_vector_size(weights) != nr_edges) {
-        IGRAPH_ERRORF("Weights vector size (%ld) not equal to number of edges (%ld).", IGRAPH_EINVAL,
-                      igraph_vector_size(weights), nr_edges);
-    }
-
+    igraph_vector_ptr_free_all(paths);
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(paths, igraph_vector_destroy);
     igraph_vector_ptr_resize(paths, k);
     if (k == 0) {
         return IGRAPH_SUCCESS;
+    }
+    for (i = 1; i < k; i ++) {
+        VECTOR(*paths)[i] = NULL;
     }
     VECTOR(*paths)[0] = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_vector_init(VECTOR(*paths)[0], 0);

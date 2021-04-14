@@ -79,10 +79,13 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_printignore);
 
     printf("Zero vertices, from and to don't exist:\n");
-    IGRAPH_ASSERT(igraph_k_shortest_paths(&g_0, &weights, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_k_shortest_paths(&g_0, &weights, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
 
     printf("Wrong weights length:\n");
     IGRAPH_ASSERT(igraph_k_shortest_paths(&g_wiki, &weights, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
+
+    printf("Non-existent mode:\n");
+    IGRAPH_ASSERT(igraph_k_shortest_paths(&g_1, &weights, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
