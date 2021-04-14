@@ -1,0 +1,83 @@
+One vertex:
+result: 
+( )
+
+Two disconnected vertices:
+result: 
+
+Two vertices with infinite weight edge in between:
+result: 
+
+Wiki example:
+result: 
+( 1 4 7 )
+( 1 5 8 )
+( 0 2 7 )
+( 1 4 6 8 )
+( 1 3 2 7 )
+( 0 2 6 8 )
+( 1 3 2 6 8 )
+
+Wiki example, 0 shortest paths:
+result: 
+
+Wiki example, 2 shortest paths:
+result: 
+( 1 4 7 )
+( 1 5 8 )
+
+Wiki example, other direction:
+result: 
+( 7 4 1 )
+( 8 5 1 )
+( 7 2 0 )
+( 8 6 4 1 )
+( 7 2 3 1 )
+( 8 6 2 0 )
+( 8 6 2 3 1 )
+
+Wiki example, direction ignored:
+result: 
+( 7 4 1 )
+( 8 5 1 )
+( 7 4 3 0 )
+( 7 2 0 )
+( 8 6 4 1 )
+( 7 6 5 1 )
+( 7 2 3 1 )
+( 8 5 3 0 )
+( 8 6 4 3 0 )
+( 7 6 5 3 0 )
+( 8 6 2 0 )
+( 8 6 2 3 1 )
+( 8 5 4 2 0 )
+
+Wiki example, undirected:
+result: 
+( 7 4 1 )
+( 8 5 1 )
+( 7 4 3 0 )
+( 7 2 0 )
+( 8 6 4 1 )
+( 7 6 5 1 )
+( 7 2 3 1 )
+( 8 5 3 0 )
+( 8 6 4 3 0 )
+( 7 6 5 3 0 )
+( 8 6 2 0 )
+( 8 6 2 3 1 )
+( 8 5 4 2 0 )
+
+Wiki example, no weights:
+result: 
+( 0 2 7 )
+( 1 5 8 )
+( 1 4 7 )
+( 0 2 6 8 )
+( 1 3 2 7 )
+( 1 4 6 8 )
+( 1 3 2 6 8 )
+
+Zero vertices, from and to don't exist:
+Wrong weights length:
+Non-existent mode:

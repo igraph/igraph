@@ -60,28 +60,28 @@ int main() {
     printf("Two vertices with infinite weight edge in between:\n");
     call_and_print(&g_2c, &weights_inf, 2, 0, 1, IGRAPH_ALL);
 
-    printf("wiki example:\n");
+    printf("Wiki example:\n");
     call_and_print(&g_wiki, &weights_wiki, 10, 0, 5, IGRAPH_OUT);
 
-    printf("wiki example, 0 shortest paths:\n");
+    printf("Wiki example, 0 shortest paths:\n");
     call_and_print(&g_wiki, &weights_wiki, 0, 0, 5, IGRAPH_OUT);
 
-    printf("wiki example, 2 shortest paths:\n");
+    printf("Wiki example, 2 shortest paths:\n");
     call_and_print(&g_wiki, &weights_wiki, 2, 0, 5, IGRAPH_OUT);
 
-    printf("wiki example, other direction:\n");
+    printf("Wiki example, other direction:\n");
     call_and_print(&g_wiki, &weights_wiki, 10, 5, 0, IGRAPH_IN);
 
-    printf("wiki example, direction ignored:\n");
+    printf("Wiki example, direction ignored:\n");
     call_and_print(&g_wiki, &weights_wiki, 20, 5, 0, IGRAPH_ALL);
 
-    printf("wiki example, undirected:\n");
+    printf("Wiki example, undirected:\n");
     call_and_print(&g_wiki_u, &weights_wiki, 20, 5, 0, IGRAPH_ALL);
 
-    printf("wiki example, no weights:\n");
+    printf("Wiki example, no weights:\n");
     call_and_print(&g_wiki, NULL, 10, 0, 5, IGRAPH_OUT);
 
-    igraph_set_error_handler(igraph_error_handler_printignore);
+    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Zero vertices, from and to don't exist:\n");
     IGRAPH_ASSERT(igraph_k_shortest_paths(&g_0, &weights, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
