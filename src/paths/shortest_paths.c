@@ -1331,10 +1331,13 @@ static int igraph_i_semidelete_vertex(const igraph_t *graph,
  * \brief K shortest paths (geodesics) between two vertices.
  *
  * \param graph The graph object.
+ * \param weights The edge weights of the graph. Can be \c NULL for an
+ *        unweighted graph. Infinite weights will be treated as missing
+ *        edges.
  * \param paths Pointer to an initialized pointer vector, the result
- *   will be stored here in \ref igraph_vector_t objects. Each vector
- *   object contains the vertices along the k-th shortest path between the
- *   \p from and \p to vertex.
+ *        will be stored here in \ref igraph_vector_t objects. Each vector
+ *        object contains the vertices along the k-th shortest path between the
+ *         \p from and \p to vertex.
  * \param k The number of paths. 
  * \param from The id of the vertex from which the geodesics are
  *        calculated.
@@ -1410,9 +1413,17 @@ int igraph_k_shortest_paths(const igraph_t *graph,
                                                    to,
                                                    weights,
                                                    mode));
+    igraph_vector_t *path_0 = VECTOR(*paths)[0];
+    igraph_bool_t infinite_path = 0;
+    for (i = 0; i < igraph_vector_size(path_0); i++) {
+        int edge = VECTOR(*path_0)[i];
+        if (weights && !IGRAPH_FINITE(VECTOR(*weights)[edge])) {
+            infinite_path = 1;
+        }
+    }
     //printf("first path:\n");
     //print_vector(VECTOR(*paths)[0]);
-    if (from != to && igraph_vector_size(VECTOR(*paths)[0]) == 0) {
+    if (infinite_path || (from != to && igraph_vector_size(VECTOR(*paths)[0]) == 0)) {
         igraph_vector_destroy(VECTOR(*paths)[0]);
         IGRAPH_FREE(VECTOR(*paths)[0]);
         igraph_vector_ptr_resize(paths, 0);
@@ -1528,18 +1539,18 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             //printf("spur path\n");
             //print_vector(&path_spur);
             //check if path is not infinite
-            igraph_bool_t path_infinite = 0;
+            igraph_bool_t infinite_path = 0;
             for (i = 0; i < igraph_vector_size(&path_spur); i++) {
                 int edge = VECTOR(path_spur)[i];
                 if (!IGRAPH_FINITE(VECTOR(*weights)[edge])) {
                     //printf("spur path infinite\n");
-                    path_infinite = 1;
+                    infinite_path = 1;
                     break;
                 }
             }
 
             added_path = 0;
-            if (!path_infinite) {
+            if (!infinite_path) {
                 path_total = path_root;
                 igraph_vector_append(path_total, &path_spur);
 
