@@ -1419,13 +1419,13 @@ int igraph_k_shortest_paths(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
+    igraph_vector_ptr_init(&paths_pot, 0);
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_pot, igraph_vector_destroy);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &paths_pot);
     IGRAPH_VECTOR_INIT_FINALLY(&path_spur, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&weights_old, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&edges_removed, 0);
 
-    igraph_vector_ptr_init(&paths_pot, 0);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &paths_pot);
 
     null_weights = !weights;
     if (null_weights) {
@@ -1519,7 +1519,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             }
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
-                        NULL,
+                                                           NULL,
                                                            &path_spur,
                                                            vertex_spur,
                                                            to,
