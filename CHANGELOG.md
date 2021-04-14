@@ -14,6 +14,7 @@
  - The generated pkg-config file was incorrect when `CMAKE_INSTALL_<dir>` variables were absolute paths.
  - On Unix-like systems, the library name is now `libigraph.so.0.0.0`, as it used to be for igraph 0.8 and earlier.
  - Fixed a return type mismatch in parser sources, and fixed some warnings with recent versions of gcc.
+ - Fixed a bug in `igraph_get_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` that returned incorrect results for unreachable vertices.
 
 ### Other
 

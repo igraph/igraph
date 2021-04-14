@@ -284,6 +284,11 @@ add_legacy_tests(
   topological_sorting
 )
 
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  bug_1760
+)
+
 # components.at
 add_examples(
   FOLDER examples/simple NAMES
