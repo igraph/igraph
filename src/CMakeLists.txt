@@ -413,7 +413,7 @@ configure_package_config_file(
   ${PROJECT_BINARY_DIR}/igraph-config.cmake
   # Install destination selected according to https://wiki.debian.org/CMake
   # and by looking at how eigen3 does it in Ubuntu
-  INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
@@ -447,12 +447,12 @@ install(
 install(
   FILES ${PROJECT_BINARY_DIR}/igraph-config.cmake
         ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 install(
   EXPORT igraph_targets
   FILE igraph-targets.cmake
   NAMESPACE igraph::
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 
