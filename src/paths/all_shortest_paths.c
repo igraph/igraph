@@ -51,9 +51,15 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
  * all of them will be returned.
  *
  * \param graph The graph object.
- * \param res Pointer to an initialized pointer vector, the result
+ * \param vertices Pointer to an initialized pointer vector, the result
  *   will be stored here in \ref igraph_vector_t objects. Each vector
  *   object contains the vertices along a shortest path from \p from
+ *   to another vertex. The vectors are ordered according to their
+ *   target vertex: first the shortest paths to vertex 0, then to
+ *   vertex 1, etc. No data is included for unreachable vertices.
+ * \param edges Pointer to an initialized pointer vector, the result
+ *   will be stored here in \ref igraph_vector_t objects. Each vector
+ *   object contains the edges along a shortest path from \p from
  *   to another vertex. The vectors are ordered according to their
  *   target vertex: first the shortest paths to vertex 0, then to
  *   vertex 1, etc. No data is included for unreachable vertices.
@@ -333,14 +339,15 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             while (fatherptr != 0) {
                 if (vertices) {
                     VECTOR(*vertices)[j++] = VECTOR(paths)[fatherptr - 1];
-                } else{
-                    /* If dont return the vertex or the edge path then release*/
+                } else {
+                    /* if we do not need to return the vertex path, release */
                     igraph_vector_destroy(VECTOR(paths)[fatherptr - 1]);
                     igraph_Free(VECTOR(paths)[fatherptr - 1]);
                 }
                 if (edges) {
                     VECTOR(*edges)[t++] = VECTOR(path_edge)[fatherptr - 1];
                 } else {
+                    /* if we do not need to return the edge path, release */
                     igraph_vector_destroy(VECTOR(path_edge)[fatherptr - 1]);
                     igraph_Free(VECTOR(path_edge)[fatherptr - 1]);
                 }
