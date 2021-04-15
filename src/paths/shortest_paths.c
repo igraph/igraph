@@ -1378,6 +1378,7 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     igraph_bool_t added_path, null_weights;
     long int nr_edges = igraph_ecount(graph);
     igraph_bool_t infinite_path, already_in_potential_paths;
+    igraph_vector_t *path_0;
 
     igraph_vector_ptr_free_all(paths);
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(paths, igraph_vector_destroy);
@@ -1392,18 +1393,18 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     }
 
     VECTOR(*paths)[0] = IGRAPH_CALLOC(1, igraph_vector_t);
-    igraph_vector_init(VECTOR(*paths)[0], 0);
+    path_0 = VECTOR(*paths)[0];
+    igraph_vector_init(path_0, 0);
 
     IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
                                                    NULL,
-                                                   VECTOR(*paths)[0],
+                                                   path_0,
                                                    from,
                                                    to,
                                                    weights,
                                                    mode));
 
     /* Check if there's a path. */
-    igraph_vector_t *path_0 = VECTOR(*paths)[0];
     infinite_path = 0;
     for (i = 0; i < igraph_vector_size(path_0); i++) {
         int edge = VECTOR(*path_0)[i];
@@ -1411,10 +1412,10 @@ int igraph_k_shortest_paths(const igraph_t *graph,
             infinite_path = 1;
         }
     }
-    if (infinite_path || (from != to && igraph_vector_size(VECTOR(*paths)[0]) == 0)) {
+    if (infinite_path || (from != to && igraph_vector_size(path_0) == 0)) {
         /* No path found. */
-        igraph_vector_destroy(VECTOR(*paths)[0]);
-        IGRAPH_FREE(VECTOR(*paths)[0]);
+        igraph_vector_destroy(path_0);
+        IGRAPH_FREE(path_0);
         igraph_vector_ptr_resize(paths, 0);
         return IGRAPH_SUCCESS;
     }
