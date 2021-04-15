@@ -1015,7 +1015,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         /* by definition, the shortest path leading to the starting vertex
          * consists of the vertex itself only */
         path = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (path == 0)
+        if (path == 0) {
             IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths_dijkstra",
                         IGRAPH_ENOMEM);
         }
@@ -1217,8 +1217,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_destroy(&dists);
     igraph_vector_ptr_destroy_all(&parents);
     igraph_vector_ptr_destroy_all(&parents_edge);
-    IGRAPH_FINALLY_CLEAN(5);
-
     if (free_vertices) {
         igraph_vector_ptr_destroy_all(vertices);
         igraph_free(vertices);
