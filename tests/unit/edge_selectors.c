@@ -25,7 +25,7 @@ void check(igraph_t *graph, igraph_es_t *es) {
     IGRAPH_ASSERT(igraph_eit_create(graph, *es, &eit) == IGRAPH_SUCCESS);
     for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         edge = IGRAPH_EIT_GET(eit);
-        printf("%d %d\n", IGRAPH_FROM(graph, edge), IGRAPH_TO(graph, edge));
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, edge), IGRAPH_TO(graph, edge));
     }
     igraph_eit_destroy(&eit);
 }

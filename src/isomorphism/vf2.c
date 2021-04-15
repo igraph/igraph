@@ -857,18 +857,16 @@ static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
     }
 }
 
-static igraph_bool_t igraph_i_get_isomorphisms_vf2(
+static int igraph_i_get_isomorphisms_vf2_inner(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
-
     igraph_i_iso_cb_data_t *data = arg;
     igraph_vector_ptr_t *ptrvector = data->arg;
     igraph_vector_t *newvector = IGRAPH_CALLOC(1, igraph_vector_t);
     IGRAPH_UNUSED(map12);
     if (!newvector) {
-        igraph_error("Out of memory", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
-        return 0;           /* stop right here */
+        IGRAPH_ERROR("", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, newvector);
     IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
@@ -876,7 +874,14 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
     IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, newvector));
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 1;         /* continue finding subisomorphisms */
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_bool_t igraph_i_get_isomorphisms_vf2(
+        const igraph_vector_t *map12,
+        const igraph_vector_t *map21,
+        void *arg) {
+    return igraph_i_get_isomorphisms_vf2_inner(map12, map21, arg) == IGRAPH_SUCCESS;
 }
 
 /**
@@ -1651,18 +1656,16 @@ static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
     }
 }
 
-static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
+static int igraph_i_get_subisomorphisms_vf2_inner(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
-
     igraph_i_iso_cb_data_t *data = arg;
     igraph_vector_ptr_t *vector = data->arg;
     igraph_vector_t *newvector = IGRAPH_CALLOC(1, igraph_vector_t);
     IGRAPH_UNUSED(map12);
     if (!newvector) {
-        igraph_error("Out of memory", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
-        return 0;           /* stop right here */
+        IGRAPH_ERROR("", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, newvector);
     IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
@@ -1670,7 +1673,14 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
     IGRAPH_CHECK(igraph_vector_ptr_push_back(vector, newvector));
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 1;         /* continue finding subisomorphisms */
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
+        const igraph_vector_t *map12,
+        const igraph_vector_t *map21,
+        void *arg) {
+    return igraph_i_get_subisomorphisms_vf2_inner(map12, map21, arg) == IGRAPH_SUCCESS;
 }
 
 /**

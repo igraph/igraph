@@ -74,6 +74,22 @@
 
 #include "core/indheap.h"
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_floor
+ * \brief Transform a real vector to a long vector by flooring each element.
+ *
+ * </para><para>
+ * Flooring means rounding down to the nearest integer.
+ *
+ * \param from The original real vector object.
+ * \param to Pointer to an initialized long vector. The result will
+ *           be stored here.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory
+ *
+ * Time complexity: O(n), where n is the number of elements in the vector.
+ */
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
     long int i, n = igraph_vector_size(from);
 
@@ -81,7 +97,7 @@ int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
     for (i = 0; i < n; i++) {
         VECTOR(*to)[i] = (long int) floor(VECTOR(*from)[i]);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
@@ -346,7 +362,7 @@ int igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
 
 int igraph_vector_complex_real(const igraph_vector_complex_t *v,
                                igraph_vector_t *real) {
-    int i, n = (int) igraph_vector_complex_size(v);
+    long int i, n = igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(real, n));
     for (i = 0; i < n; i++) {
         VECTOR(*real)[i] = IGRAPH_REAL(VECTOR(*v)[i]);
@@ -357,7 +373,7 @@ int igraph_vector_complex_real(const igraph_vector_complex_t *v,
 
 int igraph_vector_complex_imag(const igraph_vector_complex_t *v,
                                igraph_vector_t *imag) {
-    int i, n = (int) igraph_vector_complex_size(v);
+    long int i, n = igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(imag, n));
     for (i = 0; i < n; i++) {
         VECTOR(*imag)[i] = IGRAPH_IMAG(VECTOR(*v)[i]);
@@ -369,7 +385,7 @@ int igraph_vector_complex_imag(const igraph_vector_complex_t *v,
 int igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
                                    igraph_vector_t *real,
                                    igraph_vector_t *imag) {
-    int i, n = (int) igraph_vector_complex_size(v);
+    long int i, n = igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(real, n));
     IGRAPH_CHECK(igraph_vector_resize(imag, n));
     for (i = 0; i < n; i++) {
@@ -384,7 +400,7 @@ int igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
 int igraph_vector_complex_create(igraph_vector_complex_t *v,
                                  const igraph_vector_t *real,
                                  const igraph_vector_t *imag) {
-    int i, n = (int) igraph_vector_size(real);
+    long int i, n = igraph_vector_size(real);
     if (n != igraph_vector_size(imag)) {
         IGRAPH_ERROR("Real and imag vector sizes don't match", IGRAPH_EINVAL);
     }
@@ -402,7 +418,7 @@ int igraph_vector_complex_create(igraph_vector_complex_t *v,
 int igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
                                        const igraph_vector_t *r,
                                        const igraph_vector_t *theta) {
-    int i, n = (int) igraph_vector_size(r);
+    long int i, n = igraph_vector_size(r);
     if (n != igraph_vector_size(theta)) {
         IGRAPH_ERROR("'r' and 'theta' vector sizes don't match", IGRAPH_EINVAL);
     }
@@ -445,7 +461,7 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 }
 
 int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
-    int i, n = igraph_vector_size(v);
+    long int i, n = igraph_vector_size(v);
     if (tol < 0.0) {
         IGRAPH_ERROR("`tol' tolerance must be non-negative", IGRAPH_EINVAL);
     }
@@ -486,7 +502,7 @@ int igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool_t *is_nan)
     IGRAPH_ASSERT(is_nan->stor_begin != NULL);
     IGRAPH_CHECK(igraph_vector_bool_resize(is_nan, igraph_vector_size(v)));
     for (ptr = v->stor_begin, ptr_nan = is_nan->stor_begin; ptr < v->end; ptr++, ptr_nan++) {
-        *ptr_nan = igraph_is_nan(*ptr);
+        *ptr_nan = igraph_is_nan(*ptr) ? 1 : 0;
     }
     return IGRAPH_SUCCESS;
 }

@@ -17,7 +17,7 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     igraph_vector_t neis;
     long int i, j, eid, sum, temp, num_ignored_es;
     int *p_head, *p_head_copy;
-    double* p_weight;
+    double* p_weight = 0;
 
     // Get the number of vertices and edges. For undirected graphs, we add
     // an edge in both directions.

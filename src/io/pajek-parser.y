@@ -48,26 +48,21 @@
 #include <string.h>
 #include <math.h>
 
-#include "internal/hacks.h"
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_attributes.h"
 #include "config.h"
+
 #include "core/math.h"
-
 #include "io/pajek-header.h"
-#include "io/parsers/pajek-parser.h"
+#include "io/parsers/pajek-parser.h" /* it must come first because of YYSTYPE */
+#include "io/parsers/pajek-lexer.h"
+#include "internal/hacks.h"
 
-#define yyscan_t void*
-
-int igraph_pajek_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
-		       void* scanner);
 int igraph_pajek_yyerror(YYLTYPE* locp, 
 			 igraph_i_pajek_parsedata_t *context, 
 			 const char *s);
-char *igraph_pajek_yyget_text (yyscan_t yyscanner );
-int igraph_pajek_yyget_leng (yyscan_t yyscanner );
 
 int igraph_i_pajek_add_string_vertex_attribute(const char *name, 
 					       const char *value,

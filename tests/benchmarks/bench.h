@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2013-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,40 +14,39 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_BENCH_H
 #define IGRAPH_BENCH_H
 
-#include <sys/resource.h>
+#include <sys/resource.h> /* getrusage */
+#include <sys/time.h>     /* gettimeofday */
+#include <unistd.h>       /* sleep */
 
-static inline void igraph_get_cpu_time(igraph_real_t *data) {
+static inline void igraph_get_cpu_time(double *data) {
 
-    struct rusage self, children;
+    struct rusage self;
+    struct timeval real;
+    gettimeofday(&real, NULL);
     getrusage(RUSAGE_SELF, &self);
-    getrusage(RUSAGE_CHILDREN, &children);
-    data[0] = (double) self.ru_utime.tv_sec +
-              1e-3 * (self.ru_utime.tv_usec / 1000);
-    data[1] = (double) self.ru_stime.tv_sec +
-              1e-3 * (self.ru_stime.tv_usec / 1000);
-    data[2] = (double) children.ru_utime.tv_sec +
-              1e-3 * (children.ru_utime.tv_usec / 1000);
-    data[3] = (double) children.ru_stime.tv_sec +
-              1e-3 * (children.ru_stime.tv_usec / 1000);
+    data[0] = (double) real.tv_sec          + 1e-6 * real.tv_usec;          /* real */
+    data[1] = (double) self.ru_utime.tv_sec + 1e-6 * self.ru_utime.tv_usec; /* user */
+    data[2] = (double) self.ru_stime.tv_sec + 1e-6 * self.ru_stime.tv_usec; /* system */
 }
 
-#define BENCH(NAME, ...)    do {                                                         \
-        double start[4], stop[4];                                                                \
-        igraph_get_cpu_time(start);                                                          \
-        { __VA_ARGS__; };                                                                                \
-        igraph_get_cpu_time(stop);                                                           \
-        printf("%s %.3gs\n", NAME,                                                           \
-               stop[0]+stop[1]+stop[2]+stop[3] -                               \
-               start[0]-start[1]-start[2]-start[3]);                       \
+#define BENCH_INIT() do { sleep(1); } while (0)
+
+#define BENCH(NAME, ...)    do { \
+        double start[3], stop[3]; \
+        double r, u, s; \
+        igraph_get_cpu_time(start); \
+        { __VA_ARGS__; } \
+        igraph_get_cpu_time(stop); \
+        r = 1e-3 * round(1e3 * (stop[0] - start[0])); \
+        u = 1e-3 * round(1e3 * (stop[1] - start[1])); \
+        s = 1e-3 * round(1e3 * (stop[2] - start[2])); \
+        printf("%-80s %5.3gs  %5.3gs  %5.3gs\n", NAME, r, u, s); \
     } while (0)
 
 #endif

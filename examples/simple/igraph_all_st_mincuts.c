@@ -41,9 +41,9 @@ int print_and_destroy(igraph_t *g,
                 igraph_integer_t from, to;
                 igraph_edge(g, VECTOR(*vec2)[e], &from, &to);
                 if (igraph_is_directed(g)) {
-                    printf("  %i -> %i\n", from, to);
+                    printf("  %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n", from, to);
                 } else {
-                    printf("  %i -- %i\n", from, to);
+                    printf("  %" IGRAPH_PRId " -- %" IGRAPH_PRId "\n", from, to);
                 }
             }
         }

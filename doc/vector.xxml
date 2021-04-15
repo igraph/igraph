@@ -58,6 +58,7 @@
 <!-- doxrox-include igraph_vector_sub -->
 <!-- doxrox-include igraph_vector_mul -->
 <!-- doxrox-include igraph_vector_div -->
+<!-- doxrox-include igraph_vector_floor -->
 </section>
 
 <section id="vector-comparisons"><title>Vector comparisons</title>
@@ -87,6 +88,9 @@
 <!-- doxrox-include igraph_vector_prod -->
 <!-- doxrox-include igraph_vector_isininterval -->
 <!-- doxrox-include igraph_vector_maxdifference -->
+<!-- doxrox-include igraph_vector_order -->
+<!-- doxrox-include igraph_vector_is_nan -->
+<!-- doxrox-include igraph_vector_is_any_nan -->
 </section>
 
 <section id="vector-searching-for-elements"><title>Searching for elements</title>

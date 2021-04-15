@@ -9,7 +9,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   set(TARGET_NAME ${NAMESPACE}_${NAME})
   set(TEST_NAME "${NAMESPACE}::${NAME}")
 
-  add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/${FOLDER}/${NAME})
+  add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/${FOLDER}/${NAME}.c)
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 

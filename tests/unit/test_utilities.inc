@@ -51,7 +51,7 @@ void print_vector_int(const igraph_vector_int_t *v) {
     long i, n = igraph_vector_int_size(v);
     printf("(");
     for (i=0; i < n; i++) {
-        printf(" %d", VECTOR(*v)[i]);
+        printf(" %" IGRAPH_PRId, VECTOR(*v)[i]);
     }
     printf(" )\n");
 }
@@ -107,7 +107,7 @@ void print_graph(const igraph_t *graph) {
     printf("vcount: %ld\n", vcount);
     printf("edges: {\n");
     for (i=0; i < ecount; ++i)
-        printf("%d %d\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
     printf("}\n");
 }
 

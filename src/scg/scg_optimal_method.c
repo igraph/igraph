@@ -43,7 +43,7 @@
 #include "igraph_vector.h"
 #include "igraph_qsort.h"
 
-int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
+int igraph_i_optimal_partition(const igraph_real_t *v, igraph_integer_t *gr, int n,
                                int nt, int matrix, const igraph_real_t *p,
                                igraph_real_t *value) {
 
