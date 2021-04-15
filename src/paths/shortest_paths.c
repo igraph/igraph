@@ -1334,27 +1334,27 @@ static int igraph_i_semidelete_vertex(const igraph_t *graph,
  *        calculated.
  * \param to The id of the vertex to which the geodesics are
  *        calculated.
- * \param mode The type of shortest paths to be use for the
+ * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
  *        \cli IGRAPH_OUT
- *          the shortest outgoing paths are calculated.
+ *          The shortest outgoing paths are calculated.
  *        \cli IGRAPH_IN
- *          the shortest incoming paths are calculated.
+ *          The shortest incoming paths are calculated.
  *        \cli IGRAPH_ALL
- *          the directed graph is considered as an
+ *          The directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
- *           not enough memory for temporary data.
+ *           Not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
  *           \p from or \p to is an invalid vertex id.
  *        \cli IGRAPH_EINVMODE
- *           invalid mode argument.
+ *           Invalid mode argument.
  *        \cli IGRAPH_EINVAL
- *           invalid argument.
+ *           Invalid argument.
  *        \endclist
  *
  * Time complexity: K|V|(|V|log|V| + |E|), where |V| is the number of vertices,
@@ -1430,7 +1430,6 @@ int igraph_k_shortest_paths(const igraph_t *graph,
     /* If weights are NULL we use weights of 1, which then later can be replaced
      * with infinite weights.
      */
-
     null_weights = !weights;
     if (null_weights) {
         weights = IGRAPH_CALLOC(1, igraph_vector_t);
