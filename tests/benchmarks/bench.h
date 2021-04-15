@@ -37,6 +37,12 @@ static inline void igraph_get_cpu_time(double *data) {
 
 #define BENCH_INIT() do { sleep(1); } while (0)
 
+#define REPEAT(CODE, N) \
+    do { \
+        long rep_i; \
+        for (rep_i=0; rep_i < N; ++rep_i) { CODE; } \
+    } while (0)
+
 #define BENCH(NAME, ...)    do { \
         double start[3], stop[3]; \
         double r, u, s; \

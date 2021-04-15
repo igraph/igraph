@@ -796,6 +796,8 @@ add_benchmarks(
   igraph_cliques
   igraph_coloring
   igraph_maximal_cliques
+  igraph_pagerank
+  igraph_pagerank_weighted
   igraph_random_walk
   igraph_transitivity
 )
