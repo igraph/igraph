@@ -2,6 +2,7 @@ include(CheckCCompilerFlag)
 
 if(MSVC)
   add_compile_options(/FS)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
 if (NOT MSVC)
