@@ -4,8 +4,9 @@
 include(JoinPaths)
 
 # Converts the name of a library file (or framework on macOS) into an
-# appropriate linker flag if the library file resides in a standard
-# library path. Returns the input intact otherwise.
+# appropriate linker flag (-lsomething or -framework something.framework).
+# Returns the input intact if its extension does not look like a shared or
+# static library extension.
 function(convert_library_file_to_flags output_variable input)
   get_filename_component(input_filename ${input} NAME_WE)
   get_filename_component(input_extension ${input} LAST_EXT)
