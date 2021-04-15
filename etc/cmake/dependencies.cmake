@@ -7,7 +7,7 @@ include(FindThreads)
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored and those that may not
   set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK GMP)
-  set(NONVENDORABLE_DEPENDENCIES GLPK)
+  set(NONVENDORABLE_DEPENDENCIES GLPK OpenMP)
 
   # Declare configuration options for dependencies
   tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
@@ -19,7 +19,7 @@ macro(find_dependencies)
 
   # Declare dependencies
   set(REQUIRED_DEPENDENCIES "")
-  set(OPTIONAL_DEPENDENCIES FLEX BISON)
+  set(OPTIONAL_DEPENDENCIES FLEX BISON OpenMP)
   set(VENDORED_DEPENDENCIES "")
 
   # Extend dependencies depending on whether we will be using the vendored
@@ -82,7 +82,28 @@ macro(find_dependencies)
 
   # Find dependencies
   foreach(DEPENDENCY ${REQUIRED_DEPENDENCIES} ${OPTIONAL_DEPENDENCIES})
-    find_package(${DEPENDENCY})
+    list(FIND REQUIRED_DEPENDENCIES "${DEPENDENCY}" INDEX)
+    set(NEED_THIS_DEPENDENCY NO)
+
+    if(INDEX GREATER_EQUAL 0)
+      # This is a required dependency, search for it unconditionally. Do
+      # not use REQUIRED; we will report errors in a single batch at the end
+      # of the configuration process
+      set(NEED_THIS_DEPENDENCY YES)
+    else()
+      # This is an optional dependency, search for it only if the user did not
+      # turn it off explicitly
+      string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+      if(NOT DEFINED IGRAPH_${LIBNAME_UPPER}_SUPPORT)
+        set(NEED_THIS_DEPENDENCY YES)
+      elseif(IGRAPH_${LIBNAME_UPPER}_SUPPORT)
+        set(NEED_THIS_DEPENDENCY YES)
+      endif()
+    endif()
+
+    if(NEED_THIS_DEPENDENCY AND NOT DEFINED ${DEPENDENCY}_FOUND)
+      find_package(${DEPENDENCY})
+    endif()
   endforeach()
 
   # Override libraries of vendored dependencies even if they were somehow

@@ -36,12 +36,9 @@ target_compile_definitions(prpack PRIVATE IGRAPH_STATIC)
 
 # PRPACK attempts to use OpenMP pragmas, so check whether we need any extra
 # compiler flags to support it
-find_package(OpenMP)
-if(OpenMP_FOUND)
+if(IGRAPH_OPENMP_SUPPORT)
   target_link_libraries(prpack PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
 # Turn on all warnings for GCC, clang and MSVC
-# TODO(ntamas): it does not work yet, gcc errors out with:
-#     ignoring #pragma omp parallel [-Werror=unknown-pragmas]
-# use_all_warnings(prpack)
+use_all_warnings(prpack)
