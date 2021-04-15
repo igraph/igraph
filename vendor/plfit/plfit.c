@@ -514,6 +514,7 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
         local_best_result.D = DBL_MAX;
         local_best_result.xmin = 0;
         local_best_result.alpha = 0;
+        local_best_result.p = 0;
 
         /* The range of the for loop below is divided among the threads.
          * nowait means that there will be no implicit barrier at the end
@@ -572,7 +573,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
     };
 
     int success;
-    size_t i, best_n, num_uniques;
+    size_t i, best_n, num_uniques = 0;
     double x, *px, **uniques;
 
     DATA_POINTS_CHECK;

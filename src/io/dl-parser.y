@@ -45,22 +45,17 @@
 */
 
 #include "config.h"
-#include "core/math.h"
 
+#include "core/math.h"
 #include "internal/hacks.h"
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"
+#include "io/parsers/dl-lexer.h"
 
 #include <stdio.h>
 
-#define yyscan_t void*
-
-int igraph_dl_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, void* scanner);
 int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context, 
 		      const char *s);
-char *igraph_dl_yyget_text (yyscan_t yyscanner );
-int igraph_dl_yyget_leng (yyscan_t yyscanner );
-
 int igraph_i_dl_add_str(char *newstr, int length, 
 			igraph_i_dl_parsedata_t *context);
 int igraph_i_dl_add_edge(long int from, long int to,

@@ -16,9 +16,11 @@ foreach(FORMAT dl gml lgl ncol pajek)
   else()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
+      COMPILE_FLAGS "--no-lines"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
+      COMPILE_FLAGS "--noline --header-file=${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h"
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -446,11 +448,31 @@ generate_export_header(igraph
   EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/igraph_export.h
 )
 
+# Provide an igraph-config.cmake file in the installation directory so
+# users can find the installed igraph library with FIND_PACKAGE(igraph)
+# from their CMakeLists.txt files
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  ${PROJECT_SOURCE_DIR}/etc/cmake/igraph-config.cmake.in
+  ${PROJECT_BINARY_DIR}/igraph-config.cmake
+  # Install destination selected according to https://wiki.debian.org/CMake
+  # and by looking at how eigen3 does it in Ubuntu
+  INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+)
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
+  VERSION ${PACKAGE_VERSION_BASE}
+  COMPATIBILITY SameMinorVersion
+)
+
 # Define how to install the library
 install(
-  TARGETS igraph
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  TARGETS igraph bliss cliquer plfit prpack
+  EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
   DIRECTORY ${PROJECT_SOURCE_DIR}/include/
@@ -466,3 +488,15 @@ install(
   FILES ${PROJECT_BINARY_DIR}/igraph.pc
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
+install(
+  FILES ${PROJECT_BINARY_DIR}/igraph-config.cmake
+        ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+)
+install(
+  EXPORT igraph_targets
+  FILE igraph-targets.cmake
+  NAMESPACE igraph::
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+)
+

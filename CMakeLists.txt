@@ -133,9 +133,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   )
 endif()
 
-# Traverse subdirectories
-add_subdirectory(src)
+# Traverse subdirectories. vendor/ should come first because code in
+# src/CMakeLists.txt depends on targets in vendor/
 add_subdirectory(vendor)
+add_subdirectory(src)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()
