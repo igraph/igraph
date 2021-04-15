@@ -28,6 +28,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_stack.h"
+#include "igraph_qsort.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
@@ -615,9 +616,14 @@ int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  * in order. Assumes that both paths are pointers to igraph_vector_t
  * objects and that they are not empty
  */
-static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
-    return (int) (igraph_vector_tail(*(const igraph_vector_t**)path1) -
-                  igraph_vector_tail(*(const igraph_vector_t**)path2));
+static int igraph_i_vector_tail_cmp(void *extra, const void* a, const void* b) {
+    igraph_vector_ptr_t *paths = (igraph_vector_ptr_t *) extra;
+    long int *aa = (long int*) a;
+    long int *bb = (long int*) b;
+    igraph_vector_t *path_a = (igraph_vector_t *) VECTOR(*paths)[*aa];
+    igraph_vector_t *path_b = (igraph_vector_t *) VECTOR(*paths)[*bb];
+
+    return (int) (igraph_vector_tail(path_a) - igraph_vector_tail(path_b));
 }
 
 
@@ -703,6 +709,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists, order;
+    igraph_vector_long_t index, index_temp, mapping;
     igraph_vector_ptr_t parents, parents_edge;
 
     igraph_finally_func_t *edge_item_destructor, *vertices_item_destructor;
@@ -1006,11 +1013,12 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         /* clear the paths vector */
         /* If res doesn't exist, then create one, in order for the algorithm to work. */
         if (!vertices) {
-            vertices = igraph_Calloc(1, igraph_vector_ptr_t);
+            vertices = IGRAPH_CALLOC(1, igraph_vector_ptr_t);
             if (vertices == 0) {
                 IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
             }
             IGRAPH_CHECK(igraph_vector_ptr_init(vertices, 0));
+            IGRAPH_FINALLY(igraph_vector_ptr_destroy, vertices);
             igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
             free_vertices = 1;
             IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
@@ -1101,12 +1109,12 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                             parent_path_edge = (igraph_vector_t*)VECTOR(*edges)[parent_path_idx];
                             IGRAPH_CHECK(igraph_vector_copy(path, parent_path_edge));
                             IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
-                            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to vertices */
+                            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to edges */
                             IGRAPH_CHECK(igraph_vector_push_back(path, parent_edge));
                         } else {
                             IGRAPH_CHECK(igraph_vector_init(path, 1));
                             IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
-                            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to vertices */
+                            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to edges */
                             VECTOR(*path)[0] = parent_edge;
                         }
                     }
@@ -1130,42 +1138,64 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             tmp = igraph_vector_tail(path);
             if (is_target[(long int)tmp] == 1) {
                 /* we need this path, keep it */
-                if (!free_vertices) {
-                    VECTOR(*vertices)[j] = path;
-                }
+                //inserting permutation index for sorting
+                VECTOR(*vertices)[j] = path;
                 if (edges) {
                     path = (igraph_vector_t*)VECTOR(*edges)[i];
-                    // for sorting purpuse add the terget to the end of the path
-                    igraph_vector_push_back(path, (igraph_real_t) tmp);
                     VECTOR(*edges)[j] = path;
                 }
                 j++;
             } else {
                 /* we don't need this path, free it */
-                if (!free_vertices) {
-                    igraph_vector_destroy(path); free(path);
-                }
+                igraph_vector_destroy(path); free(path);
                 if (edges) {
                     path = (igraph_vector_t*)VECTOR(*edges)[i];
                     igraph_vector_destroy(path); free(path);
                 }
-            }
+            }   
         }
-        if (!free_vertices){
-            IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, j));
-            /* sort the paths by the target vertices */
-            igraph_vector_ptr_sort(vertices, igraph_i_vector_tail_cmp);
+        IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, j));
+        if (edges) {
+            IGRAPH_CHECK(igraph_vector_ptr_resize(edges, j));
         }
         
-        if (edges){
-            IGRAPH_CHECK(igraph_vector_ptr_resize(edges, j));
-            igraph_vector_ptr_sort(edges, igraph_i_vector_tail_cmp);
-            // removing the target from the tail of each vector in edges
-            for (i = 0; i < igraph_vector_ptr_size(edges); i++) {
-                path = (igraph_vector_t *) VECTOR(*edges)[i];
-                igraph_vector_pop_back(path);
+        /* sort the paths by the target vertices */
+        IGRAPH_CHECK(igraph_vector_long_init_seq(&index, 0, j));
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
+        igraph_qsort_r(VECTOR(index), j, sizeof(long int), vertices, igraph_i_vector_tail_cmp);
+        // index_temp[i] is what path (relative to the original vertices) is in index i
+        IGRAPH_CHECK(igraph_vector_long_init_seq(&index_temp, 0, j));
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &index_temp);
+        // mapping[i] is the location of the i element
+        IGRAPH_CHECK(igraph_vector_long_init_seq(&mapping, 0, j)); 
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &mapping);
+        // sort accourding to the permutation of index
+        igraph_vector_t *path_temp;
+        long int path_old, path_new, ind;
+        for (i = 0; i < j; i++) {
+            if (VECTOR(index_temp)[i] != VECTOR(index)[i]) {
+                path_old = VECTOR(index_temp)[i];
+                path_new = VECTOR(index)[i];
+                ind = VECTOR(mapping)[path_new];
+                path_temp = (igraph_vector_t *) VECTOR(*vertices)[i];
+                VECTOR(*vertices)[i] = (igraph_vector_t *) VECTOR(*vertices)[ind];
+                VECTOR(*vertices)[ind] = path_temp;
+                if (edges) {
+                    path_temp = (igraph_vector_t *) VECTOR(*edges)[i];
+                    VECTOR(*edges)[i] = (igraph_vector_t *) VECTOR(*edges)[ind];
+                    VECTOR(*edges)[ind] = path_temp;
+                }
+                //updating the mapping
+                VECTOR(mapping)[path_old] = ind; 
+                VECTOR(mapping)[path_new] = i;
+                VECTOR(index_temp)[i] = path_new;
+                VECTOR(index_temp)[ind] = path_old;
             }
         }
+        igraph_vector_long_destroy(&index);
+        igraph_vector_long_destroy(&index_temp);
+        igraph_vector_long_destroy(&mapping);
+        IGRAPH_FINALLY_CLEAN(3);
     }
 
     /* free the allocated memory */
@@ -1180,5 +1210,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         igraph_free(vertices);
     }
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
+
