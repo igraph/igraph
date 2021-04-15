@@ -213,7 +213,7 @@ cmake --build . --target check --config Release
         <ulink url="https://chocolatey.org/packages/winflexbison3">Chocolatey
         package manager</ulink>.
       </para>
-      <section id="instal-Installation-vcpkg">
+      <section id="igraph-Installation-vcpkg">
         <title>vcpkg</title>
         <para>
           Most external dependencies can be conveniently installed using
@@ -461,7 +461,7 @@ $ cmake --build . --target html
     other package managers. Please read it carefully before packaging
     igraph.
   </para>
-  <section>
+  <section id="igraph-Installation-auto-detection-of-dependencies">
     <title>Auto-detection of dependencies</title>
     <para>
       igraph bundles several of its dependencies (or simplified versions
@@ -494,7 +494,7 @@ $ cmake .. \
 </programlisting>
     </para>
   </section>
-  <section>
+  <section id="igraph-Installation-shared-and-static-builds">
     <title>Shared and static builds</title>
     <para>
       On Windows, shared and static builds should not be installed in the same
@@ -509,7 +509,7 @@ $ cmake .. \
       These issues do not affect Unix-like systems.
     </para>
   </section>
-  <section>
+  <section id="igraph-Installation-cross-compiling">
     <title>Cross-compiling</title>
     <para>
       When building igraph with an internal ARPACK, LAPACK or BLAS, it
@@ -537,7 +537,7 @@ $ cmake .. \
 </programlisting>
     </para>
   </section>
-  <section>
+  <section id="igraph-Installation-additional-notes">
     <title>Additional notes</title>
     <itemizedlist>
       <listitem>
