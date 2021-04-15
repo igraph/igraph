@@ -397,10 +397,6 @@ include(GNUInstallDirs)
 
 # Generate pkgconfig file
 include(pkgconfig_helpers)
-generate_pkgconfig_file(
-  ${PROJECT_SOURCE_DIR}/igraph.pc.in
-  ${PROJECT_BINARY_DIR}/igraph.pc
-)
 
 include(GenerateExportHeader)
 generate_export_header(igraph
