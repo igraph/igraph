@@ -11,6 +11,9 @@ int main() {
 
     igraph_vector_init(&betweenness, 0);
 
+    /* Kautz and De Bruijn graphs are connected, therefore there should not be a dramatic difference
+     * in the performance of the directed and undirected calculations. */
+
     igraph_kautz(&graph, 4, 5);
     BENCH(" 1 Betweenness, Kautz(4,5), directed",
           igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, NULL));

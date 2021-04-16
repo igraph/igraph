@@ -793,6 +793,7 @@ add_legacy_tests(
 add_benchmarks(
   NAMES
   igraph_betweenness
+  igraph_betweenness_weighted
   igraph_cliques
   igraph_coloring
   igraph_maximal_cliques

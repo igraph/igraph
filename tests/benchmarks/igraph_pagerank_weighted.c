@@ -2,7 +2,7 @@
 
 #include "bench.h"
 
-void randvec(igraph_vector_t *vec, const igraph_t *graph) {
+void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
     long i, n = igraph_ecount(graph);
     igraph_vector_resize(vec, n);
     for (i=0; i < n; ++i) {
@@ -24,7 +24,7 @@ int main() {
     igraph_vector_init(&weights, 0);
 
     igraph_barabasi_game(&graph, 100000, 1, 4, NULL, 1, 0, IGRAPH_DIRECTED, IGRAPH_BARABASI_PSUMTREE, NULL);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH(" 1 PageRank weighted, Barabasi n=100000 m=4, PRPACK, 10x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 10)
     );
@@ -34,7 +34,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_barabasi_game(&graph, 100000, 1, 10, NULL, 1, 0, IGRAPH_DIRECTED, IGRAPH_BARABASI_PSUMTREE, NULL);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH(" 3 PageRank weighted, Barabasi n=100000 m=10, PRPACK, 5x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 5)
     );
@@ -44,7 +44,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 100, 1000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH(" 5 PageRank weighted, GNM(100,1000), PRPACK, 1000x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 1000)
     );
@@ -54,7 +54,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 200, 4000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH(" 7 PageRank weighted, GNM(200,4000), PRPACK, 1000x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 1000)
     );
@@ -64,7 +64,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 10000, 20000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH(" 9 PageRank weighted, GNM(10000,20000), PRPACK, 100x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 100)
     );
@@ -74,7 +74,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 100000, 100000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH("11 PageRank weighted, GNM(100000,100000), PRPACK, 10x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 10)
     );
@@ -84,7 +84,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 100000, 500000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH("13 PageRank weighted, GNM(100000,500000), PRPACK, 10x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 10)
     );
@@ -94,7 +94,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_kautz(&graph, 6, 6);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH("13 PageRank weighted, Kautz(6,6), PRPACK, 1x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 1)
     );
@@ -104,7 +104,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_de_bruijn(&graph, 7, 7);
-    randvec(&weights, &graph);
+    rand_weight_vec(&weights, &graph);
     BENCH("13 PageRank weighted, DeBruijn(7,7), PRPACK, 1x",
           REPEAT(igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &res, NULL, igraph_vss_all(), IGRAPH_DIRECTED, 0.85, &weights, NULL), 1)
     );
