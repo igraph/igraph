@@ -1,5 +1,7 @@
 include(helpers)
 
+include(CheckSymbolExists)
+
 # The threading library is not needed for igraph itself, but might be needed
 # for tests
 include(FindThreads)
@@ -124,5 +126,25 @@ macro(find_dependencies)
   set(HAVE_GMP ${GMP_FOUND})
   set(HAVE_LIBXML ${LIBXML2_FOUND})
 
-  find_library(MATH_LIBRARY m)
+  # Check whether we need to link to the math library
+  if(NOT DEFINED CACHE{NEED_LINKING_AGAINST_LIBM})
+    check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
+    if(NOT SINH_FUNCTION_EXISTS)
+      unset(SINH_FUNCTION_EXISTS CACHE)
+      set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES m)
+      check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
+      if(SINH_FUNCTION_EXISTS)
+        set(NEED_LINKING_AGAINST_LIBM True CACHE BOOL "" FORCE)
+      else()
+        message(FATAL_ERROR "Failed to figure out how to link to the math library on this platform")
+      endif()
+      set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+    endif()
+    unset(SINH_FUNCTION_EXISTS CACHE)
+  endif()
+  
+  if(NEED_LINKING_AGAINST_LIBM)
+    find_library(MATH_LIBRARY m)
+  endif()
 endmacro()
