@@ -128,6 +128,8 @@ macro(find_dependencies)
 
   # Check whether we need to link to the math library
   if(NOT DEFINED CACHE{NEED_LINKING_AGAINST_LIBM})
+    set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
+    set(CMAKE_REQUIRED_QUIET ON)
     check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
     if(NOT SINH_FUNCTION_EXISTS)
       unset(SINH_FUNCTION_EXISTS CACHE)
@@ -142,9 +144,13 @@ macro(find_dependencies)
       set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
     endif()
     unset(SINH_FUNCTION_EXISTS CACHE)
+	set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
   endif()
   
   if(NEED_LINKING_AGAINST_LIBM)
     find_library(MATH_LIBRARY m)
   endif()
+
+  mark_as_advanced(MATH_LIBRARY)
+  mark_as_advanced(NEED_LINKING_AGAINST_LIBM)
 endmacro()
