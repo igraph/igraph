@@ -17,6 +17,8 @@ int main() {
     igraph_t graph;
     igraph_vector_t closeness, weight;
 
+    /* These closeness benchmarks are identical to the weighted betweenness ones. */
+
     /* This benchmark compares directed/undirected and weighted/unweighted calculations
      * on the same graphs. */
 
