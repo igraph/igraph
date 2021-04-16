@@ -57,6 +57,17 @@ void print_vector_int(const igraph_vector_int_t *v) {
 }
 
 
+/* Print elements of a long vector */
+void print_vector_long(const igraph_vector_long_t *v) {
+    long i, n = igraph_vector_long_size(v);
+    printf("(");
+    for (i=0; i < n; i++) {
+        printf(" %ld", VECTOR(*v)[i]);
+    }
+    printf(" )\n");
+}
+
+
 /* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
 void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
     long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);

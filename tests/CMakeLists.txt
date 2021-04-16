@@ -286,6 +286,11 @@ add_legacy_tests(
   topological_sorting
 )
 
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  bug_1760
+)
+
 # components.at
 add_examples(
   FOLDER examples/simple NAMES
@@ -790,9 +795,12 @@ add_legacy_tests(
 add_benchmarks(
   NAMES
   igraph_betweenness
+  igraph_betweenness_weighted
   igraph_cliques
   igraph_coloring
   igraph_maximal_cliques
+  igraph_pagerank
+  igraph_pagerank_weighted
   igraph_random_walk
   igraph_transitivity
 )
