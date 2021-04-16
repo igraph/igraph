@@ -797,6 +797,7 @@ add_benchmarks(
   igraph_betweenness
   igraph_betweenness_weighted
   igraph_cliques
+  igraph_closeness_weighted
   igraph_coloring
   igraph_maximal_cliques
   igraph_pagerank
