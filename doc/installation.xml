@@ -394,6 +394,13 @@ pacman -S \
       </listitem>
       <listitem>
         <para>
+          <literal>IGRAPH_OPENMP_SUPPORT</literal>: whether to use OpenMP
+          parallelization to accelerate certain functions such as PageRank
+          calculation. Compiler support is required.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
           <literal>IGRAPH_ENABLE_LTO</literal>: whether to build igraph
           with link-time optimization, which improves performance. Not
           supported with all compilers.
@@ -424,7 +431,7 @@ pacman -S \
       <listitem>
         <para>
           <ulink url="https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html"><literal>CMAKE_INSTALL_PREFIX</literal></ulink>:
-          the location where igraph will be installed
+          the location where igraph will be installed.
         </para>
       </listitem>
     </itemizedlist>
