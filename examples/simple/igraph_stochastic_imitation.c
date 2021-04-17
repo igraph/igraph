@@ -227,6 +227,8 @@ int petersen_game_test() {
 int main() {
     int ret;
 
+    igraph_rng_seed(igraph_rng_default(), 547612);
+
     ret = error_tests();
     if (ret) {
         return ret;

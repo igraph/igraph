@@ -182,7 +182,6 @@ static int igraph_i_sspf_weighted(
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
  *
- * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the
@@ -226,7 +225,6 @@ int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_betweenness_cutoff
  * \brief Range-limited betweenness centrality.
  *
- * </para><para>
  * This function computes a range-limited version of betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -635,7 +633,6 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
  *
  * \deprecated-by igraph_edge_betweenness_cutoff 0.9
  *
- * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the

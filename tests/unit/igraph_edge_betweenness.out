@@ -4,5 +4,7 @@
 
  unweighted small graphs 
 ( 4 3 3 2 )
+
+Small undirected graph 2, unweighted, cutoff=2
 ( 3 3 3 4 3 4 3 4 4 3 3 3 )
 bug 950( 0 0 2.33333 2.33333 2.33333 0 2.33333 2.33333 2.33333 2.33333 2.33333 2.33333 0 0 0 )

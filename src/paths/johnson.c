@@ -35,14 +35,17 @@
  * contains negative edge weights, and it is worth using it if we
  * calculate the shortest paths from many sources.
  *
- * </para><para> If no edge weights are supplied, then the unweighted
+ * </para><para>
+ * If no edge weights are supplied, then the unweighted
  * version, \ref igraph_shortest_paths() is called.
  *
- * </para><para> If all the supplied edge weights are non-negative,
+ * </para><para>
+ * If all the supplied edge weights are non-negative,
  * then Dijkstra's algorithm is used by calling
  * \ref igraph_shortest_paths_dijkstra().
  *
- * \param graph The input graph, typically it is directed.
+ * \param graph The input graph. If negative weights are present, it
+ *   should be directed.
  * \param res Pointer to an initialized matrix, the result will be
  *   stored here, one line for each source vertex, one column for each
  *   target vertex.
@@ -86,14 +89,21 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+    /* If no edges, then we can just run the unweighted version */
+    if (no_of_edges == 0) {
+        return igraph_shortest_paths(graph, res, from, to, IGRAPH_OUT);
     }
 
     /* If no negative weights, then we can run Dijkstra's algorithm */
-    if (no_of_edges > 0 && igraph_vector_min(weights) >= 0) {
-        return igraph_shortest_paths_dijkstra(graph, res, from, to,
-                                              weights, IGRAPH_OUT);
+    {
+        igraph_real_t min_weight = igraph_vector_min(weights);
+        if (igraph_is_nan(min_weight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
+        if (min_weight >= 0) {
+            return igraph_shortest_paths_dijkstra(graph, res, from, to,
+                                                  weights, IGRAPH_OUT);
+        }
     }
 
     if (!igraph_is_directed(graph)) {
@@ -182,7 +192,7 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
             for (j = 0, IGRAPH_VIT_RESET(tovit); j < nc; j++, IGRAPH_VIT_NEXT(tovit)) {
                 long int v2 = IGRAPH_VIT_GET(tovit);
                 igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
-                MATRIX(*res, i, v2) -= sub;
+                MATRIX(*res, i, j) -= sub;
             }
             igraph_vit_destroy(&tovit);
             IGRAPH_FINALLY_CLEAN(1);
@@ -193,5 +203,5 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
     igraph_matrix_destroy(&bfres);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

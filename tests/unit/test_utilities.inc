@@ -12,14 +12,15 @@
 
 /* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
 void print_real(FILE *f, igraph_real_t x, const char *format) {
+    igraph_bool_t g8 = !strcmp(format, "%8g");
     if (igraph_finite(x)) {
         fprintf(f, format, x);
     } else if (igraph_is_nan(x)) {
-        fprintf(f, "NaN");
+        fprintf(f, g8 ? "     NaN" : "NaN");
     } else if (igraph_is_posinf(x)) {
-        fprintf(f, "Inf");
+        fprintf(f, g8 ? "     Inf" : "Inf");
     } else if (igraph_is_neginf(x)) {
-        fprintf(f, "-Inf");
+        fprintf(f, g8 ? "    -Inf" : "-Inf");
     }
 }
 
@@ -50,7 +51,18 @@ void print_vector_int(const igraph_vector_int_t *v) {
     long i, n = igraph_vector_int_size(v);
     printf("(");
     for (i=0; i < n; i++) {
-        printf(" %d", VECTOR(*v)[i]);
+        printf(" %" IGRAPH_PRId, VECTOR(*v)[i]);
+    }
+    printf(" )\n");
+}
+
+
+/* Print elements of a long vector */
+void print_vector_long(const igraph_vector_long_t *v) {
+    long i, n = igraph_vector_long_size(v);
+    printf("(");
+    for (i=0; i < n; i++) {
+        printf(" %ld", VECTOR(*v)[i]);
     }
     printf(" )\n");
 }
@@ -106,7 +118,7 @@ void print_graph(const igraph_t *graph) {
     printf("vcount: %ld\n", vcount);
     printf("edges: {\n");
     for (i=0; i < ecount; ++i)
-        printf("%d %d\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
     printf("}\n");
 }
 

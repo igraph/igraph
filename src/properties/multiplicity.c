@@ -291,6 +291,9 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * <para>Edge multiplicity is not considered here, e.g. if there are two
  * (A,B) edges and one (B,A) edge, then all three are considered to be
  * mutual.
+ * </para>
+ *
+ * <para>Loops are always mutual.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
@@ -322,7 +325,7 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
         igraph_vector_bool_fill(res, 1);
         igraph_eit_destroy(&eit);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
@@ -349,5 +352,5 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -50,22 +50,24 @@ int main() {
 
     igraph_t g;
     igraph_vector_t hist;
-    igraph_vector_t cp;
+    igraph_vector_t cp_3, cp_4;
 
-    igraph_vector_init_real(&cp, 8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    igraph_vector_init_real(&cp_3, 3, 0.0, 0.0, 0.0);
+    igraph_vector_init_real(&cp_4, 4, 0.0, 0.0, 0.0, 0.0);
 
     igraph_ring(&g, 1000, IGRAPH_DIRECTED, 1, 1);
     igraph_vector_init(&hist, 0);
-    igraph_motifs_randesu(&g, &hist, 3, &cp);
+    igraph_motifs_randesu(&g, &hist, 3, &cp_3);
     print_vector(&hist);
     igraph_destroy(&g);
     igraph_vector_destroy(&hist);
 
     igraph_famous(&g, "bull");
-    igraph_motifs_randesu_callback(&g, 3, &cp, &print_motif, 0);
-    igraph_motifs_randesu_callback(&g, 4, &cp, &print_motif, 0);
+    igraph_motifs_randesu_callback(&g, 3, &cp_3, &print_motif, 0);
+    igraph_motifs_randesu_callback(&g, 4, &cp_4, &print_motif, 0);
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&cp);
+    igraph_vector_destroy(&cp_3);
+    igraph_vector_destroy(&cp_4);
     return 0;
 }

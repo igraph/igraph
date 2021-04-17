@@ -167,7 +167,10 @@ prpack_base_graph::~prpack_base_graph() {
 
 void prpack_base_graph::read_smat(FILE* f, const bool weighted) {
     // read in header
+#ifndef NDEBUG
+	// needed in the assertion only
     double ignore = 0.0;
+#endif
     assert(fscanf(f, "%d %lf %d", &num_vs, &ignore, &num_es) == 3);
     // fill in heads and tails
     num_self_es = 0;

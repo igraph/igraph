@@ -8,6 +8,7 @@ int main() {
     igraph_integer_t ec, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
+    BENCH_INIT();
 
     igraph_vector_init(&walk, 0);
     igraph_vector_init(&weights, 0);

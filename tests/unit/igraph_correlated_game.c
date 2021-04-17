@@ -29,6 +29,8 @@
 int main() {
     igraph_t g1, g2;
 
+    igraph_rng_seed(igraph_rng_default(), 9275);
+
     igraph_erdos_renyi_game(&g1, IGRAPH_ERDOS_RENYI_GNP, 10, .3,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_correlated_game(&g1, &g2, .9, .3, /* permutation=*/ 0);

@@ -59,22 +59,14 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
      * the values are relatively large negative numbers, in which case we should
      * negate the eigenvector.
      */
-    long int i, n = igraph_vector_size(vector);
+    long int n = igraph_vector_size(vector);
     igraph_real_t mi, ma;
 
     if (n == 0) {
         return 0;
     }
 
-    mi = ma = VECTOR(*vector)[0];
-    for (i = 1; i < n; i++) {
-        if (VECTOR(*vector)[i] < mi) {
-            mi = VECTOR(*vector)[i];
-        }
-        if (VECTOR(*vector)[i] > ma) {
-            ma = VECTOR(*vector)[i];
-        }
-    }
+    igraph_vector_minmax(vector, &mi, &ma);
 
     if (mi >= 0) {
         return 0;
@@ -83,8 +75,8 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
         return 1;
     }
 
-    mi /= ma;
-    return (mi < 1e-5) ? 1 : 0;
+    /* is the most negative value larger in magnitude than the most positive? */
+    return (-mi/ma > 1);
 }
 
 static int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
@@ -825,7 +817,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
 /**
  * \function igraph_hub_score
- * Kleinberg's hub scores
+ * \brief Kleinberg's hub scores.
  *
  * The hub scores of the vertices are defined as the principal
  * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
@@ -871,7 +863,7 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 
 /**
  * \function igraph_authority_score
- * Kleinerg's authority scores
+ * \brief Kleinerg's authority scores.
  *
  * The authority scores of the vertices are defined as the principal
  * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency

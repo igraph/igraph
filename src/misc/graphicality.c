@@ -487,6 +487,8 @@ static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degree
         }
     }
 
+    *res = 1;
+
 finish:
     igraph_vector_int_destroy(&num_degs);
     IGRAPH_FINALLY_CLEAN(1);

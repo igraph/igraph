@@ -256,7 +256,7 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
+igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
     long int left, right, middle;
 
     IGRAPH_ASSERT(set != NULL);

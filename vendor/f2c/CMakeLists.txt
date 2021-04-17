@@ -15,6 +15,14 @@ set(
 if(F2C_EXTERNAL_ARITH_HEADER)
   configure_file(${F2C_EXTERNAL_ARITH_HEADER} arith.h COPYONLY)
 else()
+  if (CMAKE_CROSSCOMPILING)
+    # Warn only, as in some circumstances, such as macOS with Rosetta,
+    # arithchk can be run through emulation and the build with not fail.
+    message(WARNING 
+      "Cross-compiling with internal ARPACK, BLAS or LAPACK, "
+      "but F2C_EXTERNAL_ARITH_HEADER was not set. The build is likely to fail. "
+      "See igraph's installation instructions for more information.")
+  endif()
   add_custom_command(
     OUTPUT arith.h
     COMMENT "Generating arith.h for f2c..."
@@ -73,10 +81,10 @@ add_library(
 target_include_directories(
   f2c_vendored
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_BINARY_DIR}/include
-  ${CMAKE_SOURCE_DIR}/src
-  ${CMAKE_BINARY_DIR}/src
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
+  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_BINARY_DIR}/src
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -90,7 +98,7 @@ if (MSVC)
   target_include_directories(
     f2c_vendored
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/msvc/include
+	${PROJECT_SOURCE_DIR}/msvc/include
   )
 endif()
 

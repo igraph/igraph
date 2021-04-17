@@ -88,9 +88,9 @@ memcpy(&realtimer,&old_realtimer,sizeof(struct timeval));*/
 /* Recursion and helper functions */
 static boolean sub_unweighted_single(int *table, int size, int min_size,
 				     graph_t *g);
-static int sub_unweighted_all(int *table, int size, int min_size, int max_size,
-			      boolean maximal, graph_t *g,
-			      clique_options *opts);
+static CLIQUER_LARGE_INT sub_unweighted_all(int *table, int size, int min_size, int max_size,
+                                            boolean maximal, graph_t *g,
+                                            clique_options *opts);
 static int sub_weighted_all(int *table, int size, int weight,
 			    int current_weight, int prune_low, int prune_high,
 			    int min_weight, int max_weight, boolean maximal,
@@ -336,19 +336,20 @@ static boolean sub_unweighted_single(int *table, int size, int min_size,
  * Returns the number of cliques stored (not neccessarily number of cliques
  * in graph, if user/time_function aborts).
  */
-static int unweighted_clique_search_all(int *table, int start,
-					int min_size, int max_size,
-					boolean maximal, graph_t *g,
-					clique_options *opts) {
+static CLIQUER_LARGE_INT unweighted_clique_search_all(int *table, int start,
+                                                      int min_size, int max_size,
+                                                      boolean maximal, graph_t *g,
+                                                      clique_options *opts) {
     /*
 	struct timeval timeval;
 	struct tms tms;
     */
-	int i,j;
+        int i, j;
 	int v;
 	int *newtable;
 	int newsize;
-	int count=0;
+        CLIQUER_LARGE_INT r;
+        CLIQUER_LARGE_INT count=0;
 
 	if (temp_count) {
 		temp_count--;
@@ -372,15 +373,15 @@ static int unweighted_clique_search_all(int *table, int start,
 		}
 
 		SET_ADD_ELEMENT(current_clique,v);
-		j=sub_unweighted_all(newtable,newsize,min_size-1,max_size-1,
+                r=sub_unweighted_all(newtable,newsize,min_size-1,max_size-1,
 				     maximal,g,opts);
 		SET_DEL_ELEMENT(current_clique,v);
-		if (j<0) {
+                if (r<0) {
 			/* Abort. */
-			count-=j;
+                        count-=r;
 			break;
 		}
-		count+=j;
+                count+=r;
 
 #if 0
 		if (opts->time_function) {
@@ -432,15 +433,15 @@ static int unweighted_clique_search_all(int *table, int start,
  * clique_size[] for all values in table must be defined and correct,
  * otherwise inaccurate results may occur.
  */
-static int sub_unweighted_all(int *table, int size, int min_size, int max_size,
-			      boolean maximal, graph_t *g,
-			      clique_options *opts) {
+static CLIQUER_LARGE_INT sub_unweighted_all(int *table, int size, int min_size, int max_size,
+                                            boolean maximal, graph_t *g,
+                                            clique_options *opts) {
 	int i;
-	int v;
-	int n;
+	int v;        
 	int *newtable;
 	int *p1, *p2;
-	int count=0;     /* Amount of cliques found */
+        CLIQUER_LARGE_INT n;
+        CLIQUER_LARGE_INT count=0;     /* Amount of cliques found */
 
 	if (min_size <= 0) {
 		if ((!maximal) || is_maximal(current_clique,g)) {
@@ -1224,11 +1225,11 @@ set_t clique_unweighted_find_single(graph_t *g,int min_size,int max_size,
  * stored in opts->clique_list[] are newly allocated, and can be freed
  * by set_free().
  */
-int clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
-			       boolean maximal, clique_options *opts) {
+CLIQUER_LARGE_INT clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
+                                             boolean maximal, clique_options *opts) {
 	int i;
 	int *table;
-	int count;
+        CLIQUER_LARGE_INT count;
 
 	ENTRANCE_SAVE();
 	entrance_level++;
@@ -1544,8 +1545,9 @@ set_t clique_find_single(graph_t *g,int min_weight,int max_weight,
  */
 int clique_find_all(graph_t *g, int min_weight, int max_weight,
 		    boolean maximal, clique_options *opts) {
-	int i,n;
+        int i,n;
 	int *table;
+        CLIQUER_LARGE_INT r;
 
 	ENTRANCE_SAVE();
 	entrance_level++;
@@ -1586,10 +1588,10 @@ int clique_find_all(graph_t *g, int min_weight, int max_weight,
 		
 		weight_multiplier = g->weights[0];
 		entrance_level--;
-		i=clique_unweighted_find_all(g,min_weight,max_weight,maximal,
+                r=clique_unweighted_find_all(g,min_weight,max_weight,maximal,
 					     opts);
 		ENTRANCE_RESTORE();
-		return i;
+                return r;
 	}
 
 	/* Dynamic allocation */

@@ -11,9 +11,9 @@ add_library(
 target_include_directories(
   cliquer
   PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_BINARY_DIR}/include
-  ${CMAKE_BINARY_DIR}/src
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
+  ${PROJECT_BINARY_DIR}/src
 )
 
 if (BUILD_SHARED_LIBS)

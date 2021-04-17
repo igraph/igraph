@@ -6,6 +6,9 @@ int main() {
     igraph_vector_t outdeg, indeg, vec;
     igraph_bool_t is_simple;
 
+    /* Set random seed for reproducibility */
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     igraph_vector_init_real(&outdeg, 10, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0);
     igraph_vector_init_real(&indeg, 10, 4.0, 4.0, 2.0, 2.0, 4.0, 4.0, 2.0, 2.0, 3.0, 3.0);
     igraph_vector_init(&vec, 0);

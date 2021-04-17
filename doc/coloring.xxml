@@ -9,5 +9,6 @@
 
 <!-- doxrox-include igraph_vertex_coloring_greedy -->
 <!-- doxrox-include igraph_coloring_greedy_t -->
+<!-- doxrox-include igraph_is_perfect -->
 
 </chapter>

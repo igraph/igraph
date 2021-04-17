@@ -639,7 +639,6 @@ void graph_print(graph_t *g) {
 	return;
 }
 
-#endif
 
 /*
  * graph_test()
@@ -763,3 +762,4 @@ int graph_test_regular(graph_t *g) {
 	return n;
 }
 
+#endif

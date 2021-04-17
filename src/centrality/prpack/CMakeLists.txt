@@ -22,8 +22,8 @@ target_compile_definitions(
 target_include_directories(
   prpack
   PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_BINARY_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
 )
 
 if (BUILD_SHARED_LIBS)
@@ -34,7 +34,11 @@ endif()
 # function as is (without visibility specification)
 target_compile_definitions(prpack PRIVATE IGRAPH_STATIC)
 
+# PRPACK attempts to use OpenMP pragmas, so check whether we need any extra
+# compiler flags to support it
+if(IGRAPH_OPENMP_SUPPORT)
+  target_link_libraries(prpack PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
 # Turn on all warnings for GCC, clang and MSVC
-# TODO(ntamas): it does not work yet, gcc errors out with:
-#     ignoring #pragma omp parallel [-Werror=unknown-pragmas]
-# use_all_warnings(prpack)
+use_all_warnings(prpack)

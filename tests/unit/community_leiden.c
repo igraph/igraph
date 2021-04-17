@@ -36,7 +36,7 @@ void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, 
 
     igraph_community_leiden(graph, edge_weights, NULL, resolution_parameter, 0.01, 0, &membership, &nb_clusters, &quality);
 
-    printf("Leiden found %i clusters using CPM (resolution parameter=%.2f), quality is %.4f.\n", nb_clusters, resolution_parameter, quality);
+    printf("Leiden found %" IGRAPH_PRId " clusters using CPM (resolution parameter=%.2f), quality is %.4f.\n", nb_clusters, resolution_parameter, quality);
 
     printf("Membership: ");
     igraph_vector_print(&membership);
@@ -67,9 +67,9 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     igraph_community_leiden(graph, edge_weights, &degree, 1.0 / (2 * m), 0.01, 0, &membership, &nb_clusters, &quality);
 
     if (isnan(quality)) {
-        printf("Leiden found %i clusters using modularity, quality is nan.\n", nb_clusters);
+        printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is nan.\n", nb_clusters);
     } else {
-        printf("Leiden found %i clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
+        printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
     }
 
     printf("Membership: ");

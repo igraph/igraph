@@ -146,13 +146,13 @@ static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int
     return k;
 }
 
-unsigned long int igraph_rng_glibc2_get(void *vstate) {
+static unsigned long int igraph_rng_glibc2_get(void *vstate) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     return igraph_i_rng_glibc2_get(&state->i, &state->j, 31, state->x);
 }
 
-igraph_real_t igraph_rng_glibc2_get_real(void *state) {
+static igraph_real_t igraph_rng_glibc2_get_real(void *state) {
     return igraph_rng_glibc2_get(state) / 2147483648.0;
 }
 
@@ -180,7 +180,7 @@ static void igraph_i_rng_glibc2_init(long int *x, int n,
     }
 }
 
-int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+static int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     int i;
@@ -197,7 +197,7 @@ int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     return IGRAPH_SUCCESS;
 }
 
-int igraph_rng_glibc2_init(void **state) {
+static int igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
@@ -211,7 +211,7 @@ int igraph_rng_glibc2_init(void **state) {
     return IGRAPH_SUCCESS;
 }
 
-void igraph_rng_glibc2_destroy(void *vstate) {
+static void igraph_rng_glibc2_destroy(void *vstate) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     IGRAPH_FREE(state);
@@ -251,23 +251,23 @@ typedef struct {
     unsigned long int x;
 } igraph_i_rng_rand_state_t;
 
-unsigned long int igraph_rng_rand_get(void *vstate) {
+static unsigned long int igraph_rng_rand_get(void *vstate) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = (1103515245 * state->x + 12345) & 0x7fffffffUL;
     return state->x;
 }
 
-igraph_real_t igraph_rng_rand_get_real(void *vstate) {
+static igraph_real_t igraph_rng_rand_get_real(void *vstate) {
     return igraph_rng_rand_get (vstate) / 2147483648.0 ;
 }
 
-int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+static int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = seed;
     return IGRAPH_SUCCESS;
 }
 
-int igraph_rng_rand_init(void **state) {
+static int igraph_rng_rand_init(void **state) {
     igraph_i_rng_rand_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_rand_state_t);
@@ -281,7 +281,7 @@ int igraph_rng_rand_init(void **state) {
     return IGRAPH_SUCCESS;
 }
 
-void igraph_rng_rand_destroy(void *vstate) {
+static void igraph_rng_rand_destroy(void *vstate) {
     igraph_i_rng_rand_state_t *state =
         (igraph_i_rng_rand_state_t*) vstate;
     IGRAPH_FREE(state);
@@ -343,7 +343,7 @@ typedef struct {
     int mti;
 } igraph_i_rng_mt19937_state_t;
 
-unsigned long int igraph_rng_mt19937_get(void *vstate) {
+static unsigned long int igraph_rng_mt19937_get(void *vstate) {
     igraph_i_rng_mt19937_state_t *state = vstate;
 
     unsigned long k ;
@@ -387,11 +387,11 @@ unsigned long int igraph_rng_mt19937_get(void *vstate) {
     return k;
 }
 
-igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
+static igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
     return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
 }
 
-int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+static int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_mt19937_state_t *state = vstate;
     int i;
 
@@ -415,7 +415,7 @@ int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     return IGRAPH_SUCCESS;
 }
 
-int igraph_rng_mt19937_init(void **state) {
+static int igraph_rng_mt19937_init(void **state) {
     igraph_i_rng_mt19937_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_mt19937_state_t);
@@ -429,7 +429,7 @@ int igraph_rng_mt19937_init(void **state) {
     return IGRAPH_SUCCESS;
 }
 
-void igraph_rng_mt19937_destroy(void *vstate) {
+static void igraph_rng_mt19937_destroy(void *vstate) {
     igraph_i_rng_mt19937_state_t *state =
         (igraph_i_rng_mt19937_state_t*) vstate;
     IGRAPH_FREE(state);
@@ -641,11 +641,11 @@ igraph_rng_t *igraph_rng_default() {
 
 /* ------------------------------------ */
 
-double igraph_norm_rand(igraph_rng_t *rng);
-double igraph_rgeom(igraph_rng_t *rng, double p);
-double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
-double igraph_rexp(igraph_rng_t *rng, double rate);
-double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
+static double igraph_norm_rand(igraph_rng_t *rng);
+static double igraph_rgeom(igraph_rng_t *rng, double p);
+static double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
+static double igraph_rexp(igraph_rng_t *rng, double rate);
+static double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
 
 /**
  * \function igraph_rng_init
@@ -1545,7 +1545,7 @@ static int imin2(int x, int y) {
     return (x < y) ? x : y;
 }
 
-double igraph_norm_rand(igraph_rng_t *rng) {
+static double igraph_norm_rand(igraph_rng_t *rng) {
 
     double u1;
 
@@ -1704,7 +1704,7 @@ double igraph_exp_rand(igraph_rng_t *rng) {
 #define TRUE  1
 #define M_1_SQRT_2PI    0.398942280401432677939946059934     /* 1/sqrt(2pi) */
 
-double igraph_rpois(igraph_rng_t *rng, double mu) {
+static double igraph_rpois(igraph_rng_t *rng, double mu) {
     /* Factorial Table (0:9)! */
     const double fact[10] = {
         1., 1., 2., 6., 24., 120., 720., 5040., 40320., 362880.
@@ -1910,7 +1910,7 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 #undef a6
 #undef a7
 
-double igraph_rgeom(igraph_rng_t *rng, double p) {
+static double igraph_rgeom(igraph_rng_t *rng, double p) {
     if (igraph_is_nan(p) || p <= 0 || p > 1) {
         ML_ERR_return_NAN;
     }
@@ -1922,7 +1922,7 @@ double igraph_rgeom(igraph_rng_t *rng, double p) {
 
 #define repeat for(;;)
 
-double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
+static double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
     /* FIXME: These should become THREAD_specific globals : */
 
     static IGRAPH_THREAD_LOCAL double c, fm, npq, p1, p2, p3, p4, qn;
@@ -2100,7 +2100,7 @@ finis:
     return (double)ix;
 }
 
-igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
+static igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
     igraph_real_t scale = 1.0 / rate;
     if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
         if (scale == 0.0) {
@@ -2222,7 +2222,7 @@ double igraph_dnorm(double x, double mu, double sigma, int give_log) {
  *    Output: a variate from the gamma(a)-distribution
  */
 
-double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
+static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
     /* Constants : */
     static const double sqrt32 = 5.656854;
     static const double exp_m1 = 0.36787944117144232159;/* exp(-1) = 1/e */

@@ -48,24 +48,19 @@
 #include <string.h>
 
 #include "igraph_types.h" 
-#include "core/math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
 
+#include "core/math.h"
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
+#include "io/parsers/ncol-lexer.h"
 #include "internal/hacks.h"
 
-#define yyscan_t void*
-
-int igraph_ncol_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
-		      void* scanner);
 int igraph_ncol_yyerror(YYLTYPE* locp, 
 			igraph_i_ncol_parsedata_t *context, 
 			const char *s);
-char *igraph_ncol_yyget_text (yyscan_t yyscanner );
-int igraph_ncol_yyget_leng (yyscan_t yyscanner );
 igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 
 #define scanner context->scanner
