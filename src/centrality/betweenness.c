@@ -37,7 +37,7 @@ IGRAPH_OTHER (used in inclist to discover the neighbor vertex) is a slow functio
 
 /*
  * Internal function to calculate the single source shortest paths for the
- * unweighted case.
+ * vertex unweighted case.
  *
  * \param  graph   the graph to calculate the single source shortest paths on
  * \param  source  the source node
@@ -47,12 +47,12 @@ IGRAPH_OTHER (used in inclist to discover the neighbor vertex) is a slow functio
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  fathers incidence list that starts empty and that stores the IDs
- *                 of the edges that lead to a given node during the traversal
- * \param  inclist the incidence list of the graph
+ * \param  fathers adjacent list that starts empty and that stores the IDs
+ *                 of the vertices that lead to a given node during the traversal
+ * \param  adjlist the adjacent list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_t *dist, 
+static int igraph_i_sspf(const igraph_t *graph, long int source, igraph_vector_t *dist, 
     double *nrgeo,
     igraph_stack_t *S,
     igraph_adjlist_t *fathers,
@@ -110,7 +110,7 @@ static int igraph_i_sspf( const igraph_t *graph, long int source, igraph_vector_
 
 /*
  * Internal function to calculate the single source shortest paths for the
- * unweighted case.
+ * edge unweighted case.
  *
  * \param  graph   the graph to calculate the single source shortest paths on
  * \param  source  the source node
@@ -183,7 +183,7 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
 }
 
 /*
- * Internal function to calculate the single source shortest paths for the
+ * Internal function to calculate the single source shortest paths for the vertex
  * weighted case.
  *
  * \param  graph   the graph to calculate the single source shortest paths on
@@ -195,8 +195,8 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  fathers incidence list that starts empty and that stores the IDs
- *                 of the edges that lead to a given node during the traversal
+ * \param  fathers adjacent list that starts empty and that stores the IDs
+ *                 of the vertices that lead to a given node during the traversal
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
@@ -287,7 +287,7 @@ static int igraph_i_sspf_weighted (
 }
 
 /*
- * Internal function to calculate the single source shortest paths for the
+ * Internal function to calculate the single source shortest paths for the edge
  * weighted case.
  *
  * \param  graph   the graph to calculate the single source shortest paths on
@@ -1027,7 +1027,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         source = IGRAPH_VIT_GET(vit_source);
 
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, weights, source, &dist, nrgeo, &S, &fathers, &inclist, -1));
+            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, -1));
         } else {
             IGRAPH_CHECK(igraph_i_sspf (graph, source, &dist, nrgeo, &S, &fathers, &adjlist, -1));
         }
