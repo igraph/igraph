@@ -1,7 +1,7 @@
 
 language: c
 cache: ccache
-# dist: xenial
+dist: focal
 os: linux
 
 # Ignore branches with names starting with certain keywords:
@@ -77,7 +77,6 @@ jobs:
 
     - name: "Linux ppc64"
       os: linux
-      dist: focal # snap fails with ppc64 on earlier Ubuntu
       arch: ppc64le
 
     # - name: "Linux s390x"
