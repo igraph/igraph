@@ -8,10 +8,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -64,7 +66,6 @@ int main() {
     igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
 
     igraph_vector_init(&bet, 0);
-    
 
     igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet,
@@ -73,8 +74,8 @@ int main() {
             /* weights=   */ 0,
             /* cutoff=    */ 2);
 
-        igraph_vector_destroy(&bet);
-        igraph_destroy(&g);
+    igraph_vector_destroy(&bet);
+    igraph_destroy(&g);
 
     printf("\nTree\n");
     printf("==========================================================\n");
@@ -129,7 +130,6 @@ int main() {
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
-
 
     printf("\nCorner case cutoff 0.0\n");
     printf("==========================================================\n");
