@@ -747,6 +747,10 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
 
 int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
+#define IGRAPH_I_NEIGHBORS_IF_SKIP(vertex) \
+    if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) || \
+            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)  || \
+            (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added))
 
     long int length = 0, idx = 0;
     long int i, j;
@@ -808,9 +812,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     igraph_real_t to = VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
-                    if ((loops == IGRAPH_NO_LOOPS && to == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && to == pnode && last_added == pnode)  ||
-                        (multiple == IGRAPH_NO_MULTIPLE && to == last_added)) {
+                    IGRAPH_I_NEIGHBORS_IF_SKIP(to) {
                         length--;
                         continue;
                     }
@@ -832,9 +834,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     igraph_real_t from = VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
-                    if ((loops == IGRAPH_NO_LOOPS && from == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && from == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE && from == last_added)) {
+                    IGRAPH_I_NEIGHBORS_IF_SKIP(from) {
                         length--;
                         continue;
                     }
@@ -892,9 +892,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 n2 = (long int) VECTOR(graph->from)[eid2];
                 if (n1 < n2) {
                     i1++;
-                    if ((loops == IGRAPH_NO_LOOPS && n1 == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE && n1 == last_added)) {
+                    IGRAPH_I_NEIGHBORS_IF_SKIP(n1) {
                         length--;
                         continue;
                     }
@@ -902,9 +900,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                     last_added = n1;
                 } else if (n1 > n2) {
                     i2++;
-                    if ((loops == IGRAPH_NO_LOOPS && n2 == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && n2 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE && n2 == last_added)) {
+                    IGRAPH_I_NEIGHBORS_IF_SKIP(n2) {
                         length--;
                         continue;
                     }
@@ -913,9 +909,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 } else {
                     i1++;
                     i2++;
-                    if ((loops == IGRAPH_NO_LOOPS && n1 == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE && n1 == last_added)) {
+                    IGRAPH_I_NEIGHBORS_IF_SKIP(n1) {
                         length-=2;
                         continue;
                     }
@@ -933,9 +927,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
             while (i1 < j1) {
                 eid1 = (long int) VECTOR(graph->oi)[i1++];
                 igraph_real_t to = (long int) VECTOR(graph->to)[eid1];
-                if ((loops == IGRAPH_NO_LOOPS && to == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && to == pnode && last_added == pnode)  ||
-                        (multiple == IGRAPH_NO_MULTIPLE && to == last_added)) {
+                IGRAPH_I_NEIGHBORS_IF_SKIP(to) {
                     length--;
                     continue;
                 }
@@ -945,9 +937,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
             while (i2 < j2) {
                 eid2 = (long int) VECTOR(graph->ii)[i2++];
                 igraph_real_t from =  (long int) VECTOR(graph->from)[eid2];
-                if ((loops == IGRAPH_NO_LOOPS && from == pnode) ||
-                        (loops == IGRAPH_LOOPS_ONCE && from == pnode && last_added == pnode)  ||
-                        (multiple == IGRAPH_NO_MULTIPLE && from == last_added)) {
+                IGRAPH_I_NEIGHBORS_IF_SKIP(from) {
                     length--;
                     continue;
                 }
@@ -959,6 +949,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
     IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
     return IGRAPH_SUCCESS;
+#undef IGRAPH_I_NEIGHBORS_IF_SKIP
 }
 /**
  * \ingroup internal
