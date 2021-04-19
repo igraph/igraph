@@ -1,0 +1,25 @@
+directed: false
+vcount: 6
+edges: {
+2 0
+3 1
+4 2
+3 2
+5 3
+}
+directed: false
+vcount: 8
+edges: {
+3 0
+5 2
+4 2
+4 1
+6 1
+1 0
+7 0
+}
+directed: false
+vcount: 2
+edges: {
+1 0
+}

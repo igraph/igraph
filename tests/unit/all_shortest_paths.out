@@ -1,0 +1,24 @@
+Singleton graph
+( 0 )
+
+Singleton graph, weighted
+( 0 )
+
+No paths
+
+Unweighted
+( 0 1 2 5 4 )
+( 0 1 2 5 4 )
+( 0 1 2 3 4 )
+( 0 1 2 3 4 )
+
+Weighted, uniform weights
+( 0 1 2 5 4 )
+( 0 1 2 5 4 )
+( 0 1 2 3 4 )
+( 0 1 2 3 4 )
+
+Weighted, multiple weighted shortest paths
+( 0 1 2 5 4 )
+( 0 1 6 7 3 4 )
+( 0 1 2 3 4 )

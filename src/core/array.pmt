@@ -1,0 +1,90 @@
+/* -*- mode: C -*-  */
+/*
+   IGraph library.
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
+*/
+
+#include "igraph_types.h"
+
+int FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a, long int n1, long int n2,
+                                  long int n3) {
+    int ret;
+    ret = FUNCTION(igraph_vector, init)(&a->data, n1 * n2 * n3);
+    a->n1 = n1;
+    a->n2 = n2;
+    a->n3 = n3;
+    a->n1n2 = n1 * n2;
+
+    return ret;
+}
+
+void FUNCTION(igraph_array3, destroy)(TYPE(igraph_array3) *a) {
+    FUNCTION(igraph_vector, destroy)(&a->data);
+}
+
+long int FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a) {
+    return (a->n1n2) * (a->n3);
+}
+
+long int FUNCTION(igraph_array3, n)(const TYPE(igraph_array3) *a, long int idx) {
+    switch (idx) {
+    case 1: return a->n1;
+        break;
+    case 2: return a->n2;
+        break;
+    case 3: return a->n3;
+        break;
+    }
+    return 0;
+}
+
+int FUNCTION(igraph_array3, resize)(TYPE(igraph_array3) *a, long int n1, long int n2,
+                                    long int n3) {
+    int ret = FUNCTION(igraph_vector, resize)(&a->data, n1 * n2 * n3);
+    a->n1 = n1;
+    a->n2 = n2;
+    a->n3 = n3;
+    a->n1n2 = n1 * n2;
+
+    return ret;
+}
+
+void FUNCTION(igraph_array3, null)(TYPE(igraph_array3) *a) {
+    FUNCTION(igraph_vector, null)(&a->data);
+}
+
+BASE FUNCTION(igraph_array3, sum)(const TYPE(igraph_array3) *a) {
+    return FUNCTION(igraph_vector, sum)(&a->data);
+}
+
+void FUNCTION(igraph_array3, scale)(TYPE(igraph_array3) *a, BASE by) {
+    FUNCTION(igraph_vector, scale)(&a->data, by);
+}
+
+void FUNCTION(igraph_array3, fill)(TYPE(igraph_array3) *a, BASE e) {
+    FUNCTION(igraph_vector, fill)(&a->data, e);
+}
+
+int FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
+                                    const TYPE(igraph_array3) *from) {
+    IGRAPH_CHECK(FUNCTION(igraph_array3, resize)(to, from->n1, from->n2, from->n3));
+    FUNCTION(igraph_vector, update)(&to->data, &from->data);
+    return 0;
+}

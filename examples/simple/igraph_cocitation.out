@@ -1,8 +1,11 @@
- 0 0 1 0
- 0 0 0 0
- 1 0 0 1
- 0 0 1 0
- 0 1 0 0
- 1 0 0 0
- 0 0 0 0
- 0 0 0 0
+Bibliographic coupling matrix:
+0 0 1 0
+0 0 0 0
+1 0 0 1
+0 0 1 0
+
+Cocitation matrix:
+0 1 0 0
+1 0 0 0
+0 0 0 0
+0 0 0 0

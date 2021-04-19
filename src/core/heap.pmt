@@ -1,0 +1,355 @@
+/* -*- mode: C -*-  */
+/*
+   IGraph library.
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
+*/
+
+#include "igraph_memory.h"
+#include "igraph_error.h"
+#include "config.h"
+
+#include <string.h>         /* memcpy & co. */
+#include <stdlib.h>
+
+#define PARENT(x)     (((x)+1)/2-1)
+#define LEFTCHILD(x)  (((x)+1)*2-1)
+#define RIGHTCHILD(x) (((x)+1)*2)
+
+/* Declare internal functions */
+static void FUNCTION(igraph_heap, i_build)(BASE* arr, long int size, long int head);
+static void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem);
+static void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head);
+static void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2);
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_init
+ * \brief Initializes an empty heap object.
+ *
+ * Creates an empty heap, but allocates size for some elements.
+ * \param h Pointer to an uninitialized heap object.
+ * \param alloc_size Number of elements to allocate memory for.
+ * \return Error code.
+ *
+ * Time complexity: O(\p alloc_size), assuming memory allocation is a
+ * linear operation.
+ */
+
+int FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, long int alloc_size) {
+    if (alloc_size <= 0 ) {
+        alloc_size = 1;
+    }
+    h->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
+    if (h->stor_begin == 0) {
+        IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM);
+    }
+    h->stor_end = h->stor_begin + alloc_size;
+    h->end = h->stor_begin;
+    h->destroy = 1;
+
+    return 0;
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_init_array
+ * \brief Build a heap from an array.
+ *
+ * Initializes a heap object from an array, the heap is also
+ * built of course (constructor).
+ * \param h Pointer to an uninitialized heap object.
+ * \param data Pointer to an array of base data type.
+ * \param len The length of the array at \p data.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of elements in the heap.
+ */
+
+int FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, long int len) {
+    h->stor_begin = IGRAPH_CALLOC(len, BASE);
+    if (h->stor_begin == 0) {
+        IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
+    }
+    h->stor_end = h->stor_begin + len;
+    h->end = h->stor_end;
+    h->destroy = 1;
+
+    memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
+
+    FUNCTION(igraph_heap, i_build) (h->stor_begin, h->end - h->stor_begin, 0);
+
+    return 0;
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_destroy
+ * \brief Destroys an initialized heap object.
+ *
+ * \param h The heap object.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
+    if (h->destroy) {
+        if (h->stor_begin != 0) {
+            IGRAPH_FREE(h->stor_begin);
+            h->stor_begin = 0;
+        }
+    }
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_empty
+ * \brief Decides whether a heap object is empty.
+ *
+ * \param h The heap object.
+ * \return \c TRUE if the heap is empty, \c FALSE otherwise.
+ *
+ * TIme complexity: O(1).
+ */
+
+igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    return h->stor_begin == h->end;
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_push
+ * \brief Add an element.
+ *
+ * Adds an element to the heap.
+ * \param h The heap object.
+ * \param elem The element to add.
+ * \return Error code.
+ *
+ * Time complexity: O(log n), n is the number of elements in the
+ * heap if no reallocation is needed, O(n) otherwise. It is ensured
+ * that n push operations are performed in O(n log n) time.
+ */
+
+int FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+
+    /* full, allocate more storage */
+    if (h->stor_end == h->end) {
+        long int new_size = FUNCTION(igraph_heap, size)(h) * 2;
+        if (new_size == 0) {
+            new_size = 1;
+        }
+        IGRAPH_CHECK(FUNCTION(igraph_heap, reserve)(h, new_size));
+    }
+
+    *(h->end) = elem;
+    h->end += 1;
+
+    /* maintain heap */
+    FUNCTION(igraph_heap, i_shift_up)(h->stor_begin, FUNCTION(igraph_heap, size)(h),
+                                      FUNCTION(igraph_heap, size)(h) - 1);
+
+    return 0;
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_top
+ * \brief Top element.
+ *
+ * For maximum heaps this is the largest, for minimum heaps the
+ * smallest element of the heap.
+ * \param h The heap object.
+ * \return The top element.
+ *
+ * Time complexity: O(1).
+ */
+
+BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h) {
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h->stor_begin != h->end);
+
+    return h->stor_begin[0];
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_delete_top
+ * \brief Return and removes the top element
+ *
+ * Removes and returns the top element of the heap. For maximum heaps
+ * this is the largest, for minimum heaps the smallest element.
+ * \param h The heap object.
+ * \return The top element.
+ *
+ * Time complexity: O(log n), n is the number of elements in the
+ * heap.
+ */
+
+BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h) {
+    BASE tmp;
+
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+
+    tmp = h->stor_begin[0];
+    FUNCTION(igraph_heap, i_switch)(h->stor_begin, 0, FUNCTION(igraph_heap, size)(h) - 1);
+    h->end -= 1;
+    FUNCTION(igraph_heap, i_sink)(h->stor_begin, h->end - h->stor_begin, 0);
+
+    return tmp;
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_size
+ * \brief Number of elements
+ *
+ * Gives the number of elements in a heap.
+ * \param h The heap object.
+ * \return The number of elements in the heap.
+ *
+ * Time complexity: O(1).
+ */
+
+long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    return h->end - h->stor_begin;
+}
+
+/**
+ * \ingroup heap
+ * \function igraph_heap_reserve
+ * \brief Allocate more memory
+ *
+ * Allocates memory for future use. The size of the heap is
+ * unchanged. If the heap is larger than the \p size parameter then
+ * nothing happens.
+ * \param h The heap object.
+ * \param size The number of elements to allocate memory for.
+ * \return Error code.
+ *
+ * Time complexity: O(\p size) if \p size is larger than the current
+ * number of elements. O(1) otherwise.
+ */
+
+int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size) {
+    long int actual_size = FUNCTION(igraph_heap, size)(h);
+    BASE *tmp;
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+
+    if (size <= actual_size) {
+        return 0;
+    }
+
+    tmp = IGRAPH_REALLOC(h->stor_begin, (size_t) size, BASE);
+    if (tmp == 0) {
+        IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM);
+    }
+    h->stor_begin = tmp;
+    h->stor_end = h->stor_begin + size;
+    h->end = h->stor_begin + actual_size;
+
+    return 0;
+}
+
+/**
+ * \ingroup heap
+ * \brief Build a heap, this should not be called directly.
+ */
+
+void FUNCTION(igraph_heap, i_build)(BASE* arr,
+                                    long int size, long int head) {
+
+    if (RIGHTCHILD(head) < size) {
+        /* both subtrees */
+        FUNCTION(igraph_heap, i_build)(arr, size, LEFTCHILD(head) );
+        FUNCTION(igraph_heap, i_build)(arr, size, RIGHTCHILD(head));
+        FUNCTION(igraph_heap, i_sink)(arr, size, head);
+    } else if (LEFTCHILD(head) < size) {
+        /* only left */
+        FUNCTION(igraph_heap, i_build)(arr, size, LEFTCHILD(head));
+        FUNCTION(igraph_heap, i_sink)(arr, size, head);
+    } else {
+        /* none */
+    }
+}
+
+/**
+ * \ingroup heap
+ * \brief Shift an element upwards in a heap, this should not be
+ * called directly.
+ */
+
+void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem) {
+
+    if (elem == 0 || arr[elem] HEAPLESS arr[PARENT(elem)]) {
+        /* at the top */
+    } else {
+        FUNCTION(igraph_heap, i_switch)(arr, elem, PARENT(elem));
+        FUNCTION(igraph_heap, i_shift_up)(arr, size, PARENT(elem));
+    }
+}
+
+/**
+ * \ingroup heap
+ * \brief Moves an element down in a heap, this function should not be
+ * called directly.
+ */
+
+void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head) {
+
+    if (LEFTCHILD(head) >= size) {
+        /* no subtrees */
+    } else if (RIGHTCHILD(head) == size ||
+               arr[LEFTCHILD(head)] HEAPMOREEQ arr[RIGHTCHILD(head)]) {
+        /* sink to the left if needed */
+        if (arr[head] HEAPLESS arr[LEFTCHILD(head)]) {
+            FUNCTION(igraph_heap, i_switch)(arr, head, LEFTCHILD(head));
+            FUNCTION(igraph_heap, i_sink)(arr, size, LEFTCHILD(head));
+        }
+    } else {
+        /* sink to the right */
+        if (arr[head] HEAPLESS arr[RIGHTCHILD(head)]) {
+            FUNCTION(igraph_heap, i_switch)(arr, head, RIGHTCHILD(head));
+            FUNCTION(igraph_heap, i_sink)(arr, size, RIGHTCHILD(head));
+        }
+    }
+}
+
+/**
+ * \ingroup heap
+ * \brief Switches two elements in a heap, this function should not be
+ * called directly.
+ */
+
+void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2) {
+    if (e1 != e2) {
+        BASE tmp = arr[e1];
+        arr[e1] = arr[e2];
+        arr[e2] = tmp;
+    }
+}

@@ -1,0 +1,974 @@
+( )
+
+SIMPLE GRAPH:
+Largest:
+directed: false
+vcount: 0
+edges: {
+}
+Smallest:
+directed: false
+vcount: 0
+edges: {
+}
+Index:
+directed: false
+vcount: 0
+edges: {
+}
+
+LOOPLESS MULTIGRAPH:
+Largest:
+directed: false
+vcount: 0
+edges: {
+}
+Smallest:
+directed: false
+vcount: 0
+edges: {
+}
+Index:
+directed: false
+vcount: 0
+edges: {
+}
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 0
+edges: {
+}
+Smallest:
+directed: false
+vcount: 0
+edges: {
+}
+Index:
+directed: false
+vcount: 0
+edges: {
+}
+
+
+( 1 2 2 3 )
+
+SIMPLE GRAPH:
+Largest:
+directed: false
+vcount: 4
+edges: {
+3 2
+3 1
+3 0
+2 1
+}
+Smallest:
+directed: false
+vcount: 4
+edges: {
+3 0
+3 2
+2 1
+3 1
+}
+Index:
+directed: false
+vcount: 4
+edges: {
+3 0
+3 1
+2 1
+3 2
+}
+
+LOOPLESS MULTIGRAPH:
+Largest:
+directed: false
+vcount: 4
+edges: {
+3 1
+3 2
+1 0
+3 2
+}
+Smallest:
+directed: false
+vcount: 4
+edges: {
+3 0
+3 1
+2 1
+3 2
+}
+Index:
+directed: false
+vcount: 4
+edges: {
+3 0
+3 1
+2 1
+3 2
+}
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 4
+edges: {
+3 1
+3 2
+1 0
+3 2
+}
+Smallest:
+directed: false
+vcount: 4
+edges: {
+3 0
+3 1
+2 1
+3 2
+}
+Index:
+directed: false
+vcount: 4
+edges: {
+3 0
+3 1
+2 1
+3 2
+}
+
+
+( 1 2 2 -3 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPY MULTIGRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+
+( 1 1 2 3 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPY MULTIGRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+
+( 1 2 3 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest:
+directed: false
+vcount: 3
+edges: {
+2 1
+2 0
+2 1
+}
+Smallest:
+directed: false
+vcount: 3
+edges: {
+2 0
+2 1
+2 1
+}
+Index:
+directed: false
+vcount: 3
+edges: {
+2 0
+2 1
+2 1
+}
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 3
+edges: {
+2 1
+2 0
+2 1
+}
+Smallest:
+directed: false
+vcount: 3
+edges: {
+2 0
+2 1
+2 1
+}
+Index:
+directed: false
+vcount: 3
+edges: {
+2 0
+2 1
+2 1
+}
+
+
+( 4 4 4 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest:
+directed: false
+vcount: 3
+edges: {
+1 0
+2 1
+2 0
+2 1
+2 0
+1 0
+}
+Smallest:
+directed: false
+vcount: 3
+edges: {
+2 0
+1 0
+2 0
+1 0
+2 1
+2 1
+}
+Index:
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+2 0
+1 0
+2 1
+2 1
+}
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 3
+edges: {
+1 0
+2 1
+2 0
+2 1
+2 0
+1 0
+}
+Smallest:
+directed: false
+vcount: 3
+edges: {
+2 0
+1 0
+2 0
+1 0
+2 1
+2 1
+}
+Index:
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+2 0
+1 0
+2 1
+2 1
+}
+
+
+( 3 5 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 2
+edges: {
+1 0
+1 0
+1 0
+1 1
+}
+Smallest:
+directed: false
+vcount: 2
+edges: {
+1 0
+1 0
+1 0
+1 1
+}
+Index:
+directed: false
+vcount: 2
+edges: {
+1 0
+1 0
+1 0
+1 1
+}
+
+
+( 5 3 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 2
+edges: {
+1 0
+1 0
+1 0
+0 0
+}
+Smallest:
+directed: false
+vcount: 2
+edges: {
+1 0
+1 0
+1 0
+0 0
+}
+Index:
+directed: false
+vcount: 2
+edges: {
+1 0
+1 0
+1 0
+0 0
+}
+
+
+( 1 3 3 4 1 2 1 1 1 3 )
+
+SIMPLE GRAPH:
+Largest:
+directed: false
+vcount: 10
+edges: {
+9 3
+3 2
+3 1
+5 3
+9 2
+9 1
+2 1
+8 5
+7 6
+4 0
+}
+Smallest:
+directed: false
+vcount: 10
+edges: {
+8 3
+7 3
+6 1
+4 2
+9 0
+9 5
+5 2
+2 1
+9 3
+3 1
+}
+Index:
+directed: false
+vcount: 10
+edges: {
+3 0
+3 1
+2 1
+9 1
+3 2
+9 2
+5 3
+5 4
+9 6
+8 7
+}
+
+LOOPLESS MULTIGRAPH:
+Largest:
+directed: false
+vcount: 10
+edges: {
+3 1
+9 2
+5 3
+9 1
+3 2
+4 0
+7 6
+8 5
+9 1
+3 2
+}
+Smallest:
+directed: false
+vcount: 10
+edges: {
+8 3
+7 1
+6 2
+9 4
+3 0
+5 3
+5 1
+2 1
+9 2
+9 3
+}
+Index:
+directed: false
+vcount: 10
+edges: {
+3 0
+3 1
+2 1
+9 1
+9 2
+3 2
+5 3
+5 4
+9 6
+8 7
+}
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 10
+edges: {
+3 1
+9 2
+5 3
+9 1
+3 2
+4 0
+7 6
+8 5
+9 1
+3 2
+}
+Smallest:
+directed: false
+vcount: 10
+edges: {
+8 3
+7 1
+6 2
+9 4
+3 0
+5 3
+5 1
+2 1
+9 2
+9 3
+}
+Index:
+directed: false
+vcount: 10
+edges: {
+3 0
+3 1
+2 1
+9 1
+9 2
+3 2
+5 3
+5 4
+9 6
+8 7
+}
+
+
+( 2 0 3 2 2 2 2 3 )
+
+SIMPLE GRAPH:
+Largest:
+directed: false
+vcount: 8
+edges: {
+7 2
+7 6
+7 5
+4 2
+3 2
+4 0
+3 0
+6 5
+}
+Smallest:
+directed: false
+vcount: 8
+edges: {
+6 2
+7 6
+5 2
+7 5
+7 0
+3 2
+4 0
+4 3
+}
+Index:
+directed: false
+vcount: 8
+edges: {
+2 0
+7 0
+7 2
+3 2
+4 3
+5 4
+6 5
+7 6
+}
+
+LOOPLESS MULTIGRAPH:
+Largest:
+directed: false
+vcount: 8
+edges: {
+7 2
+3 0
+5 4
+7 6
+3 2
+5 0
+7 4
+6 2
+}
+Smallest:
+directed: false
+vcount: 8
+edges: {
+6 2
+7 6
+7 0
+3 0
+4 3
+5 4
+5 2
+7 2
+}
+Index:
+directed: false
+vcount: 8
+edges: {
+2 0
+7 0
+7 2
+3 2
+4 3
+5 4
+6 5
+7 6
+}
+
+LOOPY MULTIGRAPH:
+Largest:
+directed: false
+vcount: 8
+edges: {
+7 2
+3 0
+5 4
+7 6
+3 2
+5 0
+7 4
+6 2
+}
+Smallest:
+directed: false
+vcount: 8
+edges: {
+6 2
+7 6
+7 0
+3 0
+4 3
+5 4
+5 2
+7 2
+}
+Index:
+directed: false
+vcount: 8
+edges: {
+2 0
+7 0
+7 2
+3 2
+4 3
+5 4
+6 5
+7 6
+}
+
+
+( )
+( )
+
+SIMPLE GRAPH:
+Largest:
+directed: true
+vcount: 0
+edges: {
+}
+Smallest:
+directed: true
+vcount: 0
+edges: {
+}
+Index:
+directed: true
+vcount: 0
+edges: {
+}
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 3 0 1 1 1 1 0 1 )
+( 2 1 0 2 2 1 0 0 )
+
+SIMPLE GRAPH:
+Largest:
+directed: true
+vcount: 8
+edges: {
+0 3
+0 4
+0 5
+3 0
+4 0
+5 4
+2 3
+7 1
+}
+Smallest:
+directed: true
+vcount: 8
+edges: {
+7 0
+2 3
+5 4
+3 0
+0 4
+0 3
+0 5
+4 1
+}
+Index:
+directed: true
+vcount: 8
+edges: {
+0 3
+0 4
+0 5
+2 0
+3 4
+4 3
+5 0
+7 1
+}
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 3 1 2 3 1 2 2 )
+( 2 2 1 2 3 2 2 )
+
+SIMPLE GRAPH:
+Largest:
+directed: true
+vcount: 7
+edges: {
+4 0
+3 4
+3 5
+3 6
+1 4
+0 1
+0 3
+0 5
+6 2
+6 1
+2 6
+2 3
+5 0
+5 4
+}
+Smallest:
+directed: true
+vcount: 7
+edges: {
+2 4
+2 0
+0 3
+0 5
+0 6
+6 4
+6 1
+1 3
+3 5
+3 4
+3 1
+4 6
+5 0
+5 2
+}
+Index:
+directed: true
+vcount: 7
+edges: {
+0 4
+0 3
+0 5
+1 6
+2 4
+2 1
+3 0
+3 6
+3 5
+4 0
+5 4
+5 3
+6 1
+6 2
+}
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 0 1 2 )
+( 1 0 2 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 2 1 0 )
+( 2 0 1 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 1 2 0 )
+( 0 2 1 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 0 2 )
+( 2 0 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 3 3 3 3 )
+( 3 3 3 3 )
+
+SIMPLE GRAPH:
+Largest:
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 0
+1 2
+1 3
+2 0
+2 1
+2 3
+3 0
+3 1
+3 2
+}
+Smallest:
+directed: true
+vcount: 4
+edges: {
+3 0
+3 1
+3 2
+2 3
+2 0
+2 1
+1 3
+1 2
+1 0
+0 3
+0 2
+0 1
+}
+Index:
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 0
+1 2
+1 3
+2 0
+2 1
+2 3
+3 0
+3 1
+3 2
+}
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+

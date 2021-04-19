@@ -1,0 +1,15 @@
+set(IGRAPH_VERSION "@PACKAGE_VERSION_BASE@")
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/igraph-targets.cmake")
+
+# Turn on CMP0012 because the following if() conditionals will use "ON" and
+# "OFF" verbatim and they must be evaluated as booleans
+cmake_policy(PUSH)
+cmake_policy(SET CMP0012 NEW)
+if(@IGRAPH_OPENMP_SUPPORT@)
+  find_package(OpenMP)
+endif()
+cmake_policy(POP)
+
+check_required_components(igraph)

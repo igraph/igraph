@@ -1,0 +1,43 @@
+No vertices:
+directed: false
+vcount: 0
+edges: {
+}
+No edges:
+directed: false
+vcount: 5
+edges: {
+}
+Prefer more edges to make a star of double edges:
+directed: false
+vcount: 5
+edges: {
+0 1
+0 1
+0 2
+0 2
+0 3
+0 3
+0 4
+0 4
+}
+Prefer older edges to make a star:
+directed: false
+vcount: 7
+edges: {
+0 1
+0 1
+0 2
+0 3
+0 3
+0 4
+0 5
+0 5
+0 6
+}
+Checking if adding one edge per step makes a tree.
+Checking if these errors are properly handled:
+Negative number of vertices.
+Negative number of edges.
+Negative aging bin.
+Negative zero appeal.

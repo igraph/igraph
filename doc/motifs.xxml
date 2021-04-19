@@ -16,12 +16,12 @@ by Holland and Leinhardt, and named dyad census and triad census.
 <!-- doxrox-include igraph_dyad_census -->
 <!-- doxrox-include igraph_triad_census -->
 
-<section><title>Finding triangles</title>
+<section id="finding-triangles"><title>Finding triangles</title>
 <!-- doxrox-include igraph_adjacent_triangles -->
 <!-- doxrox-include igraph_list_triangles -->
 </section>
 
-<section><title>Graph motifs</title>
+<section id="graph-motifs"><title>Graph motifs</title>
 <!-- doxrox-include igraph_motifs_randesu -->
 <!-- doxrox-include igraph_motifs_randesu_no -->
 <!-- doxrox-include igraph_motifs_randesu_estimate -->

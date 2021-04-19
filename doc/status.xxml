@@ -7,17 +7,17 @@
 <section id="igraph-Status">
 <title>Status handlers</title>
 
-<section>
+<section id="about-status-handlers">
 <!-- doxrox-include about_status_handlers -->
 </section>
 
-<section><title>Setting up status handlers</title>
+<section id="setting-up-status-handlers"><title>Setting up status handlers</title>
 <!-- doxrox-include igraph_status_handler_t -->
 <!-- doxrox-include igraph_set_status_handler -->
 <!-- doxrox-include igraph_status_handler_stderr -->
 </section>
 
-<section><title>Invoking the status handler</title>
+<section id="invoking-the-status-handler"><title>Invoking the status handler</title>
 <!-- doxrox-include IGRAPH_STATUS -->
 <!-- doxrox-include IGRAPH_STATUSF -->
 <!-- doxrox-include igraph_status -->

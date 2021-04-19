@@ -4,7 +4,6 @@
 
   <!-- import the chunked XSL stylesheet -->
   <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
-  <xsl:include href="devhelp.xsl"/>
   <xsl:include href="version-greater-or-equal.xsl"/>
 
   <!-- change some parameters -->
@@ -13,8 +12,8 @@
   <xsl:param name="toc.section.depth">0</xsl:param>
   <xsl:param name="generate.section.toc.level">2</xsl:param>
   <xsl:param name="generate.toc">
-    book	toc
-    chapter	toc
+    book        toc
+    chapter     toc
     section     toc
   </xsl:param>
   
@@ -60,36 +59,6 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     </xsl:if>
     <xsl:apply-imports/>
 
-    <!-- generate the index.sgml href index -->
-    <xsl:call-template name="generate.index"/>
-    <xsl:call-template name="generate.devhelp"/>
-  </xsl:template>
-
-  <xsl:template name="generate.index">
-    <xsl:call-template name="write.text.chunk">
-      <xsl:with-param name="filename" select="'index.sgml'"/>
-      <xsl:with-param name="content">
-        <!-- check all anchor and refentry elements -->
-        <xsl:apply-templates select="//anchor|//refentry"
-                             mode="generate.index.mode"/>
-      </xsl:with-param>
-      <xsl:with-param name="encoding" select="'utf-8'"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template match="*" mode="generate.index.mode">
-    <xsl:if test="not(@href)">
-      <xsl:text>&lt;ANCHOR id=&quot;</xsl:text>
-      <xsl:value-of select="@id"/>
-      <xsl:text>&quot; href=&quot;</xsl:text>
-      <xsl:if test="$gtkdoc.bookname">
-        <xsl:value-of select="$gtkdoc.bookname"/>
-        <xsl:text>/</xsl:text>
-      </xsl:if>
-      <xsl:call-template name="href.target"/>
-      <xsl:text>&quot;&gt;
-</xsl:text>
-    </xsl:if>
   </xsl:template>
 
   <!-- ========================================================= -->
@@ -129,6 +98,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
             content="GTK-Doc V{$gtkdoc.version} (XML mode)"/>
     </xsl:if>
     <link rel="stylesheet" href="style.css" type="text/css"/>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css"/>
 
       <!-- copied from the html.head template in the docbook stylesheets
            we don't want links for all refentrys, thats just too much
@@ -166,50 +136,54 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     <xsl:variable name="up" select="parent::*"/>
 
     <xsl:if test="$suppress.navigation = '0' and $home != .">
-      <div class="navigation-header" width="100%"
+      <div class="navigation-header mb-4" width="100%"
            summary = "Navigation header">
-	<div class="btn-group">
+        <div class="btn-group">
           <xsl:if test="count($prev) > 0">
-            <a accesskey="p" class="btn btn-default">
+            <a accesskey="p" class="btn btn-light">
               <xsl:attribute name="href">
-		<xsl:call-template name="href.target">
+                <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$prev"/>
-		</xsl:call-template>
+                </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-chevron-left"></i>
+              <i class="fa fa-chevron-left"></i>
+              Previous
             </a>
           </xsl:if>
           <xsl:if test="count($up) > 0 and $up != $home">
-            <a accesskey="u" class="btn btn-default">
+            <a accesskey="u" class="btn btn-light">
               <xsl:attribute name="href">
                 <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$up"/>
                 </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-chevron-up"></i>
+              <i class="fa fa-chevron-up"></i>
+              Up
             </a>
           </xsl:if>
           <xsl:if test="$home != .">
-            <a accesskey="h" class="btn btn-default">
+            <a accesskey="h" class="btn btn-light">
               <xsl:attribute name="href">
                 <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$home"/>
                 </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-home"></i>
+              <i class="fa fa-home"></i>
+              Home
             </a>
           </xsl:if>
           <xsl:if test="count($next) > 0">
-            <a accesskey="n" class="btn btn-default">
+            <a accesskey="n" class="btn btn-light">
               <xsl:attribute name="href">
                 <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$next"/>
                 </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-chevron-right"></i>
-	    </a>
+              <i class="fa fa-chevron-right"></i>
+              Next
+            </a>
           </xsl:if>
-	</div>
+        </div>
       </div>
     </xsl:if>
   </xsl:template>
@@ -260,12 +234,6 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
   </xsl:template>
 
   <xsl:template name="user.footer.content">
-    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-    </script>
-    <script type="text/javascript">
-      _uacct = "UA-1392972-1";
-      urchinTracker();
-    </script>
   </xsl:template>
 
   <!-- avoid creating multiple identical indices 
@@ -362,7 +330,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
 
   <xsl:template match="example">
     <xsl:variable name="id" select="@id"/>
-    <div class="hideshow" onClick="toggle(this)">
+    <div class="hideshow" onClick="toggle(this, event)">
       <xsl:apply-imports />
     </div>
   </xsl:template>

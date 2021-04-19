@@ -1,0 +1,13 @@
+{
+    "title": "igraph",
+    "upload_type": "software",
+    "keywords": [
+        "graph theory",
+        "network analysis"
+    ],
+    "creators": [
+        {
+            "name": "The igraph Core Team"
+        }
+    ]
+}

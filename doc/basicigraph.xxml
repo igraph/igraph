@@ -7,7 +7,7 @@
 <chapter id="igraph-Basic">
 <title>About &igraph; graphs, the basic interface</title>
 
-<section><title>The &igraph; data model</title>
+<section id="igraph-data-model"><title>The &igraph; data model</title>
 <para>
 The &igraph; library can handle directed and
 undirected graphs. The &igraph; graphs are multisets
@@ -21,7 +21,7 @@ the graph is directed or undirected.
 
 <para>
 Like the edges, the &igraph; vertices are also
-labeled by number between zero and the number of vertices minus one. 
+labeled by numbers between zero and the number of vertices minus one. 
 So, to summarize, a directed graph can be imagined like this:
 <informalexample>
 <programlisting>
@@ -85,39 +85,40 @@ To eliminate multiple edges from a graph, you can use
 </para>
 </section>
 
-<section><title>The basic interface</title>
+<section id="basic-interface"><title>The basic interface</title>
 <!-- doxrox-include about_basic_interface -->
 
-<section><title>Graph Constructors and Destructors</title>
+<section id="graph-constructors-and-destructors"><title>Graph Constructors and Destructors</title>
 <!-- doxrox-include igraph_empty -->
 <!-- doxrox-include igraph_empty_attrs -->
 <!-- doxrox-include igraph_copy -->
 <!-- doxrox-include igraph_destroy -->
 </section>
 
-<section><title>Basic Query Operations</title>
+<section id="basic-query-operations"><title>Basic Query Operations</title>
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
 <!-- doxrox-include igraph_edge -->
+<!-- doxrox-include igraph_edges -->
+<!-- doxrox-include IGRAPH_FROM -->
+<!-- doxrox-include IGRAPH_TO -->
+<!-- doxrox-include IGRAPH_OTHER -->
 <!-- doxrox-include igraph_get_eid -->
 <!-- doxrox-include igraph_get_eids -->
 <!-- doxrox-include igraph_get_eids_multi -->
 <!-- doxrox-include igraph_neighbors -->
 <!-- doxrox-include igraph_incident -->
 <!-- doxrox-include igraph_is_directed -->
+<!-- doxrox-include igraph_is_same_graph -->
 <!-- doxrox-include igraph_degree -->
 </section>
 
-<section><title>Adding and Deleting Vertices and Edges</title>
+<section id="adding-and-deleting-vertices-and-edges"><title>Adding and Deleting Vertices and Edges</title>
 <!-- doxrox-include igraph_add_edge -->
 <!-- doxrox-include igraph_add_edges -->
 <!-- doxrox-include igraph_add_vertices -->
 <!-- doxrox-include igraph_delete_edges -->
 <!-- doxrox-include igraph_delete_vertices -->
-</section>
-
-<section><title>Deprecated functions</title>
-<!-- doxrox-include igraph_adjacent -->
 </section>
 
 </section>

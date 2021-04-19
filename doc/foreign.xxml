@@ -9,7 +9,7 @@
 
 <!-- doxrox-include about_loadsave -->
 
-<section><title>Simple edge list and similar formats</title>
+<section id="simple-edge-list-and-similar-formats"><title>Simple edge list and similar formats</title>
 <!-- doxrox-include igraph_read_graph_edgelist -->
 <!-- doxrox-include igraph_write_graph_edgelist -->
 <!-- doxrox-include igraph_read_graph_ncol -->
@@ -20,30 +20,30 @@
 <!-- doxrox-include igraph_write_graph_dimacs -->
 </section>
 
-<section><title>Binary formats</title>
+<section id="binary-formats"><title>Binary formats</title>
 <!-- doxrox-include igraph_read_graph_graphdb -->
 </section>
 
-<section><title>GraphML format</title>
+<section id="graphml-format"><title>GraphML format</title>
 <!-- doxrox-include igraph_read_graph_graphml -->
 <!-- doxrox-include igraph_write_graph_graphml -->
 </section>
 
-<section><title>GML format</title>
+<section id="gml-format"><title>GML format</title>
 <!-- doxrox-include igraph_read_graph_gml -->
 <!-- doxrox-include igraph_write_graph_gml -->
 </section>
 
-<section><title>Pajek format</title>
+<section id="pajek-format"><title>Pajek format</title>
 <!-- doxrox-include igraph_read_graph_pajek -->
 <!-- doxrox-include igraph_write_graph_pajek -->
 </section>
 
-<section><title>UCINET's DL file format</title>
+<section id="ucinets-dl-file-format"><title>UCINET's DL file format</title>
 <!-- doxrox-include igraph_read_graph_dl -->
 </section>
 
-<section><title>Graphviz format</title>
+<section id="graphviz-format"><title>Graphviz format</title>
 <!-- doxrox-include igraph_write_graph_dot -->
 </section>
 

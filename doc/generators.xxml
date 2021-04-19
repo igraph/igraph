@@ -9,7 +9,7 @@
 
 <!-- doxrox-include about_generators -->
 
-<section><title>Deterministic Graph Generators</title>
+<section id="deterministic-graph-generators"><title>Deterministic Graph Generators</title>
 <!-- doxrox-include igraph_create -->
 <!-- doxrox-include igraph_small -->
 <!-- doxrox-include igraph_adjacency -->
@@ -30,10 +30,9 @@
 <!-- doxrox-include igraph_de_bruijn -->
 <!-- doxrox-include igraph_kautz -->
 <!-- doxrox-include igraph_extended_chordal_ring -->
-<!-- doxrox-include igraph_connect_neighborhood -->
 </section>
 
-<section><title>Games: Randomized Graph Generators</title>
+<section id="games-randomized-graph-generators"><title>Games: Randomized Graph Generators</title>
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->
@@ -55,7 +54,7 @@
 <!-- doxrox-include igraph_recent_degree_game -->
 <!-- doxrox-include igraph_barabasi_aging_game -->
 <!-- doxrox-include igraph_recent_degree_aging_game -->
-<!---doxrox-include igraph_lastcit_game -->
+<!-- doxrox-include igraph_lastcit_game -->
 <!-- doxrox-include igraph_cited_type_game -->
 <!-- doxrox-include igraph_citing_cited_type_game -->
 <!-- doxrox-include igraph_sbm_game -->
@@ -63,11 +62,9 @@
 <!-- doxrox-include igraph_hsbm_list_game -->
 <!-- doxrox-include igraph_dot_product_game -->
 <!-- doxrox-include igraph_tree_game -->
-<!-- doxrox-include igraph_sample_sphere_surface -->
-<!-- doxrox-include igraph_sample_sphere_volume -->
-<!-- doxrox-include igraph_sample_dirichlet -->
 <!-- doxrox-include igraph_correlated_game -->
 <!-- doxrox-include igraph_correlated_pair_game -->
+<!-- doxrox-include igraph_simple_interconnected_islands_game -->
 </section>
 
 </chapter>

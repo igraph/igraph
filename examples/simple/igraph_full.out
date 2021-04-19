@@ -1,0 +1,4 @@
+The undirected complete graph on 10 vertices has 45 edges.
+The directed complete graph on 10 vertices has 90 edges.
+The undirected complete graph on 10 vertices with self-loops has 55 edges.
+The directed complete graph on 10 vertices with self-loops has 100 edges.

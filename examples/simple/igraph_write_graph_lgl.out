@@ -1,0 +1,37 @@
+Output without isolates:
+# 0
+1
+2
+# 1
+2
+3
+# 2
+4
+# 3
+4
+
+Output with isolates:
+# 0
+1
+2
+# 1
+2
+3
+# 2
+4
+# 3
+4
+# 5
+# 6
+
+Output vertex and edge labels:
+# A
+B 3
+C 4
+# B
+C 5
+D 6
+# C
+E 7
+# D
+E 8

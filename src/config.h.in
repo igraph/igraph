@@ -1,0 +1,35 @@
+#ifndef IGRAPH_CONFIG_H
+#define IGRAPH_CONFIG_H
+
+#cmakedefine HAVE_EXPM1 1
+#cmakedefine HAVE_FMIN 1
+#cmakedefine HAVE_FINITE 1
+#cmakedefine HAVE_ISFINITE 1
+#cmakedefine HAVE_LOG2 1
+#cmakedefine HAVE_LOG1P 1
+#cmakedefine HAVE_RINT 1
+#cmakedefine HAVE_RINTF 1
+#cmakedefine HAVE_ROUND 1
+#cmakedefine HAVE_STPCPY 1
+#cmakedefine HAVE_STRCASECMP 1
+#cmakedefine HAVE__STRICMP 1
+#cmakedefine HAVE_STRDUP 1
+
+#cmakedefine HAVE_GLPK 1
+#cmakedefine HAVE_LIBXML 1
+
+#cmakedefine INTERNAL_BLAS 1
+#cmakedefine INTERNAL_LAPACK 1
+#cmakedefine INTERNAL_ARPACK 1
+#cmakedefine INTERNAL_GMP 1
+
+#define IGRAPH_F77_SAVE static @TLS_KEYWORD@
+#define IGRAPH_THREAD_LOCAL @TLS_KEYWORD@
+
+#define PACKAGE_VERSION "@PACKAGE_VERSION@"
+#define PACKAGE_VERSION_MAJOR @PACKAGE_VERSION_MAJOR@
+#define PACKAGE_VERSION_MINOR @PACKAGE_VERSION_MINOR@
+#define PACKAGE_VERSION_PATCH @PACKAGE_VERSION_PATCH@
+#define PACKAGE_VERSION_PRERELEASE "@PACKAGE_VERSION_PRERELEASE@"
+
+#endif

@@ -2,34 +2,17 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
-<!ENTITY tut_simple SYSTEM "../examples/doc/tut_simple.c">
 ]>
 
-<chapter id="igraph-tutorial">
+<chapter id="igraph-Tutorial">
 <title>Tutorial</title>
 
-<section><title>Lesson 1. Compiling programs using igraph.</title>
+<section id="tut-lesson-1"><title>Compiling programs using igraph</title>
 
 <para>
 The following short example program demonstrates the basic usage of 
 the <command>igraph</command> library.
-<programlisting>
-<![CDATA[#include <igraph.h>
-
-int main(void)
-{
-     igraph_integer_t diameter;
-     igraph_t graph;
-     igraph_rng_seed(igraph_rng_default(), 42);
-     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 1000, 5.0/1000,
-                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-     igraph_diameter(&graph, &diameter, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
-     printf("Diameter of a random graph with average degree 5: %d\n",
-             (int) diameter);
-     igraph_destroy(&graph);
-     return 0;
-}]]>
-</programlisting>
+<xi:include href="../examples/tutorial/tutorial1.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
 <para>
@@ -44,67 +27,129 @@ type. Fourth, the <link
 linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
-destroys it, ie. deallocates the memory associated to it.
+destroys it, i.e. deallocates the memory associated to it.
 </para>
 
 <para>
-For compiling this program you need a C compiler, if this is called 
-<command>gcc</command> and the previous code is saved in file
-<filename>igraph_test.c</filename>, you will need a command like this:
+For compiling this program you need a C compiler. Optionally,
+<ulink url="https://cmake.org">CMake</ulink> can be used to automate the compilation.
+</para>
+
+<section id="tut-lesson-1-compiling-with-cmake">
+<title>Compiling with CMake</title>
+
+<para>
+It is convenient to use CMake because it can automatically discover the
+necessary compilation flags on all operating systems. Many IDEs support
+CMake, and can work with CMake projects directly. To create a CMake project
+for this example program, create a file name <filename>CMakeLists.txt</filename> with the
+following contents:
+
 <programlisting>
-gcc igraph_test.c -I/usr/local/igraph -L/usr/local/lib -ligraph -o igraph_test
+cmake_minimum_required(VERSION 3.16)
+project(igraph_test C)
+
+find_package(igraph REQUIRED)
+
+add_executable(igraph_test igraph_test.c)
+target_link_libraries(igraph_test PUBLIC igraph::igraph)
+</programlisting>
+</para>
+
+<para>
+To compile the project, create a new directory called build, and switch to it:
+<programlisting>
+mkdir build
+cd build
+</programlisting>
+</para>
+
+<para>
+Run CMake to configure the project:
+<programlisting>
+cmake ..
+</programlisting>
+</para>
+
+<para>
+If igraph was installed at a non-standard location, specify its prefix
+using the <option>-DCMAKE_PREFIX_PATH=...</option> option. The prefix must be
+the same directory that was specified as the <option>CMAKE_INSTALL_PREFIX</option>
+when compiling igraph.
+</para>
+
+<para>
+If configuration has succeeded, build the program using
+<programlisting>
+cmake --build .
+</programlisting>
+</para>
+
+</section>
+
+<section id="tut-lesson-1-compiling-without-cmake">
+<title>Compiling without CMake</title>
+
+<para>
+On most Unix-like systems, the default C compiler is called <command>cc</command>.
+To compile the test program, you will need a command similar to the following:
+<programlisting>
+cc igraph_test.c -I/usr/local/include/igraph -L/usr/local/lib -ligraph -o igraph_test
 </programlisting>
 </para>
 
 <para>
 The exact form depends on where <command>igraph</command> was installed on your
-system. The directory after the <option>-I</option> switch is the one
-containing the <filename>igraph.h</filename> file, while the one
-following <option>-L</option> should contain the 
-library file itself, usually a file called
-<filename>libigraph.so</filename>, <filename>libigraph.a</filename> or
-<filename>igraph.dll</filename>. 
-It your system has the <command>pkg-config</command> utility you are
-likely to get the neccessary compile options by issuing the command
+system, whether it was compiled as a shared or static library, and the external
+libraries it was linked to. The directory after the <option>-I</option> switch
+is the one containing the <filename>igraph.h</filename> file, while the one
+following <option>-L</option> should contain the library file itself, usually a
+file called <filename>libigraph.a</filename> (static library on macOS and
+Linux), <filename>libigraph.so</filename> (shared library on Linux),
+<filename>libigraph.dylib</filename> (shared library on macOS),
+<filename>igraph.lib</filename> (static library on Windows) or
+<filename>igraph.dll</filename> (shared library on Windows). If
+<command>igraph</command> was compiled as a static library, it is also
+necessary to manually link to all of its dependencies.
+</para>
+
+<para>
+If your system has the <command>pkg-config</command> utility you are
+likely to get the necessary compile options by issuing the command
 <programlisting>
 pkg-config --libs --cflags igraph
 </programlisting>
-</para>
-
-<para>
-The executable can be run by simply typing its name like this:
+(if <command>igraph</command> was built as a shared library) or
 <programlisting>
-./igraph_test
+pkg-config --static --libs --cflags igraph
 </programlisting>
-on most systems. If you use dynamic linking and the <command>igraph</command>
-libraries are not at a standard place, you may need to set the
-<envar>LD_LIBRARY_PATH</envar> variable, the syntax depends on the
-shell use are using. In <command>bash</command> it goes like this:
-<programlisting>
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libs/igraph
-./igraph_test
-</programlisting>
-Here we assumed that the <command>igraph</command> library is installed in 
-<filename>/home/user/libs/igraph</filename>. Alternatively, you can use
-the <envar>LD_PRELOAD</envar> variable to preload the
-<command>igraph</command> library before invoking your program:
-<programlisting>
-LD_PRELOAD=/home/user/libs/igraph/libigraph.so ./igraph_test
-</programlisting>
-Please note that <envar>LD_PRELOAD</envar> and
-<envar>LD_LIBRARY_PATH</envar> are usually available only on
-Un*x-like systems. On Windows using Cygwin it is usually enough to set the
-<envar>PATH</envar> enviroment variable to include the folder in which
-the <command>igraph</command> library is installed, look for the 
-<filename>cygigraph-0.dll</filename> or similar file.
+(if <command>igraph</command> was built as a static library).
 </para>
 
 </section>
-<section><title>Lesson 2. Creating your first graphs.</title>
+
+<section id="tut-lesson-1-running-the-program">
+<title>Running the program</title>
+
+<para>
+On most systems, the executable can be run by simply typing its name like this:
+<programlisting>
+./igraph_test
+</programlisting>
+If you use dynamic linking and the <command>igraph</command>
+library is not in a standard place, you may need to add its location to the
+<envar>LD_LIBRARY_PATH</envar> (Linux), <envar>DYLD_LIBRARY_PATH</envar> (macOS)
+or <envar>PATH</envar> (Windows) environment variables.
+</para>
+
+</section>
+
+</section>
+<section id="tut-lesson-2"><title>Creating your first graphs</title>
 
 <para>
 The functions generating graph objects are called graph
-generators. Stochastic (=randomized) graph generators are called
+generators. Stochastic (i.e. randomized) graph generators are called
 <quote>games</quote>.
 </para>
 
@@ -112,9 +157,9 @@ generators. Stochastic (=randomized) graph generators are called
 <command>igraph</command> can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
-both. Eg. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
+both. E.g. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
 which (surprisingly) calculates
-shortest paths from a vertex to another vertices can calculate
+shortest paths from a vertex to other vertices can calculate
 directed or undirected paths.
 </para>
 
@@ -133,41 +178,7 @@ adds some random edges to it and calculates the average length of
 shortest paths between all pairs of vertices in the graph before and
 after adding the random edges. (The message is that some random edges
 can reduce path lengths a lot.)
-<programlisting>
-<![CDATA[#include <igraph.h>
-
-int main(void) {
-  igraph_real_t avg_path;
-  igraph_t graph;
-  igraph_vector_t dimvector;
-  igraph_vector_t edges;
-  int i;
-  
-  igraph_vector_init(&dimvector, 2);
-  VECTOR(dimvector)[0]=30;
-  VECTOR(dimvector)[1]=30;
-  igraph_lattice(&graph, &dimvector, 0, IGRAPH_UNDIRECTED, 0, 1);
-
-  igraph_rng_seed(igraph_rng_default(), 42);
-  igraph_vector_init(&edges, 20);
-  for (i=0; i<igraph_vector_size(&edges); i++) {
-    VECTOR(edges)[i] = rand() % (int)igraph_vcount(&graph);
-  }
-
-  igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
-  printf("Average path length (lattice):            %f\n", (double) avg_path);
-
-  igraph_add_edges(&graph, &edges, 0);
-  igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
-  printf("Average path length (randomized lattice): %f\n", (double) avg_path);
-  
-  igraph_vector_destroy(&dimvector);
-  igraph_vector_destroy(&edges);
-  igraph_destroy(&graph);
-
-  return 0;
-}]]>
-</programlisting>
+<xi:include href="../examples/tutorial/tutorial2.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
 <para>
@@ -176,20 +187,20 @@ This example illustrates some new points. <command>igraph</command> uses
 instead of plain C arrays. <type>igraph_vector_t</type> is superior to
 regular arrays in almost every sense. Vectors are created by the
 <link linkend="igraph_vector_init"><function>igraph_vector_init()</function></link>
-function and like graphs they should be destroyed if not 
+function and, like graphs, they should be destroyed if not 
 needed any more by calling 
 <link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on them. A vector can be indexed by the 
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). Vectors 
-can be resized, eg. most <command>igraph</command> functions returning the result in a
+can be resized, e.g. most <command>igraph</command> functions returning the result in a
 vector resize it to the size of the result.
 </para>
 
 <para>
 <link linkend="igraph_lattice"><function>igraph_lattice()</function></link>
 takes a vector argument specifying the dimensions of 
-the lattice, in this example we generate a 30x30 two dimensional
+the lattice. In this example we generate a 30x30 two dimensional
 lattice. See the documentation of
 <link linkend="igraph_lattice"><function>igraph_lattice()</function></link> in
 the reference manual for the other arguments.
@@ -219,66 +230,21 @@ between the same pair of vertices.
 <type>igraph_t</type> can of course
 represent loops and
 multiple edges, although some routines expect simple graphs,
-ie. graphs without loop and multiple edges, because for example some
+i.e. graphs without loop and multiple edges, because for example some
 structural properties are ill-defined for non-simple graphs. Loop
 edges can be removed by calling 
 <link linkend="igraph_simplify"><function>igraph_simplify()</function></link>.
 </para>
 
 </section>
-<section><title>Lesson 3. Calculating various properties of graphs.</title>
+<section id="tut-lesson-3"><title>Calculating various properties of graphs</title>
 <para>
 In our next example we will calculate various centrality measures in a
 friendship graph. The friendship graph is from the famous Zachary karate
 club study. (Web search on 'Zachary karate' if you want to know more about
 this.) Centrality measures quantify how central is the position of
 individual vertices in the graph.
-<programlisting>
-<![CDATA[#include <igraph.h>
-
-int main(void) {
-     igraph_t graph;
-     igraph_vector_t v;
-     igraph_vector_t result;
-     igraph_real_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
-                               0,10, 0,11, 0,12, 0,13, 0,17, 0,19, 0,21, 0,31,
-                               1, 2, 1, 3, 1, 7, 1,13, 1,17, 1,19, 1,21, 1,30,
-                               2, 3, 2, 7, 2,27, 2,28, 2,32, 2, 9, 2, 8, 2,13,
-                               3, 7, 3,12, 3,13, 4, 6, 4,10, 5, 6, 5,10, 5,16,
-                               6,16, 8,30, 8,32, 8,33, 9,33,13,33,14,32,14,33,
-                              15,32,15,33,18,32,18,33,19,33,20,32,20,33,
-                              22,32,22,33,23,25,23,27,23,32,23,33,23,29,
-                              24,25,24,27,24,31,25,31,26,29,26,33,27,33,
-                              28,31,28,33,29,32,29,33,30,32,30,33,31,32,31,33,
-                              32,33
-     };
-
-     igraph_vector_view(&v, edges, sizeof(edges)/sizeof(double));
-     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
-
-     igraph_vector_init(&result, 0);
-
-     igraph_degree(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
-                   IGRAPH_LOOPS);
-     printf("Maximum degree is      %10i, vertex %2i.\n",
-            (int)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
-
-     igraph_closeness(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
-                      /*weights=*/ 0, /*normalized=*/ 0);
-     printf("Maximum closeness is   %10f, vertex %2i.\n",
-             (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
-
-     igraph_betweenness(&graph, &result, igraph_vss_all(),
-                        IGRAPH_UNDIRECTED, /*weights=*/ 0, /*nobigint=*/ 1);
-     printf("Maximum betweenness is %10f, vertex %2i.\n",
-             (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
-
-     igraph_vector_destroy(&result);
-     igraph_destroy(&graph);
-
-     return 0;
-}]]>
-</programlisting>
+<xi:include href="../examples/tutorial/tutorial3.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
 <para>
@@ -305,7 +271,7 @@ it to be able to hold the result.
 The <constant>igraph_vss_all()</constant> argument tells the functions to
 calculate the property for every vertex in the graph, it is shorthand
 for a <emphasis>vertex selector</emphasis> (<type>igraph_vs_t</type>). 
-Vertex selectors help performing operations on a subset of vertices,
+Vertex selectors help to perform operations on a subset of vertices,
 you can read more about them in <link linkend="igraph-Iterators">one
 of the following chapters.</link>
 </para>

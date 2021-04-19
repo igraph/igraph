@@ -1,0 +1,294 @@
+/* -*- mode: C -*-  */
+/*
+   IGraph library.
+   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
+*/
+
+#include "igraph_types.h"
+#include "igraph_memory.h"
+#include "igraph_error.h"
+#include "config.h"
+
+#include <string.h>         /* memcpy & co. */
+#include <stdlib.h>
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_init
+ * \brief Initializes a stack.
+ *
+ * The initialized stack is always empty.
+ * \param s Pointer to an uninitialized stack.
+ * \param size The number of elements to allocate memory for.
+ * \return Error code.
+ *
+ * Time complexity: O(\p size).
+ */
+
+int FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long int size) {
+    long int alloc_size;
+    IGRAPH_ASSERT(s != NULL);
+    if (size < 0) {
+        size = 0;
+    }
+    alloc_size = size > 0 ? size : 1;
+    s->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
+    if (s->stor_begin == 0) {
+        IGRAPH_ERROR("stack init failed", IGRAPH_ENOMEM);
+    }
+    s->stor_end = s->stor_begin + alloc_size;
+    s->end = s->stor_begin;
+
+    return 0;
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_destroy
+ * \brief Destroys a stack object.
+ *
+ * Deallocate the memory used for a stack.
+ * It is possible to reinitialize a destroyed stack again by
+ * \ref igraph_stack_init().
+ * \param s The stack to destroy.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_stack, destroy)    (TYPE(igraph_stack)* s) {
+    IGRAPH_ASSERT(s != NULL);
+    if (s->stor_begin != 0) {
+        IGRAPH_FREE(s->stor_begin);
+        s->stor_begin = NULL;
+    }
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_reserve
+ * \brief Reserve memory.
+ *
+ * Reserve memory for future use. The actual size of the stack is
+ * unchanged.
+ * \param s The stack object.
+ * \param size The number of elements to reserve memory for. If it is
+ *     not bigger than the current size then nothing happens.
+ * \return Error code.
+ *
+ * Time complexity: should be around O(n), the new allocated size of
+ * the stack.
+ */
+
+int FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long int size) {
+    long int actual_size = FUNCTION(igraph_stack, size)(s);
+    BASE *tmp;
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+
+    if (size <= actual_size) {
+        return 0;
+    }
+
+    tmp = IGRAPH_REALLOC(s->stor_begin, (size_t) size, BASE);
+    if (tmp == 0) {
+        IGRAPH_ERROR("stack reserve failed", IGRAPH_ENOMEM);
+    }
+    s->stor_begin = tmp;
+    s->stor_end = s->stor_begin + size;
+    s->end = s->stor_begin + actual_size;
+
+    return 0;
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_empty
+ * \brief Decides whether a stack object is empty.
+ *
+ * \param s The stack object.
+ * \return Boolean, \c TRUE if the stack is empty, \c FALSE
+ * otherwise.
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_bool_t FUNCTION(igraph_stack, empty)      (TYPE(igraph_stack)* s) {
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s->end != NULL);
+    return s->stor_begin == s->end;
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_size
+ * \brief Returns the number of elements in a stack.
+ *
+ * \param s The stack object.
+ * \return The number of elements in the stack.
+ *
+ * Time complexity: O(1).
+ */
+
+long int FUNCTION(igraph_stack, size)       (const TYPE(igraph_stack)* s) {
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    return s->end - s->stor_begin;
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_clear
+ * \brief Removes all elements from a stack.
+ *
+ * \param s The stack object.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_stack, clear)      (TYPE(igraph_stack)* s) {
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    s->end = s->stor_begin;
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_push
+ * \brief Places an element on the top of a stack.
+ *
+ * The capacity of the stack is increased, if needed.
+ * \param s The stack object.
+ * \param elem The element to push.
+ * \return Error code.
+ *
+ * Time complexity: O(1) is no reallocation is needed, O(n)
+ * otherwise, but it is ensured that n push operations are performed
+ * in O(n) time.
+ */
+
+int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    if (s->end == s->stor_end) {
+        /* full, allocate more storage */
+
+        BASE *bigger = NULL, *old = s->stor_begin;
+
+        bigger = IGRAPH_CALLOC(2 * FUNCTION(igraph_stack, size)(s), BASE);
+        if (bigger == 0) {
+            IGRAPH_ERROR("stack push failed", IGRAPH_ENOMEM);
+        }
+        memcpy(bigger, s->stor_begin,
+               (size_t) FUNCTION(igraph_stack, size)(s)*sizeof(BASE));
+
+        s->end        = bigger + (s->stor_end - s->stor_begin);
+        s->stor_end   = bigger + 2 * (s->stor_end - s->stor_begin);
+        s->stor_begin = bigger;
+
+        *(s->end) = elem;
+        (s->end) += 1;
+
+        IGRAPH_FREE(old);
+    } else {
+        *(s->end) = elem;
+        (s->end) += 1;
+    }
+    return 0;
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_pop
+ * \brief Removes and returns an element from the top of a stack.
+ *
+ * The stack must contain at least one element, call \ref
+ * igraph_stack_empty() to make sure of this.
+ * \param s The stack object.
+ * \return The removed top element.
+ *
+ * Time complexity: O(1).
+ */
+
+BASE FUNCTION(igraph_stack, pop)        (TYPE(igraph_stack)* s) {
+
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s->end != NULL);
+    IGRAPH_ASSERT(s->end != s->stor_begin);
+
+    (s->end)--;
+
+    return *(s->end);
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_top
+ * \brief Query top element.
+ *
+ * Returns the top element of the stack, without removing it.
+ * The stack must be non-empty.
+ * \param s The stack.
+ * \return The top element.
+ *
+ * Time complexity: O(1).
+ */
+
+BASE FUNCTION(igraph_stack, top)        (const TYPE(igraph_stack)* s) {
+
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s->end != NULL);
+    IGRAPH_ASSERT(s->end != s->stor_begin);
+
+    return *(s->end - 1);
+}
+
+#if defined (OUT_FORMAT)
+#ifndef USING_R
+
+int FUNCTION(igraph_stack, print)(const TYPE(igraph_stack) *s) {
+    long int i, n = FUNCTION(igraph_stack, size)(s);
+    if (n != 0) {
+        printf(OUT_FORMAT, s->stor_begin[0]);
+    }
+    for (i = 1; i < n; i++) {
+        printf(" " OUT_FORMAT, s->stor_begin[i]);
+    }
+    printf("\n");
+    return 0;
+}
+#endif
+
+int FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack) *s, FILE *file) {
+    long int i, n = FUNCTION(igraph_stack, size)(s);
+    if (n != 0) {
+        fprintf(file, OUT_FORMAT, s->stor_begin[0]);
+    }
+    for (i = 1; i < n; i++) {
+        fprintf(file, " " OUT_FORMAT, s->stor_begin[i]);
+    }
+    fprintf(file, "\n");
+    return 0;
+}
+
+#endif
+

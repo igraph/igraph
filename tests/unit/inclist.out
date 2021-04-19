@@ -1,0 +1,256 @@
+Testing loop edge elimination in undirected graph
+
+Loops eliminated: {
+  0: ( 0 5 1 7 )
+  1: ( 0 2 )
+  2: ( 2 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+Loops listed once: {
+  0: ( 0 5 1 7 )
+  1: ( 0 2 )
+  2: ( 2 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+Loops listed twice: {
+  0: ( 0 5 1 7 )
+  1: ( 0 2 )
+  2: ( 2 3 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 8 11 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+============================================================
+
+Testing lazy loop edge elimination in undirected graph
+
+Loops eliminated: {
+  0: ( 0 5 1 7 )
+  1: ( 0 2 )
+  2: ( 2 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+Loops listed once: {
+  0: ( 0 5 1 7 )
+  1: ( 0 2 )
+  2: ( 2 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+Loops listed twice: {
+  0: ( 0 5 1 7 )
+  1: ( 0 2 )
+  2: ( 2 3 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 8 11 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+============================================================
+
+Testing loop edge elimination in directed graph
+
+In-edges, loops eliminated: {
+  0: ( 5 7 )
+  1: ( 0 )
+  2: ( 2 )
+  3: ( 1 4 )
+  4: ( 6 )
+  5: ( 9 12 )
+  6: ( 10 )
+}
+
+In-edges, loops listed once: {
+  0: ( 5 7 )
+  1: ( 0 )
+  2: ( 2 3 )
+  3: ( 1 4 )
+  4: ( 6 11 8 )
+  5: ( 9 12 )
+  6: ( 10 )
+}
+
+In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given: {
+  0: ( 5 7 )
+  1: ( 0 )
+  2: ( 2 3 )
+  3: ( 1 4 )
+  4: ( 6 11 8 )
+  5: ( 9 12 )
+  6: ( 10 )
+}
+
+Out-edges, loops eliminated: {
+  0: ( 0 1 )
+  1: ( 2 )
+  2: ( 4 )
+  3: ( 5 6 )
+  4: ( 7 9 10 )
+  5: ( )
+  6: ( 12 )
+}
+
+Out-edges, loops listed once: {
+  0: ( 0 1 )
+  1: ( 2 )
+  2: ( 3 4 )
+  3: ( 5 6 )
+  4: ( 7 11 8 9 10 )
+  5: ( )
+  6: ( 12 )
+}
+
+Out-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given: {
+  0: ( 0 1 )
+  1: ( 2 )
+  2: ( 3 4 )
+  3: ( 5 6 )
+  4: ( 7 11 8 9 10 )
+  5: ( )
+  6: ( 12 )
+}
+
+In- and out-edges, loops eliminated: {
+  0: ( 0 1 5 7 )
+  1: ( 0 2 )
+  2: ( 2 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+In- and out-edges, loops listed once: {
+  0: ( 0 1 5 7 )
+  1: ( 0 2 )
+  2: ( 2 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+In- and out-edges, loops listed twice: {
+  0: ( 0 1 5 7 )
+  1: ( 0 2 )
+  2: ( 2 3 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 11 8 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+============================================================
+
+Testing lazy loop edge elimination in directed graph
+
+In-edges, loops eliminated: {
+  0: ( 5 7 )
+  1: ( 0 )
+  2: ( 2 )
+  3: ( 1 4 )
+  4: ( 6 )
+  5: ( 9 12 )
+  6: ( 10 )
+}
+
+In-edges, loops listed once: {
+  0: ( 5 7 )
+  1: ( 0 )
+  2: ( 2 3 )
+  3: ( 1 4 )
+  4: ( 6 11 8 )
+  5: ( 9 12 )
+  6: ( 10 )
+}
+
+In-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given: {
+  0: ( 5 7 )
+  1: ( 0 )
+  2: ( 2 3 )
+  3: ( 1 4 )
+  4: ( 6 11 8 )
+  5: ( 9 12 )
+  6: ( 10 )
+}
+
+Out-edges, loops eliminated: {
+  0: ( 0 1 )
+  1: ( 2 )
+  2: ( 4 )
+  3: ( 5 6 )
+  4: ( 7 9 10 )
+  5: ( )
+  6: ( 12 )
+}
+
+Out-edges, loops listed once: {
+  0: ( 0 1 )
+  1: ( 2 )
+  2: ( 3 4 )
+  3: ( 5 6 )
+  4: ( 7 11 8 9 10 )
+  5: ( )
+  6: ( 12 )
+}
+
+Out-edges, loops listed once even if IGRAPH_LOOPS_TWICE is given: {
+  0: ( 0 1 )
+  1: ( 2 )
+  2: ( 3 4 )
+  3: ( 5 6 )
+  4: ( 7 11 8 9 10 )
+  5: ( )
+  6: ( 12 )
+}
+
+In- and out-edges, loops eliminated: {
+  0: ( 0 1 5 7 )
+  1: ( 0 2 )
+  2: ( 2 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+In- and out-edges, loops listed once: {
+  0: ( 0 1 5 7 )
+  1: ( 0 2 )
+  2: ( 2 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+In- and out-edges, loops listed twice: {
+  0: ( 0 1 5 7 )
+  1: ( 0 2 )
+  2: ( 2 3 3 4 )
+  3: ( 5 1 4 6 )
+  4: ( 7 6 11 11 8 8 9 10 )
+  5: ( 9 12 )
+  6: ( 10 12 )
+}
+
+============================================================
+

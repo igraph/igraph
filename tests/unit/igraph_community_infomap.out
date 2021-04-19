@@ -1,0 +1,21 @@
+# Two triangles connected by one edge
+Codelength: 2.51787 (in 2 modules)
+Membership: 0 0 0 1 1 1 
+# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)
+Codelength: 2.94884 (in 2 modules)
+Membership: 0 0 0 0 1 1 1 1 
+# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)
+Codelength: 2.96655 (in 2 modules)
+Membership: 0 1 0 0 0 1 1 1 
+# Zachary Karate club
+Codelength: 4.60606 (in 3 modules)
+Membership: 0 0 0 0 1 1 1 0 2 0 1 0 0 0 2 2 1 0 2 0 2 0 2 2 2 2 2 2 2 2 2 2 2 2 
+# Flow (from infomap_dir.tgz)
+Codelength: 3.32773 (in 4 modules)
+Membership: 0 0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 
+# MultiphysChemBioEco40W_weighted_dir.net (from infomap_dir.tgz)
+Codelength: 3.87095 (in 5 modules)
+Membership: 0 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 4 3 3 
+# Wiktionary english verbs (synonymy 2008)
+|V|=7339 |E|=8293 directed=0
+Codelength OK.

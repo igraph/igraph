@@ -1,0 +1,45 @@
+No vertices, transitivity zero, NULL weights:
+( )
+
+No vertices, transitivity zero, NULL weights, no vs:
+( )
+
+No vertices, transitivity zero, no weights:
+( )
+
+No vertices, transitivity zero, no weights, no vs:
+( )
+
+No vertices, transitivity NAN:
+( )
+
+No vertices, transitivity NAN, no vs:
+( )
+
+One vertex, transitivity zero:
+( 0 )
+
+One vertex, transitivity NaN:
+( NaN )
+
+One vertex, transitivity zero, vs one:
+( 0 )
+
+One vertex, transitivity NaN, vs one:
+( NaN )
+
+Simple graph, NULL weights, transitivity NAN:
+Warning: No weights given for Barrat's transitivity, unweighted version is used.
+( 1 0.666667 0.666667 0.333333 NaN NaN )
+
+Simple graph, with weights, transitivity NAN:
+( 1 0.75 0.625 0.277778 NaN NaN )
+
+Simple graph, with weights, transitivity zero:
+( 1 0.75 0.625 0.277778 0 0 )
+
+Simple graph, with weights, transitivity zero, vss none:
+( )
+
+Wrong weight length, vss all:
+Wrong weight length, vss none:

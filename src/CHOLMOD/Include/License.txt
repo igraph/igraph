@@ -1,8 +1,0 @@
-CHOLMOD/Include/* files.
-Copyright (C) 2005-2006, either Univ. of Florida or T. Davis,
-depending on the file.
-
-Refer to each include file in this directory; each file is licensed
-separately, according to the Module for which it contains definitions
-and prototypes.
-

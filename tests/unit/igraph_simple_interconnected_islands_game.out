@@ -1,0 +1,43 @@
+No islands:
+directed: false
+vcount: 0
+edges: {
+}
+One island, no edges:
+directed: false
+vcount: 4
+edges: {
+}
+One island, full graph:
+directed: false
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 2
+1 3
+2 3
+}
+Two islands, full graphs, no connections between islands:
+directed: false
+vcount: 8
+edges: {
+0 1
+0 2
+0 3
+1 2
+1 3
+2 3
+4 5
+4 6
+4 7
+5 6
+5 7
+6 7
+}
+Three islands, full graphs, 20 connections between islands.
+Negative number of islands.
+Negative island size.
+Probability out of range.
+Negative number of edges between islands.

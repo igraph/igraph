@@ -7,31 +7,31 @@
 <section id="igraph-Progress">
 <title>Progress handlers</title>
 
-<section>
+<section id="about-progress-handlers">
 <!-- doxrox-include about_progress_handlers -->
 </section>
 
-<section><title>Setting up progress handlers</title>
+<section id="setting-up-progress-handlers"><title>Setting up progress handlers</title>
 <!-- doxrox-include igraph_progress_handler_t -->
 <!-- doxrox-include igraph_set_progress_handler -->
 <!-- doxrox-include igraph_progress_handler_stderr -->
 </section>
 
-<section><title>Invoking the progress handler</title>
+<section id="invoking-the-progress-handler"><title>Invoking the progress handler</title>
 <!-- doxrox-include IGRAPH_PROGRESS -->
 <!-- doxrox-include igraph_progress -->
 <!-- doxrox-include igraph_progressf -->
 </section>
 
-<section>
+<section id="writing-progress-handlers">
 <!-- doxrox-include writing_progress_handlers -->
 </section>
 
-<section>
+<section id="functions-with-progress">
 <!-- doxrox-include igraph_functions_with_progress -->
 </section>
 
-<section>
+<section id="progress-and-threads">
 <!-- doxrox-include progress_and_threads -->
 </section>
 

@@ -1,24 +1,19 @@
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 #ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
+    #define __BEGIN_DECLS extern "C" {
+    #define __END_DECLS }
 #else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
+    #define __BEGIN_DECLS /* empty */
+    #define __END_DECLS /* empty */
 #endif
 
-#undef DECLDIR
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
+/* This is to eliminate gcc warnings about unused parameters */
+#define IGRAPH_UNUSED(x) (void)(x)
+
+/* Include the definition of macros controlling symbol visibility */
+#include "igraph_export.h"
+
+/* Used instead of IGRAPH_EXPORT with functions that need to be tested,
+ * but are not part of the public API. */
+#define IGRAPH_PRIVATE_EXPORT IGRAPH_EXPORT

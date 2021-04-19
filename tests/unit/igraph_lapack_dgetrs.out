@@ -1,0 +1,86 @@
+Checking empty matrices:
+LU matrix:
+Pivot vector:
+
+B matrix:
+Returned matrix:
+
+Checking 3x3 matrix:
+LU matrix:
+7 8 9
+0.285714 -0.285714 0.428571
+0.142857 0.5 -0.5
+Pivot vector:
+1 2 3
+B matrix:
+1
+1
+1
+Returned matrix:
+6
+-4
+-1
+
+Checking transpose and pivot:
+LU matrix:
+9 3 1
+0.888889 -0.666667 0.111111
+0.777778 0.5 0.166667
+Pivot vector:
+3 2 3
+B matrix:
+1
+1
+1
+Returned matrix:
+6
+-4
+-1
+
+Checking 2x3 matrix, expected to fail:
+LU matrix:
+4 5 6
+0.25 0.75 1.5
+Pivot vector:
+2 2
+B matrix:
+1
+1
+
+Checking singular matrix, this gives random output, so we just check for memory problems.
+
+Checking wrong size of B matrix, should fail:
+LU matrix:
+7 8 9
+0.285714 -0.285714 0.428571
+0.142857 0.5 -0.5
+Pivot vector:
+1 2 3
+B matrix:
+1
+1
+
+Checking nonexisting pivots, should fail:
+LU matrix:
+7 8 9
+0.285714 -0.285714 0.428571
+0.142857 0.5 -0.5
+Pivot vector:
+5 6 7
+B matrix:
+1
+1
+1
+
+Checking too few pivots, should fail:
+LU matrix:
+7 8 9
+0.285714 -0.285714 0.428571
+0.142857 0.5 -0.5
+Pivot vector:
+
+B matrix:
+1
+1
+1
+

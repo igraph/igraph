@@ -1,0 +1,39 @@
+Leiden found 2 clusters using modularity, quality is 0.4524.
+Membership: 0 0 0 0 0 1 1 1 1 1
+
+Leiden found 2 clusters using modularity, quality is 0.4524.
+Membership: 0 0 0 0 0 1 1 1 1 1
+
+Leiden found 2 clusters using modularity, quality is 0.1797.
+Membership: 0 0 1 1 1 1
+
+Leiden found 2 clusters using modularity, quality is 0.1709.
+Membership: 0 0 0 1 1 1
+
+Leiden found 4 clusters using modularity, quality is 0.4188.
+Membership: 0 0 0 0 1 1 1 0 2 0 1 0 0 0 2 2 1 0 2 0 2 0 2 3 3 3 2 3 3 2 2 3 2 2
+
+Leiden found 2 clusters using CPM (resolution parameter=0.06), quality is 0.6495.
+Membership: 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1
+
+Leiden found 3 clusters using modularity, quality is 0.5000.
+Membership: 0 0 0 0 1 1 1 1 2
+
+Leiden found 4 clusters using modularity, quality is 0.5450.
+Membership: 0 0 0 0 0 1 1 1 1 1 2 2 2 3 3 3 3 2 2 2
+
+Leiden found 2 clusters using CPM (resolution parameter=0.05), quality is 0.7500.
+Membership: 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1
+
+Leiden found 10 clusters using modularity, quality is nan.
+Membership: 0 1 2 3 4 5 6 7 8 9
+
+Leiden found 3 clusters using CPM (resolution parameter=0.40), quality is 0.1000.
+Membership: 0 0 1 1 2 2
+
+Leiden found 3 clusters using CPM (resolution parameter=0.40), quality is 0.5500.
+Membership: 0 0 1 1 2 2
+
+Leiden found 2 clusters using modularity, quality is 0.5000.
+Membership: 0 1
+

@@ -7,11 +7,11 @@
 <chapter id="igraph-SCG">
 <title>Spectral Coarse Graining</title>
 
-<section><title>Introduction</title>
+<section id="about-scg"><title>Introduction</title>
 <!-- doxrox-include about_scg -->
 </section>
 
-<section><title>SCG functions</title>
+<section id="scg-functions"><title>SCG functions</title>
 <!-- doxrox-include igraph_scg_adjacency -->
 <!-- doxrox-include igraph_scg_stochastic -->
 <!-- doxrox-include igraph_scg_laplacian -->

@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -24,8 +24,8 @@
 #ifndef IGRAPH_INTERRUPT_H
 #define IGRAPH_INTERRUPT_H
 
-#include "igraph_error.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 
 __BEGIN_DECLS
 
@@ -72,7 +72,7 @@ __BEGIN_DECLS
  * interface writers, because usually this is the only way to allow handling
  * of Ctrl-C and similar keypresses properly.
  * </para>
- * <para> 
+ * <para>
  * Your interruption handler will be called regularly during long operations
  * (so it is not guaranteed to be called during operations which tend to be
  * short, like adding single edges). An interruption handler accepts no
@@ -99,9 +99,9 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_interruption_handler_t
- * 
+ *
  * This is the type of the interruption handler functions.
- * 
+ *
  * \param data reserved for possible future use
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
@@ -112,16 +112,16 @@ typedef int igraph_interruption_handler_t (void* data);
  * \function igraph_allow_interruption
  *
  * This is the function which is called (usually via the
- * \ref IGRAPH_INTERRUPTION macro) if \a igraph is checking for interruption
+ * \ref IGRAPH_ALLOW_INTERRUPTION macro) if \a igraph is checking for interruption
  * requests.
  *
  * \param data reserved for possible future use, now it is always \c NULL
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-DECLDIR int igraph_allow_interruption(void* data);
+IGRAPH_EXPORT int igraph_allow_interruption(void* data);
 
-DECLDIR igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
+IGRAPH_EXPORT igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
 
 __END_DECLS
 

@@ -1,0 +1,47 @@
+No vertices:
+No edges:
+[      NaN      NaN      NaN
+       NaN      NaN      NaN
+       NaN      NaN      NaN ]
+Triangle with no resolution should give the adjacency matrix:
+[        0        1        1
+         1        0        1
+         1        1        0 ]
+Triangle and point with self-loop, undirected :
+[     -0.5      0.5      0.5     -0.5
+       0.5     -0.5      0.5     -0.5
+       0.5      0.5     -0.5     -0.5
+      -0.5     -0.5     -0.5      1.5 ]
+Triangle and point with self-loop, directed, but direction ignored:
+[     -0.5      0.5      0.5     -0.5
+       0.5     -0.5      0.5     -0.5
+       0.5      0.5     -0.5     -0.5
+      -0.5     -0.5     -0.5      1.5 ]
+Triangle and point with self-loop, directed:
+[        0      0.5        0     -0.5
+         0    -0.25      0.5    -0.25
+         0        0        0        0
+         0    -0.25     -0.5     0.75 ]
+Triangle with weights 0, 1, 2:
+[ -0.166667 -0.333333      0.5
+  -0.333333 -0.666667        1
+       0.5        1     -1.5 ]
+Triangle with weights 0, -1, -2:
+[ 0.166667 0.333333     -0.5
+  0.333333 0.666667       -1
+      -0.5       -1      1.5 ]
+Directed triangle with weights 0, 1, 2:
+[        0        0        0
+         0        0        0
+         0        0        0 ]
+Triangle with weights -1, 0, 1 will cause divisions by zero:
+[     -Inf      NaN      Inf
+       NaN      NaN      NaN
+       Inf      NaN     -Inf ]
+Comparison with modularity:
+[     -0.7     0.86      1.3        0    -0.56
+      -0.7    -0.14      2.3        0    -0.56
+         0        0        0        0        0
+  -0.933333 -0.186667 -0.933333        0  3.25333
+   3.83333 -0.233333 -1.16667        0 -0.933333 ]
+Modularity: 0.349333, modularity via matrix: 0.349333

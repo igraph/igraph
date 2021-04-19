@@ -1,0 +1,15 @@
+No vertices:
+directed: true
+vcount: 0
+edges: {
+}
+No edges, undirected:
+directed: false
+vcount: 10
+edges: {
+}
+Checking some basic outputs.
+Negative number of vertices.
+Negative number of edges.
+Exponent out too low.
+Exponent in too low but not negative.

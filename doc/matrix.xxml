@@ -7,29 +7,29 @@
 <section id="igraph-Matrices">
 <title>Matrices</title>
 
-<section>
+<section id="about-matrix">
 <!-- doxrox-include about_igraph_matrix_t_objects -->
 </section>
 
-<section>
+<section id="matrix-constructor-and-destructor">
 <!-- doxrox-include igraph_matrix_constructor_and_destructor -->
 <!-- doxrox-include igraph_matrix_init -->
 <!-- doxrox-include igraph_matrix_copy -->
 <!-- doxrox-include igraph_matrix_destroy -->
 </section>
 
-<section><title>Initializing elements</title>
+<section id="matrix-initializing-elements"><title>Initializing elements</title>
 <!-- doxrox-include igraph_matrix_null -->
 <!-- doxrox-include igraph_matrix_fill -->
 </section>
 
-<section><title>Copying matrices</title>
+<section id="copying-matrices"><title>Copying matrices</title>
 <!-- doxrox-include igraph_matrix_copy_to -->
 <!-- doxrox-include igraph_matrix_update -->
 <!-- doxrox-include igraph_matrix_swap -->
 </section>
 
-<section>
+<section id="matrix-accessing-elements">
 <!-- doxrox-include igraph_matrix_accessing_elements -->
 <!-- doxrox-include MATRIX -->
 <!-- doxrox-include igraph_matrix_e -->
@@ -37,7 +37,7 @@
 <!-- doxrox-include igraph_matrix_set --> 
 </section>
 
-<section><title>Operations on rows and columns</title>
+<section id="operations-on-rows-and-columns"><title>Operations on rows and columns</title>
 <!--doxrox-include igraph_matrix_get_row -->
 <!--doxrox-include igraph_matrix_get_col -->
 <!--doxrox-include igraph_matrix_set_row -->
@@ -49,8 +49,7 @@
 <!--doxrox-include igraph_matrix_select_rows_cols -->
 </section>
 
-<section>
-<title>Matrix operations</title>
+<section id="matrix-operations"><title>Matrix operations</title>
 <!-- doxrox-include igraph_matrix_add_constant -->
 <!-- doxrox-include igraph_matrix_scale -->
 <!-- doxrox-include igraph_matrix_add -->
@@ -64,7 +63,7 @@
 <!-- doxrox-include igraph_matrix_transpose -->
 </section>
 
-<section><title>Matrix comparisons</title>
+<section id="matrix-comparisons"><title>Matrix comparisons</title>
 <!-- doxrox-include igraph_matrix_all_e -->
 <!-- doxrox-include igraph_matrix_all_l -->
 <!-- doxrox-include igraph_matrix_all_g -->
@@ -72,14 +71,12 @@
 <!-- doxrox-include igraph_matrix_all_ge -->
 </section>
 
-<section>
-<title>Combining matrices</title>
+<section id="combining-matrices"><title>Combining matrices</title>
 <!-- doxrox-include igraph_matrix_rbind -->
 <!-- doxrox-include igraph_matrix_cbind -->
 </section>
 
-<section>
-<title>Finding minimum and maximum</title>
+<section id="matrix-finding-minimum-and-maximum"><title>Finding minimum and maximum</title>
 <!-- doxrox-include igraph_matrix_min -->
 <!-- doxrox-include igraph_matrix_max -->
 <!-- doxrox-include igraph_matrix_which_min -->
@@ -88,8 +85,7 @@
 <!-- doxrox-include igraph_matrix_which_minmax -->
 </section>
 
-<section>
-<title>Matrix properties</title>
+<section id="matrix-properties"><title>Matrix properties</title>
 <!-- doxrox-include igraph_matrix_empty -->
 <!-- doxrox-include igraph_matrix_isnull -->
 <!-- doxrox-include igraph_matrix_size -->
@@ -100,13 +96,12 @@
 <!-- doxrox-include igraph_matrix_maxdifference -->
 </section>
 
-<section><title>Searching for elements</title>
+<section id="matrix-searching-for-elements"><title>Searching for elements</title>
 <!-- doxrox-include igraph_matrix_contains -->
 <!-- doxrox-include igraph_matrix_search -->
 </section>
 
-<section>
-<title>Resizing operations</title>
+<section id="matrix-resizing-operations"><title>Resizing operations</title>
 <!-- doxrox-include igraph_matrix_resize -->
 <!-- doxrox-include igraph_matrix_resize_min -->
 <!-- doxrox-include igraph_matrix_add_rows -->
@@ -116,4 +111,3 @@
 </section>
 
 </section>
-
