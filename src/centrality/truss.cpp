@@ -47,37 +47,37 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   igraph_vector_int_t triangles, support;
   igraph_vector_t eid, unpacked_triangles;
 
+  /* Manage the stack to make it memory safe */
+  IGRAPH_VECTOR_INT_INIT_FINALLY(&support, igraph_ecount(graph));
+  IGRAPH_VECTOR_INIT_FINALLY(&eid, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&unpacked_triangles, 0);
+  IGRAPH_VECTOR_INT_INIT_FINALLY(&triangles, 0);  // will be resized
+
   // List the triangles as vertex triplets.
-  igraph_vector_int_init(&triangles, 0);  // will be resized
-  igraph_list_triangles(graph, &triangles);
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &triangles);
+  IGRAPH_CHECK(igraph_list_triangles(graph, &triangles));
 
   // Unpack the triangles from vertex list to edge list.
   long int num_triangles = igraph_vector_int_size(&triangles);
-  igraph_vector_init(&unpacked_triangles, 2 * num_triangles);
-  unpack(&triangles, &unpacked_triangles);
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &unpacked_triangles);
+  IGRAPH_CHECK(igraph_vector_resize(&unpacked_triangles, 2 * num_triangles));
+  IGRAPH_CHECK(unpack(&triangles, &unpacked_triangles));
   igraph_vector_int_destroy(&triangles);
   IGRAPH_FINALLY_CLEAN(1);
 
   // Get the edge ids of the unpacked triangles. Note: a given eid can occur
   // multiple times in this list if it is in multiple triangles.
-  igraph_vector_init(&eid, num_triangles);
-  igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1);
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &eid);
+  IGRAPH_CHECK(igraph_vector_resize(&eid, num_triangles));
+  IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1));
   igraph_vector_destroy(&unpacked_triangles);
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the support of the edges.
-  igraph_vector_int_init(&support, igraph_ecount(graph));
-  compute_support(&eid, &support);
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &support);
+  IGRAPH_CHECK(compute_support(&eid, &support));
   igraph_vector_destroy(&eid);
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the truss of the edges.
-  igraph_vector_int_init(truss, igraph_ecount(graph));
-  trussness(graph, &support, truss);
+  IGRAPH_CHECK(igraph_vector_int_init(truss, igraph_ecount(graph)));
+  IGRAPH_CHECK(trussness(graph, &support, truss));
   igraph_vector_int_destroy(&support);
   IGRAPH_FINALLY_CLEAN(1);
 
