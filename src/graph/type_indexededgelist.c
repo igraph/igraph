@@ -747,10 +747,15 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
 
 int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
-#define IGRAPH_I_NEIGHBORS_IF_SKIP(vertex) \
-    if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) || \
-            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)  || \
-            (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added))
+#define IGRAPH_I_NEIGHBORS_SKIP(vertex, n)                                             \
+    if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
+            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode) ||  \
+            (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added)) {                \
+        length -= n;                                                                   \
+        continue;                                                                      \
+    } else {                                                                           \
+        last_added = vertex;                                                           \
+    }
 
     long int length = 0, idx = 0;
     long int i, j;
@@ -812,12 +817,8 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     igraph_real_t to = VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
-                    IGRAPH_I_NEIGHBORS_IF_SKIP(to) {
-                        length--;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(to, 1);
                     VECTOR(*neis)[idx++] = to;
-                    last_added = to;
                 }
             }
         }
@@ -834,12 +835,8 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     igraph_real_t from = VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
-                    IGRAPH_I_NEIGHBORS_IF_SKIP(from) {
-                        length--;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(from, 1);
                     VECTOR(*neis)[idx++] = from;
-                    last_added = from;
                 }
             }
         }
@@ -892,29 +889,17 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 n2 = (long int) VECTOR(graph->from)[eid2];
                 if (n1 < n2) {
                     i1++;
-                    IGRAPH_I_NEIGHBORS_IF_SKIP(n1) {
-                        length--;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(n1, 1);
                     VECTOR(*neis)[idx++] = n1;
-                    last_added = n1;
                 } else if (n1 > n2) {
                     i2++;
-                    IGRAPH_I_NEIGHBORS_IF_SKIP(n2) {
-                        length--;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(n2, 1);
                     VECTOR(*neis)[idx++] = n2;
-                    last_added = n2;
                 } else {
                     i1++;
                     i2++;
-                    IGRAPH_I_NEIGHBORS_IF_SKIP(n1) {
-                        length-=2;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(n1, 2);
                     VECTOR(*neis)[idx++] = n1;
-                    last_added = n1;
                     if ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
                          (multiple == IGRAPH_NO_MULTIPLE)) {
                          length--;
@@ -927,23 +912,15 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
             while (i1 < j1) {
                 eid1 = (long int) VECTOR(graph->oi)[i1++];
                 igraph_real_t to = (long int) VECTOR(graph->to)[eid1];
-                IGRAPH_I_NEIGHBORS_IF_SKIP(to) {
-                    length--;
-                    continue;
-                }
+                IGRAPH_I_NEIGHBORS_SKIP(to, 1);
                 VECTOR(*neis)[idx++] = to;
-                last_added = to;
             }
 
             while (i2 < j2) {
                 eid2 = (long int) VECTOR(graph->ii)[i2++];
                 igraph_real_t from =  (long int) VECTOR(graph->from)[eid2];
-                IGRAPH_I_NEIGHBORS_IF_SKIP(from) {
-                    length--;
-                    continue;
-                }
+                IGRAPH_I_NEIGHBORS_SKIP(from, 1);
                 VECTOR(*neis)[idx++] = from;
-                last_added = from;
             }
 
         }
@@ -951,7 +928,6 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
     IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
     return IGRAPH_SUCCESS;
-#undef IGRAPH_I_NEIGHBORS_IF_SKIP
 }
 /**
  * \ingroup internal
@@ -1805,10 +1781,6 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer
 
 int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
-#define IGRAPH_I_INCIDENT_IF_SKIP(vertex) \
-    if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) || \
-            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)  || \
-            (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added))
 
     long int length = 0, idx = 0;
     long int i, j;
@@ -1861,12 +1833,8 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     long int edge = VECTOR(graph->oi)[i];
                     igraph_real_t other = VECTOR(graph->to)[edge];
-                    IGRAPH_I_INCIDENT_IF_SKIP(other) {
-                        length--;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(other, 1);
                     VECTOR(*eids)[idx++] = edge;
-                    last_added = other;
                 }
             }
         }
@@ -1883,12 +1851,8 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                 for (i = (long int) VECTOR(graph->is)[node]; i < j; i++) {
                     long int edge = VECTOR(graph->ii)[i];
                     igraph_real_t other = VECTOR(graph->from)[edge];
-                    IGRAPH_I_INCIDENT_IF_SKIP(other) {
-                        length--;
-                        continue;
-                    }
+                    IGRAPH_I_NEIGHBORS_SKIP(other, 1);
                     VECTOR(*eids)[idx++] = edge;
-                    last_added = other;
                 }
 
             }
@@ -1934,67 +1898,46 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                 n1 = (long int) VECTOR(graph->to)[eid1];
                 n2 = (long int) VECTOR(graph->from)[eid2];
                 if (n1 < n2) {
-                    IGRAPH_I_INCIDENT_IF_SKIP(n1) {
-                        length--;
-                        i1++;
-                        continue;
-                    }
-                    VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i1++];
-                    last_added = n1;
+                    i1++;
+                    IGRAPH_I_NEIGHBORS_SKIP(n1, 1);
+                    VECTOR(*eids)[idx++] = eid1;
                 } else if (n1 > n2) {
-                    IGRAPH_I_INCIDENT_IF_SKIP(n2) {
-                        length--;
-                        i2++;
-                        continue;
-                    }
-                    VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i2++];
-                    last_added = n2;
+                    i2++;
+                    IGRAPH_I_NEIGHBORS_SKIP(n2, 1);
+                    VECTOR(*eids)[idx++] = eid2;
                 } else {
-                    IGRAPH_I_INCIDENT_IF_SKIP(n1) {
-                        length -= 2;
-                        i1++;
-                        i2++;
-                        continue;
-                    }
-                    VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i1++];
-                    last_added = n1;
+                    i1++;
+                    i2++;
+                    IGRAPH_I_NEIGHBORS_SKIP(n2, 2);
+                    VECTOR(*eids)[idx++] = eid1;
                     if ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
                          (multiple == IGRAPH_NO_MULTIPLE)) {
                         length--;
-                        i2++;
                         continue;
                     }
-                    VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i2++];
+                    VECTOR(*eids)[idx++] = eid2;
                 }
             }
 
             while (i1 < j1) {
                 eid1 = VECTOR(graph->oi)[i1++];
                 igraph_real_t to = VECTOR(graph->to)[eid1];
-                IGRAPH_I_INCIDENT_IF_SKIP(to) {
-                    length--;
-                    continue;
-                }
+                IGRAPH_I_NEIGHBORS_SKIP(to, 1);
                 VECTOR(*eids)[idx++] = eid1;
-                last_added = to;
             }
 
             while (i2 < j2) {
                 eid2 = VECTOR(graph->ii)[i2++];
                 igraph_real_t from = VECTOR(graph->from)[eid2];
-                IGRAPH_I_INCIDENT_IF_SKIP(from) {
-                    length--;
-                    continue;
-                }
+                IGRAPH_I_NEIGHBORS_SKIP(from, 1);
                 VECTOR(*eids)[idx++] = eid2;
-                last_added = from;
             }
         }
 
     }
     IGRAPH_CHECK(igraph_vector_resize(eids, length));
     return IGRAPH_SUCCESS;
-#undef IGRAPH_I_INCIDENT_IF_SKIP
+#undef IGRAPH_I_NEIGHBORS_SKIP
 }
 
 
