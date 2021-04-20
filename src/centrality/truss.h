@@ -31,7 +31,7 @@
 
 void unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
 void compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
-void trussness(const igraph_t *graph, igraph_vector_int_t *support,
+igraph_error_t trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *truss);
 int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss);
 

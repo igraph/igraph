@@ -141,23 +141,22 @@ void compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
  *
  * \example examples/simple/igraph_truss.c
  */
-void trussness(const igraph_t *graph, igraph_vector_int_t *support,
+igraph_error_t trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *truss){
 
+  igraph_vector_bool_t completed;
+  igraph_integer_t fromVertex, toVertex, e1, e2;
+  igraph_vector_t fromNeighbors, toNeighbors, q1, q2, commonNeighbors;
+
   // Get max possible value = max entry in support.
-  int max = 0;
-  for (long int i = 0; i < igraph_vector_int_size(support); ++i) {
-    int value = VECTOR(*support)[i];
-    if (max < value) { max = value; }
-  }
+  int max = igraph_vector_int_max(support);
 
   // The vector of levels. Each level of the vector is a set of edges initially
   // at that level of support, where support is # of triangles the edge is in.
   vector< unordered_set<long int> > vec(max + 1);
 
   // Initialize completed edges.
-  igraph_vector_bool_t completed;
-  igraph_vector_bool_init(&completed, igraph_ecount(graph));
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(&completed, igraph_ecount(graph));
 
   // Add each edge to its appropriate level of support.
   for (long int i = 0; i < igraph_vector_int_size(support); ++i) {
@@ -172,11 +171,9 @@ void trussness(const igraph_t *graph, igraph_vector_int_t *support,
   }
 
   // Initialize variables needed below.
-  igraph_integer_t fromVertex, toVertex, e1, e2;
-  igraph_vector_t fromNeighbors, toNeighbors, q1, q2, commonNeighbors;
-  igraph_vector_init(&fromNeighbors, 0);
-  igraph_vector_init(&toNeighbors, 0);
-  igraph_vector_init(&commonNeighbors, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&fromNeighbors, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&toNeighbors, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&commonNeighbors, 0);
 
   // Move through the levels, one level at a time, starting at first level.
   for (int level = 1; level <= max; ++level){
@@ -235,8 +232,11 @@ void trussness(const igraph_t *graph, igraph_vector_int_t *support,
   }  // end for-loop over levels
 
   // Clean up.
-  igraph_vector_destroy(&fromNeighbors);
-  igraph_vector_destroy(&toNeighbors);
   igraph_vector_destroy(&commonNeighbors);
+  igraph_vector_destroy(&toNeighbors);
+  igraph_vector_destroy(&fromNeighbors);
   igraph_vector_bool_destroy(&completed);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return IGRAPH_SUCCESS;
 }
