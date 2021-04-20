@@ -88,9 +88,8 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
 void unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
-  int j;
-  for (long int i = 0; i < igraph_vector_int_size(tri); i = i + 3){
-    j = i * 2;
+  long int i, j;
+  for (i = 0, j = 0; i < igraph_vector_int_size(tri); i += 3, j += 6){
     VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
     VECTOR(*unpacked_tri)[j+1] = VECTOR(*unpacked_tri)[j+4] = VECTOR(*tri)[i+1];
     VECTOR(*unpacked_tri)[j+3] = VECTOR(*unpacked_tri)[j+5] = VECTOR(*tri)[i+2];
