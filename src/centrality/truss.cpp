@@ -81,7 +81,7 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   igraph_vector_int_destroy(&support);
   IGRAPH_FINALLY_CLEAN(1);
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 // Unpack the triangles as a vector of vertices to be a vector of edges.
