@@ -273,6 +273,11 @@ IGRAPH_EXPORT int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A);
 
 IGRAPH_EXPORT int igraph_sparsemat_neg(igraph_sparsemat_t *A);
 
+IGRAPH_EXPORT int igraph_sparsemat_normalize_cols(igraph_sparsemat_t *sparsemat,
+                                                  igraph_bool_t allow_zeros);
+IGRAPH_EXPORT int igraph_sparsemat_normalize_rows(igraph_sparsemat_t *sparsemat,
+                                                  igraph_bool_t allow_zeros);
+
 IGRAPH_EXPORT int igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
                                                  igraph_sparsemat_t *sparsemat);
 IGRAPH_EXPORT int igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it);

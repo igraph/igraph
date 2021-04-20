@@ -86,11 +86,7 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
-#include "misc/conversion_internal.h"
-
 #include "scg_headers.h"
-
-#include "math.h"
 
 /**
  * \section about_scg
@@ -1117,8 +1113,13 @@ static int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
 
     IGRAPH_CHECK(igraph_sparsemat_copy(mysparse, sparse));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparse);
-    IGRAPH_CHECK(igraph_i_normalize_sparsemat(mysparse,
-                 norm == IGRAPH_SCG_NORM_COL));
+
+    if (norm == IGRAPH_SCG_NORM_COL) {
+        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(mysparse, /* allow_zeros = */ 0));
+    } else {
+        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(mysparse, /* allow_zeros = */ 0));
+    }
+
     IGRAPH_FINALLY_CLEAN(1);
 
     return 0;
