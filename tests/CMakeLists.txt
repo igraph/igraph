@@ -13,7 +13,6 @@ add_custom_target(
 add_dependencies(check build_tests)
 
 # Add a custom target for benchmarks and another one for building them
-# TODO(ntamas)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
@@ -675,25 +674,6 @@ if(CMAKE_USE_PTHREADS_INIT)
     )
   endif()
 endif()
-
-# scg.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_scg_grouping
-  igraph_scg_grouping2
-  igraph_scg_grouping3
-  igraph_scg_grouping4
-  igraph_scg_semiprojectors
-  igraph_scg_semiprojectors2
-  igraph_scg_semiprojectors3
-  scg
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  scg2
-  scg3
-)
 
 # random.at
 add_examples(

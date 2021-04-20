@@ -134,8 +134,6 @@
 
   <xi:include href="hrg.xml"/>
 
-  <xi:include href="scg.xml"/>
-
   <xi:include href="embedding.xml"/>
 
   <xi:include href="operators.xml"/>
