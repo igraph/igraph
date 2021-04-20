@@ -99,8 +99,9 @@ void unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
 void compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
-  for (long int i = 0; i < igraph_vector_size(eid); ++i){
-    VECTOR(*support)[(int) VECTOR(*eid)[i]] += 1;
+  long int m = igraph_vector_size(eid);
+  for (long int i = 0; i < m; ++i){
+    VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
   }
 }
 
