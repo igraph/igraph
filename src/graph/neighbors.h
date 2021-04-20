@@ -26,4 +26,11 @@ int igraph_i_neighbors(const igraph_t *graph,
                        igraph_loops_t loops,
                        igraph_multiple_t multiple);
 
+int igraph_i_incident(const igraph_t *graph,
+                       igraph_vector_t *eids,
+                       igraph_integer_t pnode,
+                       igraph_neimode_t mode,
+                       igraph_loops_t loops,
+                       igraph_multiple_t multiple);
+
 #endif /* IGRAPH_NEIGHBORS_H */
