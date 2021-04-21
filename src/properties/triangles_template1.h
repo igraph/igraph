@@ -38,6 +38,8 @@ nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
 if (nodes_to_calc == 0) {
     igraph_vector_clear(res);
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 

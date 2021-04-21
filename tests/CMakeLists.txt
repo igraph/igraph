@@ -13,7 +13,6 @@ add_custom_target(
 add_dependencies(check build_tests)
 
 # Add a custom target for benchmarks and another one for building them
-# TODO(ntamas)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
@@ -82,6 +81,7 @@ add_legacy_tests(
   igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
@@ -286,6 +286,11 @@ add_legacy_tests(
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
+)
+
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  bug_1760
 )
 
 # components.at
@@ -672,25 +677,6 @@ if(CMAKE_USE_PTHREADS_INIT)
   endif()
 endif()
 
-# scg.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_scg_grouping
-  igraph_scg_grouping2
-  igraph_scg_grouping3
-  igraph_scg_grouping4
-  igraph_scg_semiprojectors
-  igraph_scg_semiprojectors2
-  igraph_scg_semiprojectors3
-  scg
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  scg2
-  scg3
-)
-
 # random.at
 add_examples(
   FOLDER examples/simple NAMES
@@ -792,9 +778,13 @@ add_legacy_tests(
 add_benchmarks(
   NAMES
   igraph_betweenness
+  igraph_betweenness_weighted
   igraph_cliques
+  igraph_closeness_weighted
   igraph_coloring
   igraph_maximal_cliques
+  igraph_pagerank
+  igraph_pagerank_weighted
   igraph_random_walk
   igraph_transitivity
 )

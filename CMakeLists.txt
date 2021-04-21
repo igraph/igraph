@@ -21,13 +21,7 @@ include(PreventInSourceBuilds)
 
 # Make use of ccache if it is present on the host system -- unless explicitly
 # asked to disable it
-option(USE_CCACHE "Use ccache to speed up compilation if it is installed" ON)
-if(USE_CCACHE)
-  find_program(CCACHE_PROGRAM ccache)
-  if(CCACHE_PROGRAM)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-  endif()
-endif()
+include(UseCCacheWhenInstalled)
 
 # Figure out the version number from Git
 include(version)
@@ -76,11 +70,6 @@ find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
-
-# The math library is needed on Linux to find symbols like exmp1 or fmin
-if(UNIX)
-  set(CMAKE_REQUIRED_LIBRARIES "m")
-endif()
 
 # First we check for some functions and symbols
 check_symbol_exists(expm1 math.h HAVE_EXPM1)

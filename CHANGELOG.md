@@ -2,9 +2,36 @@
 
 ## [Unreleased]
 
+### Added
+
+ - OpenMP is now enabled and used by certain functions (notably PageRank calculation) when the compiler supports it. Set `IGRAPH_OPENMP_SUPPORT=OFF` at configuration time to disable this.
+
 ### Fixed
 
- - igraph can now be used as a CMake subproject in other CMake-based projects
+ - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
+ - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
+ - igraph no longer links to the math library (`libm`) when this is not necessary.
+ - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
+
+## [0.9.2] - 2021-04-14
+
+### Added
+
+ - CMake package files are now installed with igraph. This allows `find_package(igraph)` to find igraph and detect the appropriate compilation options for projects that link to it.
+
+### Fixed
+
+ - igraph can now be used as a CMake subproject in other CMake-based projects.
+ - The documentaton can now be built from the release tarball.
+ - Configuration will no longer fail when the release tarball is extracted into a subdirectory of an unrelated git repository.
+ - The generated pkg-config file was incorrect when `CMAKE_INSTALL_<dir>` variables were absolute paths.
+ - On Unix-like systems, the library name is now `libigraph.so.0.0.0`, as it used to be for igraph 0.8 and earlier.
+ - Fixed a return type mismatch in parser sources, and fixed some warnings with recent versions of gcc.
+ - Fixed a bug in `igraph_get_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` that returned incorrect results for unreachable vertices.
+
+### Other
+
+ - Improved installation instructions and tutorial.
 
 ## [0.9.1] - 2021-03-23
 
