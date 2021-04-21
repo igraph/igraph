@@ -15,13 +15,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: ['i686', 'x86_64']
+        arch: ['i686', 'x86_64', 'ucrt-x86_64']
         shared_libs: ['ON', 'OFF']
         include:
           - arch: i686
             msystem: MINGW32
           - arch: x86_64
             msystem: MINGW64
+          - arch: ucrt-x86_64
+            msystem: UCRT64
 
     defaults:
       run:
@@ -59,4 +61,5 @@ jobs:
         with:
           name: failure
           path: |
-            build-${{ matrix.arch }}/tests/**
+            build-${{ matrix.arch }}/tests/*
+            !build-${{ matrix.arch }}/tests/*.exe

@@ -337,7 +337,7 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
  *   not using the attribute handler interface properly.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
- * \enumval IGRAPH_ELAPACK A LAPACK call resulted an error.
+ * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
  * \enumval IGRAPH_EDRL Internal error in the DrL layout generator.
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  * \enumval IGRAPH_EGLP Internal GLPK error.
