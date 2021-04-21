@@ -1,11 +1,13 @@
 /*
 
   Copyright 2017 The Johns Hopkins University Applied Physics Laboratory LLC. All Rights Reserved.
+  Copyright 2021 The igraph team.
 
   Truss algorithm for cohesive subgroups.
 
   Author: Alex Perrone
   Date: 2017-08-03
+  Minor edits: The igraph team, 2021
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,6 +33,12 @@
 
 using namespace std;
 
+/* helper functions */
+void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
+void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
+int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+  igraph_vector_int_t *truss);
+
 /**
  * \function trussness
  * \brief Find the "trussness" for every edge in the graph. This
@@ -43,7 +51,7 @@ using namespace std;
  *
  * \example examples/simple/igraph_truss.cpp
  */
-int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
+igraph_error_t igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   igraph_vector_int_t triangles, support;
   igraph_vector_t eid, unpacked_triangles;
 
@@ -59,7 +67,7 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   // Unpack the triangles from vertex list to edge list.
   long int num_triangles = igraph_vector_int_size(&triangles);
   IGRAPH_CHECK(igraph_vector_resize(&unpacked_triangles, 2 * num_triangles));
-  IGRAPH_CHECK(unpack(&triangles, &unpacked_triangles));
+  IGRAPH_CHECK(igraph_truss_i_unpack(&triangles, &unpacked_triangles));
   igraph_vector_int_destroy(&triangles);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -71,13 +79,13 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the support of the edges.
-  IGRAPH_CHECK(compute_support(&eid, &support));
+  IGRAPH_CHECK(igraph_truss_i_compute_support(&eid, &support));
   igraph_vector_destroy(&eid);
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the truss of the edges.
   IGRAPH_CHECK(igraph_vector_int_init(truss, igraph_ecount(graph)));
-  IGRAPH_CHECK(trussness(graph, &support, truss));
+  IGRAPH_CHECK(igraph_i_trussness(graph, &support, truss));
   igraph_vector_int_destroy(&support);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -87,7 +95,7 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
 // Unpack the triangles as a vector of vertices to be a vector of edges.
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
-void unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
+void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
   long int i, j;
   for (i = 0, j = 0; i < igraph_vector_int_size(tri); i += 3, j += 6){
     VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
@@ -98,7 +106,7 @@ void unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
 
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
-void compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
+void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
   long int m = igraph_vector_size(eid);
   for (long int i = 0; i < m; ++i){
     VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
@@ -141,7 +149,7 @@ void compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
  *
  * \example test/unit/truss.cpp FIXME: can we make a C file instead?
  */
-igraph_error_t trussness(const igraph_t *graph, igraph_vector_int_t *support,
+igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *truss){
 
   igraph_vector_bool_t completed;

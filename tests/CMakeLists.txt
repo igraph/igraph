@@ -210,6 +210,7 @@ add_legacy_tests(
   tree_game
   ring
   watts_strogatz_game
+  truss
 )
 
 # structural_properties.at

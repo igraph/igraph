@@ -35,17 +35,17 @@
 
 //void print_results(const igraph_t *graph, igraph_vector_int_t *v, FILE *f);
 
-void print_and_destroy(igraph_t *graph, igraph_vector_int_t *v) {
+void print_and_destroy(igraph_t *graph, igraph_vector_int_t *truss) {
     long int i;
     igraph_integer_t from, to;
     printf("fromNode,toNode,truss\n");
-    for (i=0; i < igraph_vector_int_size(v); i++) {
+    for (i=0; i < igraph_vector_int_size(truss); i++) {
         igraph_edge(graph, i, &from, &to);
-        printf("%d,%d,%li\n", from, to, (long int) VECTOR(*v)[i]);
+        printf("%d,%d,%li\n", from, to, (long int) VECTOR(*truss)[i]);
     }
 
-    igraph_vector_int_destroy(&truss);
-    igraph_destroy(&graph);
+    igraph_vector_int_destroy(truss);
+    igraph_destroy(graph);
 
 }
 
@@ -70,7 +70,6 @@ int main() {
     igraph_vector_int_init(&truss, igraph_ecount(&graph));
     igraph_truss(&graph, &truss);
     print_and_destroy(&graph, &truss);
-    fclose(output);
   
     VERIFY_FINALLY_STACK();
   
