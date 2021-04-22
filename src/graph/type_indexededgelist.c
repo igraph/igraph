@@ -763,11 +763,11 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
     long int node = pnode;
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
             mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Mode should be either IGRAPH_OUT, IGRAPH_IN or IGRAPH_ALL.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -775,7 +775,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
-        IGRAPH_ERROR("For a directected graph with directions not ignored, "
+        IGRAPH_ERROR("For a directected graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.\n", IGRAPH_EINVAL);
     }
     /* Calculate needed space first & allocate it */
@@ -1788,15 +1788,20 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
     long int node = pnode;
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("cannot get incident edges", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("cannot get incident edges", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Mode should be either IGRAPH_OUT, IGRAPH_IN or IGRAPH_ALL.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
+        IGRAPH_ERROR("For a directected graph (with directions not ignored), "
+                     "IGRAPH_LOOPS_TWICE does not make sense.\n", IGRAPH_EINVAL);
     }
 
     /* Calculate needed space first & allocate it */
