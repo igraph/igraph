@@ -19,6 +19,8 @@
 #ifndef IGRAPH_NEIGHBORS_H
 #define IGRAPH_NEIGHBORS_H
 
+#include "igraph_constants.h"
+
 int igraph_i_neighbors(const igraph_t *graph,
                        igraph_vector_t *neis,
                        igraph_integer_t pnode,
