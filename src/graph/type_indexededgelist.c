@@ -776,7 +776,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
-        IGRAPH_ERROR("For a directected graph (with directions not ignored), "
+        IGRAPH_ERROR("For a directed graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.\n", IGRAPH_EINVAL);
     }
     /* Calculate needed space first & allocate it */
@@ -1799,7 +1799,7 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
-        IGRAPH_ERROR("For a directected graph (with directions not ignored), "
+        IGRAPH_ERROR("For a directed graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.\n", IGRAPH_EINVAL);
     }
 
