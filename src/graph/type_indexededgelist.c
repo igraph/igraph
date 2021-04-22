@@ -761,6 +761,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
     long int i, j;
 
     long int node = pnode;
+    igraph_real_t last_added = -1;
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
         IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
@@ -814,7 +815,6 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                         VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
                 }
             } else {
-                igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     igraph_real_t to = VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
                     IGRAPH_I_NEIGHBORS_SKIP(to, 1);
@@ -832,8 +832,7 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                         VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
                 }
             } else {
-                igraph_real_t last_added = -1;
-                for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
+                for (i = (long int) VECTOR(graph->is)[node]; i < j; i++) {
                     igraph_real_t from = VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
                     IGRAPH_I_NEIGHBORS_SKIP(from, 1);
                     VECTOR(*neis)[idx++] = from;
@@ -881,7 +880,6 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 VECTOR(*neis)[idx++] = (long int) VECTOR(graph->from)[eid2];
             }
         } else {
-            igraph_real_t last_added = -1;
             while (i1 < j1 && i2 < j2) {
                 eid1 = (long int) VECTOR(graph->oi)[i1];
                 eid2 = (long int) VECTOR(graph->ii)[i2];
@@ -1786,6 +1784,7 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
     long int i, j;
 
     long int node = pnode;
+    igraph_real_t last_added = -1;
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
         IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
@@ -1834,7 +1833,6 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                     VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i];
                 }
             } else {
-                igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->os)[node]; i < j; i++) {
                     long int edge = VECTOR(graph->oi)[i];
                     igraph_real_t other = VECTOR(graph->to)[edge];
@@ -1852,7 +1850,6 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                     VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i];
                 }
             } else {
-                igraph_real_t last_added = -1;
                 for (i = (long int) VECTOR(graph->is)[node]; i < j; i++) {
                     long int edge = VECTOR(graph->ii)[i];
                     igraph_real_t other = VECTOR(graph->from)[edge];
@@ -1896,7 +1893,6 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                 VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i2++];
             }
         } else {
-            igraph_real_t last_added = -1;
             while (i1 < j1 && i2 < j2) {
                 eid1 = (long int) VECTOR(graph->oi)[i1];
                 eid2 = (long int) VECTOR(graph->ii)[i2];

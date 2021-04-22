@@ -36,38 +36,44 @@ int main() {
     igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
     igraph_small(&g_lmu, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
 
+    igraph_vector_t eids;
+    igraph_vector_init(&eids, 0);
+
     printf("One vertex:\n");
     call_and_print(&g_1, 0, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 
-    printf("Vertex with multiple edges to vertex 2, IGRAPH_OUT, IGRAPH_MULTIPLE:\n");
+    printf("Vertex with multiple edges, IGRAPH_IN, IGRAPH_MULTIPLE:\n");
+    call_and_print(&g_lm, 0, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+
+    printf("Vertex with multiple edges, IGRAPH_OUT, IGRAPH_MULTIPLE:\n");
     call_and_print(&g_lm, 0, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 
-    printf("Vertex with multiple edges to vertex 2, IGRAPH_ALL, IGRAPH_MULTIPLE:\n");
+    printf("Vertex with multiple edges, IGRAPH_ALL, IGRAPH_MULTIPLE:\n");
     call_and_print(&g_lm, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
-    printf("Vertex with multiple edges to vertex 2, undirected, IGRAPH_MULTIPLE:\n");
-    call_and_print(&g_lmu, 0, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("Vertex with multiple edges, undirected, IGRAPH_MULTIPLE:\n");
+    call_and_print(&g_lmu, 0, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 
-    printf("Vertex 1 with loop, IGRAPH_OUT, IGRAPH_LOOPS_ONCE:\n");
-    call_and_print(&g_lm, 1, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+    printf("Vertex with multiple edges, IGRAPH_IN, IGRAPH_NO_MULTIPLE:\n");
+    call_and_print(&g_lm, 0, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
 
-    printf("Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_TWICE:\n");
-    call_and_print(&g_lm, 1, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("Vertex with multiple edges, IGRAPH_OUT, IGRAPH_NO_MULTIPLE:\n");
+    call_and_print(&g_lm, 0, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
 
-    printf("Vertex 1 with loop, undirected, IGRAPH_LOOPS_TWICE:\n");
-    call_and_print(&g_lmu, 1, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    printf("Vertex with multiple edges, IGRAPH_ALL, IGRAPH_NO_MULTIPLE:\n");
+    call_and_print(&g_lm, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
+
+    printf("Vertex with multiple edges, undirected, IGRAPH_NO_MULTIPLE:\n");
+    call_and_print(&g_lmu, 0, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
     printf("Vertex 1 with loop, IGRAPH_OUT, IGRAPH_NO_LOOPS:\n");
     call_and_print(&g_lm, 1, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
 
-    printf("Vertex with multiple edges to vertex 2, IGRAPH_OUT, IGRAPH_NO_MULTIPLE:\n");
-    call_and_print(&g_lm, 0, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
-
-    printf("Vertex with multiple edges to vertex 2, IGRAPH_ALL, IGRAPH_NO_MULTIPLE:\n");
-    call_and_print(&g_lm, 0, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
-
     printf("Vertex 1 with loop, IGRAPH_ALL, IGRAPH_NO_LOOPS:\n");
     call_and_print(&g_lm, 1, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+
+    printf("Vertex 1 with loop, undirected, IGRAPH_NO_LOOPS:\n");
+    call_and_print(&g_lmu, 1, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
 
     printf("Vertex 1 with loop, IGRAPH_OUT, IGRAPH_LOOPS_ONCE:\n");
     call_and_print(&g_lm, 1, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
@@ -75,11 +81,25 @@ int main() {
     printf("Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_ONCE:\n");
     call_and_print(&g_lm, 1, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 
+    printf("Vertex 1 with loop, undirected, IGRAPH_LOOPS_ONCE:\n");
+    call_and_print(&g_lmu, 1, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+
+    printf("Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_TWICE:\n");
+    call_and_print(&g_lm, 1, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+
+    printf("Vertex 1 with loop, undirected, IGRAPH_LOOPS_TWICE:\n");
+    call_and_print(&g_lmu, 1, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
+
+    printf("Trying IGRAPH_LOOPS_TWICE with IGRAPH_OUT:\n");
+    IGRAPH_ASSERT(igraph_i_incident(&g_lm, &eids, 0, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE) == IGRAPH_EINVAL);
 
     igraph_destroy(&g_1);
     igraph_destroy(&g_lm);
     igraph_destroy(&g_lmu);
+    igraph_vector_destroy(&eids);
 
     VERIFY_FINALLY_STACK();
     return 0;

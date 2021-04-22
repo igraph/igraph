@@ -1,26 +1,35 @@
 One vertex:
 ( )
-Vertex with multiple edges to vertex 2, IGRAPH_OUT, IGRAPH_MULTIPLE:
+Vertex with multiple edges, IGRAPH_IN, IGRAPH_MULTIPLE:
+( 2 2 )
+Vertex with multiple edges, IGRAPH_OUT, IGRAPH_MULTIPLE:
 ( 1 2 )
-Vertex with multiple edges to vertex 2, IGRAPH_ALL, IGRAPH_MULTIPLE:
+Vertex with multiple edges, IGRAPH_ALL, IGRAPH_MULTIPLE:
 ( 1 2 2 2 )
-Vertex with multiple edges to vertex 2, undirected, IGRAPH_MULTIPLE:
+Vertex with multiple edges, undirected, IGRAPH_MULTIPLE:
 ( 1 2 2 2 )
-Vertex 1 with loop, IGRAPH_OUT, IGRAPH_LOOPS_ONCE:
-( 1 3 )
-Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_TWICE:
-( 0 1 1 3 )
-Vertex 1 with loop, undirected, IGRAPH_LOOPS_TWICE:
-( 0 1 1 3 )
+Vertex with multiple edges, IGRAPH_IN, IGRAPH_NO_MULTIPLE:
+( 2 )
+Vertex with multiple edges, IGRAPH_OUT, IGRAPH_NO_MULTIPLE:
+( 1 2 )
+Vertex with multiple edges, IGRAPH_ALL, IGRAPH_NO_MULTIPLE:
+( 1 2 )
+Vertex with multiple edges, undirected, IGRAPH_NO_MULTIPLE:
+( 1 2 )
 Vertex 1 with loop, IGRAPH_OUT, IGRAPH_NO_LOOPS:
 ( 3 )
-Vertex with multiple edges to vertex 2, IGRAPH_OUT, IGRAPH_NO_MULTIPLE:
-( 1 2 )
-Vertex with multiple edges to vertex 2, IGRAPH_ALL, IGRAPH_NO_MULTIPLE:
-( 1 2 )
 Vertex 1 with loop, IGRAPH_ALL, IGRAPH_NO_LOOPS:
+( 0 3 )
+Vertex 1 with loop, undirected, IGRAPH_NO_LOOPS:
 ( 0 3 )
 Vertex 1 with loop, IGRAPH_OUT, IGRAPH_LOOPS_ONCE:
 ( 1 3 )
 Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_ONCE:
 ( 0 1 3 )
+Vertex 1 with loop, undirected, IGRAPH_LOOPS_ONCE:
+( 0 1 3 )
+Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_TWICE:
+( 0 1 1 3 )
+Vertex 1 with loop, undirected, IGRAPH_LOOPS_TWICE:
+( 0 1 1 3 )
+Trying IGRAPH_LOOPS_TWICE with IGRAPH_OUT:
