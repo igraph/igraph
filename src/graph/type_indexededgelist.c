@@ -861,8 +861,8 @@ int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_inte
                 i2++;
                 DEDUPLICATE_IF_NEEDED(n1, 2);
                 VECTOR(*neis)[idx++] = n1;
-                if ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE)) {
+                if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
+                        (multiple == IGRAPH_NO_MULTIPLE))) {
                     length--;
                     continue;
                 }
@@ -1853,8 +1853,8 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
                 i2++;
                 DEDUPLICATE_IF_NEEDED(n2, 2);
                 VECTOR(*eids)[idx++] = eid1;
-                if ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE)) {
+                if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
+                        (multiple == IGRAPH_NO_MULTIPLE))) {
                     length--;
                     continue;
                 }
