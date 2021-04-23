@@ -85,9 +85,11 @@ int main() {
     igraph_vector_destroy(&node_types);
     DESTROY_GVM();
 
+    VERIFY_FINALLY_STACK();
+    igraph_set_error_handler(igraph_error_handler_ignore);
+
     /*Distribution of types should have at least one positive value*/
     init_vm(&type_dist, 0, 0, &pref_matrix, 0, 1, 1, 0);
-    igraph_set_error_handler(igraph_error_handler_ignore);
     IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /* types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0, NULL) == IGRAPH_EINVAL);
     DESTROY_GVM();
 

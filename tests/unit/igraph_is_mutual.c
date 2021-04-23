@@ -51,6 +51,7 @@ int main() {
     printf("Same graph, but undirected:\n");
     call_and_print(&g_lmu, igraph_ess_all(IGRAPH_EDGEORDER_ID));
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Edge out of range.\n");

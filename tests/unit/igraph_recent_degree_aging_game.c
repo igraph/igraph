@@ -63,6 +63,7 @@ int main() {
     igraph_destroy(&g);
     igraph_vector_destroy(&outseq);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking if these errors are properly handled:\n");

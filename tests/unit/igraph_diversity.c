@@ -32,7 +32,7 @@ int main() {
 
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
-    
+
     /* real graph */
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, 1,3, 2,3, -1);
     igraph_vector_init_int_end(&weights, -1, 3, 2, 8, 1, 1, -1);
@@ -45,6 +45,7 @@ int main() {
     igraph_destroy(&g);
 
     /* error conditions are tested from now on */
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     /* graph with multiple edges */

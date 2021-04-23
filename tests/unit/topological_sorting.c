@@ -51,6 +51,7 @@ int main() {
     print_vector_round(&res);
 
     /* Error handling */
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     /* Add a cycle: 5 -> 0 */

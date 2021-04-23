@@ -59,6 +59,7 @@ int main() {
     igraph_maximum_cardinality_search(&g_lmu, &alpha, &alpham1);
     call_and_print(&g_lmu, &alpha, &alpham1);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Wrong size alpha.\n");

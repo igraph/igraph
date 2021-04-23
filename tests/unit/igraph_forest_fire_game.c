@@ -47,7 +47,9 @@ int main() {
                   /*bw_factor*/ 0.5, /*pambs*/3, /*directed*/ 1) == IGRAPH_SUCCESS);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
+
     printf("Negative fw_prob.\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ -0.5,
                   /*bw_factor*/ 0.0, /*pambs*/100, /*directed*/ 1) == IGRAPH_EINVAL);
