@@ -26,6 +26,12 @@
 
 */
 
+#include "igraph_error.h"
+#include "igraph_adjlist.h"
+#include "igraph_interface.h"
+#include "igraph_motifs.h"
+#include "igraph_community.h"
+
 #include <iostream>
 #include <vector>
 #include <unordered_set>
@@ -50,7 +56,7 @@ int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
  *
  * \example examples/simple/igraph_truss.cpp
  */
-igraph_error_t igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
+int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   igraph_vector_int_t triangles, support;
   igraph_vector_t eid, unpacked_triangles;
 
@@ -66,7 +72,7 @@ igraph_error_t igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   // Unpack the triangles from vertex list to edge list.
   long int num_triangles = igraph_vector_int_size(&triangles);
   IGRAPH_CHECK(igraph_vector_resize(&unpacked_triangles, 2 * num_triangles));
-  IGRAPH_CHECK(igraph_truss_i_unpack(&triangles, &unpacked_triangles));
+  igraph_truss_i_unpack(&triangles, &unpacked_triangles);
   igraph_vector_int_destroy(&triangles);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -78,7 +84,7 @@ igraph_error_t igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the support of the edges.
-  IGRAPH_CHECK(igraph_truss_i_compute_support(&eid, &support));
+  igraph_truss_i_compute_support(&eid, &support);
   igraph_vector_destroy(&eid);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -148,13 +154,13 @@ void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_in
  *
  * \example test/unit/truss.cpp FIXME: can we make a C file instead?
  */
-igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *truss){
 
-  igraph_vector_bool_t completed;
   igraph_integer_t fromVertex, toVertex, e1, e2;
-  igraph_vector_int_t fromNeighbors, toNeighbors, q1, q2, commonNeighbors;
+  igraph_vector_bool_t completed;
   igraph_adjlist_t adjlist;
+  igraph_vector_int_t fromNeighbors, toNeighbors, q1, q2, commonNeighbors;
   bool e1_complete, e2_complete;
   int j, n, level, newLevel;
   long int i, seed, ncommon;
@@ -185,9 +191,9 @@ igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *su
 
   // Initialize variables needed below.
   /* FIXME: I think multiedges but not loops should stay here? */
-  IGRAPH_CHECK(igraph_adjlist_init(g, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS,
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS,
                                    IGRAPH_MULTIPLE));
-  IGRAPH_FINALLY(igraph_adjlist_destroy);
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
   IGRAPH_VECTOR_INT_INIT_FINALLY(&commonNeighbors, 0);
 
   /* Sort each vector of neighbors, so it's done once for all */
@@ -222,7 +228,7 @@ igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *su
       igraph_vector_int_intersect_sorted(&q1, &q2, &commonNeighbors);
 
       /* Go over the overlapping neighbors and check each */
-      ncommon = igraph_vector_int_size(&commonNeighbors)
+      ncommon = igraph_vector_int_size(&commonNeighbors);
       for (j = 0; j < ncommon; j++){
         n = VECTOR(commonNeighbors)[j];  // the common neighbor
         igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, 1);
@@ -259,7 +265,7 @@ igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *su
   igraph_vector_int_destroy(&commonNeighbors);
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_bool_destroy(&completed);
-  IGRAPH_FINALLY_CLEAN(5);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return IGRAPH_SUCCESS;
 }

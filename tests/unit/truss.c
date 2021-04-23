@@ -1,11 +1,13 @@
 /*
 
   Copyright 2017 The Johns Hopkins University Applied Physics Laboratory LLC. All Rights Reserved.
+  Copyright 2021 The igraph team
 
   Truss algorithm for cohesive subgroups.
 
   Author: Alex Perrone
   Date: 2017-08-03
+  Minor edits: The igraph team, 2021
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
