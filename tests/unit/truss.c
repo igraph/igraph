@@ -26,16 +26,10 @@
 
 */
 
+#include <stdio.h>
 #include <igraph.h>
-/*
-#include <truss.h>
-#include <time.h>
-#include <sys/time.h>
-#include <inttypes.h>
-*/
-#include "test_utilities.inc"
 
-//void print_results(const igraph_t *graph, igraph_vector_int_t *v, FILE *f);
+#include "test_utilities.inc"
 
 void print_and_destroy(igraph_t *graph, igraph_vector_int_t *truss) {
     long int i;
