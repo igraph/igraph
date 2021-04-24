@@ -31,25 +31,26 @@
 
 #include "test_utilities.inc"
 
-void print_and_destroy(igraph_t *graph, igraph_vector_int_t *truss) {
-    long int i;
+void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
+    long int i, n;
     igraph_integer_t from, to;
+    n = igraph_vector_int_size(trussness);
     printf("fromNode,toNode,truss\n");
-    for (i=0; i < igraph_vector_int_size(truss); i++) {
+    for (i=0; i < n; i++) {
         igraph_edge(graph, i, &from, &to);
-        printf("%d,%d,%li\n", from, to, (long int) VECTOR(*truss)[i]);
+        printf("%" IGRAPH_PRId ",%" IGRAPH_PRId ",%li\n", from, to, (long int) VECTOR(*trussness)[i]);
     }
 
-    igraph_vector_int_destroy(truss);
+    igraph_vector_int_destroy(trussness);
     igraph_destroy(graph);
 
 }
 
 int main() {
 
-    igraph_t graph;
+    igraph_t graph, truss;
     igraph_vector_t v;
-    igraph_vector_int_t truss;
+    igraph_vector_int_t trussness;
   
     igraph_real_t edges[] = { 0,1, 0,2, 0,3, 0,4,
       1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 3,6, 3,11,
@@ -62,10 +63,12 @@ int main() {
 
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
-    // Compute the truss of the edges.
-    igraph_vector_int_init(&truss, igraph_ecount(&graph));
-    igraph_truss(&graph, &truss);
-    print_and_destroy(&graph, &truss);
+    /* Compute the trussness of the edges. */
+    igraph_vector_int_init(&trussness, igraph_ecount(&graph));
+    igraph_trussness(&graph, &trussness);
+    print_and_destroy(&graph, &trussness);
+
+    /* Compute the actual subgraph */
   
     VERIFY_FINALLY_STACK();
   

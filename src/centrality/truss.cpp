@@ -26,11 +26,11 @@
 
 */
 
-#include "igraph_error.h"
 #include "igraph_adjlist.h"
+#include "igraph_community.h"
+#include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_motifs.h"
-#include "igraph_community.h"
 
 #include <iostream>
 #include <vector>
@@ -39,9 +39,9 @@
 using namespace std;
 
 /* helper functions */
-void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
-void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
-int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+static void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
+static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
+static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *truss);
 
 /**
@@ -49,14 +49,30 @@ int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
  * \brief Find the "trussness" for every edge in the graph. This
  * indicates the highest k-truss that the edge occurs in.
  *
+  * </para><para>
+ * A k-truss is a subgraph in which every edge occurs in at least k-2 triangles in the subgraph.
+ *
+ * </para><para>
+ * This function returns the highest k for each edge. If you are interested in
+ * a particular k-truss subgraph, you can subset the graph using to those eids
+ * which are >= k because each k-truss is a subgraph of a (k–1)-truss
+ * (thus to get * all 4-trusses, take k >= 4 because the 5-trusses, 6-trusses, etc need to be included).
+ *
+ * </para><para>The current implementation of this function iteratively
+ * decrements support of each edge using O(|E|) space and O(|E|^1.5) time.
+ *
  * \param graph The input graph.
  * \param truss Pointer to initialized vector of truss values that will
  * indicate the highest k-truss each edge occurs in. It will be resized as
  * needed.
+ * \return Error code.
  *
- * \example examples/simple/igraph_truss.cpp
+ * Time complexity: It should be O(|E|^1.5). See Algorithm 2 in:
+ * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
+ * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
+*
  */
-int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
+int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* truss){
   igraph_vector_int_t triangles, support;
   igraph_vector_t eid, unpacked_triangles;
 
@@ -89,7 +105,7 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the truss of the edges.
-  IGRAPH_CHECK(igraph_vector_int_init(truss, igraph_ecount(graph)));
+  IGRAPH_CHECK(igraph_vector_int_resize(truss, igraph_ecount(graph)));
   IGRAPH_CHECK(igraph_i_trussness(graph, &support, truss));
   igraph_vector_int_destroy(&support);
   IGRAPH_FINALLY_CLEAN(1);
@@ -100,9 +116,10 @@ int igraph_truss(const igraph_t* graph, igraph_vector_int_t* truss){
 // Unpack the triangles as a vector of vertices to be a vector of edges.
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
-void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
+static void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
   long int i, j;
-  for (i = 0, j = 0; i < igraph_vector_int_size(tri); i += 3, j += 6){
+  long int m = igraph_vector_int_size(tri);
+  for (i = 0, j = 0; i < m; i += 3, j += 6){
     VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
     VECTOR(*unpacked_tri)[j+1] = VECTOR(*unpacked_tri)[j+4] = VECTOR(*tri)[i+1];
     VECTOR(*unpacked_tri)[j+3] = VECTOR(*unpacked_tri)[j+5] = VECTOR(*tri)[i+2];
@@ -111,7 +128,7 @@ void igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpa
 
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
-void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
+static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
   long int m = igraph_vector_size(eid);
   for (long int i = 0; i < m; ++i){
     VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
@@ -119,48 +136,15 @@ void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_in
 }
 
 
-/**
- * \function trussness
- * \brief Find the "trussness" for every edge in the graph. This
- * indicates the highest k-truss that the edge occurs in.
- *
- * This may differ from the literature in that the value returned is 2 less.
- *
- * </para><para>
- * A k-truss is a subgraph in which every edge occurs in at least k triangles in the subgraph.
- *
- * </para><para>
- * This function returns the highest k for each edge. If you are interested in
- * a particular k-truss subgraph, you can subset the graph using to those eids
- * which are >= k because each k-truss is a subgraph of a (k–1)-truss
- * (thus to get * all 4-trusses, take k >= 4 because the 5-trusses, 6-trusses, etc need to be included).
- *
- * </para><para>The current implementation of this function iteratively
- * decrements support of each edge using O(|E|) space and O(|E|^1.5) time.
- *
- * \param graph The input graph.
- * \param support The support of each edge, specified as a vector where the
- * indices stand for the edges, and support is (initially!) the number of
- * triangles the edge occurs in. This is used as a workspace and is changed,
- * then destroyed.
- * \param truss This will indicate the highest k-truss each edge occurs in.
- * \return Error code.
- *
- *
- * Time complexity: It should be O(|E|^1.5). See Algorithm 2 in:
- * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
- * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
- *
- *
- * \example test/unit/truss.cpp FIXME: can we make a C file instead?
- */
-int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+/* internal function doing the computations once the support is defined */
+static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *truss){
 
   igraph_integer_t fromVertex, toVertex, e1, e2;
   igraph_vector_bool_t completed;
   igraph_adjlist_t adjlist;
-  igraph_vector_int_t fromNeighbors, toNeighbors, q1, q2, commonNeighbors;
+  igraph_vector_int_t *fromNeighbors, *toNeighbors, *q1, *q2;
+  igraph_vector_int_t commonNeighbors;
   bool e1_complete, e2_complete;
   int j, n, level, newLevel;
   long int i, seed, ncommon;
@@ -185,12 +169,11 @@ int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
   // of any triangles, so there's not much to do and we "complete" them
   unordered_set<long int>::iterator it;
   for (it = vec[0].begin(); it != vec[0].end(); ++it){
-    VECTOR(*truss)[*it] = 0;
+    VECTOR(*truss)[*it] = 2;
     VECTOR(completed)[*it] = 1;
   }
 
   // Initialize variables needed below.
-  /* FIXME: I think multiedges but not loops should stay here? */
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS,
                                    IGRAPH_MULTIPLE));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -213,19 +196,19 @@ int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
       /* Find neighbors of both vertices. If they run into each other,
        * there is a triangle. Because we sorted the adjacency list already,
        * we don't need to sort it for every edge here */
-      fromNeighbors = adjlist.adjs[fromVertex];
-      toNeighbors = adjlist.adjs[toVertex];
+      fromNeighbors = igraph_adjlist_get(&adjlist, fromVertex);
+      toNeighbors = igraph_adjlist_get(&adjlist, toVertex);
       q1 = fromNeighbors;
       q2 = toNeighbors;
 
-      if (igraph_vector_int_size(&q1) > igraph_vector_int_size(&q2)){
+      if (igraph_vector_int_size(q1) > igraph_vector_int_size(q2)){
         // case: #fromNeighbors > #toNeigbors, so make q1 the smaller set.
         q1 = toNeighbors;
         q2 = fromNeighbors;
       }
 
       // Intersect the neighbors.
-      igraph_vector_int_intersect_sorted(&q1, &q2, &commonNeighbors);
+      igraph_vector_int_intersect_sorted(q1, q2, &commonNeighbors);
 
       /* Go over the overlapping neighbors and check each */
       ncommon = igraph_vector_int_size(&commonNeighbors);
@@ -255,7 +238,7 @@ int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
         }
       }
       // Record this edge; its level is its trussness.
-      VECTOR(*truss)[seed] = level;
+      VECTOR(*truss)[seed] = level + 2;
       VECTOR(completed)[seed] = 1;  // mark as complete
       igraph_vector_int_clear(&commonNeighbors);
     }  // end while
