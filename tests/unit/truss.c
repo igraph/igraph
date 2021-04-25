@@ -48,7 +48,7 @@ void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
 
 int main() {
 
-    igraph_t graph, truss;
+    igraph_t graph;
     igraph_vector_t v;
     igraph_vector_int_t trussness;
   
@@ -64,12 +64,10 @@ int main() {
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
     /* Compute the trussness of the edges. */
-    igraph_vector_int_init(&trussness, igraph_ecount(&graph));
+    igraph_vector_int_init(&trussness, 0);
     igraph_trussness(&graph, &trussness);
     print_and_destroy(&graph, &trussness);
 
-    /* Compute the actual subgraph */
-  
     VERIFY_FINALLY_STACK();
   
     return 0;
