@@ -35,17 +35,22 @@ int main() {
     igraph_vector_t perm;
     igraph_bool_t iso;
 
-    igraph_bliss_sh_t sh_list[] = {
+    igraph_bliss_sh_t sh_values[] = {
         IGRAPH_BLISS_F, IGRAPH_BLISS_FL,
         IGRAPH_BLISS_FS, IGRAPH_BLISS_FM,
         IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM
     };
 
+    const char *sh_names[] = {
+        "F", "FL", "FS", "FM", "FLM", "FSM"
+    };
+
     size_t i;
 
-    for (i=0; i < sizeof(sh_list) / sizeof(igraph_bliss_sh_t); ++i) {
+    for (i=0; i < sizeof(sh_values) / sizeof(igraph_bliss_sh_t); ++i) {
 
-        igraph_bliss_sh_t sh = sh_list[i];
+        igraph_bliss_sh_t sh = sh_values[i];
+        printf("Splitting heuristic: %s\n", sh_names[i]);
 
         igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
         igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
@@ -53,41 +58,54 @@ int main() {
         igraph_permute_vertices(&ring1, &ring2, &perm);
 
         /* Without colors */
+        printf("Without vertex colors: ");
+        iso = 0;
         igraph_isomorphic_bliss(&ring1, &ring2, 0, 0, &iso, 0, 0, sh, 0, 0);
-        IGRAPH_ASSERT(iso);
+        printf("%s\n", iso ? "YES" : "NO");
 
         /* Everything has the same colors */
+        printf("All vertices having the same color: ");
         igraph_vector_int_init(&color1, igraph_vcount(&ring1));
         igraph_vector_int_init(&color2, igraph_vcount(&ring2));
+        igraph_vector_int_fill(&color1, 1);
+        igraph_vector_int_fill(&color2, 1);
 
+        iso = 0;
         igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, sh, 0, 0);
-        IGRAPH_ASSERT(iso);
+        printf("%s\n", iso ? "YES" : "NO");
 
         /* Try a negative result */
+        printf("Non-matching colors 1: ");
         igraph_vector_int_fill(&color1, 0);
         igraph_vector_int_fill(&color2, 0);
         VECTOR(color1)[0] = 1;
+
+        iso = 1;
         igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, sh, 0, 0);
-        IGRAPH_ASSERT(! iso);
+        printf("%s\n", iso ? "YES" : "NO");
 
         /* Another negative, same color distribution, different topology */
+        printf("Non-matching colors 2: ");
         igraph_vector_int_fill(&color1, 0);
         igraph_vector_int_fill(&color2, 0);
         VECTOR(color1)[0] = 1;
         VECTOR(color1)[1] = 1;
         VECTOR(color2)[0] = 1;
         VECTOR(color2)[2] = 1;
+
+        iso = 1;
         igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, sh, 0, 0);
-        IGRAPH_ASSERT(! iso);
+        printf("%s\n", iso ? "YES" : "NO");
 
-
-        /* More complicated test with colors */
         igraph_vector_int_destroy(&color1);
         igraph_vector_int_destroy(&color2);
 
         igraph_vector_destroy(&perm);
         igraph_destroy(&ring2);
         igraph_destroy(&ring1);
+
+        /* More complicated test with colors */
+        printf("Isomorphic colored graphs: ");
 
         igraph_small(&g1, 8, IGRAPH_DIRECTED,
                      0, 4, 0, 5, 0, 6, 1, 4, 1, 5, 1, 7, 2, 4, 2, 6, 2, 7, 3, 5, 3, 6, 3, 7, -1
@@ -111,13 +129,15 @@ int main() {
 
         iso = 0;
         igraph_isomorphic_bliss(&g1, &g2, &color1, &color2, &iso, 0, 0, sh, 0, 0);
-        IGRAPH_ASSERT(iso);
+        printf("%s\n", iso ? "YES" : "NO");
 
         igraph_vector_int_destroy(&color1);
         igraph_vector_int_destroy(&color2);
 
         igraph_destroy(&g2);
         igraph_destroy(&g1);
+
+        printf("\n");
 
         VERIFY_FINALLY_STACK();
 
