@@ -47,6 +47,9 @@ int main() {
 
     size_t i;
 
+    /* necessary because of igraph_vector_shuffle() below */
+    igraph_rng_seed(igraph_rng_default(), 137);
+
     for (i=0; i < sizeof(sh_values) / sizeof(igraph_bliss_sh_t); ++i) {
 
         igraph_bliss_sh_t sh = sh_values[i];
