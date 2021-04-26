@@ -37,3 +37,5 @@ Graph with 2 edges from 0 to 1, and 2 from 1 to 0, IGRAPH_ALL, IGRAPH_MULTIPLE:
 Graph with 1 edge from 0 to 1, and 2 from 1 to 0, IGRAPH_ALL, IGRAPH_MULTIPLE:
 ( 1 1 1 )
 Trying IGRAPH_LOOPS_TWICE with IGRAPH_OUT:
+Trying invalid vertex ID:
+Trying invalid mode:
