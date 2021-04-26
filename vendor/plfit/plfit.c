@@ -483,8 +483,9 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
         plfit_continuous_xmin_opt_data_t* opt_data, plfit_result_t* best_result,
         size_t* best_n) {
     /* i must be signed, otherwise OpenMP on Windows will complain as it
-     * supports signed types only */
-    ssize_t i;
+     * supports signed types only. ssize_t is a POSIX extension so it won't
+     * work */
+    long int i;
     plfit_result_t global_best_result;
     size_t global_best_n;
 
