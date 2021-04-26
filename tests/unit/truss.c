@@ -52,18 +52,23 @@ int main() {
     igraph_vector_t v;
     igraph_vector_int_t trussness;
   
+    /* Create actual graph */
     igraph_real_t edges[] = { 0,1, 0,2, 0,3, 0,4,
       1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 3,6, 3,11,
       4,5, 4,6, 5,6, 5,7, 5,8, 5,9, 6,7, 6,10, 6,11,
       7,8, 7,9, 8,9, 8,10 };
-
     long int n = sizeof(edges) / sizeof(igraph_real_t);
 
     igraph_vector_view(&v, edges, n);
-
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
     /* Compute the trussness of the edges. */
+    igraph_vector_int_init(&trussness, 0);
+    igraph_trussness(&graph, &trussness);
+    print_and_destroy(&graph, &trussness);
+
+    /* Null graph trivial case */
+    igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
     igraph_vector_int_init(&trussness, 0);
     igraph_trussness(&graph, &trussness);
     print_and_destroy(&graph, &trussness);
