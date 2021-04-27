@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_trussness()` calculates the trussness of each edge in the graph
+   (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+
 ## [0.9.2] - 2021-04-14
 
 ### Added
