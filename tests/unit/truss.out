@@ -24,4 +24,12 @@ fromNode,toNode,truss
 7,9,4
 8,9,4
 8,10,2
+
+Null graph:
+fromNode,toNode,truss
+
+Singleton graph:
+fromNode,toNode,truss
+
+Graph with no edges:
 fromNode,toNode,truss

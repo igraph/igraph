@@ -68,7 +68,22 @@ int main() {
     print_and_destroy(&graph, &trussness);
 
     /* Null graph trivial case */
+    printf("\nNull graph:\n");
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_int_init(&trussness, 0);
+    igraph_trussness(&graph, &trussness);
+    print_and_destroy(&graph, &trussness);
+
+    /* Singleton graph trivial case */
+    printf("\nSingleton graph:\n");
+    igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
+    igraph_vector_int_init(&trussness, 0);
+    igraph_trussness(&graph, &trussness);
+    print_and_destroy(&graph, &trussness);
+
+    /* Graph with no edges trivial case */
+    printf("\nGraph with no edges:\n");
+    igraph_empty(&graph, 10, IGRAPH_UNDIRECTED);
     igraph_vector_int_init(&trussness, 0);
     igraph_trussness(&graph, &trussness);
     print_and_destroy(&graph, &trussness);
