@@ -94,6 +94,7 @@ int main() {
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("4 vertices, negative hgaps, emits error.\n");

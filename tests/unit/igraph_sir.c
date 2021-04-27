@@ -70,6 +70,7 @@ int main() {
     printf("Full graph, more infections expected than line with same rates:\n");
     print_result(&g_full, 1, 1, 2);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     IGRAPH_ASSERT(igraph_sir(&g_lm, 1, 1, 1, NULL) == IGRAPH_EINVAL);

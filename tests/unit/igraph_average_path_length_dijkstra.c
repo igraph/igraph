@@ -73,6 +73,7 @@ int main() {
     printf("Graph with loops and multiple edges, ignoring direction:\n");
     compute_and_print(&g_lm, &weights_lm, 0, 1);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking incorrect weight length error handling.\n");

@@ -4,8 +4,15 @@
 
 ### Added
 
- - `igraph_trussness()` calculates the trussness of each edge in the graph
-   (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+ - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+ - OpenMP is now enabled and used by certain functions (notably PageRank calculation) when the compiler supports it. Set `IGRAPH_OPENMP_SUPPORT=OFF` at configuration time to disable this.
+
+### Fixed
+
+ - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
+ - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
+ - igraph no longer links to the math library (`libm`) when this is not necessary.
+ - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
 
 ## [0.9.2] - 2021-04-14
 

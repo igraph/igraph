@@ -55,6 +55,7 @@ int main() {
     igraph_vector_destroy(&comm1);
     igraph_vector_destroy(&comm2);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("\nExpected to fail nicely:\n\n");
@@ -72,7 +73,6 @@ int main() {
     IGRAPH_ASSERT(igraph_split_join_distance(&comm1, &comm2, &distance12, &distance21) == IGRAPH_EINVAL);
     igraph_vector_destroy(&comm1);
     igraph_vector_destroy(&comm2);
-
 
     VERIFY_FINALLY_STACK();
     return 0;

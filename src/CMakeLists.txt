@@ -14,13 +14,17 @@ foreach(FORMAT dl gml lgl ncol pajek)
       ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c
     )
   else()
+    if (BISON_VERSION VERSION_GREATER_EQUAL 3)
+      set(bison_no_deprecated -Wno-deprecated)
+    endif()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
-      COMPILE_FLAGS "--no-lines"
+      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "--noline --header-file=${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h"
+      COMPILE_FLAGS "--noline"
+      DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -239,13 +243,6 @@ add_library(
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
-
-  scg/scg_approximate_methods.c
-  scg/scg_exact_scg.c
-  scg/scg_kmeans.c
-  scg/scg_optimal_method.c
-  scg/scg_utils.c
-  scg/scg.c
 
   isomorphism/bliss.cc
   isomorphism/isoclasses.c

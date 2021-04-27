@@ -9,6 +9,11 @@ if (NOT MSVC)
   check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
 endif()
 
+set(
+  IGRAPH_WARNINGS_AS_ERRORS ON CACHE BOOL
+  "Treat warnings as errors with GCC-like compilers"
+)
+
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE 
@@ -25,7 +30,8 @@ macro(use_all_warnings TARGET_NAME)
     target_compile_options(${TARGET_NAME} PRIVATE 
       # GCC-style compilers:
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
+        -Wall -Wextra -pedantic -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
       >
       $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
       # Intel compiler:
