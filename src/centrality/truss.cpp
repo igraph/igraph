@@ -48,13 +48,13 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
                               igraph_vector_int_t *trussness);
 
 /**
- * \function trussness
- * \brief Find the "trussness" for every edge in the graph. This
- * indicates the highest k-truss that the edge occurs in.
+ * \function igraph_trussness
+ * \brief Finding the "trussness" of the edges in a network.
  *
  * </para><para>
  * A k-truss is a subgraph in which every edge occurs in at least k-2 triangles
- * in the subgraph.
+ * in the subgraph. The trussness of an edge indicates the highest k-truss that
+ * the edge occurs in.
  *
  * </para><para>
  * This function returns the highest k for each edge. If you are interested in
