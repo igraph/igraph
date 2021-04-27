@@ -40,7 +40,7 @@
 using namespace std;
 
 /* helper functions */
-static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, long int num_triangles, igraph_vector_t *unpacked_tri);
+static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
 static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
 static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
   igraph_vector_int_t *trussness);
@@ -50,7 +50,7 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * \brief Find the "trussness" for every edge in the graph. This
  * indicates the highest k-truss that the edge occurs in.
  *
-  * </para><para>
+ * </para><para>
  * A k-truss is a subgraph in which every edge occurs in at least k-2 triangles in the subgraph.
  *
  * </para><para>
@@ -71,7 +71,6 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * Time complexity: It should be O(|E|^1.5). See Algorithm 2 in:
  * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
  * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
-*
  */
 int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
   long int num_triangles;
@@ -87,10 +86,9 @@ int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
 
   // List the triangles as vertex triplets.
   IGRAPH_CHECK(igraph_list_triangles(graph, &triangles));
-  num_triangles = igraph_vector_int_size(&triangles);
 
   // Unpack the triangles from vertex list to edge list.
-  IGRAPH_CHECK(igraph_truss_i_unpack(&triangles, num_triangles, &unpacked_triangles));
+  IGRAPH_CHECK(igraph_truss_i_unpack(&triangles, &unpacked_triangles));
   igraph_vector_int_destroy(&triangles);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -116,8 +114,10 @@ int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
 // Unpack the triangles as a vector of vertices to be a vector of edges.
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
-static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, long int num_triangles, igraph_vector_t *unpacked_tri) {
-  long int i, j;
+static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
+  long int i, j, num_triangles;
+
+  num_triangles = igraph_vector_int_size(tri);
 
   IGRAPH_CHECK(igraph_vector_resize(unpacked_tri, 2 * num_triangles));
 
