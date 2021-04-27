@@ -33,7 +33,6 @@
 #include "igraph_interface.h"
 #include "igraph_motifs.h"
 
-#include <iostream>
 #include <vector>
 #include <unordered_set>
 
