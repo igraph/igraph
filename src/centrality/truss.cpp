@@ -73,7 +73,6 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
  */
 int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
-  long int num_triangles;
   igraph_vector_int_t triangles, support;
   igraph_vector_t eid, unpacked_triangles;
 
