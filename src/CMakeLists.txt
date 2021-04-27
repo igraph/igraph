@@ -125,6 +125,7 @@ add_library(
   centrality/centralization.c
   centrality/closeness.c
   centrality/coreness.c
+  centrality/truss.cpp
   centrality/prpack.cpp
 
   cliques/cliquer.c

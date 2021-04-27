@@ -34,11 +34,12 @@
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
-/* K-Cores                                            */
+/* K-Cores and K-Truss                                */
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
-                                  igraph_neimode_t mode);
+                igraph_neimode_t mode);
+IGRAPH_EXPORT int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */
