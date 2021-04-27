@@ -28,6 +28,7 @@
 
 #include "igraph_adjlist.h"
 #include "igraph_community.h"
+#include "core/exceptions.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_motifs.h"
@@ -148,34 +149,39 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
   igraph_vector_int_t *fromNeighbors, *toNeighbors, *q1, *q2;
   igraph_vector_int_t commonNeighbors;
   bool e1_complete, e2_complete;
-  int j, n, level, newLevel;
-  long int i, seed, ncommon;
-  long int nedges = igraph_vector_int_size(support);
+  int j, n, level, newLevel, max;
+  long int i, seed, ncommon, nedges;
+
+  // C++ data structures
+  vector<bool> completed;
+  vector< unordered_set<long int> > vec;
+  unordered_set<long int>::iterator it;
 
   // Allocate memory for result
+  nedges = igraph_vector_int_size(support);
   IGRAPH_CHECK(igraph_vector_int_resize(trussness, nedges));
   if (nedges == 0)
       return IGRAPH_SUCCESS;
 
   // Get max possible value = max entry in support.
   // This cannot be computed if there are no edges, hence the above if
-  int max = igraph_vector_int_max(support);
+  max = igraph_vector_int_max(support);
 
   // Initialize completed edges.
-  vector<bool> completed(nedges);
+  IGRAPH_HANDLE_EXCEPTIONS(completed.resize(nedges));
 
   // The vector of levels. Each level of the vector is a set of edges initially
   // at that level of support, where support is # of triangles the edge is in.
-  vector< unordered_set<long int> > vec(max + 1);
+  IGRAPH_HANDLE_EXCEPTIONS(vec.resize(max + 1));
 
   // Add each edge to its appropriate level of support.
   for (i = 0; i < nedges; ++i) {
-    vec[VECTOR(*support)[i]].insert(i);  // insert edge i into its support level
+    IGRAPH_HANDLE_EXCEPTIONS(vec[VECTOR(*support)[i]].insert(i));  // insert edge i into its support level
   }
+
 
   // Record the trussness of edges at level 0. These edges are not part
   // of any triangles, so there's not much to do and we "complete" them
-  unordered_set<long int>::iterator it;
   for (it = vec[0].begin(); it != vec[0].end(); ++it){
     VECTOR(*trussness)[*it] = 2;
     completed[*it] = 1;
