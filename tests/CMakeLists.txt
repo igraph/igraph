@@ -391,6 +391,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_dyad_census
   igraph_motifs_randesu_estimate
   igraph_motifs_randesu_no
   triad_census
