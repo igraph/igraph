@@ -44,6 +44,7 @@ set(
   progress.xxml
   psumtree.xxml
   random.xxml
+  scg.xxml
   separators.xxml
   sparsemat.xxml
   sparsematrix.xxml

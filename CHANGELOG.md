@@ -8,7 +8,6 @@
 
 ### Fixed
 
- - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
  - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
  - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
  - igraph no longer links to the math library (`libm`) when this is not necessary.
