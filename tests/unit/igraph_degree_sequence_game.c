@@ -188,6 +188,7 @@ int main() {
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
     /* This degree sequence contains a zero degree, so it cannot be realized by a connected graph. */
     IGRAPH_ASSERT(

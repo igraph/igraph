@@ -87,6 +87,7 @@ int main() {
     chop_print_destroy(&result);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking proper error handling:\n");

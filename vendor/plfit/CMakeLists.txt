@@ -37,3 +37,6 @@ if (MSVC)
   target_compile_options(plfit PRIVATE /wd4100) # disable unreferenced parameter warning
 endif()
 
+if(IGRAPH_OPENMP_SUPPORT)
+  target_link_libraries(plfit PRIVATE OpenMP::OpenMP_C)
+endif()
