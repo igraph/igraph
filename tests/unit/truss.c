@@ -63,6 +63,17 @@ int main() {
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
     /* Compute the trussness of the edges. */
+    printf("Simple graph:\n");
+    igraph_vector_int_init(&trussness, 0);
+    igraph_trussness(&graph, &trussness);
+    print_and_destroy(&graph, &trussness);
+
+    /* Add some loop edges -- they should have trussness = 2 */
+    printf("\nGraph with loops:\n");
+    igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
+    igraph_add_edge(&graph, 0, 0);
+    igraph_add_edge(&graph, 7, 7);
+    igraph_add_edge(&graph, 5, 5);
     igraph_vector_int_init(&trussness, 0);
     igraph_trussness(&graph, &trussness);
     print_and_destroy(&graph, &trussness);

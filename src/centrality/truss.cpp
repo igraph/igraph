@@ -57,10 +57,12 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * This function returns the highest k for each edge. If you are interested in
  * a particular k-truss subgraph, you can subset the graph using to those eids
  * which are >= k because each k-truss is a subgraph of a (k–1)-truss
- * (thus to get * all 4-trusses, take k >= 4 because the 5-trusses, 6-trusses, etc need to be included).
+ * (thus to get all 4-trusses, take k >= 4 because the 5-trusses, 6-trusses,
+ * etc need to be included).
  *
- * </para><para>The current implementation of this function iteratively
- * decrements support of each edge using O(|E|) space and O(|E|^1.5) time.
+ * </para><para>
+ * The current implementation of this function iteratively decrements support
+ * of each edge using O(|E|) space and O(|E|^1.5) time.
  *
  * \param graph The input graph.
  * \param truss Pointer to initialized vector of truss values that will
