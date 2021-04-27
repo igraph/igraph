@@ -45,7 +45,7 @@ using namespace std;
 static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
 static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
 static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
-  igraph_vector_int_t *trussness);
+                              igraph_vector_int_t *trussness);
 
 /**
  * \function trussness
@@ -79,203 +79,203 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
  * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
  */
-int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
-  igraph_vector_int_t triangles, support;
-  igraph_vector_t eid, unpacked_triangles;
-  igraph_bool_t is_multigraph;
+int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
+    igraph_vector_int_t triangles, support;
+    igraph_vector_t eid, unpacked_triangles;
+    igraph_bool_t is_multigraph;
 
-  /* Check whether the graph is a multigraph; trussness will not work for these */
-  IGRAPH_CHECK(igraph_has_multiple(graph, &is_multigraph));
+    /* Check whether the graph is a multigraph; trussness will not work for these */
+    IGRAPH_CHECK(igraph_has_multiple(graph, &is_multigraph));
 
-  if (is_multigraph) {
-    IGRAPH_ERROR("Trussness is not implemented for multigraphs", IGRAPH_UNIMPLEMENTED);
-  }
+    if (is_multigraph) {
+        IGRAPH_ERROR("Trussness is not implemented for multigraphs", IGRAPH_UNIMPLEMENTED);
+    }
 
-  /* Manage the stack to make it memory safe: do not change the order of
-   * initialization of the following four vectors */
-  IGRAPH_VECTOR_INT_INIT_FINALLY(&support, igraph_ecount(graph));
-  IGRAPH_VECTOR_INIT_FINALLY(&eid, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&unpacked_triangles, 0);
-  IGRAPH_VECTOR_INT_INIT_FINALLY(&triangles, 0);
+    /* Manage the stack to make it memory safe: do not change the order of
+     * initialization of the following four vectors */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&support, igraph_ecount(graph));
+    IGRAPH_VECTOR_INIT_FINALLY(&eid, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&unpacked_triangles, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&triangles, 0);
 
-  // List the triangles as vertex triplets.
-  IGRAPH_CHECK(igraph_list_triangles(graph, &triangles));
+    // List the triangles as vertex triplets.
+    IGRAPH_CHECK(igraph_list_triangles(graph, &triangles));
 
-  // Unpack the triangles from vertex list to edge list.
-  IGRAPH_CHECK(igraph_truss_i_unpack(&triangles, &unpacked_triangles));
-  igraph_vector_int_destroy(&triangles);
-  IGRAPH_FINALLY_CLEAN(1);
+    // Unpack the triangles from vertex list to edge list.
+    IGRAPH_CHECK(igraph_truss_i_unpack(&triangles, &unpacked_triangles));
+    igraph_vector_int_destroy(&triangles);
+    IGRAPH_FINALLY_CLEAN(1);
 
-  // Get the edge ids of the unpacked triangles. Note: a given eid can occur
-  // multiple times in this list if it is in multiple triangles.
-  IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1));
-  igraph_vector_destroy(&unpacked_triangles);
-  IGRAPH_FINALLY_CLEAN(1);
+    // Get the edge ids of the unpacked triangles. Note: a given eid can occur
+    // multiple times in this list if it is in multiple triangles.
+    IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1));
+    igraph_vector_destroy(&unpacked_triangles);
+    IGRAPH_FINALLY_CLEAN(1);
 
-  // Compute the support of the edges.
-  igraph_truss_i_compute_support(&eid, &support);
-  igraph_vector_destroy(&eid);
-  IGRAPH_FINALLY_CLEAN(1);
+    // Compute the support of the edges.
+    igraph_truss_i_compute_support(&eid, &support);
+    igraph_vector_destroy(&eid);
+    IGRAPH_FINALLY_CLEAN(1);
 
-  // Compute the trussness of the edges.
-  IGRAPH_HANDLE_EXCEPTIONS(IGRAPH_CHECK(igraph_i_trussness(graph, &support, trussness)));
-  igraph_vector_int_destroy(&support);
-  IGRAPH_FINALLY_CLEAN(1);
+    // Compute the trussness of the edges.
+    IGRAPH_HANDLE_EXCEPTIONS(IGRAPH_CHECK(igraph_i_trussness(graph, &support, trussness)));
+    igraph_vector_int_destroy(&support);
+    IGRAPH_FINALLY_CLEAN(1);
 
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 // Unpack the triangles as a vector of vertices to be a vector of edges.
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
 static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
-  long int i, j, num_triangles;
+    long int i, j, num_triangles;
 
-  num_triangles = igraph_vector_int_size(tri);
+    num_triangles = igraph_vector_int_size(tri);
 
-  IGRAPH_CHECK(igraph_vector_resize(unpacked_tri, 2 * num_triangles));
+    IGRAPH_CHECK(igraph_vector_resize(unpacked_tri, 2 * num_triangles));
 
-  for (i = 0, j = 0; i < num_triangles; i += 3, j += 6){
-    VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
-    VECTOR(*unpacked_tri)[j+1] = VECTOR(*unpacked_tri)[j+4] = VECTOR(*tri)[i+1];
-    VECTOR(*unpacked_tri)[j+3] = VECTOR(*unpacked_tri)[j+5] = VECTOR(*tri)[i+2];
-  }
+    for (i = 0, j = 0; i < num_triangles; i += 3, j += 6) {
+        VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
+        VECTOR(*unpacked_tri)[j+1] = VECTOR(*unpacked_tri)[j+4] = VECTOR(*tri)[i+1];
+        VECTOR(*unpacked_tri)[j+3] = VECTOR(*unpacked_tri)[j+5] = VECTOR(*tri)[i+2];
+    }
 
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
 static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
-  long int m = igraph_vector_size(eid);
-  for (long int i = 0; i < m; ++i){
-    VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
-  }
+    long int m = igraph_vector_size(eid);
+    for (long int i = 0; i < m; ++i) {
+        VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
+    }
 }
 
 
 /* internal function doing the computations once the support is defined */
 static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
-  igraph_vector_int_t *trussness){
+                              igraph_vector_int_t *trussness) {
 
-  igraph_integer_t fromVertex, toVertex, e1, e2;
-  igraph_adjlist_t adjlist;
-  igraph_vector_int_t *fromNeighbors, *toNeighbors, *q1, *q2;
-  igraph_vector_int_t commonNeighbors;
-  bool e1_complete, e2_complete;
-  int j, n, level, newLevel, max;
-  long int i, seed, ncommon, nedges;
+    igraph_integer_t fromVertex, toVertex, e1, e2;
+    igraph_adjlist_t adjlist;
+    igraph_vector_int_t *fromNeighbors, *toNeighbors, *q1, *q2;
+    igraph_vector_int_t commonNeighbors;
+    bool e1_complete, e2_complete;
+    int j, n, level, newLevel, max;
+    long int i, seed, ncommon, nedges;
 
-  // C++ data structures
-  vector<bool> completed;
-  vector< unordered_set<long int> > vec;
-  unordered_set<long int>::iterator it;
+    // C++ data structures
+    vector<bool> completed;
+    vector< unordered_set<long int> > vec;
+    unordered_set<long int>::iterator it;
 
-  // Allocate memory for result
-  nedges = igraph_vector_int_size(support);
-  IGRAPH_CHECK(igraph_vector_int_resize(trussness, nedges));
-  if (nedges == 0)
-      return IGRAPH_SUCCESS;
+    // Allocate memory for result
+    nedges = igraph_vector_int_size(support);
+    IGRAPH_CHECK(igraph_vector_int_resize(trussness, nedges));
+    if (nedges == 0)
+        return IGRAPH_SUCCESS;
 
-  // Get max possible value = max entry in support.
-  // This cannot be computed if there are no edges, hence the above if
-  max = igraph_vector_int_max(support);
+    // Get max possible value = max entry in support.
+    // This cannot be computed if there are no edges, hence the above if
+    max = igraph_vector_int_max(support);
 
-  // Initialize completed edges.
-  completed.resize(nedges);
+    // Initialize completed edges.
+    completed.resize(nedges);
 
-  // The vector of levels. Each level of the vector is a set of edges initially
-  // at that level of support, where support is # of triangles the edge is in.
-  vec.resize(max + 1);
+    // The vector of levels. Each level of the vector is a set of edges initially
+    // at that level of support, where support is # of triangles the edge is in.
+    vec.resize(max + 1);
 
-  // Add each edge to its appropriate level of support.
-  for (i = 0; i < nedges; ++i) {
-    vec[VECTOR(*support)[i]].insert(i);  // insert edge i into its support level
-  }
+    // Add each edge to its appropriate level of support.
+    for (i = 0; i < nedges; ++i) {
+        vec[VECTOR(*support)[i]].insert(i);  // insert edge i into its support level
+    }
 
 
-  // Record the trussness of edges at level 0. These edges are not part
-  // of any triangles, so there's not much to do and we "complete" them
-  for (it = vec[0].begin(); it != vec[0].end(); ++it){
-    VECTOR(*trussness)[*it] = 2;
-    completed[*it] = 1;
-  }
+    // Record the trussness of edges at level 0. These edges are not part
+    // of any triangles, so there's not much to do and we "complete" them
+    for (it = vec[0].begin(); it != vec[0].end(); ++it) {
+        VECTOR(*trussness)[*it] = 2;
+        completed[*it] = 1;
+    }
 
-  // Initialize variables needed below.
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS,
-                                   IGRAPH_MULTIPLE));
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-  IGRAPH_VECTOR_INT_INIT_FINALLY(&commonNeighbors, 0);
+    // Initialize variables needed below.
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS,
+                                     IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&commonNeighbors, 0);
 
-  /* Sort each vector of neighbors, so it's done once for all */
-  igraph_adjlist_sort(&adjlist);
+    /* Sort each vector of neighbors, so it's done once for all */
+    igraph_adjlist_sort(&adjlist);
 
-  // Move through the levels, one level at a time, starting at first level.
-  for (level = 1; level <= max; ++level){
+    // Move through the levels, one level at a time, starting at first level.
+    for (level = 1; level <= max; ++level) {
 
-    /* Track down edges one at a time */
-    while (!vec[level].empty()){
-      seed = *vec[level].begin();  // pull out the first edge
-      vec[level].erase(seed);  // remove the first element
+        /* Track down edges one at a time */
+        while (!vec[level].empty()) {
+            seed = *vec[level].begin();  // pull out the first edge
+            vec[level].erase(seed);  // remove the first element
 
-      /* Find the vertices of this edge */
-      igraph_edge(graph, seed, &fromVertex, &toVertex);
+            /* Find the vertices of this edge */
+            igraph_edge(graph, seed, &fromVertex, &toVertex);
 
-      /* Find neighbors of both vertices. If they run into each other,
-       * there is a triangle. Because we sorted the adjacency list already,
-       * we don't need to sort it for every edge here */
-      fromNeighbors = igraph_adjlist_get(&adjlist, fromVertex);
-      toNeighbors = igraph_adjlist_get(&adjlist, toVertex);
-      q1 = fromNeighbors;
-      q2 = toNeighbors;
+            /* Find neighbors of both vertices. If they run into each other,
+             * there is a triangle. Because we sorted the adjacency list already,
+             * we don't need to sort it for every edge here */
+            fromNeighbors = igraph_adjlist_get(&adjlist, fromVertex);
+            toNeighbors = igraph_adjlist_get(&adjlist, toVertex);
+            q1 = fromNeighbors;
+            q2 = toNeighbors;
 
-      if (igraph_vector_int_size(q1) > igraph_vector_int_size(q2)){
-        // case: #fromNeighbors > #toNeigbors, so make q1 the smaller set.
-        q1 = toNeighbors;
-        q2 = fromNeighbors;
-      }
+            if (igraph_vector_int_size(q1) > igraph_vector_int_size(q2)) {
+                // case: #fromNeighbors > #toNeigbors, so make q1 the smaller set.
+                q1 = toNeighbors;
+                q2 = fromNeighbors;
+            }
 
-      // Intersect the neighbors.
-      IGRAPH_CHECK(igraph_vector_int_intersect_sorted(q1, q2, &commonNeighbors));
+            // Intersect the neighbors.
+            IGRAPH_CHECK(igraph_vector_int_intersect_sorted(q1, q2, &commonNeighbors));
 
-      /* Go over the overlapping neighbors and check each */
-      ncommon = igraph_vector_int_size(&commonNeighbors);
-      for (j = 0; j < ncommon; j++){
-        n = VECTOR(commonNeighbors)[j];  // the common neighbor
-        IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, 1));
-        IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, 1));
+            /* Go over the overlapping neighbors and check each */
+            ncommon = igraph_vector_int_size(&commonNeighbors);
+            for (j = 0; j < ncommon; j++) {
+                n = VECTOR(commonNeighbors)[j];  // the common neighbor
+                IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, 1));
+                IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, 1));
 
-        e1_complete = completed[e1] == 1;
-        e2_complete = completed[e2] == 1;
+                e1_complete = completed[e1] == 1;
+                e2_complete = completed[e2] == 1;
 
-        if (!e1_complete && !e2_complete){
-          // Demote this edge, if higher than current level.
-          if (VECTOR(*support)[e1] > level){
-            VECTOR(*support)[e1] -= 1;  // decrement the level
-            newLevel = VECTOR(*support)[e1];
-            vec[newLevel].insert(e1);
-            vec[newLevel + 1].erase(e1);  // the old level
-          }
-          // Demote this edge, if higher than current level.
-          if (VECTOR(*support)[e2] > level){
-            VECTOR(*support)[e2] -= 1;  // decrement the level
-            newLevel = VECTOR(*support)[e2];
-            vec[newLevel].insert(e2);
-            vec[newLevel + 1].erase(e2);  // the old level
-          }
-        }
-      }
-      // Record this edge; its level is its trussness.
-      VECTOR(*trussness)[seed] = level + 2;
-      completed[seed] = 1; // mark as complete
-      igraph_vector_int_clear(&commonNeighbors);
-    }  // end while
-  }  // end for-loop over levels
+                if (!e1_complete && !e2_complete) {
+                    // Demote this edge, if higher than current level.
+                    if (VECTOR(*support)[e1] > level) {
+                        VECTOR(*support)[e1] -= 1;  // decrement the level
+                        newLevel = VECTOR(*support)[e1];
+                        vec[newLevel].insert(e1);
+                        vec[newLevel + 1].erase(e1);  // the old level
+                    }
+                    // Demote this edge, if higher than current level.
+                    if (VECTOR(*support)[e2] > level) {
+                        VECTOR(*support)[e2] -= 1;  // decrement the level
+                        newLevel = VECTOR(*support)[e2];
+                        vec[newLevel].insert(e2);
+                        vec[newLevel + 1].erase(e2);  // the old level
+                    }
+                }
+            }
+            // Record this edge; its level is its trussness.
+            VECTOR(*trussness)[seed] = level + 2;
+            completed[seed] = 1; // mark as complete
+            igraph_vector_int_clear(&commonNeighbors);
+        }  // end while
+    }  // end for-loop over levels
 
-  // Clean up.
-  igraph_vector_int_destroy(&commonNeighbors);
-  igraph_adjlist_destroy(&adjlist);
-  IGRAPH_FINALLY_CLEAN(2);
+    // Clean up.
+    igraph_vector_int_destroy(&commonNeighbors);
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(2);
 
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
