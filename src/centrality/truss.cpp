@@ -26,15 +26,18 @@
 
 */
 
-#include "igraph_adjlist.h"
+#include <vector>
+#include <unordered_set>
+
 #include "igraph_community.h"
-#include "core/exceptions.h"
+
+#include "igraph_adjlist.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_motifs.h"
+#include "igraph_structural.h"
 
-#include <vector>
-#include <unordered_set>
+#include "core/exceptions.h"
 
 using namespace std;
 
@@ -50,7 +53,8 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * indicates the highest k-truss that the edge occurs in.
  *
  * </para><para>
- * A k-truss is a subgraph in which every edge occurs in at least k-2 triangles in the subgraph.
+ * A k-truss is a subgraph in which every edge occurs in at least k-2 triangles
+ * in the subgraph.
  *
  * </para><para>
  * This function returns the highest k for each edge. If you are interested in
@@ -61,9 +65,11 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  *
  * </para><para>
  * The current implementation of this function iteratively decrements support
- * of each edge using O(|E|) space and O(|E|^1.5) time.
+ * of each edge using O(|E|) space and O(|E|^1.5) time. The implementation does
+ * not support multigraphs; use \ref igraph_simplify() to collapse edges before
+ * calling this function.
  *
- * \param graph The input graph.
+ * \param graph The input graph. Loop edges are allowed; multigraphs are not.
  * \param truss Pointer to initialized vector of truss values that will
  * indicate the highest k-truss each edge occurs in. It will be resized as
  * needed.
@@ -76,6 +82,14 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
 int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
   igraph_vector_int_t triangles, support;
   igraph_vector_t eid, unpacked_triangles;
+  igraph_bool_t is_multigraph;
+
+  /* Check whether the graph is a multigraph; trussness will not work for these */
+  IGRAPH_CHECK(igraph_has_multiple(graph, &is_multigraph));
+
+  if (is_multigraph) {
+    IGRAPH_ERROR("Trussness is not implemented for multigraphs", IGRAPH_UNIMPLEMENTED);
+  }
 
   /* Manage the stack to make it memory safe: do not change the order of
    * initialization of the following four vectors */

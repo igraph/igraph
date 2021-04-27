@@ -65,3 +65,5 @@ fromNode,toNode,truss
 
 Graph with no edges:
 fromNode,toNode,truss
+
+Trying multigraph:

@@ -100,6 +100,17 @@ int main() {
     print_and_destroy(&graph, &trussness);
 
     VERIFY_FINALLY_STACK();
-  
+    igraph_set_error_handler(igraph_error_handler_ignore);
+
+    /* Multigraph */
+    printf("\nTrying multigraph:\n");
+    igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
+    igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_MUTUAL);
+    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_EACH, 0);
+    igraph_vector_int_init(&trussness, 0);
+    IGRAPH_ASSERT(igraph_trussness(&graph, &trussness) == IGRAPH_UNIMPLEMENTED);
+    igraph_vector_int_destroy(&trussness);
+    igraph_destroy(&graph);
+
     return 0;
 }
