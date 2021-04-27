@@ -854,15 +854,16 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
  *
  * </para><para>
  * Dyad census means classifying each pair of vertices of a directed
- * graph into three categories: mutual, there is an edge from \c a to
- * \c b and also from \c b to \c a; asymmetric, there is an edge
- * either from \c a to \c b or from \c b to \c a but not the other way
- * and null, no edges between \c a and \c b.
+ * graph into three categories: mutual (there is at least one edge from
+ * \c a to \c b and also from \c b to \c a); asymmetric (there is at least
+ * one edge either from \c a to \c b or from \c b to \c a, but not the other
+ * way) and null (no edges between \c a and \c b in either direction).
  *
  * </para><para>
  * Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
  * Structure in Sociometric Data.  American Journal of Sociology,
  * 70, 492-513.
+ *
  * \param graph The input graph. For an undirected graph, there are no
  *    asymmetric connections.
  * \param mut Pointer to an integer, the number of mutual dyads is
@@ -892,8 +893,8 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 
     for (i = 0; i < vc; i++) {
         long int ip, op;
-        igraph_i_neighbors(graph, &inneis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
-        igraph_i_neighbors(graph, &outneis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+        IGRAPH_CHECK(igraph_i_neighbors(graph, &inneis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+        IGRAPH_CHECK(igraph_i_neighbors(graph, &outneis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
 
         ip = op = 0;
         while (ip < igraph_vector_size(&inneis) &&
