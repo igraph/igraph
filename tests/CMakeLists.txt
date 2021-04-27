@@ -13,7 +13,6 @@ add_custom_target(
 add_dependencies(check build_tests)
 
 # Add a custom target for benchmarks and another one for building them
-# TODO(ntamas)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
@@ -82,6 +81,7 @@ add_legacy_tests(
   igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
@@ -202,6 +202,7 @@ add_legacy_tests(
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
+  igraph_perfect
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
@@ -276,6 +277,7 @@ add_legacy_tests(
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_pseudo_diameter
   igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
@@ -388,6 +390,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_dyad_census
   igraph_motifs_randesu_estimate
   igraph_motifs_randesu_no
   triad_census
@@ -674,25 +677,6 @@ if(CMAKE_USE_PTHREADS_INIT)
     )
   endif()
 endif()
-
-# scg.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_scg_grouping
-  igraph_scg_grouping2
-  igraph_scg_grouping3
-  igraph_scg_grouping4
-  igraph_scg_semiprojectors
-  igraph_scg_semiprojectors2
-  igraph_scg_semiprojectors3
-  scg
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  scg2
-  scg3
-)
 
 # random.at
 add_examples(

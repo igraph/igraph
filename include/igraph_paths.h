@@ -34,14 +34,15 @@ __BEGIN_DECLS
 
 IGRAPH_EXPORT int igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,
-                                  igraph_vector_t *path,
+                                  igraph_vector_t *vertex_path, igraph_vector_t *edge_path,
                                   igraph_bool_t directed, igraph_bool_t unconn);
 IGRAPH_EXPORT int igraph_diameter_dijkstra(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            igraph_real_t *pres,
                                            igraph_integer_t *pfrom,
                                            igraph_integer_t *pto,
-                                           igraph_vector_t *path,
+                                           igraph_vector_t *vertex_path, 
+                                           igraph_vector_t *edge_path,
                                            igraph_bool_t directed,
                                            igraph_bool_t unconn);
 
@@ -151,6 +152,13 @@ IGRAPH_EXPORT int igraph_eccentricity(const igraph_t *graph,
 
 IGRAPH_EXPORT int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);
+
+IGRAPH_EXPORT int igraph_pseudo_diameter(const igraph_t *graph,
+                                         igraph_real_t *diameter,
+                                         igraph_integer_t vid_start,
+                                         igraph_integer_t *from,
+                                         igraph_integer_t *to,
+                                         igraph_bool_t unconn);
 
 IGRAPH_EXPORT int igraph_get_all_simple_paths(const igraph_t *graph,
                                               igraph_vector_int_t *res,

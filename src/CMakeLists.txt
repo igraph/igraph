@@ -238,16 +238,10 @@ add_library(
   properties/loops.c
   properties/multiplicity.c
   properties/neighborhood.c
+  properties/perfect.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
-
-  scg/scg_approximate_methods.c
-  scg/scg_exact_scg.c
-  scg/scg_kmeans.c
-  scg/scg_optimal_method.c
-  scg/scg_utils.c
-  scg/scg.c
 
   isomorphism/bliss.cc
   isomorphism/isoclasses.c
