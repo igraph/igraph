@@ -106,7 +106,7 @@ int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness){
   IGRAPH_FINALLY_CLEAN(1);
 
   // Compute the trussness of the edges.
-  IGRAPH_CHECK(igraph_i_trussness(graph, &support, trussness));
+  IGRAPH_HANDLE_EXCEPTIONS(IGRAPH_CHECK(igraph_i_trussness(graph, &support, trussness)));
   igraph_vector_int_destroy(&support);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -168,15 +168,15 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
   max = igraph_vector_int_max(support);
 
   // Initialize completed edges.
-  IGRAPH_HANDLE_EXCEPTIONS(completed.resize(nedges));
+  completed.resize(nedges);
 
   // The vector of levels. Each level of the vector is a set of edges initially
   // at that level of support, where support is # of triangles the edge is in.
-  IGRAPH_HANDLE_EXCEPTIONS(vec.resize(max + 1));
+  vec.resize(max + 1);
 
   // Add each edge to its appropriate level of support.
   for (i = 0; i < nedges; ++i) {
-    IGRAPH_HANDLE_EXCEPTIONS(vec[VECTOR(*support)[i]].insert(i));  // insert edge i into its support level
+    vec[VECTOR(*support)[i]].insert(i);  // insert edge i into its support level
   }
 
 
@@ -222,14 +222,14 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
       }
 
       // Intersect the neighbors.
-      igraph_vector_int_intersect_sorted(q1, q2, &commonNeighbors);
+      IGRAPH_CHECK(igraph_vector_int_intersect_sorted(q1, q2, &commonNeighbors));
 
       /* Go over the overlapping neighbors and check each */
       ncommon = igraph_vector_int_size(&commonNeighbors);
       for (j = 0; j < ncommon; j++){
         n = VECTOR(commonNeighbors)[j];  // the common neighbor
-        igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, 1);
-        igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, 1);
+        IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, 1));
+        IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, 1));
 
         e1_complete = completed[e1] == 1;
         e2_complete = completed[e2] == 1;
