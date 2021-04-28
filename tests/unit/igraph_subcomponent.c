@@ -23,6 +23,7 @@ void call_and_print(igraph_t *graph, igraph_real_t vertex, igraph_neimode_t mode
     igraph_vector_t result;
     igraph_vector_init(&result, 0);
     IGRAPH_ASSERT(igraph_subcomponent(graph, &result, vertex, mode) == IGRAPH_SUCCESS);
+    igraph_vector_sort(&result);
     igraph_vector_print(&result);
     igraph_vector_destroy(&result);
     printf("\n");
