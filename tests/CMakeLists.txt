@@ -302,6 +302,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bridges
   igraph_decompose_strong
+  igraph_subcomponent
 )
 
 # layout.at

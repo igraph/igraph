@@ -1312,16 +1312,16 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
     igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
 
     if (!IGRAPH_FINITE(vertex) || vertex < 0 || vertex >= no_of_nodes) {
-        IGRAPH_ERROR("subcomponent failed", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("subcomponent failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Subcomponent failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -1359,5 +1359,5 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
     IGRAPH_FREE(already_added);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
