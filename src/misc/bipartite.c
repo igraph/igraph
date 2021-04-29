@@ -754,8 +754,7 @@ int igraph_get_incidence(const igraph_t *graph,
         }
     }
     if (ignored_edges) {
-            IGRAPH_WARNINGF("Types vector does not split up the graph in two independent sets, "
-                            "%ld edges running within partitions were ignored.", ignored_edges);
+            IGRAPH_WARNINGF("%ld edges running within partitions were ignored.", ignored_edges);
     }
 
     if (row_ids) {
