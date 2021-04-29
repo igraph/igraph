@@ -8,6 +8,7 @@
 
 ### Fixed
 
+ - `igraph_get_incidence()` no longer reads and writes out of bounds when given a non-bipartite graph, but gives an error.
  - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
  - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
  - The parser sources could not be generated when igraph was in a location that contained spaces in its path.

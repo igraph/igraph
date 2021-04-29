@@ -687,11 +687,13 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  * \brief Convert a bipartite graph into an incidence matrix.
  *
  * \param graph The input graph, edge directions are ignored.
- * \param types Boolean vector containing the vertex types.
+ * \param types Boolean vector containing the vertex types. All vertices
+ *   in one part of the graph should have type 0, the others type 1.
  * \param res Pointer to an initialized matrix, the result is stored
  *   here. An element of the matrix gives the number of edges
  *   (irrespectively of their direction) between the two corresponding
- *   vertices.
+ *   vertices. The rows will correspond to vertices with type 0,
+ *   the columns correspond to vertices with type 1.
  * \param row_ids Pointer to an initialized vector or a null
  *   pointer. If not a null pointer, then the vertex ids (in the
  *   graph) corresponding to the rows of the result matrix are stored
@@ -720,8 +722,8 @@ int igraph_get_incidence(const igraph_t *graph,
     long int p1, p2;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid vertex type vector for bipartite graph",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Vertex type vector size (%ld) not equal to number of vertices (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -742,6 +744,9 @@ int igraph_get_incidence(const igraph_t *graph,
         long int to = IGRAPH_TO(graph, i);
         long int from2 = (long int) VECTOR(perm)[from];
         long int to2 = (long int) VECTOR(perm)[to];
+        if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
+            IGRAPH_ERROR("Graph is not bipartite.", IGRAPH_EINVAL);
+        }
         if (! VECTOR(*types)[from]) {
             MATRIX(*res, from2, to2 - n1) += 1;
         } else {
@@ -773,7 +778,7 @@ int igraph_get_incidence(const igraph_t *graph,
 
     igraph_vector_destroy(&perm);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
