@@ -612,6 +612,11 @@ add_examples(
   igraph_bipartite_projection
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_get_incidence
+)
+
 # centralization.at
 add_examples(
   FOLDER examples/simple NAMES
