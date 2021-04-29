@@ -906,8 +906,11 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * If the elements of two vectors match but one is shorter, the shorter
  * one comes first. Thus {1, 3} comes after {1, 2, 3}, but before {1, 3, 4}.
  *
- * \param lhs The first vector.
- * \param rhs The second vector.
+ * </para><para>
+ * This function is typically used together with \ref igraph_vector_ptr_sort().
+ *
+ * \param lhs Pointer to a pointer to the first vector (interpreted as an <code>igraph_vector_t **</code>).
+ * \param rhs Pointer to a pointer to the second vector (interpreted as an <code>igraph_vector_t **</code>).
  * \return -1 if \p lhs is lexicographically smaller,
  *         0 if \p lhs and \p rhs are equal, else 1.
  * \sa \ref igraph_vector_colex_cmp() to compare vectors starting from
@@ -916,8 +919,8 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
 int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
-    const TYPE(igraph_vector) *a = lhs;
-    const TYPE(igraph_vector) *b = rhs;
+    const TYPE(igraph_vector) *a = * (TYPE(igraph_vector) **) lhs;
+    const TYPE(igraph_vector) *b = * (TYPE(igraph_vector) **) rhs;
     long int i, sa, sb;
 
     sa = FUNCTION(igraph_vector, size)(a);
@@ -952,8 +955,11 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  * shorter, the shorter one comes first. Thus {1, 2} comes after {3, 2, 1},
  * but before {0, 1, 2}.
  *
- * \param lhs The first vector.
- * \param rhs The second vector.
+ * </para><para>
+ * This function is typically used together with \ref igraph_vector_ptr_sort().
+ *
+ * \param lhs Pointer to a pointer to the first vector (interpreted as an <code>igraph_vector_t **</code>).
+ * \param rhs Pointer to a pointer to the second vector (interpreted as an <code>igraph_vector_t **</code>).
  * \return -1 if \p lhs in reverse order is
  *         lexicographically smaller than the reverse of \p rhs,
  *         0 if \p lhs and \p rhs are equal, else 1.
@@ -963,8 +969,8 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  * Time complexity: O(n), the number of elements in the smaller vector.
  */
 int FUNCTION(igraph_vector, colex_cmp)(const void *lhs, const void *rhs) {
-    const TYPE(igraph_vector) *a = lhs;
-    const TYPE(igraph_vector) *b = rhs;
+    const TYPE(igraph_vector) *a = * (TYPE(igraph_vector) **) lhs;
+    const TYPE(igraph_vector) *b = * (TYPE(igraph_vector) **) rhs;
     long int i, sa, sb, rai, rbi;
 
     sa = FUNCTION(igraph_vector, size)(a);
