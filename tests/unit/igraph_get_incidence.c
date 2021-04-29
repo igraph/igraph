@@ -65,10 +65,10 @@ int main() {
     printf("Disconnected graph with multiple edges:\n");
     call_and_print(&g_mu, &t_mu);
 
-    VERIFY_FINALLY_STACK();
+    printf("Checking non-bipartite graph.\n");
+    call_and_print(&g_mun, &t_mu);
 
-    printf("Checking on-bipartite graph error handling.\n");
-    CHECK_ERROR(igraph_get_incidence(&g_mun, &t_mu, &result, NULL, NULL), IGRAPH_EINVAL);
+    VERIFY_FINALLY_STACK();
 
     printf("Checking wrong type vector size error handling.\n");
     CHECK_ERROR(igraph_get_incidence(&g_mu, &t_0, &result, NULL, NULL), IGRAPH_EINVAL);

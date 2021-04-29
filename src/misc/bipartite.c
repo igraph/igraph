@@ -720,6 +720,7 @@ int igraph_get_incidence(const igraph_t *graph,
     long int n1 = 0, n2 = 0, i;
     igraph_vector_t perm;
     long int p1, p2;
+    long int ignored_edges = 0;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
         IGRAPH_ERRORF("Vertex type vector size (%ld) not equal to number of vertices (%ld).",
@@ -745,13 +746,16 @@ int igraph_get_incidence(const igraph_t *graph,
         long int from2 = (long int) VECTOR(perm)[from];
         long int to2 = (long int) VECTOR(perm)[to];
         if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
-            IGRAPH_ERROR("Graph is not bipartite.", IGRAPH_EINVAL);
-        }
-        if (! VECTOR(*types)[from]) {
+            ignored_edges++;
+        } else if (! VECTOR(*types)[from]) {
             MATRIX(*res, from2, to2 - n1) += 1;
         } else {
             MATRIX(*res, to2, from2 - n1) += 1;
         }
+    }
+    if (ignored_edges) {
+            IGRAPH_WARNINGF("Types vector does not split up the graph in two independent sets, "
+                            "%ld edges running within partitions were ignored.", ignored_edges);
     }
 
     if (row_ids) {

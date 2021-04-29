@@ -22,5 +22,14 @@ Row ids:
 Col ids:
 ( 1 2 4 )
 
-Checking on-bipartite graph error handling.
+Checking non-bipartite graph.
+Incidence matrix:
+[        1        3        0
+         1        1        2
+         0        0        0 ]
+Row ids:
+( 0 3 5 )
+Col ids:
+( 1 2 4 )
+
 Checking wrong type vector size error handling.
