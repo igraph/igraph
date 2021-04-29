@@ -917,6 +917,8 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  *     the last element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
+ *
+ * \example examples/simple/igraph_vector_ptr_sort.c
  */
 int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
     const TYPE(igraph_vector) *a = * (TYPE(igraph_vector) **) lhs;
@@ -967,6 +969,8 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  *     the first element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
+ *
+ * \example examples/simple/igraph_vector_ptr_sort.c
  */
 int FUNCTION(igraph_vector, colex_cmp)(const void *lhs, const void *rhs) {
     const TYPE(igraph_vector) *a = * (TYPE(igraph_vector) **) lhs;

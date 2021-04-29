@@ -535,7 +535,8 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
 
 /**
  * \ingroup vectorptr
- * \brief Sort the pointer vector based on an external comparison function
+ * \function igraph_vector_ptr_sort
+ * \brief Sorts the pointer vector based on an external comparison function.
  *
  * Sometimes it is necessary to sort the pointers in the vector based on
  * the property of the element being referenced by the pointer. This
@@ -545,7 +546,15 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
  * first argument is considered to be respectively less than, equal to, or
  * greater than the second. \c p1 and \c p2 will point to the pointer in the
  * vector, so they have to be double-dereferenced if one wants to get access
- * to the underlying object the address of which is stored in \c v .
+ * to the underlying object the address of which is stored in \c v.
+ *
+ * \param v The pointer vector to be sorted.
+ * \param compar A qsort-compatible comparison function. It must take pointers to the
+ *    elements of the pointer vector. For example, if the pointer vector contains
+ *    <code>igraph_vector_t *</code> pointers, then the comparison function must
+ *    interpret its arguments as <code>igraph_vector_t **</code>.
+ *
+ * \example examples/simple/igraph_vector_ptr_sort.c
  */
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
     igraph_qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*),
