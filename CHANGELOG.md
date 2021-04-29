@@ -38,7 +38,7 @@
 
 ### Added
 
- - `igraph_vector_lex_cmp()` and `igrapg_vector_colex_cmp()` for lexicographic
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` for lexicographic
    and colexicographic comparison of vectors. These functions may also be used
    for sorting.
 
