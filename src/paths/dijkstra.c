@@ -111,9 +111,11 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     if (!weights) {
         return igraph_shortest_paths(graph, res, from, to, mode);
     }
+
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
+
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
@@ -622,8 +624,16 @@ static int igraph_i_vector_tail_cmp(void *extra, const void* a, const void* b) {
     long int *bb = (long int*) b;
     igraph_vector_t *path_a = (igraph_vector_t *) VECTOR(*paths)[*aa];
     igraph_vector_t *path_b = (igraph_vector_t *) VECTOR(*paths)[*bb];
+    igraph_real_t tail_a = igraph_vector_tail(path_a);
+    igraph_real_t tail_b = igraph_vector_tail(path_b);
 
-    return (int) (igraph_vector_tail(path_a) - igraph_vector_tail(path_b));
+    if (tail_a > tail_b) {
+        return 1;
+    } else if (tail_a < tail_b) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 
