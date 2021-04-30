@@ -187,20 +187,34 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     }
 
     /* from -> from */
+    /* This is quite convoluted, but it needs to be done this way to cover our bases
+     * with error handling. First, we allocate memory for an igraph_vector_t */
     vptr = igraph_Calloc(1, igraph_vector_t);
     if (vptr == 0) {
         IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
     }
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
-    IGRAPH_CHECK(igraph_vector_init(vptr, 1));
+    /* Now we have an allocated pointer that we own, so we need to free it if there is
+     * an error */
+    IGRAPH_FINALLY(igraph_free, vptr);
+    /* Next, we initialize the vector and make sure to destroy it if there is an error */
+    IGRAPH_VECTOR_INIT_FINALLY(vptr, 1);
     VECTOR(*vptr)[0] = from;
+    /* Okay, no problems so far, let's push the vector to vptr. At that point, vptr will
+     * take ownership and we can get rid of our cleanup entries in the "finally" stack.
+     * There will be two of them, one for the vptr initialization as an igraph_vector_t,
+     * and one for the allocation of vptr itself */
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
+    IGRAPH_FINALLY_CLEAN(2);
+    /* Now the same dance for vptr_e */
     vptr_e = igraph_Calloc(1, igraph_vector_t);
     if (vptr_e == 0) {
         IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
     }
+    IGRAPH_FINALLY(igraph_free, vptr_e);
+    IGRAPH_VECTOR_INIT_FINALLY(vptr_e, 0);
     IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
-    IGRAPH_CHECK(igraph_vector_init(vptr_e, 1));
-    VECTOR(*vptr_e)[0] = -1;
+    IGRAPH_FINALLY_CLEAN(2);
+
     geodist[(long int)from] = 1;
     VECTOR(ptrhead)[(long int)from] = 1;
     IGRAPH_CHECK(igraph_vector_push_back(&ptrlist, 0));
@@ -268,29 +282,38 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             /* copy all existing paths to the parent */
             fatherptr = (long int) VECTOR(ptrhead)[actnode];
             while (fatherptr != 0) {
-                /* allocate a new igraph_vector_t at the end of paths */
+                /* allocate a new igraph_vector_t at the end of paths. Again, the same
+                 * complicated dance as the one we've had at the beginning of the function */
                 vptr = igraph_Calloc(1, igraph_vector_t);
                 if (vptr == 0) {
                     IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
                 }
-                IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
+                IGRAPH_FINALLY(igraph_free, vptr);
                 IGRAPH_CHECK(igraph_vector_copy(vptr, VECTOR(paths)[fatherptr - 1]));
+                IGRAPH_FINALLY(igraph_vector_destroy, vptr);
                 IGRAPH_CHECK(igraph_vector_reserve(vptr, actdist + 2));
                 IGRAPH_CHECK(igraph_vector_push_back(vptr, neighbor));
+                IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
+                IGRAPH_FINALLY_CLEAN(2);
+
                 vptr_e = igraph_Calloc(1, igraph_vector_t);
                 if (vptr_e == 0) {
                     IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
                 }
-                IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
+                IGRAPH_FINALLY(igraph_free, vptr_e);
                 /* If the previous vertex was the source then there is no edge to add*/
                 if (actnode != from) {
                     IGRAPH_CHECK(igraph_vector_copy(vptr_e, VECTOR(path_edge)[fatherptr - 1]));
+                    IGRAPH_FINALLY(igraph_vector_destroy, vptr_e);
                     IGRAPH_CHECK(igraph_vector_reserve(vptr_e, actdist + 2));
                     IGRAPH_CHECK(igraph_vector_push_back(vptr_e, VECTOR(neis)[j]));
                 } else {
-                    IGRAPH_CHECK(igraph_vector_init(vptr_e, 1));
+                    IGRAPH_VECTOR_INIT_FINALLY(vptr_e, 1);
                     VECTOR(*vptr_e)[0] = VECTOR(neis)[j];
                 }
+                IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
+                IGRAPH_FINALLY_CLEAN(2);
+                
                 IGRAPH_CHECK(igraph_vector_push_back(&ptrlist,
                                                      VECTOR(ptrhead)[neighbor]));
                 VECTOR(ptrhead)[neighbor] = igraph_vector_size(&ptrlist);
