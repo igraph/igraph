@@ -291,7 +291,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
  *           \p from is invalid vertex id, or the length of \p to is
- *           not the same as the length of \p res.
+ *           not the same as the length of \p vertices (if not NULL) or
+ *           the length of \p edges (if not NULL)
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -636,7 +637,6 @@ static int igraph_i_vector_tail_cmp(void *extra, const void* a, const void* b) {
     }
 }
 
-
 /**
  * \ingroup structural
  * \function igraph_get_all_shortest_paths_dijkstra
@@ -650,7 +650,7 @@ static int igraph_i_vector_tail_cmp(void *extra, const void* a, const void* b) {
  *   paths to vertex 0, then to vertex 1, etc. No data is included 
  *   for unreachable vertices.
  * \param edges Pointer to an initialized pointer vector or NULL. If 
- *   not null, then each vector object contains the edges along a 
+ *   not NULL, then each vector object contains the edges along a 
  *   shortest path from \p from to another vertex. The vectors are 
  *   ordered according to their target vertex: first the shortest 
  *   paths to vertex 0, then to vertex 1, etc. No data is included for
@@ -687,8 +687,7 @@ static int igraph_i_vector_tail_cmp(void *extra, const void* a, const void* b) {
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
- *           not the same as the length of \p vertices.
+ *           \p from is an invalid vertex id
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -751,32 +750,34 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
      * of each vertex in the traversal */
     IGRAPH_CHECK(igraph_vector_ptr_init(&parents, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents);
-    igraph_vector_ptr_set_item_destructor(&parents, (igraph_finally_func_t*)igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents, igraph_vector_destroy);
+
     /* parents_edge stores a vector for each vertex, listing the parent edges
      * of each vertex in the traversal */
-    if (no_of_edges == 0) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, 1));
-    }
-    else {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, no_of_edges));
-    }
+    IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, no_of_edges));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents_edge);
-    igraph_vector_ptr_set_item_destructor(&parents_edge, (igraph_finally_func_t*)igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents_edge, igraph_vector_destroy);
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_t *parent_vec, *parent_edge_vec;
+
         parent_vec = igraph_Calloc(1, igraph_vector_t);
         if (parent_vec == 0) {
             IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
         }
+        IGRAPH_FINALLY(igraph_free, parent_vec);
         IGRAPH_CHECK(igraph_vector_init(parent_vec, 0));
         VECTOR(parents)[i] = parent_vec;
+        IGRAPH_FINALLY_CLEAN(1);
+
         parent_edge_vec = igraph_Calloc(1, igraph_vector_t);
         if (parent_edge_vec == 0) {
             IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
         }
+        IGRAPH_FINALLY(igraph_free, parent_edge_vec);
         IGRAPH_CHECK(igraph_vector_init(parent_edge_vec, 0));
         VECTOR(parents_edge)[i] = parent_edge_vec;
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* distance of each vertex from the root */
@@ -852,10 +853,12 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             if (curdist < 0) {
                 /* This is the first non-infinite distance */
                 VECTOR(dists)[tto] = altdist;
+
                 parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
                 IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
                 parent_edge_vec = (igraph_vector_t*)VECTOR(parents_edge)[tto];
                 IGRAPH_CHECK(igraph_vector_push_back(parent_edge_vec, edge));
+
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
             } else if (altdist == curdist && VECTOR(*weights)[edge] > 0) {
                 /* This is an alternative path with exactly the same length.
@@ -870,12 +873,14 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             } else if (altdist < curdist) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
+
                 parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
                 igraph_vector_clear(parent_vec);
                 IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
                 parent_edge_vec = (igraph_vector_t*)VECTOR(parents_edge)[tto];
                 igraph_vector_clear(parent_edge_vec);
                 IGRAPH_CHECK(igraph_vector_push_back(parent_edge_vec, edge));
+
                 IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
             }
         }
@@ -1014,6 +1019,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             if (vertices == 0) {
                 IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
             }
+            IGRAPH_FINALLY(igraph_free, vertices);
             IGRAPH_CHECK(igraph_vector_ptr_init(vertices, 0));
             IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, vertices);
             free_vertices = 1;
@@ -1030,38 +1036,21 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                         IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, path);
-        IGRAPH_CHECK(igraph_vector_init(path, 1));
-
-        /* clear the paths vector */
-        /* If res doesn't exist, then create one, in order for the algorithm to work. */
-        if (!vertices) {
-            vertices = IGRAPH_CALLOC(1, igraph_vector_ptr_t);
-            if (vertices == 0) {
-                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
-            }
-            IGRAPH_CHECK(igraph_vector_ptr_init(vertices, 0));
-            IGRAPH_FINALLY(igraph_vector_ptr_destroy, vertices);
-            igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
-            free_vertices = 1;
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
-        } else {
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
-        }
-        
-        IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to vertices */
-
+        IGRAPH_VECTOR_INIT_FINALLY(path, 1);
         VECTOR(*path)[0] = from;
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
+        IGRAPH_FINALLY_CLEAN(2);  /* ownership of path passed to vertices */
+        
         if (edges) {
             path = igraph_Calloc(1, igraph_vector_t);
             if (path == 0)
                 IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths_dijkstra",
                             IGRAPH_ENOMEM);
-            /* the shortest path from the source to itself consist of the edge -1 */
+            /* the shortest path from the source to itself is empty */
             IGRAPH_FINALLY(igraph_free, path);
-            IGRAPH_CHECK(igraph_vector_init(path, 1));
+            IGRAPH_VECTOR_INIT_FINALLY(path, 0);
             IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
-            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to vertices */
-            VECTOR(*path)[0] = -1;
+            IGRAPH_FINALLY_CLEAN(2);  /* ownership of path passed to edges */
         }
         VECTOR(*paths_index)[(long int)from] = 1;
 
@@ -1119,9 +1108,11 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                                      IGRAPH_ENOMEM);
                     IGRAPH_FINALLY(igraph_free, path);
                     IGRAPH_CHECK(igraph_vector_copy(path, parent_path));
+                    IGRAPH_FINALLY(igraph_vector_destroy, path);
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
-                    IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to vertices */
+                    IGRAPH_FINALLY_CLEAN(2);  /* ownership of path passed to vertices */
                     IGRAPH_CHECK(igraph_vector_push_back(path, node));
+
                     if (edges) {
                         path = igraph_Calloc(1, igraph_vector_t);
                         if (path == 0)
@@ -1131,24 +1122,25 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                         if (parent_node != from) {
                             parent_path_edge = (igraph_vector_t*)VECTOR(*edges)[parent_path_idx];
                             IGRAPH_CHECK(igraph_vector_copy(path, parent_path_edge));
-                            IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
-                            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to edges */
-                            IGRAPH_CHECK(igraph_vector_push_back(path, parent_edge));
+                            IGRAPH_FINALLY(igraph_vector_destroy, path);
                         } else {
-                            IGRAPH_CHECK(igraph_vector_init(path, 1));
-                            IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
-                            IGRAPH_FINALLY_CLEAN(1);  /* ownership of path passed to edges */
-                            VECTOR(*path)[0] = parent_edge;
+                            IGRAPH_VECTOR_INIT_FINALLY(path, 0);
                         }
+                        IGRAPH_CHECK(igraph_vector_push_back(path, parent_edge));
+                        IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
+                        IGRAPH_FINALLY_CLEAN(2);  /* ownership of path passed to edges */
                     }
                 }
             }
         }
-        if (!free_vertices) {
-            /* remove the destructor from the path vector */
+
+        if (vertices) {
+            /* restore the old destructor of the path vector */
             igraph_vector_ptr_set_item_destructor(vertices, old_vertices_item_destructor);
         }
+
         if (edges) {
+            /* restore the old destructor of the edge-path vector */
             igraph_vector_ptr_set_item_destructor(edges, old_edge_item_destructor);
         }
 
@@ -1161,7 +1153,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             tmp = igraph_vector_tail(path);
             if (is_target[(long int)tmp] == 1) {
                 /* we need this path, keep it */
-                //inserting permutation index for sorting
                 VECTOR(*vertices)[j] = path;
                 if (edges) {
                     path = (igraph_vector_t*)VECTOR(*edges)[i];
@@ -1230,7 +1221,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (free_vertices) {
         igraph_vector_ptr_destroy_all(vertices);
         igraph_free(vertices);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_FINALLY_CLEAN(2);
     }
     IGRAPH_FINALLY_CLEAN(5);
     return IGRAPH_SUCCESS;
