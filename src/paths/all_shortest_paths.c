@@ -246,12 +246,31 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             }
         }
 
-        IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode,
-                                      mode));
+        /* If we need the edge-paths, we need to use igraph_incident() followed by an
+         * IGRAPH_OTHER() macro in the main loop. This is going to be slower than
+         * using igraph_neighbors() due to branch mispredictions in IGRAPH_OTHER(), so we
+         * use igraph_incident() only if the user needs the edge-paths */
+        if (edges) {
+            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode,
+                                         mode));
+        } else {
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actnode,
+                                          mode));
+        }
+
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            long int neighbor = (long int) IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);
+            long int neighbor;
             long int fatherptr;
+
+            if (edges) {
+                /* user needs the edge-paths, so 'neis' contains edge IDs, we need to resolve
+                 * the next edge ID into a vertex ID */
+                neighbor = (long int) IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);                
+            } else {
+                /* user does not need the edge-paths, so 'neis' contains vertex IDs */
+                neighbor = (long int) VECTOR(neis)[j];
+            }
 
             if (geodist[neighbor] > 0 &&
                 geodist[neighbor] - 1 < actdist + 1) {
@@ -350,7 +369,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_ptr_resize(edges, n));
     }
     j = 0;
-    t=0;
+    t = 0;
     for (i = 0; i < no_of_nodes; i++) {
         long int fatherptr = (long int) VECTOR(ptrhead)[i];
 
