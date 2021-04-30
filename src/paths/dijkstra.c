@@ -1134,16 +1134,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             }
         }
 
-        if (vertices) {
-            /* restore the old destructor of the path vector */
-            igraph_vector_ptr_set_item_destructor(vertices, old_vertices_item_destructor);
-        }
-
-        if (edges) {
-            /* restore the old destructor of the edge-path vector */
-            igraph_vector_ptr_set_item_destructor(edges, old_edge_item_destructor);
-        }
-
         /* free those paths from the result vector which we won't need */
         n = igraph_vector_ptr_size(vertices);
         j = 0;
@@ -1158,13 +1148,24 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                     path = (igraph_vector_t*)VECTOR(*edges)[i];
                     VECTOR(*edges)[j] = path;
                 }
+                /* make sure we don't leave any pointers in the vector that are
+                 * not valid any more because they have been moved elsewhere */
+                if (i > j) {
+                    VECTOR(*vertices)[i] = 0;
+                    if (edges) {
+                        VECTOR(*edges)[i] = 0;
+                    }
+                }
                 j++;
             } else {
                 /* we don't need this path, free it */
-                igraph_vector_destroy(path); free(path);
+                igraph_vector_destroy(path);
+                igraph_free(path);
+                VECTOR(*vertices)[i] = 0;
                 if (edges) {
                     path = (igraph_vector_t*)VECTOR(*edges)[i];
                     igraph_vector_destroy(path); free(path);
+                    VECTOR(*edges)[i] = 0;
                 }
             }   
         }
@@ -1210,6 +1211,18 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         igraph_vector_long_destroy(&index_temp);
         igraph_vector_long_destroy(&mapping);
         IGRAPH_FINALLY_CLEAN(3);
+
+        /* we can now restore the original destructors of the path and the
+         * edge-path vectors as we are not going to do thing any more that
+         * could potentially fail -- only cleanup is left */
+
+        if (vertices) {
+            igraph_vector_ptr_set_item_destructor(vertices, old_vertices_item_destructor);
+        }
+
+        if (edges) {
+            igraph_vector_ptr_set_item_destructor(edges, old_edge_item_destructor);
+        }
     }
 
     /* free the allocated memory */
