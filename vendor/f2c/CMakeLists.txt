@@ -91,7 +91,7 @@ target_include_directories(
 )
 
 if (WIN32)
-  target_compile_definitions(f2c_vendored PRIVATE MSDOS)
+  target_compile_definitions(f2c_vendored PRIVATE MSDOS NO_ISATTY NO_TRUNCATE)
 endif()
 
 if (BUILD_SHARED_LIBS)
