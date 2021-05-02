@@ -12,11 +12,6 @@ function(add_benchmark NAME NAMESPACE)
     target_compile_definitions(${TARGET_NAME} PRIVATE IGRAPH_STATIC)
   endif()
 
-  if (MSVC)
-    # Add MSVC-specific include path for some headers that are missing on Windows
-    target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
-  endif()
-
   add_custom_command(
     TARGET benchmark
     POST_BUILD

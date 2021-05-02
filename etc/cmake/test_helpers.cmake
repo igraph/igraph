@@ -24,11 +24,6 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
     ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/vendor ${CMAKE_BINARY_DIR}/src
   )
 
-  if (MSVC)
-    # Add MSVC-specific include path for some headers that are missing on Windows
-    target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
-  endif()
-
   set(EXPECTED_OUTPUT_FILE ${CMAKE_SOURCE_DIR}/${FOLDER}/${NAME}.out)
   set(OBSERVED_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.out)
   set(DIFF_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.diff)

@@ -94,14 +94,6 @@ if (WIN32)
   target_compile_definitions(f2c_vendored PRIVATE MSDOS)
 endif()
 
-if (MSVC)  
-  target_include_directories(
-    f2c_vendored
-    PUBLIC
-	${PROJECT_SOURCE_DIR}/msvc/include
-  )
-endif()
-
 if (BUILD_SHARED_LIBS)
   set_property(TARGET f2c_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()

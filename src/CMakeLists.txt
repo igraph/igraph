@@ -387,11 +387,6 @@ else()
   target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()
 
-if(MSVC)
-  # Add MSVC-specific include path for some headers that are missing on Windows
-  target_include_directories(igraph PRIVATE ${PROJECT_SOURCE_DIR}/msvc/include)
-endif()
-
 # Turn on all warnings for GCC, clang and MSVC
 use_all_warnings(igraph)
 
