@@ -82,6 +82,7 @@ jobs:
 
     - name: "Linux s390x"
       os: linux
+      dist: focal # cmake too old on earlier versions
       arch: s390x
       addons:
         apt:
