@@ -80,9 +80,9 @@ jobs:
       dist: focal # snap fails with ppc64 on earlier Ubuntu
       arch: ppc64le
 
-    # - name: "Linux s390x"
-    #   os: linux
-    #   arch: s390x
+    - name: "Linux s390x"
+      os: linux
+      arch: s390x
 
 notifications:
   email:
