@@ -29,18 +29,22 @@ void call_and_print(igraph_t *graph) {
 
 
 int main() {
-    igraph_t g_0, g_1, g_lm, g_lmu;
+    igraph_t g_0, g_1, g_2, g_lm, g_lmu;
 
-    igraph_small(&g_0, 0, 1, -1);
-    igraph_small(&g_1, 1, 1, -1);
-    igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
-    igraph_small(&g_lmu, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
+    igraph_small(&g_0, 0, IGRAPH_DIRECTED, -1);
+    igraph_small(&g_1, 1, IGRAPH_DIRECTED, -1);
+    igraph_small(&g_2, 2, IGRAPH_DIRECTED, 0,1, -1);
+    igraph_small(&g_lm, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
+    igraph_small(&g_lmu, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
 
     printf("No vertices:\n");
     call_and_print(&g_0);
 
     printf("One vertex:\n");
     call_and_print(&g_1);
+
+    printf("Two vertices:\n");
+    call_and_print(&g_2);
 
     printf("Graph with loops and multiple edges:\n");
     call_and_print(&g_lm);
