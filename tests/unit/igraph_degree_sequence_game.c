@@ -24,7 +24,6 @@ int main() {
     igraph_t g;
     igraph_vector_t outdeg, indeg, degrees, empty;
     igraph_bool_t is_simple, is_connected;
-    igraph_error_handler_t *ehandler;
 
     igraph_real_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
     igraph_real_t inarr[]  = {3, 6, 2, 0, 2, 2, 4, 3, 3, 3};
@@ -189,12 +188,9 @@ int main() {
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
-    ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
+
     /* This degree sequence contains a zero degree, so it cannot be realized by a connected graph. */
-    IGRAPH_ASSERT(
-            igraph_degree_sequence_game(&g, &indeg, NULL, IGRAPH_DEGSEQ_VL) == IGRAPH_EINVAL
-            );
-    igraph_set_error_handler(ehandler);
+    CHECK_ERROR(igraph_degree_sequence_game(&g, &indeg, NULL, IGRAPH_DEGSEQ_VL), IGRAPH_EINVAL);
 
     igraph_vector_destroy(&degrees);
     igraph_vector_destroy(&empty);

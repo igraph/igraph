@@ -9,7 +9,10 @@
 
 ### Fixed
 
+ - `igraph_get_incidence()` no longer reads and writes out of bounds when given a non-bipartite graph, but gives a warning and ignores edges within a part.
  - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` dereferenced their arguments only once instead of twice, and therefore did not work with `igraph_vector_ptr_sort()`.
+ - `igraph_maximal_cliques_subset()` corrupted the error handling stack ("finally stack") under some circumstances.
  - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
  - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
  - igraph no longer links to the math library (`libm`) when this is not necessary.
@@ -39,7 +42,7 @@
 
 ### Added
 
- - `igraph_vector_lex_cmp()` and `igrapg_vector_colex_cmp()` for lexicographic
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` for lexicographic
    and colexicographic comparison of vectors. These functions may also be used
    for sorting.
 

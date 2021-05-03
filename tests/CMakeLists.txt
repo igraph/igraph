@@ -64,6 +64,7 @@ add_examples(
   igraph_sparsemat7
   igraph_sparsemat8
   igraph_strvector
+  igraph_vector_ptr_sort
 )
 
 add_legacy_tests(
@@ -305,6 +306,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bridges
   igraph_decompose_strong
+  igraph_subcomponent
 )
 
 # layout.at
@@ -599,6 +601,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  dgemv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
@@ -611,6 +614,11 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_get_incidence
 )
 
 # centralization.at

@@ -95,7 +95,7 @@
         }                             \
         if (no) { *no=0; }                        \
     } while (0)
-#define CLEANUP do { IGRAPH_FINALLY_CLEAN(1); } while (0) /* res */
+#define CLEANUP do { if(res) { IGRAPH_FINALLY_CLEAN(1); } } while (0) /* res */
 #define FOR_LOOP_OVER_VERTICES                  \
     nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;    \
     for (ii=0; ii<nn; ii++)

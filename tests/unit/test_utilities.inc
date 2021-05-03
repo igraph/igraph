@@ -417,9 +417,11 @@ void print_spmatrix(igraph_spmatrix_t *m) {
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \
-          "Finally stack is not empty. " \
-          "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n"); \
-        return 100; \
+          "%s:%d : " \
+          "Finally stack is not empty (stack size is %d). " \
+          "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n", \
+          IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FINALLY_STACK_SIZE()); \
+        abort(); \
     }
 
 /* Run a test in a separate function; return the return value of the function
