@@ -926,7 +926,7 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     } else {
         *null = (vc / 2) * (vc - 1);
     }
-    if (*null < vc && vc > 1) {
+    if (*null < vc && vc > 2) {
         IGRAPH_WARNING("Integer overflow, returning -1.");
         *null = -1;
     } else {
