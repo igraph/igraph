@@ -54,6 +54,7 @@ int main() {
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
+    igraph_destroy(&g_2);
     igraph_destroy(&g_lm);
     igraph_destroy(&g_lmu);
 
