@@ -281,7 +281,7 @@ static int cycle_cmp(const void *c1, const void *c2) {
     } else if (n1 > n2) {
         return 1;
     } else {
-        return igraph_vector_lex_cmp(v1, v2);
+        return igraph_vector_lex_cmp(c1, c2);
     }
 }
 
