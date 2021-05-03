@@ -83,6 +83,15 @@ jobs:
     - name: "Linux s390x"
       os: linux
       arch: s390x
+      addons:
+        apt:
+          # restrict installed packages, as s390x does not have all of them
+          packages:
+          - ninja-build
+          - flex
+          - bison
+          - git
+          - colordiff
 
 notifications:
   email:
