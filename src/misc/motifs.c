@@ -892,13 +892,17 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < vc; i++) {
+        long int ideg, odeg;
         long int ip, op;
+
         IGRAPH_CHECK(igraph_i_neighbors(graph, &inneis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
         IGRAPH_CHECK(igraph_i_neighbors(graph, &outneis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
 
+        ideg = igraph_vector_size(&inneis);
+        odeg = igraph_vector_size(&outneis);
+
         ip = op = 0;
-        while (ip < igraph_vector_size(&inneis) &&
-               op < igraph_vector_size(&outneis)) {
+        while (ip < ideg && op < odeg) {
             if (VECTOR(inneis)[ip] < VECTOR(outneis)[op]) {
                 nonrec += 1;
                 ip++;
@@ -911,8 +915,7 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                 op++;
             }
         }
-        nonrec += (igraph_vector_size(&inneis) - ip) +
-                  (igraph_vector_size(&outneis) - op);
+        nonrec += (ideg - ip) + (odeg - op);
     }
 
     igraph_vector_destroy(&inneis);
@@ -926,7 +929,7 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     } else {
         *null = (vc / 2) * (vc - 1);
     }
-    if (*null < vc && vc > 1) {
+    if (*null < vc && vc > 2) {
         IGRAPH_WARNING("Integer overflow, returning -1.");
         *null = -1;
     } else {
