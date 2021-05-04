@@ -406,10 +406,14 @@ typedef enum {
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
-    IGRAPH_STOP              = 60  /* undocumented, used internally; signals a request to stop in functions like igraph_i_maximal_cliques_bk */
+    IGRAPH_STOP              = 60  /* undocumented, used internally */
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
- * igraph_i_error_strings[] in igraph_error.c */
+ * igraph_i_error_strings[] in igraph_error.c
+ *
+ * Information on undocumented codes:
+ *  - IGRAPH_STOP signals a request to stop in functions like igraph_i_maximal_cliques_bk()
+ */
 
 /* We use IGRAPH_FILE_BASENAME instead of __FILE__ to ensure that full
  * paths don't leak into the library code. IGRAPH_FILE_BASENAME is set up
