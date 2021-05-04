@@ -11,12 +11,16 @@
  - `igraph_get_incidence()` no longer reads and writes out of bounds when given a non-bipartite graph, but gives a warning and ignores edges within a part.
  - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
  - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` dereferenced their arguments only once instead of twice, and therefore did not work with `igraph_vector_ptr_sort()`.
- - `igraph_maximal_cliques_subset()` corrupted the error handling stack ("finally stack") under some circumstances.
+ - `igraph_maximal_cliques_subset()` and `igraph_transitivity_barrat()` corrupted the error handling stack ("finally stack") under some circumstances.
  - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
  - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
  - igraph no longer links to the math library (`libm`) when this is not necessary.
  - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
  - Fixed a compilation issue on MSYS / MinGW when link-time optimization was enabled and the `MSYS Makefiles` CMake generator was used. Some source files in igraph were renamed as a consequence, but these should not affect users of the library.
+
+### Other
+
+ - Updated the vendored CXSparse library to version 3.2.0
 
 ## [0.9.2] - 2021-04-14
 
