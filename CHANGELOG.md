@@ -16,7 +16,7 @@
  - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
  - igraph no longer links to the math library (`libm`) when this is not necessary.
  - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
- - Fixed a compilation issue on MinGW / MSYS when link-time optimization was enabled. Some source files in igraph were renamed as a consequence, but these should not affect users of the library.
+ - Fixed a compilation issue on MSYS / MinGW when link-time optimization was enabled and the `MSYS Makefiles` CMake generator was used. Some source files in igraph were renamed as a consequence, but these should not affect users of the library.
 
 ## [0.9.2] - 2021-04-14
 
