@@ -1,35 +1,15 @@
-/*
- * CXSPARSE: a Concise Sparse Matrix package - Extended.
- * Copyright (c) 2006-2009, Timothy A. Davis.
- * http://www.cise.ufl.edu/research/sparse/CXSparse
- * 
- * CXSparse is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * CXSparse is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this Module; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
 #include "cs.h"
 /* sparse QR factorization [V,beta,pinv,R] = qr (A) */
 csn *cs_qr (const cs *A, const css *S)
 {
     CS_ENTRY *Rx, *Vx, *Ax, *x ;
     double *Beta ;
-    CS_INT i, k, p, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
+    CS_INT i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
         *parent, *Rp, *Ri, *Vp, *Vi, *w, *pinv, *q ;
     cs *R, *V ;
     csn *N ;
     if (!CS_CSC (A) || !S) return (NULL) ;
-    n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
+    m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
     q = S->q ; parent = S->parent ; pinv = S->pinv ; m2 = S->m2 ;
     vnz = S->lnz ; rnz = S->unz ; leftmost = S->leftmost ;
     w = cs_malloc (m2+n, sizeof (CS_INT)) ;            /* get CS_INT workspace */
