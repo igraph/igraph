@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [0.9.3] - 2021-05-05
 
 ### Added
 
@@ -17,6 +17,10 @@
  - igraph no longer links to the math library (`libm`) when this is not necessary.
  - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
  - Fixed a compilation issue on MSYS / MinGW when link-time optimization was enabled and the `MSYS Makefiles` CMake generator was used. Some source files in igraph were renamed as a consequence, but these should not affect users of the library.
+
+### Deprecated
+
+ - `igraph_rng_min()` is now deprecated; assume a constant zero as its return value if you used this function in your own code.
 
 ### Other
 
