@@ -730,7 +730,9 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (inf) {
-        *diameter = IGRAPH_INFINITY;
+        if (diameter) {
+            *diameter = IGRAPH_INFINITY;
+        }
         if (from) {
             *from = -1;
         }
@@ -738,7 +740,9 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
             *to = -1;
         }
     } else {
-        *diameter = ecc_u;
+        if (diameter) {
+            *diameter = ecc_u;
+        }
         if (from) {
             *from = ifrom;
         }
