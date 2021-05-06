@@ -14,13 +14,17 @@ foreach(FORMAT dl gml lgl ncol pajek)
       ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c
     )
   else()
+    if (BISON_VERSION VERSION_GREATER_EQUAL 3)
+      set(bison_no_deprecated -Wno-deprecated)
+    endif()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
-      COMPILE_FLAGS "--no-lines"
+      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "--noline --header-file=${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h"
+      COMPILE_FLAGS "--noline"
+      DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -121,6 +125,7 @@ add_library(
   centrality/centralization.c
   centrality/closeness.c
   centrality/coreness.c
+  centrality/truss.cpp
   centrality/prpack.cpp
 
   cliques/cliquer.c
@@ -238,13 +243,6 @@ add_library(
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
-
-  scg/scg_approximate_methods.c
-  scg/scg_exact_scg.c
-  scg/scg_kmeans.c
-  scg/scg_optimal_method.c
-  scg/scg_utils.c
-  scg/scg.c
 
   isomorphism/bliss.cc
   isomorphism/isoclasses.c
@@ -396,51 +394,8 @@ use_all_warnings(igraph)
 # CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR variables.
 include(GNUInstallDirs)
 
-# Generate pkgconfig file.
-# The library names being used here are Linux-specific, but pkgconfig files
-# are omstly used on Linux anyway. Nevertheless, we take care not to include
-# -lm on Windows because the Python interface of igraph uses the pkg-config
-# file to decide what to link to, and we don't have a separate math library
-# on Windows.
-if(WIN32)
-  set(PKGCONFIG_LIBS_PRIVATE "")
-else()
-  set(PKGCONFIG_LIBS_PRIVATE "-lm")
-endif()
-if(APPLE)
-  # All recent macOS distributions use libc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
-elseif(NOT MSVC)
-  # Most Linux distributions and MSYS use libstdc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
-endif()
-
-if(IGRAPH_GRAPHML_SUPPORT)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_GMP)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lgmp")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_BLAS)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lblas")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_CXSPARSE)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lcxsparse")
-endif()
-if(IGRAPH_GLPK_SUPPORT AND NOT IGRAPH_USE_INTERNAL_GLPK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lglpk")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_LAPACK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -llapack")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_ARPACK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
-endif()
-
-include(JoinPaths)
-join_paths(PKGCONFIG_LIBDIR "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
-join_paths(PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
-configure_file(${PROJECT_SOURCE_DIR}/igraph.pc.in ${PROJECT_BINARY_DIR}/igraph.pc @ONLY)
+# Generate pkgconfig file
+include(pkgconfig_helpers)
 
 include(GenerateExportHeader)
 generate_export_header(igraph
@@ -457,7 +412,7 @@ configure_package_config_file(
   ${PROJECT_BINARY_DIR}/igraph-config.cmake
   # Install destination selected according to https://wiki.debian.org/CMake
   # and by looking at how eigen3 does it in Ubuntu
-  INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
@@ -491,12 +446,12 @@ install(
 install(
   FILES ${PROJECT_BINARY_DIR}/igraph-config.cmake
         ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 install(
   EXPORT igraph_targets
   FILE igraph-targets.cmake
   NAMESPACE igraph::
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 

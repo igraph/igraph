@@ -1,0 +1,41 @@
+0x0 matrix.
+
+3x3 matrix without zero rows and columns, row-wise normalization.
+col 0: locations 0 to 1
+0 : 0.75
+1 : -1
+col 1: locations 2 to 4
+0 : 0.25
+1 : -1.5
+2 : 0.222222
+col 2: locations 5 to 6
+2 : 0.777778
+1 : 3.5
+
+3x3 matrix without zero rows and columns, column-wise normalization.
+col 0: locations 0 to 1
+0 : 0.6
+1 : 0.4
+col 1: locations 2 to 4
+0 : 0.2
+1 : 0.6
+2 : 0.2
+col 2: locations 5 to 6
+2 : -1
+1 : 2
+
+3x3 matrix with zero rows and columns, row-wise normalization.
+col 0: locations 0 to 0
+0 : 1
+col 1: locations 1 to 0
+col 2: locations 1 to 1
+2 : 1
+
+3x3 matrix with zero rows and columns, column-wise normalization.
+col 0: locations 0 to 0
+0 : 1
+col 1: locations 1 to 0
+col 2: locations 1 to 1
+2 : 1
+
+uncompressed matrix.

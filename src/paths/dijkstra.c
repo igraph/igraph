@@ -500,7 +500,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                 edge = parents[act] - 1;
                 act = IGRAPH_OTHER(graph, edge, act);
             }
-            if (vvec) {
+            if (vvec && (size > 0 || node == from)) {
                 IGRAPH_CHECK(igraph_vector_resize(vvec, size + 1));
                 VECTOR(*vvec)[size] = node;
             }

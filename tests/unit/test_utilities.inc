@@ -57,6 +57,17 @@ void print_vector_int(const igraph_vector_int_t *v) {
 }
 
 
+/* Print elements of a long vector */
+void print_vector_long(const igraph_vector_long_t *v) {
+    long i, n = igraph_vector_long_size(v);
+    printf("(");
+    for (i=0; i < n; i++) {
+        printf(" %ld", VECTOR(*v)[i]);
+    }
+    printf(" )\n");
+}
+
+
 /* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
 void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
     long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
@@ -406,9 +417,11 @@ void print_spmatrix(igraph_spmatrix_t *m) {
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         printf( \
-          "Finally stack is not empty. " \
-          "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n"); \
-        return 100; \
+          "%s:%d : " \
+          "Finally stack is not empty (stack size is %d). " \
+          "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n", \
+          IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FINALLY_STACK_SIZE()); \
+        abort(); \
     }
 
 /* Run a test in a separate function; return the return value of the function
@@ -422,5 +435,13 @@ void print_spmatrix(igraph_spmatrix_t *m) {
         } \
         VERIFY_FINALLY_STACK(); \
     }
+
+#define CHECK_ERROR(funcall, expected_err) \
+    do { \
+        igraph_error_handler_t *handler; \
+        handler = igraph_set_error_handler(igraph_error_handler_ignore); \
+        IGRAPH_ASSERT(funcall == expected_err); \
+        igraph_set_error_handler(handler); \
+    } while (0)
 
 #endif /* TEST_UTILITIES_INC */

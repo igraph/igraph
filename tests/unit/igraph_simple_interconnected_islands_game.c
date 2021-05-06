@@ -54,6 +54,7 @@ int main() {
     IGRAPH_ASSERT(igraph_ecount(&g) == 18 + 60);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Negative number of islands.\n");

@@ -63,7 +63,7 @@ typedef struct igraph_eigen_which_t {
     igraph_lapack_dgeevx_balance_t balance;
 } igraph_eigen_which_t;
 
-IGRAPH_EXPORT int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
                                                 const igraph_sparsemat_t *sA,
                                                 igraph_arpack_function_t *fun, int n,
                                                 void *extra,
@@ -74,7 +74,7 @@ IGRAPH_EXPORT int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
                                                 igraph_vector_t *values,
                                                 igraph_matrix_t *vectors);
 
-IGRAPH_EXPORT int igraph_eigen_matrix(const igraph_matrix_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_eigen_matrix(const igraph_matrix_t *A,
                                       const igraph_sparsemat_t *sA,
                                       igraph_arpack_function_t *fun, int n,
                                       void *extra,
@@ -85,7 +85,7 @@ IGRAPH_EXPORT int igraph_eigen_matrix(const igraph_matrix_t *A,
                                       igraph_vector_complex_t *values,
                                       igraph_matrix_complex_t *vectors);
 
-IGRAPH_EXPORT int igraph_eigen_adjacency(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
                                          igraph_eigen_algorithm_t algorithm,
                                          const igraph_eigen_which_t *which,
                                          igraph_arpack_options_t *options,
@@ -95,7 +95,7 @@ IGRAPH_EXPORT int igraph_eigen_adjacency(const igraph_t *graph,
                                          igraph_vector_complex_t *cmplxvalues,
                                          igraph_matrix_complex_t *cmplxvectors);
 
-IGRAPH_EXPORT int igraph_eigen_laplacian(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_eigen_laplacian(const igraph_t *graph,
                                          igraph_eigen_algorithm_t algorithm,
                                          const igraph_eigen_which_t *which,
                                          igraph_arpack_options_t *options,

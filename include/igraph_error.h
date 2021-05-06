@@ -324,20 +324,20 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EDIVZERO Big integer division by zero.
- * \enumval IGARPH_GLP_EBOUND GLPK error (GLP_EBOUND).
- * \enumval IGARPH_GLP_EROOT GLPK error (GLP_EROOT).
- * \enumval IGARPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
- * \enumval IGARPH_GLP_ENODFS GLPK error (GLP_ENODFS).
- * \enumval IGARPH_GLP_EFAIL GLPK error (GLP_EFAIL).
- * \enumval IGARPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
- * \enumval IGARPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
- * \enumval IGARPH_GLP_ESTOP GLPK error (GLP_ESTOP).
+ * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
+ * \enumval IGRAPH_GLP_EROOT GLPK error (GLP_EROOT).
+ * \enumval IGRAPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
+ * \enumval IGRAPH_GLP_ENODFS GLPK error (GLP_ENODFS).
+ * \enumval IGRAPH_GLP_EFAIL GLPK error (GLP_EFAIL).
+ * \enumval IGRAPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
+ * \enumval IGRAPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
+ * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
  * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not
  *   expected to find this; it is signalled if some igraph function is
  *   not using the attribute handler interface properly.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
- * \enumval IGRAPH_ELAPACK A LAPACK call resulted an error.
+ * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
  * \enumval IGRAPH_EDRL Internal error in the DrL layout generator.
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  * \enumval IGRAPH_EGLP Internal GLPK error.
@@ -411,6 +411,15 @@ typedef enum {
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in igraph_error.c */
 
+/**
+ * \typedef igraph_error_t
+ * \brief Type alias for integers to indicate that the integer value is an error code.
+ * 
+ * This type is used as the return type of igraph functions that return an
+ * error code.
+ */
+typedef int igraph_error_t;
+
 /* We use IGRAPH_FILE_BASENAME instead of __FILE__ to ensure that full
  * paths don't leak into the library code. IGRAPH_FILE_BASENAME is set up
  * by the build system when compiling the individual files. However, when
@@ -466,8 +475,8 @@ typedef enum {
  * \sa igraph_errorf().
  */
 
-IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
-                               int igraph_errno);
+IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, int line,
+                               igraph_error_t igraph_errno);
 
 /**
  * \define IGRAPH_ERRORF
@@ -514,11 +523,11 @@ IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
  * \sa igraph_error().
  */
 
-IGRAPH_EXPORT int igraph_errorf(const char *reason, const char *file, int line,
-                                int igraph_errno, ...);
+IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
+                                igraph_error_t igraph_errno, ...);
 
-IGRAPH_EXPORT int igraph_errorvf(const char *reason, const char *file, int line,
-                                 int igraph_errno, va_list ap);
+IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file, int line,
+                                 igraph_error_t igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror
@@ -531,7 +540,7 @@ IGRAPH_EXPORT int igraph_errorvf(const char *reason, const char *file, int line,
  * \return pointer to the textual description of the error code.
  */
 
-IGRAPH_EXPORT const char* igraph_strerror(const int igraph_errno);
+IGRAPH_EXPORT const char* igraph_strerror(const igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -752,8 +761,8 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
-                                 int igraph_errno);
+IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file, int line,
+                                 igraph_error_t igraph_errno);
 
 /**
  * \define IGRAPH_WARNINGF
@@ -796,8 +805,8 @@ IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT int igraph_warningf(const char *reason, const char *file, int line,
-                                  int igraph_errno, ...);
+IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
+                                  igraph_error_t igraph_errno, ...);
 
 /**
  * \define IGRAPH_WARNING

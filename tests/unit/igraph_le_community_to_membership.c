@@ -61,6 +61,7 @@ int main() {
     print_and_destroy(&membership, &csize, &merges);
 
 
+    VERIFY_FINALLY_STACK();
     printf("These should fail nicely:\n");
     igraph_set_error_handler(igraph_error_handler_ignore);
 

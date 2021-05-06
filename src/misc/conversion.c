@@ -33,7 +33,6 @@
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
-#include "misc/conversion_internal.h"
 
 /**
  * \ingroup conversion
@@ -836,43 +835,6 @@ int igraph_get_stochastic(const igraph_t *graph,
     return 0;
 }
 
-
-int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
-                                 igraph_bool_t column_wise) {
-    igraph_vector_t sum;
-    int no_of_nodes = (int) igraph_sparsemat_nrow(sparsemat);
-    int i;
-
-    IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
-
-    if (!column_wise) {
-        IGRAPH_CHECK(igraph_sparsemat_rowsums(sparsemat, &sum));
-        for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(sum)[i] == 0.0) {
-                IGRAPH_ERROR("Zero out-degree vertices not allowed",
-                             IGRAPH_EINVAL);
-            }
-            VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
-        }
-        IGRAPH_CHECK(igraph_sparsemat_scale_rows(sparsemat, &sum));
-    } else {
-        IGRAPH_CHECK(igraph_sparsemat_colsums(sparsemat, &sum));
-        for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(sum)[i] == 0.0) {
-                IGRAPH_ERROR("Zero out-degree vertices not allowed",
-                             IGRAPH_EINVAL);
-            }
-            VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
-        }
-        IGRAPH_CHECK(igraph_sparsemat_scale_cols(sparsemat, &sum));
-    }
-
-    igraph_vector_destroy(&sum);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return 0;
-}
-
 /**
  * \function igraph_get_stochastic_sparsemat
  * \brief Stochastic adjacency matrix of a graph
@@ -899,7 +861,13 @@ int igraph_get_stochastic_sparsemat(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_get_sparsemat(graph, sparsemat));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, sparsemat);
-    IGRAPH_CHECK(igraph_i_normalize_sparsemat(sparsemat, column_wise));
+
+    if (column_wise) {
+        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(sparsemat, /* allow_zeros = */ 0));
+    } else {
+        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(sparsemat, /* allow_zeros = */ 0));
+    }
+
     IGRAPH_FINALLY_CLEAN(1);
 
     return 0;
