@@ -266,6 +266,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
+    igraph_integer_t ito, ifrom;
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
@@ -299,9 +300,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
         IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL,
                                               IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
         IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-        if (from) {
-            *from = vid_start;
-        }
+        ifrom = vid_start;
         IGRAPH_VECTOR_INIT_FINALLY(&ecc_vec, no_of_nodes);
 
         IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_start),
@@ -312,9 +311,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             inf = 1;
         } else {
             while (1) {
-                if (to) {
-                    *to = vid_ecc;
-                }
+                ito = vid_ecc;
 
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_ecc),
                                                    &adjlist, &vid_ecc, 1));
@@ -323,9 +320,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
 
                 if (ecc_u < ecc_v) {
                     ecc_u = ecc_v;
-                    if (from) {
-                        *from = *to;
-                    }
+                    ifrom = ito;
                 } else {
                     break;
                 }
@@ -401,20 +396,14 @@ int igraph_pseudo_diameter(const igraph_t *graph,
                 }
             }
 
-            if (from) {
-                if (direction) {
-                    *from = vid_end;
-                } else {
-                    *from = vid_start;
-                }
+            if (direction) {
+                ifrom = vid_end;
+                ito   = vid_end;
+            } else {
+                ifrom = vid_start;
+                ito   = vid_end;
             }
-            if (to) {
-                if (direction) {
-                    *to = vid_start;
-                } else {
-                    *to = vid_end;
-                }
-            }
+\
         }
         igraph_vector_destroy(&ecc_out);
         igraph_vector_destroy(&ecc_in);
@@ -424,7 +413,9 @@ int igraph_pseudo_diameter(const igraph_t *graph,
     }
 
     if (inf) {
-        *diameter = IGRAPH_INFINITY;
+        if (diameter) {
+            *diameter = IGRAPH_INFINITY;
+        }
         if (from) {
             *from = -1;
         }
@@ -432,7 +423,15 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             *to = -1;
         }
     } else {
-        *diameter = ecc_u;
+        if (diameter) {
+            *diameter = ecc_u;
+        }
+        if (from) {
+            *from = ifrom;
+        }
+        if (to) {
+            *to = ito;
+        }
     }
 
     return IGRAPH_SUCCESS;
