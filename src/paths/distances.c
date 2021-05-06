@@ -585,6 +585,7 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
+    igraph_integer_t ito, ifrom;
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
@@ -635,9 +636,7 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_NO_LOOPS));
         IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-        if (from) {
-            *from = vid_start;
-        }
+        ifrom = vid_start;
 
         IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_u, vid_start, &vid_ecc, unconn, &inclist));
 
@@ -645,16 +644,12 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
         if (!inf) {
             while (1) {
-                if (to) {
-                    *to = vid_ecc;
-                }
+                ito = vid_ecc;
                 IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_v, vid_ecc, &vid_ecc, unconn, &inclist));
 
                 if (ecc_u < ecc_v) {
                     ecc_u = ecc_v;
-                    if (from) {
-                        *from = *to;
-                    }
+                    ifrom = ito;
                 } else {
                     break;
                 }
@@ -721,19 +716,12 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                 }
             }
 
-            if (from) {
-                if (direction) {
-                    *from = vid_end;
-                } else {
-                    *from = vid_start;
-                }
-            }
-            if (to) {
-                if (direction) {
-                    *to = vid_start;
-                } else {
-                    *to = vid_end;
-                }
+            if (direction) {
+                ifrom = vid_end;
+                ito   = vid_start;
+            } else {
+                ifrom = vid_start;
+                ito   = vid_end;
             }
         }
         igraph_lazy_inclist_destroy(&inclist_out);
@@ -751,6 +739,12 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         }
     } else {
         *diameter = ecc_u;
+        if (from) {
+            *from = ifrom;
+        }
+        if (to) {
+            *to = ito;
+        }
     }
 
     return IGRAPH_SUCCESS;
