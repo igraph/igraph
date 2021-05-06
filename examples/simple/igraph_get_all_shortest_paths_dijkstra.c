@@ -96,6 +96,18 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
     igraph_vector_destroy(&nrgeo2);
 }
 
+void print_and_destroy_items(igraph_vector_ptr_t* vec) {
+    long int i;
+
+    for (i = 0; i < igraph_vector_ptr_size(vec); i++) {
+        igraph_vector_print(VECTOR(*vec)[i]);
+        igraph_vector_destroy(VECTOR(*vec)[i]);
+        igraph_free(VECTOR(*vec)[i]);
+    }
+
+    igraph_vector_ptr_clear(vec);
+}
+
 int main() {
 
     igraph_t g;
@@ -125,20 +137,8 @@ int main() {
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ NULL, /*mode=*/ IGRAPH_OUT);
     check_nrgeo(&g, vs, &vertices, &nrgeo);
-
-    for (i = 0; i < igraph_vector_ptr_size(&vertices); i++) {
-        igraph_vector_print(VECTOR(vertices)[i]);
-        igraph_vector_destroy(VECTOR(vertices)[i]);
-        igraph_free(VECTOR(vertices)[i]);
-        VECTOR(vertices)[i] = 0;
-    }
-
-    for (i = 0; i < igraph_vector_ptr_size(&edges); i++) {
-        igraph_vector_print(VECTOR(edges)[i]);
-        igraph_vector_destroy(VECTOR(edges)[i]);
-        igraph_free(VECTOR(edges)[i]);
-        VECTOR(edges)[i] = 0;
-    }
+    print_and_destroy_items(&vertices);
+    print_and_destroy_items(&edges);
 
     /* Same ring, but with weights */
 
@@ -149,13 +149,7 @@ int main() {
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
     check_nrgeo(&g, vs, &vertices, &nrgeo);
-
-    for (i = 0; i < igraph_vector_ptr_size(&vertices); i++) {
-        igraph_vector_print(VECTOR(vertices)[i]);
-        igraph_vector_destroy(VECTOR(vertices)[i]);
-        igraph_free(VECTOR(vertices)[i]);
-        VECTOR(vertices)[i] = 0;
-    }
+    print_and_destroy_items(&vertices);
 
     /* we are now testing the combination of vertices == NULL and edges != NUL */
 
@@ -164,13 +158,7 @@ int main() {
                 /*vertices=*/ NULL, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
-    
-    for (i = 0; i < igraph_vector_ptr_size(&edges); i++) {
-        igraph_vector_print(VECTOR(edges)[i]);
-        igraph_vector_destroy(VECTOR(edges)[i]);
-        igraph_free(VECTOR(edges)[i]);
-        VECTOR(edges)[i] = 0;
-    }
+    print_and_destroy_items(&edges);
 
     igraph_destroy(&g);
 
@@ -197,22 +185,9 @@ int main() {
     /* Sort the paths in a deterministic manner to avoid problems with
      * different qsort() implementations on different platforms */
     igraph_vector_ptr_sort(&vertices, vector_tail_cmp);
-
-    for (i = 0; i < igraph_vector_ptr_size(&vertices); i++) {
-        igraph_vector_print(VECTOR(vertices)[i]);
-        igraph_vector_destroy(VECTOR(vertices)[i]);
-        igraph_free(VECTOR(vertices)[i]);
-        VECTOR(vertices)[i] = 0;
-    }
-
     igraph_vector_ptr_sort(&edges, vector_tail_cmp);
-
-    for (i = 0; i < igraph_vector_ptr_size(&edges); i++) {
-        igraph_vector_print(VECTOR(edges)[i]);
-        igraph_vector_destroy(VECTOR(edges)[i]);
-        igraph_free(VECTOR(edges)[i]);
-        VECTOR(edges)[i] = 0;
-    }
+    print_and_destroy_items(&vertices);
+    print_and_destroy_items(&edges);
 
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
