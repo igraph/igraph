@@ -398,7 +398,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
 
             if (direction) {
                 ifrom = vid_end;
-                ito   = vid_end;
+                ito   = vid_start;
             } else {
                 ifrom = vid_start;
                 ito   = vid_end;
