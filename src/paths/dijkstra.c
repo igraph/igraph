@@ -1011,7 +1011,6 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         if (vertices) {
             igraph_vector_ptr_clear(vertices);
-            old_vertices_item_destructor = igraph_vector_ptr_get_item_destructor(vertices);
         } else {
             /* If the 'vertices' vector doesn't exist, then create one, in order
              * for the algorithm to work. */
@@ -1025,9 +1024,11 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             free_vertices = 1;
 
             /* this is correct; needed to free everyhing at the end */
-            old_vertices_item_destructor = igraph_vector_destroy;
+            igraph_vector_ptr_set_item_destructor(vertices,
+                                                (igraph_finally_func_t*)igraph_vector_destroy);
         }
 
+        old_vertices_item_destructor = igraph_vector_ptr_get_item_destructor(vertices);
         igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
 
         /* by definition, the shortest path leading to the starting vertex
