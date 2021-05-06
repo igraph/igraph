@@ -1023,7 +1023,9 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_ptr_init(vertices, 0));
             IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, vertices);
             free_vertices = 1;
-            old_vertices_item_destructor = 0;
+
+            /* this is correct; needed to free everyhing at the end */
+            old_vertices_item_destructor = igraph_vector_destroy;
         }
 
         igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
