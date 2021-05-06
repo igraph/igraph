@@ -241,7 +241,7 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_add_rows(igraph_sparsemat_t *A, lo
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
                                           long int ncol, int nzmax);
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A);
+IGRAPH_EXPORT int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
                                                igraph_vector_int_t *i,
                                                igraph_vector_int_t *j,
@@ -269,7 +269,7 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_i_sparsemat_view(igraph_sp
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
                                         igraph_sparsemat_t *sorted);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_nzmax(const igraph_sparsemat_t *A);
+IGRAPH_EXPORT int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A);
 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_neg(igraph_sparsemat_t *A);
 
