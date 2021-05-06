@@ -38,10 +38,12 @@
  * \function igraph_shortest_paths_dijkstra
  * \brief Weighted shortest path lengths between vertices.
  *
- * This function implements Dijkstra's algorithm to find the weighted
- * shortest path lengths to selected vertices from selected sources.
- * It is run independently for the given sources. It uses a binary
- * heap for efficient implementation.
+ * This function implements Dijkstra's algorithm, which can find
+ * the weighted shortest path lengths from a source vertex to all
+ * other vertices. This function allows specifying a set of source
+ * and target vertices. The algorithm is run independently for each
+ * source and the results are retained only for the specified targets.
+ * This implementation uses a binary heap for efficiency.
  *
  * \param graph The input graph, can be directed.
  * \param res The result, a matrix. A pointer to an initialized matrix
