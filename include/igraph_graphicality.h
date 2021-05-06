@@ -39,12 +39,12 @@ enum {
   IGRAPH_MULTI_SW  = 0x06  /* 110 */
 };
 
-IGRAPH_EXPORT int igraph_is_graphical(const igraph_vector_t *out_degrees,
+IGRAPH_EXPORT igraph_error_t igraph_is_graphical(const igraph_vector_t *out_degrees,
                                       const igraph_vector_t *in_degrees,
                                       const igraph_edge_type_sw_t allowed_edge_types,
                                       igraph_bool_t *res);
 
-IGRAPH_EXPORT int igraph_is_bigraphical(const igraph_vector_t *degrees1,
+IGRAPH_EXPORT igraph_error_t igraph_is_bigraphical(const igraph_vector_t *degrees1,
                                         const igraph_vector_t *degrees2,
                                         const igraph_edge_type_sw_t allowed_edge_types,
                                         igraph_bool_t *res);
@@ -52,11 +52,11 @@ IGRAPH_EXPORT int igraph_is_bigraphical(const igraph_vector_t *degrees1,
 
 /* Legacy functions (deprecated): */
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
                                                               const igraph_vector_t *in_degrees,
                                                               igraph_bool_t *res);
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
                                                                         const igraph_vector_t *in_degrees,
                                                                         igraph_bool_t *res);
 

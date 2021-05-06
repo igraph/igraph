@@ -32,6 +32,7 @@
 
 #include "core/interruption.h"
 #include "isomorphism/isoclasses.h"
+#include "graph/neighbors.h"
 
 /**
  * Callback function for igraph_motifs_randesu that counts the motifs by
@@ -48,10 +49,10 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
 
 /**
  * \function igraph_motifs_randesu
- * \brief Count the number of motifs in a graph
+ * \brief Count the number of motifs in a graph.
  *
  * </para><para>
- * Motifs are small connected subgraphs of a given structure in a
+ * Motifs are small weakly connected induced subgraphs of a given structure in a
  * graph. It is argued that the motif profile (i.e. the number of
  * different motifs in the graph) is characteristic for different
  * types of networks and network function is related to the motifs in
@@ -114,6 +115,10 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
         IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
                      IGRAPH_EINVAL);
     }
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
     if (size == 3) {
         histlen = igraph_is_directed(graph) ? 16 : 4;
     } else {
@@ -152,7 +157,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 
 /**
  * \function igraph_motifs_randesu_callback
- * \brief Finds motifs in a graph and calls a function for each of them
+ * \brief Finds motifs in a graph and calls a function for each of them.
  *
  * </para><para>
  * Similarly to \ref igraph_motifs_randesu(), this function is able to find the
@@ -208,13 +213,13 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_bool_t terminate = 0;
 
     if (size != 3 && size != 4) {
-        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
+        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented.",
                      IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_size(cut_prob) < size) {
-        IGRAPH_ERROR("The size of the cut probability vector must not be smaller than the motif size.",
-                     IGRAPH_EINVAL);
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
     if (size == 3) {
@@ -419,16 +424,23 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_adjlist_destroy(&allneis);
     igraph_stack_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(7);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_motifs_randesu_estimate
- * \brief Estimate the total number of motifs in a graph
+ * \brief Estimate the total number of motifs in a graph.
+ *
+ * This function estimates the total number of connected induced
+ * subgraphs, called motifs, of a fixed number of vertices. For
+ * example, an undirected complete graph on \c n vertices
+ * will have one motif of \p size \c n, and \c n motifs
+ * of \p size <code>n - 1</code>. As another example, one triangle
+ * and a separate vertex will have zero motifs of size four.
  *
  * </para><para>
  * This function is useful for large graphs for which it is not
- * feasible to count all the different motifs, because there is very
+ * feasible to count all the different motifs, because there are very
  * many of them.
  *
  * </para><para>
@@ -479,9 +491,27 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     long int sam;
     long int i;
 
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
+
+    if (parsample && igraph_vector_size(parsample) != 0) {
+        igraph_real_t min, max;
+        igraph_vector_minmax(parsample, &min, &max);
+        if (min < 0 || max >= no_of_nodes) {
+            IGRAPH_ERROR("Sample vertex id out of range.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (no_of_nodes == 0) {
+        *est = 0;
+        return IGRAPH_SUCCESS;
+    }
+
     added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
 
@@ -491,10 +521,10 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     IGRAPH_FINALLY(igraph_stack_destroy, &stack);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
-    if (parsample == 0) {
+    if (parsample == NULL) {
         sample = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (sample == 0) {
-            IGRAPH_ERROR("Cannot estimate motifs", IGRAPH_ENOMEM);
+        if (sample == NULL) {
+            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, sample);
         IGRAPH_VECTOR_INIT_FINALLY(sample, 0);
@@ -642,7 +672,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 
 /**
  * \function igraph_motifs_randesu_no
- * \brief Count the total number of motifs in a graph
+ * \brief Count the total number of motifs in a graph.
  *
  * </para><para>
  * This function counts the total number of motifs in a graph,
@@ -675,9 +705,13 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     long int father;
     long int i;
 
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
     added = IGRAPH_CALLOC(no_of_nodes, long int);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
 
@@ -811,26 +845,27 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     igraph_stack_destroy(&stack);
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_dyad_census
- * \brief Calculating the dyad census as defined by Holland and Leinhardt
+ * \brief Calculating the dyad census as defined by Holland and Leinhardt.
  *
  * </para><para>
  * Dyad census means classifying each pair of vertices of a directed
- * graph into three categories: mutual, there is an edge from \c a to
- * \c b and also from \c b to \c a; asymmetric, there is an edge
- * either from \c a to \c b or from \c b to \c a but not the other way
- * and null, no edges between \c a and \c b.
+ * graph into three categories: mutual (there is at least one edge from
+ * \c a to \c b and also from \c b to \c a); asymmetric (there is at least
+ * one edge either from \c a to \c b or from \c b to \c a, but not the other
+ * way) and null (no edges between \c a and \c b in either direction).
  *
  * </para><para>
  * Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
  * Structure in Sociometric Data.  American Journal of Sociology,
  * 70, 492-513.
- * \param graph The input graph, a warning is given if undirected as
- *    the results are undefined for undirected graphs.
+ *
+ * \param graph The input graph. For an undirected graph, there are no
+ *    asymmetric connections.
  * \param mut Pointer to an integer, the number of mutual dyads is
  *    stored here.
  * \param asym Pointer to an integer, the number of asymmetric dyads
@@ -845,7 +880,6 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-
 int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                        igraph_integer_t *asym, igraph_integer_t *null) {
 
@@ -854,21 +888,21 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     igraph_integer_t vc = igraph_vcount(graph);
     long int i;
 
-    if (!igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Dyad census called on undirected graph");
-    }
-
     IGRAPH_VECTOR_INIT_FINALLY(&inneis, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < vc; i++) {
+        long int ideg, odeg;
         long int ip, op;
-        igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
-        igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
+
+        IGRAPH_CHECK(igraph_i_neighbors(graph, &inneis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+        IGRAPH_CHECK(igraph_i_neighbors(graph, &outneis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+
+        ideg = igraph_vector_size(&inneis);
+        odeg = igraph_vector_size(&outneis);
 
         ip = op = 0;
-        while (ip < igraph_vector_size(&inneis) &&
-               op < igraph_vector_size(&outneis)) {
+        while (ip < ideg && op < odeg) {
             if (VECTOR(inneis)[ip] < VECTOR(outneis)[op]) {
                 nonrec += 1;
                 ip++;
@@ -881,8 +915,7 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                 op++;
             }
         }
-        nonrec += (igraph_vector_size(&inneis) - ip) +
-                  (igraph_vector_size(&outneis) - op);
+        nonrec += (ideg - ip) + (odeg - op);
     }
 
     igraph_vector_destroy(&inneis);
@@ -896,14 +929,14 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     } else {
         *null = (vc / 2) * (vc - 1);
     }
-    if (*null < vc) {
-        IGRAPH_WARNING("Integer overflow, returning -1");
+    if (*null < vc && vc > 2) {
+        IGRAPH_WARNING("Integer overflow, returning -1.");
         *null = -1;
     } else {
         *null = *null - (*mut) - (*asym);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

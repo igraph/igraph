@@ -586,13 +586,13 @@ static int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
     return 0;
 }
 
-typedef int igraph_cattributes_combine_num_t(const igraph_vector_t *input,
+typedef igraph_error_t igraph_cattributes_combine_num_t(const igraph_vector_t *input,
         igraph_real_t *output);
 
-typedef int igraph_cattributes_combine_str_t(const igraph_strvector_t *input,
+typedef igraph_error_t igraph_cattributes_combine_str_t(const igraph_strvector_t *input,
         char **output);
 
-typedef int igraph_cattributes_combine_bool_t(const igraph_vector_bool_t *input,
+typedef igraph_error_t igraph_cattributes_combine_bool_t(const igraph_vector_bool_t *input,
         igraph_bool_t *output);
 
 static int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,

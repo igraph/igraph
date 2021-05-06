@@ -78,21 +78,35 @@ whitespace  [ \r\n\t]
 
 ^#[^\n\r]*[\n]|[\r]     { /* comments ignored */ }
 
-\"[^\"]*\"                                      { return STRING; }
+\"[^\x00\"]*\"                                  { return STRING; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 [a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
-\[                      { return LISTOPEN; }
-\]                      { return LISTCLOSE; }
+\[                      {
+                          yyextra->depth++;
+                          if (yyextra->depth >= 32) {
+                            return ERROR;
+                          } else {
+                            return LISTOPEN;
+                          }
+                        }
+\]                      {
+                          yyextra->depth--;
+                          if (yyextra->depth < 0) {
+                            return ERROR;
+                          } else {
+                            return LISTCLOSE;
+                          }
+                        }
 \n\r|\r\n|\r|\n         { }
 {whitespace}            { /* other whitespace ignored */ }
 
 <<EOF>>                 { 
                           if (yyextra->eof) {
-			    yyterminate();
-			  } else {
-			    yyextra->eof=1;
-			    return EOFF;
-			  }			  
+                            yyterminate();
+                          } else {
+                            yyextra->eof=1;
+                            return EOFF;
+                          }
                         }
 .                       { return ERROR; }
 %%

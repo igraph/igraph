@@ -102,7 +102,8 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
  * \param result The result of the simulation is stored here,
  *        in a list of \ref igraph_sir_t objects. To deallocate
  *        memory, the user needs to call \ref igraph_sir_destroy on
- *        each element, before destroying the pointer vector itself.
+ *        each element, before destroying the pointer vector itself
+ *        using \ref igraph_vector_ptr_destroy_all().
  * \return Error code.
  *
  * Time complexity: O(no_sim * (|V| + |E| log(|V|))).
@@ -124,25 +125,25 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     igraph_bool_t simple;
 
     if (no_of_nodes == 0) {
-        IGRAPH_ERROR("Cannot run SIR model on empty graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot run SIR model on empty graph.", IGRAPH_EINVAL);
     }
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Edge directions are ignored in SIR model");
+        IGRAPH_WARNING("Edge directions are ignored in SIR model.");
     }
     if (beta < 0) {
-        IGRAPH_ERROR("The infection rate beta must be non-negative in SIR model", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The infection rate beta must be non-negative in SIR model.", IGRAPH_EINVAL);
     }
     /* With a recovery rate of zero, the simulation would never stop. */
     if (gamma <= 0) {
-        IGRAPH_ERROR("The recovery rate gamma must be positive in SIR model", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The recovery rate gamma must be positive in SIR model.", IGRAPH_EINVAL);
     }
     if (no_sim <= 0) {
-        IGRAPH_ERROR("Number of SIR simulations must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of SIR simulations must be positive.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_is_simple(graph, &simple));
     if (!simple) {
-        IGRAPH_ERROR("SIR model only works with simple graphs", IGRAPH_EINVAL);
+        IGRAPH_ERROR("SIR model only works with simple graphs.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_int_init(&status, no_of_nodes));
@@ -158,7 +159,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     for (i = 0; i < no_sim; i++) {
         igraph_sir_t *sir = IGRAPH_CALLOC(1, igraph_sir_t);
         if (!sir) {
-            IGRAPH_ERROR("Cannot run SIR model", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot run SIR model.", IGRAPH_ENOMEM);
         }
         IGRAPH_CHECK(igraph_sir_init(sir));
         VECTOR(*result)[i] = sir;
@@ -257,5 +258,5 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     igraph_vector_int_destroy(&status);
     IGRAPH_FINALLY_CLEAN(4);  /* + result */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

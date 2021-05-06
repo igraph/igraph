@@ -37,7 +37,7 @@
  *
  * <para>
  * A bipartite network contains two kinds of vertices and connections
- * are only possible between two vertices of different kind. There are
+ * are only possible between two vertices of different kinds. There are
  * many natural examples, e.g. movies and actors as vertices and a
  * movie is connected to all participating actors, etc.
  *
@@ -57,7 +57,7 @@
 
 /**
  * \function igraph_bipartite_projection_size
- * Calculate the number of vertices and edges in the bipartite projections
+ * \brief Calculate the number of vertices and edges in the bipartite projections.
  *
  * This function calculates the number of vertices and edges in the
  * two projections of a bipartite network. This is useful if you have
@@ -277,9 +277,10 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
 
 /**
  * \function igraph_bipartite_projection
- * Create one or both projections of a bipartite (two-mode) network
+ * \brief Create one or both projections of a bipartite (two-mode) network.
  *
  * Creates one or both projections of a bipartite graph.
+ *
  * \param graph The bipartite input graph. Directedness of the edges
  *   is ignored.
  * \param types Boolean vector giving the vertex types of the graph.
@@ -366,7 +367,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
 
 /**
  * \function igraph_full_bipartite
- * Create a full bipartite network
+ * \brief Create a full bipartite network.
  *
  * A bipartite network contains two kinds of vertices and connections
  * are only possible between two vertices of different kind. There are
@@ -479,13 +480,14 @@ int igraph_full_bipartite(igraph_t *graph,
 
 /**
  * \function igraph_create_bipartite
- * Create a bipartite graph
+ * \brief Create a bipartite graph.
  *
  * This is a simple wrapper function to create a bipartite graph. It
  * does a little more than \ref igraph_create(), e.g. it checks that
  * the graph is indeed bipartite with respect to the given \p types
  * vector. If there is an edge connecting two vertices of the same
  * kind, then an error is reported.
+ *
  * \param graph Pointer to an uninitialized graph object, the result is
  *   created here.
  * \param types Boolean vector giving the vertex types. The length of
@@ -546,7 +548,7 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
 
 /**
  * \function igraph_incidence
- * Create a bipartite graph from an incidence matrix
+ * \brief Creates a bipartite graph from an incidence matrix.
  *
  * A bipartite (or two-mode) graph contains two types of vertices and
  * edges always connect vertices of different types. An incidence
@@ -564,7 +566,7 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
  *
  * </para><para>
  * This function does not create multiple edges if \p multiple is
- * FALSE, but might create some if it is TRUE.
+ * \c FALSE, but might create some if it is \c TRUE.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param types Pointer to an initialized boolean vector, or a null
@@ -682,14 +684,16 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
 /**
  * \function igraph_get_incidence
- * Convert a bipartite graph into an incidence matrix
+ * \brief Convert a bipartite graph into an incidence matrix.
  *
  * \param graph The input graph, edge directions are ignored.
- * \param types Boolean vector containing the vertex types.
+ * \param types Boolean vector containing the vertex types. All vertices
+ *   in one part of the graph should have type 0, the others type 1.
  * \param res Pointer to an initialized matrix, the result is stored
  *   here. An element of the matrix gives the number of edges
  *   (irrespectively of their direction) between the two corresponding
- *   vertices.
+ *   vertices. The rows will correspond to vertices with type 0,
+ *   the columns correspond to vertices with type 1.
  * \param row_ids Pointer to an initialized vector or a null
  *   pointer. If not a null pointer, then the vertex ids (in the
  *   graph) corresponding to the rows of the result matrix are stored
@@ -716,10 +720,11 @@ int igraph_get_incidence(const igraph_t *graph,
     long int n1 = 0, n2 = 0, i;
     igraph_vector_t perm;
     long int p1, p2;
+    long int ignored_edges = 0;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid vertex type vector for bipartite graph",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Vertex type vector size (%ld) not equal to number of vertices (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -740,11 +745,16 @@ int igraph_get_incidence(const igraph_t *graph,
         long int to = IGRAPH_TO(graph, i);
         long int from2 = (long int) VECTOR(perm)[from];
         long int to2 = (long int) VECTOR(perm)[to];
-        if (! VECTOR(*types)[from]) {
+        if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
+            ignored_edges++;
+        } else if (! VECTOR(*types)[from]) {
             MATRIX(*res, from2, to2 - n1) += 1;
         } else {
             MATRIX(*res, to2, from2 - n1) += 1;
         }
+    }
+    if (ignored_edges) {
+            IGRAPH_WARNINGF("%ld edges running within partitions were ignored.", ignored_edges);
     }
 
     if (row_ids) {
@@ -771,22 +781,21 @@ int igraph_get_incidence(const igraph_t *graph,
 
     igraph_vector_destroy(&perm);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_is_bipartite
- * Check whether a graph is bipartite
+ * \brief Check whether a graph is bipartite.
  *
- * </para><para>
- * This function simply checks whether a graph \em could be bipartite. It tries
+ * This function checks whether a graph is bipartite. It tries
  * to find a mapping that gives a possible division of the vertices into two
  * classes, such that no two vertices of the same class are connected by an
  * edge.
  *
  * </para><para>
  * The existence of such a mapping is equivalent of having no circuits of
- * odd length in the graph. A graph with loop edges cannot bipartite.
+ * odd length in the graph. A graph with loop edges cannot be bipartite.
  *
  * </para><para>
  * Note that the mapping is not necessarily unique, e.g. if the graph has
@@ -1068,7 +1077,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
 
 /**
  * \function igraph_bipartite_game
- * Generate a bipartite random graph (similar to Erdos-Renyi)
+ * \brief Generate a bipartite random graph (similar to Erdős-Rényi).
  *
  * Similarly to unipartite (one-mode) networks, we can define the
  * G(n,p), and G(n,m) graph classes for bipartite graphs, via their
@@ -1076,6 +1085,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
  * bottom vertices is realized with probablity p, independently of the
  * rest of the edges. In G(n,m), we uniformly choose m edges to
  * realize.
+ *
  * \param graph Pointer to an uninitialized igraph graph, the result
  *    is stored here.
  * \param types Pointer to an initialized boolean vector, or a null

@@ -128,6 +128,7 @@ int main() {
     printf("Ring+ and ring where node of graph 1 should not be 3 higher than node of graph 2:\n");
     check_print_destroy(&ring_plus, &ring, NULL, NULL, NULL, NULL, &compat_not_arg, NULL, &three, IGRAPH_SUCCESS);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Ring+ and ring with different directedness.\n");

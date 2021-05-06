@@ -19,8 +19,8 @@ add_library(
 target_include_directories(
   plfit
   PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_BINARY_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
 )
 
 if (BUILD_SHARED_LIBS)
@@ -37,3 +37,6 @@ if (MSVC)
   target_compile_options(plfit PRIVATE /wd4100) # disable unreferenced parameter warning
 endif()
 
+if(IGRAPH_OPENMP_SUPPORT)
+  target_link_libraries(plfit PRIVATE OpenMP::OpenMP_C)
+endif()

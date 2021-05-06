@@ -1,0 +1,41 @@
+One vertex:
+( )
+Vertex with multiple edges, IGRAPH_IN, IGRAPH_MULTIPLE:
+( 5 4 )
+Vertex with multiple edges, IGRAPH_OUT, IGRAPH_MULTIPLE:
+( 0 1 )
+Vertex with multiple edges, IGRAPH_ALL, IGRAPH_MULTIPLE:
+( 0 1 5 4 )
+Vertex with multiple edges, undirected, IGRAPH_MULTIPLE:
+( 0 5 4 1 )
+Vertex with multiple edges, IGRAPH_IN, IGRAPH_NO_MULTIPLE:
+( 5 )
+Vertex with multiple edges, IGRAPH_OUT, IGRAPH_NO_MULTIPLE:
+( 0 1 )
+Vertex with multiple edges, IGRAPH_ALL, IGRAPH_NO_MULTIPLE:
+( 0 1 )
+Vertex with multiple edges, undirected, IGRAPH_NO_MULTIPLE:
+( 0 5 )
+Vertex 1 with loop, IGRAPH_OUT, IGRAPH_NO_LOOPS:
+( 3 )
+Vertex 1 with loop, IGRAPH_ALL, IGRAPH_NO_LOOPS:
+( 0 3 )
+Vertex 1 with loop, undirected, IGRAPH_NO_LOOPS:
+( 0 3 )
+Vertex 1 with loop, IGRAPH_OUT, IGRAPH_LOOPS_ONCE:
+( 2 3 )
+Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_ONCE:
+( 0 2 3 )
+Vertex 1 with loop, undirected, IGRAPH_LOOPS_ONCE:
+( 0 2 3 )
+Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_TWICE:
+( 0 2 2 3 )
+Vertex 1 with loop, undirected, IGRAPH_LOOPS_TWICE:
+( 0 2 2 3 )
+Graph with 2 edges from 0 to 1, and 2 from 1 to 0, IGRAPH_ALL, IGRAPH_MULTIPLE:
+( 1 3 0 2 )
+Graph with 1 edge from 0 to 1, and 2 from 1 to 0, IGRAPH_ALL, IGRAPH_MULTIPLE:
+( 0 2 1 )
+Trying IGRAPH_LOOPS_TWICE with IGRAPH_OUT:
+Vertex not in graph:
+Non-existent mode:

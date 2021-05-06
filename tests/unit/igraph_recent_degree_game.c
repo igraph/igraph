@@ -45,6 +45,7 @@ int main() {
     print_graph_canon(&g);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     /*Negative number of vertices*/

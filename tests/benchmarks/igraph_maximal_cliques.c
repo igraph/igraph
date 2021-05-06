@@ -25,6 +25,19 @@
 
 #include "bench.h"
 
+void free_result(igraph_vector_ptr_t *res) {
+    long int i, n;
+
+    n = igraph_vector_ptr_size(res);
+    for (i = 0; i < n; i++) {
+        igraph_vector_t *v = VECTOR(*res)[i];
+        igraph_vector_destroy(v);
+        igraph_free(v);
+    }
+
+    igraph_vector_ptr_resize(res, 0);
+}
+
 int main() {
 
     igraph_t g;
@@ -35,7 +48,8 @@ int main() {
                                 };
     igraph_vector_t toremove;
     igraph_vector_ptr_t res;
-    int i, n;
+
+    BENCH_INIT();
 
     igraph_vector_view(&toremove, toremovev,
                        sizeof(toremovev) / sizeof(igraph_real_t));
@@ -44,18 +58,14 @@ int main() {
 
     igraph_vector_ptr_init(&res, 0);
 
-    BENCH("1 Maximal cliques of almost complete graph",
+    BENCH(" 1 Maximal cliques of almost complete graph",
           igraph_maximal_cliques(&g, &res, /* min_size= */ 0,
                                  /* max_size= */ 0);
          );
 
     igraph_destroy(&g);
-    n = igraph_vector_ptr_size(&res);
-    for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(res)[i];
-        igraph_vector_destroy(v);
-        igraph_free(v);
-    }
+
+    free_result(&res);
     igraph_vector_ptr_destroy(&res);
 
     return 0;

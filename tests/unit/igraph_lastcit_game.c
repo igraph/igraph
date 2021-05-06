@@ -54,6 +54,7 @@ int main() {
     igraph_destroy(&g);
     igraph_vector_destroy(&preference);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     /*Negative number of nodes*/

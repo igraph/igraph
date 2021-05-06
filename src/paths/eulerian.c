@@ -389,12 +389,13 @@ static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vecto
 
         if (VECTOR(degree)[curr] != 0) {
             igraph_vector_int_t *incedges;
-            long nc, edge;
+            long nc, edge = -1;
             long int j, next;
             IGRAPH_CHECK(igraph_stack_push(&tracker, curr));
 
             incedges = igraph_inclist_get(&il, curr);
             nc = igraph_vector_int_size(incedges);
+            IGRAPH_ASSERT(nc > 0);
 
             for (j = 0; j < nc; j++) {
                 edge = (long) VECTOR(*incedges)[j];
@@ -501,12 +502,13 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
 
         if (VECTOR(remaining_out_edges)[curr] != 0) {
             igraph_vector_int_t *incedges;
-            long nc, edge;
+            long nc, edge = -1;
             long int j, next;
             IGRAPH_CHECK(igraph_stack_push(&tracker, curr));
 
             incedges = igraph_inclist_get(&il, curr);
             nc = igraph_vector_int_size(incedges);
+            IGRAPH_ASSERT(nc > 0);
 
             for (j = 0; j < nc; j++) {
                 edge = (long) VECTOR(*incedges)[j];

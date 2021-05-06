@@ -31,18 +31,18 @@
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT int igraph_graphlets_candidate_basis(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
                                                    const igraph_vector_t *weights,
                                                    igraph_vector_ptr_t *cliques,
                                                    igraph_vector_t *thresholds);
 
-IGRAPH_EXPORT int igraph_graphlets_project(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_graphlets_project(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            const igraph_vector_ptr_t *cliques,
                                            igraph_vector_t *Mu, igraph_bool_t startMu,
                                            int niter);
 
-IGRAPH_EXPORT int igraph_graphlets(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_graphlets(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    igraph_vector_ptr_t *cliques,
                                    igraph_vector_t *Mu, int niter);

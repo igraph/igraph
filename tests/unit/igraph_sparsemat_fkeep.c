@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-int fkeep_none(int row, int col, igraph_real_t value, void *other) {
+igraph_integer_t fkeep_none(igraph_integer_t row, igraph_integer_t col, igraph_real_t value, void *other) {
     IGRAPH_UNUSED(row);
     IGRAPH_UNUSED(col);
     IGRAPH_UNUSED(value);
@@ -27,7 +27,7 @@ int fkeep_none(int row, int col, igraph_real_t value, void *other) {
     return 0;
 }
 
-int fkeep(int row, int col, igraph_real_t value, void *other) {
+igraph_integer_t fkeep(igraph_integer_t row, igraph_integer_t col, igraph_real_t value, void *other) {
     if (row == 0 || col == 1 || value > *(int*)other) {
         return 0;
     }
@@ -67,6 +67,7 @@ int main() {
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat_comp);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("uncompressed matrix.\n");

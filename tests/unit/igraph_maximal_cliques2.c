@@ -25,30 +25,13 @@
 
 #include "test_utilities.inc"
 
-int sort_cmp(const void *a, const void *b) {
-    const igraph_vector_t **da = (const igraph_vector_t **) a;
-    const igraph_vector_t **db = (const igraph_vector_t **) b;
-    int i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
-    if (alen != blen) {
-        return (alen < blen) - (alen > blen);
-    }
-    for (i = 0; i < alen; i++) {
-        int ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
-        if (ea != eb) {
-            return (ea > eb) - (ea < eb);
-        }
-    }
-    return 0;
-}
-
 void sort_cliques(igraph_vector_ptr_t *cliques) {
     int i, n = igraph_vector_ptr_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
         igraph_vector_sort(v);
     }
-    igraph_qsort(VECTOR(*cliques), (size_t) n,
-                 sizeof(igraph_vector_t *), sort_cmp);
+    igraph_vector_ptr_sort(cliques, igraph_vector_lex_cmp);
 }
 
 int print_and_destroy(igraph_vector_ptr_t *cliques) {
@@ -78,9 +61,7 @@ int main() {
                            /*max_size=*/ 0);
     igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 0,
                                  /*max_size=*/ 0 /*no limit*/);
-    if (no != igraph_vector_ptr_size(&cliques)) {
-        return 1;
-    }
+    IGRAPH_ASSERT(no == igraph_vector_ptr_size(&cliques));
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);
@@ -91,15 +72,14 @@ int main() {
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP,
                             /*n=*/ 50, /*p=*/ 0.5, /*directed=*/ 0,
                             /*loops=*/ 0);
+
     igraph_vector_ptr_init(&cliques, 0);
 
     igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 8,
                            /*max_size=*/ 0);
     igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 8,
                                  /*max_size=*/ 0 /*no limit*/);
-    if (no != igraph_vector_ptr_size(&cliques)) {
-        return 2;
-    }
+    IGRAPH_ASSERT(no == igraph_vector_ptr_size(&cliques));
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);

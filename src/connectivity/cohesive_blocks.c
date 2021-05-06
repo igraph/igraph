@@ -35,7 +35,7 @@
 
 #include "core/interruption.h"
 
-static void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
+static void igraph_i_cohesive_blocks_free_graphs(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
@@ -47,19 +47,7 @@ static void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
     }
 }
 
-static void igraph_i_cohesive_blocks_free2(igraph_vector_ptr_t *ptr) {
-    long int i, n = igraph_vector_ptr_size(ptr);
-
-    for (i = 0; i < n; i++) {
-        igraph_vector_long_t *v = VECTOR(*ptr)[i];
-        if (v) {
-            igraph_vector_long_destroy(v);
-            igraph_free(v);
-        }
-    }
-}
-
-static void igraph_i_cohesive_blocks_free3(igraph_vector_ptr_t *ptr) {
+static void igraph_i_cohesive_blocks_free_vectors(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
@@ -274,11 +262,11 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&Q, 1));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &Q);
-    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free, &Q);
+    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_graphs, &Q);
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&Qmapping, 1));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &Qmapping);
-    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free2, &Qmapping);
+    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_vectors, &Qmapping);
 
     IGRAPH_CHECK(igraph_vector_long_init(&Qparent, 1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &Qparent);
@@ -310,7 +298,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_copy(graph_copy, graph));
     VECTOR(Q)[0] = graph_copy;
-    VECTOR(Qmapping)[0] = 0;  /* Identity mapping */
+    VECTOR(Qmapping)[0] = NULL;  /* Identity mapping */
     VECTOR(Qparent)[0] = -1;  /* Has no parent */
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ 1));
     VECTOR(Qcohesion)[0] = conn;
@@ -333,7 +321,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
         /* Get the separators */
         IGRAPH_CHECK(igraph_minimum_size_separators(mygraph, &separators));
-        IGRAPH_FINALLY(igraph_i_cohesive_blocks_free3, &separators);
+        IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_vectors, &separators);
         nsep = igraph_vector_ptr_size(&separators);
 
         IGRAPH_STATUSF((" %li separators,", 0, nsep));
@@ -438,7 +426,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
         igraph_destroy(mygraph);
         igraph_free(mygraph);
         VECTOR(Q)[Qptr] = 0;
-        igraph_i_cohesive_blocks_free3(&separators);
+        igraph_i_cohesive_blocks_free_vectors(&separators);
         IGRAPH_FINALLY_CLEAN(1);
 
         Qptr++;
@@ -600,7 +588,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_bool_destroy(&Qcheck);
     igraph_vector_long_destroy(&Qcohesion);
     igraph_vector_long_destroy(&Qparent);
-    igraph_i_cohesive_blocks_free2(&Qmapping);
+    igraph_i_cohesive_blocks_free_vectors(&Qmapping);
     IGRAPH_FINALLY_CLEAN(4);
 
     igraph_vector_ptr_destroy(&Qmapping);

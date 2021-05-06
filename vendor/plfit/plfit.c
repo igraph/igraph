@@ -482,7 +482,10 @@ static int plfit_i_continuous_xmin_opt_progress(void* instance, double x, double
 static int plfit_i_continuous_xmin_opt_linear_scan(
         plfit_continuous_xmin_opt_data_t* opt_data, plfit_result_t* best_result,
         size_t* best_n) {
-    size_t i;
+    /* i must be signed, otherwise OpenMP on Windows will complain as it
+     * supports signed types only. ssize_t is a POSIX extension so it won't
+     * work */
+    long int i;
     plfit_result_t global_best_result;
     size_t global_best_n;
 
@@ -514,6 +517,7 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
         local_best_result.D = DBL_MAX;
         local_best_result.xmin = 0;
         local_best_result.alpha = 0;
+        local_best_result.p = 0;
 
         /* The range of the for loop below is divided among the threads.
          * nowait means that there will be no implicit barrier at the end
@@ -572,7 +576,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
     };
 
     int success;
-    size_t i, best_n, num_uniques;
+    size_t i, best_n, num_uniques = 0;
     double x, *px, **uniques;
 
     DATA_POINTS_CHECK;

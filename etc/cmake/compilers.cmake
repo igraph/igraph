@@ -1,6 +1,18 @@
+include(CheckCCompilerFlag)
+
 if(MSVC)
   add_compile_options(/FS)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS) # necessary to compile for UWP
 endif()
+
+if (NOT MSVC)
+  check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
+endif()
+
+set(
+  IGRAPH_WARNINGS_AS_ERRORS ON CACHE BOOL
+  "Treat warnings as errors with GCC-like compilers"
+)
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
@@ -17,12 +29,13 @@ macro(use_all_warnings TARGET_NAME)
   else()
     target_compile_options(${TARGET_NAME} PRIVATE 
       # GCC-style compilers:
-      $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare -Wno-varargs
+      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
+        $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
+        -Wall -Wextra -pedantic -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
       >
+      $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
-        -Wall -Wextra -pedantic -Werror -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
         # disable #188: enumerated type mixed with another type; affecting IGRAPH_CHECK
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED
@@ -52,8 +65,8 @@ function(define_file_basename_for_sources targetname)
 
     # Figure out whether the relative path from the source or the build folder
     # is shorter
-    file(RELATIVE_PATH source_rel_path "${CMAKE_SOURCE_DIR}" "${source_full_path}")
-    file(RELATIVE_PATH binary_rel_path "${CMAKE_BINARY_DIR}" "${source_full_path}")
+    file(RELATIVE_PATH source_rel_path "${PROJECT_SOURCE_DIR}" "${source_full_path}")
+    file(RELATIVE_PATH binary_rel_path "${PROJECT_BINARY_DIR}" "${source_full_path}")
     string(LENGTH "${source_rel_path}" source_rel_path_length)
     string(LENGTH "${binary_rel_path}" binary_rel_path_length)
     if(binary_rel_path_length LESS source_rel_path_length)

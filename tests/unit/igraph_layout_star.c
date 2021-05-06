@@ -40,8 +40,6 @@ int main() {
     igraph_t g;
     igraph_vector_t order;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
-
     printf("Star of 8 points and a center:\n");
     igraph_small(&g, 9, 0, -1);
     print_and_destroy(&g, 0, NULL, IGRAPH_SUCCESS);
@@ -50,6 +48,9 @@ int main() {
     igraph_small(&g, 9, 0, -1);
     igraph_vector_init_int(&order, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
     print_and_destroy(&g, 0, &order, IGRAPH_SUCCESS);
+
+    VERIFY_FINALLY_STACK();
+    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking if negative center fails nicely.\n");
     igraph_small(&g, 9, 0, -1);

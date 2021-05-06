@@ -2,6 +2,50 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+ - OpenMP is now enabled and used by certain functions (notably PageRank calculation) when the compiler supports it. Set `IGRAPH_OPENMP_SUPPORT=OFF` at configuration time to disable this.
+
+### Fixed
+
+ - `igraph_get_incidence()` no longer reads and writes out of bounds when given a non-bipartite graph, but gives a warning and ignores edges within a part.
+ - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` dereferenced their arguments only once instead of twice, and therefore did not work with `igraph_vector_ptr_sort()`.
+ - `igraph_maximal_cliques_subset()` corrupted the error handling stack ("finally stack") under some circumstances.
+ - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
+ - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
+ - igraph no longer links to the math library (`libm`) when this is not necessary.
+ - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
+
+## [0.9.2] - 2021-04-14
+
+### Added
+
+ - CMake package files are now installed with igraph. This allows `find_package(igraph)` to find igraph and detect the appropriate compilation options for projects that link to it.
+
+### Fixed
+
+ - igraph can now be used as a CMake subproject in other CMake-based projects.
+ - The documentaton can now be built from the release tarball.
+ - Configuration will no longer fail when the release tarball is extracted into a subdirectory of an unrelated git repository.
+ - The generated pkg-config file was incorrect when `CMAKE_INSTALL_<dir>` variables were absolute paths.
+ - On Unix-like systems, the library name is now `libigraph.so.0.0.0`, as it used to be for igraph 0.8 and earlier.
+ - Fixed a return type mismatch in parser sources, and fixed some warnings with recent versions of gcc.
+ - Fixed a bug in `igraph_get_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` that returned incorrect results for unreachable vertices.
+
+### Other
+
+ - Improved installation instructions and tutorial.
+
+## [0.9.1] - 2021-03-23
+
+### Added
+
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` for lexicographic
+   and colexicographic comparison of vectors. These functions may also be used
+   for sorting.
+
 ### Changed
 
  - `igraph_community_multilevel()` is now randomized (PR #1696, thanks to Daniel Noom).
@@ -21,18 +65,23 @@
  - `igraph_transitivity_undirected()`, `igraph_transitivity_avglocal_undirected()` and `igraph_transitivity_barrat()` no longer trigger an assertion failure when used with the null graph (PRs #1709, #1710).
  - `igraph_(personalized_)pagerank()` would return incorrect results for weighted multigraphs with fewer than 128 vertices when using `IGRAPH_PAGERANK_ALGO_PRPACK`.
  - `igraph_diversity()` now checks its input more carefully, and throws an error when the input graph has multi-edges or is directed.
+ - `igraph_shortest_paths_johnson()` would return incorrect results when the `to` argument differed from `from` (thanks to Daniel Noom).
+ - `igraph_is_graphical()` would fail to set the result variable for certain special degree sequences in the undirected simple graph case.
+ - Non-maximal clique finding functions would sometimes return incomplete results when finding more than 2147483647 (i.e. 2^31 - 1) cliques.
  - GLPK internal errors no longer crash igraph.
  - Fixed some potential memory leaks that could happen on error conditions or when certain functions were interrupted.
  - When testing a DLL build on Windows, the `PATH` was sometimes not set correctly, causing the tests to fail (PR #1692).
- - When compiling the development version (as opposed to the release tarball), the build would fail with newer versions of `bison` and `flex`.
+ - When compiling from the git repository (as opposed to the release tarball), the build would fail with recent versions of `bison` and `flex`.
 
 ### Other
 
  - Documentation improvements.
  - Much faster documentation builds.
  - Allow using a pre-generated `arith.h` header for f2c when cross-compiling; see the Installation section of the documentation.
+ - The `IGRAPH_ENABLE_LTO` build option now supports the `AUTO` value, which uses LTO only if the compiler supports it. Warning: CMake may not always be able to detect that LTO is not fully supported. Therefore, the default setting is `OFF`.
  - The following functions are now interruptible: `igraph_grg_game()`, `igraph_sbm_game()`, `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`.
  - Functions that use GLPK, such as `igraph_feedback_arc_set()` and `igraph_community_optimal_modularity()` are now interruptible.
+ - Add support for older versions of Clang that do not recognize the `-Wno-varargs` flag.
 
 ### Acknowledgments
 

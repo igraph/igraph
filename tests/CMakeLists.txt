@@ -1,4 +1,5 @@
 include(test_helpers)
+include(benchmark_helpers)
 
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
@@ -7,8 +8,18 @@ add_custom_target(
   check
   COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C $<CONFIG>
   COMMENT "Executing unit tests..."
+  USES_TERMINAL
 )
 add_dependencies(check build_tests)
+
+# Add a custom target for benchmarks and another one for building them
+add_custom_target(build_benchmarks)
+add_custom_target(
+  benchmark
+  COMMAND true
+  COMMENT "Running benchmarks..."
+)
+add_dependencies(benchmark build_benchmarks)
 
 # Some newer gcc version have --enable-new-dtags on by default. This then leads
 # to using RUNPATH instead of RPATH. Since RUNPATH is only considered after
@@ -53,6 +64,7 @@ add_examples(
   igraph_sparsemat7
   igraph_sparsemat8
   igraph_strvector
+  igraph_vector_ptr_sort
 )
 
 add_legacy_tests(
@@ -70,9 +82,11 @@ add_legacy_tests(
   igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
+  igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
@@ -124,6 +138,8 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_same_graph
+  igraph_i_incident
+  igraph_i_neighbors
 )
 
 # iterators.at
@@ -187,6 +203,7 @@ add_legacy_tests(
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
+  igraph_perfect
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
@@ -196,6 +213,7 @@ add_legacy_tests(
   tree_game
   ring
   watts_strogatz_game
+  truss
 )
 
 # structural_properties.at
@@ -252,7 +270,10 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
+  igraph_is_chordal
+  igraph_is_mutual
   igraph_is_tree
+  igraph_list_triangles
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs
@@ -270,6 +291,11 @@ add_legacy_tests(
   topological_sorting
 )
 
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  bug_1760
+)
+
 # components.at
 add_examples(
   FOLDER examples/simple NAMES
@@ -281,6 +307,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bridges
   igraph_decompose_strong
+  igraph_subcomponent
 )
 
 # layout.at
@@ -367,6 +394,9 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_dyad_census
+  igraph_motifs_randesu_estimate
+  igraph_motifs_randesu_no
   triad_census
 )
 
@@ -572,6 +602,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  dgemv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
@@ -584,6 +615,11 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_get_incidence
 )
 
 # centralization.at
@@ -651,25 +687,6 @@ if(CMAKE_USE_PTHREADS_INIT)
     )
   endif()
 endif()
-
-# scg.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_scg_grouping
-  igraph_scg_grouping2
-  igraph_scg_grouping3
-  igraph_scg_grouping4
-  igraph_scg_semiprojectors
-  igraph_scg_semiprojectors2
-  igraph_scg_semiprojectors3
-  scg
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  scg2
-  scg3
-)
 
 # random.at
 add_examples(
@@ -750,6 +767,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_running_mean
+  igraph_solve_lsap
 )
 
 # memory allocation
@@ -757,4 +775,28 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   zero_allocs
+)
+
+# simulation
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sir
+)
+
+
+# benchmarks
+add_benchmarks(
+  NAMES
+  igraph_betweenness
+  igraph_betweenness_weighted
+  igraph_cliques
+  igraph_closeness_weighted
+  igraph_coloring
+  igraph_maximal_cliques
+  igraph_pagerank
+  igraph_pagerank_weighted
+  igraph_power_law_fit
+  igraph_random_walk
+  igraph_transitivity
 )

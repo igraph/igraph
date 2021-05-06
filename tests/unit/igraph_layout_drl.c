@@ -79,6 +79,7 @@ int main() {
                   /*weights*/ NULL, /*fixed*/ 0) == IGRAPH_SUCCESS);
     check_and_destroy(&result, 50);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Negative damping.\n");
