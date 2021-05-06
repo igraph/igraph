@@ -282,11 +282,11 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_init(igraph_sparsemat_ite
                                                  igraph_sparsemat_t *sparsemat);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_bool_t igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it);
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it);
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it);
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it);
+IGRAPH_EXPORT int igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it);
+IGRAPH_EXPORT int igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it);
+IGRAPH_EXPORT int igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_real_t igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it);
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it);
+IGRAPH_EXPORT int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it);
 
 __END_DECLS
 
