@@ -852,21 +852,17 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
  * NaN values is undefined.
  *
  * \param v the array to be sorted
- * \param inds the output array of indices. this must be initialized,
+ * \param inds the output array of indices. This must be initialized,
  *         but will be resized
  * \param descending whether the output array should be sorted in descending
  *        order.
  * \return Error code.
  *
- * This routine uses the C library qsort routine.
+ * This routine uses igraph's built-in qsort routine.
  * Algorithm: 1) create an array of pointers to the elements of v. 2)
  * Pass this array to qsort. 3) after sorting the difference between
  * the pointer value and the first pointer value gives its original
  * position in the array. Use this to set the values of inds.
- *
- * Some tests show that this routine is faster than
- * igraph_vector_heapsort_ind by about 10 percent
- * for small vectors to a factor of two for large vectors.
  */
 
 long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
