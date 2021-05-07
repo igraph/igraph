@@ -1,22 +1,22 @@
-/*
- * CXSPARSE: a Concise Sparse Matrix package - Extended.
- * Copyright (c) 2006-2009, Timothy A. Davis.
- * http://www.cise.ufl.edu/research/sparse/CXSparse
- * 
- * CXSparse is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * CXSparse is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this Module; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+/* ========================================================================== */
+/* CXSparse/Include/cs.h file */
+/* ========================================================================== */
+
+/* This is the CXSparse/Include/cs.h file.  It has the same name (cs.h) as
+   the CSparse/Include/cs.h file.  The 'make install' for SuiteSparse installs
+   CXSparse, and this file, instead of CSparse.  The two packages have the same
+   cs.h include filename, because CXSparse is a superset of CSparse.  Any user
+   program that uses CSparse can rely on CXSparse instead, with no change to the
+   user code.  The #include "cs.h" line will work for both versions, in user
+   code, and the function names and user-visible typedefs from CSparse all
+   appear in CXSparse.  For experimenting and changing the package itself, I
+   recommend using CSparse since it's simpler and easier to modify.  For
+   using the package in production codes, I recommend CXSparse since it has
+   more features (support for complex matrices, and both int and long
+   versions).
  */
+
+/* ========================================================================== */
 
 #ifndef _CXS_H
 #define _CXS_H
@@ -42,15 +42,17 @@ extern "C" {
 #endif
 #endif
 
-#define CS_VER 2                    /* CXSparse Version 2.2.3 */
+#define CS_VER 3                    /* CXSparse Version */
 #define CS_SUBVER 2
-#define CS_SUBSUB 3
-#define CS_DATE "Mar 24, 2009"      /* CXSparse release date */
-#define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2009"
+#define CS_SUBSUB 0
+#define CS_DATE "Sept 12, 2017"       /* CSparse release date */
+#define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2016"
 #define CXSPARSE
 
-/* define UF_long */
-#include "UFconfig.h"
+#include "SuiteSparse_config.h"
+#define cs_long_t       SuiteSparse_long
+#define cs_long_t_id    SuiteSparse_long_id
+#define cs_long_t_max   SuiteSparse_long_max
 
 /* -------------------------------------------------------------------------- */
 /* double/int version of CXSparse */
@@ -80,7 +82,7 @@ int cs_di_qrsol (int order, const cs_di *A, double *b) ;
 cs_di *cs_di_transpose (const cs_di *A, int values) ;
 cs_di *cs_di_compress (const cs_di *T) ;
 double cs_di_norm (const cs_di *A) ;
-int cs_di_print (const cs_di *A, int brief) ;
+/*int cs_di_print (const cs_di *A, int brief) ;*/
 cs_di *cs_di_load (FILE *f) ;
 
 /* utilities */
@@ -187,56 +189,56 @@ cs_did *cs_di_ddone (cs_did *D, cs_di *C, void *w, int ok) ;
 
 
 /* -------------------------------------------------------------------------- */
-/* double/UF_long version of CXSparse */
+/* double/cs_long_t version of CXSparse */
 /* -------------------------------------------------------------------------- */
 
 /* --- primary CSparse routines and data structures ------------------------- */
 
 typedef struct cs_dl_sparse  /* matrix in compressed-column or triplet form */
 {
-    UF_long nzmax ; /* maximum number of entries */
-    UF_long m ;     /* number of rows */
-    UF_long n ;     /* number of columns */
-    UF_long *p ;    /* column pointers (size n+1) or col indlces (size nzmax) */
-    UF_long *i ;    /* row indices, size nzmax */
+    cs_long_t nzmax ; /* maximum number of entries */
+    cs_long_t m ;     /* number of rows */
+    cs_long_t n ;     /* number of columns */
+    cs_long_t *p ;    /* column pointers (size n+1) or col indlces (size nzmax) */
+    cs_long_t *i ;    /* row indices, size nzmax */
     double *x ;     /* numerical values, size nzmax */
-    UF_long nz ;    /* # of entries in triplet matrix, -1 for compressed-col */
+    cs_long_t nz ;    /* # of entries in triplet matrix, -1 for compressed-col */
 } cs_dl ;
 
 cs_dl *cs_dl_add (const cs_dl *A, const cs_dl *B, double alpha, double beta) ;
-UF_long cs_dl_cholsol (UF_long order, const cs_dl *A, double *b) ;
-UF_long cs_dl_dupl (cs_dl *A) ;
-UF_long cs_dl_entry (cs_dl *T, UF_long i, UF_long j, double x) ;
-UF_long cs_dl_lusol (UF_long order, const cs_dl *A, double *b, double tol) ;
-UF_long cs_dl_gaxpy (const cs_dl *A, const double *x, double *y) ;
+cs_long_t cs_dl_cholsol (cs_long_t order, const cs_dl *A, double *b) ;
+cs_long_t cs_dl_dupl (cs_dl *A) ;
+cs_long_t cs_dl_entry (cs_dl *T, cs_long_t i, cs_long_t j, double x) ;
+cs_long_t cs_dl_lusol (cs_long_t order, const cs_dl *A, double *b, double tol) ;
+cs_long_t cs_dl_gaxpy (const cs_dl *A, const double *x, double *y) ;
 cs_dl *cs_dl_multiply (const cs_dl *A, const cs_dl *B) ;
-UF_long cs_dl_qrsol (UF_long order, const cs_dl *A, double *b) ;
-cs_dl *cs_dl_transpose (const cs_dl *A, UF_long values) ;
+cs_long_t cs_dl_qrsol (cs_long_t order, const cs_dl *A, double *b) ;
+cs_dl *cs_dl_transpose (const cs_dl *A, cs_long_t values) ;
 cs_dl *cs_dl_compress (const cs_dl *T) ;
 double cs_dl_norm (const cs_dl *A) ;
-UF_long cs_dl_print (const cs_dl *A, UF_long brief) ;
+/*cs_long_t cs_dl_print (const cs_dl *A, cs_long_t brief) ;*/
 cs_dl *cs_dl_load (FILE *f) ;
 
 /* utilities */
-void *cs_dl_calloc (UF_long n, size_t size) ;
+void *cs_dl_calloc (cs_long_t n, size_t size) ;
 void *cs_dl_free (void *p) ;
-void *cs_dl_realloc (void *p, UF_long n, size_t size, UF_long *ok) ;
-cs_dl *cs_dl_spalloc (UF_long m, UF_long n, UF_long nzmax, UF_long values,
-    UF_long t) ;
+void *cs_dl_realloc (void *p, cs_long_t n, size_t size, cs_long_t *ok) ;
+cs_dl *cs_dl_spalloc (cs_long_t m, cs_long_t n, cs_long_t nzmax, cs_long_t values,
+    cs_long_t t) ;
 cs_dl *cs_dl_spfree (cs_dl *A) ;
-UF_long cs_dl_sprealloc (cs_dl *A, UF_long nzmax) ;
-void *cs_dl_malloc (UF_long n, size_t size) ;
+cs_long_t cs_dl_sprealloc (cs_dl *A, cs_long_t nzmax) ;
+void *cs_dl_malloc (cs_long_t n, size_t size) ;
 
 /* --- secondary CSparse routines and data structures ----------------------- */
 
 typedef struct cs_dl_symbolic  /* symbolic Cholesky, LU, or QR analysis */
 {
-    UF_long *pinv ;     /* inverse row perm. for QR, fill red. perm for Chol */
-    UF_long *q ;        /* fill-reducing column permutation for LU and QR */
-    UF_long *parent ;   /* elimination tree for Cholesky and QR */
-    UF_long *cp ;       /* column pointers for Cholesky, row counts for QR */
-    UF_long *leftmost ; /* leftmost[i] = min(find(A(i,:))), for QR */
-    UF_long m2 ;        /* # of rows for QR, after adding fictitious rows */
+    cs_long_t *pinv ;     /* inverse row perm. for QR, fill red. perm for Chol */
+    cs_long_t *q ;        /* fill-reducing column permutation for LU and QR */
+    cs_long_t *parent ;   /* elimination tree for Cholesky and QR */
+    cs_long_t *cp ;       /* column pointers for Cholesky, row counts for QR */
+    cs_long_t *leftmost ; /* leftmost[i] = min(find(A(i,:))), for QR */
+    cs_long_t m2 ;        /* # of rows for QR, after adding fictitious rows */
     double lnz ;        /* # entries in L for LU or Cholesky; in V for QR */
     double unz ;        /* # entries in U for LU; in R for QR */
 } cs_dls ;
@@ -245,43 +247,43 @@ typedef struct cs_dl_numeric   /* numeric Cholesky, LU, or QR factorization */
 {
     cs_dl *L ;      /* L for LU and Cholesky, V for QR */
     cs_dl *U ;      /* U for LU, r for QR, not used for Cholesky */
-    UF_long *pinv ; /* partial pivoting for LU */
+    cs_long_t *pinv ; /* partial pivoting for LU */
     double *B ;     /* beta [0..n-1] for QR */
 } cs_dln ;
 
 typedef struct cs_dl_dmperm_results    /* cs_dl_dmperm or cs_dl_scc output */
 {
-    UF_long *p ;    /* size m, row permutation */
-    UF_long *q ;    /* size n, column permutation */
-    UF_long *r ;    /* size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q) */
-    UF_long *s ;    /* size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q) */
-    UF_long nb ;    /* # of blocks in fine dmperm decomposition */
-    UF_long rr [5] ;    /* coarse row decomposition */
-    UF_long cc [5] ;    /* coarse column decomposition */
+    cs_long_t *p ;    /* size m, row permutation */
+    cs_long_t *q ;    /* size n, column permutation */
+    cs_long_t *r ;    /* size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q) */
+    cs_long_t *s ;    /* size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q) */
+    cs_long_t nb ;    /* # of blocks in fine dmperm decomposition */
+    cs_long_t rr [5] ;    /* coarse row decomposition */
+    cs_long_t cc [5] ;    /* coarse column decomposition */
 } cs_dld ;
 
-UF_long *cs_dl_amd (UF_long order, const cs_dl *A) ;
+cs_long_t *cs_dl_amd (cs_long_t order, const cs_dl *A) ;
 cs_dln *cs_dl_chol (const cs_dl *A, const cs_dls *S) ;
-cs_dld *cs_dl_dmperm (const cs_dl *A, UF_long seed) ;
-UF_long cs_dl_droptol (cs_dl *A, double tol) ;
-UF_long cs_dl_dropzeros (cs_dl *A) ;
-UF_long cs_dl_happly (const cs_dl *V, UF_long i, double beta, double *x) ;
-UF_long cs_dl_ipvec (const UF_long *p, const double *b, double *x, UF_long n) ;
-UF_long cs_dl_lsolve (const cs_dl *L, double *x) ;
-UF_long cs_dl_ltsolve (const cs_dl *L, double *x) ;
+cs_dld *cs_dl_dmperm (const cs_dl *A, cs_long_t seed) ;
+cs_long_t cs_dl_droptol (cs_dl *A, double tol) ;
+cs_long_t cs_dl_dropzeros (cs_dl *A) ;
+cs_long_t cs_dl_happly (const cs_dl *V, cs_long_t i, double beta, double *x) ;
+cs_long_t cs_dl_ipvec (const cs_long_t *p, const double *b, double *x, cs_long_t n) ;
+cs_long_t cs_dl_lsolve (const cs_dl *L, double *x) ;
+cs_long_t cs_dl_ltsolve (const cs_dl *L, double *x) ;
 cs_dln *cs_dl_lu (const cs_dl *A, const cs_dls *S, double tol) ;
-cs_dl *cs_dl_permute (const cs_dl *A, const UF_long *pinv, const UF_long *q,
-    UF_long values) ;
-UF_long *cs_dl_pinv (const UF_long *p, UF_long n) ;
-UF_long cs_dl_pvec (const UF_long *p, const double *b, double *x, UF_long n) ;
+cs_dl *cs_dl_permute (const cs_dl *A, const cs_long_t *pinv, const cs_long_t *q,
+    cs_long_t values) ;
+cs_long_t *cs_dl_pinv (const cs_long_t *p, cs_long_t n) ;
+cs_long_t cs_dl_pvec (const cs_long_t *p, const double *b, double *x, cs_long_t n) ;
 cs_dln *cs_dl_qr (const cs_dl *A, const cs_dls *S) ;
-cs_dls *cs_dl_schol (UF_long order, const cs_dl *A) ;
-cs_dls *cs_dl_sqr (UF_long order, const cs_dl *A, UF_long qr) ;
-cs_dl *cs_dl_symperm (const cs_dl *A, const UF_long *pinv, UF_long values) ;
-UF_long cs_dl_usolve (const cs_dl *U, double *x) ;
-UF_long cs_dl_utsolve (const cs_dl *U, double *x) ;
-UF_long cs_dl_updown (cs_dl *L, UF_long sigma, const cs_dl *C,
-    const UF_long *parent) ;
+cs_dls *cs_dl_schol (cs_long_t order, const cs_dl *A) ;
+cs_dls *cs_dl_sqr (cs_long_t order, const cs_dl *A, cs_long_t qr) ;
+cs_dl *cs_dl_symperm (const cs_dl *A, const cs_long_t *pinv, cs_long_t values) ;
+cs_long_t cs_dl_usolve (const cs_dl *U, double *x) ;
+cs_long_t cs_dl_utsolve (const cs_dl *U, double *x) ;
+cs_long_t cs_dl_updown (cs_dl *L, cs_long_t sigma, const cs_dl *C,
+    const cs_long_t *parent) ;
 
 /* utilities */
 cs_dls *cs_dl_sfree (cs_dls *S) ;
@@ -290,38 +292,38 @@ cs_dld *cs_dl_dfree (cs_dld *D) ;
 
 /* --- tertiary CSparse routines -------------------------------------------- */
 
-UF_long *cs_dl_counts (const cs_dl *A, const UF_long *parent,
-    const UF_long *post, UF_long ata) ;
-double cs_dl_cumsum (UF_long *p, UF_long *c, UF_long n) ;
-UF_long cs_dl_dfs (UF_long j, cs_dl *G, UF_long top, UF_long *xi,
-    UF_long *pstack, const UF_long *pinv) ;
-UF_long *cs_dl_etree (const cs_dl *A, UF_long ata) ;
-UF_long cs_dl_fkeep (cs_dl *A,
-    UF_long (*fkeep) (UF_long, UF_long, double, void *), void *other) ;
-double cs_dl_house (double *x, double *beta, UF_long n) ;
-UF_long *cs_dl_maxtrans (const cs_dl *A, UF_long seed) ;
-UF_long *cs_dl_post (const UF_long *parent, UF_long n) ;
+cs_long_t *cs_dl_counts (const cs_dl *A, const cs_long_t *parent,
+    const cs_long_t *post, cs_long_t ata) ;
+double cs_dl_cumsum (cs_long_t *p, cs_long_t *c, cs_long_t n) ;
+cs_long_t cs_dl_dfs (cs_long_t j, cs_dl *G, cs_long_t top, cs_long_t *xi,
+    cs_long_t *pstack, const cs_long_t *pinv) ;
+cs_long_t *cs_dl_etree (const cs_dl *A, cs_long_t ata) ;
+cs_long_t cs_dl_fkeep (cs_dl *A,
+    cs_long_t (*fkeep) (cs_long_t, cs_long_t, double, void *), void *other) ;
+double cs_dl_house (double *x, double *beta, cs_long_t n) ;
+cs_long_t *cs_dl_maxtrans (const cs_dl *A, cs_long_t seed) ;
+cs_long_t *cs_dl_post (const cs_long_t *parent, cs_long_t n) ;
 cs_dld *cs_dl_scc (cs_dl *A) ;
-UF_long cs_dl_scatter (const cs_dl *A, UF_long j, double beta, UF_long *w,
-    double *x, UF_long mark,cs_dl *C, UF_long nz) ;
-UF_long cs_dl_tdfs (UF_long j, UF_long k, UF_long *head, const UF_long *next,
-    UF_long *post, UF_long *stack) ;
-UF_long cs_dl_leaf (UF_long i, UF_long j, const UF_long *first,
-    UF_long *maxfirst, UF_long *prevleaf, UF_long *ancestor, UF_long *jleaf) ;
-UF_long cs_dl_reach (cs_dl *G, const cs_dl *B, UF_long k, UF_long *xi,
-    const UF_long *pinv) ;
-UF_long cs_dl_spsolve (cs_dl *L, const cs_dl *B, UF_long k, UF_long *xi,
-    double *x, const UF_long *pinv, UF_long lo) ;
-UF_long cs_dl_ereach (const cs_dl *A, UF_long k, const UF_long *parent,
-    UF_long *s, UF_long *w) ;
-UF_long *cs_dl_randperm (UF_long n, UF_long seed) ;
+cs_long_t cs_dl_scatter (const cs_dl *A, cs_long_t j, double beta, cs_long_t *w,
+    double *x, cs_long_t mark,cs_dl *C, cs_long_t nz) ;
+cs_long_t cs_dl_tdfs (cs_long_t j, cs_long_t k, cs_long_t *head, const cs_long_t *next,
+    cs_long_t *post, cs_long_t *stack) ;
+cs_long_t cs_dl_leaf (cs_long_t i, cs_long_t j, const cs_long_t *first,
+    cs_long_t *maxfirst, cs_long_t *prevleaf, cs_long_t *ancestor, cs_long_t *jleaf) ;
+cs_long_t cs_dl_reach (cs_dl *G, const cs_dl *B, cs_long_t k, cs_long_t *xi,
+    const cs_long_t *pinv) ;
+cs_long_t cs_dl_spsolve (cs_dl *L, const cs_dl *B, cs_long_t k, cs_long_t *xi,
+    double *x, const cs_long_t *pinv, cs_long_t lo) ;
+cs_long_t cs_dl_ereach (const cs_dl *A, cs_long_t k, const cs_long_t *parent,
+    cs_long_t *s, cs_long_t *w) ;
+cs_long_t *cs_dl_randperm (cs_long_t n, cs_long_t seed) ;
 
 /* utilities */
-cs_dld *cs_dl_dalloc (UF_long m, UF_long n) ;
-cs_dl *cs_dl_done (cs_dl *C, void *w, void *x, UF_long ok) ;
-UF_long *cs_dl_idone (UF_long *p, cs_dl *C, void *w, UF_long ok) ;
-cs_dln *cs_dl_ndone (cs_dln *N, cs_dl *C, void *w, void *x, UF_long ok) ;
-cs_dld *cs_dl_ddone (cs_dld *D, cs_dl *C, void *w, UF_long ok) ;
+cs_dld *cs_dl_dalloc (cs_long_t m, cs_long_t n) ;
+cs_dl *cs_dl_done (cs_dl *C, void *w, void *x, cs_long_t ok) ;
+cs_long_t *cs_dl_idone (cs_long_t *p, cs_dl *C, void *w, cs_long_t ok) ;
+cs_dln *cs_dl_ndone (cs_dln *N, cs_dl *C, void *w, void *x, cs_long_t ok) ;
+cs_dld *cs_dl_ddone (cs_dld *D, cs_dl *C, void *w, cs_long_t ok) ;
 
 
 /* -------------------------------------------------------------------------- */
@@ -355,7 +357,7 @@ int cs_ci_qrsol (int order, const cs_ci *A, cs_complex_t *b) ;
 cs_ci *cs_ci_transpose (const cs_ci *A, int values) ;
 cs_ci *cs_ci_compress (const cs_ci *T) ;
 double cs_ci_norm (const cs_ci *A) ;
-int cs_ci_print (const cs_ci *A, int brief) ;
+/*int cs_ci_print (const cs_ci *A, int brief) ;*/
 cs_ci *cs_ci_load (FILE *f) ;
 
 /* utilities */
@@ -462,58 +464,58 @@ cs_cid *cs_ci_ddone (cs_cid *D, cs_ci *C, void *w, int ok) ;
 
 
 /* -------------------------------------------------------------------------- */
-/* complex/UF_long version of CXSparse */
+/* complex/cs_long_t version of CXSparse */
 /* -------------------------------------------------------------------------- */
 
 /* --- primary CSparse routines and data structures ------------------------- */
 
 typedef struct cs_cl_sparse  /* matrix in compressed-column or triplet form */
 {
-    UF_long nzmax ; /* maximum number of entries */
-    UF_long m ;     /* number of rows */
-    UF_long n ;     /* number of columns */
-    UF_long *p ;    /* column pointers (size n+1) or col indlces (size nzmax) */
-    UF_long *i ;    /* row indices, size nzmax */
+    cs_long_t nzmax ; /* maximum number of entries */
+    cs_long_t m ;     /* number of rows */
+    cs_long_t n ;     /* number of columns */
+    cs_long_t *p ;    /* column pointers (size n+1) or col indlces (size nzmax) */
+    cs_long_t *i ;    /* row indices, size nzmax */
     cs_complex_t *x ;    /* numerical values, size nzmax */
-    UF_long nz ;    /* # of entries in triplet matrix, -1 for compressed-col */
+    cs_long_t nz ;    /* # of entries in triplet matrix, -1 for compressed-col */
 } cs_cl ;
 
 cs_cl *cs_cl_add (const cs_cl *A, const cs_cl *B, cs_complex_t alpha,
     cs_complex_t beta) ;
-UF_long cs_cl_cholsol (UF_long order, const cs_cl *A, cs_complex_t *b) ;
-UF_long cs_cl_dupl (cs_cl *A) ;
-UF_long cs_cl_entry (cs_cl *T, UF_long i, UF_long j, cs_complex_t x) ;
-UF_long cs_cl_lusol (UF_long order, const cs_cl *A, cs_complex_t *b,
+cs_long_t cs_cl_cholsol (cs_long_t order, const cs_cl *A, cs_complex_t *b) ;
+cs_long_t cs_cl_dupl (cs_cl *A) ;
+cs_long_t cs_cl_entry (cs_cl *T, cs_long_t i, cs_long_t j, cs_complex_t x) ;
+cs_long_t cs_cl_lusol (cs_long_t order, const cs_cl *A, cs_complex_t *b,
     double tol) ;
-UF_long cs_cl_gaxpy (const cs_cl *A, const cs_complex_t *x, cs_complex_t *y) ;
+cs_long_t cs_cl_gaxpy (const cs_cl *A, const cs_complex_t *x, cs_complex_t *y) ;
 cs_cl *cs_cl_multiply (const cs_cl *A, const cs_cl *B) ;
-UF_long cs_cl_qrsol (UF_long order, const cs_cl *A, cs_complex_t *b) ;
-cs_cl *cs_cl_transpose (const cs_cl *A, UF_long values) ;
+cs_long_t cs_cl_qrsol (cs_long_t order, const cs_cl *A, cs_complex_t *b) ;
+cs_cl *cs_cl_transpose (const cs_cl *A, cs_long_t values) ;
 cs_cl *cs_cl_compress (const cs_cl *T) ;
 double cs_cl_norm (const cs_cl *A) ;
-UF_long cs_cl_print (const cs_cl *A, UF_long brief) ;
+/*cs_long_t cs_cl_print (const cs_cl *A, cs_long_t brief) ;*/
 cs_cl *cs_cl_load (FILE *f) ;
 
 /* utilities */
-void *cs_cl_calloc (UF_long n, size_t size) ;
+void *cs_cl_calloc (cs_long_t n, size_t size) ;
 void *cs_cl_free (void *p) ;
-void *cs_cl_realloc (void *p, UF_long n, size_t size, UF_long *ok) ;
-cs_cl *cs_cl_spalloc (UF_long m, UF_long n, UF_long nzmax, UF_long values,
-    UF_long t) ;
+void *cs_cl_realloc (void *p, cs_long_t n, size_t size, cs_long_t *ok) ;
+cs_cl *cs_cl_spalloc (cs_long_t m, cs_long_t n, cs_long_t nzmax, cs_long_t values,
+    cs_long_t t) ;
 cs_cl *cs_cl_spfree (cs_cl *A) ;
-UF_long cs_cl_sprealloc (cs_cl *A, UF_long nzmax) ;
-void *cs_cl_malloc (UF_long n, size_t size) ;
+cs_long_t cs_cl_sprealloc (cs_cl *A, cs_long_t nzmax) ;
+void *cs_cl_malloc (cs_long_t n, size_t size) ;
 
 /* --- secondary CSparse routines and data structures ----------------------- */
 
 typedef struct cs_cl_symbolic  /* symbolic Cholesky, LU, or QR analysis */
 {
-    UF_long *pinv ;     /* inverse row perm. for QR, fill red. perm for Chol */
-    UF_long *q ;        /* fill-reducing column permutation for LU and QR */
-    UF_long *parent ;   /* elimination tree for Cholesky and QR */
-    UF_long *cp ;       /* column pointers for Cholesky, row counts for QR */
-    UF_long *leftmost ; /* leftmost[i] = min(find(A(i,:))), for QR */
-    UF_long m2 ;        /* # of rows for QR, after adding fictitious rows */
+    cs_long_t *pinv ;     /* inverse row perm. for QR, fill red. perm for Chol */
+    cs_long_t *q ;        /* fill-reducing column permutation for LU and QR */
+    cs_long_t *parent ;   /* elimination tree for Cholesky and QR */
+    cs_long_t *cp ;       /* column pointers for Cholesky, row counts for QR */
+    cs_long_t *leftmost ; /* leftmost[i] = min(find(A(i,:))), for QR */
+    cs_long_t m2 ;        /* # of rows for QR, after adding fictitious rows */
     double lnz ;        /* # entries in L for LU or Cholesky; in V for QR */
     double unz ;        /* # entries in U for LU; in R for QR */
 } cs_cls ;
@@ -522,45 +524,45 @@ typedef struct cs_cl_numeric   /* numeric Cholesky, LU, or QR factorization */
 {
     cs_cl *L ;          /* L for LU and Cholesky, V for QR */
     cs_cl *U ;          /* U for LU, r for QR, not used for Cholesky */
-    UF_long *pinv ;     /* partial pivoting for LU */
+    cs_long_t *pinv ;     /* partial pivoting for LU */
     double *B ;         /* beta [0..n-1] for QR */
 } cs_cln ;
 
 typedef struct cs_cl_dmperm_results    /* cs_cl_dmperm or cs_cl_scc output */
 {
-    UF_long *p ;    /* size m, row permutation */
-    UF_long *q ;    /* size n, column permutation */
-    UF_long *r ;    /* size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q) */
-    UF_long *s ;    /* size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q) */
-    UF_long nb ;    /* # of blocks in fine dmperm decomposition */
-    UF_long rr [5] ;   /* coarse row decomposition */
-    UF_long cc [5] ;   /* coarse column decomposition */
+    cs_long_t *p ;    /* size m, row permutation */
+    cs_long_t *q ;    /* size n, column permutation */
+    cs_long_t *r ;    /* size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q) */
+    cs_long_t *s ;    /* size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q) */
+    cs_long_t nb ;    /* # of blocks in fine dmperm decomposition */
+    cs_long_t rr [5] ;   /* coarse row decomposition */
+    cs_long_t cc [5] ;   /* coarse column decomposition */
 } cs_cld ;
 
-UF_long *cs_cl_amd (UF_long order, const cs_cl *A) ;
+cs_long_t *cs_cl_amd (cs_long_t order, const cs_cl *A) ;
 cs_cln *cs_cl_chol (const cs_cl *A, const cs_cls *S) ;
-cs_cld *cs_cl_dmperm (const cs_cl *A, UF_long seed) ;
-UF_long cs_cl_droptol (cs_cl *A, double tol) ;
-UF_long cs_cl_dropzeros (cs_cl *A) ;
-UF_long cs_cl_happly (const cs_cl *V, UF_long i, double beta, cs_complex_t *x) ;
-UF_long cs_cl_ipvec (const UF_long *p, const cs_complex_t *b,
-    cs_complex_t *x, UF_long n) ;
-UF_long cs_cl_lsolve (const cs_cl *L, cs_complex_t *x) ;
-UF_long cs_cl_ltsolve (const cs_cl *L, cs_complex_t *x) ;
+cs_cld *cs_cl_dmperm (const cs_cl *A, cs_long_t seed) ;
+cs_long_t cs_cl_droptol (cs_cl *A, double tol) ;
+cs_long_t cs_cl_dropzeros (cs_cl *A) ;
+cs_long_t cs_cl_happly (const cs_cl *V, cs_long_t i, double beta, cs_complex_t *x) ;
+cs_long_t cs_cl_ipvec (const cs_long_t *p, const cs_complex_t *b,
+    cs_complex_t *x, cs_long_t n) ;
+cs_long_t cs_cl_lsolve (const cs_cl *L, cs_complex_t *x) ;
+cs_long_t cs_cl_ltsolve (const cs_cl *L, cs_complex_t *x) ;
 cs_cln *cs_cl_lu (const cs_cl *A, const cs_cls *S, double tol) ;
-cs_cl *cs_cl_permute (const cs_cl *A, const UF_long *pinv, const UF_long *q,
-    UF_long values) ;
-UF_long *cs_cl_pinv (const UF_long *p, UF_long n) ;
-UF_long cs_cl_pvec (const UF_long *p, const cs_complex_t *b,
-    cs_complex_t *x, UF_long n) ;
+cs_cl *cs_cl_permute (const cs_cl *A, const cs_long_t *pinv, const cs_long_t *q,
+    cs_long_t values) ;
+cs_long_t *cs_cl_pinv (const cs_long_t *p, cs_long_t n) ;
+cs_long_t cs_cl_pvec (const cs_long_t *p, const cs_complex_t *b,
+    cs_complex_t *x, cs_long_t n) ;
 cs_cln *cs_cl_qr (const cs_cl *A, const cs_cls *S) ;
-cs_cls *cs_cl_schol (UF_long order, const cs_cl *A) ;
-cs_cls *cs_cl_sqr (UF_long order, const cs_cl *A, UF_long qr) ;
-cs_cl *cs_cl_symperm (const cs_cl *A, const UF_long *pinv, UF_long values) ;
-UF_long cs_cl_usolve (const cs_cl *U, cs_complex_t *x) ;
-UF_long cs_cl_utsolve (const cs_cl *U, cs_complex_t *x) ;
-UF_long cs_cl_updown (cs_cl *L, UF_long sigma, const cs_cl *C,
-    const UF_long *parent) ;
+cs_cls *cs_cl_schol (cs_long_t order, const cs_cl *A) ;
+cs_cls *cs_cl_sqr (cs_long_t order, const cs_cl *A, cs_long_t qr) ;
+cs_cl *cs_cl_symperm (const cs_cl *A, const cs_long_t *pinv, cs_long_t values) ;
+cs_long_t cs_cl_usolve (const cs_cl *U, cs_complex_t *x) ;
+cs_long_t cs_cl_utsolve (const cs_cl *U, cs_complex_t *x) ;
+cs_long_t cs_cl_updown (cs_cl *L, cs_long_t sigma, const cs_cl *C,
+    const cs_long_t *parent) ;
 
 /* utilities */
 cs_cls *cs_cl_sfree (cs_cls *S) ;
@@ -569,38 +571,38 @@ cs_cld *cs_cl_dfree (cs_cld *D) ;
 
 /* --- tertiary CSparse routines -------------------------------------------- */
 
-UF_long *cs_cl_counts (const cs_cl *A, const UF_long *parent,
-    const UF_long *post, UF_long ata) ;
-double cs_cl_cumsum (UF_long *p, UF_long *c, UF_long n) ;
-UF_long cs_cl_dfs (UF_long j, cs_cl *G, UF_long top, UF_long *xi,
-    UF_long *pstack, const UF_long *pinv) ;
-UF_long *cs_cl_etree (const cs_cl *A, UF_long ata) ;
-UF_long cs_cl_fkeep (cs_cl *A,
-    UF_long (*fkeep) (UF_long, UF_long, cs_complex_t, void *), void *other) ;
-cs_complex_t cs_cl_house (cs_complex_t *x, double *beta, UF_long n) ;
-UF_long *cs_cl_maxtrans (const cs_cl *A, UF_long seed) ;
-UF_long *cs_cl_post (const UF_long *parent, UF_long n) ;
+cs_long_t *cs_cl_counts (const cs_cl *A, const cs_long_t *parent,
+    const cs_long_t *post, cs_long_t ata) ;
+double cs_cl_cumsum (cs_long_t *p, cs_long_t *c, cs_long_t n) ;
+cs_long_t cs_cl_dfs (cs_long_t j, cs_cl *G, cs_long_t top, cs_long_t *xi,
+    cs_long_t *pstack, const cs_long_t *pinv) ;
+cs_long_t *cs_cl_etree (const cs_cl *A, cs_long_t ata) ;
+cs_long_t cs_cl_fkeep (cs_cl *A,
+    cs_long_t (*fkeep) (cs_long_t, cs_long_t, cs_complex_t, void *), void *other) ;
+cs_complex_t cs_cl_house (cs_complex_t *x, double *beta, cs_long_t n) ;
+cs_long_t *cs_cl_maxtrans (const cs_cl *A, cs_long_t seed) ;
+cs_long_t *cs_cl_post (const cs_long_t *parent, cs_long_t n) ;
 cs_cld *cs_cl_scc (cs_cl *A) ;
-UF_long cs_cl_scatter (const cs_cl *A, UF_long j, cs_complex_t beta,
-    UF_long *w, cs_complex_t *x, UF_long mark,cs_cl *C, UF_long nz) ;
-UF_long cs_cl_tdfs (UF_long j, UF_long k, UF_long *head, const UF_long *next,
-    UF_long *post, UF_long *stack) ;
-UF_long cs_cl_leaf (UF_long i, UF_long j, const UF_long *first,
-    UF_long *maxfirst, UF_long *prevleaf, UF_long *ancestor, UF_long *jleaf) ;
-UF_long cs_cl_reach (cs_cl *G, const cs_cl *B, UF_long k, UF_long *xi,
-    const UF_long *pinv) ;
-UF_long cs_cl_spsolve (cs_cl *L, const cs_cl *B, UF_long k, UF_long *xi, 
-    cs_complex_t *x, const UF_long *pinv, UF_long lo) ;
-UF_long cs_cl_ereach (const cs_cl *A, UF_long k, const UF_long *parent,
-    UF_long *s, UF_long *w) ;
-UF_long *cs_cl_randperm (UF_long n, UF_long seed) ;
+cs_long_t cs_cl_scatter (const cs_cl *A, cs_long_t j, cs_complex_t beta,
+    cs_long_t *w, cs_complex_t *x, cs_long_t mark,cs_cl *C, cs_long_t nz) ;
+cs_long_t cs_cl_tdfs (cs_long_t j, cs_long_t k, cs_long_t *head, const cs_long_t *next,
+    cs_long_t *post, cs_long_t *stack) ;
+cs_long_t cs_cl_leaf (cs_long_t i, cs_long_t j, const cs_long_t *first,
+    cs_long_t *maxfirst, cs_long_t *prevleaf, cs_long_t *ancestor, cs_long_t *jleaf) ;
+cs_long_t cs_cl_reach (cs_cl *G, const cs_cl *B, cs_long_t k, cs_long_t *xi,
+    const cs_long_t *pinv) ;
+cs_long_t cs_cl_spsolve (cs_cl *L, const cs_cl *B, cs_long_t k, cs_long_t *xi, 
+    cs_complex_t *x, const cs_long_t *pinv, cs_long_t lo) ;
+cs_long_t cs_cl_ereach (const cs_cl *A, cs_long_t k, const cs_long_t *parent,
+    cs_long_t *s, cs_long_t *w) ;
+cs_long_t *cs_cl_randperm (cs_long_t n, cs_long_t seed) ;
 
 /* utilities */
-cs_cld *cs_cl_dalloc (UF_long m, UF_long n) ;
-cs_cl *cs_cl_done (cs_cl *C, void *w, void *x, UF_long ok) ;
-UF_long *cs_cl_idone (UF_long *p, cs_cl *C, void *w, UF_long ok) ;
-cs_cln *cs_cl_ndone (cs_cln *N, cs_cl *C, void *w, void *x, UF_long ok) ;
-cs_cld *cs_cl_ddone (cs_cld *D, cs_cl *C, void *w, UF_long ok) ;
+cs_cld *cs_cl_dalloc (cs_long_t m, cs_long_t n) ;
+cs_cl *cs_cl_done (cs_cl *C, void *w, void *x, cs_long_t ok) ;
+cs_long_t *cs_cl_idone (cs_long_t *p, cs_cl *C, void *w, cs_long_t ok) ;
+cs_cln *cs_cl_ndone (cs_cln *N, cs_cl *C, void *w, void *x, cs_long_t ok) ;
+cs_cld *cs_cl_ddone (cs_cld *D, cs_cl *C, void *w, cs_long_t ok) ;
 
 #endif
 
@@ -609,9 +611,9 @@ cs_cld *cs_cl_ddone (cs_cld *D, cs_cl *C, void *w, UF_long ok) ;
 /* -------------------------------------------------------------------------- */
 
 #ifdef CS_LONG
-#define CS_INT UF_long
-#define CS_INT_MAX UF_long_max
-#define CS_ID UF_long_id
+#define CS_INT cs_long_t
+#define CS_INT_MAX cs_long_t_max
+#define CS_ID cs_long_t_id
 #ifdef CS_COMPLEX
 #define CS_ENTRY cs_complex_t
 #define CS_NAME(nm) cs_cl ## nm
@@ -670,7 +672,7 @@ cs_cld *cs_cl_ddone (cs_cld *D, cs_cl *C, void *w, UF_long ok) ;
 #define cs_transpose CS_NAME (_transpose)
 #define cs_compress CS_NAME (_compress)
 #define cs_norm CS_NAME (_norm)
-#define cs_print CS_NAME (_print)
+/*#define cs_print CS_NAME (_print)*/
 #define cs_load CS_NAME (_load)
 
 /* utilities */
@@ -746,8 +748,8 @@ cs_cld *cs_cl_ddone (cs_cld *D, cs_cl *C, void *w, UF_long ok) ;
 #ifndef NCOMPLEX
 cs_di *cs_i_real (cs_ci *A, int real) ;
 cs_ci *cs_i_complex (cs_di *A, int real) ;
-cs_dl *cs_l_real (cs_cl *A, UF_long real) ;
-cs_cl *cs_l_complex (cs_dl *A, UF_long real) ;
+cs_dl *cs_l_real (cs_cl *A, cs_long_t real) ;
+cs_cl *cs_l_complex (cs_dl *A, cs_long_t real) ;
 #endif
 
 #ifdef __cplusplus

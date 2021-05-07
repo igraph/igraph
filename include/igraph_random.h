@@ -38,7 +38,7 @@ __BEGIN_DECLS
 
 typedef struct igraph_rng_type_t {
     const char *name;
-    unsigned long int min; /* at the moment, 'min' must always be set to 0 */
+    unsigned long int min; /* 'min' must always be set to 0 */
     unsigned long int max;
     int (*init)(void **state);
     void (*destroy)(void *state);
@@ -66,7 +66,7 @@ IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
 IGRAPH_EXPORT unsigned long int igraph_rng_max(igraph_rng_t *rng);
-IGRAPH_EXPORT unsigned long int igraph_rng_min(igraph_rng_t *rng);
+IGRAPH_EXPORT IGRAPH_DEPRECATED unsigned long int igraph_rng_min(igraph_rng_t *rng);
 IGRAPH_EXPORT const char *igraph_rng_name(igraph_rng_t *rng);
 
 IGRAPH_EXPORT long int igraph_rng_get_integer(igraph_rng_t *rng,

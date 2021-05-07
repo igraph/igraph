@@ -3,7 +3,6 @@ add_library(
   plfit
   OBJECT
   EXCLUDE_FROM_ALL
-  error.c
   gss.c
   hzeta.c
   kolmogorov.c
@@ -12,6 +11,7 @@ add_library(
   options.c
   platform.c
   plfit.c
+  plfit_error.c
   rbinom.c
   sampling.c
 )

@@ -12,6 +12,7 @@
   border: solid 1px #4444ff;
   padding: 0.5em;
   font-size: 16px;
+  overflow: auto;
 }
 .constant, .literal {
   font-size: 16px;
@@ -163,9 +164,9 @@ ul.download-links li.download-external {
   padding-left: 18px;
 }
 
-a { color: #00f; text-decoration: none }
-a:visited { color: #00c }
-a:hover { color: #00f; text-decoration: underline; cursor: hand; }
+a { color: #22d; text-decoration: none }
+a:visited { color: #219 }
+a:hover { color: #22d; text-decoration: underline; cursor: hand; }
 h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
 h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
 h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }

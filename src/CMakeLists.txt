@@ -84,7 +84,7 @@ add_library(
 
   constructors/adjacency.c
   constructors/atlas.c
-  constructors/basic.c
+  constructors/basic_constructors.c
   constructors/de_bruijn.c
   constructors/famous.c
   constructors/full.c
@@ -128,11 +128,12 @@ add_library(
   centrality/truss.cpp
   centrality/prpack.cpp
 
-  cliques/cliquer.c
+  cliques/cliquer_wrapper.c
   cliques/cliques.c
   cliques/maximal_cliques.c
   cliques/glet.c
 
+  community/community_misc.c
   community/edge_betweenness.c
   community/fast_modularity.c
   community/fluid.c
@@ -144,7 +145,6 @@ add_library(
   community/leading_eigenvector.c
   community/leiden.c
   community/louvain.c
-  community/misc.c
   community/modularity.c
   community/optimal_modularity.c
   community/spinglass/clustertool.cpp
@@ -180,7 +180,6 @@ add_library(
   io/pajek.c
   ${PARSER_SOURCES}
 
-  layout/bipartite.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -192,13 +191,14 @@ add_library(
   layout/fruchterman_reingold.c
   layout/gem.c
   layout/graphopt.c
-  layout/grid.c
   layout/kamada_kawai.c
-  layout/lgl.c
+  layout/large_graph.c
+  layout/layout_bipartite.c
+  layout/layout_grid.c
+  layout/layout_random.c
   layout/mds.c
   layout/merge_dla.c
   layout/merge_grid.c
-  layout/random.c
   layout/reingold_tilford.c
   layout/sugiyama.c
 
@@ -230,7 +230,7 @@ add_library(
   paths/simple_paths.c
   paths/unweighted.c
 
-  properties/basic.c
+  properties/basic_properties.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c
@@ -247,7 +247,7 @@ add_library(
   isomorphism/bliss.cc
   isomorphism/isoclasses.c
   isomorphism/lad.c
-  isomorphism/misc.c
+  isomorphism/isomorphism_misc.c
   isomorphism/queries.c
   isomorphism/vf2.c
 
