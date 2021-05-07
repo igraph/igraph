@@ -28,6 +28,7 @@
 #include "igraph_qsort.h"
 
 #include <string.h>         /* memcpy & co. */
+#include <stdint.h>         /* uintptr_t */
 #include <stdlib.h>
 
 /**
