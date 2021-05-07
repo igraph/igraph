@@ -103,6 +103,8 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
                                                          long int i, long int j);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, permute)(TYPE(igraph_vector) *v,
+                                                         const igraph_vector_t *ind);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v);
 
 /*-----------------------*/

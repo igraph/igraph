@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
+ - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
+
 ## [0.9.3] - 2021-05-05
 
 ### Added
