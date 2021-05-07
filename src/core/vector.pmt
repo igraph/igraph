@@ -883,9 +883,9 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     }
     first = vind[0];
     if (descending) {
-        igraph_qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector, i_qsort_ind_cmp_desc));
+        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_qsort_ind_cmp_desc));
     } else {
-        igraph_qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector, i_qsort_ind_cmp_asc));
+        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_qsort_ind_cmp_asc));
     }
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = vind[i] - first;

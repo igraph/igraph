@@ -637,3 +637,79 @@ igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector
     IGRAPH_ASSERT(v != 0);
     return v->item_destructor;
 }
+
+typedef int cmp_t (const void *, const void *);
+
+/**
+ * Comparison function passed to qsort_r from  igraph_vector_ptr_qsort_ind
+ */
+static int igraph_vector_ptr_i_qsort_ind_cmp(void *thunk, const void *p1, const void *p2) {
+    cmp_t* cmp = (cmp_t*) thunk;
+    uintptr_t *pa = (uintptr_t*) p1;
+    uintptr_t *pb = (uintptr_t*) p2;
+    void** item_a_ptr = (void**) *pa;
+    void** item_b_ptr = (void**) *pb;
+    return cmp(*item_a_ptr, *item_b_ptr);
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_qsort_ind
+ * \brief Return a permutation of indices that sorts a vector of pointers
+ *
+ * Takes an unsorted array \c v as input and computes an array of
+ * indices inds such that v[ inds[i] ], with i increasing from 0, is
+ * an ordered array (either ascending or descending, depending on
+ * \v order). The order of indices for identical elements is not
+ * defined.
+ *
+ * \param v the array to be sorted
+ * \param inds the output array of indices. This must be initialized,
+ *         but will be resized
+ * \param cmp a comparator function that takes two elements of the pointer
+ *        vector being sorted (these are constant pointers on their own)
+ *        and returns a negative value if the item \em "pointed to" by the
+ *        first pointer is smaller than the item \em "pointed to" by the
+ *        second pointer, a positive value if it is larger, or zero if the
+ *        two items are equal
+ * \return Error code.
+ *
+ * This routine uses the C library qsort routine.
+ * Algorithm: 1) create an array of pointers to the elements of v. 2)
+ * Pass this array to qsort. 3) after sorting the difference between
+ * the pointer value and the first pointer value gives its original
+ * position in the array. Use this to set the values of inds.
+ */
+
+igraph_error_t igraph_vector_ptr_qsort_ind(igraph_vector_ptr_t *v,
+        igraph_vector_t *inds, cmp_t cmp) {
+    unsigned long int i;
+    uintptr_t *vind, first;
+    size_t n = (size_t) igraph_vector_ptr_size(v);
+
+    IGRAPH_CHECK(igraph_vector_resize(inds, (long) n));
+    if (n == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    vind = IGRAPH_CALLOC(n, uintptr_t);
+    if (vind == 0) {
+        IGRAPH_ERROR("igraph_vector_ptr_qsort_ind failed", IGRAPH_ENOMEM);
+    }
+
+    for (i = 0; i < n; i++) {
+        vind[i] = (uintptr_t) &VECTOR(*v)[i];
+    }
+
+    first = vind[0];
+
+    igraph_qsort_r(vind, n, sizeof(uintptr_t), (void*)cmp, igraph_vector_ptr_i_qsort_ind_cmp);
+
+    for (i = 0; i < n; i++) {
+        VECTOR(*inds)[i] = vind[i] - first;
+    }
+
+    IGRAPH_FREE(vind);
+
+    return IGRAPH_SUCCESS;
+}
