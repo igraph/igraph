@@ -39,10 +39,12 @@
  * \function igraph_shortest_paths_dijkstra
  * \brief Weighted shortest path lengths between vertices.
  *
- * This function implements Dijkstra's algorithm to find the weighted
- * shortest path lengths to all vertices from a single source. It is run
- * independently for the given sources. It uses a binary heap for
- * efficient implementation.
+ * This function implements Dijkstra's algorithm, which can find
+ * the weighted shortest path lengths from a source vertex to all
+ * other vertices. This function allows specifying a set of source
+ * and target vertices. The algorithm is run independently for each
+ * source and the results are retained only for the specified targets.
+ * This implementation uses a binary heap for efficiency.
  *
  * \param graph The input graph, can be directed.
  * \param res The result, a matrix. A pointer to an initialized matrix
@@ -113,15 +115,17 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
+                      " of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
     }
 
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         } else if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
