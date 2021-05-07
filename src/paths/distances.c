@@ -311,6 +311,8 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             inf = 1;
         } else {
             while (1) {
+                IGRAPH_ALLOW_INTERRUPTION();
+
                 ito = vid_ecc;
 
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_ecc),
@@ -368,6 +370,8 @@ int igraph_pseudo_diameter(const igraph_t *graph,
             }
 
             while (1) {
+                IGRAPH_ALLOW_INTERRUPTION();
+
                 vid_end = vid_ecc;
 
                 /* TODO: In the undirected case, we break ties between vertices at the
@@ -643,6 +647,8 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
         if (!inf) {
             while (1) {
+                IGRAPH_ALLOW_INTERRUPTION();
+
                 ito = vid_ecc;
                 IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_v, vid_ecc, &vid_ecc, unconn, &inclist));
 
@@ -689,6 +695,8 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
             }
 
             while (1) {
+                IGRAPH_ALLOW_INTERRUPTION();
+
                 vid_end = vid_ecc;
 
                 /* TODO: In the undirected case, we break ties between vertices at the
