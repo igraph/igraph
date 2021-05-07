@@ -34,7 +34,7 @@
 /* When vid_ecc is not NULL, only one vertex id should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
  * vids. If unconn == FALSE and not all other vertices were reachable from
- * the single given vertex, -1 is returned n vid_ecc. */
+ * the single given vertex, -1 is returned in vid_ecc. */
 static int igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
@@ -403,7 +403,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
                 ifrom = vid_start;
                 ito   = vid_end;
             }
-\
+
         }
         igraph_vector_destroy(&ecc_out);
         igraph_vector_destroy(&ecc_in);
@@ -445,7 +445,6 @@ int igraph_pseudo_diameter(const igraph_t *graph,
  * the one with the lowest degree is chosen.
  * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
  * wil be set to infinity, and \p vid_ecc to -1;
- *
  */
 int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_lazy_inclist_t *inclist) {
     long int no_of_nodes = igraph_vcount(graph);
