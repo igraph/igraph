@@ -623,12 +623,9 @@ int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  * in order. Assumes that both paths are pointers to igraph_vector_t
  * objects and that they are not empty
  */
-static int igraph_i_vector_tail_cmp(void *extra, const void* a, const void* b) {
-    igraph_vector_ptr_t *paths = (igraph_vector_ptr_t *) extra;
-    long int *aa = (long int*) a;
-    long int *bb = (long int*) b;
-    igraph_vector_t *path_a = (igraph_vector_t *) VECTOR(*paths)[*aa];
-    igraph_vector_t *path_b = (igraph_vector_t *) VECTOR(*paths)[*bb];
+static int igraph_i_vector_tail_cmp(const void* a, const void* b) {
+    const igraph_vector_t *path_a = (const igraph_vector_t *) a;
+    const igraph_vector_t *path_b = (const igraph_vector_t *) b;
     igraph_real_t tail_a = igraph_vector_tail(path_a);
     igraph_real_t tail_b = igraph_vector_tail(path_b);
 
@@ -721,8 +718,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
-    igraph_vector_t dists, order;
-    igraph_vector_long_t index, index_temp, mapping;
+    igraph_vector_t dists, order, index;
     igraph_vector_ptr_t parents, parents_edge;
 
     igraph_finally_func_t *old_edge_item_destructor, *old_vertices_item_destructor;
@@ -1182,42 +1178,14 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         }
         
         /* sort the paths by the target vertices */
-        IGRAPH_CHECK(igraph_vector_long_init_seq(&index, 0, j));
-        IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
-        igraph_qsort_r(VECTOR(index), j, sizeof(long int), vertices, igraph_i_vector_tail_cmp);
-        // index_temp[i] is what path (relative to the original vertices) is in index i
-        IGRAPH_CHECK(igraph_vector_long_init_seq(&index_temp, 0, j));
-        IGRAPH_FINALLY(igraph_vector_long_destroy, &index_temp);
-        // mapping[i] is the location of the i element
-        IGRAPH_CHECK(igraph_vector_long_init_seq(&mapping, 0, j)); 
-        IGRAPH_FINALLY(igraph_vector_long_destroy, &mapping);
-        // sort accourding to the permutation of index
-        igraph_vector_t *path_temp;
-        long int path_old, path_new, ind;
-        for (i = 0; i < j; i++) {
-            if (VECTOR(index_temp)[i] != VECTOR(index)[i]) {
-                path_old = VECTOR(index_temp)[i];
-                path_new = VECTOR(index)[i];
-                ind = VECTOR(mapping)[path_new];
-                path_temp = (igraph_vector_t *) VECTOR(*vertices)[i];
-                VECTOR(*vertices)[i] = (igraph_vector_t *) VECTOR(*vertices)[ind];
-                VECTOR(*vertices)[ind] = path_temp;
-                if (edges) {
-                    path_temp = (igraph_vector_t *) VECTOR(*edges)[i];
-                    VECTOR(*edges)[i] = (igraph_vector_t *) VECTOR(*edges)[ind];
-                    VECTOR(*edges)[ind] = path_temp;
-                }
-                //updating the mapping
-                VECTOR(mapping)[path_old] = ind; 
-                VECTOR(mapping)[path_new] = i;
-                VECTOR(index_temp)[i] = path_new;
-                VECTOR(index_temp)[ind] = path_old;
-            }
+        IGRAPH_VECTOR_INIT_FINALLY(&index, 0);
+        igraph_vector_ptr_sort_ind(vertices, &index, igraph_i_vector_tail_cmp);
+        IGRAPH_CHECK(igraph_vector_ptr_permute(vertices, &index));
+        if (edges) {
+            IGRAPH_CHECK(igraph_vector_ptr_permute(edges, &index));
         }
-        igraph_vector_long_destroy(&index);
-        igraph_vector_long_destroy(&index_temp);
-        igraph_vector_long_destroy(&mapping);
-        IGRAPH_FINALLY_CLEAN(3);
+        igraph_vector_destroy(&index);
+        IGRAPH_FINALLY_CLEAN(1);
 
         /* we can now restore the original destructors of the path and the
          * edge-path vectors as we are not going to do thing any more that
