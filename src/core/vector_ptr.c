@@ -642,9 +642,9 @@ igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector
 typedef int cmp_t (const void *, const void *);
 
 /**
- * Comparison function passed to qsort_r from  igraph_vector_ptr_qsort_ind
+ * Comparison function passed to qsort_r from  igraph_vector_ptr_sort_ind
  */
-static int igraph_vector_ptr_i_qsort_ind_cmp(void *thunk, const void *p1, const void *p2) {
+static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
     cmp_t* cmp = (cmp_t*) thunk;
     uintptr_t *pa = (uintptr_t*) p1;
     uintptr_t *pb = (uintptr_t*) p2;
@@ -655,7 +655,7 @@ static int igraph_vector_ptr_i_qsort_ind_cmp(void *thunk, const void *p1, const 
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_qsort_ind
+ * \function igraph_vector_ptr_sort_ind
  * \brief Return a permutation of indices that sorts a vector of pointers
  *
  * Takes an unsorted array \c v as input and computes an array of
@@ -682,7 +682,7 @@ static int igraph_vector_ptr_i_qsort_ind_cmp(void *thunk, const void *p1, const 
  * position in the array. Use this to set the values of inds.
  */
 
-igraph_error_t igraph_vector_ptr_qsort_ind(igraph_vector_ptr_t *v,
+igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
         igraph_vector_t *inds, cmp_t cmp) {
     unsigned long int i;
     uintptr_t *vind, first;
@@ -695,7 +695,7 @@ igraph_error_t igraph_vector_ptr_qsort_ind(igraph_vector_ptr_t *v,
 
     vind = IGRAPH_CALLOC(n, uintptr_t);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_ptr_qsort_ind failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM);
     }
 
     for (i = 0; i < n; i++) {
@@ -704,7 +704,7 @@ igraph_error_t igraph_vector_ptr_qsort_ind(igraph_vector_ptr_t *v,
 
     first = vind[0];
 
-    igraph_qsort_r(vind, n, sizeof(uintptr_t), (void*)cmp, igraph_vector_ptr_i_qsort_ind_cmp);
+    igraph_qsort_r(vind, n, sizeof(uintptr_t), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
 
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = (vind[i] - first) / sizeof(uintptr_t);
@@ -734,8 +734,8 @@ igraph_error_t igraph_vector_ptr_qsort_ind(igraph_vector_ptr_t *v,
  *
  * </para><para>
  * The index vector that this function takes is compatible with the index vector
- * returned from \ref igraph_vector_qsort_ind(); passing in the index vector
- * from \ref igraph_vector_qsort_ind() will sort the original vector.
+ * returned from \ref igraph_vector_sort_ind(); passing in the index vector
+ * from \ref igraph_vector_sort_ind() will sort the original vector.
  *
  * </para><para>
  * As a special case, this function allows the index vector to be \em shorter

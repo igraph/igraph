@@ -99,7 +99,7 @@ add_legacy_tests(
   vector2
   vector3
   vector_ptr
-  vector_ptr_qsort_ind
+  vector_ptr_sort_ind
   vector_qsort_ind
 )
 

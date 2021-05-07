@@ -42,7 +42,7 @@ int main() {
     /* Special case: empty vector */
     igraph_vector_ptr_init(&vectors, 0);
     igraph_vector_init(&indices, 0);
-    igraph_vector_ptr_qsort_ind(&vectors, &indices, compare_first_items);
+    igraph_vector_ptr_sort_ind(&vectors, &indices, compare_first_items);
     print_vector(&indices);
     igraph_vector_destroy(&indices);
     igraph_vector_ptr_destroy_all(&vectors);
@@ -60,7 +60,7 @@ int main() {
     /* Sort the vector of vectors by the first item of each vector, and get
      * the index vector */
     igraph_vector_init(&indices, 0);
-    igraph_vector_ptr_qsort_ind(&vectors, &indices, compare_first_items);
+    igraph_vector_ptr_sort_ind(&vectors, &indices, compare_first_items);
     print_vector(&indices);
 
     /* Permute the vector of vectors by the index vector */
