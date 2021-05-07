@@ -33,45 +33,36 @@ static int compare_first_items(const void* a, const void* b) {
 }
 
 int main() {
-    igraph_vector_ptr_t vectors;
-    igraph_vector_t* vec;
+    igraph_vector_t vector;
     igraph_vector_t indices;
-    int values[] = { 3, 5, 0, 7, 9, 6, 2, 8, 1, 4, -1 };
+    igraph_real_t values[] = { 87, 23, 8, 82, 94, 56, 36, 33, 76, 66 };
+    igraph_real_t values2[] = { 87, 23, 8, 82, 94, 56, 36, 33, 76, 66 };
     int i, *ptr;
 
     /* Special case: empty vector */
-    igraph_vector_ptr_init(&vectors, 0);
+    igraph_vector_init(&vector, 0);
     igraph_vector_init(&indices, 0);
-    igraph_vector_ptr_qsort_ind(&vectors, &indices, compare_first_items);
+    igraph_vector_qsort_ind(&vector, &indices, /* descending = */ 0);
     print_vector(&indices);
     igraph_vector_destroy(&indices);
-    igraph_vector_ptr_destroy_all(&vectors);
+    igraph_vector_destroy(&vector);
 
-    /* Create vectors of length 1, each containing a value from 'values', and
-     * put them in a vector of pointers */
-    igraph_vector_ptr_init(&vectors, 0);
-    for (ptr = values; *ptr >= 0; ptr++) {
-        vec = igraph_Calloc(1, igraph_vector_t);
-        igraph_vector_init(vec, 1);
-        VECTOR(*vec)[0] = *ptr;
-        igraph_vector_ptr_push_back(&vectors, vec);
-    }
-
-    /* Sort the vector of vectors by the first item of each vector, and get
-     * the index vector */
+    /* Non-empty vector, descending */
+    igraph_vector_view(&vector, values, sizeof(values) / sizeof(igraph_real_t));
     igraph_vector_init(&indices, 0);
-    igraph_vector_ptr_qsort_ind(&vectors, &indices, compare_first_items);
+    igraph_vector_qsort_ind(&vector, &indices, /* descending = */ 1);
     print_vector(&indices);
 
-    /* Permute the vector of vectors by the index vector */
-    igraph_vector_ptr_permute(&vectors, &indices);
+    /* Non-empty vector, ascending */
+    igraph_vector_view(&vector, values2, sizeof(values2) / sizeof(igraph_real_t));
+    igraph_vector_qsort_ind(&vector, &indices, /* descending = */ 0);
+    print_vector(&indices);
+
+    /* Permute the vector by the index vector */
+    igraph_vector_permute(&vector, &indices);
+    print_vector(&vector);
 
     /* Print and clean up */
-    for (i = 0; i < igraph_vector_ptr_size(&vectors); i++) {
-        print_vector(VECTOR(vectors)[i]);
-        igraph_vector_destroy(VECTOR(vectors)[i]);
-    }
-    igraph_vector_ptr_destroy_all(&vectors);
     igraph_vector_destroy(&indices);
 
     /* Check finalizer stack */

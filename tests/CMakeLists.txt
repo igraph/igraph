@@ -100,6 +100,7 @@ add_legacy_tests(
   vector3
   vector_ptr
   vector_ptr_qsort_ind
+  vector_qsort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
