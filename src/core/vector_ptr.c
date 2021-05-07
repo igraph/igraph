@@ -734,8 +734,8 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
  *
  * </para><para>
  * The index vector that this function takes is compatible with the index vector
- * returned from \ref igraph_vector_sort_ind(); passing in the index vector
- * from \ref igraph_vector_sort_ind() will sort the original vector.
+ * returned from \ref igraph_vector_ptr_sort_ind(); passing in the index vector
+ * from \ref igraph_vector_ptr_sort_ind() will sort the original vector.
  *
  * </para><para>
  * As a special case, this function allows the index vector to be \em shorter
