@@ -50,10 +50,10 @@ igraph_bool_t _test_spanner (igraph_t *graph, igraph_t *spanner, double stretch,
         edge = IGRAPH_EIT_GET(graph_edges);
         igraph_edge(graph, edge, &from, &to);
         igraph_get_eid(spanner, &edge_spanner, from, to, IGRAPH_UNDIRECTED, 0);
-        if (edge != -1) {
+        if (edge_spanner != -1) {
             double weight_graph = VECTOR(*weights)[edge];
             double weight_spanner = VECTOR(*spanner_weights)[edge_spanner];
-            IGRAPH_ASSERT(weight_graph == weight_graph);
+            IGRAPH_ASSERT(weight_graph == weight_spanner);
         }
     }
 
