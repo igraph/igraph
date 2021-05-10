@@ -178,10 +178,8 @@ int main () {
     IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight) == IGRAPH_EINVAL);
     VECTOR(weights)[10] = 42;
 
-	/*
     printf("Invalid spanning factor\n");
     IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 0.5, &weights, &spanner_weight) == IGRAPH_EINVAL);
-	*/
 
     printf("Invalid weight vector length\n");
     igraph_vector_resize(&weights, no_of_edges - 1);

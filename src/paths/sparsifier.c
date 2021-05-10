@@ -130,6 +130,10 @@ int igraph_spanner (const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
+    /* Test validity of stretch factor */
+    if (stretch < 1) {
+        IGRAPH_ERROR("Stretch factor must be at least 1", IGRAPH_EINVAL);
+    }
 
     // If the weights is empty (the graph is unweigthed) then assign a weight vector of ones
     if (!weights) {
