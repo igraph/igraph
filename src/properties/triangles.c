@@ -526,9 +526,9 @@ static int igraph_adjacent_triangles4(const igraph_t *graph,
 
 /**
  * \function igraph_adjacent_triangles
- * Count the number of triangles a vertex is part of
+ * \brief Count the number of triangles a vertex is part of.
  *
- * \param graph The input graph. Edge directions are ignored.
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Initiliazed vector, the results are stored here.
  * \param vids The vertices to perform the calculation for.
  * \return Error mode.
