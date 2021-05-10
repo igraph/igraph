@@ -218,14 +218,14 @@ int igraph_spanner (const igraph_t *graph,
 
         // Step 2 and 3
         for (long int v = 0; v < no_of_nodes; v++) {
-            // If the cluster of v is sampled than continue
+            // If the cluster of v is sampled then continue
             v_center = VECTOR(clustering)[v];
             if (VECTOR(sampled_centers)[v_center]) {
                 VECTOR(new_clustering)[v] = v_center;
                 continue;
             }
             
-            // If the node isn't inside any cluster than continue
+            // If the node isn't inside any cluster then continue
             neis = igraph_inclist_get(&inclist, v);
             nlen = igraph_vector_int_size(neis);
             if (VECTOR(clustering)[v] == -1) {
@@ -292,13 +292,8 @@ int igraph_spanner (const igraph_t *graph,
         if (igraph_heap_size(&edges_to_add) > size_limit) {
             igraph_inclist_destroy(&inclist);
             IGRAPH_FINALLY_CLEAN(1);
-            // free the heaps
-            while (!igraph_heap_empty(&edges_to_add)) {
-                igraph_heap_delete_top(&edges_to_add);
-            }
-            while (!igraph_heap_empty(&edges_to_remove)) {
-                igraph_heap_delete_top(&edges_to_remove);
-            }
+            igraph_heap_clear(&edges_to_add);
+            igraph_heap_clear(&edges_to_remove);
             continue;
         }
         i = i+1;
