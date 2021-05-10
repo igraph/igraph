@@ -57,7 +57,7 @@ IGRAPH_EXPORT int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *re
 IGRAPH_EXPORT int igraph_to_directed(igraph_t *graph,
                                      igraph_to_directed_t flags);
 IGRAPH_EXPORT int igraph_to_undirected(igraph_t *graph,
-                                       igraph_to_undirected_t flags,
+                                       igraph_to_undirected_t mode,
                                        const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
 
