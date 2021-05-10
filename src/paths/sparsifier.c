@@ -70,34 +70,32 @@ static int igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
 /**
  * \ingroup structural
  * \function igraph_spanner
- * \brief Retrun a spanner of a graph with a given stretch factor.
+ * \brief Return a spanner of a graph with a given stretch factor.
  * 
  * A spanner of a graph G = (V,E) with a stretch t is a subgraph
  * H = (V,Es) such that Es is a subset of E and the distance 
  * between any pair of nodes in H is at most t times the distance
- * is G. The returned graph is always a spanner of the 
+ * in G. The returned graph is always a spanner of the 
  * given graph with the specified stretch. For weighted graphs the
- * number of edges in the spanner is O(k * n^(1 + 1 / k)) where k is
+ * number of edges in the spanner is O(k * n^(1 + 1 / k)), where k is
  * k = (stretch + 1) / 2,  m is the number of edges and n is the number
  * of nodes in G. For unweighted graphs the number of edges is 
  * O(n^(1 + 1 / k) + kn).
  * 
  * </para><para>
- * This function is based on Baswana and Sen random algorithm: "A Simple and
+ * This function is based on the algorithm of Baswana and Sen: "A Simple and
  * Linear Time Randomized Algorithm for Computing Sparse Spanners in 
  * Weighted Graphs"  
  *
  * \param graph An undirected connected graph object. If the graph
- *        is directed, the directions of the edges would be ignored.
+ *        is directed, the directions of the edges will be ignored.
  * \param spanner Pointer to an uninitalized graph_t pointer. The
- *        function would return the spanner in this pointer
+ *        function will return the spanner in this pointer.
  * \param stretch The stretch factor of the spanner.
  * \param weights The edge weights or NULL. 
- * \param spanner_weight Pointer to uninitalized vector or NULL. If not NULL,
- *        the function would save the weights of the edges in the spanner
- *        accourding to the edges IDs in the spanner graph.
- * \param seed A pointer to unsigned long int or NULL. If not NULL would be
- *        used a seed for the rng.
+ * \param spanner_weight Pointer to an uninitalized vector or NULL. If not NULL,
+ *        the function will save the weights of the edges in the spanner
+ *        accourding to the edge IDs in the spanner graph.
  * 
  * \return Error code:
  *        \clist
@@ -105,9 +103,8 @@ static int igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
  *           not enough memory for temporary data.
  *        \endclist
  *
- * Time complexity: The algorithm is a randomized las vegas algorithm. The expected
+ * Time complexity: The algorithm is a randomized Las Vegas algorithm. The expected
  *                  running time is O(km) where k is the value mentiened above.
- *
  */
 int igraph_spanner (const igraph_t *graph,
         igraph_t *spanner,
