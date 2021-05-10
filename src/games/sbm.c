@@ -103,9 +103,9 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (igraph_vector_int_size(block_sizes) != no_blocks) {
-        IGRAPH_ERRORF("Block size vector length (%ld) not equal to number of rows "
-                      "in preference matrix (%ld).", IGRAPH_EINVAL, igraph_vector_int_size(block_sizes),
-                      no_blocks);
+        IGRAPH_ERRORF("Block size vector length (%ld) does not agree with "
+                      "preference matrix size (%ld).", IGRAPH_EINVAL, 
+                      igraph_vector_int_size(block_sizes), no_blocks);
     }
 
     if (no_blocks > 0) {
