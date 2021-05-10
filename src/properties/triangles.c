@@ -457,17 +457,19 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  * </para><para>
  * Note that this measure is different from the global transitivity measure
  * (see \ref igraph_transitivity_undirected() ) as it calculates a transitivity
- * value for each vertex individually. See the following reference for more
- * details:
+ * value for each vertex individually.
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
+ * </para><para>
+ * References:
  *
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
  *
- * </para><para>
- * Clustering coefficient is an alternative name for transitivity.
- *
- * \param graph The input graph, which should be undirected and simple.
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed.
  * \param vids Vertex set, the vertices for which the local
@@ -488,17 +490,6 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
-
-    igraph_bool_t simple;
-
-    if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Transitivity works on undirected graphs only", IGRAPH_EINVAL);
-    }
-
-    igraph_is_simple(graph, &simple);
-    if (!simple) {
-        IGRAPH_ERROR("Transitivity works on simple graphs only", IGRAPH_EINVAL);
-    }
 
     if (igraph_vs_is_all(&vids)) {
         return igraph_transitivity_local_undirected4(graph, res, mode);
