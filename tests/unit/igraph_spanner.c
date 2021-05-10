@@ -78,12 +78,13 @@ int main () {
     igraph_t graph, spanner;
     igraph_vector_t weights, spanner_weight;
     igraph_bool_t check_spanner;
-    igraph_rng_t rng;
-    long int no_of_edges, no_of_edges_spanner;
-    IGRAPH_CHECK(igraph_rng_init(&rng, &igraph_rngtype_mt19937));
-    IGRAPH_CHECK(igraph_rng_seed(&rng, time(0)));
+    long int no_of_nodes, no_of_edges, no_of_edges_spanner;
 
-    // trevial spanner with stretch of one
+    /* Seed the RNG to make the test output predictable */
+    igraph_rng_seed(igraph_rng_default(), 42);
+
+    /* Trivial spanner with stretch of one */
+    printf("Trivial case with stretch of one\n");
     igraph_full(&graph, 20, IGRAPH_UNDIRECTED, 0);
     igraph_spanner(&graph, &spanner, 1, NULL, NULL);
     no_of_edges = igraph_ecount(&graph);
@@ -91,11 +92,12 @@ int main () {
     IGRAPH_ASSERT(no_of_edges_spanner == no_of_edges);
     igraph_destroy(&spanner);
 
-    //Test spanner for random weighted complete graph
+    /* Test spanner for random weighted complete graph */
+    printf("Weighted complete graph\n");
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (int i = 0; i < no_of_edges; i++) {
-        double generated_number = igraph_rng_get_unif(&rng, 1, 100);
+        double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
     igraph_spanner(&graph, &spanner, 10, &weights, &spanner_weight);
@@ -104,7 +106,8 @@ int main () {
     igraph_vector_destroy(&weights);
     igraph_destroy(&spanner);
 
-    // Test spanner for unweighted complete graph
+    /* Test spanner for unweighted complete graph */
+    printf("Unweighted complete graph\n");
     igraph_spanner(&graph, &spanner, 5, NULL, NULL);
     int spanner_no_of_edges = igraph_ecount(&spanner);
     no_of_edges = igraph_ecount(&graph);
@@ -118,12 +121,13 @@ int main () {
     igraph_destroy(&spanner);
     igraph_destroy(&graph);
 
-    // Random erdos renyi graph
+    /* Random Erdos-Renyi graph */
+    printf("Random Erdos-Renyi graph\n");
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.9, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (int i = 0; i < no_of_edges; i++) {
-        double generated_number = igraph_rng_get_unif(&rng, 1, 100);
+        double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
     igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight);
@@ -133,14 +137,58 @@ int main () {
     igraph_destroy(&spanner);
     igraph_destroy(&graph);
 
-    // Singlton graph
+    /* Singleton graph */
+    printf("Singleton graph\n");
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
     igraph_spanner(&graph, &spanner, 2, NULL, NULL);
-    int no_of_nodes = igraph_vcount(&spanner);
+    no_of_nodes = igraph_vcount(&spanner);
     IGRAPH_ASSERT(no_of_nodes == 1);
     igraph_destroy(&spanner);
     igraph_destroy(&graph);
 
-    igraph_rng_destroy(&rng);
+    /* Null graph */
+    printf("Null graph\n");
+    igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
+    igraph_spanner(&graph, &spanner, 2, NULL, NULL);
+    no_of_nodes = igraph_vcount(&spanner);
+    IGRAPH_ASSERT(no_of_nodes == 0);
+    igraph_destroy(&spanner);
+    igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
+
+    /* Error conditions */
+    igraph_set_error_handler(igraph_error_handler_ignore);
+
+    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.9, IGRAPH_UNDIRECTED, 0);
+    no_of_edges = igraph_ecount(&graph);
+    igraph_vector_init(&weights, no_of_edges);
+    for (int i = 0; i < no_of_edges; i++) {
+        double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
+        VECTOR(weights)[i] = generated_number;
+    }
+
+    printf("Negative weight\n");
+    VECTOR(weights)[10] = -42;
+    IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight) == IGRAPH_EINVAL);
+    VECTOR(weights)[10] = 42;
+
+    printf("NaN weight\n");
+    VECTOR(weights)[10] = IGRAPH_NAN;
+    IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight) == IGRAPH_EINVAL);
+    VECTOR(weights)[10] = 42;
+
+	/*
+    printf("Invalid spanning factor\n");
+    IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 0.5, &weights, &spanner_weight) == IGRAPH_EINVAL);
+	*/
+
+    printf("Invalid weight vector length\n");
+    igraph_vector_resize(&weights, no_of_edges - 1);
+    IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight) == IGRAPH_EINVAL);
+
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&graph);
+
     return IGRAPH_SUCCESS;
 }
