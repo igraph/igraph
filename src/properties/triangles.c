@@ -43,22 +43,24 @@
  * is taken. Vertices with less than two neighbors require special treatment,
  * they will either be left out from the calculation or they will be considered
  * as having zero transitivity, depending on the \c mode argument.
+ * Edge directions and edge multiplicities are ignored.
  *
  * </para><para>
  * Note that this measure is different from the global transitivity measure
  * (see \ref igraph_transitivity_undirected() ) as it simply takes the
- * average local transitivity across the whole network. See the following
- * reference for more details:
+ * average local transitivity across the whole network.
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
+ * </para><para>
+ * References:
  *
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
  *
- * </para><para>
- * Clustering coefficient is an alternative name for transitivity.
- *
- * \param graph The input graph, directed graphs are considered as
- *    undirected ones.
+ * \param graph The input graph. Edge directions and multiplicites are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat vertices with degree less than two.
  *    \c IGRAPH_TRANSITIVITY_NAN leaves them out from averaging,
@@ -260,7 +262,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
-        IGRAPH_ERROR("local transitivity calculation failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
