@@ -505,7 +505,7 @@ igraph_get_all_simple_paths:
         IGNORE: RR
 
 igraph_spanner:
-        PARAMS: GRAPH graph, OUT GRAPH spanner, INT stretch, \
+        PARAMS: GRAPH graph, OUT GRAPH spanner, REAL stretch, \
                 EDGEWEIGHTS weights=NULL, OUT EDGEWEIGHTS spanner_weight=NULL
                 INT seed
         DEPS: from ON graph, to ON graph, res ON graph
