@@ -49,6 +49,7 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
 
 /**
  * \section about_adjlists
+ *
  * <para>Sometimes it is easier to work with a graph which is in
  * adjacency list format: a list of vectors; each vector contains the
  * neighbor vertices or incident edges of a given vertex. Typically,
@@ -97,6 +98,7 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
  * creation, e.g. the graph can be destroyed and modified, the
  * adjacency list contains the state of the graph at the time of its
  * initialization.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
  * \param mode Constant specifying whether outgoing
@@ -621,7 +623,9 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
  * in the incidence list \em once. When \p mode is \c IGRAPH_ALL, each edge ID
  * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
- * will appear \em twice for the \em same vertex.
+ * may potentially appear \em twice for the \em same vertex. Use the \p loops
+ * argument to control whether this will be the case (\c IGRAPH_LOOPS_TWICE )
+ * or not (\c IGRAPH_LOOPS_ONCE or \c IGRAPH_NO_LOOPS).
  *
  * \param graph The input graph.
  * \param il Pointer to an uninitialized incidence list.
