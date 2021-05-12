@@ -70,7 +70,7 @@ static int igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
 /**
  * \ingroup structural
  * \function igraph_spanner
- * \brief Return a spanner of a graph with a given stretch factor.
+ * \brief Calculates a spanner of a graph with a given stretch factor.
  * 
  * A spanner of a graph G = (V,E) with a stretch t is a subgraph
  * H = (V,Es) such that Es is a subset of E and the distance 
@@ -89,13 +89,12 @@ static int igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
  *
  * \param graph An undirected connected graph object. If the graph
  *        is directed, the directions of the edges will be ignored.
- * \param spanner Pointer to an uninitalized graph_t pointer. The
- *        function will return the spanner in this pointer.
+ * \param spanenr An initialized vector, the IDs of the edges that constitute
+ *        the calculated spanner will be returned here. Use
+ *        \ref igraph_subgraph_edges() to extract the spanner as a separate
+ *        graph object.
  * \param stretch The stretch factor of the spanner.
  * \param weights The edge weights or NULL. 
- * \param spanner_weight Pointer to an uninitalized vector or NULL. If not NULL,
- *        the function will save the weights of the edges in the spanner
- *        accourding to the edge IDs in the spanner graph.
  * 
  * \return Error code:
  *        \clist
@@ -104,25 +103,23 @@ static int igraph_i_lightest_edge_cluster(const igraph_t *residual_graph,
  *        \endclist
  *
  * Time complexity: The algorithm is a randomized Las Vegas algorithm. The expected
- *                  running time is O(km) where k is the value mentiened above.
+ *                  running time is O(km) where k is the value mentioned above.
  */
-int igraph_spanner (const igraph_t *graph,
-        igraph_t *spanner,
-        igraph_real_t stretch,
-        igraph_vector_t *weights,
-        igraph_vector_t *spanner_weight) { 
+int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
+        igraph_real_t stretch, igraph_vector_t *weights) { 
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph), edge;
     long int i = 0, nlen, neighbor, v_center;
-    double sample_prob, size_limit, k = (stretch + 1) / 2, weight;
+    double sample_prob, size_limit, k = (stretch + 1) / 2;
     igraph_t residual_graph;
     igraph_vector_t clustering, centers, lightest_neighbor, lightest_weight, residual_weight;
     igraph_vector_bool_t sampled_centers;
-    igraph_vector_t new_clustering, eids, spanner_weight_temp;
+    igraph_vector_t new_clustering, eids;
     igraph_vector_int_t *neis;
     igraph_real_t generated_number;
     igraph_integer_t from, to;
+    igraph_integer_t edge_in_original_graph;
     igraph_inclist_t inclist;
     igraph_es_t es;
     igraph_heap_t edges_to_remove, edges_to_add;
@@ -157,9 +154,8 @@ int igraph_spanner (const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_destroy, &residual_weight);
     }
 
-    // Initialized the spanner and the weight vector
-    IGRAPH_CHECK(igraph_empty(spanner, no_of_nodes, IGRAPH_UNDIRECTED));
-    IGRAPH_VECTOR_INIT_FINALLY(&spanner_weight_temp, 0);
+    // Clear the vector that will contain the IDs of the edges in the spanner
+    igraph_vector_clear(spanner);
 
     // Phase 1: forming the clusters
     // Create a residual graph with V' = V and E' = E. If the graph is unweighted than each edge has
@@ -306,9 +302,10 @@ int igraph_spanner (const igraph_t *graph,
                 // only if the edge is new, meaning it wasn't inserted by the j-1 element in the list
                 // then insert the edge to the spanner. 
                 igraph_edge(&residual_graph, edge, &from, &to);
-                IGRAPH_CHECK(igraph_add_edge(spanner, from, to));
-                weight = VECTOR(residual_weight)[edge];
-                IGRAPH_CHECK(igraph_vector_push_back(&spanner_weight_temp, weight));
+                IGRAPH_CHECK(
+                    igraph_get_eid(graph, &edge_in_original_graph, from, to, /* directed = */ 0, /* error = */ 1)
+                );
+                IGRAPH_CHECK(igraph_vector_push_back(spanner, edge_in_original_graph));
             }
             edge_old = edge;
         }
@@ -391,14 +388,12 @@ int igraph_spanner (const igraph_t *graph,
             // only if the edge is new, meaning it wasn't inserted by the j-1 element in the list
             // then insert the edge to the spanner. 
             igraph_edge(&residual_graph, edge, &from, &to);
-            IGRAPH_CHECK(igraph_add_edge(spanner, from, to));
-            weight = VECTOR(residual_weight)[edge];
-            IGRAPH_CHECK(igraph_vector_push_back(&spanner_weight_temp, weight));
+            IGRAPH_CHECK(
+                igraph_get_eid(graph, &edge_in_original_graph, from, to, /* directed = */ 0, /* error = */ 1)
+            );
+            IGRAPH_CHECK(igraph_vector_push_back(spanner, edge_in_original_graph));
         }
         edge_old = edge;
-    }
-    if (spanner_weight) {
-        IGRAPH_CHECK(igraph_vector_copy(spanner_weight, &spanner_weight_temp));
     }
     
     // Free memory
@@ -411,10 +406,10 @@ int igraph_spanner (const igraph_t *graph,
     igraph_vector_destroy(&lightest_weight);
     igraph_vector_destroy(&new_clustering);
     igraph_vector_bool_destroy(&sampled_centers);
-    igraph_vector_destroy(&spanner_weight_temp);
     igraph_heap_destroy(&edges_to_remove);
     igraph_heap_destroy(&edges_to_add);
     igraph_vector_destroy(&eids);
-    IGRAPH_FINALLY_CLEAN(13);
+    IGRAPH_FINALLY_CLEAN(12);
+
     return IGRAPH_SUCCESS;
 }

@@ -180,10 +180,9 @@ IGRAPH_EXPORT int igraph_random_edge_walk(const igraph_t *graph,
                                           igraph_random_walk_stuck_t stuck);
 
 IGRAPH_EXPORT int igraph_spanner(const igraph_t *graph,
-                                igraph_t *spanner,
+                                igraph_vector_t *spanner,
                                 igraph_real_t stretch,
-                                igraph_vector_t *weights,
-                                igraph_vector_t *spanner_weight);
+                                igraph_vector_t *weights);
 
 __END_DECLS
 
