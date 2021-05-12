@@ -67,6 +67,7 @@ int main() {
                   /*mode*/ IGRAPH_ALL, /*mindist*/ 4) == IGRAPH_SUCCESS);
     print_vector(&result);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Negative order.\n");

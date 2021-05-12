@@ -50,6 +50,7 @@ int main() {
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat_comp);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("uncompressed matrix.\n");

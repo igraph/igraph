@@ -1,5 +1,7 @@
 include(helpers)
 
+include(CheckSymbolExists)
+
 # The threading library is not needed for igraph itself, but might be needed
 # for tests
 include(FindThreads)
@@ -7,7 +9,7 @@ include(FindThreads)
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored and those that may not
   set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK GMP)
-  set(NONVENDORABLE_DEPENDENCIES GLPK)
+  set(NONVENDORABLE_DEPENDENCIES GLPK OpenMP)
 
   # Declare configuration options for dependencies
   tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
@@ -19,7 +21,7 @@ macro(find_dependencies)
 
   # Declare dependencies
   set(REQUIRED_DEPENDENCIES "")
-  set(OPTIONAL_DEPENDENCIES FLEX BISON)
+  set(OPTIONAL_DEPENDENCIES FLEX BISON OpenMP)
   set(VENDORED_DEPENDENCIES "")
 
   # Extend dependencies depending on whether we will be using the vendored
@@ -82,7 +84,28 @@ macro(find_dependencies)
 
   # Find dependencies
   foreach(DEPENDENCY ${REQUIRED_DEPENDENCIES} ${OPTIONAL_DEPENDENCIES})
-    find_package(${DEPENDENCY})
+    list(FIND REQUIRED_DEPENDENCIES "${DEPENDENCY}" INDEX)
+    set(NEED_THIS_DEPENDENCY NO)
+
+    if(INDEX GREATER_EQUAL 0)
+      # This is a required dependency, search for it unconditionally. Do
+      # not use REQUIRED; we will report errors in a single batch at the end
+      # of the configuration process
+      set(NEED_THIS_DEPENDENCY YES)
+    else()
+      # This is an optional dependency, search for it only if the user did not
+      # turn it off explicitly
+      string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+      if(NOT DEFINED IGRAPH_${LIBNAME_UPPER}_SUPPORT)
+        set(NEED_THIS_DEPENDENCY YES)
+      elseif(IGRAPH_${LIBNAME_UPPER}_SUPPORT)
+        set(NEED_THIS_DEPENDENCY YES)
+      endif()
+    endif()
+
+    if(NEED_THIS_DEPENDENCY AND NOT DEFINED ${DEPENDENCY}_FOUND)
+      find_package(${DEPENDENCY})
+    endif()
   endforeach()
 
   # Override libraries of vendored dependencies even if they were somehow
@@ -103,5 +126,31 @@ macro(find_dependencies)
   set(HAVE_GMP ${GMP_FOUND})
   set(HAVE_LIBXML ${LIBXML2_FOUND})
 
-  find_library(MATH_LIBRARY m)
+  # Check whether we need to link to the math library
+  if(NOT DEFINED CACHE{NEED_LINKING_AGAINST_LIBM})
+    set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
+    set(CMAKE_REQUIRED_QUIET ON)
+    check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
+    if(NOT SINH_FUNCTION_EXISTS)
+      unset(SINH_FUNCTION_EXISTS CACHE)
+      set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES m)
+      check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
+      if(SINH_FUNCTION_EXISTS)
+        set(NEED_LINKING_AGAINST_LIBM True CACHE BOOL "" FORCE)
+      else()
+        message(FATAL_ERROR "Failed to figure out how to link to the math library on this platform")
+      endif()
+      set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+    endif()
+    unset(SINH_FUNCTION_EXISTS CACHE)
+	set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
+  endif()
+  
+  if(NEED_LINKING_AGAINST_LIBM)
+    find_library(MATH_LIBRARY m)
+  endif()
+
+  mark_as_advanced(MATH_LIBRARY)
+  mark_as_advanced(NEED_LINKING_AGAINST_LIBM)
 endmacro()

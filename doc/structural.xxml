@@ -104,6 +104,7 @@
 <!-- doxrox-include igraph_eigenvector_centrality -->
 <!-- doxrox-include igraph_hub_score -->
 <!-- doxrox-include igraph_authority_score -->
+<!-- doxrox-include igraph_convergence_degree -->
 </section>
 
 <section id="range-limited-centrality-measures"><title>Range-limited Centrality Measures</title>
@@ -176,8 +177,9 @@
 <!-- doxrox-include igraph_assortativity_degree -->
 </section>
 
-<section id="k-cores"><title>K-Cores</title>
+<section id="k-cores"><title>K-Cores and K-Trusses</title>
 <!-- doxrox-include igraph_coreness -->
+<!-- doxrox-include igraph_trussness -->
 </section>
 
 <section id="topological-sorting-directed-acyclic-graphs"><title>Topological Sorting, Directed Acyclic Graphs</title>

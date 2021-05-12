@@ -15,12 +15,33 @@ set(
 if(F2C_EXTERNAL_ARITH_HEADER)
   configure_file(${F2C_EXTERNAL_ARITH_HEADER} arith.h COPYONLY)
 else()
+  if (CMAKE_CROSSCOMPILING)
+    # Warn only, as in some circumstances, such as macOS with Rosetta,
+    # arithchk can be run through emulation and the build with not fail.
+    message(WARNING 
+      "Cross-compiling with internal ARPACK, BLAS or LAPACK, "
+      "but F2C_EXTERNAL_ARITH_HEADER was not set. The build is likely to fail. "
+      "See igraph's installation instructions for more information.")
+  endif()
   add_custom_command(
     OUTPUT arith.h
     COMMENT "Generating arith.h for f2c..."
     COMMAND arithchk > ${CMAKE_CURRENT_BINARY_DIR}/arith.h
     DEPENDS arithchk
     VERBATIM
+  )
+endif()
+
+# Hidden CMake option for Szabolcs so he can collect arith.h headers from
+# multiple systems in CI
+option(IGRAPH_PRINT_ARITH_HEADER "Print the contents of the generated arith.h for debugging purposes")
+mark_as_advanced(IGRAPH_PRINT_ARITH_HEADER)
+if(IGRAPH_PRINT_ARITH_HEADER)
+  add_custom_command(
+    TARGET arithchk POST_BUILD
+    COMMENT "Printing contents of arith.h..."
+    COMMAND arithchk
+    VERBATIM USES_TERMINAL
   )
 endif()
 

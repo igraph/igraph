@@ -60,7 +60,6 @@ set(
     "\\\\.l$"
     "\\\\.y$"
     "${CMAKE_SOURCE_DIR}/build"
-    "${CMAKE_SOURCE_DIR}/optional/simpleraytracer"
 )
 
 #############################################################################

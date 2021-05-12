@@ -119,6 +119,7 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) 
 
 int igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
     context->eof = 0;
+    context->depth = 0;
     context->scanner = 0;
     context->tree = 0;
     context->errmsg[0] = 0;

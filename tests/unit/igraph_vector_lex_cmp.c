@@ -31,21 +31,22 @@ int main() {
     igraph_vector_init_real(&v7, 3, 9e30, 2e30, 1e30);
     igraph_vector_init_real(&v8, 2, 3e30, 3e30);
 
-    igraph_vector_t vectors[] = {v1, v2, v3, v4, v5, v6, v7, v8};
+    igraph_vector_t *vectors[] = {&v1, &v2, &v3, &v4, &v5, &v6, &v7, &v8};
+    long n = sizeof(vectors) / sizeof(igraph_vector_t *);
 
     printf("Lexicographical ordering:\n");
-    qsort(vectors, 8, sizeof(igraph_vector_t), igraph_vector_lex_cmp);
+    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_lex_cmp);
 
-    for (int i = 0; i < 8; i++) {
-        print_vector(&vectors[i]);
+    for (int i = 0; i < n; i++) {
+        print_vector(vectors[i]);
     }
 
     printf("\nColexicographical ordering:\n");
-    qsort(vectors, 8, sizeof(igraph_vector_t), igraph_vector_colex_cmp);
+    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_colex_cmp);
 
-    for (int i = 0; i < 8; i++) {
-        print_vector(&vectors[i]);
-        igraph_vector_destroy(&vectors[i]);
+    for (int i = 0; i < n; i++) {
+        print_vector(vectors[i]);
+        igraph_vector_destroy(vectors[i]);
     }
 
     VERIFY_FINALLY_STACK();

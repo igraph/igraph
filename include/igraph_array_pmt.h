@@ -36,16 +36,16 @@ typedef struct TYPE(igraph_array3) {
     #define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
 #endif
 
-IGRAPH_EXPORT int FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a, long int n1, long int n2,
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a, long int n1, long int n2,
                                                 long int n3);
 IGRAPH_EXPORT void FUNCTION(igraph_array3, destroy)(TYPE(igraph_array3) *a);
 IGRAPH_EXPORT long int FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a);
 IGRAPH_EXPORT long int FUNCTION(igraph_array3, n)(const TYPE(igraph_array3) *a, long int idx);
-IGRAPH_EXPORT int FUNCTION(igraph_array3, resize)(TYPE(igraph_array3) *a, long int n1, long int n2,
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_array3, resize)(TYPE(igraph_array3) *a, long int n1, long int n2,
                                                   long int n3);
 IGRAPH_EXPORT void FUNCTION(igraph_array3, null)(TYPE(igraph_array3) *a);
 IGRAPH_EXPORT BASE FUNCTION(igraph_array3, sum)(const TYPE(igraph_array3) *a);
 IGRAPH_EXPORT void FUNCTION(igraph_array3, scale)(TYPE(igraph_array3) *a, BASE by);
 IGRAPH_EXPORT void FUNCTION(igraph_array3, fill)(TYPE(igraph_array3) *a, BASE e);
-IGRAPH_EXPORT int FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
                                                   const TYPE(igraph_array3) *from);

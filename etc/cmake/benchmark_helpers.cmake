@@ -22,6 +22,7 @@ function(add_benchmark NAME NAMESPACE)
     POST_BUILD
     COMMAND ${TARGET_NAME}
     COMMENT "Running benchmark: ${NAME}"
+    USES_TERMINAL
   )
 endfunction()
 

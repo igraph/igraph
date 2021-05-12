@@ -40,6 +40,10 @@
   <xsl:param name="gtkdoc.version" select="''"/>
   <xsl:param name="gtkdoc.bookname" select="''"/>
 
+  <!-- generate consistent IDs so permalinks and bookmarks stay useful when a
+       new igraph version is released -->
+  <xsl:param name="generate.consistent.ids" select="1"/>
+
   <!-- ========================================================= -->
   <!-- template to create the index.sgml anchor index -->
 

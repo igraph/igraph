@@ -21,13 +21,7 @@ include(PreventInSourceBuilds)
 
 # Make use of ccache if it is present on the host system -- unless explicitly
 # asked to disable it
-option(USE_CCACHE "Use ccache to speed up compilation if it is installed" ON)
-if(USE_CCACHE)
-  find_program(CCACHE_PROGRAM ccache)
-  if(CCACHE_PROGRAM)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-  endif()
-endif()
+include(UseCCacheWhenInstalled)
 
 # Figure out the version number from Git
 include(version)
@@ -77,11 +71,6 @@ find_dependencies()
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
 
-# The math library is needed on Linux to find symbols like exmp1 or fmin
-if(UNIX)
-  set(CMAKE_REQUIRED_LIBRARIES "m")
-endif()
-
 # First we check for some functions and symbols
 check_symbol_exists(expm1 math.h HAVE_EXPM1)
 check_symbol_exists(fmin math.h HAVE_FMIN)
@@ -104,12 +93,12 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
   append_coverage_compiler_flags()
   setup_target_for_coverage_lcov(
     NAME coverage
-	EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
+    EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
     # Generated files are excluded; apparently the CodeCoverage script has some
-	# problems with them. Yes, the exclusion is correct, it refers to a nonexistent
-	# directory that somehow gets into the coverage resolts. /Applications is for
-	# macOS -- it excludes files from the macOS SDK.
-	EXCLUDE "io/*.l" "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
+    # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
+    # directory that somehow gets into the coverage resolts. /Applications is for
+    # macOS -- it excludes files from the macOS SDK.
+    EXCLUDE "io/*.l" "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
   )
 endif()
 
@@ -127,11 +116,16 @@ configure_file(
 # included as a sub-project in another CMake project
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/etc/cmake/CTestCustom.cmake.in
+    ${PROJECT_BINARY_DIR}/CTestCustom.cmake
+  )
 endif()
 
-# Traverse subdirectories
-add_subdirectory(src)
+# Traverse subdirectories. vendor/ should come first because code in
+# src/CMakeLists.txt depends on targets in vendor/
 add_subdirectory(vendor)
+add_subdirectory(src)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()

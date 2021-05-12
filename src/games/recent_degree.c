@@ -71,7 +71,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
                               igraph_bool_t directed) {
 
     long int no_of_nodes = nodes;
-    long int no_of_neighbors;
+    long int no_of_neighbors = 0;
     long int no_of_edges;
     igraph_vector_t edges;
     long int i, j;

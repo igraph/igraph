@@ -1,23 +1,3 @@
-/*
- * CXSPARSE: a Concise Sparse Matrix package - Extended.
- * Copyright (c) 2006-2009, Timothy A. Davis.
- * http://www.cise.ufl.edu/research/sparse/CXSparse
- * 
- * CXSparse is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * CXSparse is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this Module; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
 #include "cs.h"
 /* allocate a sparse matrix (triplet form or compressed-column form) */
 cs *cs_spalloc (CS_INT m, CS_INT n, CS_INT nzmax, CS_INT values, CS_INT triplet)
@@ -40,6 +20,7 @@ CS_INT cs_sprealloc (cs *A, CS_INT nzmax)
     CS_INT ok, oki, okj = 1, okx = 1 ;
     if (!A) return (0) ;
     if (nzmax <= 0) nzmax = (CS_CSC (A)) ? (A->p [A->n]) : A->nz ;
+    nzmax = CS_MAX (nzmax, 1) ;
     A->i = cs_realloc (A->i, nzmax, sizeof (CS_INT), &oki) ;
     if (CS_TRIPLET (A)) A->p = cs_realloc (A->p, nzmax, sizeof (CS_INT), &okj) ;
     if (A->x) A->x = cs_realloc (A->x, nzmax, sizeof (CS_ENTRY), &okx) ;
@@ -55,7 +36,7 @@ cs *cs_spfree (cs *A)
     cs_free (A->p) ;
     cs_free (A->i) ;
     cs_free (A->x) ;
-    return (cs_free (A)) ;      /* free the cs struct and return NULL */
+    return ((cs *) cs_free (A)) ;   /* free the cs struct and return NULL */
 }
 
 /* free a numeric factorization */
@@ -66,7 +47,7 @@ csn *cs_nfree (csn *N)
     cs_spfree (N->U) ;
     cs_free (N->pinv) ;
     cs_free (N->B) ;
-    return (cs_free (N)) ;      /* free the csn struct and return NULL */
+    return ((csn *) cs_free (N)) ;  /* free the csn struct and return NULL */
 }
 
 /* free a symbolic factorization */
@@ -78,7 +59,7 @@ css *cs_sfree (css *S)
     cs_free (S->parent) ;
     cs_free (S->cp) ;
     cs_free (S->leftmost) ;
-    return (cs_free (S)) ;      /* free the css struct and return NULL */
+    return ((css *) cs_free (S)) ;  /* free the css struct and return NULL */
 }
 
 /* allocate a cs_dmperm or cs_scc result */
@@ -102,7 +83,7 @@ csd *cs_dfree (csd *D)
     cs_free (D->q) ;
     cs_free (D->r) ;
     cs_free (D->s) ;
-    return (cs_free (D)) ;
+    return ((csd *) cs_free (D)) ;  /* free the csd struct and return NULL */
 }
 
 /* free workspace and return a sparse matrix result */
@@ -118,7 +99,7 @@ CS_INT *cs_idone (CS_INT *p, cs *C, void *w, CS_INT ok)
 {
     cs_spfree (C) ;                     /* free temporary matrix */
     cs_free (w) ;                       /* free workspace */
-    return (ok ? p : cs_free (p)) ;     /* return result if OK, else free it */
+    return (ok ? p : (CS_INT *) cs_free (p)) ; /* return result, or free it */
 }
 
 /* free workspace and return a numeric factorization (Cholesky, LU, or QR) */

@@ -32,8 +32,43 @@
 
 #include <string.h>
 
-/*
- * \example examples/simple/graph_convergence_degree.c
+/**
+ * \function igraph_convergence_degree
+ * \brief Calculates the convergence degree of each edge in a graph.
+ * 
+ * Let us define the input set of an edge (i, j) as the set of vertices where
+ * the shortest paths passing through (i, j) originate, and similarly, let us
+ * defined the output set of an edge (i, j) as the set of vertices where the
+ * shortest paths passing through (i, j) terminate. The convergence degree of
+ * an edge is defined as the normalized value of the difference between the
+ * size of the input set and the output set, i.e. the difference of them
+ * divided by the sum of them. Convergence degrees are in the range (-1, 1); a
+ * positive value indicates that the edge is \em convergent since the shortest
+ * paths passing through it originate from a larger set and terminate in a
+ * smaller set, while a negative value indicates that the edge is \em divergent
+ * since the paths originate from a small set and terminate in a larger set.
+ * 
+ * </para><para>
+ * Note that the convergence degree as defined above does not make sense in
+ * undirected graphs as there is no distinction between the input and output
+ * set. Therefore, for undirected graphs, the input and output sets of an edge
+ * are determined by orienting the edge arbitrarily while keeping the remaining
+ * edges undirected, and then taking the absolute value of the convergence
+ * degree.
+ * 
+ * \param graph The input graph, it can be either directed or undirected.
+ * \param result Pointer to an initialized vector; the convergence degrees of
+ *   each edge will be stored here. May be \c NULL if we are not interested in
+ *   the exact convergence degrees.
+ * \param ins Pointer to an initialized vector; the size of the input set of
+ *   each edge will be stored here. May be \c NULL if we are not interested in
+ *   the sizes of the input sets.
+ * \param outs Pointer to an initialized vector; the size of the output set of
+ *   each edge will be stored here. May be \c NULL if we are not interested in
+ *   the sizes of the output sets.
+ * \return Error code.
+ *
+ * Time complexity: O(|V||E|), the number of vertices times the number of edges.
  */
 int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                               igraph_vector_t *ins, igraph_vector_t *outs) {
@@ -78,7 +113,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
     IGRAPH_FINALLY(igraph_free, geodist);
 
     /* Collect shortest paths originating from/to every node to correctly
-     * determine input field sizes */
+     * determine input and output field sizes */
     for (k = 0; k < (directed ? 2 : 1); k++) {
         igraph_neimode_t neimode = (k == 0) ? IGRAPH_OUT : IGRAPH_IN;
         igraph_real_t *vec;

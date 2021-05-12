@@ -1,0 +1,23 @@
+Input matrix A:
+[        2       -6        0       -7        9       -5        7        1
+        -7       10        2        8        3        0       -7       -9
+         8        0        6       -4       -4       -1        3        3
+        -8        7        4        8       -7       -4        9       -6
+        -6       10       -1       10       -3        2       -7        5 ]
+
+Input vector x:
+( -7 3 2 6 7 -5 1 -6 )
+
+Result vector DGEMV:
+( 15 199 -106 149 62 )
+
+Result vector naive:
+( 15 199 -106 149 62 )
+
+Adding to previous result with beta=2:
+
+Result vector DGEMV:
+( 45 597 -318 447 186 )
+
+Result vector naive:
+( 45 597 -318 447 186 )
