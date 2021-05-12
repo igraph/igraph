@@ -21,7 +21,7 @@
 #include "test_utilities.inc"
 #include <stdlib.h>
 
-igraph_bool_t _test_spanner (igraph_t *graph, igraph_t *spanner, double stretch, igraph_vector_t *weights, igraph_vector_t *spanner_weights) {
+void test_spanner(igraph_t *graph, igraph_t *spanner, double stretch, igraph_vector_t *weights, igraph_vector_t *spanner_weights) {
     /* check the spanner and compare it to the original graph in several topics:
         1) Compare the number of nodes.
         2) If the weights of the edges are equal between the graphs (doesn't work on multigraph).
@@ -38,26 +38,26 @@ igraph_bool_t _test_spanner (igraph_t *graph, igraph_t *spanner, double stretch,
 
     // compare number of nodes
     IGRAPH_ASSERT(spanner_no_of_nodes == no_of_nodes);
+
     // compare number of edges
     IGRAPH_ASSERT(no_of_edges > no_of_edges_spanner);
 
-    igraph_matrix_init(&res_spanner, 0, 0);
-    igraph_matrix_init(&res_graph, 0, 0);
-
-    igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &graph_edges);
     // compare the edges and their weight
+    igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &graph_edges);
     for (IGRAPH_EIT_RESET(graph_edges); !IGRAPH_EIT_END(graph_edges); IGRAPH_EIT_NEXT(graph_edges)) {
         edge = IGRAPH_EIT_GET(graph_edges);
         igraph_edge(graph, edge, &from, &to);
         igraph_get_eid(spanner, &edge_spanner, from, to, IGRAPH_UNDIRECTED, 0);
         if (edge_spanner != -1) {
-            double weight_graph = VECTOR(*weights)[edge];
+            double weight_graph = weights ? VECTOR(*weights)[edge] : 1;
             double weight_spanner = VECTOR(*spanner_weights)[edge_spanner];
             IGRAPH_ASSERT(weight_graph == weight_spanner);
         }
     }
 
     // Validate the stretch factor
+    igraph_matrix_init(&res_spanner, 0, 0);
+    igraph_matrix_init(&res_graph, 0, 0);
     igraph_shortest_paths_dijkstra(graph, &res_graph, igraph_vss_all(), igraph_vss_all(), weights, IGRAPH_ALL);
     igraph_shortest_paths_dijkstra(spanner, &res_spanner, igraph_vss_all(), igraph_vss_all(), spanner_weights, IGRAPH_ALL);
     for (int x = 0; x < no_of_nodes; x++) {
@@ -65,19 +65,16 @@ igraph_bool_t _test_spanner (igraph_t *graph, igraph_t *spanner, double stretch,
             if (x == y) {
                 continue;
             }
-            IGRAPH_ASSERT(MATRIX(res_spanner, x, y) < MATRIX(res_graph, x, y) * stretch);
+            IGRAPH_ASSERT(MATRIX(res_spanner, x, y) <= MATRIX(res_graph, x, y) * stretch);
         }
     }
     igraph_matrix_destroy(&res_graph);
     igraph_matrix_destroy(&res_spanner);
-
-    return IGRAPH_SUCCESS;
 }
 
 int main () {
     igraph_t graph, spanner;
     igraph_vector_t weights, spanner_weight;
-    igraph_bool_t check_spanner;
     long int no_of_nodes, no_of_edges, no_of_edges_spanner;
 
     /* Seed the RNG to make the test output predictable */
@@ -101,7 +98,7 @@ int main () {
         VECTOR(weights)[i] = generated_number;
     }
     igraph_spanner(&graph, &spanner, 10, &weights, &spanner_weight);
-    check_spanner = _test_spanner(&graph, &spanner, 10, &weights, &spanner_weight);
+    test_spanner(&graph, &spanner, 10, &weights, &spanner_weight);
     igraph_vector_destroy(&spanner_weight);
     igraph_vector_destroy(&weights);
     igraph_destroy(&spanner);
@@ -115,7 +112,7 @@ int main () {
     igraph_vector_fill(&weights, 1);
     igraph_vector_init(&spanner_weight, spanner_no_of_edges);
     igraph_vector_fill(&spanner_weight, 1);
-    _test_spanner(&graph, &spanner, 5, &weights, &spanner_weight);
+    test_spanner(&graph, &spanner, 5, &weights, &spanner_weight);
     igraph_vector_destroy(&spanner_weight);
     igraph_vector_destroy(&weights);
     igraph_destroy(&spanner);
@@ -123,7 +120,7 @@ int main () {
 
     /* Random Erdos-Renyi graph */
     printf("Random Erdos-Renyi graph\n");
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.9, IGRAPH_UNDIRECTED, 0);
+    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.25, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (int i = 0; i < no_of_edges; i++) {
@@ -131,9 +128,18 @@ int main () {
         VECTOR(weights)[i] = generated_number;
     }
     igraph_spanner(&graph, &spanner, 7, &weights, &spanner_weight);
-    _test_spanner(&graph, &spanner, 5, &weights, &spanner_weight);
+    test_spanner(&graph, &spanner, 5, &weights, &spanner_weight);
     igraph_vector_destroy(&spanner_weight);
     igraph_vector_destroy(&weights);
+    igraph_destroy(&spanner);
+    igraph_destroy(&graph);
+
+    /* Geometric random graph */
+    printf("Geometric random graph, unweighted, but requesting output weights\n");
+    igraph_grg_game(&graph, 100, 0.2, /* torus = */ 0, 0, 0);
+    igraph_spanner(&graph, &spanner, 7, 0, &spanner_weight);
+    test_spanner(&graph, &spanner, 5, 0, &spanner_weight);
+    igraph_vector_destroy(&spanner_weight);
     igraph_destroy(&spanner);
     igraph_destroy(&graph);
 
