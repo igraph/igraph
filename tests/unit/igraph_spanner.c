@@ -46,8 +46,16 @@ void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igr
     // compare number of nodes
     IGRAPH_ASSERT(igraph_vcount(&spanner_graph) == no_of_nodes);
 
-    // compare number of edges
-    IGRAPH_ASSERT(igraph_ecount(&spanner_graph) <= no_of_edges);
+    // compare number of edges. We expect the number of edges to decrease in
+    // all cases but the trivial ones
+    if (stretch > 1 && no_of_edges > 1) {
+        IGRAPH_ASSERT(igraph_ecount(&spanner_graph) < no_of_edges);
+    }
+
+    // print the number of nodes, the number of original edges and the new edge
+    // count. This is not validated (there is no expected output) but it helps
+    // to gauge whether the algorithm is not simply keeping most of the edges
+    printf("%ld, %ld --> %ld\n", no_of_nodes, no_of_edges, (long int) igraph_ecount(&spanner_graph));
 
     // Validate the stretch factor
     igraph_matrix_init(&res_spanner, 0, 0);

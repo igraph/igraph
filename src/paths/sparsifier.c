@@ -325,8 +325,8 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
             edge_old = edge;
         }
 
-        // Copy old clustering to new clustering
-        igraph_vector_update(&new_clustering, &clustering);
+        // Commit the new clustering
+        igraph_vector_update(&clustering, &new_clustering);
 
         // Remove intra-cluster edges
         for (int v = 0; v < no_of_nodes; v++) {
