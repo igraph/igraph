@@ -214,19 +214,20 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
 
         // Step 2 and 3
         for (long int v = 0; v < no_of_nodes; v++) {
-            // If the cluster of v is sampled then continue
+            // If the node isn't inside any cluster then continue
             v_center = VECTOR(clustering)[v];
+            if (v_center == -1) {
+                continue;
+            }
+
+            // If the cluster of v is sampled then continue
             if (VECTOR(sampled_centers)[v_center]) {
                 VECTOR(new_clustering)[v] = v_center;
                 continue;
             }
             
-            // If the node isn't inside any cluster then continue
             neis = igraph_inclist_get(&inclist, v);
             nlen = igraph_vector_int_size(neis);
-            if (VECTOR(clustering)[v] == -1) {
-                continue;
-            }
             igraph_vector_fill(&lightest_neighbor, -1);
             igraph_vector_fill(&lightest_weight, INFINITY);
             
