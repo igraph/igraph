@@ -256,7 +256,7 @@ In- and out-edges, loops listed twice: {
 
 Testing incidence to adjacency list conversion
 
-Incidence list:{
+Incidence list: {
   0: ( 0 1 5 7 )
   1: ( 0 2 )
   2: ( 2 3 3 4 )
@@ -266,7 +266,7 @@ Incidence list:{
   6: ( 10 12 )
 }
 
-Corresponding adjacency list:{
+Corresponding adjacency list: {
   0: ( 1 3 3 4 )
   1: ( 0 2 )
   2: ( 1 2 2 3 )
