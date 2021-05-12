@@ -1600,6 +1600,35 @@ void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, long int elem) {
 
 /**
  * \ingroup vector
+ * \function igraph_vector_remove_fast
+ * \brief Removes a single element from a vector, \em not keeping the order of
+ * the remaining elements.
+ *
+ * This function removes the element with the given element from the vector by
+ * swapping it with the last element and then popping it off. You can use this
+ * function instead of \ref igraph_vector_remove() to gain some speed if the
+ * order of elements does not matter.
+ *
+ * </para><para>
+ * Note that this function does not do range checking.
+ *
+ * \param v The vector object.
+ * \param elem The position of the element to remove.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_vector, remove_fast)(TYPE(igraph_vector) *v, long int elem) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    long int len = FUNCTION(igraph_vector, size)(v);
+    VECTOR(*v)[elem] = VECTOR(*v)[len - 1];
+    FUNCTION(igraph_vector, pop_back)(v);
+}
+
+/**
+ * \ingroup vector
  * \function igraph_vector_move_interval
  * \brief Copies a section of a vector.
  *
