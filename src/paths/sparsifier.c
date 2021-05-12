@@ -122,7 +122,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     long int edge, edge_old;
     double sample_prob, k = (stretch + 1) / 2;
     igraph_t residual_graph;
-    igraph_vector_t clustering, centers, lightest_neighbor, lightest_weight, residual_weight;
+    igraph_vector_t clustering, lightest_neighbor, lightest_weight, residual_weight;
     igraph_vector_bool_t is_cluster_sampled;
     igraph_vector_t new_clustering, eids;
     igraph_vector_int_t *neis;
@@ -176,13 +176,6 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     IGRAPH_CHECK(igraph_vector_init_seq(&clustering, 0, no_of_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &clustering);
 
-    // A vector with the list of the clustering centers. In the beginning of the 
-    // algorithm all the nodes are centers to their clusters. This is simply
-    // an alternative representation of 'clustering' but we need it to be able
-    // to sample efficiently from the current set of centers.
-    IGRAPH_CHECK(igraph_vector_init_seq(&centers, 0, no_of_nodes - 1));
-    IGRAPH_FINALLY(igraph_vector_destroy, &centers);
-
     // A mapping vector which indicates the neighboring edge with the smallest
     // weight for each cluster central
     IGRAPH_VECTOR_INIT_FINALLY(&lightest_neighbor, no_of_nodes);
@@ -214,13 +207,11 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
         igraph_vector_fill(&new_clustering, -1);
         igraph_vector_bool_fill(&is_cluster_sampled, 0);
 
-        // Step 1: sample centers
+        // Step 1: sample cluster centers
         RNG_BEGIN();
-        int size_centers = igraph_vector_size(&centers);
-        for (int j = 0; j < size_centers; j++) {
-            if (RNG_UNIF01() < sample_prob) {
-                long int center = VECTOR(centers)[j];
-                VECTOR(is_cluster_sampled)[center] = 1;
+        for (int j = 0; j < no_of_nodes; j++) {
+            if (VECTOR(clustering)[j] == j && RNG_UNIF01() < sample_prob) {
+                VECTOR(is_cluster_sampled)[j] = 1;
             }
         }
         RNG_END();
@@ -334,16 +325,8 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
             edge_old = edge;
         }
 
-        // Copy old clustering to new clutering
-        igraph_vector_fill(&clustering, -1);
-        igraph_vector_resize(&centers, 0);
-        for (int v = 0; v < no_of_nodes; v++) {
-            long int new_cluster = VECTOR(new_clustering)[v];
-            if (new_cluster == v) {
-                igraph_vector_push_back(&centers, new_cluster); // Mark that vertex new_cluster is a center
-            }
-            VECTOR(clustering)[v] = new_cluster;
-        }
+        // Copy old clustering to new clustering
+        igraph_vector_update(&new_clustering, &clustering);
 
         // Remove intra-cluster edges
         for (int v = 0; v < no_of_nodes; v++) {
@@ -414,7 +397,6 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     igraph_vector_destroy(&residual_weight);
     igraph_destroy(&residual_graph);
     igraph_vector_destroy(&clustering);
-    igraph_vector_destroy(&centers);
     igraph_inclist_destroy(&inclist);
     igraph_vector_destroy(&lightest_neighbor);
     igraph_vector_destroy(&lightest_weight);
@@ -423,7 +405,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     igraph_heap_destroy(&edges_to_remove);
     igraph_heap_destroy(&edges_to_add);
     igraph_vector_destroy(&eids);
-    IGRAPH_FINALLY_CLEAN(12);
+    IGRAPH_FINALLY_CLEAN(11);
 
     return IGRAPH_SUCCESS;
 }
