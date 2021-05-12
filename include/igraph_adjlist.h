@@ -36,6 +36,11 @@ typedef struct igraph_adjlist_t {
     igraph_vector_int_t *adjs;
 } igraph_adjlist_t;
 
+typedef struct igraph_inclist_t {
+    igraph_integer_t length;
+    igraph_vector_int_t *incs;
+} igraph_inclist_t;
+
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                       igraph_neimode_t mode, igraph_loops_t loops,
                                       igraph_multiple_t multiple);
@@ -45,6 +50,8 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_complementer(const igraph_t *gr
                                                    igraph_adjlist_t *al,
                                                    igraph_neimode_t mode,
                                                    igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_from_inclist(
+    const igraph_t *graph, igraph_adjlist_t *al, const igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_adjlist_destroy(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_clear(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_sort(igraph_adjlist_t *al);
@@ -72,11 +79,6 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, i
 
 IGRAPH_EXPORT igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                                  igraph_neimode_t mode, igraph_bool_t duplicate);
-
-typedef struct igraph_inclist_t {
-    igraph_integer_t length;
-    igraph_vector_int_t *incs;
-} igraph_inclist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_inclist_init(const igraph_t *graph,
                                       igraph_inclist_t *il,

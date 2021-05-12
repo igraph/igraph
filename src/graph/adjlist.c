@@ -285,6 +285,68 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
     return 0;
 }
 
+
+/**
+ * \function igraph_adjlist_init
+ * \brief Constructs an adjacency list of vertices from an incidence list.
+ *
+ * In some algorithms it is useful to have an adjacency list \em and an incidence
+ * list representation of the same graph, and in many cases it is the most useful
+ * if they are consistent with each other, i.e. if can be guaranteed that the
+ * vertex ID in the i-th entry of the adjacency list of vertex v is the
+ * \em other endpoint of the edge in the i-th entry of the incidence list of the
+ * same vertex. This function creates such an adjacency list from the corresponding
+ * incidence list by looking up the endpoints of each edge in the incidence
+ * list and constructing the corresponding adjacenecy vectors.
+ *
+ * </para><para>
+ * The adjacency list is independent of the graph or the incidence list after
+ * creation; in other words, modifications that are made to the graph or the
+ * incidence list are not reflected in the adjacency list.
+ *
+ * \param graph The input graph.
+ * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \param il Pointer to an \em initialized <type>igraph_inclist_t</type> object
+ *        that will be converted into an adjacency list.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
+igraph_error_t igraph_adjlist_init_from_inclist(
+    const igraph_t *graph, igraph_adjlist_t *al, const igraph_inclist_t *il) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i;
+    long int j, num_neis;
+
+    igraph_vector_int_t *neis;
+    igraph_vector_int_t *incs;
+
+    if (igraph_inclist_size(il) != no_of_nodes) {
+        IGRAPH_ERRORF(
+            "Incidence list has " IGRAPH_PRId " entries but the graph has " IGRAPH_PRId " vertices.",
+            igraph_inclist_size(il),
+            no_of_nodes
+        );
+    }
+
+    IGRAPH_CHECK(igraph_adjlist_init_empty(al, no_of_nodes));
+    for (i = 0; i < no_of_nodes; i++) {
+        neis = igraph_adjlist_get(al, i);
+        incs = igraph_inclist_get(il, i);
+
+        num_neis = igraph_vector_int_size(incs);
+        IGRAPH_CHECK(igraph_vector_int_resize(neis, num_neis));
+
+        for (j = 0; j < num_neis; j++) {
+            VECTOR(*neis)[j] = IGRAPH_OTHER(graph, VECTOR(*incs)[j], i);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_adjlist_destroy
  * \brief Deallocates an adjacency list.
