@@ -217,6 +217,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vect
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, long int pos, BASE value);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, long int elem);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, remove_fast)(TYPE(igraph_vector) *v, long int elem);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, remove_section)(TYPE(igraph_vector) *v,
                                                            long int from, long int to);
 

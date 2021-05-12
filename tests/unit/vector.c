@@ -225,8 +225,7 @@ int main() {
 
     printf("Test igraph_vector_remove_section\n");
     igraph_vector_remove_section(&v, 2, 4);
-    printf(" %li", (long int)igraph_vector_sum(&v));
-    printf(" %li\n", (long int)igraph_vector_prod(&v));
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_remove\n");
@@ -234,13 +233,21 @@ int main() {
     igraph_vector_remove(&v, 9);
     igraph_vector_remove(&v, 0);
     igraph_vector_remove(&v, 4);
-    printf(" %li\n", (long int)igraph_vector_sum(&v));
+    print_vector_format(&v, stdout, "%g");
+    igraph_vector_destroy(&v);
+
+    printf("Test igraph_vector_remove_fast\n");
+    igraph_vector_init_seq(&v, 1, 10);
+    igraph_vector_remove_fast(&v, 9);
+    igraph_vector_remove_fast(&v, 0);
+    igraph_vector_remove_fast(&v, 4);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_move_interval\n");
     igraph_vector_init_seq(&v, 0, 9);
     igraph_vector_move_interval(&v, 5, 10, 0);
-    IGRAPH_ASSERT(igraph_vector_sum(&v) == 70);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_isininterval\n");
