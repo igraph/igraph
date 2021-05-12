@@ -21,7 +21,6 @@
 
 #include "igraph_adjlist.h"
 #include "igraph_error.h"
-#include "igraph_heap.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
@@ -32,12 +31,12 @@
 #include "config.h"
 
 static void igraph_i_collect_lightest_edges_to_clusters(
-    const igraph_t *residual_graph,
+    const igraph_adjlist_t *adjlist,
+    const igraph_inclist_t *inclist,
     const igraph_vector_t *weights,
     const igraph_vector_t *clustering,
     const igraph_vector_bool_t *is_cluster_sampled,
     long int v, 
-    const igraph_vector_int_t *neis,
     igraph_vector_t *lightest_neighbor,
     igraph_vector_t *lightest_weight,
     long int *nearest_neighboring_sampled_cluster
@@ -46,14 +45,16 @@ static void igraph_i_collect_lightest_edges_to_clusters(
     // the vector and return the lightest edge to each neighboring cluster and the index of the lightest 
     // sampled cluster (if any)
 
-    float lightest_weight_to_sampled = INFINITY;
-    long int i, nlen = igraph_vector_int_size(neis);
+    igraph_real_t lightest_weight_to_sampled = INFINITY;
+    igraph_vector_int_t* adjacent_nodes = igraph_adjlist_get(adjlist, v);
+    igraph_vector_int_t* incident_edges = igraph_inclist_get(inclist, v);
+    long int i, nlen = igraph_vector_int_size(incident_edges);
 
     for (i = 0; i < nlen; i++) {
-        long int edge = VECTOR(*neis)[i];
-        long int neighbor_node = IGRAPH_OTHER(residual_graph, edge, v);
+        long int neighbor_node = VECTOR(*adjacent_nodes)[i];
+        long int edge = VECTOR(*incident_edges)[i];
         long int neighbor_cluster = VECTOR(*clustering)[neighbor_node];
-        float weight = VECTOR(*weights)[edge];
+        igraph_real_t weight = weights ? VECTOR(*weights)[edge] : 1;
 
         // If the weight of the edge being considered is smaller than the weight
         // of the lightest edge found so far that connects v to the same
@@ -118,19 +119,17 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
-    long int i, nlen, neighbor, cluster_of_v;
-    long int edge, edge_old;
-    double sample_prob, k = (stretch + 1) / 2;
-    igraph_t residual_graph;
-    igraph_vector_t clustering, lightest_neighbor, lightest_weight, residual_weight;
+    long int i, j, v, index, nlen, neighbor, cluster;
+    double sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
+    igraph_vector_t clustering, lightest_neighbor, lightest_weight;
     igraph_vector_bool_t is_cluster_sampled;
-    igraph_vector_t new_clustering, eids;
-    igraph_vector_int_t *neis;
-    igraph_integer_t from, to;
-    igraph_integer_t edge_in_original_graph;
+    igraph_vector_bool_t is_edge_in_spanner;
+    igraph_vector_t new_clustering;
+    igraph_vector_int_t *adjacent_vertices;
+    igraph_vector_int_t *incident_edges;
+    igraph_adjlist_t adjlist;
     igraph_inclist_t inclist;
-    igraph_es_t es;
-    igraph_heap_t edges_to_remove, edges_to_add;
+    igraph_integer_t edge;
 
     if (spanner == 0) {
         return IGRAPH_SUCCESS;
@@ -141,11 +140,8 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
         IGRAPH_ERROR("Stretch factor must be at least 1", IGRAPH_EINVAL);
     }
 
-    // If the weights is empty (the graph is unweighted) then assign a weight vector of ones
-    if (!weights) {
-        IGRAPH_VECTOR_INIT_FINALLY(&residual_weight, no_of_edges);
-        igraph_vector_fill(&residual_weight, 1);
-    } else {
+    /* Test validity of weights vector */
+    if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
         }
@@ -158,17 +154,20 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
                 IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
             }
         }
-        IGRAPH_CHECK(igraph_vector_copy(&residual_weight, weights));
-        IGRAPH_FINALLY(igraph_vector_destroy, &residual_weight);
     }
 
     // Clear the vector that will contain the IDs of the edges in the spanner
     igraph_vector_clear(spanner);
 
-    // Create a residual graph with V' = V and E' = E. If the graph is unweighted,
-    // then each edge has weight of 1.
-    IGRAPH_CHECK(igraph_copy(&residual_graph, graph));
-    IGRAPH_FINALLY(igraph_destroy, &residual_graph);
+    // Create an incidence list reprsentation of the graph and also create the
+    // corresponding adjacency list. The residual graph will not be constructed
+    // explicitly; it will only exist in terms of the incidence and the adjacency
+    // lists, maintained in parallel as the edges are removed from the residual
+    // graph.
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_NO_LOOPS));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+    IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &adjlist, &inclist));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     // Phase 1: forming the clusters
     // Create a vector which maps the nodes to the centers of the corresponding
@@ -183,33 +182,30 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     // A mapping vector which indicated the minimum weight to each neighboring cluster
     IGRAPH_VECTOR_INIT_FINALLY(&lightest_weight, no_of_nodes);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&eids, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&new_clustering, no_of_nodes);
 
     // A boolean vector whose i-th element is 1 if the i-th vertex is a cluster
     // center that is sampled in the current iteration, 0 otherwise
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&is_cluster_sampled, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_heap_init(&edges_to_add, 0));
-    IGRAPH_FINALLY(igraph_heap_destroy, &edges_to_add);
-    IGRAPH_CHECK(igraph_heap_reserve(&edges_to_add, no_of_edges));
-
-    IGRAPH_CHECK(igraph_heap_init(&edges_to_remove, 0));
-    IGRAPH_FINALLY(igraph_heap_destroy, &edges_to_remove);
-    IGRAPH_CHECK(igraph_heap_reserve(&edges_to_remove, no_of_edges));
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&is_edge_in_spanner, no_of_edges);
 
     sample_prob = pow(no_of_nodes, -1 / k);
 
-    for (i = 0; i < k - 1; i++) {
-        IGRAPH_CHECK(igraph_inclist_init(&residual_graph, &inclist, IGRAPH_OUT, IGRAPH_NO_LOOPS));
-        IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+#define ADD_EDGE_TO_SPANNER {                                   \
+    if (!VECTOR(is_edge_in_spanner)[edge]) {         \
+        VECTOR(is_edge_in_spanner)[edge] = 1;        \
+        IGRAPH_CHECK(igraph_vector_push_back(spanner, edge));   \
+    }                                                           \
+}
 
+    for (i = 0; i < k - 1; i++) {
         igraph_vector_fill(&new_clustering, -1);
         igraph_vector_bool_fill(&is_cluster_sampled, 0);
 
         // Step 1: sample cluster centers
         RNG_BEGIN();
-        for (int j = 0; j < no_of_nodes; j++) {
+        for (j = 0; j < no_of_nodes; j++) {
             if (VECTOR(clustering)[j] == j && RNG_UNIF01() < sample_prob) {
                 VECTOR(is_cluster_sampled)[j] = 1;
             }
@@ -217,16 +213,14 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
         RNG_END();
 
         // Step 2 and 3
-        for (long int v = 0; v < no_of_nodes; v++) {
+        for (v = 0; v < no_of_nodes; v++) {
             // If v is inside a cluster and the cluster of v is sampled, then continue
-            cluster_of_v = VECTOR(clustering)[v];
-            if (cluster_of_v != -1 && VECTOR(is_cluster_sampled)[cluster_of_v]) {
-                VECTOR(new_clustering)[v] = cluster_of_v;
+            cluster = VECTOR(clustering)[v];
+            if (cluster != -1 && VECTOR(is_cluster_sampled)[cluster]) {
+                VECTOR(new_clustering)[v] = cluster;
                 continue;
             }
             
-            neis = igraph_inclist_get(&inclist, v);
-            nlen = igraph_vector_int_size(neis);
             igraph_vector_fill(&lightest_neighbor, -1);
             igraph_vector_fill(&lightest_weight, INFINITY);
             
@@ -234,12 +228,12 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
             // neighboring sampled clusters
             long int nearest_neighboring_sampled_cluster = -1;
             igraph_i_collect_lightest_edges_to_clusters(
-                &residual_graph, 
-                &residual_weight,
+                &adjlist,
+                &inclist,
+                weights,
                 &clustering,
                 &is_cluster_sampled,
-                v, 
-                neis, 
+                v,
                 &lightest_neighbor,
                 &lightest_weight,
                 &nearest_neighboring_sampled_cluster
@@ -252,160 +246,156 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
 
                 // Add lightest edge which connects vertex v to each neighboring
                 // cluster (none of which are sampled) 
-                for (long int j = 0; j < no_of_nodes; j++) {
-                    if (VECTOR(lightest_neighbor)[j] != -1) {
-                        edge = VECTOR(lightest_neighbor)[j];
-                        IGRAPH_CHECK(igraph_heap_push(&edges_to_add, (igraph_real_t) edge));
+                for (j = 0; j < no_of_nodes; j++) {
+                    edge = VECTOR(lightest_neighbor)[j];
+                    if (edge != -1) {
+                        ADD_EDGE_TO_SPANNER;
                     }
                 }
 
-                // Remove all edges incident on v from the graph
-                for (int j = 0; j < nlen; j++) {
-                    edge = VECTOR(*neis)[j];
-                    IGRAPH_CHECK(igraph_heap_push(&edges_to_remove, (igraph_real_t) edge));
+                // Remove all edges incident on v from the graph. Note that each
+                // edge being removed occurs twice in the adjacency / incidence
+                // lists
+                adjacent_vertices = igraph_adjlist_get(&adjlist, v);
+                incident_edges = igraph_inclist_get(&inclist, v);
+                nlen = igraph_vector_int_size(incident_edges);
+                for (j = 0; j < nlen; j++) {
+                    neighbor = VECTOR(*adjacent_vertices)[j];
+                    if (neighbor == v) {
+                        /* should not happen as we did not ask for loop edges in
+                         * the adjacency / incidence lists, but let's be defensive */
+                        continue;
+                    }
+
+                    if (igraph_vector_int_search(
+                        igraph_inclist_get(&inclist, neighbor),
+                        0,
+                        VECTOR(*incident_edges)[j],
+                        &index
+                    )) {
+                        igraph_vector_int_remove_fast(igraph_adjlist_get(&adjlist, neighbor), index);
+                        igraph_vector_int_remove_fast(igraph_inclist_get(&inclist, neighbor), index);
+                    }
                 }
+                igraph_vector_int_clear(adjacent_vertices);
+                igraph_vector_int_clear(incident_edges);
             } else {
                 // Case 3(b) from the paper: v is adjacent to at least one of
                 // the sampled clusters
 
                 // add the edge connecting to the lightest sampled cluster
                 edge = VECTOR(lightest_neighbor)[nearest_neighboring_sampled_cluster];
-                IGRAPH_CHECK(igraph_heap_push(&edges_to_add, (igraph_real_t) edge));
-                double lightest_sample_weight = VECTOR(lightest_weight)[nearest_neighboring_sampled_cluster];
+                ADD_EDGE_TO_SPANNER;
+
+                // 'lightest_sampled_weight' is the weight of the lightest edge connecting v to
+                // one of the sampled clusters. This is where v will belong in
+                // the new clustering.
+                lightest_sampled_weight = VECTOR(lightest_weight)[nearest_neighboring_sampled_cluster];
                 VECTOR(new_clustering)[v] = nearest_neighboring_sampled_cluster;
 
-                // Add to the spanner light edges with weight less then the lightest_sample_weight
-                for (int j = 0; j < no_of_nodes; j++) {
-                    if (VECTOR(lightest_weight)[j] < lightest_sample_weight) {
+                // Add to the spanner light edges with weight less than 'lightest_sampled_weight'
+                for (j = 0; j < no_of_nodes; j++) {
+                    if (VECTOR(lightest_weight)[j] < lightest_sampled_weight) {
                         edge = VECTOR(lightest_neighbor)[j];
-                        IGRAPH_CHECK(igraph_heap_push(&edges_to_add, (igraph_real_t) edge));
+                        ADD_EDGE_TO_SPANNER;
                     }
                 }
 
-                // Remove edges to centers with edge weight less than lightest_sample_weight
-                for (int j = 0; j < nlen; j++) {
-                    neighbor = IGRAPH_OTHER(&residual_graph, VECTOR(*neis)[j], v);
-                    long int neighbor_cluster = VECTOR(clustering)[neighbor];
-                    double weight = VECTOR(lightest_weight)[neighbor_cluster];
-                    if ((neighbor_cluster == nearest_neighboring_sampled_cluster) || (weight < lightest_sample_weight)) {
-                        edge = VECTOR(*neis)[j];
-                        IGRAPH_CHECK(igraph_heap_push(&edges_to_remove, (igraph_real_t) edge));
+                // Remove edges to centers with edge weight less than 'lightest_sampled_weight'
+                adjacent_vertices = igraph_adjlist_get(&adjlist, v);
+                incident_edges = igraph_inclist_get(&inclist, v);
+                nlen = igraph_vector_int_size(incident_edges);
+                for (j = 0; j < nlen; j++) {
+                    neighbor = VECTOR(*adjacent_vertices)[j];
+                    if (neighbor == v) {
+                        /* should not happen as we did not ask for loop edges in
+                         * the adjacency / incidence lists, but let's be defensive */
+                        continue;
+                    }
+
+                    cluster = VECTOR(clustering)[neighbor];
+                    weight = VECTOR(lightest_weight)[cluster];
+                    if ((cluster == nearest_neighboring_sampled_cluster) || (weight < lightest_sampled_weight)) {
+                        edge = VECTOR(*incident_edges)[j];
+
+                        if (igraph_vector_int_search(
+                            igraph_inclist_get(&inclist, neighbor), 0, edge, &index
+                        )) {
+                            igraph_vector_int_remove_fast(igraph_adjlist_get(&adjlist, neighbor), index);
+                            igraph_vector_int_remove_fast(igraph_inclist_get(&inclist, neighbor), index);
+                        }
+
+                        igraph_vector_int_remove_fast(adjacent_vertices, j);
+                        igraph_vector_int_remove_fast(incident_edges, j);
+
+                        j--;
+                        nlen--;
                     }
                 }
             }
-        }
-
-        // Add the edges to the spanner
-        edge_old = -1;
-        while (!igraph_heap_empty(&edges_to_add)) {
-            edge = (long int) igraph_heap_delete_top(&edges_to_add);
-            if (edge != edge_old) {
-                // only if the edge is new, meaning it wasn't inserted by the j-1 element in the list
-                // then insert the edge to the spanner. 
-                igraph_edge(&residual_graph, edge, &from, &to);
-                IGRAPH_CHECK(
-                    igraph_get_eid(graph, &edge_in_original_graph, from, to, /* directed = */ 0, /* error = */ 1)
-                );
-                IGRAPH_CHECK(igraph_vector_push_back(spanner, edge_in_original_graph));
-            }
-            edge_old = edge;
-        }
-
-        // Delete edges from residual graph
-        edge_old = -1;
-        while (!igraph_heap_empty(&edges_to_remove)) {
-            // Remove the weights in the residual_weight vector in nondecreasing order
-            edge = (long int) igraph_heap_delete_top(&edges_to_remove);
-            if (edge != edge_old) {
-                igraph_es_1(&es, edge);
-                IGRAPH_CHECK(igraph_delete_edges(&residual_graph, es));
-                igraph_vector_remove_section(&residual_weight, edge, edge+1);
-                igraph_es_destroy(&es);
-            }
-            edge_old = edge;
         }
 
         // Commit the new clustering
         igraph_vector_update(&clustering, &new_clustering);
 
         // Remove intra-cluster edges
-        for (int v = 0; v < no_of_nodes; v++) {
-            igraph_vector_clear(&eids);
-            IGRAPH_CHECK(igraph_incident(&residual_graph, &eids, v, IGRAPH_OUT));
-            nlen = igraph_vector_size(&eids);
-            for (int j = nlen-1; j >= 0; j--) {
-                edge = VECTOR(eids)[j];
-                long int neighbor = IGRAPH_OTHER(&residual_graph, edge, v);
+        for (v = 0; v < no_of_nodes; v++) {
+            adjacent_vertices = igraph_adjlist_get(&adjlist, v);
+            incident_edges = igraph_inclist_get(&inclist, v);
+            nlen = igraph_vector_int_size(incident_edges);
+            for (j = 0; j < nlen; j++) {
+                neighbor = VECTOR(*adjacent_vertices)[j];
+                edge = VECTOR(*incident_edges)[j];
+                
                 if (VECTOR(clustering)[neighbor] == VECTOR(clustering)[v]) {
-                    igraph_es_1(&es, edge);
-                    IGRAPH_CHECK(igraph_delete_edges(&residual_graph, es));
-                    igraph_vector_remove_section(&residual_weight, edge, edge+1);
-                    igraph_es_destroy(&es);
+                    /* We don't need to bother with removing the other copy
+                     * of the edge from the incidence lists (and the corresponding
+                     * vertices from the adjacency lists) because we will find
+                     * them anyway as we are iterating over all nodes */
+                    igraph_vector_int_remove_fast(adjacent_vertices, j);
+                    igraph_vector_int_remove_fast(incident_edges, j);
+                    j--;
+                    nlen--;
                 }
             }
         }
-
-        // Free
-        igraph_inclist_destroy(&inclist);
-        IGRAPH_FINALLY_CLEAN(1);
     }
 
     // Phase 2: vertex_clustering joining
-    IGRAPH_CHECK(igraph_inclist_init(&residual_graph, &inclist, IGRAPH_OUT, IGRAPH_NO_LOOPS));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-    for (int v = 0; v < no_of_nodes; v++) {
+    for (v = 0; v < no_of_nodes; v++) {
         if (VECTOR(clustering)[v] != -1) {
             igraph_vector_fill(&lightest_neighbor, -1);
             igraph_vector_fill(&lightest_weight, INFINITY);
-            neis = igraph_inclist_get(&inclist, v);
             igraph_i_collect_lightest_edges_to_clusters(
-                &residual_graph, 
-                &residual_weight,
+                &adjlist,
+                &inclist,
+                weights,
                 &clustering,
                 /* is_cluster_sampled = */ NULL,
                 v, 
-                neis,
                 &lightest_neighbor,
                 &lightest_weight,
                 NULL
             );
-            for (int j = 0; j < no_of_nodes; j++) {
-                if (VECTOR(lightest_neighbor)[j] != -1) {
-                    edge = VECTOR(lightest_neighbor)[j];
-                    IGRAPH_CHECK(igraph_heap_push(&edges_to_add, (igraph_real_t) edge));
+            for (j = 0; j < no_of_nodes; j++) {
+                edge = VECTOR(lightest_neighbor)[j];
+                if (edge != -1) {
+                    ADD_EDGE_TO_SPANNER;
                 }
             }
         }
     }
 
-    edge_old = -1;
-    while (!igraph_heap_empty(&edges_to_add)) {
-        edge = (long int)igraph_heap_delete_top(&edges_to_add);
-        if (edge != edge_old) {
-            // only if the edge is new, meaning it wasn't inserted by the j-1 element in the list
-            // then insert the edge to the spanner. 
-            igraph_edge(&residual_graph, edge, &from, &to);
-            IGRAPH_CHECK(
-                igraph_get_eid(graph, &edge_in_original_graph, from, to, /* directed = */ 0, /* error = */ 1)
-            );
-            IGRAPH_CHECK(igraph_vector_push_back(spanner, edge_in_original_graph));
-        }
-        edge_old = edge;
-    }
-    
     // Free memory
-    igraph_vector_destroy(&residual_weight);
-    igraph_destroy(&residual_graph);
-    igraph_vector_destroy(&clustering);
+    igraph_vector_bool_destroy(&is_edge_in_spanner);
     igraph_inclist_destroy(&inclist);
+    igraph_adjlist_destroy(&adjlist);
+    igraph_vector_destroy(&clustering);
     igraph_vector_destroy(&lightest_neighbor);
     igraph_vector_destroy(&lightest_weight);
     igraph_vector_destroy(&new_clustering);
     igraph_vector_bool_destroy(&is_cluster_sampled);
-    igraph_heap_destroy(&edges_to_remove);
-    igraph_heap_destroy(&edges_to_add);
-    igraph_vector_destroy(&eids);
-    IGRAPH_FINALLY_CLEAN(11);
+    IGRAPH_FINALLY_CLEAN(8);
 
     return IGRAPH_SUCCESS;
 }
