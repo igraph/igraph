@@ -95,7 +95,7 @@ IGRAPH_EXPORT igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_v
                                       igraph_vector_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
                                  igraph_integer_t *result);
-IGRAPH_EXPORT igraph_error_t igraph_vs_type(const igraph_vs_t *vs);
+IGRAPH_EXPORT int igraph_vs_type(const igraph_vs_t *vs);
 
 /* -------------------------------------------------- */
 /* Vertex iterators                                   */
@@ -297,7 +297,7 @@ IGRAPH_EXPORT igraph_error_t igraph_es_as_vector(const igraph_t *graph, igraph_e
                                       igraph_vector_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
                                  igraph_integer_t *result);
-IGRAPH_EXPORT igraph_error_t igraph_es_type(const igraph_es_t *es);
+IGRAPH_EXPORT int igraph_es_type(const igraph_es_t *es);
 
 
 /* -------------------------------------------------- */
