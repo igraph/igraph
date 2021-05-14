@@ -104,7 +104,7 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
 }
 
 static void igraph_i_clear_lightest_edges_to_clusters(
-    const igraph_vector_int_t *dirty_vids,
+    igraph_vector_int_t *dirty_vids,
     igraph_vector_t *lightest_eid,
     igraph_vector_t *lightest_weight
 ) {
@@ -114,6 +114,8 @@ static void igraph_i_clear_lightest_edges_to_clusters(
         VECTOR(*lightest_weight)[vid] = INFINITY;
         VECTOR(*lightest_eid)[vid] = -1;
     }
+
+    igraph_vector_int_clear(dirty_vids);
 }
 
 /**
