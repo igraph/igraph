@@ -292,6 +292,7 @@ add_legacy_tests(
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
+  igraph_spanner
 )
 
 add_legacy_tests(
