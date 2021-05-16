@@ -282,7 +282,7 @@ fk_open(seq,fmt,n) ftnint n;
 #else
 fk_open(int seq, int fmt, ftnint n)
 #endif
-{	char nbuf[10];
+{	char nbuf[17];
 	olist a;
 	(void) sprintf(nbuf,"fort.%ld",(long)n);
 	a.oerr=1;
