@@ -96,10 +96,22 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
     igraph_vector_destroy(&nrgeo2);
 }
 
+void print_and_destroy_items(igraph_vector_ptr_t* vec) {
+    long int i;
+
+    for (i = 0; i < igraph_vector_ptr_size(vec); i++) {
+        igraph_vector_print(VECTOR(*vec)[i]);
+        igraph_vector_destroy(VECTOR(*vec)[i]);
+        igraph_free(VECTOR(*vec)[i]);
+    }
+
+    igraph_vector_ptr_clear(vec);
+}
+
 int main() {
 
     igraph_t g;
-    igraph_vector_ptr_t res;
+    igraph_vector_ptr_t vertices, edges;
     long int i;
 
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
@@ -115,39 +127,38 @@ int main() {
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
 
-    igraph_vector_ptr_init(&res, 5);
+    igraph_vector_ptr_init(&vertices, 5);
+    igraph_vector_ptr_init(&edges, 5);
     igraph_vs_vector_small(&vs, 1, 3, 4, 5, 2, 1,  -1);
 
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-                /*res=*/ &res, /*nrgeo=*/ &nrgeo,
+                /*vertices=*/ &vertices, /*edges=*/ &edges,  /*nrgeo=*/ &nrgeo,
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ NULL, /*mode=*/ IGRAPH_OUT);
-    check_nrgeo(&g, vs, &res, &nrgeo);
-
-    for (i = 0; i < igraph_vector_ptr_size(&res); i++) {
-        igraph_vector_print(VECTOR(res)[i]);
-        igraph_vector_destroy(VECTOR(res)[i]);
-        igraph_free(VECTOR(res)[i]);
-        VECTOR(res)[i] = 0;
-    }
+    check_nrgeo(&g, vs, &vertices, &nrgeo);
+    print_and_destroy_items(&vertices);
+    print_and_destroy_items(&edges);
 
     /* Same ring, but with weights */
 
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-                /*res=*/ &res, /*nrgeo=*/ &nrgeo,
+                /*vertices=*/ &vertices, /*edges=*/ NULL, /*nrgeo=*/ &nrgeo,
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
-    check_nrgeo(&g, vs, &res, &nrgeo);
+    check_nrgeo(&g, vs, &vertices, &nrgeo);
+    print_and_destroy_items(&vertices);
 
-    for (i = 0; i < igraph_vector_ptr_size(&res); i++) {
-        igraph_vector_print(VECTOR(res)[i]);
-        igraph_vector_destroy(VECTOR(res)[i]);
-        igraph_free(VECTOR(res)[i]);
-        VECTOR(res)[i] = 0;
-    }
+    /* we are now testing the combination of vertices == NULL and edges != NUL */
+
+    igraph_get_all_shortest_paths_dijkstra(
+                &g,
+                /*vertices=*/ NULL, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,
+                /*from=*/ 0, /*to=*/ vs,
+                /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
+    print_and_destroy_items(&edges);
 
     igraph_destroy(&g);
 
@@ -165,22 +176,18 @@ int main() {
     igraph_vector_view(&weights_vec, weights2, sizeof(weights2) / sizeof(igraph_real_t));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-                /*res=*/ &res, /*nrgeo=*/ &nrgeo,
+                /*vertices=*/ &vertices, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
 
-    check_nrgeo(&g, vs, &res, &nrgeo);
+    check_nrgeo(&g, vs, &vertices, &nrgeo);
 
     /* Sort the paths in a deterministic manner to avoid problems with
      * different qsort() implementations on different platforms */
-    igraph_vector_ptr_sort(&res, vector_tail_cmp);
-
-    for (i = 0; i < igraph_vector_ptr_size(&res); i++) {
-        igraph_vector_print(VECTOR(res)[i]);
-        igraph_vector_destroy(VECTOR(res)[i]);
-        igraph_free(VECTOR(res)[i]);
-        VECTOR(res)[i] = 0;
-    }
+    igraph_vector_ptr_sort(&vertices, vector_tail_cmp);
+    igraph_vector_ptr_sort(&edges, vector_tail_cmp);
+    print_and_destroy_items(&vertices);
+    print_and_destroy_items(&edges);
 
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
@@ -195,7 +202,7 @@ int main() {
     VECTOR(weights_vec)[8] = 100; /* 1-->2, 4-->8 */
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
-                /*res=*/ 0, /*nrgeo=*/ &nrgeo,
+                /*vertices=*/ 0, /*edges=*/ 0, /*nrgeo=*/ &nrgeo,
                 /*from=*/ 0, /*to=*/ vs,
                 /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
     igraph_vector_destroy(&weights_vec);
@@ -206,7 +213,8 @@ int main() {
     printf("%ld ", (long int)VECTOR(nrgeo)[12]);
     printf("%ld\n", (long int)VECTOR(nrgeo)[15]);
 
-    igraph_vector_ptr_destroy(&res);
+    igraph_vector_ptr_destroy(&vertices);
+    igraph_vector_ptr_destroy(&edges);
     igraph_vector_destroy(&nrgeo);
 
     if (!IGRAPH_FINALLY_STACK_EMPTY) {

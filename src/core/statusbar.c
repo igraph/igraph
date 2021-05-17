@@ -93,8 +93,9 @@ int igraph_statusf(const char *message, void *data, ...) {
  * \function igraph_status_handler_stderr
  * A simple predefined status handler function.
  *
- * A simple status handler function, that writes the status
- * message to the standard errror.
+ * A simple status handler function that writes the status
+ * message to the standard error.
+ * 
  * \param message The status message.
  * \param data Additional context, with user-defined semantics.
  *        Existing igraph functions pass a null pointer here.

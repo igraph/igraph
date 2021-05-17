@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 #include <vector>
 #include <limits>
 using namespace prpack;
@@ -16,8 +17,8 @@ void prpack_base_graph::initialize() {
 }
 
 prpack_base_graph::prpack_base_graph() {
-	initialize();
-	num_vs = num_es = 0;
+    initialize();
+    num_vs = num_es = 0;
 }
 
 prpack_base_graph::prpack_base_graph(const prpack_csc* g) {
@@ -103,9 +104,9 @@ prpack_base_graph::prpack_base_graph(const prpack_int64_csc* g) {
 }
 
 prpack_base_graph::prpack_base_graph(const prpack_csr* g) {
+    (void)g; // to silence an unused argument warning
     initialize();
-    assert(false);
-    // TODO
+    throw std::runtime_error("not implemented yet");
 }
 
 prpack_base_graph::prpack_base_graph(const prpack_edge_list* g) {
@@ -167,11 +168,11 @@ prpack_base_graph::~prpack_base_graph() {
 
 void prpack_base_graph::read_smat(FILE* f, const bool weighted) {
     // read in header
-#ifndef NDEBUG
-	// needed in the assertion only
     double ignore = 0.0;
-#endif
-    assert(fscanf(f, "%d %lf %d", &num_vs, &ignore, &num_es) == 3);
+    int retval = fscanf(f, "%d %lf %d", &num_vs, &ignore, &num_es);
+    if (retval != 3) {
+        throw std::runtime_error("error while parsing smat file");
+    }
     // fill in heads and tails
     num_self_es = 0;
     int* hs = new int[num_es];
@@ -185,8 +186,10 @@ void prpack_base_graph::read_smat(FILE* f, const bool weighted) {
     }
     memset(tails, 0, num_vs*sizeof(tails[0]));
     for (int i = 0; i < num_es; ++i) {
-        assert(fscanf(f, "%d %d %lf", 
-            &hs[i], &ts[i], &((weighted) ? vs[i] : ignore)) == 3);
+        retval = fscanf(f, "%d %d %lf", &hs[i], &ts[i], &((weighted) ? vs[i] : ignore));
+        if (retval != 3) {
+            throw std::runtime_error("error while parsing smat file");
+        }
         ++tails[ts[i]];
         if (hs[i] == ts[i])
             ++num_self_es;
@@ -235,7 +238,10 @@ void prpack_base_graph::read_edges(FILE* f) {
 }
 
 void prpack_base_graph::read_ascii(FILE* f) {
-    assert(fscanf(f, "%d", &num_vs) == 1);
+    int retval = fscanf(f, "%d", &num_vs);
+    if (retval != 1) {
+        throw std::runtime_error("error while parsing ascii file");
+    }
     while (getc(f) != '\n');
     vector<int>* al = new vector<int>[num_vs];
     num_es = num_self_es = 0;

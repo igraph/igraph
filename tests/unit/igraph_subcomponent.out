@@ -1,0 +1,57 @@
+No vertices, should give error for impossible starting vertex.
+One vertex.
+0
+
+All vertices of a graph, IGRAPH_OUT:
+0 1 2 3 4
+
+1 3 4
+
+0 1 2 3 4
+
+3 4
+
+4
+
+5
+
+All vertices of a graph, IGRAPH_IN:
+0 2
+
+0 1 2
+
+0 2
+
+0 1 2 3
+
+0 1 2 3 4
+
+5
+
+All vertices of a graph, IGRAPH_ALL:
+0 1 2 3 4
+
+0 1 2 3 4
+
+0 1 2 3 4
+
+0 1 2 3 4
+
+0 1 2 3 4
+
+5
+
+All vertices of a graph, undirected:
+0 1 2 3 4
+
+0 1 2 3 4
+
+0 1 2 3 4
+
+0 1 2 3 4
+
+0 1 2 3 4
+
+5
+
+Check for invalid mode error handling.

@@ -742,6 +742,74 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
 
 /**
  * \ingroup vector
+ * \function igraph_vector_permute
+ * \brief Permutes the elements of a vector in place according to an index vector.
+ *
+ * </para><para>
+ * This function takes a vector \c v and a corresponding index vector \c ind,
+ * and permutes the elements of \c v such that \c v[ind[i]] is moved to become
+ * \c v[i] after the function is executed.
+ *
+ * </para><para>
+ * It is an error to call this function with an index vector that does not
+ * represent a valid permutation. Each element in the index vector must be
+ * between 0 and the length of the vector minus one (inclusive), and each such
+ * element must appear only once. The function does not attempt to validate the
+ * index vector.
+ *
+ * </para><para>
+ * The index vector that this function takes is compatible with the index vector
+ * returned from \ref igraph_vector_qsort_ind(); passing in the index vector
+ * from \ref igraph_vector_qsort_ind() will sort the original vector.
+ *
+ * </para><para>
+ * As a special case, this function allows the index vector to be \em shorter
+ * than the vector being permuted, in which case the elements whose indices do
+ * not occur in the index vector will be removed from the vector.
+ *
+ * \param v    the vector to permute
+ * \param ind  the index vector
+ *
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: O(n), the size of the vector.
+ */
+igraph_error_t FUNCTION(igraph_vector, permute)(TYPE(igraph_vector)* v, const igraph_vector_t* index) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(index != NULL);
+    IGRAPH_ASSERT(index->stor_begin != NULL);
+    IGRAPH_ASSERT(FUNCTION(igraph_vector, size)(v) >= igraph_vector_size(index));
+
+    TYPE(igraph_vector) v_copy;
+    BASE *v_ptr;
+    igraph_real_t *ind_ptr;
+
+    /* There is a more space-efficient algorithm that needs O(1) space only,
+     * but it messes up the index vector, which we don't want */
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&v_copy, igraph_vector_size(index)));
+    IGRAPH_FINALLY(FUNCTION(igraph_vector, destroy), &v_copy);
+
+    for (
+        v_ptr = v_copy.stor_begin, ind_ptr = index->stor_begin;
+        ind_ptr < index->end;
+        v_ptr++, ind_ptr++
+    ) {
+        *v_ptr = VECTOR(*v)[(long int) *ind_ptr];
+    }
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, update)(v, &v_copy));
+
+    FUNCTION(igraph_vector, destroy)(&v_copy);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector
  * \function igraph_vector_sort_cmp
  * \brief Internal comparison function of vector elements, used by
  * \ref igraph_vector_sort().
@@ -852,21 +920,17 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
  * NaN values is undefined.
  *
  * \param v the array to be sorted
- * \param inds the output array of indices. this must be initialized,
+ * \param inds the output array of indices. This must be initialized,
  *         but will be resized
  * \param descending whether the output array should be sorted in descending
  *        order.
  * \return Error code.
  *
- * This routine uses the C library qsort routine.
+ * This routine uses igraph's built-in qsort routine.
  * Algorithm: 1) create an array of pointers to the elements of v. 2)
  * Pass this array to qsort. 3) after sorting the difference between
  * the pointer value and the first pointer value gives its original
  * position in the array. Use this to set the values of inds.
- *
- * Some tests show that this routine is faster than
- * igraph_vector_heapsort_ind by about 10 percent
- * for small vectors to a factor of two for large vectors.
  */
 
 long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
@@ -887,9 +951,9 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     }
     first = vind[0];
     if (descending) {
-        igraph_qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector, i_qsort_ind_cmp_desc));
+        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_qsort_ind_cmp_desc));
     } else {
-        igraph_qsort(vind, n, sizeof(BASE**), FUNCTION(igraph_vector, i_qsort_ind_cmp_asc));
+        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_qsort_ind_cmp_asc));
     }
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = vind[i] - first;
@@ -906,18 +970,23 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * If the elements of two vectors match but one is shorter, the shorter
  * one comes first. Thus {1, 3} comes after {1, 2, 3}, but before {1, 3, 4}.
  *
- * \param lhs The first vector.
- * \param rhs The second vector.
+ * </para><para>
+ * This function is typically used together with \ref igraph_vector_ptr_sort().
+ *
+ * \param lhs Pointer to a pointer to the first vector (interpreted as an <code>igraph_vector_t **</code>).
+ * \param rhs Pointer to a pointer to the second vector (interpreted as an <code>igraph_vector_t **</code>).
  * \return -1 if \p lhs is lexicographically smaller,
  *         0 if \p lhs and \p rhs are equal, else 1.
  * \sa \ref igraph_vector_colex_cmp() to compare vectors starting from
  *     the last element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
+ *
+ * \example examples/simple/igraph_vector_ptr_sort.c
  */
 int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
-    const TYPE(igraph_vector) *a = lhs;
-    const TYPE(igraph_vector) *b = rhs;
+    const TYPE(igraph_vector) *a = * (TYPE(igraph_vector) **) lhs;
+    const TYPE(igraph_vector) *b = * (TYPE(igraph_vector) **) rhs;
     long int i, sa, sb;
 
     sa = FUNCTION(igraph_vector, size)(a);
@@ -952,8 +1021,11 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  * shorter, the shorter one comes first. Thus {1, 2} comes after {3, 2, 1},
  * but before {0, 1, 2}.
  *
- * \param lhs The first vector.
- * \param rhs The second vector.
+ * </para><para>
+ * This function is typically used together with \ref igraph_vector_ptr_sort().
+ *
+ * \param lhs Pointer to a pointer to the first vector (interpreted as an <code>igraph_vector_t **</code>).
+ * \param rhs Pointer to a pointer to the second vector (interpreted as an <code>igraph_vector_t **</code>).
  * \return -1 if \p lhs in reverse order is
  *         lexicographically smaller than the reverse of \p rhs,
  *         0 if \p lhs and \p rhs are equal, else 1.
@@ -961,10 +1033,12 @@ int FUNCTION(igraph_vector, lex_cmp)(const void *lhs, const void *rhs) {
  *     the first element.
  *
  * Time complexity: O(n), the number of elements in the smaller vector.
+ *
+ * \example examples/simple/igraph_vector_ptr_sort.c
  */
 int FUNCTION(igraph_vector, colex_cmp)(const void *lhs, const void *rhs) {
-    const TYPE(igraph_vector) *a = lhs;
-    const TYPE(igraph_vector) *b = rhs;
+    const TYPE(igraph_vector) *a = * (TYPE(igraph_vector) **) lhs;
+    const TYPE(igraph_vector) *b = * (TYPE(igraph_vector) **) rhs;
     long int i, sa, sb, rai, rbi;
 
     sa = FUNCTION(igraph_vector, size)(a);
@@ -1522,6 +1596,35 @@ void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, long int elem) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     FUNCTION(igraph_vector, remove_section)(v, elem, elem + 1);
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_remove_fast
+ * \brief Removes a single element from a vector, \em not keeping the order of
+ * the remaining elements.
+ *
+ * This function removes the element with the given element from the vector by
+ * swapping it with the last element and then popping it off. You can use this
+ * function instead of \ref igraph_vector_remove() to gain some speed if the
+ * order of elements does not matter.
+ *
+ * </para><para>
+ * Note that this function does not do range checking.
+ *
+ * \param v The vector object.
+ * \param elem The position of the element to remove.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_vector, remove_fast)(TYPE(igraph_vector) *v, long int elem) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    long int len = FUNCTION(igraph_vector, size)(v);
+    VECTOR(*v)[elem] = VECTOR(*v)[len - 1];
+    FUNCTION(igraph_vector, pop_back)(v);
 }
 
 /**

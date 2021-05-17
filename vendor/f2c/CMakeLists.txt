@@ -32,6 +32,19 @@ else()
   )
 endif()
 
+# Hidden CMake option for Szabolcs so he can collect arith.h headers from
+# multiple systems in CI
+option(IGRAPH_PRINT_ARITH_HEADER "Print the contents of the generated arith.h for debugging purposes")
+mark_as_advanced(IGRAPH_PRINT_ARITH_HEADER)
+if(IGRAPH_PRINT_ARITH_HEADER)
+  add_custom_command(
+    TARGET arithchk POST_BUILD
+    COMMENT "Printing contents of arith.h..."
+    COMMAND arithchk
+    VERBATIM USES_TERMINAL
+  )
+endif()
+
 # Declare the files needed to compile our vendored f2c copy
 add_library(
   f2c_vendored

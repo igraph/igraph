@@ -14,13 +14,17 @@ foreach(FORMAT dl gml lgl ncol pajek)
       ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c
     )
   else()
+    if (BISON_VERSION VERSION_GREATER_EQUAL 3)
+      set(bison_no_deprecated -Wno-deprecated)
+    endif()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
-      COMPILE_FLAGS "--no-lines"
+      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "--noline --header-file=${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h"
+      COMPILE_FLAGS "--noline"
+      DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -80,7 +84,7 @@ add_library(
 
   constructors/adjacency.c
   constructors/atlas.c
-  constructors/basic.c
+  constructors/basic_constructors.c
   constructors/de_bruijn.c
   constructors/famous.c
   constructors/full.c
@@ -121,13 +125,15 @@ add_library(
   centrality/centralization.c
   centrality/closeness.c
   centrality/coreness.c
+  centrality/truss.cpp
   centrality/prpack.cpp
 
-  cliques/cliquer.c
+  cliques/cliquer_wrapper.c
   cliques/cliques.c
   cliques/maximal_cliques.c
   cliques/glet.c
 
+  community/community_misc.c
   community/edge_betweenness.c
   community/fast_modularity.c
   community/fluid.c
@@ -139,7 +145,6 @@ add_library(
   community/leading_eigenvector.c
   community/leiden.c
   community/louvain.c
-  community/misc.c
   community/modularity.c
   community/optimal_modularity.c
   community/spinglass/clustertool.cpp
@@ -175,7 +180,6 @@ add_library(
   io/pajek.c
   ${PARSER_SOURCES}
 
-  layout/bipartite.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -187,13 +191,14 @@ add_library(
   layout/fruchterman_reingold.c
   layout/gem.c
   layout/graphopt.c
-  layout/grid.c
   layout/kamada_kawai.c
-  layout/lgl.c
+  layout/large_graph.c
+  layout/layout_bipartite.c
+  layout/layout_grid.c
+  layout/layout_random.c
   layout/mds.c
   layout/merge_dla.c
   layout/merge_grid.c
-  layout/random.c
   layout/reingold_tilford.c
   layout/sugiyama.c
 
@@ -224,8 +229,9 @@ add_library(
   paths/shortest_paths.c
   paths/simple_paths.c
   paths/unweighted.c
+  paths/sparsifier.c
 
-  properties/basic.c
+  properties/basic_properties.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c
@@ -239,17 +245,10 @@ add_library(
   properties/trees.c
   properties/triangles.c
 
-  scg/scg_approximate_methods.c
-  scg/scg_exact_scg.c
-  scg/scg_kmeans.c
-  scg/scg_optimal_method.c
-  scg/scg_utils.c
-  scg/scg.c
-
   isomorphism/bliss.cc
   isomorphism/isoclasses.c
   isomorphism/lad.c
-  isomorphism/misc.c
+  isomorphism/isomorphism_misc.c
   isomorphism/queries.c
   isomorphism/vf2.c
 

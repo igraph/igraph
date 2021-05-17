@@ -136,6 +136,26 @@ igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
 
 /**
  * \ingroup heap
+ * \function igraph_heap_clear
+ * \brief Removes all elements from a heap.
+ *
+ * </para><para>
+ * This function simply sets the size of the heap to zero, it does
+ * not free any allocated memory. For that you have to call
+ * \ref igraph_heap_destroy().
+ * \param h The heap object.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h) {
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    h->end = h->stor_begin;
+}
+
+/**
+ * \ingroup heap
  * \function igraph_heap_push
  * \brief Add an element.
  *

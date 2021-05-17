@@ -13,7 +13,6 @@ add_custom_target(
 add_dependencies(check build_tests)
 
 # Add a custom target for benchmarks and another one for building them
-# TODO(ntamas)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
@@ -65,6 +64,7 @@ add_examples(
   igraph_sparsemat7
   igraph_sparsemat8
   igraph_strvector
+  igraph_vector_ptr_sort
 )
 
 add_legacy_tests(
@@ -82,6 +82,7 @@ add_legacy_tests(
   igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_spmatrix_add_col_values
@@ -98,6 +99,8 @@ add_legacy_tests(
   vector2
   vector3
   vector_ptr
+  vector_ptr_sort_ind
+  vector_qsort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
@@ -137,6 +140,8 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_same_graph
+  igraph_i_incident
+  igraph_i_neighbors
 )
 
 # iterators.at
@@ -204,12 +209,14 @@ add_legacy_tests(
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
+  igraph_sbm_game
   igraph_simple_interconnected_islands_game
   igraph_static_power_law_game
   tree
   tree_game
   ring
   watts_strogatz_game
+  truss
 )
 
 # structural_properties.at
@@ -277,6 +284,7 @@ add_legacy_tests(
   igraph_neighborhood_size
   igraph_pagerank
   igraph_pseudo_diameter
+  igraph_pseudo_diameter_dijkstra
   igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
@@ -285,6 +293,7 @@ add_legacy_tests(
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
+  igraph_spanner
 )
 
 add_legacy_tests(
@@ -303,6 +312,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bridges
   igraph_decompose_strong
+  igraph_subcomponent
 )
 
 # layout.at
@@ -389,6 +399,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_dyad_census
   igraph_motifs_randesu_estimate
   igraph_motifs_randesu_no
   triad_census
@@ -596,6 +607,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  dgemv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
   igraph_lapack_dgehrd
@@ -608,6 +620,11 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_get_incidence
 )
 
 # centralization.at
@@ -675,25 +692,6 @@ if(CMAKE_USE_PTHREADS_INIT)
     )
   endif()
 endif()
-
-# scg.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_scg_grouping
-  igraph_scg_grouping2
-  igraph_scg_grouping3
-  igraph_scg_grouping4
-  igraph_scg_semiprojectors
-  igraph_scg_semiprojectors2
-  igraph_scg_semiprojectors3
-  scg
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  scg2
-  scg3
-)
 
 # random.at
 add_examples(
@@ -798,10 +796,12 @@ add_benchmarks(
   igraph_betweenness
   igraph_betweenness_weighted
   igraph_cliques
+  igraph_closeness_weighted
   igraph_coloring
   igraph_maximal_cliques
   igraph_pagerank
   igraph_pagerank_weighted
+  igraph_power_law_fit
   igraph_random_walk
   igraph_transitivity
 )

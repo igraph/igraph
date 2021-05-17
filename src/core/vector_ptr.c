@@ -28,6 +28,7 @@
 #include "igraph_qsort.h"
 
 #include <string.h>         /* memcpy & co. */
+#include <stdint.h>         /* uintptr_t */
 #include <stdlib.h>
 
 /**
@@ -535,7 +536,8 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
 
 /**
  * \ingroup vectorptr
- * \brief Sort the pointer vector based on an external comparison function
+ * \function igraph_vector_ptr_sort
+ * \brief Sorts the pointer vector based on an external comparison function.
  *
  * Sometimes it is necessary to sort the pointers in the vector based on
  * the property of the element being referenced by the pointer. This
@@ -545,7 +547,15 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
  * first argument is considered to be respectively less than, equal to, or
  * greater than the second. \c p1 and \c p2 will point to the pointer in the
  * vector, so they have to be double-dereferenced if one wants to get access
- * to the underlying object the address of which is stored in \c v .
+ * to the underlying object the address of which is stored in \c v.
+ *
+ * \param v The pointer vector to be sorted.
+ * \param compar A qsort-compatible comparison function. It must take pointers to the
+ *    elements of the pointer vector. For example, if the pointer vector contains
+ *    <code>igraph_vector_t *</code> pointers, then the comparison function must
+ *    interpret its arguments as <code>igraph_vector_t **</code>.
+ *
+ * \example examples/simple/igraph_vector_ptr_sort.c
  */
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
     igraph_qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*),
@@ -627,4 +637,149 @@ igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(
 igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v) {
     IGRAPH_ASSERT(v != 0);
     return v->item_destructor;
+}
+
+typedef int cmp_t (const void *, const void *);
+
+/**
+ * Comparison function passed to qsort_r from  igraph_vector_ptr_sort_ind
+ */
+static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
+    cmp_t* cmp = (cmp_t*) thunk;
+    uintptr_t *pa = (uintptr_t*) p1;
+    uintptr_t *pb = (uintptr_t*) p2;
+    void** item_a_ptr = (void**) *pa;
+    void** item_b_ptr = (void**) *pb;
+    return cmp(*item_a_ptr, *item_b_ptr);
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_sort_ind
+ * \brief Return a permutation of indices that sorts a vector of pointers
+ *
+ * Takes an unsorted array \c v as input and computes an array of
+ * indices inds such that v[ inds[i] ], with i increasing from 0, is
+ * an ordered array (either ascending or descending, depending on
+ * \v order). The order of indices for identical elements is not
+ * defined.
+ *
+ * \param v the array to be sorted
+ * \param inds the output array of indices. This must be initialized,
+ *         but will be resized
+ * \param cmp a comparator function that takes two elements of the pointer
+ *        vector being sorted (these are constant pointers on their own)
+ *        and returns a negative value if the item \em "pointed to" by the
+ *        first pointer is smaller than the item \em "pointed to" by the
+ *        second pointer, a positive value if it is larger, or zero if the
+ *        two items are equal
+ * \return Error code.
+ *
+ * This routine uses the C library qsort routine.
+ * Algorithm: 1) create an array of pointers to the elements of v. 2)
+ * Pass this array to qsort. 3) after sorting the difference between
+ * the pointer value and the first pointer value gives its original
+ * position in the array. Use this to set the values of inds.
+ */
+
+igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
+        igraph_vector_t *inds, cmp_t cmp) {
+    unsigned long int i;
+    uintptr_t *vind, first;
+    size_t n = (size_t) igraph_vector_ptr_size(v);
+
+    IGRAPH_CHECK(igraph_vector_resize(inds, (long) n));
+    if (n == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    vind = IGRAPH_CALLOC(n, uintptr_t);
+    if (vind == 0) {
+        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM);
+    }
+
+    for (i = 0; i < n; i++) {
+        vind[i] = (uintptr_t) &VECTOR(*v)[i];
+    }
+
+    first = vind[0];
+
+    igraph_qsort_r(vind, n, sizeof(uintptr_t), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
+
+    for (i = 0; i < n; i++) {
+        VECTOR(*inds)[i] = (vind[i] - first) / sizeof(uintptr_t);
+    }
+
+    IGRAPH_FREE(vind);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_permute
+ * \brief Permutes the elements of a pointer vector in place according to an index vector.
+ *
+ * </para><para>
+ * This function takes a vector \c v and a corresponding index vector \c ind,
+ * and permutes the elements of \c v such that \c v[ind[i]] is moved to become
+ * \c v[i] after the function is executed.
+ *
+ * </para><para>
+ * It is an error to call this function with an index vector that does not
+ * represent a valid permutation. Each element in the index vector must be
+ * between 0 and the length of the vector minus one (inclusive), and each such
+ * element must appear only once. The function does not attempt to validate the
+ * index vector.
+ *
+ * </para><para>
+ * The index vector that this function takes is compatible with the index vector
+ * returned from \ref igraph_vector_ptr_sort_ind(); passing in the index vector
+ * from \ref igraph_vector_ptr_sort_ind() will sort the original vector.
+ *
+ * </para><para>
+ * As a special case, this function allows the index vector to be \em shorter
+ * than the vector being permuted, in which case the elements whose indices do
+ * not occur in the index vector will be removed from the vector.
+ *
+ * \param v    the vector to permute
+ * \param ind  the index vector
+ *
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: O(n), the size of the vector.
+ */
+igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_vector_t* index) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(index != NULL);
+    IGRAPH_ASSERT(index->stor_begin != NULL);
+    IGRAPH_ASSERT(igraph_vector_ptr_size(v) >= igraph_vector_size(index));
+
+    igraph_vector_ptr_t v_copy;
+    void** v_ptr;
+    igraph_real_t *ind_ptr;
+
+    /* There is a more space-efficient algorithm that needs O(1) space only,
+     * but it messes up the index vector, which we don't want */
+
+    IGRAPH_CHECK(igraph_vector_ptr_init(&v_copy, igraph_vector_size(index)));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &v_copy);
+
+    for (
+        v_ptr = v_copy.stor_begin, ind_ptr = index->stor_begin;
+        ind_ptr < index->end;
+        v_ptr++, ind_ptr++
+    ) {
+        *v_ptr = VECTOR(*v)[(long int) *ind_ptr];
+    }
+
+    IGRAPH_CHECK(igraph_vector_ptr_resize(v, igraph_vector_size(index)));
+    igraph_vector_ptr_copy_to(&v_copy, VECTOR(*v));
+
+    igraph_vector_ptr_destroy(&v_copy);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }

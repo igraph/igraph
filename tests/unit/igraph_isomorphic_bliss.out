@@ -1,0 +1,42 @@
+Splitting heuristic: F
+Without vertex colors: YES
+All vertices having the same color: YES
+Non-matching colors 1: NO
+Non-matching colors 2: NO
+Isomorphic colored graphs: YES
+
+Splitting heuristic: FL
+Without vertex colors: YES
+All vertices having the same color: YES
+Non-matching colors 1: NO
+Non-matching colors 2: NO
+Isomorphic colored graphs: YES
+
+Splitting heuristic: FS
+Without vertex colors: YES
+All vertices having the same color: YES
+Non-matching colors 1: NO
+Non-matching colors 2: NO
+Isomorphic colored graphs: YES
+
+Splitting heuristic: FM
+Without vertex colors: YES
+All vertices having the same color: YES
+Non-matching colors 1: NO
+Non-matching colors 2: NO
+Isomorphic colored graphs: YES
+
+Splitting heuristic: FLM
+Without vertex colors: YES
+All vertices having the same color: YES
+Non-matching colors 1: NO
+Non-matching colors 2: NO
+Isomorphic colored graphs: YES
+
+Splitting heuristic: FSM
+Without vertex colors: YES
+All vertices having the same color: YES
+Non-matching colors 1: NO
+Non-matching colors 2: NO
+Isomorphic colored graphs: YES
+

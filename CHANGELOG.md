@@ -2,6 +2,40 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
+ - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
+ - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
+ - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
+
+## [0.9.3] - 2021-05-05
+
+### Added
+
+ - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+ - OpenMP is now enabled and used by certain functions (notably PageRank calculation) when the compiler supports it. Set `IGRAPH_OPENMP_SUPPORT=OFF` at configuration time to disable this.
+
+### Fixed
+
+ - `igraph_get_incidence()` no longer reads and writes out of bounds when given a non-bipartite graph, but gives a warning and ignores edges within a part.
+ - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` dereferenced their arguments only once instead of twice, and therefore did not work with `igraph_vector_ptr_sort()`.
+ - `igraph_maximal_cliques_subset()` and `igraph_transitivity_barrat()` corrupted the error handling stack ("finally stack") under some circumstances.
+ - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
+ - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
+ - igraph no longer links to the math library (`libm`) when this is not necessary.
+ - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
+ - Fixed a compilation issue on MSYS / MinGW when link-time optimization was enabled and the `MSYS Makefiles` CMake generator was used. Some source files in igraph were renamed as a consequence, but these should not affect users of the library.
+
+### Deprecated
+
+ - `igraph_rng_min()` is now deprecated; assume a constant zero as its return value if you used this function in your own code.
+
+### Other
+
+ - Updated the vendored CXSparse library to version 3.2.0
+
 ## [0.9.2] - 2021-04-14
 
 ### Added
@@ -26,7 +60,7 @@
 
 ### Added
 
- - `igraph_vector_lex_cmp()` and `igrapg_vector_colex_cmp()` for lexicographic
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` for lexicographic
    and colexicographic comparison of vectors. These functions may also be used
    for sorting.
 

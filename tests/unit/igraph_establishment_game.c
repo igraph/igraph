@@ -72,10 +72,12 @@ int main() {
     IGRAPH_ASSERT(igraph_vector_size(&node_type_vec) == 20);
     DESTROY_GVM();
 
+    VERIFY_FINALLY_STACK();
+    igraph_set_error_handler(igraph_error_handler_ignore);
+
     /*Distribution of types should have at least one possible value*/
     igraph_vector_init(&type_dist, 0);
     igraph_matrix_init(&pref_matrix, 0, 0);
-    igraph_set_error_handler(igraph_error_handler_ignore);
     IGRAPH_ASSERT(igraph_establishment_game(&g, /*nodes*/ 20, /* types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0, /*node_type_vec*/ NULL) == IGRAPH_EINVAL);
     DESTROY_GVM();
 
