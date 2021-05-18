@@ -36,6 +36,10 @@
  * avoid an expensive IGRAPH_OTHER() lookup on edge IDs. The cost of this macro
  * comes from the inability of the branch predictor to predict accurately whether
  * the condition in the macro will be true or not.
+ * 
+ * The following four functions are very similar in their structure. If you make
+ * a modification to one of them, consider whether the same modification makes
+ * sense in the context of the remaining three functions as well.
  */
 
 /*
@@ -55,25 +59,29 @@
  * \param  adjlist the adjacency list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf(const igraph_t *graph, long int source, igraph_vector_t *dist, 
+static int igraph_i_sspf(
+    const igraph_t *graph,
+    long int source,
+    igraph_vector_t *dist, 
     double *nrgeo,
-    igraph_stack_t *S,
+    igraph_stack_t *stack,
     igraph_adjlist_t *fathers,
     igraph_adjlist_t *adjlist,
-    igraph_real_t cutoff) {
-    
-    igraph_dqueue_t Q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_int_t *neis;
+    igraph_real_t cutoff
+) {
+    igraph_dqueue_t queue;
+    const igraph_vector_int_t *neis;
+    igraph_vector_int_t *v;
     long int nlen;
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
+    IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
     
-    IGRAPH_CHECK(igraph_dqueue_push(&Q, source));
+    IGRAPH_CHECK(igraph_dqueue_push(&queue, source));
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
-    while (!igraph_dqueue_empty(&Q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&Q);
+    while (!igraph_dqueue_empty(&queue)) {
+        long int actnode = (long int) igraph_dqueue_pop(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && VECTOR(*dist)[actnode] > cutoff + 1) {
@@ -84,27 +92,32 @@ static int igraph_i_sspf(const igraph_t *graph, long int source, igraph_vector_t
             continue;
         }
 
-        IGRAPH_CHECK(igraph_stack_push(S, actnode));
+        /* Record that we have visited this node */
+        IGRAPH_CHECK(igraph_stack_push(stack, actnode));
+
+        /* Examine the neighbors of this node */
         neis = igraph_adjlist_get(adjlist, actnode);
         nlen = igraph_vector_int_size(neis);
         for (int j = 0; j < nlen; j++) {
             long int neighbor = (long int) VECTOR(*neis)[j];
+
             if (VECTOR(*dist)[neighbor] == 0) {
+                /* We have found 'neighbor' for the first time */
                 VECTOR(*dist)[neighbor] = VECTOR(*dist)[actnode] + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&Q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_push(&queue, neighbor));
             }
+
             if (VECTOR(*dist)[neighbor] == VECTOR(*dist)[actnode] + 1 &&
                 (VECTOR(*dist)[neighbor] <= cutoff + 1 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                igraph_vector_int_t *v = igraph_adjlist_get(fathers,
-                                            neighbor);
-                igraph_vector_int_push_back(v, actnode);
+                v = igraph_adjlist_get(fathers, neighbor);
+                IGRAPH_CHECK(igraph_vector_int_push_back(v, actnode));
                 nrgeo[neighbor] += nrgeo[actnode];
             }
         }
     }
 
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS; 
@@ -129,23 +142,24 @@ static int igraph_i_sspf(const igraph_t *graph, long int source, igraph_vector_t
  */
 static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_vector_t *dist, 
     double *nrgeo,
-    igraph_stack_t *S,
+    igraph_stack_t *stack,
     igraph_inclist_t *fathers,
     const igraph_inclist_t *inclist,
     igraph_real_t cutoff
 ) {
-    igraph_dqueue_t Q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_t queue;
     const igraph_vector_int_t *neis;
+    igraph_vector_int_t *v;
     long int nlen;
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
+    IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
     
-    IGRAPH_CHECK(igraph_dqueue_push(&Q, source));
+    IGRAPH_CHECK(igraph_dqueue_push(&queue, source));
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
-    while (!igraph_dqueue_empty(&Q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&Q);
+    while (!igraph_dqueue_empty(&queue)) {
+        long int actnode = (long int) igraph_dqueue_pop(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && VECTOR(*dist)[actnode] > cutoff + 1) {
@@ -156,27 +170,33 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
             continue;
         }
 
-        IGRAPH_CHECK(igraph_stack_push(S, actnode));
+        /* Record that we have visited this node */
+        IGRAPH_CHECK(igraph_stack_push(stack, actnode));
+
+        /* Examine the neighbors of this node */
         neis = igraph_inclist_get(inclist, actnode);
         nlen = igraph_vector_int_size(neis);
         for (int j = 0; j < nlen; j++) {
             long int edge = (long int) VECTOR(*neis)[j];
             long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
+
             if (VECTOR(*dist)[neighbor] == 0) {
+                /* We have found 'neighbor' for the first time */
                 VECTOR(*dist)[neighbor] = VECTOR(*dist)[actnode] + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&Q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_push(&queue, neighbor));
             }
+
             if (VECTOR(*dist)[neighbor] == VECTOR(*dist)[actnode] + 1 &&
                 (VECTOR(*dist)[neighbor] <= cutoff + 1 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                igraph_vector_int_t *v = igraph_inclist_get(fathers, neighbor);
+                v = igraph_inclist_get(fathers, neighbor);
                 IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                 nrgeo[neighbor] += nrgeo[actnode];
             }
         }
     }
 
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS; 
@@ -195,37 +215,42 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  fathers adjacent list that starts empty and that stores the IDs
+ * \param  fathers adjacency list that starts empty and that stores the IDs
  *                 of the vertices that lead to a given node during the traversal
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
 static int igraph_i_sspf_weighted(
-    const igraph_t *graph, long int source, igraph_vector_t *dist, 
+    const igraph_t *graph,
+    long int source, 
+    igraph_vector_t *dist, 
     double *nrgeo, 
     const igraph_vector_t *weights,
-    igraph_stack_t *S,
+    igraph_stack_t *stack,
     igraph_adjlist_t *fathers,
     igraph_inclist_t *inclist,
-    igraph_real_t cutoff) {
-    
-    int cmp_result;
-    igraph_2wheap_t Q;
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
+    igraph_real_t cutoff
+) {
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
     
-    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
-    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
+    int cmp_result;
+    igraph_2wheap_t queue;
+    const igraph_vector_int_t *neis;
+    igraph_vector_int_t *v;
+    long int nlen;
+    
+    /* TODO: this is an O|V| step here. We could save some time by pre-allocating
+     * the two-way heap in the caller and re-using it here */
+    IGRAPH_CHECK(igraph_2wheap_init(&queue, (long int) igraph_vcount(graph)));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &queue);
 
-    igraph_2wheap_push_with_index(&Q, source, -1.0);
+    igraph_2wheap_push_with_index(&queue, source, -1.0);
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
-    while (!igraph_2wheap_empty(&Q)) {
-        long int minnei = igraph_2wheap_max_index(&Q);
-        igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
-        igraph_vector_int_t *neis;
-        long int nlen;
+    while (!igraph_2wheap_empty(&queue)) {
+        long int minnei = igraph_2wheap_max_index(&queue);
+        igraph_real_t mindist = -igraph_2wheap_delete_max(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && mindist > cutoff + 1.0) {
@@ -236,7 +261,8 @@ static int igraph_i_sspf_weighted(
             continue;
         }
 
-        igraph_stack_push(S, minnei);
+        /* Record that we have visited this node */
+        IGRAPH_CHECK(igraph_stack_push(stack, minnei));
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_inclist_get(inclist, minnei);
@@ -256,30 +282,30 @@ static int igraph_i_sspf_weighted(
 
             if (curdist == 0) {
                 /* This is the first non-infinite distance */
-                igraph_vector_int_t *v = igraph_adjlist_get(fathers, to);
-                igraph_vector_int_resize(v, 1);
+                v = igraph_adjlist_get(fathers, to);
+                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
                 VECTOR(*v)[0] = minnei;
                 nrgeo[to] = nrgeo[minnei];
                 VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&queue, to, -altdist));
             } else if (cmp_result < 0) {
                 /* This is a shorter path */
-                igraph_vector_int_t *v = igraph_adjlist_get(fathers, to);
-                igraph_vector_int_resize(v, 1);
+                v = igraph_adjlist_get(fathers, to);
+                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
                 VECTOR(*v)[0] = minnei;
                 nrgeo[to] = nrgeo[minnei];
                 VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
-            } else if (cmp_result == 0 &&
-                (altdist <= cutoff + 1.0 || cutoff < 0)) {
+                IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
+            } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                igraph_vector_int_t *v = igraph_adjlist_get(fathers, to);
-                igraph_vector_int_push_back(v, minnei);
+                v = igraph_adjlist_get(fathers, to);
+                IGRAPH_CHECK(igraph_vector_int_push_back(v, minnei));
                 nrgeo[to] += nrgeo[minnei];
             }
         }
     }
-    igraph_2wheap_destroy(&Q);
+
+    igraph_2wheap_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -304,7 +330,9 @@ static int igraph_i_sspf_weighted(
  * \param  cutoff  cutoff length of shortest paths
  */
 static int igraph_i_sspf_weighted_edge(
-    const igraph_t *graph, long int source, igraph_vector_t *dist, 
+    const igraph_t *graph,
+    long int source,
+    igraph_vector_t *dist, 
     double *nrgeo, 
     const igraph_vector_t *weights,
     igraph_stack_t *stack,
@@ -312,24 +340,26 @@ static int igraph_i_sspf_weighted_edge(
     const igraph_inclist_t *inclist,
     igraph_real_t cutoff
 ) {
-    
-    int cmp_result;
-    igraph_2wheap_t Q;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
-    
-    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
-    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
-    igraph_2wheap_push_with_index(&Q, source, -1.0);
+    int cmp_result;
+    igraph_2wheap_t queue;
+    const igraph_vector_int_t *neis;
+    igraph_vector_int_t *v;
+    long int nlen;
+    
+    /* TODO: this is an O|V| step here. We could save some time by pre-allocating
+     * the two-way heap in the caller and re-using it here */
+    IGRAPH_CHECK(igraph_2wheap_init(&queue, (long int) igraph_vcount(graph)));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &queue);
+
+    igraph_2wheap_push_with_index(&queue, source, -1.0);
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
-    while (!igraph_2wheap_empty(&Q)) {
-        long int minnei = igraph_2wheap_max_index(&Q);
-        igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
-        const igraph_vector_int_t *neis;
-        long int nlen;
+    while (!igraph_2wheap_empty(&queue)) {
+        long int minnei = igraph_2wheap_max_index(&queue);
+        igraph_real_t mindist = -igraph_2wheap_delete_max(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && mindist > cutoff + 1.0) {
@@ -340,7 +370,8 @@ static int igraph_i_sspf_weighted_edge(
             continue;
         }
 
-        igraph_stack_push(stack, minnei);
+        /* Record that we have visited this node */
+        IGRAPH_CHECK(igraph_stack_push(stack, minnei));
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_inclist_get(inclist, minnei);
@@ -360,31 +391,30 @@ static int igraph_i_sspf_weighted_edge(
 
             if (curdist == 0) {
                 /* This is the first non-infinite distance */
-                igraph_vector_int_t *v = igraph_inclist_get(fathers, to);
-                igraph_vector_int_resize(v, 1);
+                v = igraph_inclist_get(fathers, to);
+                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
                 VECTOR(*v)[0] = edge;
                 nrgeo[to] = nrgeo[minnei];
                 VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&queue, to, -altdist));
             } else if (cmp_result < 0) {
                 /* This is a shorter path */
-                igraph_vector_int_t *v = igraph_inclist_get(fathers, to);
-                igraph_vector_int_resize(v, 1);
+                v = igraph_inclist_get(fathers, to);
+                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
                 VECTOR(*v)[0] = edge;
                 nrgeo[to] = nrgeo[minnei];
                 VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
-            } else if (cmp_result == 0 &&
-                (altdist <= cutoff + 1.0 || cutoff < 0)) {
+                IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
+            } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                igraph_vector_int_t *v = igraph_inclist_get(fathers, to);
-                igraph_vector_int_push_back(v, edge);
+                v = igraph_inclist_get(fathers, to);
+                IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                 nrgeo[to] += nrgeo[minnei];
             }
         }
     }
 
-    igraph_2wheap_destroy(&Q);
+    igraph_2wheap_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
