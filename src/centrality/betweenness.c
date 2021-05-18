@@ -574,10 +574,12 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     if (igraph_vs_is_all(&vids)) {
+        /* result covers all vertices */
         IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
         igraph_vector_null(res);
         tmpres = res;
     } else {
+        /* result needed only for a subset of the vertices */
         IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
     }
 
@@ -1008,6 +1010,8 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_sources;
+    igraph_integer_t no_of_processed_sources;
     igraph_adjlist_t adjlist, fathers;
     igraph_inclist_t inclist;
     long int source, j;
@@ -1038,20 +1042,24 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         }
     }
 
+    IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
+
     IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit_source));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit_source);
+
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit_target));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit_target); 
 
     if (!igraph_vs_is_all(&vids)) {
-        /* subset */
+        /* result needed only for a subset of the vertices */
         IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
     } else {
-        /* only  */
+        /* result covers all vertices */
         IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
         igraph_vector_null(res);
         tmpres = res;
     }
+
     if (weights) {
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -1059,6 +1067,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     }
+
     IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
 
@@ -1088,10 +1097,17 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         is_target[(long int) IGRAPH_VIT_GET(vit_target)] = 1;
     }    
 
-    for (IGRAPH_VIT_RESET(vit_source); !IGRAPH_VIT_END(vit_source); IGRAPH_VIT_NEXT(vit_source)) {
+    for (
+        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit_source);
+        !IGRAPH_VIT_END(vit_source);
+        IGRAPH_VIT_NEXT(vit_source), no_of_processed_sources++
+    ) {
         source = IGRAPH_VIT_GET(vit_source);
 
-        /* TODO(ntamas): add progress report here */
+        IGRAPH_PROGRESS(
+            "Betweenness centrality (subset): ",
+            100.0 * no_of_processed_sources / no_of_sources, 0
+        );
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (weights) {
@@ -1123,8 +1139,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
             nrgeo[w] = 0;
             igraph_vector_int_clear(igraph_adjlist_get(&fathers, w));
         }
-
-    } 
+    }
 
     /* Keep only the requested vertices */
     if (!igraph_vs_is_all(&vids)) {
@@ -1207,6 +1222,8 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                                    const igraph_vector_t *weights) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_sources;
+    igraph_integer_t no_of_processed_sources;
     igraph_inclist_t inclist, fathers;
     igraph_vit_t vit_source, vit_target;
     igraph_eit_t eit;
@@ -1235,6 +1252,8 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
             }
         }
     }
+
+    IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
     IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit_source));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit_source);
@@ -1281,10 +1300,17 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_destroy, &S);
 
-    for (IGRAPH_VIT_RESET(vit_source); !IGRAPH_VIT_END(vit_source); IGRAPH_VIT_NEXT(vit_source)) { 
+    for (
+        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit_source);
+        !IGRAPH_VIT_END(vit_source);
+        IGRAPH_VIT_NEXT(vit_source), no_of_processed_sources++
+    ) {
         source = IGRAPH_VIT_GET(vit_source);
 
-        /* TODO(ntamas): add progress report here */
+        IGRAPH_PROGRESS(
+            "Edge betweenness centrality (subset): ",
+            100.0 * no_of_processed_sources / no_of_sources, 0
+        );
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (weights) {
