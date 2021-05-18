@@ -629,8 +629,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
     } /* for source < no_of_nodes */
 
-    IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
-
+    /* Keep only the requested vertices */
     if (!igraph_vs_is_all(&vids)) {
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -650,6 +649,8 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     if (!directed || !igraph_is_directed(graph)) {
         igraph_vector_scale(res, 0.5);
     }
+
+    IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
 
     igraph_Free(nrgeo);
     igraph_Free(tmpscore);
@@ -854,15 +855,28 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     igraph_vector_null(result);
 
     for (source = 0; source < no_of_nodes; source++) {
+
+        /* Loop invariant that is valid at this point:
+         *
+         * - the stack S is empty
+         * - the 'dist' vector contains zeros only
+         * - the 'nrgeo' array contains zeros only
+         * - the 'tmpscore' array contains zeros only
+         * - the 'fathers' incidence list contains empty vectors only
+         */
+
         IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0 * source / no_of_nodes, 0);
         IGRAPH_ALLOW_INTERRUPTION();
 
+        /* Conduct single-source shortest path searches from each source node */
         if (weights) {
             IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, cutoff));
         } else {
             IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &fathers, &inclist, cutoff));
         }
 
+        /* Aggregate betweenness scores for the edges we have reached in this
+         * traversal */
         while (!igraph_stack_empty(&S)) {
             long int w = (long int) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
@@ -877,7 +891,9 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
                     nrgeo[w];
             }
 
-            /* Reset variables */
+            /* Reset variables to ensure that the 'for' loop invariant will
+             * still be valid in the next iteration */
+
             tmpscore[w] = 0;
             VECTOR(dist)[w] = 0;
             nrgeo[w] = 0;
@@ -885,11 +901,11 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
         }
     } /* source < no_of_nodes */
 
-    IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
-
     if (!directed || !igraph_is_directed(graph)) {
         igraph_vector_scale(result, 0.5);
     }
+
+    IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
 
     igraph_stack_destroy(&S);
     igraph_inclist_destroy(&inclist);
