@@ -622,10 +622,11 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             long int actnode = (long int) igraph_stack_pop(&S);
             igraph_vector_int_t *neis = igraph_adjlist_get(&fathers, actnode);
             long int nneis = igraph_vector_int_size(neis);
+            double coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
 
             for (j = 0; j < nneis; j++) {
                 neighbor = (long int) VECTOR(*neis)[j];
-                tmpscore[neighbor] += (tmpscore[actnode] + 1) * nrgeo[neighbor] / nrgeo[actnode];
+                tmpscore[neighbor] += nrgeo[neighbor] * coeff;
             }
 
             if (actnode != source) {
@@ -880,12 +881,13 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
             long int actnode = (long int) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, actnode);
             long int fatv_len = igraph_vector_int_size(fatv);
+            double coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
 
             for (j = 0; j < fatv_len; j++) {
                 long int fedge = (long int) VECTOR(*fatv)[j];
                 long int neighbor = IGRAPH_OTHER(graph, fedge, actnode);
-                tmpscore[neighbor] += nrgeo[neighbor] / nrgeo[actnode] * (1.0 + tmpscore[actnode]);
-                VECTOR(*result)[fedge] += (tmpscore[actnode] + 1) * nrgeo[neighbor] / nrgeo[actnode];
+                tmpscore[neighbor] += nrgeo[neighbor] * coeff;
+                VECTOR(*result)[fedge] += nrgeo[neighbor] * coeff;
             }
 
             /* Reset variables to ensure that the 'for' loop invariant will
@@ -1121,14 +1123,17 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
             long int actnode = (long int) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, actnode);
             long int fatv_len = igraph_vector_int_size(fatv);
+            double coeff;
+
+            if (is_target[actnode]) {
+                coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
+            } else {
+                coeff = tmpscore[actnode] / nrgeo[actnode];
+            }
 
             for (j = 0; j < fatv_len; j++) {
                 father = (long int) VECTOR(*fatv)[j];
-                if (is_target[actnode]) {
-                    tmpscore[father] += nrgeo[father] / nrgeo[actnode] * (1 + tmpscore[actnode]);
-                } else {
-                    tmpscore[father] += nrgeo[father] / nrgeo[actnode] * (tmpscore[actnode]);
-                }
+                tmpscore[father] += nrgeo[father] * coeff;
             }
             
             if (actnode != source) {
@@ -1335,21 +1340,20 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
             long int actnode = (long int) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, actnode);
             long int fatv_len = igraph_vector_int_size(fatv);
+            double coeff;
+
+            if (is_target[actnode]) {
+                coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
+            } else {
+                coeff = tmpscore[actnode] / nrgeo[actnode];
+                // coeff = tmpscore[actnode] / fatv_len;
+            }
 
             for (j = 0; j < fatv_len; j++) {
                 long int father_edge = (long int) VECTOR(*fatv)[j];
                 long int neighbor = IGRAPH_OTHER(graph, father_edge, actnode);
-                double coeff;
-
-                if (is_target[actnode]) {
-                    coeff = nrgeo[neighbor] / nrgeo[actnode] * (1 + tmpscore[actnode]);
-                } else {
-                    coeff = nrgeo[neighbor] / nrgeo[actnode] * tmpscore[actnode];
-                    // coeff = tmpscore[actnode] / fatv_len;
-                }
-
-                tmpscore[neighbor] += coeff;
-                VECTOR(*tmpres)[father_edge] += coeff;
+                tmpscore[neighbor] += nrgeo[neighbor] * coeff;
+                VECTOR(*tmpres)[father_edge] += nrgeo[neighbor] * coeff;
             }
 
             /* Reset variables to ensure that the 'for' loop invariant will
