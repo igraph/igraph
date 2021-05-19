@@ -700,7 +700,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 
 /**
  * \define IGRAPH_CHECK_CALLBACK
- * \check Checks the return value of a callback.
+ * \brief Checks the return value of a callback.
  * 
  * \param expr An expression, usually a call to a user-defined callback function.
  * It is guaranteed to be evaluated only once.

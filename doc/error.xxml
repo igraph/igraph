@@ -53,6 +53,7 @@
 <!-- doxrox-include igraph_error -->
 <!-- doxrox-include igraph_errorf -->
 <!-- doxrox-include IGRAPH_CHECK -->
+<!-- doxrox-include IGRAPH_CHECK_CALLBACK -->
 </section>
 
 <section id="deallocating-memory">
