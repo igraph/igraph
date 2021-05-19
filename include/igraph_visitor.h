@@ -58,16 +58,18 @@ __BEGIN_DECLS
  *   from the root of the current search tree.
  * \param extra The extra argument that was passed to \ref
  *   igraph_bfs().
- * \return A logical value, if TRUE (=non-zero), that is interpreted
- *    as a request to stop the BFS and return to the caller. If a BFS
- *    is terminated like this, then all elements of the result vectors
+ * \return \c IGRAPH_SUCCESS if the BFS should continue, \c IGRAPH_STOP
+ *    if the BFS should stop and return to the caller normally. Any other
+ *    value is treated as an igraph error code, terminating the search and
+ *    returning to the caller with the same error code. If a BFS is
+ *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
  *    contain NaN.
  *
  * \sa \ref igraph_bfs()
  */
 
-typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
+typedef igraph_error_t igraph_bfshandler_t(const igraph_t *graph,
         igraph_integer_t vid,
         igraph_integer_t pred,
         igraph_integer_t succ,
@@ -105,16 +107,18 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t
  *   from the root of the current search tree.
  * \param extra The extra argument that was passed to \ref
  *   igraph_dfs().
- * \return A logical value, if TRUE (=non-zero), that is interpreted
- *    as a request to stop the DFS and return to the caller. If a DFS
- *    is terminated like this, then all elements of the result vectors
+ * \return \c IGRAPH_SUCCESS if the DFS should continue, \c IGRAPH_STOP
+ *    if the DFS should stop and return to the caller normally. Any other
+ *    value is treated as an igraph error code, terminating the search and
+ *    returning to the caller with the same error code. If a BFS is
+ *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
  *    contain NaN.
  *
  * \sa \ref igraph_dfs()
  */
 
-typedef igraph_bool_t igraph_dfshandler_t(const igraph_t *graph,
+typedef igraph_error_t igraph_dfshandler_t(const igraph_t *graph,
         igraph_integer_t vid,
         igraph_integer_t dist,
         void *extra);

@@ -613,7 +613,7 @@ typedef struct igraph_i_all_st_cuts_minimal_dfs_data_t {
     const igraph_vector_t *map;
 } igraph_i_all_st_cuts_minimal_dfs_data_t;
 
-static igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(
+static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
         const igraph_t *graph,
         igraph_integer_t vid,
         igraph_integer_t dist,
@@ -633,13 +633,13 @@ static igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(
             long int top = (long int) igraph_stack_top(stack);
             VECTOR(*nomark)[top] = 1; /* we just found a smaller one */
         }
-        igraph_stack_push(stack, realvid); /* TODO: error check */
+        IGRAPH_CHECK(igraph_stack_push(stack, realvid));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(
+static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_outcb(
         const igraph_t *graph,
         igraph_integer_t vid,
         igraph_integer_t dist,
@@ -656,7 +656,7 @@ static igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(
         igraph_stack_pop(stack);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
@@ -703,7 +703,7 @@ static int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                             /*dist=*/ 0, /*in_callback=*/
                             igraph_i_all_st_cuts_minimal_dfs_incb,
                             /*out_callback=*/
-                            igraph_i_all_st_cuts_minimal_dfs_otcb,
+                            igraph_i_all_st_cuts_minimal_dfs_outcb,
                             /*extra=*/ &data));
 
     igraph_vector_clear(minimal);
