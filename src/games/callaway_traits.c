@@ -87,7 +87,7 @@ int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
     if(nodes < 0){
         IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
-    
+
     if (types < 1) {
         IGRAPH_ERROR("The number of vertex types must be at least 1.", IGRAPH_EINVAL);
     }
@@ -108,7 +108,7 @@ int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
             IGRAPH_ERROR("The vertex type distribution vector must not contain NaN.", IGRAPH_EINVAL);
         }
     }
-    
+
     if (igraph_matrix_nrow(pref_matrix) != types || igraph_matrix_ncol(pref_matrix) != types) {
         IGRAPH_ERROR("The preference matrix must be square and agree in dimensions with the number of types.", IGRAPH_EINVAL);
     }

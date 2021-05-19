@@ -58,4 +58,3 @@ void reduce_cliques2(network*, bool,  long );
 void clear_all_markers(network *net);
 
 #endif
-

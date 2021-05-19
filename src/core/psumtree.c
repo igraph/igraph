@@ -36,7 +36,7 @@ static double igraph_i_log2(double f) {
 /**
  * \ingroup psumtree
  * \section igraph_psumtree
- * 
+ *
  * <para>The \type igraph_psumtree_t data type represents a partial prefix sum
  * tree. A partial prefix sum tree is a data structure that can be used to draw
  * samples from a discrete probability distribution with dynamic probabilities
@@ -45,7 +45,7 @@ static double igraph_i_log2(double f) {
  * the items. Intermediate nodes of the tree always contain the sum of its two
  * children. When the value of a leaf node is updated, the values of its
  * ancestors are also updated accordingly.</para>
- * 
+ *
  * <para>Samples can be drawn from the probability distribution represented by
  * the tree by generating a uniform random number between 0 (inclusive) and the
  * value of the root of the tree (exclusive), and then following the branches
@@ -54,7 +54,7 @@ static double igraph_i_log2(double f) {
  * the left branch of the tree is taken; otherwise the generated number is
  * decreased by the value in the node and the right branch of the tree is
  * taken, until a leaf node is reached.</para>
- * 
+ *
  * <para>Note that the sampling process works only if all the values in the tree
  * are non-negative. This is enforced by the object; in particular, trying to
  * set a negative value for an item will produce an igraph error.</para>
@@ -78,15 +78,15 @@ static double igraph_i_log2(double f) {
  * \ingroup psumtree
  * \function igraph_psumtree_init
  * \brief Initializes a partial prefix sum tree.
- * 
+ *
  * </para><para>
  * The tree is initialized with a fixed number of elements. After initialization,
  * the value corresponding to each element is zero.
- * 
+ *
  * \param t The tree to initialize
  * \param size The number of elements in the tree
  * \return Error code, typically \c IGRAPH_ENOMEM if there is not enough memory
- * 
+ *
  * Time complexity: O(n) for a tree containing n elements
  */
 int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
@@ -100,7 +100,7 @@ int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
  * \ingroup psumtree
  * \function igraph_psumtree_reset
  * \brief Resets all the values in the tree to zero.
- * 
+ *
  * \param t The tree to reset.
  */
 void igraph_psumtree_reset(igraph_psumtree_t *t) {
@@ -116,7 +116,7 @@ void igraph_psumtree_reset(igraph_psumtree_t *t) {
  * All partial prefix sum trees initialized by \ref igraph_psumtree_init()
  * should be properly destroyed by this function. A destroyed tree needs to be
  * reinitialized by \ref igraph_psumtree_init() if you want to use it again.
- * 
+ *
  * \param t Pointer to the (previously initialized) tree to destroy.
  *
  * Time complexity: operating system dependent.
@@ -131,11 +131,11 @@ void igraph_psumtree_destroy(igraph_psumtree_t *t) {
  * \brief Retrieves the value corresponding to an item in the tree.
  *
  * </para><para>
- * 
+ *
  * \param t The tree to query.
  * \param idx The index of the item whose value is to be retrieved.
  * \return The value corresponding to the item with the given index.
- * 
+ *
  * Time complexity: O(1)
  */
 igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
@@ -147,24 +147,24 @@ igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
  * \ingroup psumtree
  * \function igraph_psumtree_search
  * \brief Finds an item in the tree, given a value.
- * 
+ *
  * This function finds the item with the lowest index where it holds that the
  * sum of all the items with a \em lower index is less than or equal to the given
  * value and that the sum of all the items with a lower index plus the item
  * itself is larger than the given value.
- * 
+ *
  * </para><para>
  * If you think about the partial prefix sum tree as a tool to sample from a
  * discrete probability distribution, then calling this function repeatedly
  * with uniformly distributed random numbers in the range 0 (inclusive) to the
  * sum of all values in the tree (exclusive) will sample the items in the tree
  * with a probability that is proportional to their associated values.
- * 
+ *
  * \param t The tree to query.
  * \param idx The index of the item is returned here.
  * \param search The value to use for the search.
  * \return Error code; currently the search always succeeds.
- * 
+ *
  * Time complexity: O(log n), where n is the number of items in the tree.
  */
 int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
@@ -194,13 +194,13 @@ int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
  * \ingroup psumtree
  * \function igraph_psumtree_update
  * \brief Updates the value associated to an item in the tree.
- * 
+ *
  * \param t The tree to query.
  * \param idx The index of the item to update.
  * \param new_value The new value of the item.
  * \return Error code, \c IGRAPH_EINVAL if the new value is negative or NaN,
  *         \c IGRAPH_SUCCESS if the operation was successful.
- * 
+ *
  * Time complexity: O(log n), where n is the number of items in the tree.
  */
 int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,

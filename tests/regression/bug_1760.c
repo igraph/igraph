@@ -49,7 +49,7 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     printf("Predecessors:\n");
     print_vector_long(&predecessors);
     printf("\n");
-    
+
     printf("Inbound edges:\n");
     print_vector_long(&inbound_edges);
     printf("\n");
@@ -119,7 +119,7 @@ int test_weighted(
     printf("Predecessors:\n");
     print_vector_long(&predecessors);
     printf("\n");
-    
+
     printf("Inbound edges:\n");
     print_vector_long(&inbound_edges);
     printf("\n");

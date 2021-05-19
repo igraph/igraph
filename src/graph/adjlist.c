@@ -152,7 +152,7 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     for (i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        
+
         IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, mode));
 
         n = igraph_vector_size(&tmp);
@@ -393,7 +393,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
                                     igraph_adjlist_t *al) {
     long int i, j, l, n, p;
     igraph_vector_int_t *v;
-    
+
     IGRAPH_WARNING(
         "igraph_adjlist_remove_duplicate() is deprecated; use the constructor "
         "arguments of igraph_adjlist_init() to specify whether you want loop "
@@ -503,10 +503,10 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
      * _incidence_ lists, and the only way for an edge ID to appear twice
      * within an incidence list is if the edge is a loop edge; otherwise each
      * element will be unique.
-     * 
+     *
      * Note that incidence vectors are not sorted by edge ID, so we need to
      * look up the edges in the graph to decide whether they are loops or not.
-     * 
+     *
      * Also, it may be tempting to introduce a boolean in case of IGRAPH_LOOPS_ONCE,
      * and flip it every time we see a loop to get rid of half of the occurrences,
      * but the problem is that even if the same loop edge ID appears twice in
@@ -559,7 +559,7 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
         IGRAPH_FREE(seen_loops);
         IGRAPH_FINALLY_CLEAN(2);
     }
-    
+
     return IGRAPH_SUCCESS;
 }
 
@@ -753,7 +753,7 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
  * \brief Removes all edges from an incidence list.
  *
  * \param il The incidence list.
- * 
+ *
  * Time complexity: depends on memory management, typically O(n), where n is
  * the total number of elements in the incidence list.
  */
@@ -792,7 +792,7 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
         )
     ) {
         /* nothing to simplify */
-        return IGRAPH_SUCCESS;        
+        return IGRAPH_SUCCESS;
     }
 
     if (loops == IGRAPH_NO_LOOPS) {
@@ -1088,7 +1088,7 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t*);
     if (il->incs == 0) {
-     
+
         IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, il->incs);

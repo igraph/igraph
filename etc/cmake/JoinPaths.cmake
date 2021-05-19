@@ -24,4 +24,3 @@ function(join_paths joined_path first_path_segment)
     endforeach()
     set(${joined_path} "${temp_path}" PARENT_SCOPE)
 endfunction()
-

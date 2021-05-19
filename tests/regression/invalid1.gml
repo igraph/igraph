@@ -231,7 +231,7 @@ graph
   [
     source 11
     target 1
-  
+
     source 20
     target 1
   ]

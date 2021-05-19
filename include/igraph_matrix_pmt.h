@@ -242,4 +242,3 @@ IGRAPH_EXPORT int FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *
 IGRAPH_EXPORT int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
                                                            const igraph_vector_t *neg,
                                                            long int nremove);
-

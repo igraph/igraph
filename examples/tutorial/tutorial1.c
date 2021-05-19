@@ -11,11 +11,10 @@ int main() {
 
   igraph_diameter(&graph, &diameter, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
   printf("Diameter of a random graph with average degree %g: %g\n",
-          2.0 * igraph_ecount(&graph) / igraph_vcount(&graph), 
+          2.0 * igraph_ecount(&graph) / igraph_vcount(&graph),
           (double) diameter);
 
   igraph_destroy(&graph);
 
   return 0;
 }
-

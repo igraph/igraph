@@ -30,7 +30,7 @@ REPLACE ----- template base type, we cowardly assume real number --------------
 
 BASE
 
-WITH 
+WITH
 
 igraph_real_t
 
@@ -125,14 +125,14 @@ WITH --------------------------------------------------------------------------
 
   <varlistentry><term><parameter>\g<paramname></parameter>:</term>
   <listitem><para>
-  \g<paramtext></para></listitem></varlistentry>  
+  \g<paramtext></para></listitem></varlistentry>
 
 REPLACE ----- \return command -------------------------------------------------
 
 # a return statement ends with an empty line or the end of the comment
 \\return\b\s*                     # \return command
 (?P<text>.*?)                     # the text
-(?=(\n\s*?\n)|                    # empty line or 
+(?=(\n\s*?\n)|                    # empty line or
  (\*\/)|                          # the end of the comment or
  (\\sa\b))                        # \sa command
 
@@ -297,7 +297,7 @@ WITH --------------------------------------------------------------------------
 
   <varlistentry><term><constant>\g<paramname></constant>:</term>
   <listitem><para>
-  \g<paramtext></para></listitem></varlistentry>  
+  \g<paramtext></para></listitem></varlistentry>
 
 REPLACE ----- \struct ---------------------------------------------------------
 
@@ -613,7 +613,7 @@ REPLACE ----- replace <code> with <literal> -----------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<\g<c>literal> 
+<\g<c>literal>
 
 REPLACE ----- add http:// and https:// links ----------------------------------
 
@@ -696,4 +696,3 @@ We reserve the right to change the function signature without changing the
 major version of igraph. Use it at your own risk.</para>
 </warning>
 <para>
-

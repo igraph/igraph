@@ -78,4 +78,3 @@ prpack_preprocessed_gs_graph::~prpack_preprocessed_gs_graph() {
     delete[] d;
     delete[] num_outlinks;
 }
-

@@ -1,45 +1,45 @@
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
 
 %{
 
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -59,17 +59,17 @@
 #include "io/parsers/gml-lexer.h"
 #include "internal/hacks.h" /* strcasecmp */
 
-int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
+int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
                        const char *s);
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
 void igraph_i_gml_get_string(char *s, int len, void *res);
 double igraph_i_gml_get_real(char *s, int len);
 igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value);
-igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
+igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
                                               char *v, int vlen);
-igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len, 
+igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
                                             char *value, int valuelen);
-igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
+igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len,
                                           igraph_gml_tree_t *list);
 igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
 
@@ -116,11 +116,11 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 
 %%
 
-input:   list      { context->tree=$1; } 
+input:   list      { context->tree=$1; }
        | list EOFF { context->tree=$1; }
 ;
 
-list:   keyvalue      { $$=$1; } 
+list:   keyvalue      { $$=$1; }
       | list keyvalue { $$=igraph_i_gml_merge($1, $2); };
 
 keyvalue:   key num
@@ -133,22 +133,22 @@ keyvalue:   key num
             { $$=igraph_i_gml_make_numeric2($1.s, $1.len, $2.s, $2.len); }
 ;
 
-key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner), 
-                                        igraph_gml_yyget_leng(scanner), 
+key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner),
+                                        igraph_gml_yyget_leng(scanner),
                                         &$$); USE($1); };
-num : NUM { $$=igraph_i_gml_get_real(igraph_gml_yyget_text(scanner), 
+num : NUM { $$=igraph_i_gml_get_real(igraph_gml_yyget_text(scanner),
                                      igraph_gml_yyget_leng(scanner)); };
 
-string: STRING { igraph_i_gml_get_string(igraph_gml_yyget_text(scanner), 
-                                         igraph_gml_yyget_leng(scanner), 
+string: STRING { igraph_i_gml_get_string(igraph_gml_yyget_text(scanner),
+                                         igraph_gml_yyget_leng(scanner),
                                          &$$); };
 
 %%
 
-int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
+int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
                        const char *s) {
-  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
-           "Parse error in GML file, line %i (%s)", 
+  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
+           "Parse error in GML file, line %i (%s)",
            locp->first_line, s);
   return 0;
 }
@@ -156,7 +156,7 @@ int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
 void igraph_i_gml_get_keyword(char *s, int len, void *res) {
   struct { char *s; int len; } *p=res;
   p->s=IGRAPH_CALLOC(len+1, char);
-  if (!p->s) { 
+  if (!p->s) {
     igraph_error("Cannot read GML file", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
   }
   memcpy(p->s, s, sizeof(char)*len);
@@ -167,7 +167,7 @@ void igraph_i_gml_get_keyword(char *s, int len, void *res) {
 void igraph_i_gml_get_string(char *s, int len, void *res) {
   struct { char *s; int len; } *p=res;
   p->s=IGRAPH_CALLOC(len-1, char);
-  if (!p->s) { 
+  if (!p->s) {
     igraph_error("Cannot read GML file", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
   }
   memcpy(p->s, s+1, sizeof(char)*(len-2));
@@ -182,12 +182,12 @@ double igraph_i_gml_get_real(char *s, int len) {
   sscanf(s, "%lf", &num);
   s[len]=tmp;
   return num;
-} 
+}
 
 igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
-  if (!t) { 
+  if (!t) {
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
@@ -203,16 +203,16 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
           return 0;
         }
   }
-  
+
   return t;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
+igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
                                               char* v, int vlen) {
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
   char tmp = v[vlen];
 
-  if (!t) { 
+  if (!t) {
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
@@ -249,11 +249,11 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
   return t;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len, 
+igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
                                             char *value, int valuelen) {
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
-  if (!t) { 
+  if (!t) {
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
@@ -270,12 +270,12 @@ igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
   return t;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
+igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len,
                                           igraph_gml_tree_t *list) {
-  
+
   igraph_gml_tree_t *t=IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
-  if (!t) { 
+  if (!t) {
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }

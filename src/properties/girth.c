@@ -42,8 +42,8 @@
  * multiple edges are ignored.
  *
  * </para><para>
- * For graphs that contain no cycles, and only for such graphs, 
- * zero is returned. Note that in some applications, it is customary 
+ * For graphs that contain no cycles, and only for such graphs,
+ * zero is returned. Note that in some applications, it is customary
  * to define the girth of acyclic graphs to be infinity. However, infinity
  * is not representable as an \c igraph_integer_t, therefore zero is used
  * for this case.
@@ -206,4 +206,3 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 
     return 0;
 }
-

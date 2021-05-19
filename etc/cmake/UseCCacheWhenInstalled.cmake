@@ -5,4 +5,3 @@ if(USE_CCACHE)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
   endif()
 endif()
-

@@ -1340,5 +1340,3 @@ static int igraph_i_layout_sugiyama_horizontal_compaction_place_block(long int v
 #ifdef SUGIYAMA_DEBUG
     #undef SUGIYAMA_DEBUG
 #endif
-
-

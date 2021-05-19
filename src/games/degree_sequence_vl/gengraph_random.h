@@ -211,4 +211,3 @@ public:
 // } // namespace
 
 #endif // RNG_H
-

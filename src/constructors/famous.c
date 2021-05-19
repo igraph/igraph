@@ -24,7 +24,7 @@
 
 #include "igraph_constructors.h"
 
-#include "internal/hacks.h" 
+#include "internal/hacks.h"
 
 const igraph_real_t igraph_i_famous_bull[] = {
     5, 5, 0,

@@ -67,5 +67,3 @@ int igraph_i_exact_coarse_graining(const igraph_real_t *v,
 
     return 0;
 }
-
-

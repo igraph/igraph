@@ -150,7 +150,7 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
     IGRAPH_ASSERT(sv->data != 0);
 
     value_len = strlen(value);
-    if (sv->data[idx] == 0) {        
+    if (sv->data[idx] == 0) {
         sv->data[idx] = IGRAPH_CALLOC(value_len + 1, char);
         if (sv->data[idx] == 0) {
             IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);

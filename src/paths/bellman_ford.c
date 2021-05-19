@@ -220,7 +220,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * and allows negative weights. When there is more than one shortest path between
  * two vertices, only one of them is returned.
  *
- * If there are no negative weights, you are better off with 
+ * If there are no negative weights, you are better off with
  * \ref igraph_get_shortest_paths_dijkstra() .
  *
  * \param graph The input graph, can be directed.

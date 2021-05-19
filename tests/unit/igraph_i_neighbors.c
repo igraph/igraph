@@ -103,10 +103,10 @@ int main() {
 
     printf("Trying IGRAPH_LOOPS_TWICE with IGRAPH_OUT:\n");
     IGRAPH_ASSERT(igraph_i_neighbors(&g_lm, &neis, 0, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE) == IGRAPH_EINVAL);
-    
+
     printf("Trying invalid vertex ID:\n");
     IGRAPH_ASSERT(igraph_i_neighbors(&g_lm, &neis, 42, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE) == IGRAPH_EINVVID);
-    
+
     printf("Trying invalid mode:\n");
     IGRAPH_ASSERT(igraph_i_neighbors(&g_lm, &neis, 0, (igraph_neimode_t) 42, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE) == IGRAPH_EINVMODE);
 

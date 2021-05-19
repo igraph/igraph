@@ -313,4 +313,3 @@ int igraph_cmp_epsilon(double a, double b, double eps) {
         return (abs_diff / (fabs(a) + fabs(b)) < eps) ? 0 : (diff < 0 ? -1 : 1);
     }
 }
-

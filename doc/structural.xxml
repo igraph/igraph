@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -206,7 +206,7 @@
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
-<!-- doxrox-include igraph_get_edgelist -->	
+<!-- doxrox-include igraph_get_edgelist -->
 </section>
 
 </chapter>

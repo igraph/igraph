@@ -284,5 +284,3 @@ public:
 } // namespace gengraph
 
 #endif //GRAPH_MOLLOY_OPT_H
-
-

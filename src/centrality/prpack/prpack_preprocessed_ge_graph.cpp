@@ -63,4 +63,3 @@ prpack_preprocessed_ge_graph::~prpack_preprocessed_ge_graph() {
     delete[] matrix;
     delete[] d;
 }
-

@@ -60,4 +60,3 @@ static inline void igraph_get_cpu_time(double *data) {
     } while (0)
 
 #endif
-

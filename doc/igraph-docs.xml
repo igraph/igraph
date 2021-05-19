@@ -7,7 +7,7 @@
 <!ENTITY aacute "&#xe1;">
 <!ENTITY ccaron "&#269;">
 <!ENTITY uuml "&#252;">
-<!ENTITY % local.common.attrib    "xmlns:xi            CDATA       #FIXED       
+<!ENTITY % local.common.attrib    "xmlns:xi            CDATA       #FIXED
 'http://www.w3.org/2001/XInclude'" >
 ]>
 

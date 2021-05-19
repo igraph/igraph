@@ -6,4 +6,3 @@
 # * VERSION_FILE_PATH should be set to the name of the version file
 
 FILE(WRITE "${VERSION_FILE_PATH}" "${IGRAPH_VERSION}")
-

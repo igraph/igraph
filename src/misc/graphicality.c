@@ -633,7 +633,7 @@ static int igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degr
         return IGRAPH_SUCCESS;
     }
 
-    /* Create an index vector that sorts the vertices by decreasing in-degree */    
+    /* Create an index vector that sorts the vertices by decreasing in-degree */
     IGRAPH_CHECK(igraph_vector_long_init_seq(&index_array, 0, vcount - 1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index_array);
 

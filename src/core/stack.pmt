@@ -291,4 +291,3 @@ int FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack) *s, FILE *file) {
 }
 
 #endif
-

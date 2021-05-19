@@ -128,4 +128,3 @@ igraph_set_status_handler(igraph_status_handler_t new_handler) {
     igraph_i_status_handler = new_handler;
     return previous_handler;
 }
-

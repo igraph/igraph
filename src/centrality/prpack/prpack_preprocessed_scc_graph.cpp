@@ -199,4 +199,3 @@ prpack_preprocessed_scc_graph::~prpack_preprocessed_scc_graph() {
     delete[] encoding;
     delete[] decoding;
 }
-

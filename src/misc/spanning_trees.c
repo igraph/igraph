@@ -511,4 +511,3 @@ int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res, igr
 
     return IGRAPH_SUCCESS;
 }
-

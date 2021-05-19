@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -34,7 +34,7 @@
 <!-- doxrox-include MATRIX -->
 <!-- doxrox-include igraph_matrix_e -->
 <!-- doxrox-include igraph_matrix_e_ptr -->
-<!-- doxrox-include igraph_matrix_set --> 
+<!-- doxrox-include igraph_matrix_set -->
 </section>
 
 <section id="operations-on-rows-and-columns"><title>Operations on rows and columns</title>

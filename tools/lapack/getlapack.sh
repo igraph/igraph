@@ -1,5 +1,5 @@
 #! /bin/sh
-# 
+#
 # ./getlapack.sh dgeev dsyevr dnaupd dneupd dsaupd dseupd dgemv dgeevx \
 #                dgetrf dgetrs dgesv dlapy2 dpotrf dsyrk dtrsv
 #
@@ -31,12 +31,12 @@ tar xzf blas.tgz
 
 ## Download, unpack and patch LAPACK
 
-if test ! -f lapack.tgz; then 
+if test ! -f lapack.tgz; then
     curl -o lapack.tgz http://www.netlib.org/lapack/lapack-${LAPACK_VERSION}.tgz
 fi
 lapackdir=`tar tzf lapack.tgz | head -1 | cut -f1 -d"/"`
 rm -rf ${lapackdir}
-tar xzf lapack.tgz 
+tar xzf lapack.tgz
 
 cd /tmp/${lapackdir}
 patch -p 1 <${origdir}/lapack.patch
@@ -59,8 +59,8 @@ blas=()
 known() {
     needle=$1
     res=0
-    for i in ${alreadydone[@]}; do 
-	    if [[ $i == ${needle} ]]; then 
+    for i in ${alreadydone[@]}; do
+	    if [[ $i == ${needle} ]]; then
 		return 0
 	    fi
     done
@@ -69,15 +69,15 @@ known() {
 
 getdeps() {
     name=$1;
-    f2c -a ${name}.f >/dev/null 2>/dev/null && 
+    f2c -a ${name}.f >/dev/null 2>/dev/null &&
     gcc -Wno-logical-op-parentheses -Wno-shift-op-parentheses \
 		-I/Users/tamas/include \
 		-c ${name}.c >/dev/null &&
-    nm ${name}.o | grep " U " | awk ' { print $2 }' | 
+    nm ${name}.o | grep " U " | awk ' { print $2 }' |
     sed 's/_$//g' | sed 's/^_//g'
 }
 
-dofunction() {    
+dofunction() {
     name=$1;
 
     if known $name; then return 0; fi
@@ -96,10 +96,10 @@ dofunction() {
 	arpack[$[${#arpack[@]}+1]]=$name
     elif test -f /tmp/${lapackdir}/INSTALL/${name}.f; then
 	cd /tmp/${lapackdir}/INSTALL
-	lapack[$[${#lapack[@]}+1]]=$name	
+	lapack[$[${#lapack[@]}+1]]=$name
     elif test -f ${origdir}/extra/${name}.f; then
 	cd ${origdir}/extra
-	lapack[$[${#lapack[@]}+1]]=$name	
+	lapack[$[${#lapack[@]}+1]]=$name
     else
 	return
     fi
@@ -151,8 +151,8 @@ trans_dir=${origdir} ${origdir}/CompletePolish *.f
 cd /tmp/${destdir}
 rm -f *.f
 
-## Prefix the function calls with 'igraph', this is needed 
-## if the user wants to link igraph including internal BLAS/LAPACK/ARPACK 
+## Prefix the function calls with 'igraph', this is needed
+## if the user wants to link igraph including internal BLAS/LAPACK/ARPACK
 ## and BLAS/LAPACK/ARPACK for some reason
 
 extrafunctions=(dlamc1 dlamc2 dlamc3 dlamc4 dlamc5)

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -15,7 +15,7 @@
 <!-- doxrox-include about_vertex_selectors -->
 <!-- doxrox-include igraph_vs_all -->
 <!-- doxrox-include igraph_vs_adj -->
-<!-- doxrox-include igraph_vs_nonadj -->	
+<!-- doxrox-include igraph_vs_nonadj -->
 <!-- doxrox-include igraph_vs_none -->
 <!-- doxrox-include igraph_vs_1 -->
 <!-- doxrox-include igraph_vs_vector -->
@@ -95,7 +95,7 @@
 
 
 <!-- <section id="examples"><title>Examples</title>
-	</section> 
+	</section>
 -->
 
 </chapter>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -21,11 +21,11 @@ the graph is directed or undirected.
 
 <para>
 Like the edges, the &igraph; vertices are also
-labeled by numbers between zero and the number of vertices minus one. 
+labeled by numbers between zero and the number of vertices minus one.
 So, to summarize, a directed graph can be imagined like this:
 <informalexample>
 <programlisting>
-  ( vertices: 6, 
+  ( vertices: 6,
     directed: yes,
     {
      (0,2),
@@ -68,8 +68,8 @@ just like in the directed case.
 
 <para>It is possible to convert a directed graph to an undirected one,
 see the <link linkend="igraph_to_directed">
-<function>igraph_to_directed()</function></link> 
-and <link linkend="igraph_to_undirected"> 
+<function>igraph_to_directed()</function></link>
+and <link linkend="igraph_to_undirected">
 <function>igraph_to_undirected()</function></link> functions.
 </para>
 
@@ -79,9 +79,9 @@ be stored in &igraph; graphs, but for most functions
 (like <link linkend="igraph_betweenness">
 <function>igraph_betweenness()</function></link>) it is not checked
 that they work well on graphs with multiple edges.
-To eliminate multiple edges from a graph, you can use 
+To eliminate multiple edges from a graph, you can use
 <link linkend="igraph_simplify">
-  <function>igraph_simplify()</function></link>. 
+  <function>igraph_simplify()</function></link>.
 </para>
 </section>
 

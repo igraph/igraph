@@ -1590,4 +1590,3 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 
     return 0;
 }
-

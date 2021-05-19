@@ -23,16 +23,16 @@ len	[a-z][a-z0-9]*_len
 "ivout_("               |
 "xerbla_("              |
 [a-z]"tim"[a-z0-9]*"_(" |
-[a-z]"prtb"[a-z0-9]"_(" { 
+[a-z]"prtb"[a-z0-9]"_(" {
                           register int c, paran_count = 1;
-                          printf("%s", yytext); /* unchanged */ 	
+                          printf("%s", yytext); /* unchanged */
 			  /* Loop until the correct closing paranthesis */
                           while (paran_count != 0) {
                               c = input();
                               if (c == '(') ++paran_count;
                               else if (c == ')') --paran_count;
                               putchar(c);
-                          } 
+                          }
                         }
 {cS}"("{S}ftnlen{S}")"{S}[1-9][0-9]* { ; /* omit -- f2c -A */ }
 {cS}[1-9]([0-9])*L	{ ; /* omit */ }

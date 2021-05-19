@@ -6,7 +6,7 @@
 .releaseinfo { padding: 0px 20px 10px; }
 .navigation-header { position: absolute; right: 20px; top: 7px; }
 .navigation-footer { padding: 0px 20px 10px; }
-.programlisting 
+.programlisting
 {
   background: #eeeeff;
   border: solid 1px #4444ff;
@@ -17,7 +17,7 @@
 .constant, .literal {
   font-size: 16px;
 }
-.variablelist 
+.variablelist
 {
   padding: 4px;
   margin-left: 3em;
@@ -32,7 +32,7 @@ code
   font-size: 16px;
 }
 
-table.navigation 
+table.navigation
 {
     color: #fff;
     margin: 0;
@@ -42,28 +42,28 @@ table.navigation
     border-bottom: 1px solid #1c477f;
     font-size: large;
 }
-table.navigation a 
+table.navigation a
 {
   color: #fff;
 }
-.navigation .title 
+.navigation .title
 {
   font-size: 200%;
 }
-div.refnamediv 
+div.refnamediv
 {
   margin-top: 2em;
 }
-div.gallery-float 
+div.gallery-float
 {
   float: left;
   padding: 10px;
 }
-div.gallery-float img 
+div.gallery-float img
 {
   border-style: none;
 }
-div.gallery-spacer 
+div.gallery-spacer
 {
   clear: both;
 }
@@ -262,8 +262,8 @@ div.example-contents {
 .example p.title b:before {
   content: '\25B6\00a0';
 }
-.example p.title:hover { 
-  color: #00f; 
+.example p.title:hover {
+  color: #00f;
   text-decoration: underline;
   cursor: hand;
 }

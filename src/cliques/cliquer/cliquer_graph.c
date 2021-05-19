@@ -98,7 +98,7 @@ void graph_resize(graph_t *g, int size) {
 	g->weights=realloc(g->weights,size * sizeof(int));
 	for (i=g->n; i<size; i++)
 		g->weights[i]=1;
-	
+
 	g->n=size;
 	return;
 }
@@ -110,7 +110,7 @@ void graph_resize(graph_t *g, int size) {
  */
 void graph_crop(graph_t *g) {
 	int i;
-	
+
 	for (i=g->n-1; i>=1; i--)
 		if (set_size(g->edges[i])>0)
 			break;
@@ -347,7 +347,7 @@ graph_t *graph_read_dimacs(FILE *fp) {
 		g=graph_read_dimacs_binary(fp,buffer);
 	}
 	return g;
-}	
+}
 
 
 /*
@@ -566,7 +566,7 @@ void graph_print(graph_t *g) {
 	int extra=0;
 	unsigned int weight=0;
 	boolean weighted;
-	
+
 	ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
 
 	if (g==NULL) {
@@ -578,7 +578,7 @@ void graph_print(graph_t *g) {
 		       "(should be positive)!\n",g->n);
 		return;
 	}
-	
+
 	weighted=graph_weighted(g);
 
 	printf("%s graph has %d vertices, %d edges (density %.2f).\n",
@@ -647,7 +647,7 @@ void graph_print(graph_t *g) {
  * symmetric and anti-reflexive, and that all vertex weights are positive.
  * If output is non-NULL, prints a few lines telling the status of the graph
  * to file descriptor output.
- * 
+ *
  * Returns TRUE if the graph is valid, FALSE otherwise.
  */
 boolean graph_test(graph_t *g,FILE *output) {
@@ -669,7 +669,7 @@ boolean graph_test(graph_t *g,FILE *output) {
 	}
 
 	weighted=graph_weighted(g);
-	
+
 	for (i=0; i < g->n; i++) {
 		if (g->edges[i]==NULL) {
 			if (output)
@@ -706,9 +706,9 @@ boolean graph_test(graph_t *g,FILE *output) {
 		if (weight<INT_MAX)
 			weight += g->weights[i];
 	}
-	
+
 	edges/=2;  /* Each is counted twice. */
-	
+
 	if (output) {
 		/* Semi-weighted means all weights are equal, but not 1. */
 		fprintf(output,"%s graph has %d vertices, %d edges "
@@ -716,7 +716,7 @@ boolean graph_test(graph_t *g,FILE *output) {
 			weighted?"Weighted":
 			((g->weights[0]==1)?"Unweighted":"Semi-weighted"),
 			g->n,edges,(float)edges/((float)(g->n - 1)*(g->n)/2));
-		
+
 		if (asymm)
 			fprintf(output,"   WARNING: Graph contained %d "
 				"asymmetric edges!\n",asymm);
@@ -736,7 +736,7 @@ boolean graph_test(graph_t *g,FILE *output) {
 		    weight<INT_MAX)
 			fprintf(output,"Graph OK.\n");
 	}
-	
+
 	if (asymm || refl || nonpos || extra || weight>=INT_MAX)
 		return FALSE;
 

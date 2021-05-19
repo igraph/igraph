@@ -100,4 +100,3 @@ int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n, int p,
 
     return 0;
 }
-

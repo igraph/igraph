@@ -16,10 +16,10 @@ set(
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
-    target_compile_options(${TARGET_NAME} PRIVATE 
+    target_compile_options(${TARGET_NAME} PRIVATE
       /W4 # enable most warnings, then disable:
       /wd4244 # 'conversion' conversion from 'type1' to 'type2', possible loss of data
-      /wd4267 # 'var' : conversion from 'size_t' to 'type', possible loss of data 
+      /wd4267 # 'var' : conversion from 'size_t' to 'type', possible loss of data
       /wd4996 # deprecated functions, e.g. 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead.
       /wd4456 # declaration of 'identifier' hides previous local declaration
       /wd4800 # forcing value to 'true' or 'false' (performance warning)
@@ -27,7 +27,7 @@ macro(use_all_warnings TARGET_NAME)
       /wd4701 # potentially uninitialized local variable
     )
   else()
-    target_compile_options(${TARGET_NAME} PRIVATE 
+    target_compile_options(${TARGET_NAME} PRIVATE
       # GCC-style compilers:
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
@@ -82,4 +82,3 @@ function(define_file_basename_for_sources targetname)
     )
   endforeach()
 endfunction()
-

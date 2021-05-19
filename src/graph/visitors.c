@@ -41,7 +41,7 @@
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
  * vertex ids.
- * 
+ *
  * </para><para>
  * Consider using \ref igraph_bfs_simple instead if you set most of the output
  * arguments provided by this function to a null pointer.
@@ -295,7 +295,7 @@ int igraph_bfs(const igraph_t *graph,
  * are not needed. It is allowed to supply null pointers as
  * the output arguments the user is not interested in, in this case they will
  * be ignored.
- * 
+ *
  * \param graph The input graph.
  * \param vid The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
@@ -433,7 +433,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
  * vertex ids.
- * 
+ *
  * \param graph The input graph.
  * \param root The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
