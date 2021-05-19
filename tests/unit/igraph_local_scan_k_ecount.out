@@ -16,6 +16,9 @@ Same graph, without loops, k=1:
 Same graph with loop, k=1, undirected:
 ( 4 3 3 5 2 0 )
 
+Checking if calling igraph_local_scan_1_ecount properly redirects:
+( 4 3 3 5 2 0 )
+
 Same graph, directed, k=2:
 ( 2 4 2 6 5 0 )
 
@@ -26,3 +29,4 @@ Same graph, weighted:
 ( 0.9 2 2 2 1.8 0 )
 
 Wrong size weights.
+Negative k.

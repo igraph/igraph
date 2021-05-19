@@ -57,6 +57,12 @@ int main() {
     printf("Same graph with loop, k=1, undirected:\n");
     call_and_print(&g_lmu, 1, NULL, IGRAPH_IN);
 
+    printf("Checking if calling igraph_local_scan_1_ecount properly redirects:\n");
+    igraph_vector_clear(&result);
+    IGRAPH_ASSERT(igraph_local_scan_1_ecount(&g_lmu, &result, NULL, IGRAPH_IN) == IGRAPH_SUCCESS);
+    print_vector(&result);
+    printf("\n");
+
     printf("Same graph, directed, k=2:\n");
     call_and_print(&g_lm, 2, NULL, IGRAPH_IN);
 
@@ -71,6 +77,9 @@ int main() {
     printf("Wrong size weights.\n");
     igraph_vector_clear(&weights);
     CHECK_ERROR(igraph_local_scan_k_ecount(&g_lmu, 3, &result, &weights, IGRAPH_ALL), IGRAPH_EINVAL);
+
+    printf("Negative k.\n");
+    CHECK_ERROR(igraph_local_scan_k_ecount(&g_lmu, -3, &result, NULL, IGRAPH_ALL), IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
