@@ -420,6 +420,33 @@ static int igraph_i_sspf_weighted_edge(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t igraph_i_betweenness_check_weights(
+    const igraph_vector_t* weights, igraph_integer_t no_of_edges
+) {
+    igraph_real_t minweight;
+
+    if (weights) {
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERROR("Weight vector length must match the number of edges.", IGRAPH_EINVAL);
+        }
+        if (no_of_edges > 0) {
+            minweight = igraph_vector_min(weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
+            } else if (igraph_is_nan(minweight)) {
+                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            } else if (minweight <= IGRAPH_SHORTEST_PATH_EPSILON) {
+                IGRAPH_WARNING(
+                    "Some weights are smaller than epsilon, calculations may "
+                    "suffer from numerical precision issues."
+                );
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /***** Vertex betweenness *****/
 
 /**
@@ -527,23 +554,8 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     double *tmpscore;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_vit_t vit;
-    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
-    if (weights) {
-        if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
-        }
-        if (no_of_edges > 0) {
-            igraph_real_t minweight = igraph_vector_min(weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
-            } else if (igraph_is_nan(minweight)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-            } else if (minweight <= eps) {
-                IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
-            }
-        }
-    }
+    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     if (weights) {
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
@@ -811,24 +823,9 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     double *nrgeo;
     double *tmpscore;
     long int source, j;
-    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
     igraph_stack_t S;
 
-    if (weights) {
-        if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
-        }
-        if (no_of_edges > 0) {
-            igraph_real_t minweight = igraph_vector_min(weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
-            } else if (igraph_is_nan(minweight)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-            } else if (minweight <= eps) {
-                IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
-            }
-        }
-    }
+    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -1024,23 +1021,8 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     double *tmpscore;
     igraph_vit_t vit, vit_source, vit_target;
     unsigned char *is_target;
-    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
-    if (weights) {
-        if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
-        }
-        if (no_of_edges > 0) {
-            igraph_real_t minweight = igraph_vector_min(weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-            } else if (igraph_is_nan(minweight)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
-            } else if (minweight <= eps) {
-                IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
-            }
-        }
-    }
+    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
@@ -1234,24 +1216,9 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     double *tmpscore;
     long int source, j;
     unsigned char *is_target;
-    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
     igraph_stack_t S;
 
-    if (weights) {
-        if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
-        }
-        if (no_of_edges > 0) {
-            igraph_real_t minweight = igraph_vector_min(weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
-            } else if (igraph_is_nan(minweight)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-            } else if (minweight <= eps) {
-                IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
-            }
-        }
-    }
+    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
