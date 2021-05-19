@@ -270,6 +270,7 @@ add_legacy_tests(
   igraph_diversity
   igraph_eccentricity
   igraph_edge_betweenness
+  igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
