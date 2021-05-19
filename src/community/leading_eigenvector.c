@@ -455,10 +455,12 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * \param callback A null pointer or a function of type \ref
  *    igraph_community_leading_eigenvector_callback_t. If given, this
  *    callback function is called after each eigenvector/eigenvalue
- *    calculation. If the callback returns a non-zero value, then the
- *    community finding algorithm stops. See the arguments passed to
- *    the callback at the documentation of \ref
- *    igraph_community_leading_eigenvector_callback_t.
+ *    calculation. If the callback returns \c IGRAPH_STOP, then the
+ *    community finding algorithm stops. If it returns \c IGRAPH_SUCCESS,
+ *    the algorithm continues normally. Any other return value is considered
+ *    an igraph error code and will terminete the algorithm with the same
+ *    error code. See the arguments passed to the callback at the documentation
+ *    of \ref igraph_community_leading_eigenvector_callback_t.
  * \param callback_extra Extra argument to pass to the callback
  *    function.
  * \return Error code.
@@ -799,11 +801,17 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
         if (callback) {
             igraph_vector_t vv;
-            int ret;
+            igraph_error_t ret;
+
             igraph_vector_view(&vv, storage.v, size);
-            ret = callback(mymembership, comm, storage.d[0], &vv,
-                           arpcb1, &extra, callback_extra);
-            if (ret) {
+            IGRAPH_CHECK_CALLBACK(
+                callback(
+                    mymembership, comm, storage.d[0], &vv, arpcb1,
+                    &extra, callback_extra
+                ), &ret
+            );
+
+            if (ret == IGRAPH_STOP) {
                 break;
             }
         }
