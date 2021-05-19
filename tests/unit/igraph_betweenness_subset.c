@@ -25,6 +25,7 @@ int main() {
     igraph_es_t es;
     igraph_vector_t eb, node_vec, source_vec, target_vec, bet, bet2, weights, edges;
     igraph_vs_t vs, vs_source, vs_target;
+    long int i, vid, n;
 
     igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
@@ -75,21 +76,82 @@ int main() {
 
     printf("\nTree\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
+    igraph_tree(&g, 11111, 10, IGRAPH_TREE_UNDIRECTED);
 
-    igraph_vs_seq(&vs_source, 19800, 19999); 
-    igraph_vs_seq(&vs_target, 19800, 19999);    
+    /* We are including the rightmost 200 vertices from the lowermost layer
+     * (layer 5) of the tree. These have 20 parents in layer 4, 2 grandparents
+     * in layer 3, and a single grand-grandparent in layer 2. None of the
+     * shortest paths we consider should therefore pass through the root, the
+     * first 9 vertices of layer 2, the first 98 vertices of layer 3 or the
+     * first 980 vertices of layer 4; the betweenness of these vertices should
+     * all be zeros.
+     * 
+     * Also, the betweenness of the common grand-grandparent in layer 2 is easy
+     * to calculate as any shortest path going between grand-grandchildren
+     * reachable via its left child and via its right child should pass through
+     * it. This gives us a betweenness of 100 * 100 = 10000 for this node.
+     * Similar calculations reveal that the betweenness of its two children
+     * will be 100 * 100 + 100 * 90 / 2 = 14500 (the same paths as above plus any
+     * path that goes from any of its subtree to any other subtree). These are
+     * also the maximal betweennesses. The betwennesses in the remaining layers
+     * are 1945 and 199 if the vertex being considered is a descendant of the
+     * common grand-grandparent in layer 2, and zero otherwise. */
+
+    igraph_vs_seq(&vs_source, 10911, 11110); 
+    igraph_vs_seq(&vs_target, 10911, 11110);    
     igraph_vector_init(&bet, 0);
 
-    igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet,
-            /* vids=      */ igraph_vss_all(),
-            /* directed = */ IGRAPH_UNDIRECTED,
-            /* sources = */ vs_source,
-            /* target = */ vs_target,
-            /* weights=   */ NULL);
+    igraph_betweenness_subset(
+        /* graph=     */ &g,
+        /* res=       */ &bet,
+        /* vids=      */ igraph_vss_all(),
+        /* directed = */ IGRAPH_UNDIRECTED,
+        /* sources =  */ vs_source,
+        /* target =   */ vs_target,
+        /* weights=   */ NULL
+    );
 
     printf("Max betweenness: %f\n", igraph_vector_max(&bet));
+
+    n = igraph_vcount(&g);
+    for (i = 0; i < n; i++) {
+        long int expected;
+
+        if (i >= 10911) {
+            /* layer 5, in the subset. There are 199 shortest paths that
+             * contain these nodes, but the nodes are the _endpoints_ of the
+             * paths so they don't count in the betweenness score */
+            expected = 0;
+        } else if (i >= 1111) {
+            /* layer 5, not in the subset */
+            expected = 0;
+        } else if (i >= 1091) {
+            /* layer 4, rightmost 20 nodes */
+            expected = 1945;
+        } else if (i >= 111) {
+            /* layer 4, remaining nodes */
+            expected = 0;
+        } else if (i >= 109) {
+            /* layer 3, rightmost 2 nodes */
+            expected = 14500;
+        } else if (i >= 11) {
+            /* layer 3, remaining nodes */
+            expected = 0;
+        } else if (i == 10) {
+            /* layer 2, rightmost node */
+            expected = 10000;
+        } else {
+            expected = 0;
+        }
+
+        if (VECTOR(bet)[i] != expected) {
+            printf(
+                "Invalid betweenness for vertex %ld, expected %ld, got %ld\n",
+                i, expected, (long int) VECTOR(bet)[i]
+            );
+            break;
+        }
+    }
 
     igraph_vector_init(&bet2, 0);
     igraph_vector_init(&weights, igraph_ecount(&g));

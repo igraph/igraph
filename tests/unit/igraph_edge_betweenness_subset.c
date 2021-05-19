@@ -65,10 +65,118 @@ void test_bug950_edge() {
 int main() {
     igraph_t g;
     igraph_es_t es;
-    igraph_vector_t eb, node_vec, source_vec, target_vec, bet, weights, edges;
+    igraph_vector_t eb, node_vec, source_vec, target_vec, bet, bet2, weights, edges;
     igraph_vs_t vs, vs_source, vs_target;
+    long int i, n;
 
     /* edge betweenness test */
+
+    printf("Tree\n");
+    printf("==========================================================\n");
+    igraph_tree(&g, 11111, 10, IGRAPH_TREE_UNDIRECTED);
+
+    /* We are including the rightmost 200 vertices from the lowermost layer
+     * (layer 5) of the tree. These have 20 parents in layer 4, 2 grandparents
+     * in layer 3, and a single grand-grandparent in layer 2. None of the
+     * shortest paths we consider should therefore pass through the root, the
+     * first 9 vertices of layer 2, the first 98 vertices of layer 3 or the
+     * first 980 vertices of layer 4; the edge betweenness of the "upward"
+     * pointing edges from these vertices should all be zeros.
+     * 
+     * (Note that due to how igraph constructs tree graphs, edge i is always the
+     * edge that leads from vertex i+1 towards the root).
+     * 
+     * Also, the edge betweenness of the edges leading to children of the common
+     * grand-grandparent in layer 2 is easy to calculate as any shortest path
+     * going between grand-grandchildren reachable via its left child and via
+     * its right child should pass through them. This gives us a betweenness of
+     * 100 * 100 = 10000 for both of these edges.
+     * 
+     * Similar calculations reveal that the edge betwennesses in subsequent
+     * layers are 1900 (10 * 190) and 199 (1 * 199) if the edge being considered
+     * leads to a descendant of the common grand-grandparent in layer 2, and
+     * zero otherwise. */
+
+    igraph_vs_seq(&vs_source, 10911, 11110); 
+    igraph_vs_seq(&vs_target, 10911, 11110);    
+    igraph_vector_init(&bet, 0);
+
+    igraph_edge_betweenness_subset(
+        /* graph=     */ &g,
+        /* res=       */ &bet,
+        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+        /* directed = */ IGRAPH_UNDIRECTED,
+        /* sources =  */ vs_source,
+        /* target =   */ vs_target,
+        /* weights=   */ NULL
+    );
+
+    printf("Max edge betweenness: %f\n", igraph_vector_max(&bet));
+
+    n = igraph_ecount(&g);
+    for (i = 0; i < n; i++) {
+        long int expected;
+        long int vid = i + 1;
+
+        if (vid >= 10911) {
+            /* edge leading to layer 5, in the subset. There are 199 shortest
+             * paths that pass through this edge, one path to any _other_
+             * node in the selected subset of 200 nodes */
+            expected = 199;
+        } else if (vid >= 1111) {
+            /* edge leading to layer 5, not in the subset */
+            expected = 0;
+        } else if (vid >= 1091) {
+            /* edge leading to layer 4, rightmost 20 nodes */
+            expected = 1900;
+        } else if (vid >= 111) {
+            /* edge leading to layer 4, remaining nodes */
+            expected = 0;
+        } else if (vid >= 109) {
+            /* edge leading to layer 3, rightmost 2 nodes */
+            expected = 10000;
+        } else if (vid >= 11) {
+            /* edge leading to layer 3, remaining nodes */
+            expected = 0;
+        } else if (vid == 10) {
+            /* edge leading to layer 2, rightmost node */
+            expected = 0;
+        } else {
+            expected = 0;
+        }
+
+        if (VECTOR(bet)[i] != expected) {
+            printf(
+                "Invalid betweenness for edge %ld (from vertex %ld towards the "
+                "root), expected %ld, got %ld\n",
+                i, vid, expected, (long int) VECTOR(bet)[i]
+            );
+            break;
+        }
+    }
+
+    igraph_vector_init(&bet2, 0);
+    igraph_vector_init(&weights, igraph_ecount(&g));
+    igraph_vector_fill(&weights, 1.0);
+
+    igraph_edge_betweenness_subset(
+        /* graph=     */ &g,
+        /* res=       */ &bet2,
+        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+        /* directed = */ IGRAPH_UNDIRECTED,
+        /* sources = */ vs_source,
+        /* target = */ vs_target,
+        /* weights=   */ &weights
+    );
+
+    IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
+
+    igraph_vector_destroy(&weights);
+    igraph_vs_destroy(&vs_source);
+    igraph_vs_destroy(&vs_target);
+    igraph_vector_destroy(&bet);
+    igraph_vector_destroy(&bet2);
+    igraph_destroy(&g);
 
     {
         /* We use igraph_create() instead of igraph_small() as some MSVC versions
@@ -91,7 +199,7 @@ int main() {
             28, 33, 29, 32, 29, 33, 30, 32, 30, 33,
             31, 32, 31, 33, 32, 33
         };
-        printf("Large unweighted graph, edge betweenness\n");
+        printf("\nLarge unweighted graph, edge betweenness\n");
         printf("==========================================================\n");
         igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
         igraph_vector_init_seq(&source_vec, 0, 32);
