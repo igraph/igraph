@@ -53,13 +53,16 @@ __BEGIN_DECLS
  *   out which isomorphism class belongs to a given motif.
  * \param extra The extra argument that was passed to \ref
  *   igraph_motifs_randesu_callback().
- * \return A logical value, if TRUE (=non-zero), that is interpreted
- *    as a request to stop the motif search and return to the caller.
+ * \return \c IGRAPH_SUCCESS to continue the motif search,
+ *    \c IGRAPH_STOP to stop the motif search and return to the caller
+ *    normally. Any other return value is interpreted as an igraph error code,
+ *    which will terminate the search and return the same error code to the
+ *    caller.
  *
  * \sa \ref igraph_motifs_randesu_callback()
  */
 
-typedef igraph_bool_t igraph_motifs_handler_t(const igraph_t *graph,
+typedef igraph_error_t igraph_motifs_handler_t(const igraph_t *graph,
         igraph_vector_t *vids,
         int isoclass,
         void* extra);

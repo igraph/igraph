@@ -305,6 +305,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                 for (i = 0; i < s; i++) {
                     long int k, s2;
                     long int last;
+                    igraph_error_t ret;
 
                     if (cp != 0 && RNG_UNIF01() < cp) {
                         continue;
@@ -329,10 +330,16 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                         }
                     }
 
-                    if (callback(graph, &vids, (int) arr_code[code], extra)) {
+                    IGRAPH_CHECK_CALLBACK(
+                        callback(graph, &vids, (int) arr_code[code], extra),
+                        &ret
+                    );
+                    
+                    if (ret == IGRAPH_STOP) {
                         terminate = 1;
                         break;
                     }
+
                     igraph_vector_pop_back(&vids);
                     subg[last] = 0;
                 }
