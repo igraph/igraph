@@ -5,4 +5,3 @@ set(
   BOOL
   "Verify that the 'finally' stack is cleaned up properly. Useful only in debugging; do not use in production."
 )
-

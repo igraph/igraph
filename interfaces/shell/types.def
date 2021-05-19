@@ -70,12 +70,12 @@ VECTOR:
 
 VECTOR_OR_0:
   DECL: igraph_vector_t v_%C%; igraph_vector_t *%C%=0
-  INCONV: 
+  INCONV:
     IN: %C%=&v_%C%; shell_read_vector(%C%, optarg);
     OUT: %C%=&v_%C%; igraph_vector_init(%C%, 0); \
          shell_arg_%C%=strdup(optarg);
   OUTCONV:
-    IN: if (%C%) { igraph_vector_destroy(%C%); }    
+    IN: if (%C%) { igraph_vector_destroy(%C%); }
     OUT: if (%C%) { shell_write_vector(%C%, shell_arg_%C%); \
                     igraph_vector_destroy(%C%); }
 
@@ -96,14 +96,14 @@ EDGESET:
   DECL: igraph_vector_t v_%C%; igraph_es_t %C%
   DEFAULT:
     ALL: igraph_ess_all(IGRAPH_EDGEORDER_ID)
-  INCONV: 
+  INCONV:
     IN: shell_read_vector(&v_%C%, optarg); igraph_es_vector(&%C%, &v_%C%);
   OUTCONV:
     IN: if (!igraph_es_is_all(&%C%)) { igraph_es_destroy(&%C%); }
 
 VERTEXSET:
   CTYPE: igraph_vs_t
-  DECL: igraph_vector_t v_%C%; igraph_vs_t %C% 
+  DECL: igraph_vector_t v_%C%; igraph_vs_t %C%
   DEFAULT:
     ALL: igraph_vss_all()
   INCONV:

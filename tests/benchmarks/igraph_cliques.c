@@ -28,7 +28,7 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 100, 3000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     BENCH(" 1 Cliques in random graph with 100 vertices and 3000 edges",
           igraph_cliques(&g, &res, /* min_size= */ 0, /* max_size= */ 0);
-         );    
+         );
     igraph_destroy(&g);
     free_result(&res);
 

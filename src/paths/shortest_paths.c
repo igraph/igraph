@@ -191,7 +191,7 @@ static int igraph_i_average_path_length_dijkstra(
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
-    
+
     /* Avoid returning a negative zero, which would be printed as -0 in tests. */
     if (no_of_nodes > 0) {
         no_of_pairs = no_of_nodes * (no_of_nodes - 1.0);

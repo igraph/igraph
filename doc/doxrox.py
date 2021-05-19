@@ -123,7 +123,7 @@ def main():
                 chunks = cache.get(key)
             else:
                 key, chunks = None, None
-            
+
             if chunks is not None:
                 op("{0} chunks read from cache".format(len(chunks)))
             else:
@@ -309,7 +309,7 @@ def read_regex_rules_file(filename):
 
                         match = re.match(r"^REPLACE\s+-+\s+(?P<name>.*)\s+-", line)
                         rule_name = match.group("name") if match else None
-                
+
                 elif line.startswith("WITH") or line.startswith("RUN"):
                     # the second half of the pattern block starts
                     if mode != "replace":
@@ -317,7 +317,7 @@ def read_regex_rules_file(filename):
                     else:
                         mode = "with"
                     rule_type = "with" if line.startswith("WITH") else "run"
-                    
+
                 elif re.match(r"^\s*$", line):
                     # empty line, do nothing
                     pass
@@ -442,7 +442,7 @@ class ChunkCache:
         self._dirty = False
         self._hash = hash
         self._path = Path(filename)
-        
+
     def _load(self):
         """Populates the in-memory copy of the cache from the disk."""
         if self._path.exists():
@@ -483,7 +483,7 @@ class ChunkCache:
         """
         if not isinstance(contents, bytes):
             contents = contents.encode("utf-8")
-        
+
         key = self._hash()
         key.update(contents)
         return key.hexdigest()

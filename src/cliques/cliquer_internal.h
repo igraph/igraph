@@ -25,4 +25,3 @@ int igraph_i_weighted_clique_number(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_real_t *res);
 
 #endif // IGRAPH_CLIQUER_H
-

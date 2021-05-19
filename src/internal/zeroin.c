@@ -202,4 +202,3 @@ int igraph_zeroin(              /* An estimate of the root */
     *res = b;
     return IGRAPH_DIVERGED;
 }
-

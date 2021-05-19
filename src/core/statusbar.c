@@ -95,7 +95,7 @@ int igraph_statusf(const char *message, void *data, ...) {
  *
  * A simple status handler function that writes the status
  * message to the standard error.
- * 
+ *
  * \param message The status message.
  * \param data Additional context, with user-defined semantics.
  *        Existing igraph functions pass a null pointer here.
@@ -129,4 +129,3 @@ igraph_set_status_handler(igraph_status_handler_t new_handler) {
     igraph_i_status_handler = new_handler;
     return previous_handler;
 }
-

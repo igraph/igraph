@@ -102,4 +102,3 @@ public:
 }        /* end of namespaces */
 
 #endif // WALKTRAP_GRAPH_H
-

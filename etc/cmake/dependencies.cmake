@@ -146,7 +146,7 @@ macro(find_dependencies)
     unset(SINH_FUNCTION_EXISTS CACHE)
 	set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
   endif()
-  
+
   if(NEED_LINKING_AGAINST_LIBM)
     find_library(MATH_LIBRARY m)
   endif()

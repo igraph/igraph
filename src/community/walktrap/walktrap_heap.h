@@ -131,4 +131,3 @@ public:
 }        /* end of namespaces */
 
 #endif // WALKTRAP_HEAP_H
-

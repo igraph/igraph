@@ -206,4 +206,3 @@ loop:   SWAPINIT(a, es);
     }
     /*      qsort(pn - r, r / es, es, cmp);*/
 }
-

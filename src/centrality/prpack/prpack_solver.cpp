@@ -432,7 +432,7 @@ prpack_result* prpack_solver::solve_via_gs_err(
     }
     // initialize delta
     double delta = 0.;
-    // run Gauss-Seidel, note that we store x/deg[i] throughout this 
+    // run Gauss-Seidel, note that we store x/deg[i] throughout this
     // iteration.
     int64_t maxedges = (int64_t)((double)num_es*std::min(
                             log(tol)/log(alpha),
@@ -453,8 +453,8 @@ prpack_result* prpack_solver::solve_via_gs_err(
             new_val += delta*u[u_exists*i]; // add the dangling node adjustment
             if (num_outlinks[i] < 0) {
                 delta += alpha*(new_val - old_val);
-            } 
-            // note that new_val > old_val, but the fabs is just for 
+            }
+            // note that new_val > old_val, but the fabs is just for
             COMPENSATED_SUM(err, -(new_val - old_val), c);
             x[i] = new_val/num_outlinks[i];
         }
@@ -625,7 +625,7 @@ prpack_result* prpack_solver::solve_via_schur_gs_uv(
 
 /** Gauss-Seidel using strongly connected components.
  * Notes:
- *   If not weighted, then we store x[i] = "x[i]/outdegree" to 
+ *   If not weighted, then we store x[i] = "x[i]/outdegree" to
  *   avoid additional arithmetic.  We don't do this for the weighted
  *   case because the adjustment may not be constant.
  */
@@ -882,4 +882,3 @@ prpack_result* prpack_solver::combine_uv(
     delete ret_v;
     return ret;
 }
-

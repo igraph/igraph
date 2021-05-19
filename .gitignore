@@ -7,11 +7,4 @@
 /IGRAPH_VERSION
 /build
 /build-*
-/config.h
-/config.h.in
-/valgrind-testbed
-/Makefile
-/src/Makefile
-/doc/Makefile
 /tools/**/*.pyc
-

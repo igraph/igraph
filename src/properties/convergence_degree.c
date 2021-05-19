@@ -35,7 +35,7 @@
 /**
  * \function igraph_convergence_degree
  * \brief Calculates the convergence degree of each edge in a graph.
- * 
+ *
  * Let us define the input set of an edge (i, j) as the set of vertices where
  * the shortest paths passing through (i, j) originate, and similarly, let us
  * defined the output set of an edge (i, j) as the set of vertices where the
@@ -47,7 +47,7 @@
  * paths passing through it originate from a larger set and terminate in a
  * smaller set, while a negative value indicates that the edge is \em divergent
  * since the paths originate from a small set and terminate in a larger set.
- * 
+ *
  * </para><para>
  * Note that the convergence degree as defined above does not make sense in
  * undirected graphs as there is no distinction between the input and output
@@ -55,7 +55,7 @@
  * are determined by orienting the edge arbitrarily while keeping the remaining
  * edges undirected, and then taking the absolute value of the convergence
  * degree.
- * 
+ *
  * \param graph The input graph, it can be either directed or undirected.
  * \param result Pointer to an initialized vector; the convergence degrees of
  *   each edge will be stored here. May be \c NULL if we are not interested in

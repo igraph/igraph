@@ -144,4 +144,3 @@ int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
         return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     }
 }
-

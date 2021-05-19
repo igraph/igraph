@@ -505,7 +505,7 @@ $ cmake .. \
     <title>Shared and static builds</title>
     <para>
       On Windows, shared and static builds should not be installed in the same
-      location. If you decide to do so anyway, keep in mind the following: 
+      location. If you decide to do so anyway, keep in mind the following:
       Both builds contain an <literal>igraph.lib</literal> file. The static one
       should be renamed to avoid conflict. The headers from the static build
       are incompatible with the shared library. The headers from the shared build

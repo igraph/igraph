@@ -266,7 +266,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             if (edges) {
                 /* user needs the edge-paths, so 'neis' contains edge IDs, we need to resolve
                  * the next edge ID into a vertex ID */
-                neighbor = (long int) IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);                
+                neighbor = (long int) IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);
             } else {
                 /* user does not need the edge-paths, so 'neis' contains vertex IDs */
                 neighbor = (long int) VECTOR(neis)[j];
@@ -332,7 +332,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                 }
                 IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
                 IGRAPH_FINALLY_CLEAN(2);
-                
+
                 IGRAPH_CHECK(igraph_vector_push_back(&ptrlist,
                                                      VECTOR(ptrhead)[neighbor]));
                 VECTOR(ptrhead)[neighbor] = igraph_vector_size(&ptrlist);
@@ -363,7 +363,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
         }
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, n));    
+        IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, n));
     }
     if (edges) {
         IGRAPH_CHECK(igraph_vector_ptr_resize(edges, n));

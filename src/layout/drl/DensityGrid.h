@@ -82,4 +82,3 @@ private:
 } // namespace drl
 
 #endif // __DENSITY_GRID_H__
-

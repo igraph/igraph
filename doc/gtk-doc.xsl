@@ -16,13 +16,13 @@
     chapter     toc
     section     toc
   </xsl:param>
-  
+
   <xsl:param name="default.encoding" select="'US-ASCII'"/>
   <xsl:param name="chunker.output.encoding" select="'US-ASCII'"/>
   <xsl:param name="chunker.output.indent" select="'yes'"/>
-  <xsl:param name="chunk.fast" select="1"/> 
+  <xsl:param name="chunk.fast" select="1"/>
   <xsl:param name="chunk.section.depth" select="0"/>
-  <xsl:param name="chunk.first.sections" select="0"/> 
+  <xsl:param name="chunk.first.sections" select="0"/>
   <xsl:param name="chapter.autolabel" select="1"/>
   <xsl:param name="section.autolabel" select="1"/>
   <xsl:param name="use.id.as.filename" select="1"/>
@@ -57,7 +57,7 @@
     <xsl:if test="$tooldver = 0">
       <xsl:message terminate="yes">
 FATAL-ERROR: You need the DocBook XSL Stylesheets version 1.36 or higher
-to build the documentation. 
+to build the documentation.
 Get a newer version at http://docbook.sourceforge.net/projects/xsl/
       </xsl:message>
     </xsl:if>
@@ -240,10 +240,10 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
   <xsl:template name="user.footer.content">
   </xsl:template>
 
-  <!-- avoid creating multiple identical indices 
+  <!-- avoid creating multiple identical indices
        if the stylesheets don't support filtered indices
     -->
-  <xsl:template match="index"> 
+  <xsl:template match="index">
     <xsl:variable name="has-filtered-index">
       <xsl:call-template name="version-greater-or-equal">
         <xsl:with-param name="ver1" select="$VERSION" />
@@ -252,7 +252,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     </xsl:variable>
     <xsl:if test="($has-filtered-index = 1) or (count(@role) = 0)">
       <xsl:apply-imports/>
-    </xsl:if> 
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="index" mode="toc">
@@ -264,9 +264,9 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     </xsl:variable>
     <xsl:if test="($has-filtered-index = 1) or (count(@role) = 0)">
       <xsl:apply-imports/>
-    </xsl:if> 
+    </xsl:if>
   </xsl:template>
- 
+
   <xsl:template match="para">
     <xsl:choose>
       <xsl:when test="@role = 'gallery'">
@@ -278,7 +278,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-imports/>
-      </xsl:otherwise> 
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -320,7 +320,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
           </p>
         </td>
         <td valign="top" align="right">
-           <!-- find the gallery image to use here 
+           <!-- find the gallery image to use here
                 - determine the id of the enclosing refentry
                 - look for an inlinegraphic inside a link with linkend == refentryid inside a para with role == gallery
                 - use it here
@@ -338,5 +338,5 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
       <xsl:apply-imports />
     </div>
   </xsl:template>
-  
+
 </xsl:stylesheet>

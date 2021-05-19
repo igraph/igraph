@@ -86,4 +86,3 @@ int igraph_cmp_epsilon(double a, double b, double eps);
 __END_DECLS
 
 #endif
-

@@ -42,7 +42,7 @@
  *      unless it is a null pointer. Row \c i of the matrix was
  *      interchanged with row <code>ipiv[i]</code>.
  * \param info LAPACK error code. Zero on successful exit. If its value is
- *      a positive number i, it indicates that U(i,i) is exactly zero. 
+ *      a positive number i, it indicates that U(i,i) is exactly zero.
  *      The factorization has been
  *      completed, but the factor U is exactly singular, and division
  *      by zero will occur if it is used to solve a system of
@@ -952,5 +952,3 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
 
     return 0;
 }
-
-

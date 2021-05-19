@@ -168,4 +168,3 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
 
     return 0;
 }
-

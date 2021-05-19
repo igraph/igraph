@@ -437,7 +437,7 @@ static CLIQUER_LARGE_INT sub_unweighted_all(int *table, int size, int min_size, 
                                             boolean maximal, graph_t *g,
                                             clique_options *opts) {
 	int i;
-	int v;        
+	int v;
 	int *newtable;
 	int *p1, *p2;
         CLIQUER_LARGE_INT n;
@@ -581,7 +581,7 @@ static int weighted_clique_search_single(int *table, int min_weight,
 		}
 		return 0;
 	}
-	
+
 	localopts.time_function=NULL;
 	localopts.reorder_function=NULL;
 	localopts.reorder_map=NULL;
@@ -833,7 +833,7 @@ static int sub_weighted_all(int *table, int size, int weight,
 		if (current_weight >= max_weight) {
 			/* Clique too heavy. */
 			return min_weight-1;
-		} 
+		}
 	}
 	if (size <= 0) {
 		/* current_weight < min_weight, prune_low < min_weight,
@@ -932,7 +932,7 @@ static boolean store_clique(set_t clique, graph_t *g, clique_options *opts) {
 		/*
 		 * This has been a major source of bugs:
 		 * Has clique_list_count been set to 0 before calling
-		 * the recursions? 
+		 * the recursions?
 		 */
 		if (clique_list_count <= 0) {
 			IGRAPH_FATAL("CLIQUER INTERNAL ERROR: clique_list_count has negative value! Please report as a bug.");
@@ -1185,7 +1185,7 @@ set_t clique_unweighted_find_single(graph_t *g,int min_size,int max_size,
 			}
 		}
 	}
-	
+
     cleanreturn:
 	s=current_clique;
 
@@ -1585,7 +1585,7 @@ int clique_find_all(graph_t *g, int min_weight, int max_weight,
 				return 0;
 			}
 		}
-		
+
 		weight_multiplier = g->weights[0];
 		entrance_level--;
                 r=clique_unweighted_find_all(g,min_weight,max_weight,maximal,

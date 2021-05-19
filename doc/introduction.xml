@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -12,7 +12,7 @@ igraph is a library for creating and manipulating graphs.
 You can look at it in two ways: first, igraph contains the implementation
 of quite a lot of graph algorithms. These include classic graph
 algorithms like graph isomorphism, graph girth and connectivity and
-also the new wave graph algorithms like transitivity, graph motifs and 
+also the new wave graph algorithms like transitivity, graph motifs and
 community structure detection. Skim through the table of contents
 or the index of this book to get an impression of what is available.</para>
 
@@ -45,7 +45,7 @@ likely to come. High level languages such as R or Python make it
 possible to use graph routines with much greater comfort, without
 actually writing a single line of C code. They have some, usually very
 small, speed penalty compared to the C version, but add ease of use and much
-flexibility. This manual, however, covers only the C library. If you 
+flexibility. This manual, however, covers only the C library. If you
 want to use Python, R or the Wolfram Language, please see the documentation written
 specifically for these interfaces and come back here only if you are
 interested in some detail which is not covered in those documents.

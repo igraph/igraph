@@ -46,7 +46,7 @@ int main() {
     vector_print(&vids);
     vector_print(&layers);
     vector_print(&parents);
-    
+
     igraph_destroy(&g);
 
     igraph_vector_destroy(&vids);

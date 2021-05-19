@@ -1,5 +1,5 @@
-LOADLIBS = -ly -lfl -lm  
-LIBS = -lfl -lm  
+LOADLIBS = -ly -lfl -lm
+LIBS = -lfl -lm
 CFLAGS	= -O
 
 all: lenscrub comment

@@ -1140,4 +1140,3 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
     return 0;
 }
-

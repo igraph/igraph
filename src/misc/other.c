@@ -432,4 +432,3 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
 
     return 0;
 }
-

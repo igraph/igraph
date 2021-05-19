@@ -455,4 +455,3 @@ install(
   NAMESPACE igraph::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
-

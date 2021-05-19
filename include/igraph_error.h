@@ -701,13 +701,13 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 /**
  * \define IGRAPH_CHECK_CALLBACK
  * \brief Checks the return value of a callback.
- * 
+ *
  * \param expr An expression, usually a call to a user-defined callback function.
  * It is guaranteed to be evaluated only once.
  * \param code Pointer to an optional variable of type \c igraph_error_t; the
  * value of this variable will be set to the error code if it is not a null
  * pointer.
- * 
+ *
  * Identical to \ref IGRAPH_CHECK, but treats \c IGRAPH_STOP as a normal
  * (non-erroneous) return code. This macro is used in some igraph functions
  * that allow the user to hook into a long-running calculation with a callback
@@ -716,7 +716,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * callback will terminate the calculation without reporting an error. Returning
  * any other value from the callback is treated as an error code, and igraph
  * will trigger the necessary cleanup functions before exiting the function.
- * 
+ *
  * </para><para>
  * Note that \c IGRAPH_CHECK_CALLBACK does not handle \c IGRAPH_STOP by any
  * means except returning it in the variable pointed to by \c code. It is the

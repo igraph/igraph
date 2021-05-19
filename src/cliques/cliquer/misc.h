@@ -57,4 +57,3 @@
 #endif
 
 #endif /* !CLIQUER_MISC_H */
-

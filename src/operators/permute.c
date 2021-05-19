@@ -94,4 +94,3 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }
-

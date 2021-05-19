@@ -38,15 +38,15 @@
  * such that the i-th element contains the ID of the lightest edge that leads
  * from node v to cluster i. Similarly, the lightest_weight vector is updated
  * to contain the weights of these edges.
- * 
- * When the is_cluster_sampled vector is provided, the 
+ *
+ * When the is_cluster_sampled vector is provided, the
  * nearest_neighboring_sampled_cluster pointer is also updated to the index of
  * the cluster that has the smallest weight among the _sampled_ ones.
- * 
+ *
  * As a pre-condition, this function requires the lightest_eid vector to be
  * filled with -1 and the lightest_weight vector to be filled with infinity.
  * This is _not_ checked within the function.
- * 
+ *
  * Use the igraph_i_clean_lighest_edges_to_clusters() function to clear these vectors
  * after you are done with them. Avoid using igraph_vector_fill() because that
  * one is O(|V|), while igraph_i_clean_lightest_edge_vector() is O(d) where d
@@ -58,14 +58,14 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     const igraph_vector_t *weights,
     const igraph_vector_t *clustering,
     const igraph_vector_bool_t *is_cluster_sampled,
-    long int v, 
+    long int v,
     igraph_vector_t *lightest_eid,
     igraph_vector_t *lightest_weight,
     igraph_vector_int_t *dirty_vids,
     long int *nearest_neighboring_sampled_cluster
 ) {
     // This internal function gets the residual graph, the clustering, the sampled clustering and
-    // the vector and return the lightest edge to each neighboring cluster and the index of the lightest 
+    // the vector and return the lightest edge to each neighboring cluster and the index of the lightest
     // sampled cluster (if any)
 
     igraph_real_t lightest_weight_to_sampled = INFINITY;
@@ -122,21 +122,21 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  * \ingroup structural
  * \function igraph_spanner
  * \brief Calculates a spanner of a graph with a given stretch factor.
- * 
+ *
  * A spanner of a graph G = (V,E) with a stretch t is a subgraph
- * H = (V,Es) such that Es is a subset of E and the distance 
+ * H = (V,Es) such that Es is a subset of E and the distance
  * between any pair of nodes in H is at most t times the distance
- * in G. The returned graph is always a spanner of the 
+ * in G. The returned graph is always a spanner of the
  * given graph with the specified stretch. For weighted graphs the
  * number of edges in the spanner is O(k * n^(1 + 1 / k)), where k is
  * k = (stretch + 1) / 2,  m is the number of edges and n is the number
- * of nodes in G. For unweighted graphs the number of edges is 
+ * of nodes in G. For unweighted graphs the number of edges is
  * O(n^(1 + 1 / k) + kn).
- * 
+ *
  * </para><para>
  * This function is based on the algorithm of Baswana and Sen: "A Simple and
- * Linear Time Randomized Algorithm for Computing Sparse Spanners in 
- * Weighted Graphs"  
+ * Linear Time Randomized Algorithm for Computing Sparse Spanners in
+ * Weighted Graphs"
  *
  * \param graph An undirected connected graph object. If the graph
  *        is directed, the directions of the edges will be ignored.
@@ -145,8 +145,8 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  *        \ref igraph_subgraph_edges() to extract the spanner as a separate
  *        graph object.
  * \param stretch The stretch factor of the spanner.
- * \param weights The edge weights or NULL. 
- * 
+ * \param weights The edge weights or NULL.
+ *
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -157,7 +157,7 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  *                  running time is O(km) where k is the value mentioned above.
  */
 int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
-        igraph_real_t stretch, igraph_vector_t *weights) { 
+        igraph_real_t stretch, igraph_vector_t *weights) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -253,7 +253,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
 }
 
             igraph_vector_fill(&lightest_weight, INFINITY);
-            
+
     for (i = 0; i < k - 1; i++) {
         igraph_vector_fill(&new_clustering, -1);
         igraph_vector_bool_fill(&is_cluster_sampled, 0);
@@ -275,7 +275,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
                 VECTOR(new_clustering)[v] = cluster;
                 continue;
             }
-            
+
             // Step 2: find the lightest edge that connects vertex v to its
             // neighboring sampled clusters
             long int nearest_neighboring_sampled_cluster = -1;
@@ -298,7 +298,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
                 // sampled clusters.
 
                 // Add lightest edge which connects vertex v to each neighboring
-                // cluster (none of which are sampled) 
+                // cluster (none of which are sampled)
                 for (j = 0; j < no_of_nodes; j++) {
                     edge = VECTOR(lightest_eid)[j];
                     if (edge != -1) {
@@ -405,7 +405,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
             for (j = 0; j < nlen; j++) {
                 neighbor = VECTOR(*adjacent_vertices)[j];
                 edge = VECTOR(*incident_edges)[j];
-                
+
                 if (VECTOR(clustering)[neighbor] == VECTOR(clustering)[v]) {
                     /* We don't need to bother with removing the other copy
                      * of the edge from the incidence lists (and the corresponding
@@ -429,7 +429,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
                 weights,
                 &clustering,
                 /* is_cluster_sampled = */ NULL,
-                v, 
+                v,
                 &lightest_eid,
                 &lightest_weight,
                 &dirty_vids,

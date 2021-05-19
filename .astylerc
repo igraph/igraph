@@ -34,4 +34,3 @@
 # Keep complex statement sequences on the same line; they are that way for
 # a reason
 --keep-one-line-statements
-

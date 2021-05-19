@@ -269,4 +269,3 @@ void clear_all_markers(network *net) {
         n_cur = iter.Next();
     }
 }
-

@@ -163,7 +163,7 @@ int main() {
     /* turn on attribute handling */
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    ifile = fopen("LINKS.NET", "r");
+    ifile = fopen("links.net", "r");
     if (ifile == 0) {
         return 10;
     }

@@ -645,15 +645,15 @@ static int igraph_i_vector_tail_cmp(const void* a, const void* b) {
  *
  * \param graph The graph object.
  * \param vertices Pointer to an initialized pointer vector or NULL.
- *   If not NULL, then each vector object contains the vertices along a 
+ *   If not NULL, then each vector object contains the vertices along a
  *   shortest path from \p from to another vertex. The vectors are
- *   ordered according to their target vertex: first the shortest 
- *   paths to vertex 0, then to vertex 1, etc. No data is included 
+ *   ordered according to their target vertex: first the shortest
+ *   paths to vertex 0, then to vertex 1, etc. No data is included
  *   for unreachable vertices.
- * \param edges Pointer to an initialized pointer vector or NULL. If 
- *   not NULL, then each vector object contains the edges along a 
- *   shortest path from \p from to another vertex. The vectors are 
- *   ordered according to their target vertex: first the shortest 
+ * \param edges Pointer to an initialized pointer vector or NULL. If
+ *   not NULL, then each vector object contains the edges along a
+ *   shortest path from \p from to another vertex. The vectors are
+ *   ordered according to their target vertex: first the shortest
  *   paths to vertex 0, then to vertex 1, etc. No data is included for
  *   unreachable vertices.
  * \param nrgeo Pointer to an initialized igraph_vector_t object or
@@ -1043,7 +1043,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         VECTOR(*path)[0] = from;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(vertices, path));
         IGRAPH_FINALLY_CLEAN(2);  /* ownership of path passed to vertices */
-        
+
         if (edges) {
             path = igraph_Calloc(1, igraph_vector_t);
             if (path == 0)
@@ -1170,13 +1170,13 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                     igraph_vector_destroy(path); free(path);
                     VECTOR(*edges)[i] = 0;
                 }
-            }   
+            }
         }
         IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, j));
         if (edges) {
             IGRAPH_CHECK(igraph_vector_ptr_resize(edges, j));
         }
-        
+
         /* sort the paths by the target vertices */
         IGRAPH_VECTOR_INIT_FINALLY(&index, 0);
         igraph_vector_ptr_sort_ind(vertices, &index, igraph_i_vector_tail_cmp);
@@ -1216,4 +1216,3 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
-

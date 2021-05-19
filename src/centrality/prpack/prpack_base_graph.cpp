@@ -147,7 +147,7 @@ prpack_base_graph::prpack_base_graph(const char* filename, const char* format, c
     if (ext == "smat") {
         read_smat(f, weighted);
     } else {
-        prpack_utils::validate(!weighted, 
+        prpack_utils::validate(!weighted,
             "Error: graph format is not compatible with weighted option.");
         if (ext == "edges" || ext == "eg2") {
             read_edges(f);
@@ -276,7 +276,7 @@ void prpack_base_graph::read_ascii(FILE* f) {
     delete[] al;
 }
 
-prpack_base_graph::prpack_base_graph(int nverts, int nedges, 
+prpack_base_graph::prpack_base_graph(int nverts, int nedges,
         std::pair<int,int>* edges) {
     initialize();
     num_vs = nverts;
@@ -313,10 +313,10 @@ prpack_base_graph::prpack_base_graph(int nverts, int nedges,
     delete[] osets;
 }
 
-/** Normalize the edge weights to sum to one.  
+/** Normalize the edge weights to sum to one.
  */
 void prpack_base_graph::normalize_weights() {
-    if (!vals) { 
+    if (!vals) {
         // skip normalizing weights if not using values
         return;
     }
@@ -339,4 +339,3 @@ void prpack_base_graph::normalize_weights() {
         }
     }
 }
-

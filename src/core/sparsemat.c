@@ -3007,7 +3007,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
  * of non-zero entires in matrix columns <code>k-1</code> and lower.
  * <code>p[0]</code> is always zero and <code>p[n]</code> is always the total
  * number of non-zero entires in the matrix. <code>i[l]</code> is the row index
- * of the \c l-th stored element, while <code>x[l]</code> is its value. 
+ * of the \c l-th stored element, while <code>x[l]</code> is its value.
  * If a matrix element with indices <code>(j, k)</code> is explicitly stored,
  * it must be located between positions <code>p[k]</code> and <code>p[k+1] - 1</code>
  * (inclusive) in the \p i and \p x vectors.

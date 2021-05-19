@@ -51,7 +51,7 @@ int main() {
     igraph_t graph;
     igraph_vector_t v;
     igraph_vector_int_t trussness;
-  
+
     /* Create actual graph */
     igraph_real_t edges[] = { 0,1, 0,2, 0,3, 0,4,
       1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 3,6, 3,11,
@@ -61,7 +61,7 @@ int main() {
 
     igraph_vector_view(&v, edges, n);
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
-  
+
     /* Compute the trussness of the edges. */
     printf("Simple graph:\n");
     igraph_vector_int_init(&trussness, 0);

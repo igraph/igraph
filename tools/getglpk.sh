@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ -d ../optional/glpk ]; then 
+if [ -d ../optional/glpk ]; then
     echo "GLPK directory '../optional/glpk' already exists, remove it first"
 #    exit 1
 fi
@@ -42,10 +42,10 @@ diff -ru glpk.old/glpenv01.c glpk/glpenv01.c
 +++ glpk/glpenv01.c	2012-03-30 12:03:54.000000000 -0400
 @@ -23,6 +23,7 @@
  ***********************************************************************/
- 
+
  #include "glpapi.h"
 +#include "igraph_error.h"
- 
+
  /***********************************************************************
  *  NAME
 @@ -126,19 +127,15 @@
@@ -66,7 +66,7 @@ diff -ru glpk.old/glpenv01.c glpk/glpenv01.c
 -      {  fprintf(stderr, "Invalid GLPK environment\n");
 -         fflush(stderr);
 -         abort();
-+      {  
++      {
 +	IGRAPH_ERROR("Invalid GLPK environment", IGRAPH_EGLP);
        }
        return env;
@@ -78,7 +78,7 @@ diff -ru glpk.old/glpenv01.c glpk/glpenv01.c
 -      {  fprintf(stderr, "Invalid GLPK environment\n");
 -         fflush(stderr);
 -         abort();
-+      {  
++      {
 +	 IGRAPH_ERROR("Invalid GLPK environment", IGRAPH_EGLP);
        }
        /* close handles to shared libraries */
@@ -87,7 +87,7 @@ diff -ru glpk.old/glpenv03.c glpk/glpenv03.c
 --- glpk.old/glpenv03.c	2012-03-30 11:30:58.000000000 -0400
 +++ glpk/glpenv03.c	2012-04-02 11:18:42.000000000 -0400
 @@ -40,9 +40,9 @@
- 
+
  void glp_printf(const char *fmt, ...)
  {     va_list arg;
 -      va_start(arg, fmt);
@@ -98,7 +98,7 @@ diff -ru glpk.old/glpenv03.c glpk/glpenv03.c
 +      /* va_end(arg); */
        return;
  }
- 
+
 @@ -64,22 +64,22 @@
  void glp_vprintf(const char *fmt, va_list arg)
  {     ENV *env = get_env_ptr();
@@ -137,16 +137,16 @@ diff -ru glpk.old/glpenv03.c glpk/glpenv03.c
 +      /* } */
  skip: return;
  }
- 
+
 diff -ru glpk.old/glpenv04.c glpk/glpenv04.c
 --- glpk.old/glpenv04.c	2012-03-30 11:30:58.000000000 -0400
 +++ glpk/glpenv04.c	2012-03-30 11:56:41.000000000 -0400
 @@ -23,6 +23,7 @@
  ***********************************************************************/
- 
+
  #include "glpapi.h"
 +#include "igraph_error.h"
- 
+
  /***********************************************************************
  *  NAME
 @@ -44,14 +45,7 @@
@@ -164,12 +164,12 @@ diff -ru glpk.old/glpenv04.c glpk/glpenv04.c
 +      igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
        /* no return */
  }
- 
+
 diff -ru glpk.old/glpenv07.c glpk/glpenv07.c
 --- glpk.old/glpenv07.c	2012-03-30 11:30:58.000000000 -0400
 +++ glpk/glpenv07.c	2012-03-31 13:21:03.000000000 -0400
 @@ -413,13 +413,13 @@
- 
+
  static void *c_fopen(const char *fname, const char *mode)
  {     FILE *fh;
 -      if (strcmp(fname, "/dev/stdin") == 0)
@@ -231,7 +231,7 @@ diff -ru glpk.old/glpmpl04.c glpk/glpmpl04.c
 --- glpk.old/glpmpl04.c	2012-03-30 11:30:58.000000000 -0400
 +++ glpk/glpmpl04.c	2012-04-01 00:07:09.000000000 -0400
 @@ -341,11 +341,11 @@
- 
+
  void open_output(MPL *mpl, char *file)
  {     xassert(mpl->out_fp == NULL);
 -      if (file == NULL)
@@ -248,7 +248,7 @@ diff -ru glpk.old/glpmpl04.c glpk/glpmpl04.c
           if (mpl->out_fp == NULL)
              error(mpl, "unable to create %s - %s", file, xerrmsg());
 @@ -362,9 +362,9 @@
- 
+
  void write_char(MPL *mpl, int c)
  {     xassert(mpl->out_fp != NULL);
 -      if (mpl->out_fp == (void *)stdout)
@@ -261,7 +261,7 @@ diff -ru glpk.old/glpmpl04.c glpk/glpmpl04.c
        return;
  }
 @@ -393,7 +393,7 @@
- 
+
  void flush_output(MPL *mpl)
  {     xassert(mpl->out_fp != NULL);
 -      if (mpl->out_fp != (void *)stdout)

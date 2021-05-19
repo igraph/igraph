@@ -42,5 +42,3 @@ IGRAPH_EXPORT void igraph_version(const char **version_string,
 __END_DECLS
 
 #endif
-
-

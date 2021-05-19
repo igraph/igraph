@@ -418,5 +418,3 @@ void FlowGraph::back_to(FlowGraph * fgraph) {
 
     codeLength = fgraph->codeLength;
 }
-
-
