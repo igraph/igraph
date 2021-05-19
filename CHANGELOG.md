@@ -9,6 +9,10 @@
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
 
+### Changed
+
+ - `igraph_version()` no longer returns an error code.
+
 ## [0.9.3] - 2021-05-05
 
 ### Added
