@@ -76,11 +76,14 @@ IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, c
  *   inverse of \p map12 basically.
  * \param arg This extra argument was passed to \ref
  *   igraph_isomorphic_function_vf2() when it was called.
- * \return Boolean, whether to continue with the isomorphism search.
+ * \return \c IGRAPH_SUCCESS to continue the search, \c IGRAPH_STOP to
+ *   terminate the search. Any other return value is interpreted as an
+ *   igraph error code, which will then abort the search and return the
+ *   same error code from the caller function.
  */
 
 
-typedef igraph_bool_t igraph_isohandler_t(const igraph_vector_t *map12,
+typedef igraph_error_t igraph_isohandler_t(const igraph_vector_t *map12,
         const igraph_vector_t *map21, void *arg);
 
 /**

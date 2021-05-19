@@ -67,8 +67,11 @@
  * \ref igraph_isohandler_t. This function will be called whenever VF2
  * finds an isomorphism between the two graphs. The mapping between
  * the two graphs will be also provided to this function. If the
- * callback returns a nonzero value then the search is continued,
- * otherwise it stops. The callback function must not destroy the
+ * callback returns \c IGRAPH_SUCCESS, then the search is continued,
+ * otherwise it stops. \c IGRAPH_STOP as a return value can be used to
+ * indicate normal premature termination; any other return value will be
+ * treated as an igraph error code, making the caller function return the
+ * same error code as well. The callback function must not destroy the
  * mapping vectors that are passed to it.
  * \param graph1 The first input graph.
  * \param graph2 The second input graph.
@@ -620,7 +623,9 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
         }
 
         if (matched_nodes == no_of_nodes && isohandler_fn) {
-            if (!isohandler_fn(core_1, core_2, arg)) {
+            igraph_error_t ret;
+            IGRAPH_CHECK_CALLBACK(isohandler_fn(core_1, core_2, arg), &ret);
+            if (ret == IGRAPH_STOP) {
                 break;
             }
         }
@@ -677,14 +682,14 @@ static igraph_bool_t igraph_i_isocompat_edge_cb(
     return data->edge_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
 }
 
-static igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
-                                             igraph_vector_t *map21,
-                                             void *arg) {
+static igraph_error_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
+                                              igraph_vector_t *map21,
+                                              void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *iso = 1;
-    return 0;         /* don't need to continue */
+    return IGRAPH_STOP;
 }
 
 /**
@@ -775,7 +780,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
     return 0;
 }
 
-static igraph_bool_t igraph_i_count_isomorphisms_vf2(
+static igraph_error_t igraph_i_count_isomorphisms_vf2(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
@@ -783,7 +788,7 @@ static igraph_bool_t igraph_i_count_isomorphisms_vf2(
     igraph_integer_t *count = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *count += 1;
-    return 1;         /* always continue */
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -857,7 +862,7 @@ static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
     }
 }
 
-static int igraph_i_get_isomorphisms_vf2_inner(
+static igraph_error_t igraph_i_get_isomorphisms_vf2(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
@@ -875,13 +880,6 @@ static int igraph_i_get_isomorphisms_vf2_inner(
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
-}
-
-static igraph_bool_t igraph_i_get_isomorphisms_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
-        void *arg) {
-    return igraph_i_get_isomorphisms_vf2_inner(map12, map21, arg) == IGRAPH_SUCCESS;
 }
 
 /**
@@ -991,9 +989,10 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
  *    here.
  * \param isohandler_fn A pointer to a function of type \ref
  *   igraph_isohandler_t. This will be called whenever a subgraph
- *   isomorphism is found. If the function returns with a non-zero value
- *   then the search is continued, otherwise it stops and the function
- *   returns.
+ *   isomorphism is found. If the function returns \c IGRAPH_SUCCESS,
+ *   then the search is continued. If the function returns \c IGRAPH_STOP,
+ *   the search is terminated normally. Any other value is treated as an
+ *   igraph error code.
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.
@@ -1451,7 +1450,9 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
         }
 
         if (matched_nodes == no_of_nodes2 && isohandler_fn) {
-            if (!isohandler_fn(core_1, core_2, arg)) {
+            igraph_error_t ret;
+            IGRAPH_CHECK_CALLBACK(isohandler_fn(core_1, core_2, arg), &ret);
+            if (ret == IGRAPH_STOP) {
                 break;
             }
         }
@@ -1483,7 +1484,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     return 0;
 }
 
-static igraph_bool_t igraph_i_subisomorphic_vf2(
+static igraph_error_t igraph_i_subisomorphic_vf2(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
@@ -1491,7 +1492,7 @@ static igraph_bool_t igraph_i_subisomorphic_vf2(
     igraph_bool_t *iso = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *iso = 1;
-    return 0; /* stop */
+    return IGRAPH_STOP;
 }
 
 /**
@@ -1571,7 +1572,7 @@ int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
     return 0;
 }
 
-static igraph_bool_t igraph_i_count_subisomorphisms_vf2(
+static igraph_error_t igraph_i_count_subisomorphisms_vf2(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
@@ -1579,7 +1580,7 @@ static igraph_bool_t igraph_i_count_subisomorphisms_vf2(
     igraph_integer_t *count = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *count += 1;
-    return 1;         /* always continue */
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1656,7 +1657,7 @@ static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
     }
 }
 
-static int igraph_i_get_subisomorphisms_vf2_inner(
+static igraph_error_t igraph_i_get_subisomorphisms_vf2(
         const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
@@ -1674,13 +1675,6 @@ static int igraph_i_get_subisomorphisms_vf2_inner(
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
-}
-
-static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
-        void *arg) {
-    return igraph_i_get_subisomorphisms_vf2_inner(map12, map21, arg) == IGRAPH_SUCCESS;
 }
 
 /**
