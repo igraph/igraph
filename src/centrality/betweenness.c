@@ -579,7 +579,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
-    tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
+    tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
@@ -1019,28 +1019,12 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_t dist;
     double *nrgeo;
     double *tmpscore;
-    igraph_vit_t vit, vit_source, vit_target;
+    igraph_vit_t vit;
     unsigned char *is_target;
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
-
-    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit_source));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit_source);
-
-    IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit_target));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit_target); 
-
-    if (!igraph_vs_is_all(&vids)) {
-        /* result needed only for a subset of the vertices */
-        IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
-    } else {
-        /* result covers all vertices */
-        IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
-        igraph_vector_null(res);
-        tmpres = res;
-    }
 
     if (weights) {
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
@@ -1055,15 +1039,16 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_destroy, &S);
+
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     nrgeo = igraph_Calloc(no_of_nodes, double);
-
     if (nrgeo == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
-    tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
+
+    tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
@@ -1075,16 +1060,33 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     }
     IGRAPH_FINALLY(igraph_free, is_target); 
 
-    for (IGRAPH_VIT_RESET(vit_target); !IGRAPH_VIT_END(vit_target); IGRAPH_VIT_NEXT(vit_target)) {
-        is_target[(long int) IGRAPH_VIT_GET(vit_target)] = 1;
-    }    
+    IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        is_target[(long int) IGRAPH_VIT_GET(vit)] = 1;
+    }
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    if (!igraph_vs_is_all(&vids)) {
+        /* result needed only for a subset of the vertices */
+        IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
+    } else {
+        /* result covers all vertices */
+        IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+        igraph_vector_null(res);
+        tmpres = res;
+    }
+
+    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     for (
-        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit_source);
-        !IGRAPH_VIT_END(vit_source);
-        IGRAPH_VIT_NEXT(vit_source), no_of_processed_sources++
+        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit);
+        !IGRAPH_VIT_END(vit);
+        IGRAPH_VIT_NEXT(vit), no_of_processed_sources++
     ) {
-        source = IGRAPH_VIT_GET(vit_source);
+        source = IGRAPH_VIT_GET(vit);
 
         IGRAPH_PROGRESS(
             "Betweenness centrality (subset): ",
@@ -1123,12 +1125,15 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         }
     }
 
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+
     /* Keep only the requested vertices */
     if (!igraph_vs_is_all(&vids)) {
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-        IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
 
+        IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
         for (j = 0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), j++) {
             long int node = IGRAPH_VIT_GET(vit);
@@ -1144,21 +1149,18 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         igraph_vector_scale(res, 0.5);
     }
 
-    igraph_Free(nrgeo);
+    igraph_Free(is_target);
     igraph_Free(tmpscore);
+    igraph_Free(nrgeo);
     igraph_vector_destroy(&dist);
     igraph_stack_destroy(&S);
     igraph_adjlist_destroy(&fathers);
     if (weights) {
         igraph_inclist_destroy(&inclist);
-    }
-    else {
+    } else {
         igraph_adjlist_destroy(&adjlist);
     }
-    igraph_Free(is_target);
-    igraph_vit_destroy(&vit_source);
-    igraph_vit_destroy(&vit_target);
-    IGRAPH_FINALLY_CLEAN(9);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
@@ -1207,7 +1209,7 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_integer_t no_of_sources;
     igraph_integer_t no_of_processed_sources;
     igraph_inclist_t inclist, fathers;
-    igraph_vit_t vit_source, vit_target;
+    igraph_vit_t vit;
     igraph_eit_t eit;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t dist;
@@ -1222,30 +1224,19 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
-    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit_source));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit_source);
-    IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit_target));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit_target); 
-
-    if (!igraph_es_is_all(&eids)) {
-        /* subset */
-        IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_edges);
-    } else {
-        /* only  */
-        IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges));
-        igraph_vector_null(res);
-        tmpres = res;
-    }
-
     is_target = igraph_Calloc(no_of_nodes, unsigned char);
     if (is_target == 0) {
         IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
-    for (IGRAPH_VIT_RESET(vit_target); !IGRAPH_VIT_END(vit_target); IGRAPH_VIT_NEXT(vit_target)) {
-        is_target[(long int) IGRAPH_VIT_GET(vit_target)] = 1;
-    }   
+    IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        is_target[(long int) IGRAPH_VIT_GET(vit)] = 1;
+    }
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -1253,11 +1244,13 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+
     nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
         IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
+
     tmpscore = igraph_Calloc(no_of_nodes, double);
     if (tmpscore == 0) {
         IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
@@ -1267,12 +1260,25 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_destroy, &S);
 
+    if (!igraph_es_is_all(&eids)) {
+        /* result needed only for a subset of the vertices */
+        IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_edges);
+    } else {
+        /* result covers all vertices */
+        IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges));
+        igraph_vector_null(res);
+        tmpres = res;
+    }
+
+    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
     for (
-        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit_source);
-        !IGRAPH_VIT_END(vit_source);
-        IGRAPH_VIT_NEXT(vit_source), no_of_processed_sources++
+        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit);
+        !IGRAPH_VIT_END(vit);
+        IGRAPH_VIT_NEXT(vit), no_of_processed_sources++
     ) {
-        source = IGRAPH_VIT_GET(vit_source);
+        source = IGRAPH_VIT_GET(vit);
 
         IGRAPH_PROGRESS(
             "Edge betweenness centrality (subset): ",
@@ -1318,10 +1324,14 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     }
 
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+
     /* Keep only the requested edges */
     if (!igraph_es_is_all(&eids)) {
         IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
         IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
         IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
 
         for (j = 0, IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit);
@@ -1341,15 +1351,13 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     }
 
     igraph_stack_destroy(&S);
-    igraph_inclist_destroy(&inclist);
-    igraph_inclist_destroy(&fathers);
-    igraph_vector_destroy(&dist);
     igraph_Free(tmpscore);
     igraph_Free(nrgeo);
+    igraph_vector_destroy(&dist);
+    igraph_inclist_destroy(&fathers);
+    igraph_inclist_destroy(&inclist);
     igraph_Free(is_target);
-    igraph_vit_destroy(&vit_source);
-    igraph_vit_destroy(&vit_target);
-    IGRAPH_FINALLY_CLEAN(9);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
