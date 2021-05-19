@@ -44,10 +44,6 @@ int main() {
                                         0.0711, 0.2409
                                       };
 
-    igraph_real_t nontriv_res[] = { 20, 0, 0, 0, 0, 19, 80, 85, 32, 0, 10,
-                                    75, 70, 0, 36, 81, 60, 0, 19, 19, 86
-                                  };
-
     /*******************************************************/
 
     printf("BA graph\n");
@@ -121,12 +117,7 @@ int main() {
     igraph_betweenness(/*graph=*/ &g, /*res=*/ &bet, /*vids=*/ igraph_vss_all(),
                                   /*directed=*/0, /*weights=*/ &weights);
 
-    printf("Max betweenness: %f\n", igraph_vector_max(&bet));
-
-    igraph_vector_view(&bet2, nontriv_res,
-                       sizeof(nontriv_res) / sizeof(igraph_real_t));
-
-    IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
+    print_vector(&bet);
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
@@ -152,8 +143,8 @@ int main() {
             /* weights=   */ 0,
             /* cutoff=    */ -1);
 
-    igraph_vector_print(&bet);
-    igraph_vector_print(&bet2);
+    print_vector(&bet);
+    print_vector(&bet2);
 
     igraph_vector_destroy(&bet);
     igraph_vector_destroy(&bet2);
@@ -178,8 +169,8 @@ int main() {
             /* weights=   */ &weights,
             /* cutoff=    */ -1);
 
-    igraph_vector_print(&bet);
-    igraph_vector_print(&bet2);
+    print_vector(&bet);
+    print_vector(&bet2);
 
     igraph_vector_destroy(&bet);
     igraph_vector_destroy(&bet2);
@@ -207,14 +198,14 @@ int main() {
                                   igraph_vss_all(), IGRAPH_UNDIRECTED,
                 /* weights */ NULL,
                 /* cutoff */ cutoff);
-        igraph_vector_print(&bet);
+        print_vector(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_cutoff(&g, &bet2,
                                   igraph_vss_all(), IGRAPH_UNDIRECTED,
                 /* weights */ &weights,
                 /* cutoff */ cutoff);
-        igraph_vector_print(&bet2);
+        print_vector(&bet2);
         printf("\n");
 
         IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
@@ -248,14 +239,14 @@ int main() {
                                   igraph_vss_all(), IGRAPH_UNDIRECTED,
                 /* weights */ NULL,
                 /* cutoff */ cutoff);
-        igraph_vector_print(&bet);
+        print_vector(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_cutoff(&g, &bet2,
                                   igraph_vss_all(), IGRAPH_UNDIRECTED,
                 /* weights */ &weights,
                 /* cutoff */ cutoff);
-        igraph_vector_print(&bet2);
+        print_vector(&bet2);
         printf("\n");
     }
 

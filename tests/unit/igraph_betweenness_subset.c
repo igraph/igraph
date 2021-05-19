@@ -41,10 +41,6 @@ int main() {
                                         0.0711, 0.2409
                                       };
 
-    igraph_real_t nontriv_res[] = { 20, 0, 0, 0, 0, 19, 80, 85, 32, 0, 10,
-                                    75, 70, 0, 36, 81, 60, 0, 19, 19, 86
-                                  };
-
     printf("BA graph (smoke test)\n");
     printf("==========================================================\n");
     igraph_barabasi_game(/* graph= */    &g,
@@ -124,17 +120,15 @@ int main() {
                        sizeof(nontriv_weights) / sizeof(igraph_real_t));
 
     igraph_vector_init(&bet, 0);
-        igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet,
-            /* vids=      */ igraph_vss_all(),
-            /* directed = */ IGRAPH_UNDIRECTED,
-            /* sources = */ igraph_vss_all(),
-            /* target = */ igraph_vss_all(),
-            /* weights=   */ &weights);
+    igraph_betweenness_subset(/* graph=     */ &g,
+        /* res=       */ &bet,
+        /* vids=      */ igraph_vss_all(),
+        /* directed = */ IGRAPH_UNDIRECTED,
+        /* sources = */ igraph_vss_all(),
+        /* target = */ igraph_vss_all(),
+        /* weights=   */ &weights);
 
-    igraph_vector_view(&bet2, nontriv_res,
-                    sizeof(nontriv_res) / sizeof(igraph_real_t));
-    IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
+    print_vector(&bet);
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
@@ -168,7 +162,7 @@ int main() {
             /* sources = */ vs_source,
             /* target = */ igraph_vss_all(),
             /* weights=   */ NULL);
-        igraph_vector_print(&bet);
+        print_vector(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
@@ -178,7 +172,7 @@ int main() {
             /* sources = */ vs_source,
             /* target = */ igraph_vss_all(),
             /* weights */ &weights);
-        igraph_vector_print(&bet2);
+        print_vector(&bet2);
         printf("\n");
 
         IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
@@ -222,7 +216,7 @@ int main() {
             /* sources = */ igraph_vss_all(),
             /* target = */ vs_target,
             /* weights */ NULL);
-        igraph_vector_print(&bet);
+        print_vector(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
@@ -232,7 +226,7 @@ int main() {
             /* sources = */ igraph_vss_all(),
             /* target = */ vs_target,
             /* weights */ &weights);
-        igraph_vector_print(&bet2);
+        print_vector(&bet2);
         printf("\n");
 
         igraph_vs_destroy(&vs_target);
@@ -257,8 +251,8 @@ int main() {
         /* weights=   */ NULL);
     
     print_vector(&bet);
+
     igraph_vector_destroy(&bet);
-    
     igraph_destroy(&g);
 
     printf("\n37x37 grid graph\n");
