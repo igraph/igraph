@@ -558,10 +558,10 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     if (weights) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     }
 
@@ -828,7 +828,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
@@ -1027,10 +1027,10 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
     if (weights) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     }
 
@@ -1263,7 +1263,7 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
@@ -1346,7 +1346,6 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                 coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
             } else {
                 coeff = tmpscore[actnode] / nrgeo[actnode];
-                // coeff = tmpscore[actnode] / fatv_len;
             }
 
             for (j = 0; j < fatv_len; j++) {

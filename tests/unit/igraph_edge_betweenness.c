@@ -173,8 +173,8 @@ int main() {
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
-    printf("\nSmall undirected graph 3, unweighted, with multi-edges\n");
-    igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 1, 2, 2, 3, 3, 0, -1);
+    printf("\nSmall undirected graph 3, unweighted, with multiple and loop edges\n");
+    igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 1, 2, 1, 1, 2, 3, 3, 0, 3, 3, -1);
     igraph_vector_init(&eb, 0);
     igraph_edge_betweenness(/* graph=     */ &g,
             /* res=       */ &eb,
