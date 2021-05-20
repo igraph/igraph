@@ -533,6 +533,13 @@ igraph_betweenness_cutoff:
         FLAGS: PROGRESS
         IGNORE: RR
 
+igraph_betweenness_subset:
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
+                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
+        DEPS: vids ON graph, weights ON graph, res ON graph vids
+        FLAGS: PROGRESS
+        IGNORE: RR
+
 igraph_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True, \
                 EDGEWEIGHTS weights=NULL
@@ -545,6 +552,14 @@ igraph_edge_betweenness_cutoff:
                 EDGEWEIGHTS weights=NULL, REAL cutoff
         DEPS: weights ON graph
         NAME-R: estimate_edge_betweenness
+        IGNORE: RR
+
+igraph_edge_betweenness_subset:
+        PARAMS: GRAPH graph, OUT VERTEXINDEX res, EDGESET vids=ALL, \
+                VERTEXSET sources=ALL, VERTEXSET targets=ALL,
+                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
+        DEPS: vids ON graph, weights ON graph, res ON graph vids
+        FLAGS: PROGRESS
         IGNORE: RR
 
 igraph_pagerank:

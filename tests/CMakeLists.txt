@@ -262,6 +262,7 @@ add_legacy_tests(
   igraph_average_path_length
   igraph_average_path_length_dijkstra
   igraph_betweenness
+  igraph_betweenness_subset
   igraph_closeness
   igraph_convergence_degree
   igraph_count_multiple
@@ -269,6 +270,7 @@ add_legacy_tests(
   igraph_diversity
   igraph_eccentricity
   igraph_edge_betweenness
+  igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
