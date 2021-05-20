@@ -40,7 +40,7 @@ int main() {
      * the direction of the edges (one is swapped in g2 */
     err = igraph_is_same_graph(&g1, &g2, &res);
     IGRAPH_ASSERT(!err);
-    IGRAPH_ASSERT(res);    
+    IGRAPH_ASSERT(res);
 
     /* end of undirected */
     igraph_destroy(&g1);

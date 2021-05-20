@@ -118,4 +118,3 @@ prpack_preprocessed_schur_graph::~prpack_preprocessed_schur_graph() {
     delete[] encoding;
     delete[] decoding;
 }
-

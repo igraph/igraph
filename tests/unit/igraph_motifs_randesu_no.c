@@ -61,6 +61,7 @@ int main() {
     printf("Triangle and a vertex, motif size 4:\n");
     call_and_print(&g_4_3_1, /*size*/ 4, &cut_prob_0_4);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Cut prob too short.\n");

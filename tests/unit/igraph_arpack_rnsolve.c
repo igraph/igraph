@@ -83,6 +83,8 @@ int check_eigenvector(
                    "eigenvector, coordinate %d differs by %.4f + %.4f*i\n",
                    test_name, IGRAPH_REAL(eval), IGRAPH_IMAG(eval),
                    i, IGRAPH_REAL(prod), IGRAPH_IMAG(prod));
+
+            free(evec);
             return 1;
         }
     }
@@ -120,16 +122,6 @@ int check_eigenvectors(
     return (errors > 0) ? 1 : 0;
 }
 
-void print_debug_output(
-    igraph_matrix_t* values, igraph_matrix_t* vectors
-) {
-    printf("---\n");
-    igraph_matrix_print(values);
-    printf("---\n");
-    igraph_matrix_print(vectors);
-    printf("---\n");
-}
-
 #define DIM 10
 
 int main() {
@@ -149,8 +141,11 @@ int main() {
         }
     }
 
+    printf("Input matrix:\n");
     igraph_matrix_print(&A);
-    printf("===\n");
+    printf("\n");
+
+    printf("\n4 largest eigenvalues by magnitude:\n");
 
     igraph_arpack_options_init(&options);
     options.n = DIM;
@@ -165,11 +160,16 @@ int main() {
 
     igraph_arpack_rnsolve(cb2, /*extra=*/ &data, &options, /*storage=*/ 0,
                           &values, &vectors);
+    printf("\nEigenvalues:\n");
+    igraph_matrix_print(&values);
     if (check_eigenvectors("LM #1", &A, &values, &vectors)) {
-        print_debug_output(&values, &vectors);
+        printf("\nEigenvectors:\n");
+        igraph_matrix_print(&vectors);
     }
 
     /* -------------- */
+
+    printf("\n3 largest eigenvalues by magnitude:\n");
 
     options.nev = 3;
     options.which[0] = 'L' ;
@@ -177,11 +177,16 @@ int main() {
 
     igraph_arpack_rnsolve(cb2, /*extra=*/ &data, &options, /*storage=*/ 0,
                           &values, &vectors);
+    printf("\nEigenvalues:\n");
+    igraph_matrix_print(&values);
     if (check_eigenvectors("LM #2", &A, &values, &vectors)) {
-        print_debug_output(&values, &vectors);
+        printf("\nEigenvectors:\n");
+        igraph_matrix_print(&vectors);
     }
 
     /* -------------- */
+
+    printf("\n3 smallest eigenvalues by real part:\n");
 
     options.nev = 3;
     options.which[0] = 'S' ;
@@ -189,11 +194,16 @@ int main() {
 
     igraph_arpack_rnsolve(cb2, /*extra=*/ &data, &options, /*storage=*/ 0,
                           &values, &vectors);
+    printf("\nEigenvalues:\n");
+    igraph_matrix_print(&values);
     if (check_eigenvectors("SR", &A, &values, &vectors)) {
-        print_debug_output(&values, &vectors);
+        printf("\nEigenvectors:\n");
+        igraph_matrix_print(&vectors);
     }
 
     /* -------------- */
+
+    printf("\n3 smallest eigenvalues by imaginary part:\n");
 
     options.nev = 3;
     options.which[0] = 'L' ;
@@ -201,8 +211,11 @@ int main() {
 
     igraph_arpack_rnsolve(cb2, /*extra=*/ &data, &options, /*storage=*/ 0,
                           &values, &vectors);
+    printf("\nEigenvalues:\n");
+    igraph_matrix_print(&values);
     if (check_eigenvectors("LI", &A, &values, &vectors)) {
-        print_debug_output(&values, &vectors);
+        printf("\nEigenvectors:\n");
+        igraph_matrix_print(&vectors);
     }
 
     /* -------------- */

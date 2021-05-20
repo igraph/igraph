@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -55,7 +55,7 @@ int shell_skip_whitespace(FILE *fin) {
   return 0;
 }
 
-FILE *shell_open_file(const char *where, const char *mode) {  
+FILE *shell_open_file(const char *where, const char *mode) {
   static const char *input="input";
   static const char *output="output";
   FILE *f;
@@ -70,12 +70,12 @@ FILE *shell_open_file(const char *where, const char *mode) {
 
   f=fopen(where, mode);
   if (!f) {
-    fprintf(stderr, "Cannot open %s file: `%s'\n", 
+    fprintf(stderr, "Cannot open %s file: `%s'\n",
 	    !strcmp(mode, "r") ? input : output, where);
     exit(1);
   }
   return f;
-} 
+}
 
 int shell_read_graph(igraph_t *graph, const char *where) {
   FILE *fin=shell_open_file(where, "r");
@@ -98,7 +98,7 @@ int shell_read_vector(igraph_vector_t *v, const char *where) {
   igraph_vector_init(v, 0);
   while (ret > 0) {
     ret=fscanf(fin, "%lf", &n);
-    if (ret > 0) { 
+    if (ret > 0) {
       igraph_vector_push_back(v, n);
     }
   }
@@ -115,14 +115,14 @@ int shell_write_a_vector(const igraph_vector_t *v, FILE *fout, const char *where
   int ret=1;
   long int i, n=igraph_vector_size(v);
   if (n>0) { ret=fprintf(fout, "%g", VECTOR(*v)[0]); }
-  if (ret <= 0) { 
+  if (ret <= 0) {
     fprintf(stderr, "Cannot write vector to `%s'\n", where);
     fclose(fout);
     exit(1);
   }
   for (i=1; i<n; i++) {
     ret=fprintf(fout, " %g", VECTOR(*v)[i]);
-    if (ret <= 0) { 
+    if (ret <= 0) {
       fprintf(stderr, "Cannot write vector to `%s'\n", where);
       fclose(fout);
       exit(1);
@@ -130,12 +130,12 @@ int shell_write_a_vector(const igraph_vector_t *v, FILE *fout, const char *where
   }
   fprintf(fout, "\n");
   return 0;
-}  
+}
 
 int shell_write_vector(const igraph_vector_t *v, const char *where) {
   FILE *fout=shell_open_file(where, "w");
   shell_write_a_vector(v, fout, where);
-  fclose(fout);  
+  fclose(fout);
   return 0;
 }
 
@@ -152,7 +152,7 @@ int shell_read_a_matrix(igraph_matrix_t *m, FILE *fin, const char *where) {
   for (i=0; i<nrow; i++) {
     for (j=0; j<ncol; j++) {
       ret=fscanf(fin, "%lf", &n);
-      if (ret <= 0) { 
+      if (ret <= 0) {
 	fprintf(stderr, "Error reading matrix from file '%s'\n", where);
 	fclose(fin);
 	exit(1);
@@ -166,7 +166,7 @@ int shell_read_a_matrix(igraph_matrix_t *m, FILE *fin, const char *where) {
 int shell_read_matrix(igraph_matrix_t *m, const char *where) {
   FILE *fin=shell_open_file(where, "r");
   shell_read_a_matrix(m, fin, where);
-  fclose(fin);      
+  fclose(fin);
   return 0;
 }
 
@@ -175,7 +175,7 @@ int shell_write_matrix(const igraph_matrix_t *m, const char *where) {
   long int nrow=igraph_matrix_nrow(m);
   long int ncol=igraph_matrix_ncol(m);
   long int i, j;
-    
+
   if (0>fprintf(fout, "%li %li\n", nrow, ncol)) {
     fprintf(stderr, "Error writing matrix to file '%s'.\n", where);
     fclose(fout);
@@ -194,7 +194,7 @@ int shell_write_matrix(const igraph_matrix_t *m, const char *where) {
     fprintf(fout, "\n");
   }
   fclose(fout);
-  
+
   return 0;
 }
 
@@ -212,7 +212,7 @@ int shell_read_integer(igraph_integer_t *n, const char *where) {
 int shell_write_integer(igraph_integer_t n, const char *where) {
   FILE *fout=shell_open_file(where, "w");
   int ret=fprintf(fout, "%li\n", (long int)n);
-  if (ret <= 0) { 
+  if (ret <= 0) {
     fprintf(stderr, "Cannot write integer to '%s'\n", where);
     fclose(fout);
     exit(1);
@@ -221,7 +221,7 @@ int shell_write_integer(igraph_integer_t n, const char *where) {
 }
 
 int shell_read_boolean(igraph_bool_t *b, const char *where) {
-  if (strlen(where)==0 || 
+  if (strlen(where)==0 ||
       where[0]=='0' ||
       where[0]=='F' ||
       where[0]=='f') {
@@ -236,11 +236,11 @@ int shell_write_boolean(igraph_bool_t b, const char *where) {
   int bb= b==0 ? 0 : 1;
   FILE *fout=shell_open_file(where, "w");
   int ret=fprintf(fout, "%i\n", bb);
-  if (ret <= 0) { 
+  if (ret <= 0) {
     fprintf(stderr, "Cannot write integer to '%s'\n", where);
     fclose(fout);
     exit(1);
-  }  
+  }
   return 0;
 }
 
@@ -249,14 +249,14 @@ int shell_read_real(igraph_real_t *b, const char *where) {
   if (ret == EOF || ret == 0) {
     fprintf(stderr, "Error, cannot interpret '%s' as real\n", where);
     exit(1);
-  }  
+  }
   return 0;
 }
 
 int shell_write_real(igraph_real_t b, const char *where) {
   FILE *fout=shell_open_file(where, "w");
   int ret=fprintf(fout, "%g\n", (double)b);
-  if (ret <= 0) { 
+  if (ret <= 0) {
     fprintf(stderr, "Cannot write real to `%s'\n", where);
     fclose(fout);
     exit(1);
@@ -268,7 +268,7 @@ int shell_read_enum(void* value, const char *where, ...) {
   int result=-1, *p=value;
   va_list args;
   va_start(args, where);
-  
+
   while (1) {
     char *name=va_arg(args, char*);
     int code;
@@ -282,11 +282,11 @@ int shell_read_enum(void* value, const char *where, ...) {
       break;
     }
   }
-  
+
   if (result==-1) {
     fprintf(stderr, "Cannot interpret argument: '%s'.\n", where);
     exit(1);
-  }   
+  }
 
   *p=result;
 
@@ -365,7 +365,7 @@ int shell_read_strvector(igraph_strvector_t *str, const char *where) {
   }
   fclose(fin);
   free(buffer);
-  
+
   return 0;
 }
 
@@ -384,14 +384,14 @@ int shell_write_vector_bool(igraph_vector_bool_t *v, const char *where) {
   int ret=1;
   long int i, n=igraph_vector_bool_size(v);
   if (n>0) { ret=fprintf(fout, "%i", VECTOR(*v)[0]==0 ? 0 : 1); }
-  if (ret <= 0) { 
+  if (ret <= 0) {
     fprintf(stderr, "Cannot write vector to `%s'\n", where);
     fclose(fout);
     exit(1);
   }
   for (i=1; i<n; i++) {
     ret=fprintf(fout, " %i", VECTOR(*v)[i]==0 ? 0 : 1);
-    if (ret <= 0) { 
+    if (ret <= 0) {
       fprintf(stderr, "Cannot write vector to `%s'\n", where);
       fclose(fout);
       exit(1);
@@ -400,7 +400,7 @@ int shell_write_vector_bool(igraph_vector_bool_t *v, const char *where) {
   fprintf(fout, "\n");
   fclose(fout);
   return 0;
-}  
+}
 
 int shell_write_graphlist(igraph_vector_ptr_t *v, const char *where) {
   FILE *fout=shell_open_file(where, "w");
@@ -445,4 +445,3 @@ int shell_free_vectorlist(igraph_vector_ptr_t *v) {
 /* ------------------------------------------------------------------------ */
 /* Stimulus generated interface next                                        */
 /* ------------------------------------------------------------------------ */
-

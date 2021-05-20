@@ -48,7 +48,7 @@ int main() {
 
     igraph_vector_init(&types, 0);
 
-    /* Symmetric preference game */    
+    /* Symmetric preference game */
     igraph_vector_init_real(&type_dist, 3, 1.0, 1.0, 1.0);
 
     igraph_matrix_init(&pref_mat, 3, 3);

@@ -159,7 +159,7 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  *        same as the length of this vector.
  * \param nei Integer value giving the distance (number of steps)
  *        within which two vertices will be connected.
- * \param directed Boolean, whether to create a directed graph. 
+ * \param directed Boolean, whether to create a directed graph.
  *        If the \c mutual and \c circular arguments are not set to true,
  *        edges will be directed from lower-index vertices towards
  *        higher-index ones.

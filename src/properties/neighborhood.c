@@ -38,7 +38,7 @@
  * neighbors, order 2 is order 1 plus the immediate neighbors of the
  * vertices in order 1, etc.
  *
- * </para><para> 
+ * </para><para>
  * This function calculates the size of the neighborhood
  * of the given order for the given vertices.
  *

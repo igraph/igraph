@@ -93,4 +93,3 @@ else()
   message(STATUS "igraph configured successfully.")
   message(STATUS " ")
 endif()
-

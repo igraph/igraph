@@ -168,7 +168,7 @@ void test_zero_edge_graph() {
     igraph_vector_init(&res, igraph_ecount(&g));
     igraph_vector_init(&eb, igraph_ecount(&g));
 
-    igraph_community_edge_betweenness(&g, 
+    igraph_community_edge_betweenness(&g,
         &res, // result
         &eb, // edge_betweenness result
         NULL, // merges result
@@ -177,7 +177,7 @@ void test_zero_edge_graph() {
         NULL, // membership
         IGRAPH_UNDIRECTED, // directed
         NULL // weights
-        );    
+        );
 
     igraph_vector_destroy(&eb);
     printf("No crash\n");

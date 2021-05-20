@@ -33,7 +33,7 @@ typedef struct TYPE(igraph_dqueue) {
     BASE *stor_end;
 } TYPE(igraph_dqueue);
 
-IGRAPH_EXPORT int FUNCTION(igraph_dqueue, init)    (TYPE(igraph_dqueue)* q, long int size);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, init)    (TYPE(igraph_dqueue)* q, long int size);
 IGRAPH_EXPORT void FUNCTION(igraph_dqueue, destroy) (TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_dqueue, empty)   (const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT void FUNCTION(igraph_dqueue, clear)   (TYPE(igraph_dqueue)* q);
@@ -43,7 +43,7 @@ IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, pop)     (TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, pop_back)(TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, head)    (const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, back)    (const TYPE(igraph_dqueue)* q);
-IGRAPH_EXPORT int FUNCTION(igraph_dqueue, push)    (TYPE(igraph_dqueue)* q, BASE elem);
-IGRAPH_EXPORT int FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
-IGRAPH_EXPORT int FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, push)    (TYPE(igraph_dqueue)* q, BASE elem);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
 IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, long int idx);

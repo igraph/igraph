@@ -446,9 +446,10 @@ igraph_get_shortest_paths:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths:
-        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
+                OUT EDGESETLIST_OR_0 edges, OUT VECTOR_OR_0 nrgeo, \
                 VERTEX from, VERTEXSET to, NEIMODE mode=OUT
-        DEPS: res ON graph, from ON graph, to ON graph
+        DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
         IGNORE: RR, RNamespace
 
 igraph_shortest_paths_dijkstra:
@@ -478,7 +479,7 @@ igraph_get_shortest_paths_bellman_ford:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_all_shortest_paths_dijkstra:
-        PARAMS: GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo, \
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, OUT EDGESETLIST_OR_0 edges, OUT VECTOR_OR_0 nrgeo, \
                 VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights, \
                 NEIMODE mode=OUT
         DEPS: weights ON graph, to ON graph, res ON graph, from ON graph
@@ -502,6 +503,13 @@ igraph_get_all_simple_paths:
         DEPS: from ON graph, to ON graph, res ON graph
         NAME-R: all_simple_paths
         PP-R: get.all.simple.paths.pp
+        IGNORE: RR
+
+igraph_spanner:
+        PARAMS: GRAPH graph, OUT GRAPH spanner, REAL stretch, \
+                EDGEWEIGHTS weights=NULL, OUT EDGEWEIGHTS spanner_weight=NULL
+                INT seed
+        DEPS: from ON graph, to ON graph, res ON graph
         IGNORE: RR
 
 igraph_subcomponent:

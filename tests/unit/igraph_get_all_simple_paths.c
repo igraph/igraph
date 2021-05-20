@@ -36,7 +36,7 @@ int main() {
                  3, 2, 3, 5,
                  -1);
 
-    igraph_vector_int_init(&res, 0);    
+    igraph_vector_int_init(&res, 0);
 
     for (i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);

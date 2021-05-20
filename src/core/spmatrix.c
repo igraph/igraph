@@ -1064,5 +1064,3 @@ int igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
 
     return 0;
 }
-
-

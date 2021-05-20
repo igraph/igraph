@@ -130,8 +130,8 @@ Ces termes s'entendent au singulier comme au pluriel.
 
 Le Contrat a pour objet la concession par le Concédant au Licencié d'une
 licence non exclusive, cessible et mondiale du Logiciel telle que
-définie ci-après à l'article 5 pour toute la durée de protection des droits 
-portant sur ce Logiciel. 
+définie ci-après à l'article 5 pour toute la durée de protection des droits
+portant sur ce Logiciel.
 
 
     Article 3 - ACCEPTATION
@@ -291,11 +291,11 @@ Module Externe aux obligations précédentes.
         5.3.5 COMPATIBILITE AVEC LES LICENCES CeCILL et CeCILL-C
 
 Lorsqu'un Logiciel Modifié contient une Contribution soumise au contrat
-de licence CeCILL, les stipulations prévues à l'article 5.3.4 sont 
+de licence CeCILL, les stipulations prévues à l'article 5.3.4 sont
 facultatives.
 
 Un Logiciel Modifié peut être distribué sous le contrat de licence
-CeCILL-C. Les stipulations prévues à l'article 5.3.4 sont alors 
+CeCILL-C. Les stipulations prévues à l'article 5.3.4 sont alors
 facultatives.
 
 
@@ -368,7 +368,7 @@ Concédant et le Licencié.
 
     Article 8 - RESPONSABILITE
 
-8.1 Sous réserve des dispositions de l'article 8.2, le Licencié a la 
+8.1 Sous réserve des dispositions de l'article 8.2, le Licencié a la
 faculté, sous réserve de prouver la faute du Concédant concerné, de
 solliciter la réparation du préjudice direct qu'il subirait du fait du
 Logiciel et dont il apportera la preuve.

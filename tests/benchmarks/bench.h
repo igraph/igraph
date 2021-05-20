@@ -35,7 +35,17 @@ static inline void igraph_get_cpu_time(double *data) {
     data[2] = (double) self.ru_stime.tv_sec + 1e-6 * self.ru_stime.tv_usec; /* system */
 }
 
-#define BENCH_INIT() do { sleep(1); } while (0)
+#define BENCH_INIT() \
+    do { \
+        printf("\n|> Benchmark file: %s\n", IGRAPH_FILE_BASENAME); \
+        sleep(1); \
+    } while (0)
+
+#define REPEAT(CODE, N) \
+    do { \
+        long rep_i; \
+        for (rep_i=0; rep_i < N; ++rep_i) { CODE; } \
+    } while (0)
 
 #define BENCH(NAME, ...)    do { \
         double start[3], stop[3]; \
@@ -46,8 +56,7 @@ static inline void igraph_get_cpu_time(double *data) {
         r = 1e-3 * round(1e3 * (stop[0] - start[0])); \
         u = 1e-3 * round(1e3 * (stop[1] - start[1])); \
         s = 1e-3 * round(1e3 * (stop[2] - start[2])); \
-        printf("%-80s %5.3gs  %5.3gs  %5.3gs\n", NAME, r, u, s); \
+        printf("| %-80s %5.3gs  %5.3gs  %5.3gs\n", NAME, r, u, s); \
     } while (0)
 
 #endif
-

@@ -47,10 +47,10 @@ static const char *igraph_version_string = IGRAPH_VERSION;
  * \example examples/simple/igraph_version.c
  */
 
-int igraph_version(const char **version_string,
-                   int *major,
-                   int *minor,
-                   int *subminor) {
+void igraph_version(const char **version_string,
+                    int *major,
+                    int *minor,
+                    int *subminor) {
     int i1, i2, i3;
     int *p1 = major ? major : &i1,
          *p2 = minor ? minor : &i2,
@@ -62,6 +62,4 @@ int igraph_version(const char **version_string,
 
     *p1 = *p2 = *p3 = 0;
     sscanf(IGRAPH_VERSION, "%i.%i.%i", p1, p2, p3);
-
-    return 0;
 }

@@ -313,7 +313,7 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
  *             for more details.
  * \param xmin the minimum value in the sample vector where the power-law
  *             behaviour is expected to kick in. Samples smaller than \c xmin
- *             will be ignored by the algoritm. Pass zero here if you want to
+ *             will be ignored by the algorithm. Pass zero here if you want to
  *             include all the samples. If \c xmin is negative, the algorithm
  *             will attempt to determine its best value automatically.
  * \param force_continuous assume that the samples in the \c data argument come
@@ -432,4 +432,3 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
 
     return 0;
 }
-

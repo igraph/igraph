@@ -49,7 +49,8 @@
  * The order of the vertex ids in the generated graph corresponds to
  * the \p block_sizes argument.
  *
- * \param graph The output graph.
+ * \param graph The output graph. This should be a pointer to an
+ *     uninitialized graph.
  * \param n Number of vertices.
  * \param pref_matrix The matrix giving the Bernoulli rates.
  *     This is a KxK matrix, where K is the number of groups.
@@ -85,36 +86,44 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     /* ------------------------------------------------------------ */
 
     if (igraph_matrix_ncol(pref_matrix) != no_blocks) {
-        IGRAPH_ERROR("Preference matrix is not square",
+        IGRAPH_ERROR("Preference matrix is not square.",
                      IGRAPH_NONSQUARE);
     }
 
-    igraph_matrix_minmax(pref_matrix, &minp, &maxp);
-    if (minp < 0 || maxp > 1) {
-        IGRAPH_ERROR("Connection probabilities must be in [0,1]", IGRAPH_EINVAL);
-    }
-
-    if (n < 0) {
-        IGRAPH_ERROR("Number of vertices must be non-negative", IGRAPH_EINVAL);
+    if (no_blocks > 0) {
+        igraph_matrix_minmax(pref_matrix, &minp, &maxp);
+        if (minp < 0 || maxp > 1) {
+            IGRAPH_ERROR("Connection probabilities must be in [0,1].", IGRAPH_EINVAL);
+        }
     }
 
     if (!directed && !igraph_matrix_is_symmetric(pref_matrix)) {
-        IGRAPH_ERROR("Preference matrix must be symmetric for undirected graphs",
+        IGRAPH_ERROR("Preference matrix must be symmetric for undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
     if (igraph_vector_int_size(block_sizes) != no_blocks) {
-        IGRAPH_ERROR("Invalid block size vector length", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Block size vector length (%ld) does not agree with "
+                      "preference matrix size (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_int_size(block_sizes), no_blocks);
     }
 
-    if (igraph_vector_int_min(block_sizes) < 0) {
-        IGRAPH_ERROR("Block sizes must be non-negative", IGRAPH_EINVAL);
+    if (no_blocks > 0) {
+        if (igraph_vector_int_min(block_sizes) < 0) {
+            IGRAPH_ERRORF("Block sizes must be non-negative, but got %" IGRAPH_PRId ".",
+                          IGRAPH_EINVAL, igraph_vector_int_min(block_sizes));
+        }
     }
 
     if (igraph_vector_int_sum(block_sizes) != n) {
-        IGRAPH_ERROR("Block sizes must sum up to number of vertices",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Sum of the block sizes (%ld) must equal the number of vertices (%ld).",
+                      IGRAPH_EINVAL, igraph_vector_int_sum(block_sizes), n);
     }
+
+    /* Since the sum of the block sizes should equal the number of vertices,
+     * and the block sizes are non-negative, the number of vertices is
+     * guaranteed to be non-negative. This shouldn't be checked separately.
+     */
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
@@ -220,7 +229,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

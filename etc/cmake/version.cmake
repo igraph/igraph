@@ -88,4 +88,3 @@ if(NOT PROJECT_NAME)
     COMMENT "Generating IGRAPH_VERSION file in build folder"
   )
 endif()
-

@@ -122,4 +122,3 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
 
     return IGRAPH_SUCCESS;
 }
-

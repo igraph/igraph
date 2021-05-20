@@ -31,4 +31,3 @@ mark_as_advanced(GMP_LIBRARY)
 if(GMP_FOUND)
   set(GMP_LIBRARIES ${GMP_LIBRARY})
 endif()
-

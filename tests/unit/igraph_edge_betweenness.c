@@ -78,7 +78,7 @@ void test_bug1050() {
     igraph_vector_destroy(&eb);
     igraph_vector_destroy(&eb2);
 
-    /* weighted */    
+    /* weighted */
     igraph_vector_init(&eb, igraph_ecount(&g));
     igraph_vector_init(&eb2, igraph_ecount(&g));
 

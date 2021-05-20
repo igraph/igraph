@@ -1030,5 +1030,3 @@ int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_si
 #ifdef MATCHING_DEBUG
     #undef MATCHING_DEBUG
 #endif
-
-

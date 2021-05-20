@@ -2,15 +2,69 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
+ - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
+ - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
+ - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
+
+### Changed
+
+ - `igraph_version()` no longer returns an error code.
+
+## [0.9.3] - 2021-05-05
+
+### Added
+
+ - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+ - OpenMP is now enabled and used by certain functions (notably PageRank calculation) when the compiler supports it. Set `IGRAPH_OPENMP_SUPPORT=OFF` at configuration time to disable this.
+
 ### Fixed
 
- - igraph can now be used as a CMake subproject in other CMake-based projects
+ - `igraph_get_incidence()` no longer reads and writes out of bounds when given a non-bipartite graph, but gives a warning and ignores edges within a part.
+ - `igraph_dyad_census()` no longer reports an overflow on singleton graphs, and handles loops and multigraphs correctly. Undirected graphs are handled consistently and will no longer give a warning.
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` dereferenced their arguments only once instead of twice, and therefore did not work with `igraph_vector_ptr_sort()`.
+ - `igraph_maximal_cliques_subset()` and `igraph_transitivity_barrat()` corrupted the error handling stack ("finally stack") under some circumstances.
+ - CMake package files did not respect `CMAKE_INSTALL_LIBDIR`. This only affected Linux distributions which install into `lib64` or other locations instead of `lib`.
+ - The parser sources could not be generated when igraph was in a location that contained spaces in its path.
+ - igraph no longer links to the math library (`libm`) when this is not necessary.
+ - `_CRT_SECURE_NO_WARNINGS` is now defined during compilation to enable compatibility with UWP.
+ - Fixed a compilation issue on MSYS / MinGW when link-time optimization was enabled and the `MSYS Makefiles` CMake generator was used. Some source files in igraph were renamed as a consequence, but these should not affect users of the library.
+
+### Deprecated
+
+ - `igraph_rng_min()` is now deprecated; assume a constant zero as its return value if you used this function in your own code.
+
+### Other
+
+ - Updated the vendored CXSparse library to version 3.2.0
+
+## [0.9.2] - 2021-04-14
+
+### Added
+
+ - CMake package files are now installed with igraph. This allows `find_package(igraph)` to find igraph and detect the appropriate compilation options for projects that link to it.
+
+### Fixed
+
+ - igraph can now be used as a CMake subproject in other CMake-based projects.
+ - The documentaton can now be built from the release tarball.
+ - Configuration will no longer fail when the release tarball is extracted into a subdirectory of an unrelated git repository.
+ - The generated pkg-config file was incorrect when `CMAKE_INSTALL_<dir>` variables were absolute paths.
+ - On Unix-like systems, the library name is now `libigraph.so.0.0.0`, as it used to be for igraph 0.8 and earlier.
+ - Fixed a return type mismatch in parser sources, and fixed some warnings with recent versions of gcc.
+ - Fixed a bug in `igraph_get_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` that returned incorrect results for unreachable vertices.
+
+### Other
+
+ - Improved installation instructions and tutorial.
 
 ## [0.9.1] - 2021-03-23
 
 ### Added
 
- - `igraph_vector_lex_cmp()` and `igrapg_vector_colex_cmp()` for lexicographic
+ - `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()` for lexicographic
    and colexicographic comparison of vectors. These functions may also be used
    for sorting.
 
@@ -126,7 +180,7 @@
    * `igraph_asymmetric_preference_game()` now accept a different number of in-types and out-types.
  - `igraph_subisomorphic_lad()` now supports graphs with self-loops.
  - `igraph_is_chordal()` and `igraph_maximum_cardinality_search()` now support non-simple graphs and directed graphs.
- - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
+ - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
  - `igraph_to_directed()`: added RANDOM and ACYCLIC modes (PR #1511).

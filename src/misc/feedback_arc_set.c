@@ -659,4 +659,3 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     return IGRAPH_SUCCESS;
 #endif
 }
-

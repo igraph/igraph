@@ -24,7 +24,7 @@ Features:
   * Cliquer is re-entrant, so you can use the clique-searching
     functions from within the callback function
 
-The full documentation can be obtained via the www page of 
+The full documentation can be obtained via the www page of
 Cliquer <http://www.tkk.fi/~pat/cliquer.html>.
 
 
@@ -50,12 +50,12 @@ Contact
 Cliquer was mainly written by Sampo Niskanen <sampo.niskanen@iki.fi>.
 
 For bug-fixes, feedback, and, in particular, for putting your
-name on the mailing list for important information regarding Cliquer, 
+name on the mailing list for important information regarding Cliquer,
 please contact:
- 
+
 Patric Ostergard
 Department of Communications and Networking
-Aalto University 
+Aalto University
 P.O. Box 13000, 00076 Aalto
 FINLAND
 <patric.ostergard@tkk.fi>

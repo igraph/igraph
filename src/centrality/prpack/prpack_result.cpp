@@ -9,4 +9,3 @@ prpack_result::prpack_result() {
 prpack_result::~prpack_result() {
     delete[] x;
 }
-

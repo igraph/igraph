@@ -777,4 +777,3 @@ int igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
 
     return IGRAPH_SUCCESS;
 }
-

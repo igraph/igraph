@@ -42,7 +42,7 @@
  *      unless it is a null pointer. Row \c i of the matrix was
  *      interchanged with row <code>ipiv[i]</code>.
  * \param info LAPACK error code. Zero on successful exit. If its value is
- *      a positive number i, it indicates that U(i,i) is exactly zero. 
+ *      a positive number i, it indicates that U(i,i) is exactly zero.
  *      The factorization has been
  *      completed, but the factor U is exactly singular, and division
  *      by zero will occur if it is used to solve a system of
@@ -241,10 +241,10 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
     igraph_vector_int_t *myipiv = ipiv, vipiv;
 
     if (n != igraph_matrix_ncol(a)) {
-        IGRAPH_ERROR("Cannot LU solve matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
     }
     if (n != igraph_matrix_nrow(b)) {
-        IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
 
     if (!ipiv) {
@@ -257,35 +257,35 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                  VECTOR(b->data), &ldb, info);
 
     if (*info > 0) {
-        IGRAPH_WARNING("LU: factor is exactly singular");
+        IGRAPH_WARNING("LU: factor is exactly singular.");
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows/column", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_ELAPACK);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of RHS vectors", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_ELAPACK);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid RHS matrix", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_ELAPACK);
             break;
         case -7:
-            IGRAPH_ERROR("Invalid LDB parameter", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_ELAPACK);
             break;
         case -8:
-            IGRAPH_ERROR("Invalid info argument", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
             break;
         }
     }
@@ -376,15 +376,15 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
     int lwork = -1, liwork = -1;
 
     if (n != igraph_matrix_ncol(A)) {
-        IGRAPH_ERROR("Cannot find eigenvalues/vectors", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot find eigenvalues/vectors.", IGRAPH_NONSQUARE);
     }
     if (which == IGRAPH_LAPACK_DSYEV_INTERVAL &&
         (vestimate < 1 || vestimate > n)) {
         IGRAPH_ERROR("Estimated (upper bound) number of eigenvalues must be "
-                     "between 1 and n", IGRAPH_EINVAL);
+                     "between 1 and n.", IGRAPH_EINVAL);
     }
     if (which == IGRAPH_LAPACK_DSYEV_SELECT && iu - il < 0) {
-        IGRAPH_ERROR("Invalid 'il' and/or 'iu' values", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'il' and/or 'iu' values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
@@ -436,7 +436,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
     if (info != 0) {
-        IGRAPH_ERROR("Invalid argument to dsyevr in workspace query", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid argument to dsyevr in workspace query.", IGRAPH_EINVAL);
     }
 
     lwork = (int) VECTOR(work)[0];
@@ -450,7 +450,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
     if (info != 0) {
-        IGRAPH_ERROR("Invalid argument to dsyevr in calculation", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid argument to dsyevr in calculation.", IGRAPH_EINVAL);
     }
 
     if (values) {
@@ -555,7 +555,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
     int error = *info;
 
     if (igraph_matrix_ncol(A) != n) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_NONSQUARE);
     }
 
     IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
@@ -598,12 +598,12 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
                  VECTOR(work), &lwork, info);
 
     if (*info < 0) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
     } else if (*info > 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
         } else {
-            IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev)");
+            IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev).");
         }
     }
 
@@ -767,7 +767,7 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     igraph_vector_t *myscale = scale, vscale;
 
     if (igraph_matrix_ncol(A) != n) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx)", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx).", IGRAPH_NONSQUARE);
     }
 
     switch (balance) {
@@ -784,7 +784,7 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
         balanc = 'B';
         break;
     default:
-        IGRAPH_ERROR("Invalid 'balance' argument", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'balance' argument.", IGRAPH_EINVAL);
         break;
     }
 
@@ -852,12 +852,12 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     if (*info < 0) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
     } else if (*info > 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
         } else {
-            IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev)");
+            IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev).");
         }
     }
 
@@ -899,11 +899,11 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
     int i;
 
     if (igraph_matrix_ncol(A) != n) {
-        IGRAPH_ERROR("Hessenberg reduction failed", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Hessenberg reduction failed.", IGRAPH_NONSQUARE);
     }
 
     if (ilo < 1 || ihi > n || ilo > ihi) {
-        IGRAPH_ERROR("Invalid `ilo' and/or `ihi'", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid `ilo' and/or `ihi'.", IGRAPH_EINVAL);
     }
 
     if (n <= 1) {
@@ -919,7 +919,7 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
                   &optwork, &lwork, &info);
 
     if (info != 0) {
-        IGRAPH_ERROR("Internal Hessenberg transformation error",
+        IGRAPH_ERROR("Internal Hessenberg transformation error.",
                      IGRAPH_EINTERNAL);
     }
 
@@ -930,7 +930,7 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
                   VECTOR(work), &lwork, &info);
 
     if (info != 0) {
-        IGRAPH_ERROR("Internal Hessenberg transformation error",
+        IGRAPH_ERROR("Internal Hessenberg transformation error.",
                      IGRAPH_EINTERNAL);
     }
 
@@ -952,5 +952,3 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
 
     return 0;
 }
-
-

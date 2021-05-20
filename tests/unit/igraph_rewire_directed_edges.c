@@ -60,7 +60,9 @@ int main() {
     igraph_vs_destroy(&vertices);
 
     /*A few erroneous calls*/
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
+
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ -0.1, /*loops*/ 0, /*mode*/ IGRAPH_ALL) == IGRAPH_EINVAL);
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 1.1, /*loops*/ 0, /*mode*/ IGRAPH_ALL) == IGRAPH_EINVAL);
     igraph_destroy(&g);

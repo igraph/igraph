@@ -29,7 +29,7 @@ int main() {
     FILE *ifile;
 
     /* PAJEK */
-    ifile = fopen("LINKS.NET", "r");
+    ifile = fopen("links.net", "r");
     if (ifile == 0) {
         return 10;
     }

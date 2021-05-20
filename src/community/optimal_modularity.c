@@ -279,4 +279,3 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
 #endif
 
 }
-

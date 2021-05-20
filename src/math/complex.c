@@ -389,4 +389,3 @@ igraph_complex_t igraph_complex_csc(igraph_complex_t z) {
 igraph_complex_t igraph_complex_cot(igraph_complex_t z) {
     return igraph_complex_inv(igraph_complex_tan(z));
 }
-

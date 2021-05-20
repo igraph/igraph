@@ -311,11 +311,11 @@ int *reorder_by_weighted_greedy_coloring(graph_t *g, boolean weighted) {
 	int min_wt,max_nwt;
 	boolean *used;
 	int *order;
-	
+
 	nwt=malloc(g->n * sizeof(int));
 	order=malloc(g->n * sizeof(int));
 	used=calloc(g->n,sizeof(boolean));
-	
+
 	for (i=0; i < g->n; i++) {
 		nwt[i]=0;
 		for (j=0; j < g->n; j++)
@@ -422,4 +422,3 @@ int *reorder_by_random(graph_t *g, boolean weighted) {
 	free(used);
 	return new;
 }
-

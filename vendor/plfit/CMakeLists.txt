@@ -3,7 +3,6 @@ add_library(
   plfit
   OBJECT
   EXCLUDE_FROM_ALL
-  error.c
   gss.c
   hzeta.c
   kolmogorov.c
@@ -12,6 +11,7 @@ add_library(
   options.c
   platform.c
   plfit.c
+  plfit_error.c
   rbinom.c
   sampling.c
 )
@@ -37,3 +37,6 @@ if (MSVC)
   target_compile_options(plfit PRIVATE /wd4100) # disable unreferenced parameter warning
 endif()
 
+if(IGRAPH_OPENMP_SUPPORT)
+  target_link_libraries(plfit PRIVATE OpenMP::OpenMP_C)
+endif()

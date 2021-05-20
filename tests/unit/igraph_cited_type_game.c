@@ -61,6 +61,7 @@ int main() {
     igraph_vector_destroy(&pref);
     igraph_vector_destroy(&types);
 
+    VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking negative number of nodes error handling.\n");

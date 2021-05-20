@@ -180,7 +180,7 @@ use or performance of this software.
 
 #### [SuiteSparse](http://www.suitesparse.com)
 
- * CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2009, Timothy A. Davis.
+ * CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2017, Timothy A. Davis.
 
    License: [GNU LGPLv2.1][lgpl2] or later
 

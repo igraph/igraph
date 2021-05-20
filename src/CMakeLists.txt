@@ -14,13 +14,17 @@ foreach(FORMAT dl gml lgl ncol pajek)
       ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c
     )
   else()
+    if (BISON_VERSION VERSION_GREATER_EQUAL 3)
+      set(bison_no_deprecated -Wno-deprecated)
+    endif()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
-      COMPILE_FLAGS "--no-lines"
+      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "--noline --header-file=${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h"
+      COMPILE_FLAGS "--noline"
+      DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -80,7 +84,7 @@ add_library(
 
   constructors/adjacency.c
   constructors/atlas.c
-  constructors/basic.c
+  constructors/basic_constructors.c
   constructors/de_bruijn.c
   constructors/famous.c
   constructors/full.c
@@ -121,13 +125,15 @@ add_library(
   centrality/centralization.c
   centrality/closeness.c
   centrality/coreness.c
+  centrality/truss.cpp
   centrality/prpack.cpp
 
-  cliques/cliquer.c
+  cliques/cliquer_wrapper.c
   cliques/cliques.c
   cliques/maximal_cliques.c
   cliques/glet.c
 
+  community/community_misc.c
   community/edge_betweenness.c
   community/fast_modularity.c
   community/fluid.c
@@ -139,7 +145,6 @@ add_library(
   community/leading_eigenvector.c
   community/leiden.c
   community/louvain.c
-  community/misc.c
   community/modularity.c
   community/optimal_modularity.c
   community/spinglass/clustertool.cpp
@@ -175,7 +180,6 @@ add_library(
   io/pajek.c
   ${PARSER_SOURCES}
 
-  layout/bipartite.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -187,13 +191,14 @@ add_library(
   layout/fruchterman_reingold.c
   layout/gem.c
   layout/graphopt.c
-  layout/grid.c
   layout/kamada_kawai.c
-  layout/lgl.c
+  layout/large_graph.c
+  layout/layout_bipartite.c
+  layout/layout_grid.c
+  layout/layout_random.c
   layout/mds.c
   layout/merge_dla.c
   layout/merge_grid.c
-  layout/random.c
   layout/reingold_tilford.c
   layout/sugiyama.c
 
@@ -224,8 +229,9 @@ add_library(
   paths/shortest_paths.c
   paths/simple_paths.c
   paths/unweighted.c
+  paths/sparsifier.c
 
-  properties/basic.c
+  properties/basic_properties.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c
@@ -239,17 +245,10 @@ add_library(
   properties/trees.c
   properties/triangles.c
 
-  scg/scg_approximate_methods.c
-  scg/scg_exact_scg.c
-  scg/scg_kmeans.c
-  scg/scg_optimal_method.c
-  scg/scg_utils.c
-  scg/scg.c
-
   isomorphism/bliss.cc
   isomorphism/isoclasses.c
   isomorphism/lad.c
-  isomorphism/misc.c
+  isomorphism/isomorphism_misc.c
   isomorphism/queries.c
   isomorphism/vf2.c
 
@@ -396,51 +395,8 @@ use_all_warnings(igraph)
 # CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR variables.
 include(GNUInstallDirs)
 
-# Generate pkgconfig file.
-# The library names being used here are Linux-specific, but pkgconfig files
-# are omstly used on Linux anyway. Nevertheless, we take care not to include
-# -lm on Windows because the Python interface of igraph uses the pkg-config
-# file to decide what to link to, and we don't have a separate math library
-# on Windows.
-if(WIN32)
-  set(PKGCONFIG_LIBS_PRIVATE "")
-else()
-  set(PKGCONFIG_LIBS_PRIVATE "-lm")
-endif()
-if(APPLE)
-  # All recent macOS distributions use libc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
-elseif(NOT MSVC)
-  # Most Linux distributions and MSYS use libstdc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
-endif()
-
-if(IGRAPH_GRAPHML_SUPPORT)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_GMP)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lgmp")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_BLAS)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lblas")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_CXSPARSE)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lcxsparse")
-endif()
-if(IGRAPH_GLPK_SUPPORT AND NOT IGRAPH_USE_INTERNAL_GLPK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lglpk")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_LAPACK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -llapack")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_ARPACK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
-endif()
-
-include(JoinPaths)
-join_paths(PKGCONFIG_LIBDIR "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
-join_paths(PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
-configure_file(${PROJECT_SOURCE_DIR}/igraph.pc.in ${PROJECT_BINARY_DIR}/igraph.pc @ONLY)
+# Generate pkgconfig file
+include(pkgconfig_helpers)
 
 include(GenerateExportHeader)
 generate_export_header(igraph
@@ -457,7 +413,7 @@ configure_package_config_file(
   ${PROJECT_BINARY_DIR}/igraph-config.cmake
   # Install destination selected according to https://wiki.debian.org/CMake
   # and by looking at how eigen3 does it in Ubuntu
-  INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
@@ -491,12 +447,11 @@ install(
 install(
   FILES ${PROJECT_BINARY_DIR}/igraph-config.cmake
         ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
 install(
   EXPORT igraph_targets
   FILE igraph-targets.cmake
   NAMESPACE igraph::
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/igraph
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )
-

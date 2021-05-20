@@ -1,23 +1,3 @@
-/*
- * CXSPARSE: a Concise Sparse Matrix package - Extended.
- * Copyright (c) 2006-2009, Timothy A. Davis.
- * http://www.cise.ufl.edu/research/sparse/CXSparse
- * 
- * CXSparse is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * CXSparse is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this Module; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
 #include "cs.h"
 /* clear w */
 static CS_INT cs_wclear (CS_INT mark, CS_INT lemax, CS_INT *w, CS_INT n)
@@ -42,7 +22,7 @@ CS_INT *cs_amd (CS_INT order, const cs *A)  /* order 0:natural, 1:Chol, 2:LU, 3:
         *hhead, *ATp, *ATi, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1,
         k2, k3, jlast, ln, dense, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi,
         ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, n, m, t ;
-    unsigned CS_INT h ;
+    CS_INT h ;
     /* --- Construct matrix C ----------------------------------------------- */
     if (!CS_CSC (A) || order <= 0 || order > 3) return (NULL) ; /* check */
     AT = cs_transpose (A, 0) ;              /* compute A' */
@@ -287,7 +267,7 @@ CS_INT *cs_amd (CS_INT order, const cs *A)  /* order 0:natural, 1:Chol, 2:LU, 3:
                 Ci [p3] = Ci [p1] ;         /* move 1st el. to end of Ei */
                 Ci [p1] = k ;               /* add k as 1st element in of Ei */
                 len [i] = pn - p1 + 1 ;     /* new len of adj. list of node i */
-                h %= n ;                    /* finalize hash of i */
+                h = ((h<0) ? (-h):h) % n ;  /* finalize hash of i */
                 next [i] = hhead [h] ;      /* place i in hash bucket */
                 hhead [h] = i ;
                 last [i] = h ;              /* save hash of i in last[i] */

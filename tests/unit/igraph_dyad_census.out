@@ -1,0 +1,15 @@
+No vertices:
+Mutual: 0 asymmetric: 0 null: 0
+
+One vertex:
+Mutual: 0 asymmetric: 0 null: 0
+
+Two vertices:
+Mutual: 0 asymmetric: 1 null: 0
+
+Graph with loops and multiple edges:
+Mutual: 1 asymmetric: 4 null: 10
+
+Same graph, but undirected:
+Mutual: 5 asymmetric: 0 null: 10
+

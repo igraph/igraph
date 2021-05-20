@@ -300,7 +300,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
         long int to;
-        
+
         if (have_outseq) {
             no_of_neighbors = (long int) VECTOR(*outseq)[i];
         }

@@ -125,6 +125,7 @@ int main() {
     /* simple directed graph - should throw an error */
     igraph_small(&g, 6, 1, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 4, 3, 4, 3, 5, 4, 5, -1);
     igraph_set_error_handler(igraph_error_handler_ignore);
+    VERIFY_FINALLY_STACK();
     IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, &flow, &capacity) == IGRAPH_EINVAL);
     igraph_set_error_handler(igraph_error_handler_abort);
     igraph_destroy(&g);

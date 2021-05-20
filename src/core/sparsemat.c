@@ -3007,7 +3007,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
  * of non-zero entires in matrix columns <code>k-1</code> and lower.
  * <code>p[0]</code> is always zero and <code>p[n]</code> is always the total
  * number of non-zero entires in the matrix. <code>i[l]</code> is the row index
- * of the \c l-th stored element, while <code>x[l]</code> is its value. 
+ * of the \c l-th stored element, while <code>x[l]</code> is its value.
  * If a matrix element with indices <code>(j, k)</code> is explicitly stored,
  * it must be located between positions <code>p[k]</code> and <code>p[k+1] - 1</code>
  * (inclusive) in the \p i and \p x vectors.
@@ -3129,6 +3129,80 @@ int igraph_sparsemat_neg(igraph_sparsemat_t *A) {
     for (i = 0; i < nz; i++, px++) {
         *px = - (*px);
     }
+
+    return 0;
+}
+
+/**
+ * \function igraph_sparsemat_normalize_cols
+ * \brief Normalizes the column sums of a sparse matrix to a given value.
+ *
+ * \param  sparsemat    the sparse matrix to normalize
+ * \param  allow_zeros  whether to allow columns with zero sums
+ * \return \c IGRAPH_SUCCESS if everything was successful,
+ *         \c IGRAPH_EINVAL if there is at least one column with zero sum and it
+ *         is disallowed,
+ *         \c IGRAPH_ENOMEM for out-of-memory conditions
+ */
+
+int igraph_sparsemat_normalize_cols(
+    igraph_sparsemat_t *sparsemat, igraph_bool_t allow_zeros
+) {
+    igraph_vector_t sum;
+    int no_of_nodes = (int) igraph_sparsemat_nrow(sparsemat);
+    int i;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_sparsemat_colsums(sparsemat, &sum));
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(sum)[i] != 0.0) {
+            VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+        } else if (!allow_zeros) {
+            IGRAPH_ERROR("Columns with zero sum are not allowed", IGRAPH_EINVAL);
+        }
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_cols(sparsemat, &sum));
+
+    igraph_vector_destroy(&sum);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return 0;
+}
+
+/**
+ * \function igraph_sparsemat_normalize_rows
+ * \brief Normalizes the row sums of a sparse matrix to a given value.
+ *
+ * \param  sparsemat    the sparse matrix to normalize
+ * \param  allow_zeros  whether to allow rows with zero sums
+ * \return \c IGRAPH_SUCCESS if everything was successful,
+ *         \c IGRAPH_EINVAL if there is at least one row with zero sum and it
+ *         is disallowed,
+ *         \c IGRAPH_ENOMEM for out-of-memory conditions
+ */
+
+int igraph_sparsemat_normalize_rows(
+    igraph_sparsemat_t *sparsemat, igraph_bool_t allow_zeros
+) {
+    igraph_vector_t sum;
+    int no_of_nodes = (int) igraph_sparsemat_nrow(sparsemat);
+    int i;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_sparsemat_rowsums(sparsemat, &sum));
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(sum)[i] != 0.0) {
+            VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+        } else if (!allow_zeros) {
+            IGRAPH_ERROR("Rows with zero sum are not allowed", IGRAPH_EINVAL);
+        }
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_rows(sparsemat, &sum));
+
+    igraph_vector_destroy(&sum);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return 0;
 }

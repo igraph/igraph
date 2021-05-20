@@ -47,7 +47,7 @@
  */
 int igraph_set_init(igraph_set_t *set, int long size) {
     long int alloc_size;
-    
+
     if (size < 0) {
         size = 0;
     }
@@ -318,4 +318,3 @@ igraph_bool_t igraph_set_iterate(igraph_set_t* set, long int* state,
         return 0;
     }
 }
-

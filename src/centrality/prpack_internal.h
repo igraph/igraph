@@ -42,4 +42,3 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
 __END_DECLS
 
 #endif
-

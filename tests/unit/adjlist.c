@@ -264,7 +264,7 @@ int test_multiedge_elimination_for_directed_graph() {
     TEST_LAZY_ADJLIST("In- and out-edges, loops also eliminated", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     TEST_LAZY_ADJLIST("In- and out-edges, loops listed once", IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE);
     TEST_LAZY_ADJLIST("In- and out-edges, loops listed twice", IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
- 
+
     printf("============================================================\n\n");
 
     igraph_destroy(&g);

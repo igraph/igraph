@@ -152,7 +152,7 @@ int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_float_fill(&temp, temp_init);
     temp_global = temp_init * no_nodes;
 
-    while (temp_global > temp_min * no_nodes && maxiter > 0) {        
+    while (temp_global > temp_min * no_nodes && maxiter > 0) {
         igraph_integer_t u, v, nlen, j;
         float px, py, pvx, pvy;
 

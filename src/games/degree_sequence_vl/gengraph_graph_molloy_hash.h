@@ -216,4 +216,3 @@ public:
 } // namespace gengraph
 
 #endif //GRAPH_MOLLOY_HASH_H
-

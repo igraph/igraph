@@ -86,5 +86,3 @@ void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* v) {
     igraph_stack_ptr_free_all(v);
     igraph_stack_ptr_destroy(v);
 }
-
-

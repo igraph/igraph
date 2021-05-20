@@ -57,4 +57,3 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t
 __END_DECLS
 
 #endif
-

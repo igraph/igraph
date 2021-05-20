@@ -41,7 +41,7 @@
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
  * vertex ids.
- * 
+ *
  * </para><para>
  * Consider using \ref igraph_bfs_simple instead if you set most of the output
  * arguments provided by this function to a null pointer.
@@ -104,6 +104,8 @@ int igraph_bfs(const igraph_t *graph,
                igraph_vector_t *pred, igraph_vector_t *succ,
                igraph_vector_t *dist, igraph_bfshandler_t *callback,
                void *extra) {
+
+    igraph_error_t ret;
 
     igraph_dqueue_t Q;
     long int no_of_nodes = igraph_vcount(graph);
@@ -254,17 +256,16 @@ int igraph_bfs(const igraph_t *graph,
             succ_vec = igraph_dqueue_empty(&Q) ? -1L :
                        (long int) igraph_dqueue_head(&Q);
             if (callback) {
-                igraph_bool_t terminate =
+                IGRAPH_CHECK_CALLBACK(
                     callback(graph, (igraph_integer_t) actvect, (igraph_integer_t)
                              pred_vec, (igraph_integer_t) succ_vec,
                              (igraph_integer_t) act_rank - 1, (igraph_integer_t) actdist,
-                             extra);
-                if (terminate) {
-                    igraph_lazy_adjlist_destroy(&adjlist);
-                    igraph_dqueue_destroy(&Q);
-                    igraph_vector_char_destroy(&added);
-                    IGRAPH_FINALLY_CLEAN(3);
-                    return 0;
+                             extra),
+                    &ret
+                );
+
+                if (ret == IGRAPH_STOP) {
+                    goto cleanup;
                 }
             }
 
@@ -277,12 +278,14 @@ int igraph_bfs(const igraph_t *graph,
 
     } /* for actroot < no_of_nodes */
 
+cleanup:
+
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_dqueue_destroy(&Q);
     igraph_vector_char_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -295,7 +298,7 @@ int igraph_bfs(const igraph_t *graph,
  * are not needed. It is allowed to supply null pointers as
  * the output arguments the user is not interested in, in this case they will
  * be ignored.
- * 
+ *
  * \param graph The input graph.
  * \param vid The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
@@ -416,7 +419,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
     IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -433,7 +436,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
  * vertex ids.
- * 
+ *
  * \param graph The input graph.
  * \param root The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
@@ -480,6 +483,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     igraph_stack_t stack;
     igraph_vector_char_t added;
     igraph_vector_long_t nptr;
+    igraph_error_t ret;
     long int actroot;
     long int act_rank = 0;
     long int rank_out = 0;
@@ -539,10 +543,10 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
         VECTOR(*dist)[(long int)root] = 0;
     }
     if (in_callback) {
-        igraph_bool_t terminate = in_callback(graph, root, 0, extra);
-        if (terminate) {
+        IGRAPH_CHECK_CALLBACK(in_callback(graph, root, 0, extra), &ret);
+        if (ret == IGRAPH_STOP) {
             FREE_ALL();
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
@@ -570,13 +574,13 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             }
 
             if (in_callback) {
-                igraph_bool_t terminate = in_callback(graph, (igraph_integer_t) actroot,
-                                                      0, extra);
-                if (terminate) {
+                IGRAPH_CHECK_CALLBACK(in_callback(graph, (igraph_integer_t) actroot, 0, extra), &ret);
+                if (ret == IGRAPH_STOP) {
                     FREE_ALL();
-                    return 0;
+                    return IGRAPH_SUCCESS;
                 }
             }
+
             actroot++;
         }
 
@@ -611,12 +615,18 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 }
 
                 if (in_callback) {
-                    igraph_bool_t terminate = in_callback(graph, (igraph_integer_t) nei,
-                                                          (igraph_integer_t) act_dist,
-                                                          extra);
-                    if (terminate) {
+                    IGRAPH_CHECK_CALLBACK(
+                        in_callback(
+                            graph,
+                            (igraph_integer_t) nei,
+                            (igraph_integer_t) act_dist,
+                            extra
+                        ),
+                        &ret
+                    );
+                    if (ret == IGRAPH_STOP) {
                         FREE_ALL();
-                        return 0;
+                        return IGRAPH_SUCCESS;
                     }
                 }
 
@@ -629,12 +639,19 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 act_dist--;
 
                 if (out_callback) {
-                    igraph_bool_t terminate = out_callback(graph, (igraph_integer_t)
-                                                           actvect, (igraph_integer_t)
-                                                           act_dist, extra);
-                    if (terminate) {
+                    IGRAPH_CHECK_CALLBACK(
+                        out_callback(
+                            graph,
+                            (igraph_integer_t) actvect,
+                            (igraph_integer_t) act_dist,
+                            extra
+                        ),
+                        &ret
+                    );
+
+                    if (ret == IGRAPH_STOP) {
                         FREE_ALL();
-                        return 0;
+                        return IGRAPH_SUCCESS;
                     }
                 }
             }
@@ -644,5 +661,5 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     FREE_ALL();
 # undef FREE_ALL
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
@@ -482,7 +483,10 @@ static int plfit_i_continuous_xmin_opt_progress(void* instance, double x, double
 static int plfit_i_continuous_xmin_opt_linear_scan(
         plfit_continuous_xmin_opt_data_t* opt_data, plfit_result_t* best_result,
         size_t* best_n) {
-    size_t i;
+    /* i must be signed, otherwise OpenMP on Windows will complain as it
+     * supports signed types only. ssize_t is a POSIX extension so it won't
+     * work */
+    ptrdiff_t i = 0; /* initialize to work around incorrect warning issued by clang 9.0 */
     plfit_result_t global_best_result;
     size_t global_best_n;
 

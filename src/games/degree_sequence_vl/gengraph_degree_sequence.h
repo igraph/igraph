@@ -98,4 +98,3 @@ public :
 } // namespace gengraph
 
 #endif //DEGREE_SEQUENCE_H
-

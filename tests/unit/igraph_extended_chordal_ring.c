@@ -47,7 +47,7 @@ int main() {
 
     /*    From article, should give double edges for chords in igraph   */
     igraph_matrix_init(&W, 2, 2);
-    int m[2][2] = {{4, 2}, 
+    int m[2][2] = {{4, 2},
                    {8, 10}};
     for (i=0; i < 2; i++) {
         for (j=0; j < 2; j++) {
