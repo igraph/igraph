@@ -106,6 +106,19 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    printf("\nSmall undirected graph with multi-edges\n");
+    printf("==========================================================\n");
+    igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 1, 2, 2, 3, 3, 0, -1);
+    igraph_vector_init(&bet, 0);
+    igraph_betweenness(/* graph=     */ &g,
+            /* res=       */ &bet,
+            /* vids=      */ igraph_vss_all(),
+            /* directed = */ 0,
+            /* weights=   */ 0);
+    print_vector(&bet);
+    igraph_vector_destroy(&bet);
+    igraph_destroy(&g);
+
     printf("\nNon-trivial weighted graph\n");
     printf("==========================================================\n");
     igraph_vector_view(&edges, nontriv, sizeof(nontriv) / sizeof(igraph_real_t));

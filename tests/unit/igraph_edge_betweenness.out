@@ -19,6 +19,9 @@ Small undirected graph 1, unweighted, cutoff=2
 Small undirected graph 2, unweighted, cutoff=2
 ( 3 3 3 4 3 4 3 4 4 3 3 3 )
 
+Small undirected graph 3, unweighted, with multi-edges
+( 2 1.16667 1.16667 2 1.66667 )
+
 Testing bug 950, tolerances
 ( 0 0 2.33333 2.33333 2.33333 0 2.33333 2.33333 2.33333 2.33333 2.33333 2.33333 0 0 0 )
 
