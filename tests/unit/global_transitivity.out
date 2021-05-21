@@ -1,0 +1,17 @@
+Null graph: NaN
+
+Singleton graph: NaN
+
+Two connected vertices: NaN
+
+Triangle: 1
+
+Two-star: 0
+
+Zachary karate club: 0.255682
+
+Directed and multigraphs:
+
+Directed multi: 0.4357541899
+Undirected multi: 0.4357541899
+Simple: 0.4357541899

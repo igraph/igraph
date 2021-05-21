@@ -43,22 +43,24 @@
  * is taken. Vertices with less than two neighbors require special treatment,
  * they will either be left out from the calculation or they will be considered
  * as having zero transitivity, depending on the \c mode argument.
+ * Edge directions and edge multiplicities are ignored.
  *
  * </para><para>
  * Note that this measure is different from the global transitivity measure
  * (see \ref igraph_transitivity_undirected() ) as it simply takes the
- * average local transitivity across the whole network. See the following
- * reference for more details:
+ * average local transitivity across the whole network.
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
+ * </para><para>
+ * References:
  *
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
  *
- * </para><para>
- * Clustering coefficient is an alternative name for transitivity.
- *
- * \param graph The input graph, directed graphs are considered as
- *    undirected ones.
+ * \param graph The input graph. Edge directions and multiplicites are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat vertices with degree less than two.
  *    \c IGRAPH_TRANSITIVITY_NAN leaves them out from averaging,
@@ -260,7 +262,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, long int);
     if (neis == 0) {
-        IGRAPH_ERROR("local transitivity calculation failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
@@ -457,17 +459,19 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  * </para><para>
  * Note that this measure is different from the global transitivity measure
  * (see \ref igraph_transitivity_undirected() ) as it calculates a transitivity
- * value for each vertex individually. See the following reference for more
- * details:
+ * value for each vertex individually.
+ *
+ * </para><para>
+ * Clustering coefficient is an alternative name for transitivity.
+ *
+ * </para><para>
+ * References:
  *
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
  *
- * </para><para>
- * Clustering coefficient is an alternative name for transitivity.
- *
- * \param graph The input graph, which should be undirected and simple.
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed.
  * \param vids Vertex set, the vertices for which the local
@@ -488,17 +492,6 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
-
-    igraph_bool_t simple;
-
-    if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Transitivity works on undirected graphs only", IGRAPH_EINVAL);
-    }
-
-    igraph_is_simple(graph, &simple);
-    if (!simple) {
-        IGRAPH_ERROR("Transitivity works on simple graphs only", IGRAPH_EINVAL);
-    }
 
     if (igraph_vs_is_all(&vids)) {
         return igraph_transitivity_local_undirected4(graph, res, mode);
@@ -533,9 +526,9 @@ static int igraph_adjacent_triangles4(const igraph_t *graph,
 
 /**
  * \function igraph_adjacent_triangles
- * Count the number of triangles a vertex is part of
+ * \brief Count the number of triangles a vertex is part of.
  *
- * \param graph The input graph. Edge directions are ignored.
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Initiliazed vector, the results are stored here.
  * \param vids The vertices to perform the calculation for.
  * \return Error mode.
@@ -593,12 +586,13 @@ int igraph_list_triangles(const igraph_t *graph,
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. More precisely, this is the ratio of the
  * triangles and connected triples in the graph, the result is a
- * single real number. Directed graphs are considered as undirected ones.
+ * single real number. Directed graphs are considered as undirected ones
+ * and multi-edges are ignored.
  *
  * </para><para>
  * Note that this measure is different from the local transitivity measure
  * (see \ref igraph_transitivity_local_undirected() ) as it calculates a single
- * value for the whole graph. See the following reference for more details:
+ * value for the whole graph.
  *
  * </para><para>
  * Clustering coefficient is an alternative name for transitivity.
@@ -610,7 +604,7 @@ int igraph_list_triangles(const igraph_t *graph,
  * S. Wasserman and K. Faust: Social Network Analysis: Methods and
  * Applications. Cambridge: Cambridge University Press, 1994.
  *
- * \param graph The graph object.
+ * \param graph The graph object. Edge directions and multiplicites are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat graphs with no connected triples.
  *   \c IGRAPH_TRANSITIVITY_NAN returns \c NaN in this case,
@@ -656,9 +650,11 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
     maxdegree = (long int) igraph_vector_max(&degree) + 1;
-    igraph_vector_order1(&degree, &order, maxdegree);
+    IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
+
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
+
     IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(rank)[ (long int) VECTOR(order)[i] ] = no_of_nodes - i - 1;
@@ -668,8 +664,8 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     neis = IGRAPH_CALLOC(no_of_nodes, long int);
-    if (neis == 0) {
-        IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
+    if (! neis) {
+        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
