@@ -273,6 +273,7 @@ add_legacy_tests(
   igraph_is_mutual
   igraph_is_tree
   igraph_list_triangles
+  igraph_local_scan_k_ecount
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs

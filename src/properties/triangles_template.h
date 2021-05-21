@@ -25,9 +25,6 @@
 #ifdef TRANSIT
 #define TRANSIT_TRIEDGES
 #endif
-#ifdef TRIEDGES
-#define TRANSIT_TRIEDGES
-#endif
 
 long int no_of_nodes = igraph_vcount(graph);
 long int node, i, j, nn;
@@ -128,9 +125,6 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
     } else {
         VECTOR(*res)[node] = VECTOR(*res)[node] / deg1 / (deg1 - 1) * 2.0;
     }
-#endif
-#ifdef TRIEDGES
-    VECTOR(*res)[node] += deg1;
 #endif
 }
 

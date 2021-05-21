@@ -158,6 +158,9 @@ static int igraph_i_local_scan_1_directed(const igraph_t *graph,
         for (i = 0; i < edgeslen1; i++) {
             int e2 = VECTOR(*edges1)[i];
             int nei = IGRAPH_OTHER(graph, e2, node);
+            if (nei == node) {
+                break;
+            }
             igraph_vector_int_t *edges2 = igraph_inclist_get(&incs, nei);
             int j, edgeslen2 = igraph_vector_int_size(edges2);
             for (j = 0; j < edgeslen2; j++) {
@@ -372,11 +375,7 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
         if (weights) {
             return igraph_i_local_scan_1_sumweights(graph, res, weights);
         } else {
-
-#define TRIEDGES
-#include "properties/triangles_template.h"
-#undef TRIEDGES
-
+            return igraph_local_scan_k_ecount(graph, 1, res, weights, mode);
         }
     }
 
@@ -579,12 +578,9 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
 
 /**
  * \function igraph_local_scan_k_ecount
- * Local scan-statistics, general function, edge count and sum of weights
+ * \brief Sum the number of edges or the weights in k-neighborhood of every vertex.
  *
- * Count the number of edges or the sum the edge weights in the
- * k-neighborhood of vertices.
- *
- * \param graph The input graph
+ * \param graph The input graph.
  * \param k The size of the neighborhood, non-negative integer.
  *        The k=0 case is special, see \ref igraph_local_scan_0().
  * \param res An initialized vector, the results are stored here.
@@ -608,16 +604,19 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
     igraph_inclist_t incs;
 
     if (k < 0) {
-        IGRAPH_ERROR("k must be non-negative in k-scan", IGRAPH_EINVAL);
+        IGRAPH_ERROR("k must be non-negative in k-scan.", IGRAPH_EINVAL);
     }
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length in k-scan", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The weight vector length (%ld) in k-scan should equal "
+                      "the number of edges of the graph (%d).",
+                      IGRAPH_EINVAL, igraph_vector_size(weights),
+                      igraph_ecount(graph));
     }
 
     if (k == 0) {
         return igraph_local_scan_0(graph, res, weights, mode);
     }
-    if (k == 1) {
+    if (k == 1 && igraph_is_directed(graph)) {
         return igraph_local_scan_1_ecount(graph, res, weights, mode);
     }
 
@@ -669,7 +668,7 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
     igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
