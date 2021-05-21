@@ -142,12 +142,20 @@ int main() {
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
+    igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_NAN);
+    IGRAPH_ASSERT(igraph_is_nan(avg_local));
+    igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_ZERO);
+    IGRAPH_ASSERT(avg_local == 0);
     igraph_destroy(&g);
 
     printf("\nSingleton graph:\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
+    igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_NAN);
+    IGRAPH_ASSERT(igraph_is_nan(avg_local));
+    igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_ZERO);
+    IGRAPH_ASSERT(avg_local == 0);
     igraph_destroy(&g);
 
     printf("\nTwo connected vertices:\n");

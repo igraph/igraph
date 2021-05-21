@@ -81,20 +81,9 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         igraph_real_t *res,
         igraph_transitivity_mode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph), nans = 0;
     igraph_real_t sum = 0.0;
-    igraph_integer_t count = 0;
-    long int node, i, j, nn;
-    igraph_adjlist_t allneis;
-    igraph_vector_int_t *neis1, *neis2;
-    long int neilen1, neilen2;
-    long int *neis;
-    long int maxdegree;
-
-    igraph_vector_t order;
-    igraph_vector_t rank;
-    igraph_vector_t degree;
-    igraph_vector_t triangles;
+    igraph_vector_t vec;
 
     if (no_of_nodes == 0) {
         if (mode == IGRAPH_TRANSITIVITY_ZERO) {
@@ -102,82 +91,25 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         } else {
             *res = IGRAPH_NAN;
         }
-        return IGRAPH_SUCCESS;
-    }
+    } else {
+        IGRAPH_VECTOR_INIT_FINALLY(&vec, no_of_nodes);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+        IGRAPH_CHECK(igraph_transitivity_local_undirected(graph, &vec, igraph_vss_all(), mode));
 
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
-                               IGRAPH_LOOPS));
-    maxdegree = (long int) igraph_vector_max(&degree) + 1;
-    igraph_vector_order1(&degree, &order, maxdegree);
-    igraph_vector_destroy(&degree);
-    IGRAPH_FINALLY_CLEAN(1);
-    IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(rank)[ (long int) VECTOR(order)[i] ] = no_of_nodes - i - 1;
-    }
-
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-
-    neis = IGRAPH_CALLOC(no_of_nodes, long int);
-    if (neis == 0) {
-        IGRAPH_ERROR("Undirected average local transitivity failed.",
-                     IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, neis);
-
-    IGRAPH_VECTOR_INIT_FINALLY(&triangles, no_of_nodes);
-
-    for (nn = no_of_nodes - 1; nn >= 0; nn--) {
-        node = (long int) VECTOR(order)[nn];
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        neis1 = igraph_adjlist_get(&allneis, node);
-        neilen1 = igraph_vector_int_size(neis1);
-        /* Mark the neighbors of 'node' */
-        for (i = 0; i < neilen1; i++) {
-            neis[ (long int)VECTOR(*neis1)[i] ] = node + 1;
-        }
-
-        for (i = 0; i < neilen1; i++) {
-            long int nei = (long int) VECTOR(*neis1)[i];
-            if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
-                neis2 = igraph_adjlist_get(&allneis, nei);
-                neilen2 = igraph_vector_int_size(neis2);
-                for (j = 0; j < neilen2; j++) {
-                    long int nei2 = (long int) VECTOR(*neis2)[j];
-                    if (VECTOR(rank)[nei2] < VECTOR(rank)[nei]) {
-                        continue;
-                    }
-                    if (neis[nei2] == node + 1) {
-                        VECTOR(triangles)[nei2] += 1;
-                        VECTOR(triangles)[nei] += 1;
-                        VECTOR(triangles)[node] += 1;
-                    }
-                }
+        for (i = 0, nans = 0; i < no_of_nodes; i++) {
+            if (!igraph_is_nan(VECTOR(vec)[i])) {
+                sum += VECTOR(vec)[i];
+            } else {
+                nans++;
             }
         }
 
-        if (neilen1 >= 2) {
-            sum += VECTOR(triangles)[node] / neilen1 / (neilen1 - 1) * 2.0;
-            count++;
-        } else if (mode == IGRAPH_TRANSITIVITY_ZERO) {
-            count++;
-        }
+        igraph_vector_destroy(&vec);
+        IGRAPH_FINALLY_CLEAN(1);
+
+        *res = sum / (no_of_nodes - nans);
     }
 
-    *res = sum / count;
-
-    igraph_vector_destroy(&triangles);
-    IGRAPH_FREE(neis);
-    igraph_adjlist_destroy(&allneis);
-    igraph_vector_destroy(&rank);
-    igraph_vector_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(5);
     return IGRAPH_SUCCESS;
 }
 
