@@ -127,16 +127,16 @@ static int igraph_i_maximal_cliques_reorder_adjlists(
     for (j = PS; j <= XE; j++) {
         int av = VECTOR(*PX)[j];
         igraph_vector_int_t *avneis = igraph_adjlist_get(adjlist, av);
-        int *avp = VECTOR(*avneis);
-        int avlen = igraph_vector_int_size(avneis);
-        int *ave = avp + avlen;
-        int *avnei = avp, *pp = avp;
+        igraph_integer_t *avp = VECTOR(*avneis);
+        long avlen = igraph_vector_int_size(avneis);
+        igraph_integer_t *ave = avp + avlen;
+        igraph_integer_t *avnei = avp, *pp = avp;
 
         for (; avnei < ave; avnei++) {
-            int avneipos = VECTOR(*pos)[(int)(*avnei)];
+            int avneipos = VECTOR(*pos)[(*avnei)];
             if (avneipos >= sPS && avneipos <= sPE) {
                 if (pp != avnei) {
-                    int tmp = *avnei;
+                    igraph_integer_t tmp = *avnei;
                     *avnei = *pp;
                     *pp = tmp;
                 }
@@ -144,6 +144,7 @@ static int igraph_i_maximal_cliques_reorder_adjlists(
             }
         }
     }
+    
     return 0;
 }
 
@@ -165,13 +166,13 @@ static int igraph_i_maximal_cliques_select_pivot(
     for (i = PS; i <= XE; i++) {
         int av = VECTOR(*PX)[i];
         igraph_vector_int_t *avneis = igraph_adjlist_get(adjlist, av);
-        int *avp = VECTOR(*avneis);
-        int avlen = igraph_vector_int_size(avneis);
-        int *ave = avp + avlen;
-        int *avnei = avp, *pp = avp;
+        igraph_integer_t *avp = VECTOR(*avneis);
+        long avlen = igraph_vector_int_size(avneis);
+        igraph_integer_t *ave = avp + avlen;
+        igraph_integer_t *avnei = avp, *pp = avp;
 
         for (; avnei < ave; avnei++) {
-            int avneipos = VECTOR(*pos)[(int)(*avnei)];
+            int avneipos = VECTOR(*pos)[(*avnei)];
             if (avneipos < soldPS || avneipos > soldXE) {
                 break;
             }

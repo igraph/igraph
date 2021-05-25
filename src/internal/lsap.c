@@ -43,7 +43,7 @@ static AP     *ap_create_problem(double *t, int n);
 /* static AP     *ap_read_problem(char *file); */
 static void    ap_free(AP *p);
 
-static int     ap_assignment(AP *p, int *res);
+static int     ap_assignment(AP *p, igraph_integer_t *res);
 /* static int     ap_costmatrix(AP *p, double **m); */
 /* static int     ap_datamatrix(AP *p, double **m); */
 /* static int     ap_iterations(AP *p); */
@@ -132,7 +132,7 @@ int ap_hungarian(AP *p) {
 }
 
 /* abbreviated interface */
-int ap_assignment(AP *p, int *res) {
+int ap_assignment(AP *p, igraph_integer_t *res) {
     int i;
 
     if (p->s == NULL) {
