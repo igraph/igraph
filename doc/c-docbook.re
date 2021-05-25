@@ -30,7 +30,7 @@ REPLACE ----- template base type, we cowardly assume real number --------------
 
 BASE
 
-WITH 
+WITH
 
 igraph_real_t
 
@@ -42,7 +42,7 @@ REPLACE ----- function object, extract its signature --------------------------
 [\s]*(?P<brief>[^\n]*?)\n        # brief description
 (?P<after>.*?)\*\/               # tail of the comment
 \s*
-(DECLDIR )?                      # strip DECLDIR from prototype
+(IGRAPH_EXPORT )?                # strip IGRAPH_EXPORT from prototype
 (?P<def>.*?\))                   # function head
 (?=(\s*;)|(\s*\{))               # prototype ends with ; function head with {
 .*\Z                             # and the remainder
@@ -69,18 +69,17 @@ REPLACE ----- <paramdef> for functions (not used currently) -------------------
 
 RUN ---------------------------------------------------------------------------
 
-if matched != None:
-    dr_params=string.split(matched.group("params"), ',')
-    dr_out=""
-    for dr_i in dr_params:
-        dr_i=string.strip(dr_i)
-        if dr_i=="...":
-            dr_out=dr_out+"<varargs/>"
-        else:
-            dr_words=re.match(r"([\w\*\&\s]+)(\b\w+)$", dr_i).groups()
-            dr_out=dr_out+"<paramdef>"+dr_words[0]+"<parameter>"+dr_words[1]+ \
-                    "</parameter></paramdef>\n"
-    actch=actch[0:matched.start()]+dr_out+actch[matched.end():]
+dr_params=string.split(matched.group("params"), ',')
+dr_out=""
+for dr_i in dr_params:
+    dr_i=string.strip(dr_i)
+    if dr_i=="...":
+        dr_out=dr_out+"<varargs/>"
+    else:
+        dr_words=re.match(r"([\w\*\&\s]+)(\b\w+)$", dr_i).groups()
+        dr_out=dr_out+"<paramdef>"+dr_words[0]+"<parameter>"+dr_words[1]+ \
+                "</parameter></paramdef>\n"
+actch=actch[0:matched.start()]+dr_out+actch[matched.end():]
 
 REPLACE ----- function parameter descriptions, head ---------------------------
 
@@ -126,14 +125,14 @@ WITH --------------------------------------------------------------------------
 
   <varlistentry><term><parameter>\g<paramname></parameter>:</term>
   <listitem><para>
-  \g<paramtext></para></listitem></varlistentry>  
+  \g<paramtext></para></listitem></varlistentry>
 
 REPLACE ----- \return command -------------------------------------------------
 
 # a return statement ends with an empty line or the end of the comment
 \\return\b\s*                     # \return command
 (?P<text>.*?)                     # the text
-(?=(\n\s*?\n)|                    # empty line or 
+(?=(\n\s*?\n)|                    # empty line or
  (\*\/)|                          # the end of the comment or
  (\\sa\b))                        # \sa command
 
@@ -298,7 +297,7 @@ WITH --------------------------------------------------------------------------
 
   <varlistentry><term><constant>\g<paramname></constant>:</term>
   <listitem><para>
-  \g<paramtext></para></listitem></varlistentry>  
+  \g<paramtext></para></listitem></varlistentry>
 
 REPLACE ----- \struct ---------------------------------------------------------
 
@@ -361,7 +360,7 @@ WITH --------------------------------------------------------------------------
 
 REPLACE ----- \typedef function -----------------------------------------------
 
-(?P<before>.*?)                   # comment head
+(?P<before>\A.*?)                   # comment head
 \\typedef\s+                      # \typedef command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 [\s]*(?P<brief>[^\n]*?)\n         # brief description
@@ -614,12 +613,11 @@ REPLACE ----- replace <code> with <literal> -----------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<\g<c>literal> 
+<\g<c>literal>
 
 REPLACE ----- add http:// and https:// links ----------------------------------
 
-(?P<link>https?:\/\/.*?)
-(?=(\s)|\))
+(?P<link>https?:\/\/[-\+=&;%@./~()'\w_]*[-\+=&;%@/~'\w_])
 
 WITH --------------------------------------------------------------------------
 
@@ -698,4 +696,3 @@ We reserve the right to change the function signature without changing the
 major version of igraph. Use it at your own risk.</para>
 </warning>
 <para>
-

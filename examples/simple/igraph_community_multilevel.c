@@ -57,6 +57,8 @@ int main() {
     igraph_vector_init(&membership, 0);
     igraph_matrix_init(&memberships, 0, 0);
 
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     /* Unweighted test graph from the paper of Blondel et al */
     igraph_small(&g, 16, IGRAPH_UNDIRECTED,
                  0, 2, 0, 3, 0, 4, 0, 5,

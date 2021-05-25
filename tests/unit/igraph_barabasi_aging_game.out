@@ -1,0 +1,72 @@
+No vertices:
+directed: false
+vcount: 0
+edges: {
+}
+No edges:
+directed: false
+vcount: 5
+edges: {
+}
+Prefer old vertices to make a star of triple edges:
+directed: true
+vcount: 5
+edges: {
+1 0
+1 0
+1 0
+2 0
+2 0
+2 0
+3 0
+3 0
+3 0
+4 0
+4 0
+4 0
+}
+Prefer new vertices to make a line of double edges:
+directed: true
+vcount: 5
+edges: {
+1 0
+1 0
+2 1
+2 1
+3 2
+3 2
+4 3
+4 3
+}
+Increasing thickness of the line using outseq:
+directed: true
+vcount: 5
+edges: {
+1 0
+1 0
+2 1
+2 1
+2 1
+3 2
+3 2
+3 2
+3 2
+4 3
+4 3
+4 3
+4 3
+4 3
+}
+Prefer more edges to make a star:
+directed: true
+vcount: 5
+edges: {
+1 0
+1 0
+2 0
+2 0
+3 0
+3 0
+4 0
+4 0
+}

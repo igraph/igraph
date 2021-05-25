@@ -21,8 +21,8 @@
 
 */
 
-#ifndef REST_RANDOM_H
-#define REST_RANDOM_H
+#ifndef IGRAPH_RANDOM_H
+#define IGRAPH_RANDOM_H
 
 #include "igraph_decls.h"
 
@@ -38,7 +38,7 @@ __BEGIN_DECLS
 
 typedef struct igraph_rng_type_t {
     const char *name;
-    unsigned long int min;
+    unsigned long int min; /* 'min' must always be set to 0 */
     unsigned long int max;
     int (*init)(void **state);
     void (*destroy)(void *state);
@@ -61,40 +61,40 @@ typedef struct igraph_rng_t {
 
 /* --------------------------------- */
 
-DECLDIR int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
-DECLDIR void igraph_rng_destroy(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
+IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
-DECLDIR int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
-DECLDIR unsigned long int igraph_rng_max(igraph_rng_t *rng);
-DECLDIR unsigned long int igraph_rng_min(igraph_rng_t *rng);
-DECLDIR const char *igraph_rng_name(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
+IGRAPH_EXPORT unsigned long int igraph_rng_max(igraph_rng_t *rng);
+IGRAPH_EXPORT IGRAPH_DEPRECATED unsigned long int igraph_rng_min(igraph_rng_t *rng);
+IGRAPH_EXPORT const char *igraph_rng_name(igraph_rng_t *rng);
 
-DECLDIR long int igraph_rng_get_integer(igraph_rng_t *rng,
-                                        long int l, long int h);
-DECLDIR igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
-        igraph_real_t m, igraph_real_t s);
-DECLDIR igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
-        igraph_real_t l, igraph_real_t h);
-DECLDIR igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
-DECLDIR igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
-DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
-        igraph_real_t p);
-DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
-DECLDIR unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
-DECLDIR igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
-        igraph_real_t scale);
-DECLDIR int igraph_rng_get_dirichlet(igraph_rng_t *rng,
-                                     const igraph_vector_t *alpha,
-                                     igraph_vector_t *result);
+IGRAPH_EXPORT long int igraph_rng_get_integer(igraph_rng_t *rng,
+                                              long int l, long int h);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
+                                                  igraph_real_t m, igraph_real_t s);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
+                                                igraph_real_t l, igraph_real_t h);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
+                                                 igraph_real_t p);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
+IGRAPH_EXPORT unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
+                                                 igraph_real_t scale);
+IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
+                                           const igraph_vector_t *alpha,
+                                           igraph_vector_t *result);
 
 /* --------------------------------- */
 
-extern const igraph_rng_type_t igraph_rngtype_glibc2;
-extern const igraph_rng_type_t igraph_rngtype_rand;
-extern const igraph_rng_type_t igraph_rngtype_mt19937;
+IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_glibc2;
+IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_rand;
+IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_mt19937;
 
-DECLDIR igraph_rng_t *igraph_rng_default(void);
-DECLDIR void igraph_rng_set_default(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_rng_t *igraph_rng_default(void);
+IGRAPH_EXPORT void igraph_rng_set_default(igraph_rng_t *rng);
 
 /* --------------------------------- */
 
@@ -110,13 +110,14 @@ double Rf_dnorm4(double x, double mu, double sigma, int give_log);
 
 #else
 
-#define RNG_BEGIN()      if (igraph_rng_default()->def==1) {    \
-        igraph_rng_seed(igraph_rng_default(), time(0));       \
-        igraph_rng_default()->def=2;                  \
+#define RNG_BEGIN() \
+    if (igraph_rng_default()->def == 1) { \
+        igraph_rng_seed(igraph_rng_default(), time(0)); \
+        igraph_rng_default()->def=2; \
     }
 #define RNG_END()       /* do nothing */
 
-DECLDIR double igraph_dnorm(double x, double mu, double sigma, int give_log);
+IGRAPH_EXPORT double igraph_dnorm(double x, double mu, double sigma, int give_log);
 
 #endif
 

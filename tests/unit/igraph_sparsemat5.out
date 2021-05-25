@@ -1,0 +1,159 @@
+== Identity matrix ==
+
+== Diagonal matrix ==
+
+== A tree, plus a ring ==
+
+Regular:
+Eigenvalues:
+( 3.79369 )
+Eigenvectors:
+[ 0.272513
+  0.387127
+  0.421856
+  0.429479
+  0.344793
+  0.266584
+   0.24469
+  0.239837
+  0.235697
+  0.224848 ]
+
+Shift and invert, LU:
+Eigenvalues:
+( 3.79369 )
+Eigenvectors:
+[ 0.272513
+  0.387127
+  0.421856
+  0.429479
+  0.344793
+  0.266584
+   0.24469
+  0.239837
+  0.235697
+  0.224848 ]
+
+Shift and invert, QR:
+Eigenvalues:
+( 3.79369 )
+Eigenvectors:
+[ 0.272513
+  0.387127
+  0.421856
+  0.429479
+  0.344793
+  0.266584
+   0.24469
+  0.239837
+  0.235697
+  0.224848 ]
+
+== A directed tree and a directed, mutual ring ==
+
+Regular:
+Eigenvalues:
+[  2.61264        0 ]
+Eigenvectors:
+[ 0.467245
+  0.571573
+  0.427081
+  0.335532
+  0.263456
+  0.130696
+  0.0780048
+  0.0731022
+  0.112985
+  0.222086 ]
+
+== A small test graph ==
+
+Regular:
+Eigenvalues:
+[  1.35971        0 ]
+Eigenvectors:
+[ 0.352334
+  0.479071
+  0.190574
+  0.525509
+  0.140158
+   0.10308
+  0.455414
+  0.0680917
+  0.125888
+  0.0925848
+  0.259125 ]
+
+== Testing the special case solver for 1x1 matrices ==
+rnsolve:
+  - eigenvalues:
+[        2        0 ]
+  - eigenvectors:
+[        1 ]
+rssolve:
+  - eigenvalues:
+( 2 )
+  - eigenvectors:
+[        1 ]
+rnsolve:
+  - eigenvalues:
+[        0        0 ]
+  - eigenvectors:
+[        1 ]
+rssolve:
+  - eigenvalues:
+( 0 )
+  - eigenvectors:
+[        1 ]
+rnsolve:
+  - eigenvalues:
+[       -3        0 ]
+  - eigenvectors:
+[        1 ]
+rssolve:
+  - eigenvalues:
+( -3 )
+  - eigenvectors:
+[        1 ]
+
+== Testing the special case solver for 2x2 matrices ==
+rnsolve:
+  - eigenvalues:
+[        5        0
+         0        0 ]
+  - eigenvectors:
+[        1       -4
+         2        2 ]
+rssolve:
+  - eigenvalues:
+( 5 0 )
+  - eigenvectors:
+[        1       -4
+         2        2 ]
+rnsolve:
+  - eigenvalues:
+[  5.37228        0
+  -0.372281        0 ]
+  - eigenvectors:
+[  1.37228 -4.37228
+         3        3 ]
+rnsolve:
+  - eigenvalues:
+[      2.5  6.91014
+       2.5 -6.91014 ]
+  - eigenvectors:
+[     -1.5  6.91014
+        10        0 ]
+rnsolve:
+  - eigenvalues:
+[        0        0
+         0        0 ]
+  - eigenvectors:
+[        1        0
+         0        1 ]
+rssolve:
+  - eigenvalues:
+( 0 0 )
+  - eigenvectors:
+[        1        0
+         0        1 ]

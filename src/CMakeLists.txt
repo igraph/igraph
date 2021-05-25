@@ -1,29 +1,30 @@
 
 # Traverse subdirectories
-add_subdirectory(bliss)
-add_subdirectory(cliquer)
-add_subdirectory(cs)
-add_subdirectory(f2c)
-add_subdirectory(lapack)
-add_subdirectory(plfit)
-add_subdirectory(prpack)
-add_subdirectory(mini-gmp)
+add_subdirectory(centrality/prpack)
+add_subdirectory(cliques/cliquer)
+add_subdirectory(isomorphism/bliss)
 
 # Generate lexers and parsers
 set(PARSER_SOURCES)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/parsers/)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/io/parsers)
 foreach(FORMAT dl gml lgl ncol pajek)
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-parser.c)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c)
     list(APPEND PARSER_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-lexer.c
-      ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-parser.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-lexer.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c
     )
   else()
+    if (BISON_VERSION VERSION_GREATER_EQUAL 3)
+      set(bison_no_deprecated -Wno-deprecated)
+    endif()
     bison_target(
-      ${FORMAT}_parser foreign-${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/parsers/foreign-${FORMAT}-parser.c
+      ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
+      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
     )
     flex_target(
-      ${FORMAT}_lexer foreign-${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/parsers/foreign-${FORMAT}-lexer.c
+      ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
+      COMPILE_FLAGS "--noline"
+      DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -34,150 +35,249 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
-  adjlist.c
-  arpack.c
-  array.c
-  atlas.c
-  attributes.c
-  basic_query.c
-  bfgs.c
-  bigint.c
-  bignum.c
-  bipartite.c
-  blas.c
-  bliss.cc
-  cattributes.c
-  centrality.c
-  cliques.c
-  clustertool.cpp
-  cocitation.c
-  cohesive_blocks.c
-  coloring.c
-  community_leiden.c
-  community.c
-  complex.c
-  components.c
-  conversion.c
-  cores.c
-  decomposition.c
-  degree_sequence.cpp
-  DensityGrid_3d.cpp
-  DensityGrid.cpp
-  distances.c
-  dotproduct.c
-  dqueue.c
-  drl_graph.cpp
-  drl_graph_3d.cpp
-  drl_layout.cpp
-  drl_layout_3d.cpp
-  eigen.c
-  embedding.c
-  fast_community.c
-  feedback_arc_set.c
-  flow.c
-  foreign-graphml.c
-  foreign.c
-  forestfire.c
-  games.c
-  gengraph_box_list.cpp
-  gengraph_degree_sequence.cpp
-  gengraph_graph_molloy_hash.cpp
-  gengraph_graph_molloy_optimized.cpp
-  gengraph_mr-connected.cpp
-  gengraph_powerlaw.cpp
-  glet.c
-  glpk_support.c
-  gml_tree.c
-  graphicality.c
-  hacks.c
-  heap.c
-  igraph_buckets.c
-  igraph_cliquer.c
-  igraph_error.c
-  igraph_estack.c
-  igraph_eulerian.c
-  igraph_fixed_vectorlist.c
-  igraph_grid.c
-  igraph_hashtable.c
-  igraph_heap.c
-  igraph_hrg_types.cc
-  igraph_hrg.cc
-  igraph_marked_queue.c
-  igraph_psumtree.c
-  igraph_set.c
-  igraph_stack.c
-  igraph_strvector.c
-  igraph_trie.c
-  infomap_FlowGraph.cc
-  infomap_Greedy.cc
-  infomap_Node.cc
-  infomap.cc
-  interrupt.c
-  iterators.c
-  lad.c
-  lapack.c
-  layout_dh.c
-  layout_fr.c
-  layout_gem.c
-  layout_kk.c
-  layout.c
-  lsap.c
-  matching.c
-  math.c
-  matrix.c
-  maximal_cliques.c
-  memory.c
-  microscopic_update.c
-  mixing.c
-  motifs.c
-  NetDataTypes.cpp
-  NetRoutines.cpp
-  operators.c
-  optimal_modularity.c
-  other.c
-  paths.c
-  pottsmodel_2.cpp
-  progress.c
-  prpack.cpp
-  qsort_r.c
-  qsort.c
-  random_walk.c
-  random.c
-  sbm.c
-  scan.c
-  scg_approximate_methods.c
-  scg_exact_scg.c
-  scg_kmeans.c
-  scg_optimal_method.c
-  scg_utils.c
-  scg.c
-  separators.c
-  shortest_paths.c
-  sir.c
-  spanning_trees.c
-  sparsemat.c
-  spectral_properties.c
-  spmatrix.c
-  st-cuts.c
-  statusbar.c
-  structural_properties.c
-  structure_generators.c
-  sugiyama.c
-  topology.c
-  triangles.c
-  type_indexededgelist.c
-  types.c
-  vector_ptr.c
-  vector.c
-  version.c
-  visitors.c
-  walktrap_communities.cpp
-  walktrap_graph.cpp
-  walktrap_heap.cpp
-  walktrap.cpp
-  zeroin.c
+  core/array.c
+  core/buckets.c
+  core/cutheap.c
+  core/dqueue.c
+  core/error.c
+  core/estack.c
+  core/fixed_vectorlist.c
+  core/grid.c
+  core/hashtable.c
+  core/heap.c
+  core/indheap.c
+  core/interruption.c
+  core/marked_queue.c
+  core/matrix.c
+  core/memory.c
+  core/printing.c
+  core/progress.c
+  core/psumtree.c
+  core/set.c
+  core/sparsemat.c
+  core/spmatrix.c
+  core/stack.c
+  core/statusbar.c
+  core/strvector.c
+  core/trie.c
+  core/vector_ptr.c
+  core/vector.c
 
+  math/bfgs.c
+  math/complex.c
+  math/utils.c
+
+  linalg/arpack.c
+  linalg/blas.c
+  linalg/eigen.c
+  linalg/lapack.c
+
+  random/random.c
+
+  graph/adjlist.c
+  graph/attributes.c
+  graph/basic_query.c
+  graph/cattributes.c
+  graph/iterators.c
+  graph/type_indexededgelist.c
+  graph/visitors.c
+
+  constructors/adjacency.c
+  constructors/atlas.c
+  constructors/basic_constructors.c
+  constructors/de_bruijn.c
+  constructors/famous.c
+  constructors/full.c
+  constructors/kautz.c
+  constructors/lcf.c
+  constructors/linegraph.c
+  constructors/prufer.c
+  constructors/regular.c
+
+  games/barabasi.c
+  games/callaway_traits.c
+  games/citations.c
+  games/correlated.c
+  games/degree_sequence_vl/gengraph_box_list.cpp
+  games/degree_sequence_vl/gengraph_degree_sequence.cpp
+  games/degree_sequence_vl/gengraph_graph_molloy_hash.cpp
+  games/degree_sequence_vl/gengraph_graph_molloy_optimized.cpp
+  games/degree_sequence_vl/gengraph_mr-connected.cpp
+  games/degree_sequence_vl/gengraph_powerlaw.cpp
+  games/degree_sequence.c
+  games/dotproduct.c
+  games/erdos_renyi.c
+  games/establishment.c
+  games/forestfire.c
+  games/grg.c
+  games/growing_random.c
+  games/islands.c
+  games/k_regular.c
+  games/preference.c
+  games/recent_degree.c
+  games/sbm.c
+  games/static_fitness.c
+  games/tree.c
+  games/watts_strogatz.c
+
+  centrality/betweenness.c
+  centrality/centrality_other.c
+  centrality/centralization.c
+  centrality/closeness.c
+  centrality/coreness.c
+  centrality/truss.cpp
+  centrality/prpack.cpp
+
+  cliques/cliquer_wrapper.c
+  cliques/cliques.c
+  cliques/maximal_cliques.c
+  cliques/glet.c
+
+  community/community_misc.c
+  community/edge_betweenness.c
+  community/fast_modularity.c
+  community/fluid.c
+  community/infomap/infomap_FlowGraph.cc
+  community/infomap/infomap_Greedy.cc
+  community/infomap/infomap_Node.cc
+  community/infomap/infomap.cc
+  community/label_propagation.c
+  community/leading_eigenvector.c
+  community/leiden.c
+  community/louvain.c
+  community/modularity.c
+  community/optimal_modularity.c
+  community/spinglass/clustertool.cpp
+  community/spinglass/NetDataTypes.cpp
+  community/spinglass/NetRoutines.cpp
+  community/spinglass/pottsmodel_2.cpp
+  community/walktrap/walktrap_communities.cpp
+  community/walktrap/walktrap_graph.cpp
+  community/walktrap/walktrap_heap.cpp
+  community/walktrap/walktrap.cpp
+
+  connectivity/cohesive_blocks.c
+  connectivity/components.c
+  connectivity/separators.c
+
+  flow/flow.c
+  flow/st-cuts.c
+
+  hrg/hrg_types.cc
+  hrg/hrg.cc
+
+  io/dimacs.c
+  io/dl.c
+  io/dot.c
+  io/edgelist.c
+  io/graphml.c
+  io/gml-tree.c
+  io/gml.c
+  io/graphdb.c
+  io/leda.c
+  io/lgl.c
+  io/ncol.c
+  io/pajek.c
   ${PARSER_SOURCES}
+
+  layout/circular.c
+  layout/davidson_harel.c
+  layout/drl/DensityGrid.cpp
+  layout/drl/DensityGrid_3d.cpp
+  layout/drl/drl_graph.cpp
+  layout/drl/drl_graph_3d.cpp
+  layout/drl/drl_layout.cpp
+  layout/drl/drl_layout_3d.cpp
+  layout/fruchterman_reingold.c
+  layout/gem.c
+  layout/graphopt.c
+  layout/kamada_kawai.c
+  layout/large_graph.c
+  layout/layout_bipartite.c
+  layout/layout_grid.c
+  layout/layout_random.c
+  layout/mds.c
+  layout/merge_dla.c
+  layout/merge_grid.c
+  layout/reingold_tilford.c
+  layout/sugiyama.c
+
+  operators/add_edge.c
+  operators/complementer.c
+  operators/compose.c
+  operators/connect_neighborhood.c
+  operators/contract.c
+  operators/difference.c
+  operators/disjoint_union.c
+  operators/intersection.c
+  operators/misc_internal.c
+  operators/permute.c
+  operators/rewire.c
+  operators/rewire_edges.c
+  operators/simplify.c
+  operators/subgraph.c
+  operators/union.c
+
+  paths/all_shortest_paths.c
+  paths/bellman_ford.c
+  paths/dijkstra.c
+  paths/distances.c
+  paths/eulerian.c
+  paths/histogram.c
+  paths/johnson.c
+  paths/random_walk.c
+  paths/shortest_paths.c
+  paths/simple_paths.c
+  paths/unweighted.c
+  paths/sparsifier.c
+
+  properties/basic_properties.c
+  properties/constraint.c
+  properties/convergence_degree.c
+  properties/dag.c
+  properties/degrees.c
+  properties/girth.c
+  properties/loops.c
+  properties/multiplicity.c
+  properties/neighborhood.c
+  properties/perfect.c
+  properties/spectral.c
+  properties/trees.c
+  properties/triangles.c
+
+  isomorphism/bliss.cc
+  isomorphism/isoclasses.c
+  isomorphism/lad.c
+  isomorphism/isomorphism_misc.c
+  isomorphism/queries.c
+  isomorphism/vf2.c
+
+  misc/bipartite.c
+  misc/chordality.c
+  misc/cocitation.c
+  misc/coloring.c
+  misc/conversion.c
+  misc/degree_sequence.cpp
+  misc/embedding.c
+  misc/feedback_arc_set.c
+  misc/graphicality.c
+  misc/matching.c
+  misc/microscopic_update.c
+  misc/mixing.c
+  misc/motifs.c
+  misc/other.c
+  misc/scan.c
+  misc/sir.c
+  misc/spanning_trees.c
+
+  internal/glpk_support.c
+  internal/hacks.c
+  internal/lsap.c
+  internal/qsort_r.c
+  internal/qsort.c
+  internal/zeroin.c
+
+  version.c
 
   # Vendored library sources. Yes, this is horrible.
   $<IF:$<OR:$<BOOL:${ARPACK_IS_VENDORED}>,$<BOOL:${BLAS_IS_VENDORED}>,$<BOOL:${LAPACK_IS_VENDORED}>>,$<TARGET_OBJECTS:f2c_vendored>,>
@@ -190,13 +290,13 @@ add_library(
 )
 
 # Set soname for the library
+set_target_properties(igraph PROPERTIES VERSION "0.0.0")
 set_target_properties(igraph PROPERTIES SOVERSION 0)
 
 # Add extra compiler definitions if needed
 target_compile_definitions(
   igraph
   PRIVATE
-  $<TARGET_PROPERTY:prpack,COMPILE_DEFINITIONS>
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
 
@@ -212,12 +312,13 @@ define_file_basename_for_sources(igraph)
 target_include_directories(
   igraph
   PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include/igraph>
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/vendor
 
   # Vendored library include paths
   $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
@@ -250,8 +351,8 @@ if(GLPK_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${GLPK_LIBRARIES})
 endif()
 
-if(GMP_LIBRARY)
-  target_link_libraries(igraph PUBLIC ${GMP_LIBRARY})
+if(GMP_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${GMP_LIBRARIES})
 endif()
 
 if(LAPACK_LIBRARIES)
@@ -269,85 +370,88 @@ target_link_libraries(
   bliss cliquer plfit prpack
 )
 
-if (WIN32)
-  # Define symbols to enable compilation of CSXSparse on Windows
-  target_compile_definitions(igraph PRIVATE NCOMPLEX)
-  if (NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode on Windows
-    target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
-  else()
-    target_compile_definitions(igraph PRIVATE IGRAPH_EXPORTS)
-  endif()
+# Disable complex number support for CXSparse because:
+#   - It is necessary to compile with MSVC
+#   - igraph does not need complex number support from CXSparse on any platform
+# This is needed here (in addition to the cxsparse_vendored target) because
+# igraph may be compiled with an external CXSparse.
+target_compile_definitions(igraph PRIVATE NCOMPLEX)
+
+if (NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
+else()
+  target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()
 
 if(MSVC)
   # Add MSVC-specific include path for some headers that are missing on Windows
-  target_include_directories(igraph PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
+  target_include_directories(igraph PRIVATE ${PROJECT_SOURCE_DIR}/msvc/include)
 endif()
 
 # Turn on all warnings for GCC, clang and MSVC
 use_all_warnings(igraph)
 
-# Generate pkgconfig file.
-# The library names being used here are Linux-specific, but pkgconfig files
-# are omstly used on Linux anyway. Nevertheless, we take care not to include
-# -lm on Windows because the Python interface of igraph uses the pkg-config
-# file to decide what to link to, and we don't have a separate math library
-# on Windows.
-if(WIN32)
-  set(PKGCONFIG_LIBS_PRIVATE "")
-else()
-  set(PKGCONFIG_LIBS_PRIVATE "-lm")
-endif()
-if(APPLE)
-  # All recent macOS distributions use libc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
-elseif(NOT MSVC)
-  # Most Linux distributions and MSYS use libstdc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
-endif()
+# GNUInstallDirs be included before generating the pkgconfig file, as it defines
+# CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR variables.
+include(GNUInstallDirs)
 
-if(IGRAPH_GRAPHML_SUPPORT)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_GMP)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lgmp")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_BLAS)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lblas")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_CXSPARSE)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lcxsparse")
-endif()
-if(IGRAPH_GLPK_SUPPORT AND NOT IGRAPH_USE_INTERNAL_GLPK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lglpk")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_LAPACK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -llapack")
-endif()
-if(NOT IGRAPH_USE_INTERNAL_ARPACK)
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
-endif()
-configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
+# Generate pkgconfig file
+include(pkgconfig_helpers)
+
+include(GenerateExportHeader)
+generate_export_header(igraph
+  STATIC_DEFINE IGRAPH_STATIC
+  EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/igraph_export.h
+)
+
+# Provide an igraph-config.cmake file in the installation directory so
+# users can find the installed igraph library with FIND_PACKAGE(igraph)
+# from their CMakeLists.txt files
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  ${PROJECT_SOURCE_DIR}/etc/cmake/igraph-config.cmake.in
+  ${PROJECT_BINARY_DIR}/igraph-config.cmake
+  # Install destination selected according to https://wiki.debian.org/CMake
+  # and by looking at how eigen3 does it in Ubuntu
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
+)
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
+  VERSION ${PACKAGE_VERSION_BASE}
+  COMPATIBILITY SameMinorVersion
+)
 
 # Define how to install the library
-include(GNUInstallDirs)
 install(
-  TARGETS igraph
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
+  TARGETS igraph bliss cliquer plfit prpack
+  EXPORT igraph_targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
-  DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+  DIRECTORY ${PROJECT_SOURCE_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph
   FILES_MATCHING PATTERN "*.h"
 )
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/include/
+  DIRECTORY ${PROJECT_BINARY_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph
   FILES_MATCHING PATTERN "*.h"
 )
 install(
-  FILES ${CMAKE_BINARY_DIR}/igraph.pc
+  FILES ${PROJECT_BINARY_DIR}/igraph.pc
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+install(
+  FILES ${PROJECT_BINARY_DIR}/igraph-config.cmake
+        ${PROJECT_BINARY_DIR}/igraph-config-version.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
+)
+install(
+  EXPORT igraph_targets
+  FILE igraph-targets.cmake
+  NAMESPACE igraph::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/igraph
 )

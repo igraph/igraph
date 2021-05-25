@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -20,6 +20,15 @@
 <!-- doxrox-include igraph_difference -->
 <!-- doxrox-include igraph_complementer -->
 <!-- doxrox-include igraph_compose -->
+</section>
+
+<section id="miscellaneous-operators"><title>Miscellaneous operators</title>
+<!-- doxrox-include igraph_connect_neighborhood -->
+<!-- doxrox-include igraph_contract_vertices -->
+<!-- doxrox-include igraph_induced_subgraph -->
+<!-- doxrox-include igraph_linegraph -->
+<!-- doxrox-include igraph_simplify -->
+<!-- doxrox-include igraph_subgraph_edges -->
 </section>
 
 </chapter>

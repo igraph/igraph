@@ -1,0 +1,42 @@
+UNWEIGHTED CASE:
+
+Global efficiency, undirected: 0.509615
+Global efficiency, directed: 0.274786
+Average local efficiency, undirected: 0.605769
+Average local efficiency, directed, all neighbors: 0.329936
+Average local efficiency, directed, in-neighbors: 0.212115
+Average local efficiency, directed, out-neighbors: 0.149466
+
+Local efficiency, undirected:
+( 1 0.633333 0.833333 0.641667 0.5 0.833333 0 0 0.711111 0.722222 1 1 0 )
+
+Local efficiency, directed, all neighbors:
+( 0.75 0.401111 0.375 0.340833 0.316667 0.333333 0 0 0.466667 0.305556 0.5 0.5 0 )
+
+Local efficiency, directed, in-neighbors:
+( 0 0 0.5 0.340833 0.527778 0.5 0 0 0.166667 0.222222 0.5 0 0 )
+
+Local efficiency, directed, out-neighbors:
+( 0 0.3875 0.25 0 0.0555556 0 0 0 0.583333 0.166667 0 0.5 0 )
+
+
+WEIGHTED CASE:
+
+Global efficiency, undirected: 0.247686
+Global efficiency, directed: 0.125356
+Average local efficiency, undirected: 0.281019
+Average local efficiency, directed, all neighbors: 0.150368
+Average local efficiency, directed, in-neighbors: 0.122897
+Average local efficiency, directed, out-neighbors: 0.068520
+
+Local efficiency, undirected:
+( 0.333333 0.306219 0.525 0.419167 0.358333 0.187037 0 0 0.380635 0.310185 0.333333 0.5 0 )
+
+Local efficiency, directed, all neighbors:
+( 0.291667 0.16403 0.245833 0.207976 0.204643 0.075 0 0 0.204987 0.143981 0.166667 0.25 0 )
+
+Local efficiency, directed, in-neighbors:
+( 0 0 0.5 0.207976 0.341071 0.125 0 0 0.0625 0.194444 0.166667 0 0 )
+
+Local efficiency, directed, out-neighbors:
+( 0 0.180711 0.116667 0 0.0416667 0 0 0 0.246164 0.0555556 0 0.25 0 )

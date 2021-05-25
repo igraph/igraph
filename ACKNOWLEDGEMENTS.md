@@ -3,9 +3,9 @@
 [igraph](https://igraph.org) includes or links to code from the following sources.
 
 
-#### [bliss 0.73](http://www.tcs.hut.fi/Software/bliss/)
+#### [bliss 0.75](https://users.aalto.fi/~tjunttil/bliss/)
 
-Copyright (c) 2003-2015 Tommi Junttila.
+Copyright (c) 2003-2021 Tommi Junttila.
 
 License: [GNU LGPLv3][lgpl3]
 
@@ -180,7 +180,7 @@ use or performance of this software.
 
 #### [SuiteSparse](http://www.suitesparse.com)
 
- * CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2009, Timothy A. Davis.
+ * CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2017, Timothy A. Davis.
 
    License: [GNU LGPLv2.1][lgpl2] or later
 

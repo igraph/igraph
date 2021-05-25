@@ -1,0 +1,34 @@
+No vertices:
+Result:      NaN
+Unconnected pairs:        0
+
+One vertex:
+Result:      NaN
+Unconnected pairs:        0
+
+Two vertices:
+Result:      NaN
+Unconnected pairs:        2
+
+Two vertices, inf for unconnected pairs:
+Result:      Inf
+Unconnected pairs:        2
+
+Smallest bifurcating directed tree:
+Result:        1
+Unconnected pairs:        4
+
+Smallest bifurcating directed tree, inf for unconnected pairs:
+Result:      Inf
+Unconnected pairs:        4
+
+Graph with loops and multiple edges:
+Result:        5
+Unconnected pairs:       19
+
+Graph with loops and multiple edges, ignoring direction:
+Result:      4.6
+Unconnected pairs:       10
+
+Checking incorrect weight length error handling.
+Checking negative weight error handling.

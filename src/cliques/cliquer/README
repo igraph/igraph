@@ -1,0 +1,61 @@
+
+Cliquer - routines for clique searching
+---------------------------------------
+
+
+Cliquer is a set of C routines for finding cliques in an arbitrary
+weighted graph. It uses an exact branch-and-bound algorithm recently
+developed by Patric Ostergard. It is designed with the aim of being
+efficient while still being flexible and easy to use.
+
+Cliquer was developed on Linux, and it should compile without
+modification on most modern UNIX systems. Other operating systems may
+require minor changes to the source code.
+
+Features:
+
+  * support for both weighted and unweighted graphs (faster routines
+    for unweighted graphs)
+  * search for maximum clique / maximum-weight clique
+  * search for clique with size / weight within a given range
+  * restrict search to maximal cliques
+  * store found cliques in memory
+  * call a user-defined function for every clique found
+  * Cliquer is re-entrant, so you can use the clique-searching
+    functions from within the callback function
+
+The full documentation can be obtained via the www page of
+Cliquer <http://www.tkk.fi/~pat/cliquer.html>.
+
+
+License
+
+Cliquer is Copyright (C) 2002 Sampo Niskanen, Patric Ostergard.
+
+Cliquer is licensed under the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version. The full license is included in
+the file LICENSE.
+
+Basically, you can use Cliquer for any purpose, provided that any
+programs or modifications you make and distribute are also licensed
+under the GNU GPL.
+
+ABSOLUTELY NO GUARANTEES OR WARRANTIES are made concerning the
+suitability, correctness, or any other aspect of these routines.
+
+
+Contact
+
+Cliquer was mainly written by Sampo Niskanen <sampo.niskanen@iki.fi>.
+
+For bug-fixes, feedback, and, in particular, for putting your
+name on the mailing list for important information regarding Cliquer,
+please contact:
+
+Patric Ostergard
+Department of Communications and Networking
+Aalto University
+P.O. Box 13000, 00076 Aalto
+FINLAND
+<patric.ostergard@tkk.fi>

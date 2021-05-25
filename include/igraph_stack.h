@@ -71,8 +71,8 @@ __BEGIN_DECLS
 
 #define IGRAPH_STACK_NULL { 0,0,0 }
 
-void igraph_stack_ptr_free_all(igraph_stack_ptr_t* s);
-void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* s);
+IGRAPH_EXPORT void igraph_stack_ptr_free_all(igraph_stack_ptr_t* s);
+IGRAPH_EXPORT void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* s);
 
 __END_DECLS
 

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Partial-prefix-sum-trees">
+<title id="partial-prefix-sum-trees">Partial prefix sum trees</title>
+
+<!-- doxrox-include igraph_psumtree -->
+<!-- doxrox-include igraph_psumtree_init -->
+<!-- doxrox-include igraph_psumtree_destroy -->
+<!-- doxrox-include igraph_psumtree_size -->
+<!-- doxrox-include igraph_psumtree_get -->
+<!-- doxrox-include igraph_psumtree_sum -->
+<!-- doxrox-include igraph_psumtree_search -->
+<!-- doxrox-include igraph_psumtree_update -->
+
+</section>

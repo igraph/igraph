@@ -30,6 +30,8 @@ int main() {
     long int no_of_nodes;
     long int i;
 
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
                  5, 6, 5, 7, 5, 8, 5, 9, 6, 7, 6, 8, 6, 9, 7, 8, 7, 9, 8, 9, 0, 5, -1);

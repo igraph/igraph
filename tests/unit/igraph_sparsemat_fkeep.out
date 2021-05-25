@@ -1,0 +1,15 @@
+0x0 matrix.
+3x3 matrix.
+Remove row 0, column 1, and values above 6:
+col 0: locations 0 to 0
+3 : 1
+col 1: locations 1 to 0
+col 2: locations 1 to 1
+1 : 4
+col 3: locations 2 to 1
+Remove everything:
+col 0: locations 0 to -1
+col 1: locations 0 to -1
+col 2: locations 0 to -1
+col 3: locations 0 to -1
+uncompressed matrix.

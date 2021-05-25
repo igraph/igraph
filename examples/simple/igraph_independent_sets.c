@@ -60,7 +60,7 @@ int main() {
             v = igraph_vector_ptr_e(&result, i);
             print_vector((igraph_vector_t*)v);
             igraph_vector_destroy(v);
-            free(v);
+            igraph_free(v);
         }
     }
     igraph_destroy(&g);
@@ -74,7 +74,7 @@ int main() {
         v = igraph_vector_ptr_e(&result, i);
         print_vector((igraph_vector_t*)v);
         igraph_vector_destroy(v);
-        free(v);
+        igraph_free(v);
     }
     igraph_vector_ptr_destroy(&result);
 

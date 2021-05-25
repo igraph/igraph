@@ -1,0 +1,19 @@
+No vertices:
+Result: 0
+
+One vertex:
+Result: 0
+
+Full graph of 50 vertices, motif size 3 (50 choose 3 = 19600):
+Result: 19600
+
+Full graph of 50 vertices, motif size 3, cut_prob 0.1 at each level:
+Result: 14030
+
+Full graph of 50 vertices, motif size 4 (50 choose 4 = 230300:
+Result: 230300
+
+Triangle and a vertex, motif size 4:
+Result: 0
+
+Cut prob too short.

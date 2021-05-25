@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""Helper script used to remove the bundled examples from the DocBook files
+that are used to generate the PDF documentation.
+
+This file is part of the documentation build process. You do not need to call
+it manually.
+"""
 
 import sys
 from xml.etree.ElementTree import ElementTree

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -64,7 +64,7 @@ names, except for the default type.
 </para>
 
 <para>
-Some examples: 
+Some examples:
 <itemizedlist>
 
 <listitem><para>
@@ -93,7 +93,7 @@ Some examples:
   <type>igraph_heap_min_t</type> is a minimum heap with
   <type>igraph_real_t</type> elements. The corresponding functions are
   called <function>igraph_heap_min_init</function>,
-  <function>igraph_heap_min_pop</function>, etc. 
+  <function>igraph_heap_min_pop</function>, etc.
 </para></listitem>
 
 <listitem><para>
@@ -104,7 +104,7 @@ Some examples:
 
 <listitem><para>
   <type>igraph_heap_min_long_t</type> is a minimum heap containing
-  <type>long int</type> elements. Its functions have the 
+  <type>long int</type> elements. Its functions have the
   <function>igraph_heap_min_long_</function> prefix.
 </para></listitem>
 
@@ -114,7 +114,7 @@ Some examples:
 <para>
 Note that the <link linkend="VECTOR">VECTOR</link> and the <link
 linkend="MATRIX">MATRIX</link> macros can be used on <emphasis>all</emphasis>
-vector and matrix types. 
+vector and matrix types.
 </para>
 
 </section>

@@ -21,14 +21,13 @@
 
 */
 
-#include "igraph_types.h"
-#include "igraph_vector.h"
-#include "igraph_matrix.h"
-
 #ifndef IGRAPH_ARPACK_H
 #define IGRAPH_ARPACK_H
 
 #include "igraph_decls.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_matrix.h"
 
 __BEGIN_DECLS
 
@@ -289,11 +288,11 @@ typedef struct igraph_arpack_storage_t {
     igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
-DECLDIR void igraph_arpack_options_init(igraph_arpack_options_t *o);
+IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
 
-DECLDIR int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
-                                       long int maxncv, long int maxldv, igraph_bool_t symm);
-DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
+                                             long int maxncv, long int maxldv, igraph_bool_t symm);
+IGRAPH_EXPORT void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 
 /**
  * \typedef igraph_arpack_function_t
@@ -312,21 +311,21 @@ DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  *    this as an error, stops and calls the igraph error handler.
  */
 
-typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
+typedef igraph_error_t igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
                                      int n, void *extra);
 
-DECLDIR int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
-                                  igraph_arpack_options_t *options,
-                                  igraph_arpack_storage_t *storage,
-                                  igraph_vector_t *values, igraph_matrix_t *vectors);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
+                                        igraph_arpack_options_t *options,
+                                        igraph_arpack_storage_t *storage,
+                                        igraph_vector_t *values, igraph_matrix_t *vectors);
 
-DECLDIR int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
-                                  igraph_arpack_options_t *options,
-                                  igraph_arpack_storage_t *storage,
-                                  igraph_matrix_t *values, igraph_matrix_t *vectors);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
+                                        igraph_arpack_options_t *options,
+                                        igraph_arpack_storage_t *storage,
+                                        igraph_matrix_t *values, igraph_matrix_t *vectors);
 
-DECLDIR int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-        long int nev);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
+                                               long int nev);
 
 __END_DECLS
 

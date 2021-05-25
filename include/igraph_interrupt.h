@@ -24,8 +24,8 @@
 #ifndef IGRAPH_INTERRUPT_H
 #define IGRAPH_INTERRUPT_H
 
-#include "igraph_error.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 
 __BEGIN_DECLS
 
@@ -106,22 +106,22 @@ __BEGIN_DECLS
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-typedef int igraph_interruption_handler_t (void* data);
+typedef igraph_error_t igraph_interruption_handler_t (void* data);
 
 /**
  * \function igraph_allow_interruption
  *
  * This is the function which is called (usually via the
- * \ref IGRAPH_INTERRUPTION macro) if \a igraph is checking for interruption
+ * \ref IGRAPH_ALLOW_INTERRUPTION macro) if \a igraph is checking for interruption
  * requests.
  *
  * \param data reserved for possible future use, now it is always \c NULL
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-DECLDIR int igraph_allow_interruption(void* data);
+IGRAPH_EXPORT igraph_error_t igraph_allow_interruption(void* data);
 
-DECLDIR igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
+IGRAPH_EXPORT igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
 
 __END_DECLS
 

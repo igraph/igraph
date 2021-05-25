@@ -74,7 +74,7 @@ int main() {
     int result;
     FILE *ifile, *ofile;
 
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* GraphML */
     ifile = fopen("test.gxl", "r");

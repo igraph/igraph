@@ -29,18 +29,16 @@
 
 __BEGIN_DECLS
 
-#define igraph_Calloc(n,t)    (t*) calloc( (size_t)(n), sizeof(t) )
-#define igraph_Realloc(p,n,t) (t*) realloc((void*)(p), (size_t)((n)*sizeof(t)))
-#define igraph_Free(p)        (free( (void *)(p) ), (p) = NULL)
+#define IGRAPH_CALLOC(n,t)    (t*) calloc( (n) > 0 ? (size_t)(n) : (size_t)1, sizeof(t) )
+#define IGRAPH_REALLOC(p,n,t) (t*) realloc((void*)(p), (n) > 0 ? (size_t)((n)*sizeof(t)) : (size_t)1)
+#define IGRAPH_FREE(p)        (free( (void *)(p) ), (p) = NULL)
 
-/* #ifndef IGRAPH_NO_CALLOC */
-/* #  define Calloc igraph_Calloc */
-/* #  define Realloc igraph_Realloc */
-/* #  define Free igraph_Free */
-/* #endif */
+#define igraph_Calloc IGRAPH_CALLOC
+#define igraph_Realloc IGRAPH_REALLOC
+#define igraph_Free IGRAPH_FREE
 
-DECLDIR void igraph_free(void *p);
-DECLDIR void *igraph_malloc(size_t n);
+IGRAPH_EXPORT void igraph_free(void *p);
+IGRAPH_EXPORT void *igraph_malloc(size_t n);
 
 __END_DECLS
 

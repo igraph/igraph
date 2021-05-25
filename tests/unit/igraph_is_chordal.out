@@ -1,0 +1,129 @@
+No vertices:
+Is chordal: 1
+Fill in:
+( )
+New graph:
+directed: false
+vcount: 0
+edges: {
+}
+
+One vertex:
+Is chordal: 1
+Fill in:
+( )
+New graph:
+directed: false
+vcount: 1
+edges: {
+}
+
+One vertex, don't calculate anything.
+
+Disconnected graph with loops and multiple edges:
+Is chordal: 0
+Fill in:
+( 3 0 )
+New graph:
+directed: false
+vcount: 6
+edges: {
+0 1
+0 2
+0 2
+0 2
+0 3
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+
+Same graph, don't ask for fill_in vector:
+Is chordal: 0
+Fill in:
+( )
+New graph:
+directed: false
+vcount: 6
+edges: {
+0 1
+0 2
+0 2
+0 2
+0 3
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+
+Same graph, don't ask for fill_in vector or newgraph:
+Is chordal: 0
+Fill in:
+( )
+
+Same graph, own calculation of alpha and its inverse:
+Is chordal: 0
+Fill in:
+( 3 0 )
+New graph:
+directed: false
+vcount: 6
+edges: {
+0 1
+0 2
+0 2
+0 2
+0 3
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+
+Same graph, own calculation of alpha:
+Is chordal: 0
+Fill in:
+( 3 0 )
+New graph:
+directed: false
+vcount: 6
+edges: {
+0 1
+0 2
+0 2
+0 2
+0 3
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+
+Same graph, own calculation of inverse alpha:
+Is chordal: 0
+Fill in:
+( 3 0 )
+New graph:
+directed: false
+vcount: 6
+edges: {
+0 1
+0 2
+0 2
+0 2
+0 3
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+
+Wrong size alpha.
+Wrong size alpham1.

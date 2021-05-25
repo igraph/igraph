@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -15,7 +15,7 @@
 <!-- doxrox-include about_vertex_selectors -->
 <!-- doxrox-include igraph_vs_all -->
 <!-- doxrox-include igraph_vs_adj -->
-<!-- doxrox-include igraph_vs_nonadj -->	
+<!-- doxrox-include igraph_vs_nonadj -->
 <!-- doxrox-include igraph_vs_none -->
 <!-- doxrox-include igraph_vs_1 -->
 <!-- doxrox-include igraph_vs_vector -->
@@ -61,6 +61,7 @@
 <!-- doxrox-include igraph_es_seq -->
 <!-- doxrox-include igraph_es_pairs -->
 <!-- doxrox-include igraph_es_pairs_small -->
+<!-- doxrox-include igraph_es_path -->
 <!-- doxrox-include igraph_es_vector_copy -->
 </section>
 
@@ -73,6 +74,7 @@
 </section>
 
 <section id="generic-edge-selector-operations"><title>Generic edge selector operations</title>
+<!-- doxrox-include igraph_es_as_vector -->
 <!-- doxrox-include igraph_es_copy -->
 <!-- doxrox-include igraph_es_destroy -->
 <!-- doxrox-include igraph_es_is_all -->
@@ -93,7 +95,7 @@
 
 
 <!-- <section id="examples"><title>Examples</title>
-	</section> 
+	</section>
 -->
 
 </chapter>

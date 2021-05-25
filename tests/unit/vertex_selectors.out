@@ -1,0 +1,22 @@
+Checking vs_none vertex selector:
+Checking vector selector:
+Some graph:
+2
+3
+4
+Edgeless graph:
+2
+3
+4
+Graph without vertices should fail.
+Vertex selector with negative index should fail
+Checking copy vector selector:
+Some graph:
+2
+3
+4
+Edgeless graph:
+2
+3
+4
+Graph without vertices should fail.

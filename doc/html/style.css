@@ -4,13 +4,20 @@
 .index { padding: 0px 20px 10px; }
 .legalnotice { padding: 0px 20px 10px; }
 .releaseinfo { padding: 0px 20px 10px; }
-.programlisting 
+.navigation-header { position: absolute; right: 20px; top: 7px; }
+.navigation-footer { padding: 0px 20px 10px; }
+.programlisting
 {
   background: #eeeeff;
   border: solid 1px #4444ff;
   padding: 0.5em;
+  font-size: 16px;
+  overflow: auto;
 }
-.variablelist 
+.constant, .literal {
+  font-size: 16px;
+}
+.variablelist
 {
   padding: 4px;
   margin-left: 3em;
@@ -19,7 +26,13 @@
 {
   vertical-align: top;
 }
-table.navigation 
+
+code
+{
+  font-size: 16px;
+}
+
+table.navigation
 {
     color: #fff;
     margin: 0;
@@ -29,28 +42,28 @@ table.navigation
     border-bottom: 1px solid #1c477f;
     font-size: large;
 }
-table.navigation a 
+table.navigation a
 {
   color: #fff;
 }
-.navigation .title 
+.navigation .title
 {
   font-size: 200%;
 }
-div.refnamediv 
+div.refnamediv
 {
   margin-top: 2em;
 }
-div.gallery-float 
+div.gallery-float
 {
   float: left;
   padding: 10px;
 }
-div.gallery-float img 
+div.gallery-float img
 {
   border-style: none;
 }
-div.gallery-spacer 
+div.gallery-spacer
 {
   clear: both;
 }
@@ -69,6 +82,12 @@ h1 {
     border-bottom: 1px solid #1c477f;
     font-size: large;
 }
+.chapter h1 {
+    /* compensate for main page horizontal padding */
+    margin: 0 -20px;
+    padding: 7px 20px 7px 35px;
+}
+
 h2 {
     font-size: 1.2em;
 }
@@ -145,14 +164,25 @@ ul.download-links li.download-external {
   padding-left: 18px;
 }
 
-a { color: #00f; text-decoration: none }
-a:visited { color: #00c }
-a:hover { color: #00f; text-decoration: underline; cursor: hand; }
+a { color: #22d; text-decoration: none }
+a:visited { color: #219 }
+a:hover { color: #22d; text-decoration: underline; cursor: hand; }
 h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
 h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
 h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
 
-span.type { font-family: monospace; }
+.navigation-header a {
+  color: white;
+  text-decoration: none;
+  padding: 4px 10px;
+  text-shadow: 0 1px 2px #000;
+  transition: background-color 300ms;
+  border-radius: 4px;
+}
+.navigation-header a:visited { color: white; text-decoration: none }
+.navigation-header a:hover { color: white; text-decoration: none; background-color: rgba(255, 255, 255, 0.3) }
+
+span.type { font-family: monospace; font-size: 16px; }
 
 /* Version info */
 #version_info {
@@ -232,8 +262,8 @@ div.example-contents {
 .example p.title b:before {
   content: '\25B6\00a0';
 }
-.example p.title:hover { 
-  color: #00f; 
+.example p.title:hover {
+  color: #00f;
   text-decoration: underline;
   cursor: hand;
 }

@@ -24,13 +24,12 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main(int argc, char **argv) {
-
+int main() {
     igraph_t g;
     FILE *ifile;
 
     /* PAJEK */
-    ifile = fopen("LINKS.NET", "r");
+    ifile = fopen("links.net", "r");
     if (ifile == 0) {
         return 10;
     }
@@ -42,5 +41,6 @@ int main(int argc, char **argv) {
     printf("Directed: %i\n", (int) igraph_is_directed(&g));
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
+
     return 0;
 }

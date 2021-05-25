@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_bool_t check_laplacian(igraph_t* graph, igraph_matrix_t* matrix, igraph_vector_t* w) {
+igraph_bool_t check_laplacian(igraph_t* graph, const igraph_matrix_t* matrix, const igraph_vector_t* w) {
     igraph_vector_t vec, res;
     long int i, j;
 
@@ -58,11 +58,11 @@ igraph_bool_t check_laplacian(igraph_t* graph, igraph_matrix_t* matrix, igraph_v
     return 1;
 }
 
-int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
+int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
     igraph_t g;
     igraph_matrix_t m, m2;
     igraph_sparsemat_t sm;
-    igraph_vector_t vec, *weights = 0;
+    igraph_vector_t vec, *weights = NULL;
     igraph_matrix_init(&m, 1, 1);
     igraph_sparsemat_init(&sm, 0, 0, 0);
 
@@ -133,7 +133,7 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
     return 0;
 }
 
-int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
+int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
     igraph_t g;
     igraph_matrix_t m, m2;
     igraph_sparsemat_t sm;
@@ -143,7 +143,7 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
     igraph_sparsemat_init(&sm, 0, 0, 0);
 
     if (w) {
-        weights = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
+        weights = (igraph_vector_t*) calloc(1, sizeof(igraph_vector_t));
         igraph_vector_copy(weights, w);
     }
 

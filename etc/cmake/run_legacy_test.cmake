@@ -16,12 +16,13 @@
 function(print_file FILENAME)
   # Replacement of "cmake -E cat" for older CMake versions. cat was added in
   # CMake 3.18
+  file(TO_NATIVE_PATH "${FILENAME}" FILENAME_NATIVE)
   if(UNIX OR APPLE)
     # Most likely Linux or macOS
-    execute_process(COMMAND "/bin/sh" "-c" "cat ${FILENAME}")
+    execute_process(COMMAND "/bin/sh" "-c" "cat ${FILENAME_NATIVE}")
   elseif(WIN32)
     # Most likely Windows
-    execute_process(COMMAND "cmd" "/c" "type" "${FILENAME}")
+    execute_process(COMMAND "cmd" "/c" "type" "${FILENAME_NATIVE}")
   endif()
 endfunction()
 

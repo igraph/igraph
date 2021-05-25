@@ -52,7 +52,7 @@ int main() {
     for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {
             MATRIX(mat, i, j) = m[i][j];
         }
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* [ 0 1 2 0 ]
        [ 2 0 0 1 ]

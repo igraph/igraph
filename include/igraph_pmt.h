@@ -69,22 +69,17 @@
     #define ZERO 0
     #define ONE 1
     #define MULTIPLICITY 1
+    #define NOTORDERED 1
+    #define NOABS 1
+    #define EQ(a,b) ((a && b) || (!a && !b))
 
 #elif defined(BASE_INT)
-    #define BASE int
+    #define BASE igraph_integer_t
     #define SHORT int
-    #define OUT_FORMAT "%d"
+    #define OUT_FORMAT "%" IGRAPH_PRId
     #define ZERO 0
     #define ONE 1
     #define MULTIPLICITY 1
-
-#elif defined(BASE_LIMB)
-    #define BASE limb_t
-    #define SHORT limb
-    #define ZERO 0
-    #define ONE 1
-    #define MULTIPLICITY 1
-    #define UNSIGNED 1
 
 #elif defined(BASE_PTR)
     #define BASE void*
@@ -147,4 +142,3 @@
     #define HEAPLESS <
     #define HEAPLESSEQ <=
 #endif
-

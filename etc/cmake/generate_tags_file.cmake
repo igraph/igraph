@@ -31,4 +31,16 @@ endforeach()
 list(SORT EXTRACTED_IDS)
 string(REPLACE ";" "\t\t\n" TAGS_OUTPUT "${EXTRACTED_IDS}")
 string(APPEND TAGS_OUTPUT "\t\t\n")
-file(WRITE "${OUTPUT_FILE}" "${TAGS_OUTPUT}")
+string(SHA1 TAGS_OUTPUT_HASH "${TAGS_OUTPUT}")
+
+# Update the output file only if it changed; this prevents CMake from calling
+# source-highlight if there is no point in rebuilding the highlighted
+# source files
+if(EXISTS "${OUTPUT_FILE}")
+  file(SHA1 "${OUTPUT_FILE}" OUTPUT_FILE_HASH)
+  if(NOT "${OUTPUT_FILE_HASH}" STREQUAL "${TAGS_OUTPUT_HASH}")
+    file(WRITE "${OUTPUT_FILE}" "${TAGS_OUTPUT}")
+  endif()
+else()
+  file(WRITE "${OUTPUT_FILE}" "${TAGS_OUTPUT}")
+endif()

@@ -1,0 +1,27 @@
+Only one member, both partitions equal to whole set:
+VI result: 0
+Rand result: failed as expected
+Adjusted Rand result: failed as expected
+NMI result: 1
+Split-join result: 0
+
+Empty sets:
+VI result: 0
+Rand result: failed as expected
+Adjusted Rand result: failed as expected
+NMI result: 1
+Split-join result: 0
+
+Two equal, differenly labeled partitions:
+VI result: 0
+Rand result: 1
+Adjusted Rand result: NaN
+NMI result: 1
+Split-join result: 0
+
+Two different partitions: ((5,1), (8,3,4), (0,6,7,2,9)) and ((5,8), (1,3,4,0), (6,7,2,9))
+VI result: 1.1343
+Rand result: 0.711111
+Adjusted Rand result: 0.312573
+NMI result: 0.455859
+Split-join result: 6

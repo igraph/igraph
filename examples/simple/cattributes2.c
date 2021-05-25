@@ -34,7 +34,7 @@ int main() {
     igraph_warning_handler_t* oldwarnhandler;
 
     /* turn on attribute handling */
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* Create a graph, add some attributes and save it as a GraphML file */
     igraph_famous(&g, "Petersen");

@@ -34,7 +34,7 @@ int main() {
     igraph_vector_t weight;
     igraph_attribute_combination_t comb;
 
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_small(&g, 4, IGRAPH_DIRECTED,
                  0, 1, 0, 1, 0, 1,

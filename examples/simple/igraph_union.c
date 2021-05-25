@@ -40,7 +40,7 @@ int print_free_vector_ptr(igraph_vector_ptr_t *v) {
     for (i = 0; i < l; i++) {
         print_vector(VECTOR(*v)[i]);
         igraph_vector_destroy(VECTOR(*v)[i]);
-        igraph_Free(VECTOR(*v)[i]);
+        IGRAPH_FREE(VECTOR(*v)[i]);
     }
     printf("===\n");
     return 0;

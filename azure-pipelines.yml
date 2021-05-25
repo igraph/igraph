@@ -1,0 +1,127 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  CMAKE_GENERATOR: Ninja
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+
+jobs:
+  - job: linux_static_vendored
+    steps:
+      - script: sudo apt-get install ninja-build ccache -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og'
+
+  - job: linux_static_external
+    steps:
+      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libopenblas-dev -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
+          int_arpack: false
+          int_cxsparse: false
+          int_gmp: false
+          int_glpk: false
+          extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
+
+  - job: linux_shared_vendored
+    steps:
+      - script: sudo apt-get install ninja-build ccache -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          build_shared: true
+
+  - job: linux_shared_external
+    steps:
+      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libopenblas-dev -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
+          int_arpack: false
+          int_cxsparse: false
+          int_gmp: false
+          int_glpk: false
+          extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
+          build_shared: true
+
+  - job: linux_x87
+    steps:
+      - script: sudo apt-get install ninja-build ccache -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          extra_cmake_args: '-DCMAKE_C_FLAGS="-mfpmath=387" -DCMAKE_CXX_FLAGS="-mfpmath=387"'
+
+  - job: linux_alpine
+    steps:
+      # https://github.com/alpinelinux/alpine-chroot-install
+      - bash: |
+          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.12.1/alpine-chroot-install && echo '5571ad4d17d14bb09ad23a75060f05553786e564  alpine-chroot-install' | sha1sum -c || exit 1
+          alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
+          sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'
+          mkdir build && cd build
+          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_ENABLE_TLS=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+          alpine cmake --build . --target build_tests
+          alpine ctest -j `nproc` --output-on-failure
+
+  - job: macos
+    pool:
+      vmImage: macos-latest
+    steps:
+      - script: |
+          brew update
+          brew install ninja ccache
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
+
+  - job: windows_static
+    pool:
+       vmImage: windows-2019
+
+    steps:
+      - template: .azure/build-win.yml
+
+  - job: windows_shared
+    pool:
+       vmImage: windows-2019
+
+    steps:
+      - template: .azure/build-win.yml
+        parameters:
+          build_shared: true
+          vcpkg_target_triplet: x64-windows
+
+  - job: documentation
+    steps:
+      - script: sudo apt-get update
+        displayName: Update package registry
+
+      - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
+        displayName: Install dependencies
+
+      - task: CMake@1
+        displayName: CMake
+        inputs:
+          cmakeArgs: '..'
+
+      - task: CMake@1
+        displayName: Doc build
+        inputs:
+          cmakeArgs: '--build . --target doc'

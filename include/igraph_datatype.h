@@ -36,7 +36,7 @@ __BEGIN_DECLS
  * \brief The internal data structure for storing graphs.
  *
  * It is simple and efficient. It has the following members:
- * - <b>n</b> The number of vertices, reduntant.
+ * - <b>n</b> The number of vertices, redundant.
  * - <b>directed</b> Whether the graph is directed.
  * - <b>from</b> The first column of the edge list.
  * - <b>to</b> The second column of the edge list.
@@ -62,8 +62,8 @@ __BEGIN_DECLS
  * are canonicalized so that the index of the 'from' vertex is not greater
  * than the index of the 'to' vertex. Thus, if v1 <= v2, only the edge (v1, v2)
  * needs to be searched for, not (v2, v1), to determine if v1 and v2 are connected.
- * However, this fact is NOT guaranteed by the documented public API, 
- * and should not be relied upon by the implementation of any functions, 
+ * However, this fact is NOT guaranteed by the documented public API,
+ * and should not be relied upon by the implementation of any functions,
  * except those belonging to the minimal API in type_indexededgelist.c.
  *
  * The storage requirements for a graph with \c |V| vertices

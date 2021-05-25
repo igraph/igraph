@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -9,7 +9,7 @@
 
 <para>
 This section deals with functions which find small induced subgraphs in a
-graph. These were first defined for subgraphs of two and three vertices 
+graph. These were first defined for subgraphs of two and three vertices
 by Holland and Leinhardt, and named dyad census and triad census.
 </para>
 

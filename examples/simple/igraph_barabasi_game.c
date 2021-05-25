@@ -50,7 +50,7 @@ int main() {
     }
     igraph_destroy(&g);
 
-    /* out degree sequence */
+    /* out-degree sequence */
     igraph_vector_resize(&v, 10);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;

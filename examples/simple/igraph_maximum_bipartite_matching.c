@@ -302,7 +302,7 @@ int test_incorrect_types() {
 }
 
 int main() {
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     if (test_graph_from_leda_tutorial()) {
         return 1;

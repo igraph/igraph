@@ -4,4 +4,3 @@ macro(tristate OPTION_NAME DESCRIPTION DEFAULT_VALUE)
 endmacro()
 
 include(PadString)
-

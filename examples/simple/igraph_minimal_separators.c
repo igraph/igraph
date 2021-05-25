@@ -50,7 +50,7 @@ int main() {
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(separators)[i];
         igraph_vector_destroy(v);
-        igraph_Free(v);
+        IGRAPH_FREE(v);
     }
     igraph_vector_ptr_destroy(&separators);
 

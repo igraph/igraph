@@ -1,7 +1,7 @@
 #!/bin/sh -
 # call this Unix script "MagicScript"
-# To use: MagicScript *.f 
-#	  that translates *.f to *.c and polish the resulting C code from f2c. 
+# To use: MagicScript *.f
+#	  that translates *.f to *.c and polish the resulting C code from f2c.
 #
 # Note: define trans_dir as the directory that contains this file.
 #
@@ -9,7 +9,7 @@
 
 rm -f -r temp
 mkdir temp
-for file do	
+for file do
        base=`echo $file | sed -e 's/\.f//g'`
    # run_stripper
        f2c -a < ${base}.f | ${trans_dir}/lenscrub > ${base}.c

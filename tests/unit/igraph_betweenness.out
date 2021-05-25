@@ -1,0 +1,107 @@
+BA graph
+==========================================================
+
+Tree
+==========================================================
+Max betweenness: 1155.000000
+
+Non-trivial weighted graph
+==========================================================
+Max betweenness: 86.000000
+
+Corner case cutoff 0.0
+==========================================================
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+104 122 51 51 51 51 18 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+104 122 51 51 51 51 18 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+Single path graph
+==========================================================
+Cutoff -1
+Unweighted
+0 3 4 3 0
+Weighted
+0 3 4 3 0
+
+Cutoff 0
+Unweighted
+0 0 0 0 0
+Weighted
+0 0 0 0 0
+
+Cutoff 1
+Unweighted
+0 0 0 0 0
+Weighted
+0 0 0 0 0
+
+Cutoff 2
+Unweighted
+0 1 1 1 0
+Weighted
+0 1 1 1 0
+
+Cutoff 3
+Unweighted
+0 2 3 2 0
+Weighted
+0 2 3 2 0
+
+Cutoff 4
+Unweighted
+0 3 4 3 0
+Weighted
+0 3 4 3 0
+
+
+Cycle graph
+==========================================================
+Cutoff -1
+Unweighted
+0.5 0.5 0.5 0.5
+Weighted
+0 1 0 1
+
+Cutoff 0
+Unweighted
+0 0 0 0
+Weighted
+0 0 0 0
+
+Cutoff 1
+Unweighted
+0 0 0 0
+Weighted
+0 0 0 0
+
+Cutoff 2
+Unweighted
+0.5 0.5 0.5 0.5
+Weighted
+0 1 0 0
+
+Cutoff 3
+Unweighted
+0.5 0.5 0.5 0.5
+Weighted
+0 1 0 1
+
+Cutoff 4
+Unweighted
+0.5 0.5 0.5 0.5
+Weighted
+0 1 0 1
+
+
+Null graph
+==========================================================
+( )
+
+Empty graph
+==========================================================
+( 0 0 )
+
+37x37 grid graph
+==========================================================
+Max betweenness: 36094.891693

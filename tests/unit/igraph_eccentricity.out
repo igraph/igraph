@@ -1,0 +1,23 @@
+Null graph:
+( )
+
+Singleton graph:
+( 0 )
+
+Path with isolated vertex:
+( 1 0 1 )
+
+Undirected path graph:
+( 4 3 2 3 4 )
+
+Directed path graph:
+( 4 3 2 1 0 )
+
+Undirected star:
+( 1 2 2 2 2 2 2 2 2 2 )
+
+Out-star:
+( 1 2 2 2 2 2 2 2 2 2 )
+
+In-star:
+( 1 0 0 0 0 0 0 0 0 0 )
