@@ -42,7 +42,7 @@ static igraph_error_t igraph_vector_int_update_from_fortran(
     size_t size = igraph_vector_fortran_int_size(fortran_vec);
 
     IGRAPH_CHECK(igraph_vector_int_resize(vec, size));
-    
+
     for (size_t i = 0; i < size; i++) {
         VECTOR(*vec)[i] = VECTOR(*fortran_vec)[i];
     }
@@ -198,7 +198,7 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
     IGRAPH_CHECK(igraph_vector_fortran_int_init(&vipiv, igraph_vector_int_size(ipiv)));
     IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &vipiv);
     IGRAPH_CHECK(igraph_vector_int_copy_to_fortran(ipiv, &vipiv));
-    
+
     igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(vipiv),
                   VECTOR(b->data), &ldb, &info);
 
@@ -280,7 +280,7 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
 
 igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                                    igraph_matrix_t *b, int *info) {
- 
+
     int n = (int) igraph_matrix_nrow(a);
     int nrhs = (int) igraph_matrix_ncol(b);
     int lda = n > 0 ? n : 1;

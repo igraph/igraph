@@ -144,7 +144,7 @@ static int igraph_i_maximal_cliques_reorder_adjlists(
             }
         }
     }
-    
+
     return 0;
 }
 

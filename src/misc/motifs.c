@@ -334,7 +334,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                         callback(graph, &vids, (int) arr_code[code], extra),
                         &ret
                     );
-                    
+
                     if (ret == IGRAPH_STOP) {
                         terminate = 1;
                         break;
