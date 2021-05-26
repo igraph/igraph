@@ -62,7 +62,7 @@ long int igraph_buckets_popmax(igraph_buckets_t *b) {
     /* Precondition: there is at least a non-empty bucket */
     /* Search for the highest bucket first */
     long int max;
-    while ( (max = (long int) VECTOR(b->bptr)[b->max]) == 0) {
+    while ( (max = VECTOR(b->bptr)[b->max]) == 0) {
         b->max --;
     }
     VECTOR(b->bptr)[b->max] = VECTOR(b->buckets)[max - 1];
@@ -130,7 +130,7 @@ void igraph_dbuckets_clear(igraph_dbuckets_t *b) {
 
 long int igraph_dbuckets_popmax(igraph_dbuckets_t *b) {
     long int max;
-    while ( (max = (long int) VECTOR(b->bptr)[b->max]) == 0) {
+    while ( (max = VECTOR(b->bptr)[b->max]) == 0) {
         b->max --;
     }
     return igraph_dbuckets_pop(b, b->max);

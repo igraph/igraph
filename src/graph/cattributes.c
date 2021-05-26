@@ -614,7 +614,7 @@ static int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
         igraph_vector_t *idx = VECTOR(*merges)[i];
         long int j, n = igraph_vector_size(idx);
         for (j = 0; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             s += VECTOR(*oldv)[x];
         }
         VECTOR(*newv)[i] = s;
@@ -645,7 +645,7 @@ static int igraph_i_cattributes_cn_prod(const igraph_attribute_record_t *oldrec,
         igraph_vector_t *idx = VECTOR(*merges)[i];
         long int j, n = igraph_vector_size(idx);
         for (j = 0; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             s *= VECTOR(*oldv)[x];
         }
         VECTOR(*newv)[i] = s;
@@ -677,7 +677,7 @@ static int igraph_i_cattributes_cn_min(const igraph_attribute_record_t *oldrec,
         long int j, n = igraph_vector_size(idx);
         igraph_real_t m = n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
         for (j = 1; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             igraph_real_t val = VECTOR(*oldv)[x];
             if (val < m) {
                 m = val;
@@ -712,7 +712,7 @@ static int igraph_i_cattributes_cn_max(const igraph_attribute_record_t *oldrec,
         long int j, n = igraph_vector_size(idx);
         igraph_real_t m = n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
         for (j = 1; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             igraph_real_t val = VECTOR(*oldv)[x];
             if (val > m) {
                 m = val;
@@ -850,7 +850,7 @@ static int igraph_i_cattributes_cn_mean(const igraph_attribute_record_t *oldrec,
         long int j, n = igraph_vector_size(idx);
         igraph_real_t s = n > 0 ? 0.0 : nan;
         for (j = 0; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             s += VECTOR(*oldv)[x];
         }
         if (n > 0) {
@@ -890,7 +890,7 @@ static int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
         igraph_real_t res;
         IGRAPH_CHECK(igraph_vector_resize(&values, n));
         for (j = 0; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             VECTOR(values)[j] = VECTOR(*oldv)[x];
         }
         IGRAPH_CHECK(func(&values, &res));
@@ -1028,7 +1028,7 @@ static int igraph_i_cattributes_cb_all_is_true(const igraph_attribute_record_t *
         n = igraph_vector_size(idx);
         VECTOR(*newv)[i] = 1;
         for (j = 0; j < n; j++) {
-            x = (long int) VECTOR(*idx)[j];
+            x = VECTOR(*idx)[j];
             if (!VECTOR(*oldv)[x]) {
                 VECTOR(*newv)[i] = 0;
                 break;
@@ -1063,7 +1063,7 @@ static int igraph_i_cattributes_cb_any_is_true(const igraph_attribute_record_t *
         n = igraph_vector_size(idx);
         VECTOR(*newv)[i] = 0;
         for (j = 0; j < n; j++) {
-            x = (long int) VECTOR(*idx)[j];
+            x = VECTOR(*idx)[j];
             if (VECTOR(*oldv)[x]) {
                 VECTOR(*newv)[i] = 1;
                 break;
@@ -1102,7 +1102,7 @@ static int igraph_i_cattributes_cb_majority(const igraph_attribute_record_t *old
 
         num_trues = 0;
         for (j = 0; j < n; j++) {
-            x = (long int) VECTOR(*idx)[j];
+            x = VECTOR(*idx)[j];
             if (VECTOR(*oldv)[x]) {
                 num_trues++;
             }
@@ -1155,7 +1155,7 @@ static int igraph_i_cattributes_cb_func(const igraph_attribute_record_t *oldrec,
 
         IGRAPH_CHECK(igraph_vector_bool_resize(&values, n));
         for (j = 0; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             VECTOR(values)[j] = VECTOR(*oldv)[x];
         }
 
@@ -1352,7 +1352,7 @@ static int igraph_i_cattributes_sn_func(const igraph_attribute_record_t *oldrec,
         char *res;
         IGRAPH_CHECK(igraph_strvector_resize(&values, n));
         for (j = 0; j < n; j++) {
-            long int x = (long int) VECTOR(*idx)[j];
+            long int x = VECTOR(*idx)[j];
             char *elem;
             igraph_strvector_get(oldv, x, &elem);
             IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));

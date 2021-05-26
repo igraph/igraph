@@ -778,11 +778,11 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
     }
 
     for (i = 0; i < nodes; i++) {
-        long int from = (long int) VECTOR(*vids)[i];
+        long int from = VECTOR(*vids)[i];
         igraph_neighbors(graph, &neis, (igraph_integer_t) from, IGRAPH_OUT);
         s = igraph_vector_size(&neis);
         for (j = 0; j < s; j++) {
-            long int nei = (long int) VECTOR(neis)[j], to;
+            long int nei = VECTOR(neis)[j], to;
             if (igraph_vector_search(vids, 0, nei, &to)) {
                 idx = (unsigned char) (mul * i + to);
                 code |= arr_idx[idx];

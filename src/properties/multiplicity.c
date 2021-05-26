@@ -196,7 +196,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            long int e2 = (long int) VECTOR(*neis)[j];
+            long int e2 = VECTOR(*neis)[j];
             long int to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to && e2 < e) {
                 VECTOR(*res)[i] = 1;
@@ -263,7 +263,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            long int e2 = (long int) VECTOR(*neis)[j];
+            long int e2 = VECTOR(*neis)[j];
             long int to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to) {
                 VECTOR(*res)[i] += 1;

@@ -200,14 +200,14 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
             /* outgoing neighbors */
             if (neis_out >= no_out) {
                 for (i = 0; i < no_out; i++) {
-                    long int nei = (long int) VECTOR(*outv)[i];
+                    long int nei = VECTOR(*outv)[i];
                     ADD_EDGE_TO(nei);
                 }
             } else {
                 long int oleft = no_out;
                 for (i = 0; i < neis_out && oleft > 0; ) {
                     long int which = RNG_INTEGER(0, oleft - 1);
-                    long int nei = (long int) VECTOR(*outv)[which];
+                    long int nei = VECTOR(*outv)[which];
                     VECTOR(*outv)[which] = VECTOR(*outv)[oleft - 1];
                     VECTOR(*outv)[oleft - 1] = nei;
                     if (VECTOR(visited)[nei] != actnode + 1) {
@@ -220,14 +220,14 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
             /* incoming neighbors */
             if (neis_in >= no_in) {
                 for (i = 0; i < no_in; i++) {
-                    long int nei = (long int) VECTOR(*inv)[i];
+                    long int nei = VECTOR(*inv)[i];
                     ADD_EDGE_TO(nei);
                 }
             } else {
                 long int ileft = no_in;
                 for (i = 0; i < neis_in && ileft > 0; ) {
                     long int which = RNG_INTEGER(0, ileft - 1);
-                    long int nei = (long int) VECTOR(*inv)[which];
+                    long int nei = VECTOR(*inv)[which];
                     VECTOR(*inv)[which] = VECTOR(*inv)[ileft - 1];
                     VECTOR(*inv)[ileft - 1] = nei;
                     if (VECTOR(visited)[nei] != actnode + 1) {

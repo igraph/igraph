@@ -143,7 +143,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     igraph_vector_sort(&nei_edges);
     n = igraph_vector_size(&nei_edges);
     for (i = 0; i < n; i++) {
-        long int vid = (long int) VECTOR(nei_edges)[i];
+        long int vid = VECTOR(nei_edges)[i];
         if (VECTOR(*my_vids_old2new)[vid] == 0) {
             IGRAPH_CHECK(igraph_vector_push_back(my_vids_new2old, vid));
             no_of_new_nodes++;
@@ -153,7 +153,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
 
     /* Create the new edge list */
     for (i = 0; i < no_of_new_nodes; i++) {
-        long int old_vid = (long int) VECTOR(*my_vids_new2old)[i];
+        long int old_vid = VECTOR(*my_vids_new2old)[i];
         long int new_vid = i;
         igraph_bool_t skip_loop_edge;
 
@@ -165,7 +165,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-                to = (long int) VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
+                to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
@@ -187,7 +187,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                     continue;
                 }
 
-                to = (long int) VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
+                to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }

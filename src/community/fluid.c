@@ -169,9 +169,9 @@ int igraph_community_fluid_communities(const igraph_t *graph,
             igraph_vector_null(&label_counters);
 
             /* Obtain actual node index */
-            v1 = (long int) VECTOR(node_order)[i];
+            v1 = VECTOR(node_order)[i];
             /* Take into account same label in updating rule */
-            kv1 = (long int) VECTOR(*membership)[v1];
+            kv1 = VECTOR(*membership)[v1];
             max_count = 0.0;
             if (kv1 != 0) {
                 VECTOR(label_counters)[kv1 - 1] += VECTOR(density)[kv1 - 1];
@@ -186,7 +186,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
             neis = igraph_adjlist_get(&al, v1);
             size = igraph_vector_int_size(neis);
             for (j = 0; j < size; j++) {
-                k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+                k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
                 /* skip if it has no label yet */
                 if (k == 0) {
                     continue;
@@ -215,7 +215,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
 
                     /* Select randomly from the dominant labels */
                     rand_idx = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
-                    k = (long int) VECTOR(dominant_labels)[rand_idx];
+                    k = VECTOR(dominant_labels)[rand_idx];
 
                     if (kv1 != 0) {
                         /* Subtract 1 vertex from corresponding community in com_to_numvertices */

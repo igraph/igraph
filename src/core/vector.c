@@ -174,10 +174,10 @@ int igraph_vector_order(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            long int next = (long int) VECTOR(ptr)[i] - 1;
+            long int next = VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (long int) VECTOR(rad)[next] - 1;
+                next = VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -187,8 +187,8 @@ int igraph_vector_order(const igraph_vector_t* v,
     igraph_vector_null(&rad);
 
     for (i = 0; i < edges; i++) {
-        long int edge = (long int) VECTOR(*res)[edges - i - 1];
-        long int radix = (long int) VECTOR(*v)[edge];
+        long int edge = VECTOR(*res)[edges - i - 1];
+        long int radix = VECTOR(*v)[edge];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[edge] = VECTOR(ptr)[radix];
         }
@@ -198,10 +198,10 @@ int igraph_vector_order(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            long int next = (long int) VECTOR(ptr)[i] - 1;
+            long int next = VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (long int) VECTOR(rad)[next] - 1;
+                next = VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -239,10 +239,10 @@ int igraph_vector_order1(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            long int next = (long int) VECTOR(ptr)[i] - 1;
+            long int next = VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (long int) VECTOR(rad)[next] - 1;
+                next = VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -281,10 +281,10 @@ int igraph_vector_order1_int(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            long int next = (long int) VECTOR(ptr)[i] - 1;
+            long int next = VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (long int) VECTOR(rad)[next] - 1;
+                next = VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -310,16 +310,16 @@ int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_vector_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        long int elem = (long int) VECTOR(*v)[i];
+        long int elem = VECTOR(*v)[i];
         VECTOR(ptr)[i] = VECTOR(rad)[elem];
         VECTOR(rad)[elem] = i + 1;
     }
 
     for (i = 0; i < nodes; i++) {
-        long int p = (long int) VECTOR(rad)[i];
+        long int p = VECTOR(rad)[i];
         while (p != 0) {
             VECTOR(*res)[p - 1] = c++;
-            p = (long int) VECTOR(ptr)[p - 1];
+            p = VECTOR(ptr)[p - 1];
         }
     }
 

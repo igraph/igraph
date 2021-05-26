@@ -135,7 +135,7 @@ static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *member
             IGRAPH_CHECK(igraph_neighbors(graph, &neis,
                                           (igraph_integer_t) act_node, IGRAPH_ALL));
             for (i = 0; i < igraph_vector_size(&neis); i++) {
-                long int neighbor = (long int) VECTOR(neis)[i];
+                long int neighbor = VECTOR(neis)[i];
                 if (already_added[neighbor] == 1) {
                     continue;
                 }
@@ -221,7 +221,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
                 VECTOR(next_nei)[act_node]++;
             } else if (VECTOR(next_nei)[act_node] <= igraph_vector_int_size(tmp)) {
                 /* we've already met this vertex but it has more children */
-                long int neighbor = (long int) VECTOR(*tmp)[(long int)
+                long int neighbor = VECTOR(*tmp)[(long int)
                                     VECTOR(next_nei)[act_node] - 1];
                 if (VECTOR(next_nei)[neighbor] == 0) {
                     IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
@@ -283,7 +283,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
             tmp = igraph_adjlist_get(&adjlist, act_node);
             n = igraph_vector_int_size(tmp);
             for (i = 0; i < n; i++) {
-                long int neighbor = (long int) VECTOR(*tmp)[i];
+                long int neighbor = VECTOR(*tmp)[i];
                 if (VECTOR(next_nei)[neighbor] != 0) {
                     continue;
                 }
@@ -431,7 +431,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actnode,
                                       IGRAPH_ALL));
         for (i = 0; i < igraph_vector_size(&neis); i++) {
-            long int neighbor = (long int) VECTOR(neis)[i];
+            long int neighbor = VECTOR(neis)[i];
             if (already_added[neighbor] != 0) {
                 continue;
             }
@@ -586,7 +586,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
                                           IGRAPH_ALL));
             /* iterate over the neighbors */
             for (i = 0; i < igraph_vector_size(&neis); i++) {
-                long int neighbor = (long int) VECTOR(neis)[i];
+                long int neighbor = VECTOR(neis)[i];
                 if (already_added[neighbor] == 1) {
                     continue;
                 }
@@ -704,7 +704,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
             } else if (VECTOR(next_nei)[act_node] <= igraph_vector_int_size(tmp)) {
                 /* we've already met this vertex but it has more children */
-                long int neighbor = (long int) VECTOR(*tmp)[(long int)
+                long int neighbor = VECTOR(*tmp)[(long int)
                                     VECTOR(next_nei)[act_node] - 1];
                 if (VECTOR(next_nei)[neighbor] == 0) {
                     /* add the root of the other children to the queue */
@@ -778,7 +778,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
             tmp = igraph_adjlist_get(&adjlist, act_node);
             n = igraph_vector_int_size(tmp);
             for (i = 0; i < n; i++) {
-                long int neighbor = (long int) VECTOR(*tmp)[i];
+                long int neighbor = VECTOR(*tmp)[i];
                 if (VECTOR(next_nei)[neighbor] != 0) {
                     continue;
                 }
@@ -1005,7 +1005,7 @@ int igraph_biconnected_components(const igraph_t *graph,
             n = igraph_vector_int_size(adjedges);
             if (actnext < n) {
                 /* Step down (maybe) */
-                long int edge = (long int) VECTOR(*adjedges)[actnext];
+                long int edge = VECTOR(*adjedges)[actnext];
                 long int nei = IGRAPH_OTHER(graph, edge, act);
                 if (VECTOR(low)[nei] == 0) {
                     if (act == i) {
@@ -1103,12 +1103,12 @@ int igraph_biconnected_components(const igraph_t *graph,
                                 IGRAPH_CHECK(igraph_vector_init(vv, 0));
                                 IGRAPH_FINALLY(igraph_vector_destroy, vv);
                                 for (ii = 0; ii < no_vert; ii++) {
-                                    long int vert = (long int) VECTOR(*nodes)[ii];
+                                    long int vert = VECTOR(*nodes)[ii];
                                     igraph_vector_int_t *edges = igraph_inclist_get(&inclist,
                                                                  vert);
                                     long int j, nn = igraph_vector_int_size(edges);
                                     for (j = 0; j < nn; j++) {
-                                        long int e = (long int) VECTOR(*edges)[j];
+                                        long int e = VECTOR(*edges)[j];
                                         long int nei = IGRAPH_OTHER(graph, e, vert);
                                         if (VECTOR(vertex_added)[nei] == comps && nei < vert) {
                                             IGRAPH_CHECK(igraph_vector_push_back(vv, e));
@@ -1343,7 +1343,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
                                       mode));
         vsize = igraph_vector_size(&tmp);
         for (i = 0; i < vsize; i++) {
-            long int neighbor = (long int) VECTOR(tmp)[i];
+            long int neighbor = VECTOR(tmp)[i];
 
             if (already_added[neighbor]) {
                 continue;

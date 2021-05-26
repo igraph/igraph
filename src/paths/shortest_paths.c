@@ -84,7 +84,7 @@ static int igraph_i_average_path_length_unweighted(
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 if (already_added[neighbor] == source + 1) {
                     continue;
                 }
@@ -234,7 +234,7 @@ static int igraph_i_average_path_length_dijkstra(
             neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
@@ -503,7 +503,7 @@ static int igraph_i_local_efficiency_unweighted(
             act_neis      = igraph_adjlist_get(adjlist, act);
             act_neis_size = igraph_vector_int_size(act_neis);
             for (j = 0; j < act_neis_size; j++) {
-                long int neighbor = (long int) VECTOR(*act_neis)[j];
+                long int neighbor = VECTOR(*act_neis)[j];
 
                 if (neighbor == vertex || already_counted[neighbor] == i + 1)
                     continue;
@@ -609,7 +609,7 @@ static int igraph_i_local_efficiency_dijkstra(
             for (j = 0; j < nlen; j++) {
                 igraph_real_t altdist, curdist;
                 igraph_bool_t active, has;
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
 
                 if (tto == vertex)
@@ -1003,7 +1003,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 if (already_added[neighbor] == i + 1) {
                     continue;
                 }
@@ -1212,7 +1212,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);

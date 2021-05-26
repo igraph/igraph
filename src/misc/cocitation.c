@@ -233,11 +233,11 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
         }
 
         for (i = 0; i < igraph_vector_size(&neis) - 1; i++) {
-            u = (long int) VECTOR(neis)[i];
-            k = (long int) VECTOR(vid_reverse_index)[u];
+            u = VECTOR(neis)[i];
+            k = VECTOR(vid_reverse_index)[u];
             for (j = i + 1; j < igraph_vector_size(&neis); j++) {
-                v = (long int) VECTOR(neis)[j];
-                l = (long int) VECTOR(vid_reverse_index)[v];
+                v = VECTOR(neis)[j];
+                l = VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
                     MATRIX(*res, k, v) += weight;
                 }
@@ -463,7 +463,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_FINALLY(igraph_free, seen);
 
         for (i = 0; i < k; i++) {
-            j = (long int) VECTOR(*pairs)[i];
+            j = VECTOR(*pairs)[i];
             if (seen[j]) {
                 continue;
             }
@@ -479,8 +479,8 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
     }
 
     for (i = 0, j = 0; i < k; i += 2, j++) {
-        u = (long int) VECTOR(*pairs)[i];
-        v = (long int) VECTOR(*pairs)[i + 1];
+        u = VECTOR(*pairs)[i];
+        v = VECTOR(*pairs)[i + 1];
 
         if (u == v) {
             VECTOR(*res)[j] = 1.0;

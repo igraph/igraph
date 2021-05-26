@@ -67,11 +67,11 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     triangles = 0;
 
     for (j = 0; j < neilen1; j++) {
-        long int v = (long int) VECTOR(*neis1)[j];
+        long int v = VECTOR(*neis1)[j];
         neis2 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
         neilen2 = igraph_vector_int_size(neis2);
         for (k = 0; k < neilen2; k++) {
-            long int v2 = (long int) VECTOR(*neis2)[k];
+            long int v2 = VECTOR(*neis2)[k];
             if (neis[v2] == i + 1) {
                 triangles += 1.0;
             }

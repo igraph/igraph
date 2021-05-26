@@ -573,11 +573,11 @@ int igraph_to_undirected(igraph_t *graph,
             n_in = igraph_vector_size(&inadj);
 
 #define STEPOUT() if ( (++p1) < n_out) {    \
-        e1 = (long int) VECTOR(outadj)[p1]; \
+        e1 = VECTOR(outadj)[p1]; \
         n1 = IGRAPH_TO(graph, e1);      \
     }
 #define STEPIN()  if ( (++p2) < n_in) {         \
-        e2 = (long int) VECTOR(inadj )[p2]; \
+        e2 = VECTOR(inadj )[p2]; \
         n2 = IGRAPH_FROM(graph, e2);        \
     }
 
@@ -708,11 +708,11 @@ int igraph_to_undirected(igraph_t *graph,
             n_in = igraph_vector_size(&inadj);
 
 #define STEPOUT() if ( (++p1) < n_out) {    \
-        e1 = (long int) VECTOR(outadj)[p1]; \
+        e1 = VECTOR(outadj)[p1]; \
         n1 = IGRAPH_TO(graph, e1);      \
     }
 #define STEPIN()  if ( (++p2) < n_in) {         \
-        e2 = (long int) VECTOR(inadj )[p2]; \
+        e2 = VECTOR(inadj )[p2]; \
         n2 = IGRAPH_FROM(graph, e2);        \
     }
 

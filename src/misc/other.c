@@ -176,10 +176,10 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     /* Check if two points have the same angle. If so, keep only the point that
      * is farthest from the pivot */
     j = 0;
-    last_idx = (long int) VECTOR(order)[0];
-    pivot_idx = (long int) VECTOR(order)[no_of_nodes - 1];
+    last_idx = VECTOR(order)[0];
+    pivot_idx = VECTOR(order)[no_of_nodes - 1];
     for (i = 1; i < no_of_nodes; i++) {
-        next_idx = (long int) VECTOR(order)[i];
+        next_idx = VECTOR(order)[i];
         if (VECTOR(angles)[last_idx] == VECTOR(angles)[next_idx]) {
             /* Keep the vertex that is farther from the pivot, drop the one that is
              * closer */
@@ -204,7 +204,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     last_idx = -1;
     before_last_idx = -1;
     while (!igraph_vector_empty(&order)) {
-        next_idx = (long int)VECTOR(order)[igraph_vector_size(&order) - 1];
+        next_idx = VECTOR(order)[igraph_vector_size(&order) - 1];
         if (next_idx < 0) {
             /* This vertex should be skipped; was excluded in an earlier step */
             igraph_vector_pop_back(&order);

@@ -108,14 +108,14 @@ static int igraph_i_community_leading_eigenvector(igraph_real_t *to,
 
     /* Ax */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         nlen = igraph_vector_int_size(neis);
         to[j] = 0.0;
         VECTOR(*tmp)[j] = 0.0;
         for (k = 0; k < nlen; k++) {
-            long int nei = (long int) VECTOR(*neis)[k];
-            long int neimemb = (long int) VECTOR(*mymembership)[nei];
+            long int nei = VECTOR(*neis)[k];
+            long int neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 to[j] += from[ (long int) VECTOR(*idx2)[nei] ];
                 VECTOR(*tmp)[j] += 1;
@@ -126,7 +126,7 @@ static int igraph_i_community_leading_eigenvector(igraph_real_t *to,
     /* Now calculate k^Tx/2m */
     ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         long int degree = igraph_vector_int_size(neis);
         ktx += from[j] * degree;
@@ -137,7 +137,7 @@ static int igraph_i_community_leading_eigenvector(igraph_real_t *to,
 
     /* Now calculate Bx */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         igraph_real_t degree = igraph_vector_int_size(neis);
         to[j] = to[j] - ktx * degree;
@@ -169,16 +169,16 @@ static int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
 
     /* Ax */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         nlen = igraph_vector_int_size(neis);
         to[j] = 0.0;
         VECTOR(*tmp)[j] = 0.0;
         for (k = 0; k < nlen; k++) {
-            long int nei = (long int) VECTOR(*neis)[k];
-            long int neimemb = (long int) VECTOR(*mymembership)[nei];
+            long int nei = VECTOR(*neis)[k];
+            long int neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
-                long int fi = (long int) VECTOR(*idx2)[nei];
+                long int fi = VECTOR(*idx2)[nei];
                 if (fi < size) {
                     to[j] += from[fi];
                 }
@@ -190,7 +190,7 @@ static int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
     /* Now calculate k^Tx/2m */
     ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size + 1; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         long int degree = igraph_vector_int_size(neis);
         if (j < size) {
@@ -203,7 +203,7 @@ static int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
 
     /* Now calculate Bx */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         igraph_real_t degree = igraph_vector_int_size(neis);
         to[j] = to[j] - ktx * degree;
@@ -238,16 +238,16 @@ static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
 
     /* Ax */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *inc = igraph_inclist_get(inclist, oldid);
         nlen = igraph_vector_int_size(inc);
         to[j] = 0.0;
         VECTOR(*tmp)[j] = 0.0;
         for (k = 0; k < nlen; k++) {
-            long int edge = (long int) VECTOR(*inc)[k];
+            long int edge = VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
             long int nei = IGRAPH_OTHER(graph, edge, oldid);
-            long int neimemb = (long int) VECTOR(*mymembership)[nei];
+            long int neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 to[j] += from[ (long int) VECTOR(*idx2)[nei] ] * w;
                 VECTOR(*tmp)[j] += w;
@@ -258,7 +258,7 @@ static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
     /* k^Tx/2m */
     ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         ktx += from[j] * str;
         ktx2 += str;
@@ -268,7 +268,7 @@ static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
 
     /* Bx */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         to[j] = to[j] - ktx * str;
         VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2 * str;
@@ -302,18 +302,18 @@ static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
 
     /* Ax */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *inc = igraph_inclist_get(inclist, oldid);
         nlen = igraph_vector_int_size(inc);
         to[j] = 0.0;
         VECTOR(*tmp)[j] = 0.0;
         for (k = 0; k < nlen; k++) {
-            long int edge = (long int) VECTOR(*inc)[k];
+            long int edge = VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
             long int nei = IGRAPH_OTHER(graph, edge, oldid);
-            long int neimemb = (long int) VECTOR(*mymembership)[nei];
+            long int neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
-                long int fi = (long int) VECTOR(*idx2)[nei];
+                long int fi = VECTOR(*idx2)[nei];
                 if (fi < size) {
                     to[j] += from[fi] * w;
                 }
@@ -325,7 +325,7 @@ static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
     /* k^Tx/2m */
     ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size + 1; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         if (j < size) {
             ktx += from[j] * str;
@@ -337,7 +337,7 @@ static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
 
     /* Bx */
     for (j = 0; j < size; j++) {
-        long int oldid = (long int) VECTOR(*idx)[j];
+        long int oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         to[j] = to[j] - ktx * str;
         VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2 * str;
@@ -899,7 +899,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
         /* Rewrite the mymembership vector */
         for (j = 0; j < size; j++) {
             if (storage.v[j] < 0) {
-                long int oldid = (long int) VECTOR(idx)[j];
+                long int oldid = VECTOR(idx)[j];
                 VECTOR(*mymembership)[oldid] = communities - 1;
             }
         }
@@ -947,8 +947,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
         j = 0;
         IGRAPH_CHECK(igraph_matrix_resize(merges, l / 2, 2));
         for (i = l; i > 0; i -= 2) {
-            long int from = (long int) VECTOR(mymerges)[i - 1];
-            long int to = (long int) VECTOR(mymerges)[i - 2];
+            long int from = VECTOR(mymerges)[i - 1];
+            long int to = VECTOR(mymerges)[i - 2];
             MATRIX(*merges, j, 0) = VECTOR(mymerges)[i - 2];
             MATRIX(*merges, j, 1) = VECTOR(mymerges)[i - 1];
             if (VECTOR(idx)[from] != 0) {

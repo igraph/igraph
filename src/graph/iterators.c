@@ -1536,8 +1536,8 @@ static int igraph_i_es_pairs_size(const igraph_t *graph,
     *result = (igraph_integer_t) (n / 2);
     /* Check for the existence of all edges */
     for (i = 0; i < *result; i++) {
-        long int from = (long int) VECTOR(*es->data.path.ptr)[2 * i];
-        long int to = (long int) VECTOR(*es->data.path.ptr)[2 * i + 1];
+        long int from = VECTOR(*es->data.path.ptr)[2 * i];
+        long int to = VECTOR(*es->data.path.ptr)[2 * i + 1];
         igraph_integer_t eid;
         IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
                                     (igraph_integer_t) to, es->data.path.mode,
@@ -1563,8 +1563,8 @@ static int igraph_i_es_path_size(const igraph_t *graph,
         *result = (igraph_integer_t) (n - 1);
     }
     for (i = 0; i < *result; i++) {
-        long int from = (long int) VECTOR(*es->data.path.ptr)[i];
-        long int to = (long int) VECTOR(*es->data.path.ptr)[i + 1];
+        long int from = VECTOR(*es->data.path.ptr)[i];
+        long int to = VECTOR(*es->data.path.ptr)[i + 1];
         igraph_integer_t eid;
         IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
                                     (igraph_integer_t) to, es->data.path.mode,
@@ -1679,8 +1679,8 @@ static int igraph_i_eit_pairs(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, n / 2);
 
     for (i = 0; i < igraph_vector_size(eit->vec); i++) {
-        long int from = (long int) VECTOR(*es.data.path.ptr)[2 * i];
-        long int to = (long int) VECTOR(*es.data.path.ptr)[2 * i + 1];
+        long int from = VECTOR(*es.data.path.ptr)[2 * i];
+        long int to = VECTOR(*es.data.path.ptr)[2 * i + 1];
         igraph_integer_t eid;
         IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
                                     (igraph_integer_t) to, es.data.path.mode,
@@ -1753,8 +1753,8 @@ static int igraph_i_eit_path(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t *)eit->vec, len);
 
     for (i = 0; i < len; i++) {
-        long int from = (long int) VECTOR(*es.data.path.ptr)[i];
-        long int to = (long int) VECTOR(*es.data.path.ptr)[i + 1];
+        long int from = VECTOR(*es.data.path.ptr)[i];
+        long int to = VECTOR(*es.data.path.ptr)[i + 1];
         igraph_integer_t eid;
         IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
                                     (igraph_integer_t) to, es.data.path.mode,

@@ -466,7 +466,7 @@ int igraph_extended_chordal_ring(
     if (nrow > 0) {
         for (i = 0; i < nodes; i++) {
             for (j = 0; j < nrow; j++) {
-                long int offset = (long int) MATRIX(*W, j, mpos);
+                long int offset = MATRIX(*W, j, mpos);
                 long int v = (i + offset) % nodes;
 
                 if (v < 0) {

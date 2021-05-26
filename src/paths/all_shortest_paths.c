@@ -269,7 +269,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                 neighbor = IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);
             } else {
                 /* user does not need the edge-paths, so 'neis' contains vertex IDs */
-                neighbor = (long int) VECTOR(neis)[j];
+                neighbor = VECTOR(neis)[j];
             }
 
             if (geodist[neighbor] > 0 &&
@@ -299,7 +299,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             geodist[neighbor] = actdist + 2;
 
             /* copy all existing paths to the parent */
-            fatherptr = (long int) VECTOR(ptrhead)[actnode];
+            fatherptr = VECTOR(ptrhead)[actnode];
             while (fatherptr != 0) {
                 /* allocate a new igraph_vector_t at the end of paths. Again, the same
                  * complicated dance as the one we've had at the beginning of the function */
@@ -337,7 +337,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                                                      VECTOR(ptrhead)[neighbor]));
                 VECTOR(ptrhead)[neighbor] = igraph_vector_size(&ptrlist);
 
-                fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
+                fatherptr = VECTOR(ptrlist)[fatherptr - 1];
             }
         }
     }
@@ -354,11 +354,11 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     /* count the number of paths in the result */
     n = 0;
     for (i = 0; i < no_of_nodes; i++) {
-        long int fatherptr = (long int) VECTOR(ptrhead)[i];
+        long int fatherptr = VECTOR(ptrhead)[i];
         if (geodist[i] > 0) {
             while (fatherptr != 0) {
                 n++;
-                fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
+                fatherptr = VECTOR(ptrlist)[fatherptr - 1];
             }
         }
     }
@@ -371,7 +371,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     j = 0;
     t = 0;
     for (i = 0; i < no_of_nodes; i++) {
-        long int fatherptr = (long int) VECTOR(ptrhead)[i];
+        long int fatherptr = VECTOR(ptrhead)[i];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -393,7 +393,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                     igraph_vector_destroy(VECTOR(path_edge)[fatherptr - 1]);
                     igraph_Free(VECTOR(path_edge)[fatherptr - 1]);
                 }
-                fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
+                fatherptr = VECTOR(ptrlist)[fatherptr - 1];
             }
         } else {
             /* no, free them */
@@ -402,7 +402,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
                 igraph_Free(VECTOR(paths)[fatherptr - 1]);
                 igraph_vector_destroy(VECTOR(path_edge)[fatherptr - 1]);
                 igraph_Free(VECTOR(path_edge)[fatherptr - 1]);
-                fatherptr = (long int) VECTOR(ptrlist)[fatherptr - 1];
+                fatherptr = VECTOR(ptrlist)[fatherptr - 1];
             }
         }
     }

@@ -173,7 +173,7 @@ static int igraph_i_multilevel_community_links(
     long int i, n, last = -1, c = -1;
     igraph_real_t weight = 1;
     long int to, to_community;
-    long int community = (long int) VECTOR(*(communities->membership))[vertex];
+    long int community = VECTOR(*(communities->membership))[vertex];
     igraph_i_multilevel_community_link *links;
 
     *weight_all = *weight_inside = *weight_loop = 0;
@@ -192,7 +192,7 @@ static int igraph_i_multilevel_community_links(
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < n; i++) {
-        long int eidx = (long int) VECTOR(*edges)[i];
+        long int eidx = VECTOR(*edges)[i];
         weight = VECTOR(*communities->weights)[eidx];
 
         to = IGRAPH_OTHER(graph, eidx, vertex);
@@ -206,7 +206,7 @@ static int igraph_i_multilevel_community_links(
             continue;
         }
 
-        to_community = (long int)VECTOR(*(communities->membership))[to];
+        to_community = VECTOR(*(communities->membership))[to];
         if (community == to_community) {
             *weight_inside += weight;
         }
@@ -438,7 +438,7 @@ static int igraph_i_community_multilevel_step(
                                                 &weight_loop, &links_community,
                                                 &links_weight);
 
-            old_id = (long int)VECTOR(*(communities.membership))[ni];
+            old_id = VECTOR(*(communities.membership))[ni];
             new_id = old_id;
 
             /* Update old community */
@@ -458,7 +458,7 @@ static int igraph_i_community_multilevel_step(
             n = igraph_vector_size(&links_community);
 
             for (j = 0; j < n; j++) {
-                long int c = (long int) VECTOR(links_community)[j];
+                long int c = VECTOR(links_community)[j];
                 igraph_real_t w = VECTOR(links_weight)[j];
 
                 igraph_real_t q_gain =

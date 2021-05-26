@@ -157,10 +157,10 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     for (i = k; i < nodes; i++) {
-        long int type1 = (long int) VECTOR(*nodetypes)[i];
+        long int type1 = VECTOR(*nodetypes)[i];
         igraph_random_sample(&potneis, 0, i - 1, k);
         for (j = 0; j < k; j++) {
-            long int type2 = (long int) VECTOR(*nodetypes)[(long int)VECTOR(potneis)[j]];
+            long int type2 = VECTOR(*nodetypes)[(long int)VECTOR(potneis)[j]];
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(potneis)[j]));

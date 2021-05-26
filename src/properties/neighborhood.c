@@ -120,7 +120,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
             if (actdist < order - 1) {
                 /* we add them to the q */
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
@@ -133,7 +133,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
             } else {
                 /* we just count them, but don't add them */
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -255,7 +255,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
             if (actdist < order - 1) {
                 /* we add them to the q */
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
@@ -268,7 +268,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
             } else {
                 /* we just count them but don't add them to q */
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -402,7 +402,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
             if (actdist < order - 1) {
                 /* we add them to the q */
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
@@ -415,7 +415,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
             } else {
                 /* we just count them but don't add them to q */
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {

@@ -69,7 +69,7 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 
     /* Then add the rest */
     while (ptr < 2 * no_of_edges) {
-        long int sh = (long int) VECTOR(*shifts)[sptr % no_of_shifts];
+        long int sh = VECTOR(*shifts)[sptr % no_of_shifts];
         long int from = sptr % no_of_nodes;
         long int to = (no_of_nodes + sptr + sh) % no_of_nodes;
         VECTOR(edges)[ptr++] = from;

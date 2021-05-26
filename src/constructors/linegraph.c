@@ -52,7 +52,7 @@ static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegr
         }
         n = igraph_vector_size(&adjedges);
         for (j = 0; j < n; j++) {
-            long int e = (long int) VECTOR(adjedges)[j];
+            long int e = VECTOR(adjedges)[j];
             if (e < i) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
@@ -63,7 +63,7 @@ static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegr
                                      IGRAPH_ALL));
         n = igraph_vector_size(&adjedges2);
         for (j = 0; j < n; j++) {
-            long int e = (long int) VECTOR(adjedges2)[j];
+            long int e = VECTOR(adjedges2)[j];
             if (e < i) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
@@ -106,7 +106,7 @@ static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegrap
         }
         n = igraph_vector_size(&adjedges);
         for (j = 0; j < n; j++) {
-            long int e = (long int) VECTOR(adjedges)[j];
+            long int e = VECTOR(adjedges)[j];
             IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
             IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
         }

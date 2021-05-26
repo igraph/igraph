@@ -163,7 +163,7 @@ static int igraph_i_betweenness_cutoff_weighted(
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
@@ -209,7 +209,7 @@ static int igraph_i_betweenness_cutoff_weighted(
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, w);
             long int fatv_len = igraph_vector_int_size(fatv);
             for (j = 0; j < fatv_len; j++) {
-                long int f = (long int) VECTOR(*fatv)[j];
+                long int f = VECTOR(*fatv)[j];
                 VECTOR(tmpscore)[f] += VECTOR(nrgeo)[f] / VECTOR(nrgeo)[w] * (1 + VECTOR(tmpscore)[w]);
             }
             if (w != source) {
@@ -411,7 +411,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             neis = igraph_adjlist_get(adjlist_out_p, actnode);
             nneis = igraph_vector_int_size(neis);
             for (j = 0; j < nneis; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 if (distance[neighbor] == 0) {
                     distance[neighbor] = distance[actnode] + 1;
                     IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
@@ -435,7 +435,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             neis = igraph_adjlist_get(adjlist_in_p, actnode);
             nneis = igraph_vector_int_size(neis);
             for (j = 0; j < nneis; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 tmpscore[neighbor] +=  (tmpscore[actnode] + 1) * nrgeo[neighbor] / nrgeo[actnode];
             }
 
@@ -638,7 +638,7 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(distance)[to];
@@ -688,7 +688,7 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
             long int fatv_len = igraph_vector_int_size(fatv);
             /* printf("Popping %li.\n", w); */
             for (j = 0; j < fatv_len; j++) {
-                long int fedge = (long int) VECTOR(*fatv)[j];
+                long int fedge = VECTOR(*fatv)[j];
                 long int neighbor = IGRAPH_OTHER(graph, fedge, w);
                 VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
                                               VECTOR(nrgeo)[w] * (1.0 + VECTOR(tmpscore)[w]);

@@ -34,8 +34,8 @@
 static void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
                                     long int hidx1, long int hidx2) {
     if (hidx1 != hidx2) {
-        long int idx1 = (long int) VECTOR(ch->index)[hidx1];
-        long int idx2 = (long int) VECTOR(ch->index)[hidx2];
+        long int idx1 = VECTOR(ch->index)[hidx1];
+        long int idx2 = VECTOR(ch->index)[hidx2];
 
         igraph_real_t tmp = VECTOR(ch->heap)[hidx1];
         VECTOR(ch->heap)[hidx1] = VECTOR(ch->heap)[hidx2];

@@ -247,7 +247,7 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
                                          IGRAPH_ALL));
             tmp_size = igraph_vector_size(&tmp);
             for (j = 0; j < tmp_size; j++) {
-                long int edge = (long int) VECTOR(tmp)[j];
+                long int edge = VECTOR(tmp)[j];
                 if (added_edges[edge] == 0) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
                     if (already_added[to] == 0) {
@@ -321,7 +321,7 @@ static int igraph_i_minimum_spanning_tree_prim(
         igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
         adj_size = igraph_vector_size(&adj);
         for (j = 0; j < adj_size; j++) {
-            igraph_integer_t edgeno = (long int) VECTOR(adj)[j];
+            igraph_integer_t edgeno = VECTOR(adj)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, i);
             if (already_added[neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
@@ -350,7 +350,7 @@ static int igraph_i_minimum_spanning_tree_prim(
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
                     adj_size = igraph_vector_size(&adj);
                     for (j = 0; j < adj_size; j++) {
-                        long int edgeno = (long int) VECTOR(adj)[j];
+                        long int edgeno = VECTOR(adj)[j];
                         long int neighbor = IGRAPH_OTHER(graph, edgeno, to);
                         if (already_added[neighbor] == 0) {
                             IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,

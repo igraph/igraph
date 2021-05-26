@@ -593,7 +593,7 @@ int igraph_strvector_index(const igraph_strvector_t *v,
     IGRAPH_CHECK(igraph_strvector_resize(newv, newlen));
 
     for (i = 0; i < newlen; i++) {
-        long int j = (long int) VECTOR(*idx)[i];
+        long int j = VECTOR(*idx)[i];
         char *str;
         igraph_strvector_get(v, j, &str);
         igraph_strvector_set(newv, i, str);

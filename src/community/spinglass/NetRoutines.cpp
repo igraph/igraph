@@ -72,8 +72,8 @@ int igraph_i_read_network(const igraph_t *graph,
     }
 
     for (ii = 0; ii < no_of_edges; ii++) {
-        long int i1 = (long int)VECTOR(edgelist)[2 * ii];
-        long int i2 = (long int)VECTOR(edgelist)[2 * ii + 1];
+        long int i1 = VECTOR(edgelist)[2 * ii];
+        long int i2 = VECTOR(edgelist)[2 * ii + 1];
         igraph_real_t Links;
         if (use_weights) {
             Links = VECTOR(*weights)[ii];

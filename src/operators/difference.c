@@ -95,8 +95,8 @@ int igraph_difference(igraph_t *res,
         n1 = igraph_vector_int_size(nei1) - 1;
         n2 = igraph_vector_int_size(nei2) - 1;
         while (n1 >= 0 && n2 >= 0) {
-            e1 = (long int) VECTOR(*nei1)[n1];
-            e2 = (long int) VECTOR(*nei2)[n2];
+            e1 = VECTOR(*nei1)[n1];
+            e2 = VECTOR(*nei2)[n2];
             v1 = IGRAPH_OTHER(orig, e1, i);
             v2 = IGRAPH_OTHER(sub, e2, i);
 
@@ -123,7 +123,7 @@ int igraph_difference(igraph_t *res,
 
         /* Copy remaining edges */
         while (n1 >= 0) {
-            e1 = (long int) VECTOR(*nei1)[n1];
+            e1 = VECTOR(*nei1)[n1];
             v1 = IGRAPH_OTHER(orig, e1, i);
             if (directed || v1 >= i) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
@@ -145,7 +145,7 @@ int igraph_difference(igraph_t *res,
         nei1 = igraph_inclist_get(&inc_orig, i);
         n1 = igraph_vector_int_size(nei1) - 1;
         while (n1 >= 0) {
-            e1 = (long int) VECTOR(*nei1)[n1];
+            e1 = VECTOR(*nei1)[n1];
             v1 = IGRAPH_OTHER(orig, e1, i);
             if (directed || v1 >= i) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));

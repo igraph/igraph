@@ -3025,7 +3025,7 @@ int FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(newv, newlen));
 
     for (i = 0; i < newlen; i++) {
-        long int j = (long int) VECTOR(*idx)[i];
+        long int j = VECTOR(*idx)[i];
         VECTOR(*newv)[i] = VECTOR(*v)[j];
     }
 

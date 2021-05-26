@@ -66,7 +66,7 @@ static int igraph_i_layout_reingold_tilford_unreachable(
         n = igraph_vector_int_size(neis);
         VECTOR(visited)[actnode] = 1;
         for (j = 0; j < n; j++) {
-            long int neighbor = (long int) VECTOR(*neis)[j];
+            long int neighbor = VECTOR(*neis)[j];
             if (!(long int)VECTOR(visited)[neighbor]) {
                 IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
             }
@@ -181,7 +181,7 @@ static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
         n = igraph_vector_int_size(neis);
 
         for (j = 0; j < n; j++) {
-            long int neighbor = (long int) VECTOR(*neis)[j];
+            long int neighbor = VECTOR(*neis)[j];
             if (vdata[neighbor].parent >= 0) {
                 continue;
             }
@@ -566,8 +566,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
         igraph_vector_null(&myroots);
         proots = &myroots;
         for (i = no_of_nodes - 1; noseen < no_comps && i >= 0; i--) {
-            long int v = (long int) VECTOR(order)[i];
-            long int mem = (long int) VECTOR(membership)[v];
+            long int v = VECTOR(order)[i];
+            long int mem = VECTOR(membership)[v];
             if (VECTOR(myroots)[mem] == 0) {
                 noseen += 1;
                 VECTOR(myroots)[mem] = v + 1;
@@ -613,8 +613,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
             igraph_vector_resize(&newedges, plus_levels * 2);
 
             for (i = 0; i < igraph_vector_size(roots); i++) {
-                long int rl = (long int) VECTOR(*rootlevel)[i];
-                long int rn = (long int) VECTOR(*roots)[i];
+                long int rl = VECTOR(*rootlevel)[i];
+                long int rn = VECTOR(*roots)[i];
                 long int j;
 
                 /* zero-level roots don't get anything special */
@@ -680,7 +680,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     */
     /* if there is only one root, no need for real_root */
     if (igraph_vector_size(proots) == 1) {
-        real_root = (long int) VECTOR(*proots)[0];
+        real_root = VECTOR(*proots)[0];
         if (real_root < 0 || real_root >= no_of_nodes) {
             IGRAPH_ERROR("Invalid vertex id.", IGRAPH_EINVVID);
         }

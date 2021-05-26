@@ -120,7 +120,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     /*   fprintf(stderr, "Ok, starting DLA\n"); */
 
     /* 1. place the largest  */
-    actg = (long int) VECTOR(sizes)[jpos++];
+    actg = VECTOR(sizes)[jpos++];
     igraph_i_layout_merge_place_sphere(&grid, 0, 0, VECTOR(r)[actg], actg);
 
     IGRAPH_PROGRESS("Merging layouts via DLA", 0.0, NULL);
@@ -129,7 +129,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
         /*     fprintf(stderr, "comp: %li", jpos); */
         IGRAPH_PROGRESS("Merging layouts via DLA", (100.0 * jpos) / graphs, NULL);
 
-        actg = (long int) VECTOR(sizes)[jpos++];
+        actg = VECTOR(sizes)[jpos++];
         /* 2. random walk, TODO: tune parameters */
         igraph_i_layout_merge_dla(&grid, actg,
                                   igraph_vector_e_ptr(&x, actg),

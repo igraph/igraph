@@ -143,8 +143,8 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         IGRAPH_CHECK(igraph_incident(graph, &edge_neis, (igraph_integer_t) v, mode));
         nv = igraph_vector_size(&neis);
         for (j = 0; j < nv; j++) {
-            long int nei = (long int) VECTOR(neis)[j];
-            long int e = (long int) VECTOR(edge_neis)[j];
+            long int nei = VECTOR(neis)[j];
+            long int e = VECTOR(edge_neis)[j];
             double w = VECTOR(*weights)[e];
             sum += w * VECTOR(deg)[nei];
         }
@@ -310,7 +310,7 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, mode));
         nv = igraph_vector_size(&neis);
         for (j = 0; j < nv; j++) {
-            long int nei = (long int) VECTOR(neis)[j];
+            long int nei = VECTOR(neis)[j];
             sum += VECTOR(deg)[nei];
         }
         if (nv != 0) {
@@ -326,7 +326,7 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 
     if (knnk) {
         for (i = 0; i < maxdeg; i++) {
-            long int dh = (long int) VECTOR(deghist)[i];
+            long int dh = VECTOR(deghist)[i];
             if (dh != 0) {
                 VECTOR(*knnk)[i] /= dh;
             } else {
@@ -408,7 +408,7 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
             IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) vid, mode));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
-                long int edge = (long int) VECTOR(neis)[j];
+                long int edge = VECTOR(neis)[j];
                 VECTOR(*res)[i] += VECTOR(*weights)[edge];
             }
         }
@@ -419,7 +419,7 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
             IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) vid, mode));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
-                long int edge = (long int) VECTOR(neis)[j];
+                long int edge = VECTOR(neis)[j];
                 long int from = IGRAPH_FROM(graph, edge);
                 long int to = IGRAPH_TO(graph, edge);
                 if (from != to) {

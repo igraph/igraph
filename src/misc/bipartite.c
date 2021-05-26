@@ -119,7 +119,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
         neis1 = igraph_adjlist_get(&adjlist, i);
         neilen1 = igraph_vector_int_size(neis1);
         for (j = 0; j < neilen1; j++) {
-            long int k, neilen2, nei = (long int) VECTOR(*neis1)[j];
+            long int k, neilen2, nei = VECTOR(*neis1)[j];
             igraph_vector_int_t *neis2 = igraph_adjlist_get(&adjlist, nei);
             if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                 IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
@@ -127,7 +127,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
             }
             neilen2 = igraph_vector_int_size(neis2);
             for (k = 0; k < neilen2; k++) {
-                long int nei2 = (long int) VECTOR(*neis2)[k];
+                long int nei2 = VECTOR(*neis2)[k];
                 if (nei2 <= i) {
                     continue;
                 }
@@ -198,12 +198,12 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
-            long int new_i = (long int) VECTOR(vertex_index)[i] - 1;
+            long int new_i = VECTOR(vertex_index)[i] - 1;
             long int iedges = 0;
             neis1 = igraph_adjlist_get(&adjlist, i);
             neilen1 = igraph_vector_int_size(neis1);
             for (j = 0; j < neilen1; j++) {
-                long int nei = (long int) VECTOR(*neis1)[j];
+                long int nei = VECTOR(*neis1)[j];
                 if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                     IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
                                  IGRAPH_EINVAL);
@@ -211,7 +211,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
                 neis2 = igraph_adjlist_get(&adjlist, nei);
                 neilen2 = igraph_vector_int_size(neis2);
                 for (k = 0; k < neilen2; k++) {
-                    long int nei2 = (long int) VECTOR(*neis2)[k], new_nei2;
+                    long int nei2 = VECTOR(*neis2)[k], new_nei2;
                     if (nei2 <= i) {
                         continue;
                     }
@@ -233,7 +233,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
                            old vertex ids here and rewrite it later */
                         IGRAPH_CHECK(igraph_vector_push_back(&edges, nei2));
                     } else {
-                        new_nei2 = (long int) VECTOR(vertex_index)[nei2] - 1;
+                        new_nei2 = VECTOR(vertex_index)[nei2] - 1;
                         IGRAPH_CHECK(igraph_vector_push_back(&edges, new_nei2));
                     }
                 }
@@ -244,9 +244,9 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
                 long int now = igraph_vector_size(&edges);
                 long int from = now - iedges * 2;
                 for (j = from; j < now; j += 2) {
-                    long int nei2 = (long int) VECTOR(edges)[j + 1];
-                    long int new_nei2 = (long int) VECTOR(vertex_index)[nei2] - 1;
-                    long int m = (long int) VECTOR(mult)[nei2];
+                    long int nei2 = VECTOR(edges)[j + 1];
+                    long int new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                    long int m = VECTOR(mult)[nei2];
                     VECTOR(edges)[j + 1] = new_nei2;
                     IGRAPH_CHECK(igraph_vector_push_back(multiplicity, m));
                 }
@@ -529,8 +529,8 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
 
     /* Check bipartiteness */
     for (i = 0; i < no_of_edges * 2; i += 2) {
-        long int from = (long int) VECTOR(*edges)[i];
-        long int to = (long int) VECTOR(*edges)[i + 1];
+        long int from = VECTOR(*edges)[i];
+        long int to = VECTOR(*edges)[i + 1];
         long int t1 = VECTOR(*types)[from];
         long int t2 = VECTOR(*types)[to];
         if ( (t1 && t2) || (!t1 && !t2) ) {
@@ -605,7 +605,7 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
         for (i = 0; i < n1; i++) {
             for (j = 0; j < n2; j++) {
-                long int elem = (long int) MATRIX(*incidence, i, j);
+                long int elem = MATRIX(*incidence, i, j);
                 long int from, to;
 
                 if (!elem) {
@@ -743,8 +743,8 @@ int igraph_get_incidence(const igraph_t *graph,
     for (i = 0; i < no_of_edges; i++) {
         long int from = IGRAPH_FROM(graph, i);
         long int to = IGRAPH_TO(graph, i);
-        long int from2 = (long int) VECTOR(perm)[from];
-        long int to2 = (long int) VECTOR(perm)[to];
+        long int from2 = VECTOR(perm)[from];
+        long int to2 = VECTOR(perm)[to];
         if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
             ignored_edges++;
         } else if (! VECTOR(*types)[from]) {
@@ -767,12 +767,12 @@ int igraph_get_incidence(const igraph_t *graph,
         for (i = 0; i < no_of_nodes; i++) {
             if (! VECTOR(*types)[i]) {
                 if (row_ids) {
-                    long int i2 = (long int) VECTOR(perm)[i];
+                    long int i2 = VECTOR(perm)[i];
                     VECTOR(*row_ids)[i2] = i;
                 }
             } else {
                 if (col_ids) {
-                    long int i2 = (long int) VECTOR(perm)[i];
+                    long int i2 = VECTOR(perm)[i];
                     VECTOR(*col_ids)[i2 - n1] = i;
                 }
             }
@@ -855,7 +855,7 @@ int igraph_is_bipartite(const igraph_t *graph,
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
-                long int nei = (long int) VECTOR(neis)[j];
+                long int nei = VECTOR(neis)[j];
                 if (VECTOR(seen)[nei]) {
                     long int neitype = VECTOR(seen)[nei];
                     if (neitype == acttype) {

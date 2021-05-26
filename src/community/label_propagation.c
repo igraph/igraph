@@ -201,7 +201,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
         RNG_BEGIN();
         /* In the prescribed order, loop over the vertices and reassign labels */
         for (i = 0; i < no_of_not_fixed_nodes; i++) {
-            v1 = (long int) VECTOR(node_order)[i];
+            v1 = VECTOR(node_order)[i];
 
             /* Count the weights corresponding to different labels */
             igraph_vector_clear(&dominant_labels);
@@ -211,7 +211,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
                 ineis = igraph_inclist_get(&il, v1);
                 num_neis = igraph_vector_int_size(ineis);
                 for (j = 0; j < num_neis; j++) {
-                    k = (long int) VECTOR(*membership)[
+                    k = VECTOR(*membership)[
                     (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];
                     if (k == 0) {
                         continue;    /* skip if it has no label yet */
@@ -234,7 +234,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
                 neis = igraph_adjlist_get(&al, v1);
                 num_neis = igraph_vector_int_size(neis);
                 for (j = 0; j < num_neis; j++) {
-                    k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+                    k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
                     if (k == 0) {
                         continue;    /* skip if it has no label yet */
                     }
@@ -256,7 +256,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
             if (igraph_vector_size(&dominant_labels) > 0) {
                 /* Select randomly from the dominant labels */
                 k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
-                k = (long int) VECTOR(dominant_labels)[k];
+                k = VECTOR(dominant_labels)[k];
                 /* Check if the _current_ label of the node is also dominant */
                 if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
                     /* Nope, we need at least one more iteration */
@@ -287,7 +287,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
                 k = j;
                 j++;
             } else {
-                k = (long int) VECTOR(label_counters)[k];
+                k = VECTOR(label_counters)[k];
             }
         } else {
             /* This is an unlabeled vertex */

@@ -370,7 +370,7 @@ static int igraph_i_maximum_bipartite_matching_unweighted(
                                       IGRAPH_ALL));
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            k = (long int) VECTOR(neis)[j];
+            k = VECTOR(neis)[j];
             if (VECTOR(*types)[k] == VECTOR(*types)[i]) {
                 IGRAPH_ERROR("Graph is not bipartite with supplied types vector", IGRAPH_EINVAL);
             }
@@ -418,8 +418,8 @@ static int igraph_i_maximum_bipartite_matching_unweighted(
         n = igraph_vector_size(&neis);
         for (i = 0; i < n; i++) {
             if (VECTOR(labels)[(long int)VECTOR(neis)[i]] < label_u) {
-                u = (long int) VECTOR(neis)[i];
-                label_u = (long int) VECTOR(labels)[u];
+                u = VECTOR(neis)[i];
+                label_u = VECTOR(labels)[u];
                 label_changed++;
             }
         }
@@ -500,7 +500,7 @@ static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
 
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            w = (long int) VECTOR(neis)[j];
+            w = VECTOR(neis)[j];
             if (VECTOR(*labels)[w] == no_of_nodes) {
                 VECTOR(*labels)[w] = VECTOR(*labels)[v] + 1;
                 matched_to = VECTOR(*match)[w];
@@ -626,7 +626,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
         neis = igraph_inclist_get(&inclist, i);
         n = igraph_vector_int_size(neis);
         for (j = 0, k = 0; j < n; j++) {
-            k = (long int) VECTOR(*neis)[j];
+            k = VECTOR(*neis)[j];
             u = IGRAPH_OTHER(graph, k, i);
             if (VECTOR(*types)[u] == VECTOR(*types)[i]) {
                 IGRAPH_ERROR("Graph is not bipartite with supplied types vector", IGRAPH_EINVAL);
@@ -716,7 +716,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
             neis = igraph_inclist_get(&inclist, v);
             n = igraph_vector_int_size(neis);
             for (i = 0; i < n; i++) {
-                j = (long int) VECTOR(*neis)[i];
+                j = VECTOR(*neis)[i];
                 /* We only care about tight edges */
                 if (!IS_TIGHT(j)) {
                     continue;

@@ -102,7 +102,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     es = 0;
     ens = 0;
     for (i = 0; i < n; i++) {
-        long int deg = (long int) VECTOR(degree)[i];
+        long int deg = VECTOR(degree)[i];
         /* Eulerian is about edges, so skip free vertices */
         if (deg == 0) continue;
 

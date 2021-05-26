@@ -122,7 +122,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
             neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
             n = igraph_vector_int_size(neis);
             for (i = 0; i < n; i++) {
-                long int nei = (long int) VECTOR(*neis)[i];
+                long int nei = VECTOR(*neis)[i];
                 long int neilevel = VECTOR(level)[nei];
                 if (neilevel != 0) {
                     if (neilevel == actlevel - 1) {
@@ -177,7 +177,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
                 neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
                 n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {
-                    long int nei = (long int) VECTOR(*neis)[i];
+                    long int nei = VECTOR(*neis)[i];
                     if (FATHER(nei) == 0) {
                         FATHER(nei) = actnode + 1;
                         igraph_dqueue_push(&q, nei);

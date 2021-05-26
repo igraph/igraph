@@ -94,7 +94,7 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
     neilen1 = igraph_vector_int_size(neis1);
 
 #ifdef TRANSIT_TRIEDGES
-    deg1 = (long int) VECTOR(degree)[node];
+    deg1 = VECTOR(degree)[node];
 #endif
 
     /* Mark the neighbors of the node */
@@ -103,11 +103,11 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
     }
 
     for (i = 0; i < neilen1; i++) {
-        long int nei = (long int) VECTOR(*neis1)[i];
+        long int nei = VECTOR(*neis1)[i];
         neis2 = igraph_adjlist_get(&allneis, nei);
         neilen2 = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen2; j++) {
-            long int nei2 = (long int) VECTOR(*neis2)[j];
+            long int nei2 = VECTOR(*neis2)[j];
             if (neis[nei2] == node + 1) {
 #ifndef TRIANGLES
                 VECTOR(*res)[nei2] += 1;

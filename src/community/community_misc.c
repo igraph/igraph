@@ -145,8 +145,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
 
     for (i = steps - 1; i >= 0; i--) {
-        long int c1 = (long int) MATRIX(*merges, i, 0);
-        long int c2 = (long int) MATRIX(*merges, i, 1);
+        long int c1 = MATRIX(*merges, i, 0);
+        long int c2 = MATRIX(*merges, i, 1);
 
         if (VECTOR(already_merged)[c1] == 0) {
             VECTOR(already_merged)[c1] = 1;
@@ -166,7 +166,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         }
 
         if (c1 < no_of_nodes) {
-            long int cid = (long int) VECTOR(tmp)[i] - 1;
+            long int cid = VECTOR(tmp)[i] - 1;
             if (membership) {
                 VECTOR(*membership)[c1] = cid + 1;
             }
@@ -178,7 +178,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         }
 
         if (c2 < no_of_nodes) {
-            long int cid = (long int) VECTOR(tmp)[i] - 1;
+            long int cid = VECTOR(tmp)[i] - 1;
             if (membership) {
                 VECTOR(*membership)[c2] = cid + 1;
             }
@@ -195,7 +195,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
         /* it can never happen that csize != 0 and membership == 0; we have
          * handled that case above */
         for (i = 0; i < no_of_nodes; i++) {
-            long int tmp = (long int) VECTOR(*membership)[i];
+            long int tmp = VECTOR(*membership)[i];
             if (tmp != 0) {
                 if (membership) {
                     VECTOR(*membership)[i] = tmp - 1;
@@ -268,7 +268,7 @@ int igraph_reindex_membership(igraph_vector_t *membership,
      * indicates that no cluster was assigned yet. */
     i_nb_clusters = 1;
     for (i = 0; i < n; i++) {
-        long int c = (long int)VECTOR(*membership)[i];
+        long int c = VECTOR(*membership)[i];
 
         if (c >= n) {
             IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
@@ -286,7 +286,7 @@ int igraph_reindex_membership(igraph_vector_t *membership,
 
     /* Assign new membership */
     for (i = 0; i < n; i++) {
-        long int c = (long int)VECTOR(*membership)[i];
+        long int c = VECTOR(*membership)[i];
         VECTOR(*membership)[i] = VECTOR(new_cluster)[c] - 1;
     }
     if (nb_clusters) {

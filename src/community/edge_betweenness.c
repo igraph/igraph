@@ -45,7 +45,7 @@ static int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
 
     IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
     for (i = 0; i < len; i++) {
-        long int t = (long int) VECTOR(*membership)[i];
+        long int t = VECTOR(*membership)[i];
         if (VECTOR(idx)[t]) {
             VECTOR(*membership)[i] = VECTOR(idx)[t] - 1;
         } else {
@@ -115,11 +115,11 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
     }
 
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
-        long int edge = (long int) VECTOR(*edges)[i];
+        long int edge = VECTOR(*edges)[i];
         long int from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
         long int to = IGRAPH_TO(graph, (igraph_integer_t) edge);
-        long int c1 = (long int) VECTOR(mymembership)[from];
-        long int c2 = (long int) VECTOR(mymembership)[to];
+        long int c1 = VECTOR(mymembership)[from];
+        long int c2 = VECTOR(mymembership)[to];
         igraph_real_t actmod;
         long int j;
         if (c1 != c2) {     /* this is a merge */
@@ -588,7 +588,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neip = igraph_inclist_get(elist_in_p, actnode);
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
-                        long int edge = (long int) VECTOR(*neip)[i];
+                        long int edge = VECTOR(*neip)[i];
                         long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
                         if (distance[neighbor] == distance[actnode] - 1 &&
                             nrgeo[neighbor] != 0) {
@@ -665,7 +665,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     long int fatv_len = igraph_vector_int_size(fatv);
 
                     for (i = 0; i < fatv_len; i++) {
-                        long int fedge = (long int) VECTOR(*fatv)[i];
+                        long int fedge = VECTOR(*fatv)[i];
                         long int neighbor = IGRAPH_OTHER(graph, fedge, w);
                         tmpscore[neighbor] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                         VECTOR(eb)[fedge] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];

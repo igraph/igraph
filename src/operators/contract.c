@@ -87,8 +87,8 @@ int igraph_contract_vertices(igraph_t *graph,
         long int from = IGRAPH_FROM(graph, e);
         long int to = IGRAPH_TO(graph, e);
 
-        long int nfrom = (long int) VECTOR(*mapping)[from];
-        long int nto = (long int) VECTOR(*mapping)[to];
+        long int nfrom = VECTOR(*mapping)[from];
+        long int nto = VECTOR(*mapping)[to];
 
         igraph_vector_push_back(&edges, nfrom);
         igraph_vector_push_back(&edges, nto);
@@ -132,7 +132,7 @@ int igraph_contract_vertices(igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_vertices);
 
         for (i = 0; i < no_of_nodes; i++) {
-            long int to = (long int) VECTOR(*mapping)[i];
+            long int to = VECTOR(*mapping)[i];
             VECTOR(sizes)[to] += 1;
         }
         for (i = 0; i < no_new_vertices; i++) {
@@ -142,7 +142,7 @@ int igraph_contract_vertices(igraph_t *graph,
             VECTOR(merges)[i] = v;
         }
         for (i = 0; i < no_of_nodes; i++) {
-            long int to = (long int) VECTOR(*mapping)[i];
+            long int to = VECTOR(*mapping)[i];
             igraph_vector_t *v = &vecs[to];
             igraph_vector_push_back(v, i);
         }

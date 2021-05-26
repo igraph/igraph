@@ -270,7 +270,7 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
                 n = igraph_vector_size(&neighbors);
                 IGRAPH_CHECK(igraph_stack_push(&path, STAR));
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neighbors)[j];
+                    long int nei = VECTOR(neighbors)[j];
                     IGRAPH_CHECK(igraph_stack_push(&path, nei));
                 }
             }

@@ -154,7 +154,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             /* ------------------------------------ */
             /* They are exactly the same */
             if (VECTOR(t->values)[i] != -1) {
-                *id = (long int) VECTOR(t->values)[i];
+                *id = VECTOR(t->values)[i];
                 return 0;
             } else {
                 VECTOR(t->values)[i] = newvalue;

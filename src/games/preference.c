@@ -217,7 +217,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         long int an = 0;
         if (type_dist) {
             for (i = 0; i < types; i++) {
-                long int no = (long int) VECTOR(*type_dist)[i];
+                long int no = VECTOR(*type_dist)[i];
                 igraph_vector_t *v = VECTOR(vids_by_type)[i];
                 for (j = 0; j < no && an < nodes; j++) {
                     VECTOR(*nodetypes)[an] = i;

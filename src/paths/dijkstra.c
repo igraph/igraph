@@ -191,7 +191,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
             neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
@@ -425,7 +425,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            long int edge = (long int) VECTOR(*neis)[i];
+            long int edge = VECTOR(*neis)[i];
             long int tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(dists)[tto];
@@ -844,7 +844,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            long int edge = (long int) VECTOR(*neis)[i];
+            long int edge = VECTOR(*neis)[i];
             long int tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(dists)[tto];
@@ -924,7 +924,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             long int node, j, k;
             igraph_vector_t *parent_vec;
 
-            node = (long int)VECTOR(order)[i];
+            node = VECTOR(order)[i];
             /* now, take the parent vertices */
             parent_vec = (igraph_vector_t*)VECTOR(parents)[node];
             k = igraph_vector_size(parent_vec);
@@ -980,7 +980,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 for (j = 0; j < i; j++) {
                     /* For each parent, check if it's already in the stack.
                      * If not, push it and mark it in is_target */
-                    n = (long int) VECTOR(*parent_vec)[j];
+                    n = VECTOR(*parent_vec)[j];
                     if (!is_target[n]) {
                         is_target[n] = 2;
                         IGRAPH_CHECK(igraph_stack_push(&stack, n));
@@ -1061,7 +1061,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             long int m, path_count;
             igraph_vector_t *parent_path, *parent_path_edge;
 
-            node = (long int) VECTOR(order)[i];
+            node = VECTOR(order)[i];
 
             /* if we don't need the shortest paths for this node (because
              * it is not standing in a shortest path between the source
@@ -1091,9 +1091,9 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             for (j = 0; j < m; j++) {
                 /* for each parent, copy the shortest paths leading to that parent
                  * and add the current vertex in the end */
-                long int parent_node = (long int) VECTOR(*parent_vec)[j];
-                long int parent_edge = (long int) VECTOR(*parent_edge_vec)[j];
-                long int parent_path_idx = (long int) VECTOR(*paths_index)[parent_node] - 1;
+                long int parent_node = VECTOR(*parent_vec)[j];
+                long int parent_edge = VECTOR(*parent_edge_vec)[j];
+                long int parent_path_idx = VECTOR(*paths_index)[parent_node] - 1;
                 /*
                 printf("  Considering parent: %ld\n", parent_node);
                 printf("  Paths to parent start at index %ld in vertices\n", parent_path_idx);

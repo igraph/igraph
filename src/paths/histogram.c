@@ -103,7 +103,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_added)[neighbor] == i + 1) {
                     continue;
                 }

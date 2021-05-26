@@ -590,8 +590,8 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_CHECK(igraph_vector_rank(&edges, &rank, no_of_nodes));
 
     for (i = 0; i < no_of_edges; i += 2) {
-        long int pos = (long int) VECTOR(rank)[i];
-        long int pos2 = (long int) VECTOR(rank)[i + 1];
+        long int pos = VECTOR(rank)[i];
+        long int pos2 = VECTOR(rank)[i + 1];
         VECTOR(from)[pos] = VECTOR(edges)[i];
         VECTOR(to)[pos]   = VECTOR(edges)[i + 1];
         VECTOR(from)[pos2] = VECTOR(edges)[i + 1];
@@ -874,7 +874,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
         IGRAPH_VECTOR_INIT_FINALLY(&flow_edges, 0);
         for (i = 0, j = 0; i < no_of_edges; i += 2, j++) {
-            long int pos = (long int) VECTOR(rank)[i];
+            long int pos = VECTOR(rank)[i];
             if ((capacity ? VECTOR(*capacity)[j] : 1.0) > RESCAP(pos)) {
                 IGRAPH_CHECK(igraph_vector_push_back(&flow_edges,
                                                      IGRAPH_FROM(graph, j)));
@@ -904,8 +904,8 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 #define MYCAP(i)      (VECTOR(mycap)[(i)])
 
             for (i = 0; i < no_of_edges; i += 2) {
-                long int pos = (long int) VECTOR(rank)[i];
-                long int pos2 = (long int) VECTOR(rank)[i + 1];
+                long int pos = VECTOR(rank)[i];
+                long int pos2 = VECTOR(rank)[i + 1];
                 MYCAP(pos) = (capacity ? VECTOR(*capacity)[i / 2] : 1.0) - RESCAP(pos);
                 MYCAP(pos2) = 0.0;
             }
@@ -1001,7 +1001,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
         IGRAPH_CHECK(igraph_vector_resize(flow, no_of_orig_edges));
         for (i = 0, j = 0; i < no_of_edges; i += 2, j++) {
-            long int pos = (long int) VECTOR(rank)[i];
+            long int pos = VECTOR(rank)[i];
             VECTOR(*flow)[j] = (capacity ? VECTOR(*capacity)[j] : 1.0) -
                                RESCAP(pos);
         }
@@ -1421,7 +1421,7 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(3);
 
     if (calc_cut) {
-        long int bignode = (long int) VECTOR(mergehist)[2 * mincut_step + 1];
+        long int bignode = VECTOR(mergehist)[2 * mincut_step + 1];
         long int i, idx;
         long int size = 1;
         char *mark;

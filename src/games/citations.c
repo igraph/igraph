@@ -180,7 +180,7 @@ int igraph_lastcit_game(igraph_t *graph,
             long int shnode = i - binwidth * k;
             long int m = index[shnode], n = index[shnode + 1];
             for (j = 2 * m; j < 2 * n; j += 2) {
-                long int cnode = (long int) VECTOR(edges)[j + 1];
+                long int cnode = VECTOR(edges)[j + 1];
                 if (lastcit[cnode] == shnode + 1) {
                     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, cnode, VECTOR(*preference)[k]));
                 }
@@ -274,7 +274,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     /* first node */
     VECTOR(cumsum)[0] = 0;
-    type = (long int) VECTOR(*types)[0];
+    type = VECTOR(*types)[0];
     if (type >= pref_len) {
         goto err_pref_too_short;
     }
@@ -297,7 +297,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, to - 1);
         }
-        type = (long int) VECTOR(*types)[i];
+        type = VECTOR(*types)[i];
         if (type >= pref_len) {
             goto err_pref_too_short;
         }
@@ -437,7 +437,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     /* First node */
     for (i = 0; i < no_of_types; i++) {
-        long int type = (long int) VECTOR(*types)[0];
+        long int type = VECTOR(*types)[0];
         if ( MATRIX(*pref, i, type) < 0) {
             IGRAPH_ERRORF("Preference matrix contains negative entry: %g.", IGRAPH_EINVAL, MATRIX(*pref, i, type));
         }
@@ -448,7 +448,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     RNG_BEGIN();
 
     for (i = 1; i < nodes; i++) {
-        long int type = (long int) VECTOR(*types)[i];
+        long int type = VECTOR(*types)[i];
         igraph_real_t sum = VECTOR(sums)[type];
         for (j = 0; j < edges_per_step; j++) {
             long int to;

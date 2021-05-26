@@ -55,7 +55,7 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
     IGRAPH_VECTOR_INIT_FINALLY(&sizes, size);
 
     for (i = 0; i < no; i++) {
-        long int to = (long int) VECTOR(*from)[i];
+        long int to = VECTOR(*from)[i];
         if (to >= 0) {
             VECTOR(sizes)[to] += 1;
         }
@@ -67,7 +67,7 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
         VECTOR(l->v)[i] = v;
     }
     for (i = 0; i < no; i++) {
-        long int to = (long int) VECTOR(*from)[i];
+        long int to = VECTOR(*from)[i];
         if (to >= 0) {
             igraph_vector_t *v = &(l->vecs[to]);
             igraph_vector_push_back(v, i);

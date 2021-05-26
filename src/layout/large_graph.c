@@ -183,12 +183,12 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
         RNG_BEGIN();
 
-        j = (long int) VECTOR(layers)[actlayer];
-        for (i = (long int) VECTOR(layers)[actlayer - 1];
+        j = VECTOR(layers)[actlayer];
+        for (i = VECTOR(layers)[actlayer - 1];
              i < VECTOR(layers)[actlayer]; i++) {
 
-            long int vid = (long int) VECTOR(vids)[i];
-            long int par = (long int) VECTOR(parents)[vid];
+            long int vid = VECTOR(vids)[i];
+            long int par = VECTOR(parents)[vid];
             IGRAPH_ALLOW_INTERRUPTION();
             igraph_2dgrid_getcenter(&grid, &massx, &massy);
             igraph_i_norm2d(&massx, &massy);
@@ -224,15 +224,15 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         /* Step 2: add the edges of the next layer */
         /*-----------------------------------------*/
 
-        for (j = (long int) VECTOR(layers)[actlayer];
+        for (j = VECTOR(layers)[actlayer];
              j < VECTOR(layers)[actlayer + 1]; j++) {
-            long int vid = (long int) VECTOR(vids)[j];
+            long int vid = VECTOR(vids)[j];
             long int k;
             IGRAPH_ALLOW_INTERRUPTION();
             IGRAPH_CHECK(igraph_incident(graph, &eids, (igraph_integer_t) vid,
                                          IGRAPH_ALL));
             for (k = 0; k < igraph_vector_size(&eids); k++) {
-                long int eid = (long int) VECTOR(eids)[k];
+                long int eid = VECTOR(eids)[k];
                 igraph_integer_t from, to;
                 igraph_edge(graph, (igraph_integer_t) eid, &from, &to);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
@@ -312,7 +312,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             /* apply the changes */
             for (jj = 0; jj < VECTOR(layers)[actlayer + 1]; jj++) {
-                long int vvid = (long int) VECTOR(vids)[jj];
+                long int vvid = VECTOR(vids)[jj];
                 igraph_real_t fx = VECTOR(forcex)[vvid];
                 igraph_real_t fy = VECTOR(forcey)[vvid];
                 igraph_real_t ded = sqrt(fx * fx + fy * fy);

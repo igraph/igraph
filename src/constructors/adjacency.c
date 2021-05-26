@@ -44,7 +44,7 @@ static int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, igraph_vector
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {
-            long int M = (long int) MATRIX(*adjmatrix, i, j);
+            long int M = MATRIX(*adjmatrix, i, j);
             for (k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -62,8 +62,8 @@ static int igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, igraph_vector_t *e
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = i; j < no_of_nodes; j++) {
-            long int M1 = (long int) MATRIX(*adjmatrix, i, j);
-            long int M2 = (long int) MATRIX(*adjmatrix, j, i);
+            long int M1 = MATRIX(*adjmatrix, i, j);
+            long int M2 = MATRIX(*adjmatrix, j, i);
             if (M1 < M2) {
                 M1 = M2;
             }
@@ -84,7 +84,7 @@ static int igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, igraph_vector_t 
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = i; j < no_of_nodes; j++) {
-            long int M = (long int) MATRIX(*adjmatrix, i, j);
+            long int M = MATRIX(*adjmatrix, i, j);
             for (k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -101,7 +101,7 @@ static int igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, igraph_vector_t 
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j <= i; j++) {
-            long int M = (long int) MATRIX(*adjmatrix, i, j);
+            long int M = MATRIX(*adjmatrix, i, j);
             for (k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -118,8 +118,8 @@ static int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *e
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = i; j < no_of_nodes; j++) {
-            long int M1 = (long int) MATRIX(*adjmatrix, i, j);
-            long int M2 = (long int) MATRIX(*adjmatrix, j, i);
+            long int M1 = MATRIX(*adjmatrix, i, j);
+            long int M2 = MATRIX(*adjmatrix, j, i);
             if (M1 > M2) {
                 M1 = M2;
             }
@@ -634,7 +634,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
         long int loops = 0;
 
         for (j = 0; j < n; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             if (nei == i) {
                 loops++;
             } else {

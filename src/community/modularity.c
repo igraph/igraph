@@ -167,8 +167,8 @@ int igraph_modularity(const igraph_t *graph,
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
             }
-            c1 = (long int) VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
-            c2 = (long int) VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
+            c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 VECTOR(e)[c1] += directed_multiplier * w;
             }
@@ -179,8 +179,8 @@ int igraph_modularity(const igraph_t *graph,
     } else {
         m = no_of_edges;
         for (i = 0; i < no_of_edges; i++) {
-            c1 = (long int) VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
-            c2 = (long int) VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
+            c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 VECTOR(e)[c1] += directed_multiplier;
             }

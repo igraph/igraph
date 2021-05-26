@@ -286,7 +286,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
         neis = igraph_adjlist_get(&allneis, father);
         s = igraph_vector_int_size(neis);
         for (i = 0; i < s; i++) {
-            long int nei = (long int) VECTOR(*neis)[i];
+            long int nei = VECTOR(*neis)[i];
             if (!added[nei] && nei > father) {
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
@@ -312,17 +312,17 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                     }
                     motifs += 1;
 
-                    last = (long int) VECTOR(adjverts)[2 * i];
+                    last = VECTOR(adjverts)[2 * i];
                     IGRAPH_CHECK(igraph_vector_push_back(&vids, last));
                     subg[last] = (char) size;
 
                     code = 0; idx = 0;
                     for (k = 0; k < size; k++) {
-                        long int from = (long int) VECTOR(vids)[k];
+                        long int from = VECTOR(vids)[k];
                         neis = igraph_adjlist_get(&alloutneis, from);
                         s2 = igraph_vector_int_size(neis);
                         for (j = 0; j < s2; j++) {
-                            long int nei = (long int) VECTOR(*neis)[j];
+                            long int nei = VECTOR(*neis)[j];
                             if (subg[nei] && k != subg[nei] - 1) {
                                 idx = (unsigned char) (mul * k + (subg[nei] - 1));
                                 code |= arr_idx[idx];
@@ -369,7 +369,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                     neis = igraph_adjlist_get(&allneis, nei);
                     s = igraph_vector_int_size(neis);
                     for (i = 0; i < s; i++) {
-                        long int nei2 = (long int) VECTOR(*neis)[i];
+                        long int nei2 = VECTOR(*neis)[i];
                         if (!added[nei2] && nei2 > father) {
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
@@ -546,7 +546,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     RNG_BEGIN();
 
     for (sam = 0; sam < sample_size; sam++) {
-        long int father = (long int) VECTOR(*sample)[sam];
+        long int father = VECTOR(*sample)[sam];
         long int level, s;
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -567,7 +567,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
                                       IGRAPH_ALL));
         s = igraph_vector_size(&neis);
         for (i = 0; i < s; i++) {
-            long int nei = (long int) VECTOR(neis)[i];
+            long int nei = VECTOR(neis)[i];
             if (!added[nei] && nei > father) {
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
@@ -610,7 +610,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
                                                   IGRAPH_ALL));
                     s = igraph_vector_size(&neis);
                     for (i = 0; i < s; i++) {
-                        long int nei2 = (long int) VECTOR(neis)[i];
+                        long int nei2 = VECTOR(neis)[i];
                         if (!added[nei2] && nei2 > father) {
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
@@ -753,7 +753,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
                                       IGRAPH_ALL));
         s = igraph_vector_size(&neis);
         for (i = 0; i < s; i++) {
-            long int nei = (long int) VECTOR(neis)[i];
+            long int nei = VECTOR(neis)[i];
             if (!added[nei] && nei > father) {
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
@@ -796,7 +796,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
                                                   IGRAPH_ALL));
                     s = igraph_vector_size(&neis);
                     for (i = 0; i < s; i++) {
-                        long int nei2 = (long int) VECTOR(neis)[i];
+                        long int nei2 = VECTOR(neis)[i];
                         if (!added[nei2] && nei2 > father) {
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
@@ -975,7 +975,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
         VECTOR(seen)[i] = i + 1;
         ign = 0;
         for (j = 0; j < neilen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             if (VECTOR(seen)[nei] == i + 1 || VECTOR(seen)[nei] == -(i + 1)) {
                 /* multiple edges or loop edge */
                 VECTOR(seen)[nei] = -(i + 1);
@@ -986,7 +986,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
         }
 
         for (j = 0; j < neilen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             if (nei <= i || (j > 0 && nei == VECTOR(*neis)[j - 1])) {
                 continue;
             }
@@ -994,7 +994,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
             neilen2 = igraph_vector_int_size(neis2);
             s = 0;
             for (k = 0; k < neilen2; k++) {
-                long int nei2 = (long int) VECTOR(*neis2)[k];
+                long int nei2 = VECTOR(*neis2)[k];
                 if (k > 0 && nei2 == VECTOR(*neis2)[k - 1]) {
                     continue;
                 }

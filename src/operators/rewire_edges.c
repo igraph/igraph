@@ -252,7 +252,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
                     VECTOR(edges)[to_rewire] = RNG_INTEGER(0, no_of_nodes - 1);
                 } else {
                     long int opos = to_rewire % 2 ? to_rewire - 1 : to_rewire + 1;
-                    long int nei = (long int) VECTOR(edges)[opos];
+                    long int nei = VECTOR(edges)[opos];
                     long int r = RNG_INTEGER(0, no_of_nodes - 2);
                     VECTOR(edges)[ to_rewire ] = (r != nei ? r : no_of_nodes - 1);
                 }
@@ -363,7 +363,7 @@ int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
             if (loops) {
                 VECTOR(edges)[2 * to_rewire + offset] = RNG_INTEGER(0, no_of_nodes - 1);
             } else {
-                long int nei = (long int) VECTOR(edges)[2 * to_rewire + (1 - offset)];
+                long int nei = VECTOR(edges)[2 * to_rewire + (1 - offset)];
                 long int r = RNG_INTEGER(0, no_of_nodes - 2);
                 VECTOR(edges)[2 * to_rewire + offset] = (r != nei ? r : no_of_nodes - 1);
             }

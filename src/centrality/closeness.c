@@ -216,7 +216,7 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
             nodes_reached++;
 
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
@@ -480,7 +480,7 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
             for (j = 0; j < igraph_vector_int_size(neis); j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;
                 }
@@ -591,7 +591,7 @@ static int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
             for (j = 0; j < igraph_vector_int_size(neis); j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                long int neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;
                 }
@@ -701,7 +701,7 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
             }
 
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
+                long int edge = VECTOR(*neis)[j];
                 long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];

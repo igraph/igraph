@@ -434,7 +434,7 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
         long int j, l = igraph_vector_int_size(v);
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            long int e = (long int) VECTOR(*v)[j];
+            long int e = VECTOR(*v)[j];
             if (VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
                 j++;
@@ -471,7 +471,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
         if (l > 0) {
             p = 1;
             for (j = 1; j < l; j++) {
-                long int e = (long int) VECTOR(*v)[j];
+                long int e = VECTOR(*v)[j];
                 /* Non-loop edges, and one end of loop edges are fine. */
                 /* We assume that the vector is sorted and we also keep it sorted */
                 if (e != i || VECTOR(*v)[j - 1] != e) {

@@ -55,7 +55,7 @@ static int igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             to[i] += from[nei];
         }
         to[i] += VECTOR(*cvec)[i] * from[i];
@@ -110,7 +110,7 @@ static int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
         nlen = igraph_vector_int_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += from[nei];
         }
         VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
@@ -122,7 +122,7 @@ static int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
         to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
@@ -146,7 +146,7 @@ static int igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *fr
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             to[i] += from[nei];
         }
         to[i] += VECTOR(*cvec)[i] * from[i];
@@ -242,7 +242,7 @@ static int igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             to[i] -= from[nei];
         }
         to[i] += VECTOR(*cvec)[i] * from[i];
@@ -301,7 +301,7 @@ static int igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from
         nlen = igraph_vector_int_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = (long int) VECTOR(*neis)[j];
+            long int nei = VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += to[nei];
         }
     }

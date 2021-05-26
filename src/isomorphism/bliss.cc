@@ -539,8 +539,8 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
     *iso = 1;
     for (i = 0; i < no_of_edges; i++) {
-        long int i1 = (long int) VECTOR(index)[i];
-        long int i2 = (long int) VECTOR(index2)[i];
+        long int i1 = VECTOR(index)[i];
+        long int i2 = VECTOR(index2)[i];
         if (VECTOR(from)[i1] != VECTOR(from2)[i2] ||
             VECTOR(to)[i1] != VECTOR(to2)[i2]) {
             *iso = 0;

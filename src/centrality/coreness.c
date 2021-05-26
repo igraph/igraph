@@ -135,9 +135,9 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
         long int v = vert[i];
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, omode));
         for (j = 0; j < igraph_vector_size(&neis); j++) {
-            long int u = (long int) VECTOR(neis)[j];
+            long int u = VECTOR(neis)[j];
             if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
-                long int du = (long int) VECTOR(*cores)[u];
+                long int du = VECTOR(*cores)[u];
                 long int pu = pos[u];
                 long int pw = bin[du];
                 long int w = vert[pw];

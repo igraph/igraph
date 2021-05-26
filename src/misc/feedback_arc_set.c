@@ -254,7 +254,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
                                          IGRAPH_OUT));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
-                eid = (long int) VECTOR(neis)[i];
+                eid = VECTOR(neis)[i];
                 k = IGRAPH_TO(graph, eid);
                 if (VECTOR(indegrees)[k] <= 0) {
                     /* Already removed, continue */
@@ -286,7 +286,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
                                          IGRAPH_IN));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
-                eid = (long int) VECTOR(neis)[i];
+                eid = VECTOR(neis)[i];
                 k = IGRAPH_FROM(graph, eid);
                 if (VECTOR(outdegrees)[k] <= 0) {
                     /* Already removed, continue */
@@ -322,7 +322,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
                                          IGRAPH_OUT));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
-                eid = (long int) VECTOR(neis)[i];
+                eid = VECTOR(neis)[i];
                 k = IGRAPH_TO(graph, eid);
                 if (VECTOR(indegrees)[k] <= 0) {
                     /* Already removed, continue */
@@ -339,7 +339,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
                                          IGRAPH_IN));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
-                eid = (long int) VECTOR(neis)[i];
+                eid = VECTOR(neis)[i];
                 k = IGRAPH_FROM(graph, eid);
                 if (VECTOR(outdegrees)[k] <= 0) {
                     /* Already removed, continue */
@@ -402,12 +402,12 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
         IGRAPH_CHECK((int) igraph_vector_long_qsort_ind(&order_vec, &ranks, 0));
 
         for (i = 0; i < no_of_nodes; i++) {
-            long int from = (long int) VECTOR(ranks)[i];
+            long int from = VECTOR(ranks)[i];
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) from,
                                           IGRAPH_OUT));
             k = igraph_vector_size(&neis);
             for (j = 0; j < k; j++) {
-                long int to = (long int) VECTOR(neis)[j];
+                long int to = VECTOR(neis)[j];
                 if (from == to) {
                     continue;
                 }
@@ -491,11 +491,11 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     }
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_destroy);
     for (i = 0; i < no_of_vertices; i++) {
-        j = (long int) VECTOR(membership)[i];
+        j = VECTOR(membership)[i];
         IGRAPH_CHECK(igraph_vector_push_back(VECTOR(vertices_by_components)[j], i));
     }
     for (i = 0; i < no_of_edges; i++) {
-        j = (long int) VECTOR(membership)[(long)IGRAPH_FROM(graph, i)];
+        j = VECTOR(membership)[(long)IGRAPH_FROM(graph, i)];
         IGRAPH_CHECK(igraph_vector_push_back(VECTOR(edges_by_components)[j], i));
     }
 
@@ -562,9 +562,9 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         /* Set up coefficients in the goal function */
         k = igraph_vector_size(edges_in_comp);
         for (j = 0; j < k; j++) {
-            l = (long int) VECTOR(*edges_in_comp)[j];
-            from = (long int) VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
-            to = (long int) VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
+            l = VECTOR(*edges_in_comp)[j];
+            from = VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
+            to = VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
             if (from == to) {
                 continue;
             }
@@ -636,9 +636,9 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         /* Find the feedback edges */
         k = igraph_vector_size(edges_in_comp);
         for (j = 0; j < k; j++) {
-            l = (long int) VECTOR(*edges_in_comp)[j];
-            from = (long int) VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
-            to = (long int) VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
+            l = VECTOR(*edges_in_comp)[j];
+            from = VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
+            to = VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
             if (from == to || VECTOR(ordering)[from] < VECTOR(ordering)[to]) {
                 IGRAPH_CHECK(igraph_vector_push_back(result, l));
             }

@@ -167,7 +167,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
             nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
-                long int nei = (long int) VECTOR(*neis)[k];
+                long int nei = VECTOR(*neis)[k];
                 long int target = IGRAPH_OTHER(graph, nei, j);
                 if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
                     /* relax the edge */
@@ -378,7 +378,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         nlen = igraph_vector_int_size(neis);
 
         for (k = 0; k < nlen; k++) {
-            long int nei = (long int) VECTOR(*neis)[k];
+            long int nei = VECTOR(*neis)[k];
             long int target = IGRAPH_OTHER(graph, nei, j);
             if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
                 /* relax the edge */

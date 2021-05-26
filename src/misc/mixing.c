@@ -89,8 +89,8 @@ int igraph_assortativity_nominal(const igraph_t *graph,
     for (e = 0; e < no_of_edges; e++) {
         long int from = IGRAPH_FROM(graph, e);
         long int to = IGRAPH_TO(graph, e);
-        long int from_type = (long int) VECTOR(*types)[from];
-        long int to_type = (long int) VECTOR(*types)[to];
+        long int from_type = VECTOR(*types)[from];
+        long int to_type = VECTOR(*types)[to];
 
         VECTOR(ai)[from_type] += 1;
         VECTOR(bi)[to_type] += 1;

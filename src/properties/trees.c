@@ -90,7 +90,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     for (r = 0; r < no_of_roots; r++) {
 
-        long int root = (long int) VECTOR(*roots)[r];
+        long int root = VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
         igraph_dqueue_push(&Q, root);
 
@@ -101,7 +101,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
             n = igraph_vector_size(&neis);
             for (i = 0; i < n; i++) {
 
-                long int edge = (long int) VECTOR(neis)[i];
+                long int edge = VECTOR(neis)[i];
                 long int from = IGRAPH_FROM(graph, edge);
                 long int to = IGRAPH_TO(graph, edge);
                 long int nei = IGRAPH_OTHER(graph, edge, actnode);

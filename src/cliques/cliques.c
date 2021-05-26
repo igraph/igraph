@@ -682,7 +682,7 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
         c = 0;
         j = 0;
         while (j < VECTOR(clqdata->deg)[v1] &&
-               (v2 = (long int) VECTOR(*neis1)[j]) <= level) {
+               (v2 = VECTOR(*neis1)[j]) <= level) {
             if (clqdata->IS[v2] == 0) {
                 c++;
             }
@@ -693,14 +693,14 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
             /* If there are no such nodes... */
             j = 0;
             while (j < VECTOR(clqdata->deg)[v1] &&
-                   (v2 = (long int) VECTOR(*neis1)[j]) <= level) {
+                   (v2 = VECTOR(*neis1)[j]) <= level) {
                 clqdata->IS[v2]++;
                 j++;
             }
             IGRAPH_CHECK(igraph_i_maximal_independent_vertex_sets_backtrack(graph, res, clqdata, (igraph_integer_t) v1));
             j = 0;
             while (j < VECTOR(clqdata->deg)[v1] &&
-                   (v2 = (long int) VECTOR(*neis1)[j]) <= level) {
+                   (v2 = VECTOR(*neis1)[j]) <= level) {
                 clqdata->IS[v2]--;
                 j++;
             }
@@ -713,14 +713,14 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
             f = 1;
             j = 0;
             while (j < VECTOR(clqdata->deg)[v1] &&
-                   (v2 = (long int) VECTOR(*neis1)[j]) <= level) {
+                   (v2 = VECTOR(*neis1)[j]) <= level) {
                 if (clqdata->IS[v2] == 0) {
                     IGRAPH_CHECK(igraph_set_add(&clqdata->buckets[v1],
                                                 (igraph_integer_t) j));
                     neis2 = igraph_adjlist_get(&clqdata->adj_list, v2);
                     k = 0;
                     while (k < VECTOR(clqdata->deg)[v2] &&
-                           (v3 = (long int) VECTOR(*neis2)[k]) <= level) {
+                           (v3 = VECTOR(*neis2)[k]) <= level) {
                         clqdata->IS[v3]--;
                         if (clqdata->IS[v3] == 0) {
                             f = 0;
@@ -738,7 +738,7 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
 
             j = 0;
             while (j < VECTOR(clqdata->deg)[v1] &&
-                   (v2 = (long int) VECTOR(*neis1)[j]) <= level) {
+                   (v2 = VECTOR(*neis1)[j]) <= level) {
                 clqdata->IS[v2]--;
                 j++;
             }
@@ -746,11 +746,11 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
             it_state = 0;
             while (igraph_set_iterate(&clqdata->buckets[v1], &it_state, &j1)) {
                 j = (long)j1;
-                v2 = (long int) VECTOR(*neis1)[j];
+                v2 = VECTOR(*neis1)[j];
                 neis2 = igraph_adjlist_get(&clqdata->adj_list, v2);
                 k = 0;
                 while (k < VECTOR(clqdata->deg)[v2] &&
-                       (v3 = (long int) VECTOR(*neis2)[k]) <= level) {
+                       (v3 = VECTOR(*neis2)[k]) <= level) {
                     clqdata->IS[v3]++;
                     k++;
                 }
@@ -1259,7 +1259,7 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
         best_cand_degree = -1;
         j = igraph_vector_int_size(&new_fini);
         for (i = 0; i < j; i++) {
-            k = (long int)VECTOR(new_fini)[i];
+            k = VECTOR(new_fini)[i];
             IGRAPH_CHECK(igraph_vector_int_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn));
             if (igraph_vector_int_size(&cn) > best_cand_degree) {
                 best_cand_degree = (igraph_integer_t) igraph_vector_int_size(&cn);
@@ -1281,7 +1281,7 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
         j = igraph_vector_int_size(&new_cand);
         l = l - 1;
         for (i = 0; i < j; i++) {
-            k = (long int)VECTOR(new_cand)[i];
+            k = VECTOR(new_cand)[i];
             IGRAPH_CHECK(igraph_vector_int_intersect_sorted(&new_cand, igraph_adjlist_get(&adj_list, k), &cn));
             if (igraph_vector_int_size(&cn) > best_cand_degree) {
                 best_cand_degree = (igraph_integer_t) igraph_vector_int_size(&cn);

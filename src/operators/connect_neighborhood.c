@@ -96,7 +96,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
         in = igraph_vector_size(&neis);
         if (order > 1) {
             for (j = 0; j < in; j++) {
-                long int nei = (long int) VECTOR(neis)[j];
+                long int nei = VECTOR(neis)[j];
                 added[nei] = i + 1;
                 igraph_dqueue_push(&q, nei);
                 igraph_dqueue_push(&q, 1);
@@ -112,7 +112,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 
             if (actdist < order - 1) {
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
@@ -130,7 +130,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
                 }
             } else {
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neis)[j];
+                    long int nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (mode != IGRAPH_ALL || i < nei) {

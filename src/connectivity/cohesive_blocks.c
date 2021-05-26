@@ -102,7 +102,7 @@ static int igraph_i_cb_components(igraph_t *graph,
             IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
             n = igraph_vector_size(neis);
             for (j = 0; j < n; j++) {
-                long int v = (long int) VECTOR(*neis)[j];
+                long int v = VECTOR(*neis)[j];
                 if (VECTOR(*excluded)[v]) {
                     if (VECTOR(*compid)[v] != cno) {
                         VECTOR(*compid)[v] = cno;
@@ -333,7 +333,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
             igraph_vector_t *v = VECTOR(separators)[i];
             long int j, n = igraph_vector_size(v);
             for (j = 0; j < n; j++) {
-                long int vv = (long int) VECTOR(*v)[j];
+                long int vv = VECTOR(*v)[j];
                 if (!VECTOR(marked)[vv]) {
                     nsepv++;
                     VECTOR(marked)[vv] = 1;
@@ -474,7 +474,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
                 continue;
             }
             for (j = 0; j < n; j++) {
-                long int v = (long int) VECTOR(*mapping)[j];
+                long int v = VECTOR(*mapping)[j];
                 VECTOR(*mapping)[j] = VECTOR(*pmapping)[v];
             }
         }

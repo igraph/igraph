@@ -374,7 +374,7 @@ int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int f
     }
     /* TODO: I think this implementation could be speeded up if I don't use
      * igraph_spmatrix_add_e directly -- but maybe it's not worth the fuss */
-    for (i = (long int) VECTOR(m->cidx)[from]; i < VECTOR(m->cidx)[from + 1]; i++) {
+    for (i = VECTOR(m->cidx)[from]; i < VECTOR(m->cidx)[from + 1]; i++) {
         IGRAPH_CHECK(igraph_spmatrix_add_e(m, (long int) VECTOR(m->ridx)[i],
                                            to, VECTOR(m->data)[i]));
     }
@@ -521,7 +521,7 @@ int igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
 
     memset(to, 0, sizeof(igraph_real_t) * (size_t) igraph_spmatrix_size(m));
     for (c = 0, dest_idx = 0; c < m->ncol; c++, dest_idx += m->nrow) {
-        for (idx = (long int) VECTOR(m->cidx)[c]; idx < VECTOR(m->cidx)[c + 1]; idx++) {
+        for (idx = VECTOR(m->cidx)[c]; idx < VECTOR(m->cidx)[c + 1]; idx++) {
             to[dest_idx + (long)VECTOR(m->ridx)[idx]] = VECTOR(m->data)[idx];
         }
     }
@@ -599,7 +599,7 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
-        for (ei = (long int) VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
+        for (ei = VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
             if (VECTOR(m->ridx)[ei] == row) {
                 /* this element will be deleted, so all elements in cidx from the
                  * column index of this element will have to be decreased by one */
@@ -646,7 +646,7 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
-        for (ei = (long int) VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
+        for (ei = VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
             if (VECTOR(m->data)[ei] == 0.0) {
                 /* this element will be deleted, so all elements in cidx from the
                  * column index of this element will have to be decreased by one */
@@ -732,7 +732,7 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
     IGRAPH_CHECK(igraph_vector_resize(res, m->ncol));
     igraph_vector_null(res);
     for (c = 0; c < m->ncol; c++) {
-        for (i = (long int) VECTOR(m->cidx)[c]; i < VECTOR(m->cidx)[c + 1]; i++) {
+        for (i = VECTOR(m->cidx)[c]; i < VECTOR(m->cidx)[c + 1]; i++) {
             VECTOR(*res)[c] += VECTOR(m->data)[i];
         }
     }
@@ -858,7 +858,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
                     *cidx = i;
                 }
                 if (ridx != 0) {
-                    for (j = (long int) VECTOR(m->cidx)[i], k = 0;
+                    for (j = VECTOR(m->cidx)[i], k = 0;
                          j < VECTOR(m->cidx)[i + 1]; j++, k++) {
                         if (VECTOR(m->ridx)[j] != k) {
                             *ridx = k;
@@ -883,7 +883,7 @@ static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
     IGRAPH_ASSERT(m != NULL);
     n = (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    for (i = (long int) VECTOR(m->cidx)[col], n = 0;
+    for (i = VECTOR(m->cidx)[col], n = 0;
          i < VECTOR(m->cidx)[col + 1]; i++, n++)
         if (VECTOR(m->data)[i] != 0.0) {
             VECTOR(*res)[n] = VECTOR(m->ridx)[i];
@@ -972,7 +972,7 @@ int igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
         return 0;
     }
 
-    mit->ri = (long int)VECTOR(mit->m->ridx)[mit->pos];
+    mit->ri = VECTOR(mit->m->ridx)[mit->pos];
     mit->value = VECTOR(mit->m->data)[mit->pos];
 
     while (VECTOR(mit->m->cidx)[mit->ci + 1] <= mit->pos) {

@@ -97,7 +97,7 @@ static int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *
         int irank = VECTOR(*rank)[i];
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            long int edge = (long int) VECTOR(*v)[j];
+            long int edge = VECTOR(*v)[j];
             long int e = IGRAPH_OTHER(graph, edge, i);
             if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;

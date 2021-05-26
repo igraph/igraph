@@ -173,8 +173,8 @@ int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
         for (j = 0; j < edges_per_step; j++) {
             long int node1 = RNG_INTEGER(0, i);
             long int node2 = RNG_INTEGER(0, i);
-            long int type1 = (long int) VECTOR(*nodetypes)[node1];
-            long int type2 = (long int) VECTOR(*nodetypes)[node2];
+            long int type1 = VECTOR(*nodetypes)[node1];
+            long int type2 = VECTOR(*nodetypes)[node2];
             /*    printf("unif: %f, %f, types: %li, %li\n", uni1, uni2, type1, type2); */
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, node1));
