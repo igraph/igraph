@@ -1538,7 +1538,7 @@ int FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 int FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
                                       BASE from, BASE to) {
     BASE *p;
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (long int) (to - from + 1)));
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
 
     for (p = v->stor_begin; p < v->end; p++) {
         *p = from++;

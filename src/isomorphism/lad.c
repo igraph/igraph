@@ -1218,7 +1218,7 @@ static int igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* G
     IGRAPH_FINALLY(igraph_vector_int_destroy, &firstComp);
     /* comp[firstComp[u]..firstComp[u]+nbComp[u]-1] = nodes of Gt that
        are compatible with u */
-    IGRAPH_CHECK(igraph_vector_int_init(&comp, (long int) (VECTOR(Gp->nbSucc)[u] *
+    IGRAPH_CHECK(igraph_vector_int_init(&comp, (VECTOR(Gp->nbSucc)[u] *
                                         Gt->nbVertices)));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
     IGRAPH_CHECK(igraph_vector_int_init(&matchedWithU, (long int) VECTOR(Gp->nbSucc)[u]));

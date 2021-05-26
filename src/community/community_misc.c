@@ -520,8 +520,8 @@ static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
         *mut_inf = 0;
         return IGRAPH_SUCCESS;
     }
-    k1 = (long int)igraph_vector_max(v1) + 1;
-    k2 = (long int)igraph_vector_max(v2) + 1;
+    k1 = igraph_vector_max(v1) + 1;
+    k2 = igraph_vector_max(v2) + 1;
     p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
@@ -660,8 +660,8 @@ static int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vec
         IGRAPH_CHECK(igraph_spmatrix_resize(m, 0, 0));
         return IGRAPH_SUCCESS;
     }
-    k1 = (long int)igraph_vector_max(v1) + 1;
-    k2 = (long int)igraph_vector_max(v2) + 1;
+    k1 = igraph_vector_max(v1) + 1;
+    k2 = igraph_vector_max(v2) + 1;
     IGRAPH_CHECK(igraph_spmatrix_resize(m, k1, k2));
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_spmatrix_add_e(m,

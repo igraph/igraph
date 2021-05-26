@@ -95,7 +95,7 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
     /* maximum degree + degree of vertices */
     IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode,
                                IGRAPH_LOOPS));
-    maxdeg = (long int) igraph_vector_max(cores);
+    maxdeg = igraph_vector_max(cores);
 
     bin = IGRAPH_CALLOC(maxdeg + 1, long int);
     if (bin == 0) {

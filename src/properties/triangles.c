@@ -108,7 +108,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = (long int) igraph_vector_max(&degree) + 1;
+    maxdegree = igraph_vector_max(&degree) + 1;
     igraph_vector_order1(&degree, &order, maxdegree);
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
@@ -655,7 +655,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = (long int) igraph_vector_max(&degree) + 1;
+    maxdegree = igraph_vector_max(&degree) + 1;
     igraph_vector_order1(&degree, &order, maxdegree);
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
@@ -868,7 +868,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = (long int) igraph_vector_max(&degree) + 1;
+    maxdegree = igraph_vector_max(&degree) + 1;
     IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
 
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL,

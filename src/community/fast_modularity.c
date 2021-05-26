@@ -693,8 +693,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     if (weights) {
         debug("Calculating weighted degrees\n");
         for (i = 0; i < no_of_edges; i++) {
-            VECTOR(a)[(long int)IGRAPH_FROM(graph, i)] += VECTOR(*weights)[i];
-            VECTOR(a)[(long int)IGRAPH_TO(graph, i)] += VECTOR(*weights)[i];
+            VECTOR(a)[IGRAPH_FROM(graph, i)] += VECTOR(*weights)[i];
+            VECTOR(a)[IGRAPH_TO(graph, i)] += VECTOR(*weights)[i];
         }
     } else {
         debug("Calculating degrees\n");
@@ -748,7 +748,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         igraph_edge(graph, (igraph_integer_t) eidx, &ffrom, &fto);
 
         /* Create the pairs themselves */
-        from = (long int)ffrom; to = (long int)fto;
+        from = ffrom; to = fto;
         if (from == to) {
             loop_weight_sum += weights ? 2 * VECTOR(*weights)[eidx] : 2;
             continue;

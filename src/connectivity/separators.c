@@ -76,7 +76,7 @@ static int igraph_i_is_separator(const igraph_t *graph,
         for (IGRAPH_VIT_RESET(*vit);
              !IGRAPH_VIT_END(*vit);
              IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ (long int) IGRAPH_VIT_GET(*vit) ] = 1;
+            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = 1;
         }
     } else {
         /* There is an exception */
@@ -84,12 +84,12 @@ static int igraph_i_is_separator(const igraph_t *graph,
         for (i = 0, IGRAPH_VIT_RESET(*vit);
              i < except;
              i++, IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ (long int) IGRAPH_VIT_GET(*vit) ] = 1;
+            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = 1;
         }
         for (IGRAPH_VIT_NEXT(*vit);
              !IGRAPH_VIT_END(*vit);
              IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ (long int) IGRAPH_VIT_GET(*vit) ] = 1;
+            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = 1;
         }
     }
 
@@ -106,7 +106,7 @@ static int igraph_i_is_separator(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_push(Q, start));
     VECTOR(*removed)[start] = 1;
     while (!igraph_dqueue_empty(Q)) {
-        long int node = (long int) igraph_dqueue_pop(Q);
+        long int node = igraph_dqueue_pop(Q);
         long int j, n;
         IGRAPH_CHECK(igraph_neighbors(graph, neis, (igraph_integer_t) node, IGRAPH_ALL));
         n = igraph_vector_size(neis);
@@ -293,7 +293,7 @@ static int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
         igraph_vector_push_back(components, i);
 
         while (!igraph_dqueue_empty(Q)) {
-            long int act_node = (long int) igraph_dqueue_pop(Q);
+            long int act_node = igraph_dqueue_pop(Q);
             igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, act_node);
             long int j, n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {

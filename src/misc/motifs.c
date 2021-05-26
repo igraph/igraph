@@ -354,8 +354,8 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
             if (level < size - 1 &&
                 !igraph_vector_empty(&adjverts)) {
                 /* we might step down */
-                long int neifather = (long int) igraph_vector_pop_back(&adjverts);
-                long int nei = (long int) igraph_vector_pop_back(&adjverts);
+                long int neifather = igraph_vector_pop_back(&adjverts);
+                long int nei = igraph_vector_pop_back(&adjverts);
 
                 if (cp == 0 || RNG_UNIF01() > cp) {
                     /* yes, step down */
@@ -383,13 +383,13 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                 while (!igraph_stack_empty(&stack) &&
                        level == igraph_stack_top(&stack) - 1) {
                     igraph_stack_pop(&stack);
-                    nei = (long int) igraph_stack_pop(&stack);
-                    neifather = (long int) igraph_stack_pop(&stack);
+                    nei = igraph_stack_pop(&stack);
+                    neifather = igraph_stack_pop(&stack);
                     igraph_vector_push_back(&adjverts, nei);
                     igraph_vector_push_back(&adjverts, neifather);
                 }
 
-                nei = (long int) igraph_vector_pop_back(&vids);
+                nei = igraph_vector_pop_back(&vids);
                 subg[nei] = 0; added[nei] -= 1; level -= 1;
                 neis = igraph_adjlist_get(&allneis, nei);
                 s = igraph_vector_int_size(neis);
@@ -594,8 +594,8 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
             if (level < size - 1 &&
                 !igraph_vector_empty(&adjverts)) {
                 /* We might step down */
-                long int neifather = (long int) igraph_vector_pop_back(&adjverts);
-                long int nei = (long int) igraph_vector_pop_back(&adjverts);
+                long int neifather = igraph_vector_pop_back(&adjverts);
+                long int nei = igraph_vector_pop_back(&adjverts);
 
                 if (cp == 0 || RNG_UNIF01() > cp) {
                     /* Yes, step down */
@@ -624,13 +624,13 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
                 while (!igraph_stack_empty(&stack) &&
                        level == igraph_stack_top(&stack) - 1) {
                     igraph_stack_pop(&stack);
-                    nei = (long int) igraph_stack_pop(&stack);
-                    neifather = (long int) igraph_stack_pop(&stack);
+                    nei = igraph_stack_pop(&stack);
+                    neifather = igraph_stack_pop(&stack);
                     igraph_vector_push_back(&adjverts, nei);
                     igraph_vector_push_back(&adjverts, neifather);
                 }
 
-                nei = (long int) igraph_vector_pop_back(&vids);
+                nei = igraph_vector_pop_back(&vids);
                 added[nei] -= 1; level -= 1;
                 IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) nei,
                                               IGRAPH_ALL));
@@ -780,8 +780,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
             if (level < size - 1 &&
                 !igraph_vector_empty(&adjverts)) {
                 /* We might step down */
-                long int neifather = (long int) igraph_vector_pop_back(&adjverts);
-                long int nei = (long int) igraph_vector_pop_back(&adjverts);
+                long int neifather = igraph_vector_pop_back(&adjverts);
+                long int nei = igraph_vector_pop_back(&adjverts);
 
                 if (cp == 0 || RNG_UNIF01() > cp) {
                     /* Yes, step down */
@@ -810,13 +810,13 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
                 while (!igraph_stack_empty(&stack) &&
                        level == igraph_stack_top(&stack) - 1) {
                     igraph_stack_pop(&stack);
-                    nei = (long int) igraph_stack_pop(&stack);
-                    neifather = (long int) igraph_stack_pop(&stack);
+                    nei = igraph_stack_pop(&stack);
+                    neifather = igraph_stack_pop(&stack);
                     igraph_vector_push_back(&adjverts, nei);
                     igraph_vector_push_back(&adjverts, neifather);
                 }
 
-                nei = (long int) igraph_vector_pop_back(&vids);
+                nei = igraph_vector_pop_back(&vids);
                 added[nei] -= 1; level -= 1;
                 IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) nei,
                                               IGRAPH_ALL));

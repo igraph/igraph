@@ -150,7 +150,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
             igraph_vector_int_t *neis;
             long int nlen;
 
-            j = (long int) igraph_dqueue_pop(&Q);
+            j = igraph_dqueue_pop(&Q);
             VECTOR(clean_vertices)[j] = 1;
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
@@ -361,7 +361,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         igraph_vector_int_t *neis;
         long int nlen;
 
-        j = (long int) igraph_dqueue_pop(&Q);
+        j = igraph_dqueue_pop(&Q);
         VECTOR(clean_vertices)[j] = 1;
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {

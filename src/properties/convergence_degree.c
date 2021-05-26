@@ -127,8 +127,8 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
             IGRAPH_CHECK(igraph_dqueue_push(&q, i));
             IGRAPH_CHECK(igraph_dqueue_push(&q, 0.0));
             while (!igraph_dqueue_empty(&q)) {
-                long int actnode = (long int) igraph_dqueue_pop(&q);
-                long int actdist = (long int) igraph_dqueue_pop(&q);
+                long int actnode = igraph_dqueue_pop(&q);
+                long int actdist = igraph_dqueue_pop(&q);
                 IGRAPH_ALLOW_INTERRUPTION();
                 eids = igraph_inclist_get(&inclist, actnode);
                 n = igraph_vector_int_size(eids);

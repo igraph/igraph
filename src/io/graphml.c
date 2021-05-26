@@ -501,7 +501,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
                     igraph_strvector_set(&state->edgeids, origsize, "");
                 }
                 eidrec.value = &state->edgeids;
-                VECTOR(eattr)[(long int)igraph_vector_ptr_size(&eattr) - 1] = &eidrec;
+                VECTOR(eattr)[igraph_vector_ptr_size(&eattr) - 1] = &eidrec;
             } else {
                 igraph_vector_ptr_pop_back(&eattr);
                 IGRAPH_WARNING("Could not add edge ids, "
@@ -794,7 +794,7 @@ static void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_
     }
 
     if (state->data_char) {
-        data_char_new_start = (long int) strlen(state->data_char);
+        data_char_new_start = strlen(state->data_char);
         state->data_char = IGRAPH_REALLOC(state->data_char,
                                           (size_t)(data_char_new_start + len + 1), char);
     } else {

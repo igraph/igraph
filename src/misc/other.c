@@ -68,7 +68,7 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
 
     /* Memory for result */
 
-    IGRAPH_CHECK(igraph_vector_resize(res, (long int)(igraph_vector_size(data) - binwidth + 1)));
+    IGRAPH_CHECK(igraph_vector_resize(res, (igraph_vector_size(data) - binwidth + 1)));
 
     /* Initial bin */
     for (i = 0; i < binwidth; i++) {
@@ -80,7 +80,7 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
     for (i = 1; i < igraph_vector_size(data) - binwidth + 1; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
         sum -= VECTOR(*data)[i - 1];
-        sum += VECTOR(*data)[ (long int)(i + binwidth - 1)];
+        sum += VECTOR(*data)[ (i + binwidth - 1)];
         VECTOR(*res)[i] = sum / binwidth;
     }
 

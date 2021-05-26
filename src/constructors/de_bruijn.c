@@ -75,7 +75,7 @@ int igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = (long int) pow(m, n);
+    no_of_nodes = pow(m, n);
     no_of_edges = no_of_nodes * m;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);

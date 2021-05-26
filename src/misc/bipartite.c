@@ -345,7 +345,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
     }
 
     if (probe1 >= 0) {
-        t1 = VECTOR(*types)[(long int)probe1];
+        t1 = VECTOR(*types)[probe1];
         if (proj2) {
             t2 = 1 - t1;
         } else {

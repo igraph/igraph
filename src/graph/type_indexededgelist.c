@@ -924,12 +924,12 @@ static int igraph_i_create_start(
             idx++; VECTOR(*res)[idx] = 0;
         }
         for (i = 1; i < no_of_edges; i++) {
-            long int n = (long int) (EDGE(i) - EDGE((long int)VECTOR(*res)[idx]));
+            long int n = (EDGE(i) - EDGE((long int)VECTOR(*res)[idx]));
             for (j = 0; j < n; j++) {
                 idx++; VECTOR(*res)[idx] = i;
             }
         }
-        j = (long int) EDGE((long int)VECTOR(*res)[idx]);
+        j = EDGE((long int)VECTOR(*res)[idx]);
         for (i = 0; i < no_of_nodes - j; i++) {
             idx++; VECTOR(*res)[idx] = no_of_edges;
         }
@@ -1550,7 +1550,7 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
 
             VECTOR(*eids)[i] = eid;
             if (eid >= 0) {
-                seen[(long int)(eid)] = 1;
+                seen[(eid)] = 1;
             } else if (error) {
                 IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
             }
@@ -1564,7 +1564,7 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid, seen);
             VECTOR(*eids)[i] = eid;
             if (eid >= 0) {
-                seen[(long int)(eid)] = 1;
+                seen[(eid)] = 1;
             } else if (error) {
                 IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
             }
@@ -1611,7 +1611,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
 
             VECTOR(*eids)[i] = eid;
             if (eid >= 0) {
-                seen[(long int)(eid)] = 1;
+                seen[(eid)] = 1;
             } else if (error) {
                 IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
             }
@@ -1625,7 +1625,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid, seen);
             VECTOR(*eids)[i] = eid;
             if (eid >= 0) {
-                seen[(long int)(eid)] = 1;
+                seen[(eid)] = 1;
             } else if (error) {
                 IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
             }

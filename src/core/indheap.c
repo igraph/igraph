@@ -405,7 +405,7 @@ static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e
 
         tmp = h->index_begin[e1];
         h->index_begin[e1] = h->index_begin[e2];
-        h->index_begin[e2] = (long int) tmp;
+        h->index_begin[e2] = tmp;
     }
 }
 

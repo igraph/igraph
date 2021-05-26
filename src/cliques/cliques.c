@@ -1212,7 +1212,7 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
         }
 
         /* Try the next node in the clique */
-        i = (long int) igraph_vector_int_pop_back(&frame.cand_filtered);
+        i = igraph_vector_int_pop_back(&frame.cand_filtered);
         IGRAPH_CHECK(igraph_vector_push_back(&clique, i));
 
         /* Remove the node from the candidate list */

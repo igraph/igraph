@@ -205,7 +205,7 @@ static int igraph_i_betweenness_cutoff_weighted(
         } /* !igraph_2wheap_empty(&Q) */
 
         while (!igraph_stack_empty(&S)) {
-            long int w = (long int) igraph_stack_pop(&S);
+            long int w = igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, w);
             long int fatv_len = igraph_vector_int_size(fatv);
             for (j = 0; j < fatv_len; j++) {
@@ -395,7 +395,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
         distance[source] = 1;
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
 
             /* Ignore vertices that are more distant than the cutoff */
             if (cutoff >= 0 && distance[actnode] > cutoff + 1) {
@@ -431,7 +431,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
            shortest paths to them. Now we do an inverse search, starting
            with the farthest nodes. */
         while (!igraph_stack_empty(&stack)) {
-            long int actnode = (long int) igraph_stack_pop(&stack);
+            long int actnode = igraph_stack_pop(&stack);
             neis = igraph_adjlist_get(adjlist_in_p, actnode);
             nneis = igraph_vector_int_size(neis);
             for (j = 0; j < nneis; j++) {
@@ -683,7 +683,7 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
         } /* igraph_2wheap_empty(&Q) */
 
         while (!igraph_stack_empty(&S)) {
-            long int w = (long int) igraph_stack_pop(&S);
+            long int w = igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
             long int fatv_len = igraph_vector_int_size(fatv);
             /* printf("Popping %li.\n", w); */
@@ -874,7 +874,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
         distance[source] = 0;
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
 
             if (cutoff >= 0 && distance[actnode] > cutoff ) {
                 /* Reset variables if node is too distant */
@@ -891,7 +891,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
             neino = igraph_vector_int_size(neip);
             for (i = 0; i < neino; i++) {
                 igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
-                long int neighbor = (long int) IGRAPH_OTHER(graph, edge, actnode);
+                long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
                 if (nrgeo[neighbor] != 0) {
                     /* we've already seen this node, another shortest path? */
                     if (distance[neighbor] == distance[actnode] + 1) {
@@ -911,7 +911,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
            shortest paths to them. Now we do an inverse search, starting
            with the farthest nodes. */
         while (!igraph_stack_empty(&stack)) {
-            long int actnode = (long int) igraph_stack_pop(&stack);
+            long int actnode = igraph_stack_pop(&stack);
             if (distance[actnode] < 1) {
                 distance[actnode] = 0;
                 tmpscore[actnode] = 0;
@@ -923,7 +923,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
             neino = igraph_vector_int_size(neip);
             for (i = 0; i < neino; i++) {
                 igraph_integer_t edgeno = (igraph_integer_t) VECTOR(*neip)[i];
-                long int neighbor = (long int) IGRAPH_OTHER(graph, edgeno, actnode);
+                long int neighbor = IGRAPH_OTHER(graph, edgeno, actnode);
                 if (distance[neighbor] == distance[actnode] - 1 &&
                     nrgeo[neighbor] != 0) {
                     tmpscore[neighbor] +=

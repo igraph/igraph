@@ -48,7 +48,7 @@ int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int wid
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
 
     if (width <= 0) {
-        width = (long int) ceil(sqrt(no_of_nodes));
+        width = ceil(sqrt(no_of_nodes));
     }
 
     x = y = 0;
@@ -89,11 +89,11 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
 
     if (width <= 0 && height <= 0) {
-        width = height = (long int) ceil(pow(no_of_nodes, 1.0 / 3));
+        width = height = ceil(pow(no_of_nodes, 1.0 / 3));
     } else if (width <= 0) {
-        width = (long int) ceil(sqrt(no_of_nodes / (double)height));
+        width = ceil(sqrt(no_of_nodes / (double)height));
     } else if (height <= 0) {
-        height = (long int) ceil(sqrt(no_of_nodes / (double)width));
+        height = ceil(sqrt(no_of_nodes / (double)width));
     }
 
     x = y = z = 0;

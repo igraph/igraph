@@ -135,8 +135,8 @@ int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
                             igraph_real_t add) {
     igraph_real_t hidx = VECTOR(ch->hptr)[(long int)index];
     if (hidx != INACTIVE && hidx != UNDEFINED) {
-        long int hidx2 = (long int) (hidx - INDEXINC);
-        /*     printf("updating vertex %li, heap index %li\n", (long int) index, hidx2); */
+        long int hidx2 = (hidx - INDEXINC);
+        /*     printf("updating vertex %li, heap index %li\n", index, hidx2); */
         VECTOR(ch->heap)[hidx2] += add;
         igraph_i_cutheap_sink(ch, hidx2);
         igraph_i_cutheap_shift_up(ch, hidx2);

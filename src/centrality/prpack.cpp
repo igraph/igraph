@@ -109,7 +109,7 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
     IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), i++) {
-        VECTOR(*vector)[i] = res->x[(long int)IGRAPH_VIT_GET(vit)];
+        VECTOR(*vector)[i] = res->x[IGRAPH_VIT_GET(vit)];
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);

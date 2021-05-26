@@ -158,7 +158,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
                 return 0;
             } else {
                 VECTOR(t->values)[i] = newvalue;
-                *id = (long int) newvalue;
+                *id = newvalue;
                 return 0;
             }
 
@@ -183,7 +183,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
                 VECTOR(t->children)[i] = node;
 
-                *id = (long int) newvalue;
+                *id = newvalue;
                 IGRAPH_FINALLY_CLEAN(3);
                 return 0;
             } else {
@@ -222,7 +222,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             VECTOR(t->values)[i] = newvalue;
             VECTOR(t->children)[i] = node;
 
-            *id = (long int) newvalue;
+            *id = newvalue;
             return 0;
 
         } else if (add) {
@@ -258,7 +258,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             VECTOR(t->values)[i] = -1;
             VECTOR(t->children)[i] = node;
 
-            *id = (long int) newvalue;
+            *id = newvalue;
             return 0;
         } else {
 
@@ -280,7 +280,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
         igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
         igraph_vector_push_back(&t->values, newvalue); /* allocated */
-        *id = (long int) newvalue;
+        *id = newvalue;
     } else {
         *id = -1;
     }

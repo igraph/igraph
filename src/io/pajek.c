@@ -562,7 +562,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
             vtypes[i] = (igraph_attribute_type_t) -1;
         }
     }
-    for (i = 0; i < (long int) (sizeof(vnumnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (sizeof(vnumnames) / sizeof(const char*)); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
                                         vnumnames[i])) {
@@ -573,7 +573,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
             }
         }
     }
-    for (i = 0; i < (long int) (sizeof(vstrnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (sizeof(vstrnames) / sizeof(const char*)); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
                                         vstrnames[i])) {
@@ -685,7 +685,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
             etypes[i] = (igraph_attribute_type_t) -1;
         }
     }
-    for (i = 0; i < (long int) (sizeof(enumnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (sizeof(enumnames) / sizeof(const char*)); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
                                         enumnames[i])) {
@@ -696,7 +696,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
             }
         }
     }
-    for (i = 0; i < (long int) (sizeof(estrnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (sizeof(estrnames) / sizeof(const char*)); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
                                         estrnames[i])) {

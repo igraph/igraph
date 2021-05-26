@@ -80,7 +80,7 @@ int igraph_contract_vertices(igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
 
     if (no_of_nodes > 0) {
-        last = (long int) igraph_vector_max(mapping);
+        last = igraph_vector_max(mapping);
     }
 
     for (e = 0; e < no_of_edges; e++) {

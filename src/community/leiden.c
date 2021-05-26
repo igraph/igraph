@@ -116,7 +116,7 @@ static int igraph_i_community_leiden_fastmovenodes(
     /* Iterate while the queue is not empty */
     j = 0;
     while (!igraph_dqueue_empty(&unstable_nodes)) {
-        long int v = (long int) igraph_dqueue_pop(&unstable_nodes);
+        long int v = igraph_dqueue_pop(&unstable_nodes);
         long int best_cluster, current_cluster = VECTOR(*membership)[v];
         long int degree, i;
         igraph_vector_int_t *edges;
@@ -129,7 +129,7 @@ static int igraph_i_community_leiden_fastmovenodes(
         }
 
         /* Find out neighboring clusters */
-        c = (long int) igraph_stack_top(&empty_clusters);
+        c = igraph_stack_top(&empty_clusters);
         VECTOR(neighbor_clusters)[0] = c;
         VECTOR(neighbor_cluster_added)[c] = 1;
         nb_neigh_clusters = 1;
@@ -139,7 +139,7 @@ static int igraph_i_community_leiden_fastmovenodes(
         degree = igraph_vector_int_size(edges);
         for (i = 0; i < degree; i++) {
             long int e = VECTOR(*edges)[i];
-            long int u = (long int)IGRAPH_OTHER(graph, e, v);
+            long int u = IGRAPH_OTHER(graph, e, v);
             if (u != v) {
                 c = VECTOR(*membership)[u];
                 if (!VECTOR(neighbor_cluster_added)[c]) {
@@ -180,7 +180,7 @@ static int igraph_i_community_leiden_fastmovenodes(
 
             for (i = 0; i < degree; i++) {
                 long int e = VECTOR(*edges)[i];
-                long int u = (long int) IGRAPH_OTHER(graph, e, v);
+                long int u = IGRAPH_OTHER(graph, e, v);
                 if (VECTOR(node_is_stable)[u] && VECTOR(*membership)[u] != best_cluster) {
                     IGRAPH_CHECK(igraph_dqueue_push(&unstable_nodes, u));
                     VECTOR(node_is_stable)[u] = 0;
@@ -333,7 +333,7 @@ static int igraph_i_community_leiden_mergenodes(
         degree = igraph_vector_int_size(edges);
         for (j = 0; j < degree; j++) {
             long int e = VECTOR(*edges)[j];
-            long int u = (long int)IGRAPH_OTHER(graph, e, v);
+            long int u = IGRAPH_OTHER(graph, e, v);
             if (u != v && VECTOR(*membership)[u] == cluster_subset) {
                 VECTOR(external_edge_weight_per_cluster_in_subset)[i] += VECTOR(*edge_weights)[e];
             }
@@ -387,7 +387,7 @@ static int igraph_i_community_leiden_mergenodes(
             nb_neigh_clusters = 1;
             for (j = 0; j < degree; j++) {
                 long int e = (long int)VECTOR(*edges)[j];
-                long int u = (long int)IGRAPH_OTHER(graph, e, v);
+                long int u = IGRAPH_OTHER(graph, e, v);
                 if (u != v && VECTOR(*membership)[u] == cluster_subset) {
                     long int c = VECTOR(*refined_membership)[u];
                     if (!VECTOR(neighbor_cluster_added)[c]) {
@@ -442,7 +442,7 @@ static int igraph_i_community_leiden_mergenodes(
 
             for (j = 0; j < degree; j++) {
                 long int e = (long int) VECTOR(*edges)[j];
-                long int u = (long int) IGRAPH_OTHER(graph, e, v);
+                long int u = IGRAPH_OTHER(graph, e, v);
                 if (VECTOR(*membership)[u] == cluster_subset) {
                     if (VECTOR(*refined_membership)[u] == chosen_cluster) {
                         VECTOR(external_edge_weight_per_cluster_in_subset)[chosen_cluster] -= VECTOR(*edge_weights)[e];
@@ -581,7 +581,7 @@ static int igraph_i_community_leiden_aggregate(
 
             for (j = 0; j < degree; j++) {
                 long int e = VECTOR(*incident_edges)[j];
-                long int u = (long int) IGRAPH_OTHER(graph, e, v);
+                long int u = IGRAPH_OTHER(graph, e, v);
                 long int c2 = VECTOR(*refined_membership)[u];
 
                 if (c2 > c) {
@@ -676,7 +676,7 @@ static int igraph_i_community_leiden_quality(
         IGRAPH_CHECK(igraph_edge(graph, e, &from, &to));
         total_edge_weight += VECTOR(*edge_weights)[e];
         /* We add the internal edge weights */
-        if (VECTOR(*membership)[(long int) from] == VECTOR(*membership)[(long int) to]) {
+        if (VECTOR(*membership)[from] == VECTOR(*membership)[to]) {
             *quality += 2 * VECTOR(*edge_weights)[e];
         }
         IGRAPH_EIT_NEXT(eit);

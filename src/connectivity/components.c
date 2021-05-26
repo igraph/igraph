@@ -131,7 +131,7 @@ static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *member
         IGRAPH_CHECK(igraph_dqueue_push(&q, first_node));
 
         while ( !igraph_dqueue_empty(&q) ) {
-            long int act_node = (long int) igraph_dqueue_pop(&q);
+            long int act_node = igraph_dqueue_pop(&q);
             IGRAPH_CHECK(igraph_neighbors(graph, &neis,
                                           (igraph_integer_t) act_node, IGRAPH_ALL));
             for (i = 0; i < igraph_vector_size(&neis); i++) {
@@ -214,7 +214,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
 
         IGRAPH_CHECK(igraph_dqueue_push(&q, i));
         while (!igraph_dqueue_empty(&q)) {
-            long int act_node = (long int) igraph_dqueue_back(&q);
+            long int act_node = igraph_dqueue_back(&q);
             tmp = igraph_adjlist_get(&adjlist, act_node);
             if (VECTOR(next_nei)[act_node] == 0) {
                 /* this is the first time we've met this vertex */
@@ -258,7 +258,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
     num_seen = 0;
 
     while (!igraph_vector_empty(&out)) {
-        long int grandfather = (long int) igraph_vector_pop_back(&out);
+        long int grandfather = igraph_vector_pop_back(&out);
 
         if (VECTOR(next_nei)[grandfather] != 0) {
             continue;
@@ -279,7 +279,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
         }
 
         while (!igraph_dqueue_empty(&q)) {
-            long int act_node = (long int) igraph_dqueue_pop_back(&q);
+            long int act_node = igraph_dqueue_pop_back(&q);
             tmp = igraph_adjlist_get(&adjlist, act_node);
             n = igraph_vector_int_size(tmp);
             for (i = 0; i < n; i++) {
@@ -426,7 +426,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
     j = 1;
     while ( !igraph_dqueue_empty(&q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&q);
+        long int actnode = igraph_dqueue_pop(&q);
         IGRAPH_ALLOW_INTERRUPTION();
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actnode,
                                       IGRAPH_ALL));
@@ -581,7 +581,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
         /* add the neighbors, recursively */
         while (!igraph_dqueue_empty(&q) ) {
             /* pop from the queue of this component */
-            long int actvert = (long int) igraph_dqueue_pop(&q);
+            long int actvert = igraph_dqueue_pop(&q);
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actvert,
                                           IGRAPH_ALL));
             /* iterate over the neighbors */
@@ -692,7 +692,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
          * until there is no more */
         while (!igraph_dqueue_empty(&q)) {
             /* this looks up but does NOT consume the queue */
-            long int act_node = (long int) igraph_dqueue_back(&q);
+            long int act_node = igraph_dqueue_back(&q);
 
             /* get all neighbors of this node */
             tmp = igraph_adjlist_get(&adjlist, act_node);
@@ -745,7 +745,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     num_seen = 0;
     while (!igraph_vector_empty(&out) && no_of_clusters < maxcompno) {
         /* consume the vector from the last element */
-        long int grandfather = (long int) igraph_vector_pop_back(&out);
+        long int grandfather = igraph_vector_pop_back(&out);
 
         /* been here, done that
          * NOTE: next_nei is initialized as [0, 0, ...] */
@@ -774,7 +774,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
         while (!igraph_dqueue_empty(&q)) {
             /* consume the queue from this node */
-            long int act_node = (long int) igraph_dqueue_pop_back(&q);
+            long int act_node = igraph_dqueue_pop_back(&q);
             tmp = igraph_adjlist_get(&adjlist, act_node);
             n = igraph_vector_int_size(tmp);
             for (i = 0; i < n; i++) {
@@ -998,7 +998,7 @@ int igraph_biconnected_components(const igraph_t *graph,
         VECTOR(low)[i] = VECTOR(num)[i] = counter++;
         while (!igraph_stack_empty(&path)) {
             long int n;
-            long int act = (long int) igraph_stack_top(&path);
+            long int act = igraph_stack_top(&path);
             long int actnext = VECTOR(nextptr)[act];
 
             adjedges = igraph_inclist_get(&inclist, act);
@@ -1025,7 +1025,7 @@ int igraph_biconnected_components(const igraph_t *graph,
                 /* Step up */
                 igraph_stack_pop(&path);
                 if (!igraph_stack_empty(&path)) {
-                    long int prev = (long int) igraph_stack_top(&path);
+                    long int prev = igraph_stack_top(&path);
                     /* Update LOW value if needed */
                     if (VECTOR(low)[act] < VECTOR(low)[prev]) {
                         VECTOR(low)[prev] = VECTOR(low)[act];
@@ -1064,7 +1064,7 @@ int igraph_biconnected_components(const igraph_t *graph,
                             }
 
                             while (!igraph_vector_empty(&edgestack)) {
-                                long int e = (long int) igraph_vector_pop_back(&edgestack);
+                                long int e = igraph_vector_pop_back(&edgestack);
                                 long int from = IGRAPH_FROM(graph, e);
                                 long int to = IGRAPH_TO(graph, e);
                                 if (tree_edges) {
@@ -1335,7 +1335,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
     already_added[(long int)vertex] = 1;
 
     while (!igraph_dqueue_empty(&q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&q);
+        long int actnode = igraph_dqueue_pop(&q);
 
         IGRAPH_ALLOW_INTERRUPTION();
 

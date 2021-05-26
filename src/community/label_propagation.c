@@ -141,7 +141,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
             }
         }
 
-        i = (long int) igraph_vector_max(membership);
+        i = igraph_vector_max(membership);
         if (i > no_of_nodes) {
             IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1.", IGRAPH_EINVAL);
         }

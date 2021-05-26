@@ -175,14 +175,14 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     /* use geodist to count how many vertices we have to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (geodist[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
-            geodist[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
+        if (geodist[ IGRAPH_VIT_GET(vit) ] == 0) {
+            geodist[ IGRAPH_VIT_GET(vit) ] = -1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
     }
 
-    if (geodist[ (long int) from ] < 0) {
+    if (geodist[ from ] < 0) {
         reached++;
     }
 
@@ -215,19 +215,19 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_ptr_push_back(&path_edge, vptr_e));
     IGRAPH_FINALLY_CLEAN(2);
 
-    geodist[(long int)from] = 1;
-    VECTOR(ptrhead)[(long int)from] = 1;
+    geodist[from] = 1;
+    VECTOR(ptrhead)[from] = 1;
     IGRAPH_CHECK(igraph_vector_push_back(&ptrlist, 0));
     if (nrgeo) {
-        VECTOR(*nrgeo)[(long int)from] = 1;
+        VECTOR(*nrgeo)[from] = 1;
     }
 
     /* Init queue */
     IGRAPH_CHECK(igraph_dqueue_push(&q, from));
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0.0));
     while (!igraph_dqueue_empty(&q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&q);
-        long int actdist = (long int) igraph_dqueue_pop(&q);
+        long int actnode = igraph_dqueue_pop(&q);
+        long int actdist = igraph_dqueue_pop(&q);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -266,7 +266,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
             if (edges) {
                 /* user needs the edge-paths, so 'neis' contains edge IDs, we need to resolve
                  * the next edge ID into a vertex ID */
-                neighbor = (long int) IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);
+                neighbor = IGRAPH_OTHER(graph, VECTOR(neis)[j], (igraph_integer_t) actnode);
             } else {
                 /* user does not need the edge-paths, so 'neis' contains vertex IDs */
                 neighbor = (long int) VECTOR(neis)[j];
@@ -348,7 +348,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     /* mark the nodes for which we need the result */
     memset(geodist, 0, sizeof(long int) * (size_t) no_of_nodes);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        geodist[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
+        geodist[ IGRAPH_VIT_GET(vit) ] = 1;
     }
 
     /* count the number of paths in the result */

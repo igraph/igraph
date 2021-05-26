@@ -66,7 +66,7 @@ FlowGraph::FlowGraph(const igraph_t * graph,
     double linkWeight = 1.0;
     igraph_integer_t from, to;
 
-    long int Nlinks = (long int) igraph_ecount(graph);
+    long int Nlinks = igraph_ecount(graph);
     if (!directed) {
         Nlinks = Nlinks * 2 ;
     }

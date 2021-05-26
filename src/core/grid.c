@@ -37,7 +37,7 @@ int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t y
     } else if (xc >= grid->maxx) {
         *x = grid->stepsx - 1;
     } else {
-        *x = (long int) floor((xc - (grid->minx)) / (grid->deltax));
+        *x = floor((xc - (grid->minx)) / (grid->deltax));
     }
 
     if (yc <= grid->miny) {
@@ -45,7 +45,7 @@ int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t y
     } else if (yc >= grid->maxy) {
         *y = grid->stepsy - 1;
     } else {
-        *y = (long int) floor((yc - (grid->miny)) / (grid->deltay));
+        *y = floor((yc - (grid->miny)) / (grid->deltay));
     }
 
     return 0;
@@ -64,8 +64,8 @@ int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
     grid->maxy = maxy;
     grid->deltay = deltay;
 
-    grid->stepsx = (long int) ceil((maxx - minx) / deltax);
-    grid->stepsy = (long int) ceil((maxy - miny) / deltay);
+    grid->stepsx = ceil((maxx - minx) / deltax);
+    grid->stepsy = ceil((maxy - miny) / deltay);
 
     IGRAPH_CHECK(igraph_matrix_init(&grid->startidx,
                                     grid->stepsx, grid->stepsy));
@@ -218,15 +218,15 @@ static int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *e
         if (igraph_2dgrid_dist2(grid, vid, act - 1) < r) {
             IGRAPH_CHECK(igraph_vector_push_back(eids, act - 1));
         }
-        act = (long int) v[act - 1];
+        act = v[act - 1];
     }
     return 0;
 }
 
 int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
                             igraph_integer_t vid, igraph_real_t r) {
-    igraph_real_t xc = MATRIX(*grid->coords, (long int)vid, 0);
-    igraph_real_t yc = MATRIX(*grid->coords, (long int)vid, 1);
+    igraph_real_t xc = MATRIX(*grid->coords, vid, 0);
+    igraph_real_t yc = MATRIX(*grid->coords, vid, 1);
     long int x, y;
     igraph_vector_clear(eids);
 

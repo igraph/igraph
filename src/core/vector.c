@@ -95,7 +95,7 @@ int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
 
     IGRAPH_CHECK(igraph_vector_long_resize(to, n));
     for (i = 0; i < n; i++) {
-        VECTOR(*to)[i] = (long int) floor(VECTOR(*from)[i]);
+        VECTOR(*to)[i] = floor(VECTOR(*from)[i]);
     }
     return IGRAPH_SUCCESS;
 }
@@ -105,7 +105,7 @@ int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
 
     IGRAPH_CHECK(igraph_vector_long_resize(to, n));
     for (i = 0; i < n; i++) {
-        VECTOR(*to)[i] = (long int) round(VECTOR(*from)[i]);
+        VECTOR(*to)[i] = round(VECTOR(*from)[i]);
     }
     return 0;
 }
@@ -159,12 +159,12 @@ int igraph_vector_order(const igraph_vector_t* v,
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&ptr, nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
     IGRAPH_CHECK(igraph_vector_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        long int radix = (long int) v2->stor_begin[i];
+        long int radix = v2->stor_begin[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -224,12 +224,12 @@ int igraph_vector_order1(const igraph_vector_t* v,
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&ptr, nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
     IGRAPH_CHECK(igraph_vector_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        long int radix = (long int) v->stor_begin[i];
+        long int radix = v->stor_begin[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -266,12 +266,12 @@ int igraph_vector_order1_int(const igraph_vector_t* v,
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&ptr, nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
     IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        long int radix = (long int) v->stor_begin[i];
+        long int radix = v->stor_begin[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }

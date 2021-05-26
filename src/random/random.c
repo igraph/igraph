@@ -176,7 +176,7 @@ static void igraph_i_rng_glibc2_init(long int *x, int n,
             s = (unsigned long) t ;
         }
 
-        x[i] = (long int) s ;
+        x[i] = s ;
     }
 }
 
@@ -768,10 +768,10 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
                                 long int l, long int h) {
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
-        return (long int)(type->get_real(rng->state) * (h - l + 1) + l);
+        return (type->get_real(rng->state) * (h - l + 1) + l);
     } else if (type->get) {
         unsigned long int max = type->max;
-        return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
+        return (type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
     }
     IGRAPH_FATAL("Internal random generator error");
 }

@@ -336,8 +336,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
             /**************************************************************/
             /* dead end, step back, if possible. Otherwise we'll terminate */
             if (depth >= 1) {
-                last2 = (long int) igraph_stack_pop(&path);
-                last1 = (long int) igraph_stack_pop(&path);
+                last2 = igraph_stack_pop(&path);
+                last1 = igraph_stack_pop(&path);
                 matched_nodes -= 1;
                 VECTOR(*core_1)[last1] = -1;
                 VECTOR(*core_2)[last2] = -1;
@@ -434,8 +434,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                         igraph_get_eid(graph2, &eid2, (igraph_integer_t) node2,
                                        (igraph_integer_t) cand2, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        if (edge_color1 && VECTOR(*edge_color1)[(long int)eid1] !=
-                            VECTOR(*edge_color2)[(long int)eid2]) {
+                        if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
+                            VECTOR(*edge_color2)[eid2]) {
                             end = 1;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
@@ -468,8 +468,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                         igraph_get_eid(graph2, &eid2, (igraph_integer_t) cand2,
                                        (igraph_integer_t) node2, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        if (edge_color1 && VECTOR(*edge_color1)[(long int)eid1] !=
-                            VECTOR(*edge_color2)[(long int)eid2]) {
+                        if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
+                            VECTOR(*edge_color2)[eid2]) {
                             end = 1;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
@@ -502,8 +502,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                         igraph_get_eid(graph2, &eid2, (igraph_integer_t) node,
                                        (igraph_integer_t) cand2, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        if (edge_color1 && VECTOR(*edge_color1)[(long int)eid1] !=
-                            VECTOR(*edge_color2)[(long int)eid2]) {
+                        if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
+                            VECTOR(*edge_color2)[eid2]) {
                             end = 1;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
@@ -536,8 +536,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                         igraph_get_eid(graph2, &eid2, (igraph_integer_t) cand2,
                                        (igraph_integer_t) node, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        if (edge_color1 && VECTOR(*edge_color1)[(long int)eid1] !=
-                            VECTOR(*edge_color2)[(long int)eid2]) {
+                        if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
+                            VECTOR(*edge_color2)[eid2]) {
                             end = 1;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
@@ -1207,8 +1207,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
             /**************************************************************/
             /* dead end, step back, if possible. Otherwise we'll terminate */
             if (depth >= 1) {
-                last2 = (long int) igraph_stack_pop(&path);
-                last1 = (long int) igraph_stack_pop(&path);
+                last2 = igraph_stack_pop(&path);
+                last1 = igraph_stack_pop(&path);
                 matched_nodes -= 1;
                 VECTOR(*core_1)[last1] = -1;
                 VECTOR(*core_2)[last2] = -1;
@@ -1329,8 +1329,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         igraph_get_eid(graph2, &eid2, (igraph_integer_t) node,
                                        (igraph_integer_t) cand2, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        if (edge_color1 && VECTOR(*edge_color1)[(long int)eid1] !=
-                            VECTOR(*edge_color2)[(long int)eid2]) {
+                        if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
+                            VECTOR(*edge_color2)[eid2]) {
                             end = 1;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
@@ -1363,8 +1363,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         igraph_get_eid(graph2, &eid2, (igraph_integer_t) cand2,
                                        (igraph_integer_t) node, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        if (edge_color1 && VECTOR(*edge_color1)[(long int)eid1] !=
-                            VECTOR(*edge_color2)[(long int)eid2]) {
+                        if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
+                            VECTOR(*edge_color2)[eid2]) {
                             end = 1;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,

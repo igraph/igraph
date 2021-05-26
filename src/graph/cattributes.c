@@ -2782,7 +2782,7 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*val)[j];
     num = (igraph_vector_t*)rec->value;
-    return VECTOR(*num)[(long int)vid];
+    return VECTOR(*num)[vid];
 }
 
 /**
@@ -2815,7 +2815,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*val)[j];
     log = (igraph_vector_bool_t*)rec->value;
-    return VECTOR(*log)[(long int)vid];
+    return VECTOR(*log)[vid];
 }
 
 /**
@@ -2848,7 +2848,7 @@ const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*val)[j];
     str = (igraph_strvector_t*)rec->value;
-    return STR(*str, (long int)vid);
+    return STR(*str, vid);
 }
 
 /**
@@ -2881,7 +2881,7 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*eal)[j];
     num = (igraph_vector_t*)rec->value;
-    return VECTOR(*num)[(long int)eid];
+    return VECTOR(*num)[eid];
 }
 
 /**
@@ -2914,7 +2914,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*eal)[j];
     log = (igraph_vector_bool_t*)rec->value;
-    return VECTOR(*log)[(long int)eid];
+    return VECTOR(*log)[eid];
 }
 
 /**
@@ -2947,7 +2947,7 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*eal)[j];
     str = (igraph_strvector_t*)rec->value;
-    return STR(*str, (long int)eid);
+    return STR(*str, eid);
 }
 
 /**
@@ -3333,7 +3333,7 @@ int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
             IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
         } else {
             igraph_vector_t *num = (igraph_vector_t*)rec->value;
-            VECTOR(*num)[(long int)vid] = value;
+            VECTOR(*num)[vid] = value;
         }
     } else {
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
@@ -3355,7 +3355,7 @@ int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
         IGRAPH_FINALLY(igraph_free, num);
         IGRAPH_VECTOR_INIT_FINALLY(num, igraph_vcount(graph));
         igraph_vector_fill(num, IGRAPH_NAN);
-        VECTOR(*num)[(long int)vid] = value;
+        VECTOR(*num)[vid] = value;
         rec->value = num;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -3396,7 +3396,7 @@ int igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
             IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
         } else {
             igraph_vector_bool_t *log = (igraph_vector_bool_t*)rec->value;
-            VECTOR(*log)[(long int)vid] = value;
+            VECTOR(*log)[vid] = value;
         }
     } else {
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
@@ -3419,7 +3419,7 @@ int igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
         IGRAPH_CHECK(igraph_vector_bool_init(log, igraph_vcount(graph)));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
         igraph_vector_bool_fill(log, 0);
-        VECTOR(*log)[(long int)vid] = value;
+        VECTOR(*log)[vid] = value;
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -3523,7 +3523,7 @@ int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
             IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
         } else {
             igraph_vector_t *num = (igraph_vector_t*)rec->value;
-            VECTOR(*num)[(long int)eid] = value;
+            VECTOR(*num)[eid] = value;
         }
     } else {
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
@@ -3545,7 +3545,7 @@ int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
         IGRAPH_FINALLY(igraph_free, num);
         IGRAPH_VECTOR_INIT_FINALLY(num, igraph_ecount(graph));
         igraph_vector_fill(num, IGRAPH_NAN);
-        VECTOR(*num)[(long int)eid] = value;
+        VECTOR(*num)[eid] = value;
         rec->value = num;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -3586,7 +3586,7 @@ int igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
             IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
         } else {
             igraph_vector_bool_t *log = (igraph_vector_bool_t*)rec->value;
-            VECTOR(*log)[(long int)eid] = value;
+            VECTOR(*log)[eid] = value;
         }
     } else {
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
@@ -3609,7 +3609,7 @@ int igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
         IGRAPH_CHECK(igraph_vector_bool_init(log, igraph_ecount(graph)));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
         igraph_vector_bool_fill(log, 0);
-        VECTOR(*log)[(long int)eid] = value;
+        VECTOR(*log)[eid] = value;
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
         IGRAPH_FINALLY_CLEAN(4);

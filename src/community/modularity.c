@@ -147,7 +147,7 @@ int igraph_modularity(const igraph_t *graph,
     /* At this point, the 'membership' vector does not have length zero,
        thus it is safe to call igraph_vector_max() and min(). */
 
-    types = (long int) igraph_vector_max(membership) + 1;
+    types = igraph_vector_max(membership) + 1;
 
     if (igraph_vector_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);

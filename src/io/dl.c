@@ -108,7 +108,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     /* Check number of vertices */
     if (n2 > 0) {
-        n = (long int) igraph_vector_max(&context.edges);
+        n = igraph_vector_max(&context.edges);
     } else {
         n = 0;
     }

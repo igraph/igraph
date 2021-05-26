@@ -88,10 +88,10 @@ int igraph_community_fluid_communities(const igraph_t *graph,
         }
         return IGRAPH_SUCCESS;
     }
-    if ((long int) no_of_communities < 1) {
+    if (no_of_communities < 1) {
         IGRAPH_ERROR("Number of requested communities must be greater than zero.", IGRAPH_EINVAL);
     }
-    if ((long int) no_of_communities > no_of_nodes) {
+    if (no_of_communities > no_of_nodes) {
         IGRAPH_ERROR("Number of requested communities must not be greater than the number of nodes.",
                      IGRAPH_EINVAL);
     }
@@ -114,9 +114,9 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
 
     /* Initialize density and com_to_numvertices vectors */
-    IGRAPH_CHECK(igraph_vector_init(&density, (long int) no_of_communities));
+    IGRAPH_CHECK(igraph_vector_init(&density, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_destroy, &density);
-    IGRAPH_CHECK(igraph_vector_int_init(&com_to_numvertices, (long int) no_of_communities));
+    IGRAPH_CHECK(igraph_vector_int_init(&com_to_numvertices, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &com_to_numvertices);
 
     /* Initialize node ordering vector */
@@ -143,10 +143,10 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     /* Create storage space for counting distinct labels and dominant ones */
-    IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, (long int) no_of_communities);
-    IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, (long int) no_of_communities);
+    IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, no_of_communities);
+    IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, no_of_communities);
 
-    IGRAPH_CHECK(igraph_vector_init(&label_counters, (long int) no_of_communities));
+    IGRAPH_CHECK(igraph_vector_init(&label_counters, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
 
     /* running is the convergence boolean variable */

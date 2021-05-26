@@ -122,15 +122,15 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
     /* Get maximum degree for initialization */
     IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg, igraph_vss_all(),
                                   mode, IGRAPH_LOOPS));
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, (long int)maxdeg);
-    IGRAPH_VECTOR_INIT_FINALLY(&edge_neis, (long int)maxdeg);
+    IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
+    IGRAPH_VECTOR_INIT_FINALLY(&edge_neis, maxdeg);
     igraph_vector_resize(&neis, 0);
     igraph_vector_resize(&edge_neis, 0);
 
     if (knnk) {
-        IGRAPH_CHECK(igraph_vector_resize(knnk, (long int)maxdeg));
+        IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg));
         igraph_vector_null(knnk);
-        IGRAPH_VECTOR_INIT_FINALLY(&deghist, (long int)maxdeg);
+        IGRAPH_VECTOR_INIT_FINALLY(&deghist, maxdeg);
     }
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
@@ -298,9 +298,9 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     igraph_vector_resize(&neis, 0);
 
     if (knnk) {
-        IGRAPH_CHECK(igraph_vector_resize(knnk, (long int)maxdeg));
+        IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg));
         igraph_vector_null(knnk);
-        IGRAPH_VECTOR_INIT_FINALLY(&deghist, (long int)maxdeg);
+        IGRAPH_VECTOR_INIT_FINALLY(&deghist, maxdeg);
     }
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {

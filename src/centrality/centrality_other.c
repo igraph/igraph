@@ -1213,7 +1213,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     while (!IGRAPH_VIT_END(vit)) {
-        VECTOR(reset)[(long int)IGRAPH_VIT_GET(vit)]++;
+        VECTOR(reset)[IGRAPH_VIT_GET(vit)]++;
         IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
@@ -1557,7 +1557,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
         IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), i++) {
-            VECTOR(*vector)[i] = MATRIX(vectors, (long int)IGRAPH_VIT_GET(vit), 0);
+            VECTOR(*vector)[i] = MATRIX(vectors, IGRAPH_VIT_GET(vit), 0);
             VECTOR(*vector)[i] /= sum;
         }
 

@@ -190,13 +190,13 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
         }
 
         while (!igraph_dqueue_empty(&neiq)) {
-            long int actamb = (long int) igraph_dqueue_pop(&neiq);
+            long int actamb = igraph_dqueue_pop(&neiq);
             igraph_vector_t *outv = outneis + actamb;
             igraph_vector_t *inv = inneis + actamb;
             long int no_in = igraph_vector_size(inv);
             long int no_out = igraph_vector_size(outv);
-            long int neis_out = (long int) RNG_GEOM(param_geom_out);
-            long int neis_in = (long int) RNG_GEOM(param_geom_in);
+            long int neis_out = RNG_GEOM(param_geom_out);
+            long int neis_in = RNG_GEOM(param_geom_in);
             /* outgoing neighbors */
             if (neis_out >= no_out) {
                 for (i = 0; i < no_out; i++) {

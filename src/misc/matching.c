@@ -701,7 +701,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
         while (!igraph_dqueue_long_empty(&q)) {
             v = (int) igraph_dqueue_long_pop(&q);
 
-            debug("Considering vertex %ld\n", (long int)v);
+            debug("Considering vertex %ld\n", v);
 
             /* v is always in the smaller set. Find the neighbors of v, which
              * are all in the larger set. Find the pairs of these nodes in
@@ -757,7 +757,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
                  * edge became non-tight in the meanwhile. We do not remove these from
                  * tight_phantom_edges at the moment, so we check them once again here.
                  */
-                if (fabs(VECTOR(labels)[(long int)v] + VECTOR(labels)[(long int)u]) > eps) {
+                if (fabs(VECTOR(labels)[v] + VECTOR(labels)[u]) > eps) {
                     continue;
                 }
                 debug("  Reached vertex %ld via tight phantom edge\n", (long)u);
@@ -788,7 +788,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
             /* Increase the size of the matching with the alternating path. */
             v = alternating_path_endpoint;
             u = (igraph_integer_t) VECTOR(parent)[v];
-            debug("Extending matching with alternating path ending in %ld.\n", (long int)v);
+            debug("Extending matching with alternating path ending in %ld.\n", v);
 
             while (u != v) {
                 w = (int) VECTOR(match)[v];
@@ -862,7 +862,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
         }
         min_slack += min_slack_2;
         debug("Starting approximation for min_slack = %.4f (based on vertex pair %ld--%ld)\n",
-              min_slack, (long int)min_slack_u, (long int)min_slack_v);
+              min_slack, min_slack_u, min_slack_v);
 
         n = igraph_vector_size(&vec1);
         for (i = 0; i < n; i++) {
@@ -872,17 +872,17 @@ static int igraph_i_maximum_bipartite_matching_weighted(
              * There are two types of incident edges: 1) real edges,
              * 2) phantom edges. Phantom edges were treated earlier
              * when we determined the initial value for min_slack. */
-            debug("Trying to expand along vertex %ld\n", (long int)u);
+            debug("Trying to expand along vertex %ld\n", u);
             neis = igraph_inclist_get(&inclist, u);
             k = igraph_vector_int_size(neis);
             for (j = 0; j < k; j++) {
                 /* v is the vertex sitting at the other end of an edge incident
                  * on u; check whether it was reached */
                 v = IGRAPH_OTHER(graph, VECTOR(*neis)[j], u);
-                debug("  Edge %ld -- %ld (ID=%ld)\n", (long int)u, (long int)v, (long int)VECTOR(*neis)[j]);
+                debug("  Edge %ld -- %ld (ID=%ld)\n", u, v, (long int)VECTOR(*neis)[j]);
                 if (VECTOR(parent)[v] >= 0) {
                     /* v was reached, so we are not interested in it */
-                    debug("    %ld was reached, so we are not interested in it\n", (long int)v);
+                    debug("    %ld was reached, so we are not interested in it\n", v);
                     continue;
                 }
                 /* v is the ID of the edge from now on */
@@ -944,7 +944,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
             u = VECTOR(smaller_set)[i];
             for (j = 0; j < larger_set_size; j++) {
                 v = VECTOR(larger_set)[j];
-                if (VECTOR(labels)[(long int)u] + VECTOR(labels)[(long int)v] <= eps) {
+                if (VECTOR(labels)[u] + VECTOR(labels)[v] <= eps) {
                     /* Tight phantom edge found. Note that we don't have to check whether
                      * u and v are connected; if they were, then the slack of this edge
                      * would be negative. */

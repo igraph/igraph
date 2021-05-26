@@ -83,9 +83,9 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = (long int) ((m + 1) * pow(m, n));
+    no_of_nodes = ((m + 1) * pow(m, n));
     no_of_edges = no_of_nodes * m;
-    allstrings = (long int) pow(m + 1, n + 1);
+    allstrings = pow(m + 1, n + 1);
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
@@ -99,7 +99,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
 
     IGRAPH_CHECK(igraph_vector_long_init(&digits, n + 1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &digits);
-    IGRAPH_CHECK(igraph_vector_long_init(&index1, (long int) pow(m + 1, n + 1)));
+    IGRAPH_CHECK(igraph_vector_long_init(&index1, pow(m + 1, n + 1)));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index1);
     IGRAPH_CHECK(igraph_vector_long_init(&index2, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index2);

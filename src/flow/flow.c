@@ -314,7 +314,7 @@ static void igraph_i_mf_push(long int v, long int e, long int n,
     (stats->nopush)++; (*npushsince)++;
     if (EXCESS(n) == 0 && n != target) {
         igraph_dbuckets_delete(ibuckets, DIST(n), n);
-        igraph_buckets_add(buckets, (long int) DIST(n), n);
+        igraph_buckets_add(buckets, DIST(n), n);
     }
     RESCAP(e) -= delta;
     RESCAP(REV(e)) += delta;
@@ -337,8 +337,8 @@ static void igraph_i_mf_discharge(long int v,
                                   int *npushsince, int *nrelabelsince) {
     do {
         long int i;
-        long int start = (long int) CURRENT(v);
-        long int stop = (long int) LAST(v);
+        long int start = CURRENT(v);
+        long int stop = LAST(v);
         for (i = start; i < stop; i++) {
             if (RESCAP(i) > 0) {
                 long int nei = HEAD(i);
@@ -610,7 +610,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         idx++; VECTOR(first)[idx] = 0;
     }
     for (i = 1; i < no_of_edges; i++) {
-        long int n = (long int) (VECTOR(from)[i] -
+        long int n = (VECTOR(from)[i] -
                                  VECTOR(from)[ (long int) VECTOR(first)[idx] ]);
         for (j = 0; j < n; j++) {
             idx++; VECTOR(first)[idx] = i;
@@ -687,10 +687,10 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
         igraph_dqueue_push(&Q, target);
-        VECTOR(added)[(long int)target] = 1;
+        VECTOR(added)[target] = 1;
         marked++;
         while (!igraph_dqueue_empty(&Q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&Q);
+            long int actnode = igraph_dqueue_pop(&Q);
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
                 long int nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
@@ -759,10 +759,10 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
         igraph_dqueue_push(&Q, source);
         igraph_dqueue_push(&Q, 0);
-        VECTOR(added)[(long int)source] = 1;
+        VECTOR(added)[source] = 1;
         while (!igraph_dqueue_empty(&Q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&Q);
-            long int actdist = (long int) igraph_dqueue_pop(&Q);
+            long int actnode = igraph_dqueue_pop(&Q);
+            long int actdist = igraph_dqueue_pop(&Q);
             DIST(actnode) = actdist;
 
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
@@ -783,7 +783,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         igraph_buckets_clear(&buckets);
         for (i = 0; i < no_of_nodes; i++) {
             if (EXCESS(i) > 0.0 && i != source && i != target) {
-                igraph_buckets_add(&buckets, (long int) DIST(i), i);
+                igraph_buckets_add(&buckets, DIST(i), i);
             }
         }
 
@@ -793,7 +793,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
             /* DISCHARGE(vertex) comes here */
             do {
-                for (i = (long int) CURRENT(vertex), j = LAST(vertex); i < j; i++) {
+                for (i = CURRENT(vertex), j = LAST(vertex); i < j; i++) {
                     if (RESCAP(i) > 0) {
                         long int nei = HEAD(i);
 
@@ -805,7 +805,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
                             if (nei != source && EXCESS(nei) == 0.0 &&
                                 DIST(nei) != no_of_nodes) {
-                                igraph_buckets_add(&buckets, (long int) DIST(nei), nei);
+                                igraph_buckets_add(&buckets, DIST(nei), nei);
                             }
 
                             EXCESS(nei) += delta;
@@ -840,7 +840,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                         DIST(vertex) = min;
                         CURRENT(vertex) = min_edge;
                         /* Vertex is still active */
-                        igraph_buckets_add(&buckets, (long int) DIST(vertex), vertex);
+                        igraph_buckets_add(&buckets, DIST(vertex), vertex);
                     }
 
                     /* TODO: gap heuristics here ??? */
@@ -917,11 +917,11 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
                 IGRAPH_CHECK(igraph_vector_long_push_back(&stack, -1));
                 IGRAPH_CHECK(igraph_vector_long_push_back(&stack, source));
-                VECTOR(added)[(long int)source] = 1;
+                VECTOR(added)[source] = 1;
                 while (!igraph_vector_long_empty(&stack) &&
                        igraph_vector_long_tail(&stack) != target) {
                     long int actnode = igraph_vector_long_tail(&stack);
-                    long int edge = FIRST(actnode) + (long int) CURRENT(actnode);
+                    long int edge = FIRST(actnode) + CURRENT(actnode);
                     long int nei;
                     while (edge < LAST(actnode) && MYCAP(edge) == 0.0) {
                         edge++;
@@ -1325,7 +1325,7 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
             for (i = 0; i < n; i++) {
                 igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
                 igraph_integer_t to = (igraph_integer_t) VECTOR(*neis)[i];
-                igraph_real_t weight = capacity ? VECTOR(*capacity)[(long int)edge] : 1.0;
+                igraph_real_t weight = capacity ? VECTOR(*capacity)[edge] : 1.0;
                 igraph_i_cutheap_update(&heap, to, weight);
             }
 
@@ -1472,8 +1472,8 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
             igraph_vector_clear(&mergehist);
             for (i = 0; i < no_of_edges; i++) {
                 igraph_edge(graph, (igraph_integer_t) i, &from, &to);
-                if ((mark[(long int)from] && !mark[(long int)to]) ||
-                    (mark[(long int)to] && !mark[(long int)from])) {
+                if ((mark[from] && !mark[to]) ||
+                    (mark[to] && !mark[from])) {
                     IGRAPH_CHECK(igraph_vector_push_back(&mergehist, i));
                 }
             }
@@ -2479,14 +2479,14 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         IGRAPH_PROGRESS("Gomory-Hu tree", (100.0 * (source - 1)) / (no_of_nodes - 1), 0);
 
         /* Find its current neighbor in the tree */
-        target = VECTOR(neighbors)[(long int)source];
+        target = VECTOR(neighbors)[source];
 
         /* Find the maximum flow between source and target */
         IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, &partition, &partition2,
                                     source, target, capacity, 0));
 
         /* Store the maximum flow and determine which side each node is on */
-        VECTOR(flow_values)[(long int)source] = flow_value;
+        VECTOR(flow_values)[source] = flow_value;
 
         /* Update the tree */
         /* igraph_maxflow() guarantees that the source vertex will be in &partition
@@ -2494,8 +2494,8 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         n = igraph_vector_size(&partition);
         for (i = 0; i < n; i++) {
             mid = VECTOR(partition)[i];
-            if (mid > source && VECTOR(neighbors)[(long int)mid] == target) {
-                VECTOR(neighbors)[(long int)mid] = source;
+            if (mid > source && VECTOR(neighbors)[mid] == target) {
+                VECTOR(neighbors)[mid] = source;
             }
         }
     }
@@ -2505,8 +2505,8 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     /* Re-use the 'partition' vector as an edge list now */
     IGRAPH_CHECK(igraph_vector_resize(&partition, 2 * (no_of_nodes - 1)));
     for (i = 1, mid = 0; i < no_of_nodes; i++, mid += 2) {
-        VECTOR(partition)[(long int)mid]   = i;
-        VECTOR(partition)[(long int)mid + 1] = VECTOR(neighbors)[(long int)i];
+        VECTOR(partition)[mid]   = i;
+        VECTOR(partition)[mid + 1] = VECTOR(neighbors)[i];
     }
 
     /* Create the tree graph; we use igraph_subgraph_edges here to keep the

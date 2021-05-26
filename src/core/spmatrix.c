@@ -881,7 +881,7 @@ static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
                                                      igraph_vector_t *res, long int col) {
     long int i, n;
     IGRAPH_ASSERT(m != NULL);
-    n = (long int) (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
+    n = (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
     IGRAPH_CHECK(igraph_vector_resize(res, n));
     for (i = (long int) VECTOR(m->cidx)[col], n = 0;
          i < VECTOR(m->cidx)[col + 1]; i++, n++)

@@ -398,15 +398,15 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (!is_target[ (long int) IGRAPH_VIT_GET(vit) ]) {
-            is_target[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
+        if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
+            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
     }
 
-    VECTOR(dists)[(long int)from] = 0.0;  /* zero distance */
-    parents[(long int)from] = 0;
+    VECTOR(dists)[from] = 0.0;  /* zero distance */
+    parents[from] = 0;
     igraph_2wheap_push_with_index(&Q, from, 0);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -808,8 +808,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (!is_target[ (long int) IGRAPH_VIT_GET(vit) ]) {
-            is_target[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
+        if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
+            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
@@ -817,7 +817,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    VECTOR(dists)[(long int)from] = 0.0;  /* zero distance */
+    VECTOR(dists)[from] = 0.0;  /* zero distance */
     igraph_2wheap_push_with_index(&Q, from, 0);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -902,7 +902,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     printf("Parent vertices:\n");
     for (i = 0; i < no_of_nodes; i++) {
       if (igraph_vector_size(VECTOR(parents)[i]) > 0) {
-        printf("[%ld]: ", (long int)i);
+        printf("[%ld]: ", i);
         igraph_vector_print(VECTOR(parents)[i]);
       }
     }
@@ -918,7 +918,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
          * order vector anyway for building the final result, we could just as well
          * build nrgeo here.
          */
-        VECTOR(*nrgeo)[(long int)from] = 1;
+        VECTOR(*nrgeo)[from] = 1;
         n = igraph_vector_size(&order);
         for (i = 1; i < n; i++) {
             long int node, j, k;
@@ -962,7 +962,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
             IGRAPH_FINALLY(igraph_vit_destroy, &vit);
             for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-                i = (long int) IGRAPH_VIT_GET(vit);
+                i = IGRAPH_VIT_GET(vit);
                 if (!is_target[i]) {
                     is_target[i] = 1;
                     IGRAPH_CHECK(igraph_stack_push(&stack, i));
@@ -1055,7 +1055,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_ptr_push_back(edges, path));
             IGRAPH_FINALLY_CLEAN(2);  /* ownership of path passed to edges */
         }
-        VECTOR(*paths_index)[(long int)from] = 1;
+        VECTOR(*paths_index)[from] = 1;
 
         for (i = 1; i < n; i++) {
             long int m, path_count;

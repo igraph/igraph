@@ -53,9 +53,9 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
                      "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
-    outsum = (long int) igraph_vector_sum(out_seq);
+    outsum = igraph_vector_sum(out_seq);
     if (directed) {
-        insum = (long int) igraph_vector_sum(in_seq);
+        insum = igraph_vector_sum(in_seq);
     }
 
     no_of_nodes = igraph_vector_size(out_seq);
@@ -151,7 +151,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected(
                      IGRAPH_EINVAL);
     }
 
-    outsum = (long int) igraph_vector_sum(seq);
+    outsum = igraph_vector_sum(seq);
     no_of_nodes = igraph_vector_size(seq);
 
     /* Allocate required data structures */
@@ -294,7 +294,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    outsum = (long int) igraph_vector_sum(out_seq);
+    outsum = igraph_vector_sum(out_seq);
     no_of_nodes = igraph_vector_size(out_seq);
 
     /* Allocate required data structures */

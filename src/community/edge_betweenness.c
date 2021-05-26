@@ -37,7 +37,7 @@
 #include <string.h>
 
 static int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
-    long int no = (long int) igraph_vector_max(membership) + 1;
+    long int no = igraph_vector_max(membership) + 1;
     igraph_vector_t idx;
     long int realno = 0;
     long int i;
@@ -553,13 +553,13 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                 distance[source] = 0;
 
                 while (!igraph_dqueue_empty(&q)) {
-                    long int actnode = (long int) igraph_dqueue_pop(&q);
+                    long int actnode = igraph_dqueue_pop(&q);
 
                     neip = igraph_inclist_get(elist_out_p, actnode);
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
                         igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
-                        long int neighbor= (long int) IGRAPH_OTHER(graph, edge, actnode);
+                        long int neighbor= IGRAPH_OTHER(graph, edge, actnode);
                         if (nrgeo[neighbor] != 0) {
                             /* we've already seen this node, another shortest path? */
                             if (distance[neighbor] == distance[actnode] + 1) {
@@ -579,7 +579,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                    shortest paths to them. Now we do an inverse search, starting
                    with the farthest nodes. */
                 while (!igraph_stack_empty(&stack)) {
-                    long int actnode = (long int) igraph_stack_pop(&stack);
+                    long int actnode = igraph_stack_pop(&stack);
                     if (distance[actnode] < 1) {
                         continue;    /* skip source node */
                     }
@@ -660,7 +660,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                 } /* igraph_2wheap_empty(&Q) */
 
                 while (!igraph_stack_empty(&stack)) {
-                    long int w = (long int) igraph_stack_pop(&stack);
+                    long int w = igraph_stack_pop(&stack);
                     igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
                     long int fatv_len = igraph_vector_int_size(fatv);
 

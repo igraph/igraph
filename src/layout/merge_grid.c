@@ -32,7 +32,7 @@ static int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
     } else if (xc >= grid->maxx) {
         *x = grid->stepsx - 1;
     } else {
-        *x = (long int) floor((xc - (grid->minx)) / (grid->deltax));
+        *x = floor((xc - (grid->minx)) / (grid->deltax));
     }
 
     if (yc <= grid->miny) {
@@ -40,7 +40,7 @@ static int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
     } else if (yc >= grid->maxy) {
         *y = grid->stepsy - 1;
     } else {
-        *y = (long int) floor((yc - (grid->miny)) / (grid->deltay));
+        *y = floor((yc - (grid->miny)) / (grid->deltay));
     }
 
     return 0;

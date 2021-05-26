@@ -560,7 +560,7 @@ int igraph_dominator_tree(const igraph_t *graph,
             VECTOR(*mydom)[w] = VECTOR(*mydom)[(long int)VECTOR(*mydom)[w]];
         }
     }
-    VECTOR(*mydom)[(long int)root] = -1;
+    VECTOR(*mydom)[root] = -1;
 
     igraph_i_dbucket_destroy(&bucket);
     igraph_adjlist_destroy(&pred);
@@ -624,13 +624,13 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
     igraph_vector_bool_t *nomark = data->nomark;
     const igraph_vector_bool_t *GammaX = data->GammaX;
     const igraph_vector_t *map = data->map;
-    long int realvid = (long int) VECTOR(*map)[(long int)vid];
+    long int realvid = (long int) VECTOR(*map)[vid];
 
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
-    if (VECTOR(*GammaX)[(long int)realvid]) {
+    if (VECTOR(*GammaX)[realvid]) {
         if (!igraph_stack_empty(stack)) {
-            long int top = (long int) igraph_stack_top(stack);
+            long int top = igraph_stack_top(stack);
             VECTOR(*nomark)[top] = 1; /* we just found a smaller one */
         }
         IGRAPH_CHECK(igraph_stack_push(stack, realvid));
@@ -647,7 +647,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_outcb(
     igraph_i_all_st_cuts_minimal_dfs_data_t *data = extra;
     igraph_stack_t *stack = data->stack;
     const igraph_vector_t *map = data->map;
-    long int realvid = (long int) VECTOR(*map)[(long int)vid];
+    long int realvid = (long int) VECTOR(*map)[vid];
 
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
@@ -1435,8 +1435,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ 1, /*loops=*/ 1,
                                  /*edge_comb=*/ 0));
 
-    newsource = (long int) VECTOR(NtoL)[(long int)source];
-    newtarget = (long int) VECTOR(NtoL)[(long int)target];
+    newsource = (long int) VECTOR(NtoL)[source];
+    newtarget = (long int) VECTOR(NtoL)[target];
 
     /* TODO: handle the newsource == newtarget case */
 

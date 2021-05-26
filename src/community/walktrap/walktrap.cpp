@@ -123,7 +123,7 @@ int igraph_community_walktrap(const igraph_t *graph,
                               igraph_vector_t *modularity,
                               igraph_vector_t *membership) {
 
-    long int no_of_nodes = (long int)igraph_vcount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
     int length = steps;
     long max_memory = -1;
 

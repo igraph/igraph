@@ -55,7 +55,7 @@ static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *re
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        remain[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
+        remain[ IGRAPH_VIT_GET(vit) ] = 1;
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -165,7 +165,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-                to = (long int) VECTOR(*my_vids_old2new)[ (long int)IGRAPH_TO(graph, eid) ];
+                to = (long int) VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
@@ -187,7 +187,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                     continue;
                 }
 
-                to = (long int) VECTOR(*my_vids_old2new)[ (long int)IGRAPH_TO(graph, eid) ];
+                to = (long int) VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
@@ -410,9 +410,9 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t from, to;
-        long int eid = (long int) IGRAPH_EIT_GET(eit);
+        long int eid = IGRAPH_EIT_GET(eit);
         IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) eid, &from, &to));
-        eremain[eid] = vremain[(long int)from] = vremain[(long int)to] = 1;
+        eremain[eid] = vremain[from] = vremain[to] = 1;
     }
 
     /* Collect the edge IDs to be deleted */

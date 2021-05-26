@@ -461,14 +461,14 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
         igraph_dqueue_clear(&q);
         IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(vit)));
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-        VECTOR(already_counted)[(long int)IGRAPH_VIT_GET(vit)] = i + 1;
+        VECTOR(already_counted)[IGRAPH_VIT_GET(vit)] = i + 1;
 
         IGRAPH_PROGRESS("Closeness: ", 100.0 * i / nodes_to_calc, NULL);
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int act = (long int) igraph_dqueue_pop(&q);
-            actdist = (long int) igraph_dqueue_pop(&q);
+            long int act = igraph_dqueue_pop(&q);
+            actdist = igraph_dqueue_pop(&q);
 
             if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */
@@ -576,8 +576,8 @@ static int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int act = (long int) igraph_dqueue_pop(&q);
-            actdist = (long int) igraph_dqueue_pop(&q);
+            long int act = igraph_dqueue_pop(&q);
+            actdist = igraph_dqueue_pop(&q);
 
             if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */

@@ -181,7 +181,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                    igraph_bool_t circular) {
 
     long int dims = igraph_vector_size(dimvector);
-    long int no_of_nodes = (long int) igraph_vector_prod(dimvector);
+    long int no_of_nodes = igraph_vector_prod(dimvector);
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int *coords, *weights;
     long int i, j;
@@ -222,7 +222,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                 if (coords[j] != VECTOR(*dimvector)[j] - 1) {
                     new_nei = i + weights[j] + 1;
                 } else {
-                    new_nei = i - (long int) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
+                    new_nei = i - (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
                     (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed)) {
@@ -235,7 +235,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                 if (coords[j] != 0) {
                     new_nei = i - weights[j] + 1;
                 } else {
-                    new_nei = i + (long int) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
+                    new_nei = i + (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
                     (VECTOR(*dimvector)[j] != 2 || !circular)) {
@@ -449,7 +449,7 @@ int igraph_extended_chordal_ring(
         IGRAPH_ERROR("An extended chordal ring has at least 3 nodes", IGRAPH_EINVAL);
     }
 
-    if ((long int)nodes % period != 0) {
+    if (nodes % period != 0) {
         IGRAPH_ERROR("The period (number of columns in W) should divide the "
                      "number of nodes", IGRAPH_EINVAL);
     }

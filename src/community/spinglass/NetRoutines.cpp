@@ -59,8 +59,8 @@ int igraph_i_read_network(const igraph_t *graph,
     NNode *node1, *node2;
     DLList_Iter<NNode*> iter;
     igraph_vector_t edgelist;
-    long int no_of_nodes = (long int) igraph_vcount(graph);
-    long int no_of_edges = (long int) igraph_ecount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
     long int ii;
     const char *empty = "";
 

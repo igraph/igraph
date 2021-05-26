@@ -267,18 +267,18 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_real_t xd, yd, dist, force;
                 IGRAPH_ALLOW_INTERRUPTION();
                 igraph_edge(graph, (igraph_integer_t) VECTOR(edges)[jj], &from, &to);
-                xd = MATRIX(*res, (long int)from, 0) - MATRIX(*res, (long int)to, 0);
-                yd = MATRIX(*res, (long int)from, 1) - MATRIX(*res, (long int)to, 1);
+                xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
+                yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
                 dist = sqrt(xd * xd + yd * yd);
                 if (dist != 0) {
                     xd /= dist;
                     yd /= dist;
                 }
                 force = dist * dist / frk;
-                VECTOR(forcex)[(long int)from] -= xd * force;
-                VECTOR(forcex)[(long int)to]   += xd * force;
-                VECTOR(forcey)[(long int)from] -= yd * force;
-                VECTOR(forcey)[(long int)to]   += yd * force;
+                VECTOR(forcex)[from] -= xd * force;
+                VECTOR(forcex)[to]   += xd * force;
+                VECTOR(forcey)[from] -= yd * force;
+                VECTOR(forcey)[to]   += yd * force;
             }
 
             /* repulsive "forces" of the vertices nearby */
@@ -286,10 +286,10 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_2dgrid_reset(&grid, &vidit);
             while ( (vid = igraph_2dgrid_next(&grid, &vidit) - 1) != -1) {
                 while ( (nei = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
-                    igraph_real_t xd = MATRIX(*res, (long int)vid, 0) -
-                                       MATRIX(*res, (long int)nei, 0);
-                    igraph_real_t yd = MATRIX(*res, (long int)vid, 1) -
-                                       MATRIX(*res, (long int)nei, 1);
+                    igraph_real_t xd = MATRIX(*res, vid, 0) -
+                                       MATRIX(*res, nei, 0);
+                    igraph_real_t yd = MATRIX(*res, vid, 1) -
+                                       MATRIX(*res, nei, 1);
                     igraph_real_t dist = sqrt(xd * xd + yd * yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
@@ -299,10 +299,10 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                         };
                         xd /= dist; yd /= dist;
                         force = frk * frk * (1.0 / dist - dist * dist / repulserad);
-                        VECTOR(forcex)[(long int)vid] += xd * force;
-                        VECTOR(forcex)[(long int)nei] -= xd * force;
-                        VECTOR(forcey)[(long int)vid] += yd * force;
-                        VECTOR(forcey)[(long int)nei] -= yd * force;
+                        VECTOR(forcex)[vid] += xd * force;
+                        VECTOR(forcex)[nei] -= xd * force;
+                        VECTOR(forcey)[vid] += yd * force;
+                        VECTOR(forcey)[nei] -= yd * force;
                     }
                 }
             }

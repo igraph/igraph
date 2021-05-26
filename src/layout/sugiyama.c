@@ -168,7 +168,7 @@ static int igraph_i_layering_init(igraph_i_layering_t* layering,
     if (igraph_vector_size(membership) == 0) {
         num_layers = 0;
     } else {
-        num_layers = (long int) igraph_vector_max(membership) + 1;
+        num_layers = igraph_vector_max(membership) + 1;
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&layering->layers, num_layers));
@@ -312,7 +312,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
                            const igraph_vector_t* layers, igraph_real_t hgap, igraph_real_t vgap,
                            long int maxiter, const igraph_vector_t *weights) {
     long int i, j, k, l, m, nei;
-    long int no_of_nodes = (long int)igraph_vcount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
     long int comp_idx;
     long int next_extd_vertex_id = no_of_nodes;
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -1181,11 +1181,11 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
                  * because of a type 1 conflict? */
                 IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) vertex,
                                             (igraph_integer_t) medians[k], 0, 1));
-                if (VECTOR(*ignored_edges)[(long int)eid]) {
+                if (VECTOR(*ignored_edges)[eid]) {
                     continue;
                 }
                 /* Okay, align with the median if possible */
-                pos = (long int) X_POS(medians[k]);
+                pos = X_POS(medians[k]);
                 if ((align_right && r > pos) || (!align_right && r < pos)) {
                     VECTOR(*align)[medians[k]] = vertex;
                     VECTOR(*roots)[vertex] = VECTOR(*roots)[medians[k]];

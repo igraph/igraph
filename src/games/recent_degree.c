@@ -138,7 +138,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
         }
 
         if (i >= time_window) {
-            while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
+            while ((j = igraph_dqueue_pop(&history)) != -1) {
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(&sumtree, j, pow(VECTOR(degree)[j], power) + zero_appeal));
             }
@@ -306,7 +306,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         }
 
         if (i >= time_window) {
-            while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
+            while ((j = igraph_dqueue_pop(&history)) != -1) {
                 long int age = (i - j) / binwidth;
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(

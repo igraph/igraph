@@ -81,7 +81,7 @@ int igraph_assortativity_nominal(const igraph_t *graph,
 
     directed = directed && igraph_is_directed(graph);
 
-    no_of_types = (long int) igraph_vector_max(types) + 1;
+    no_of_types = igraph_vector_max(types) + 1;
     IGRAPH_VECTOR_INIT_FINALLY(&ai, no_of_types);
     IGRAPH_VECTOR_INIT_FINALLY(&bi, no_of_types);
     IGRAPH_VECTOR_INIT_FINALLY(&eii, no_of_types);

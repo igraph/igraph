@@ -566,7 +566,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
         }
     } else {
         /* Just create the idx vector for the given membership vector */
-        communities = (long int) igraph_vector_max(mymembership) + 1;
+        communities = igraph_vector_max(mymembership) + 1;
         IGRAPH_STATUSF(("Starting from given membership vector with %li "
                         "communities.\n", 0, communities));
         if (history) {
@@ -652,7 +652,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     extra.mymembership = mymembership;
 
     while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
-        long int comm = (long int) igraph_dqueue_pop_back(&tosplit);
+        long int comm = igraph_dqueue_pop_back(&tosplit);
         /* depth first search */
         long int size = 0;
         igraph_real_t tmpev;
@@ -1015,7 +1015,7 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     long int components, i;
 
     if (no_of_nodes > 0) {
-        components = (long int) igraph_vector_max(membership) + 1;
+        components = igraph_vector_max(membership) + 1;
     } else {
         components = 0;
     }

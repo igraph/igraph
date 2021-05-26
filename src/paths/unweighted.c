@@ -138,13 +138,13 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
         long int reached = 0;
         IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(fromvit)));
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-        already_counted[ (long int) IGRAPH_VIT_GET(fromvit) ] = i + 1;
+        already_counted[ IGRAPH_VIT_GET(fromvit) ] = i + 1;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int act = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
+            long int act = igraph_dqueue_pop(&q);
+            long int actdist = igraph_dqueue_pop(&q);
 
             if (all_to) {
                 MATRIX(*res, i, act) = actdist;
@@ -318,8 +318,8 @@ int igraph_get_shortest_paths(const igraph_t *graph,
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (father[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
-            father[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
+        if (father[ IGRAPH_VIT_GET(vit) ] == 0) {
+            father[ IGRAPH_VIT_GET(vit) ] = -1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
@@ -340,13 +340,13 @@ int igraph_get_shortest_paths(const igraph_t *graph,
      */
 
     IGRAPH_CHECK(igraph_dqueue_push(&q, from + 1));
-    if (father[ (long int) from ] < 0) {
+    if (father[ from ] < 0) {
         reached++;
     }
-    father[ (long int)from ] = 1;
+    father[ from ] = 1;
 
     while (!igraph_dqueue_empty(&q) && reached < to_reach) {
-        long int act = (long int) igraph_dqueue_pop(&q) - 1;
+        long int act = igraph_dqueue_pop(&q) - 1;
 
         IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act, mode));
         vsize = igraph_vector_size(&tmp);

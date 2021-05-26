@@ -62,8 +62,8 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (i = 0; i < no_of_edges; i++) {
-        VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_FROM(graph, i) ];
-        VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_TO(graph, i) ];
+        VECTOR(edges)[p++] = VECTOR(*permutation)[ IGRAPH_FROM(graph, i) ];
+        VECTOR(edges)[p++] = VECTOR(*permutation)[ IGRAPH_TO(graph, i) ];
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,

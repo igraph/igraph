@@ -61,7 +61,7 @@ static int igraph_i_layout_reingold_tilford_unreachable(
     /* start from real_root and go BFS */
     IGRAPH_CHECK(igraph_dqueue_push(&q, real_root));
     while (!igraph_dqueue_empty(&q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&q);
+        long int actnode = igraph_dqueue_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
         VECTOR(visited)[actnode] = 1;
@@ -175,8 +175,8 @@ static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_push(&q, root));
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     while (!igraph_dqueue_empty(&q)) {
-        long int actnode = (long int) igraph_dqueue_pop(&q);
-        long int actdist = (long int) igraph_dqueue_pop(&q);
+        long int actnode = igraph_dqueue_pop(&q);
+        long int actdist = igraph_dqueue_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
 

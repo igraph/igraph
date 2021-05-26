@@ -242,7 +242,7 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
         IGRAPH_CHECK(igraph_dqueue_push(&q, i));
         while (! igraph_dqueue_empty(&q)) {
             long int tmp_size;
-            long int act_node = (long int) igraph_dqueue_pop(&q);
+            long int act_node = igraph_dqueue_pop(&q);
             IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act_node,
                                          IGRAPH_ALL));
             tmp_size = igraph_vector_size(&tmp);
@@ -250,8 +250,8 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
                 long int edge = (long int) VECTOR(tmp)[j];
                 if (added_edges[edge] == 0) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
-                    if (already_added[(long int) to] == 0) {
-                        already_added[(long int) to] = 1;
+                    if (already_added[to] == 0) {
+                        already_added[to] = 1;
                         added_edges[edge] = 1;
                         IGRAPH_CHECK(igraph_vector_push_back(res, edge));
                         IGRAPH_CHECK(igraph_dqueue_push(&q, to));
@@ -323,7 +323,7 @@ static int igraph_i_minimum_spanning_tree_prim(
         for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = (long int) VECTOR(adj)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, i);
-            if (already_added[(long int) neighbor] == 0) {
+            if (already_added[neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
                                                    edgeno));
             }
@@ -342,8 +342,8 @@ static int igraph_i_minimum_spanning_tree_prim(
                 igraph_integer_t to = IGRAPH_OTHER(graph, edge, from);
 
                 /* Does it point to a visited node? */
-                if (already_added[(long int)to] == 0) {
-                    already_added[(long int)to] = 1;
+                if (already_added[to] == 0) {
+                    already_added[to] = 1;
                     added_edges[edge] = 1;
                     IGRAPH_CHECK(igraph_vector_push_back(res, edge));
                     /* add all outgoing edges */

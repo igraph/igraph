@@ -95,7 +95,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
         igraph_dqueue_push(&Q, root);
 
         while (!igraph_dqueue_empty(&Q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&Q);
+            long int actnode = igraph_dqueue_pop(&Q);
 
             IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode, mode));
             n = igraph_vector_size(&neis);

@@ -78,8 +78,8 @@ static int igraph_i_average_path_length_unweighted(
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
+            long int actdist = igraph_dqueue_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
@@ -488,8 +488,8 @@ static int igraph_i_local_efficiency_unweighted(
         while (!igraph_dqueue_empty(q)) {
             igraph_vector_int_t *act_neis;
             long int act_neis_size;
-            long int act = (long int) igraph_dqueue_pop(q);
-            long int actdist = (long int) igraph_dqueue_pop(q);
+            long int act = igraph_dqueue_pop(q);
+            long int actdist = igraph_dqueue_pop(q);
 
             if (act != source && VECTOR(*nei_mask)[act]) {
                 *res += 1.0 / actdist;
@@ -992,8 +992,8 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
+            long int actdist = igraph_dqueue_pop(&q);
             if (actdist > res) {
                 res = actdist;
                 from = i;

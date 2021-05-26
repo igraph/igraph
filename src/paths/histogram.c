@@ -97,8 +97,8 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
+            long int actdist = igraph_dqueue_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);

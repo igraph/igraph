@@ -275,7 +275,7 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = (long int) igraph_vector_max(&degree) + 1;
+    maxdegree = igraph_vector_max(&degree) + 1;
     igraph_vector_order1_int(&degree, &order, maxdegree);
     igraph_vector_int_init(&rank, no_of_nodes);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);

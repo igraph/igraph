@@ -243,12 +243,12 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
         IGRAPH_CHECK(igraph_stack_push(&path, root));
 
         while (!igraph_stack_empty(&path)) {
-            long int node = (long int) igraph_stack_top(&path);
+            long int node = igraph_stack_top(&path);
             if (node == STAR) {
                 /* Leaving a node */
                 long int j, n;
                 igraph_stack_pop(&path);
-                node = (long int) igraph_stack_pop(&path);
+                node = igraph_stack_pop(&path);
                 if (!VECTOR(done)[node]) {
                     igraph_vector_pop_back(&ancestors);
                     VECTOR(done)[node] = 1;

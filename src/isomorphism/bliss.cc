@@ -515,8 +515,8 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
     IGRAPH_VECTOR_INIT_FINALLY(&index2, no_of_edges);
 
     for (i = 0; i < no_of_edges; i++) {
-        VECTOR(from)[i] = VECTOR(*mymap12)[ (long int) IGRAPH_FROM(graph1, i) ];
-        VECTOR(to)[i]   = VECTOR(*mymap12)[ (long int) IGRAPH_TO  (graph1, i) ];
+        VECTOR(from)[i] = VECTOR(*mymap12)[ IGRAPH_FROM(graph1, i) ];
+        VECTOR(to)[i]   = VECTOR(*mymap12)[ IGRAPH_TO  (graph1, i) ];
         if (! directed && VECTOR(from)[i] < VECTOR(to)[i]) {
             igraph_real_t tmp = VECTOR(from)[i];
             VECTOR(from)[i] = VECTOR(to)[i];

@@ -99,7 +99,7 @@ int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
         IGRAPH_CHECK(igraph_incident(g1, &neis1, (igraph_integer_t) i,
                                      IGRAPH_OUT));
         while (!igraph_vector_empty(&neis1)) {
-            long int con = (long int) igraph_vector_pop_back(&neis1);
+            long int con = igraph_vector_pop_back(&neis1);
             long int v1 = IGRAPH_OTHER(g1, con, i);
             if (v1 < no_of_nodes_right) {
                 IGRAPH_CHECK(igraph_incident(g2, &neis2, (igraph_integer_t) v1,

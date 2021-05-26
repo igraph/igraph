@@ -83,7 +83,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     start_edges = start_from ? igraph_ecount(start_from) : 0;
     if (outseq) {
         if (igraph_vector_size(outseq) > 1) {
-            new_edges = (long int) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
+            new_edges = (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
         } else {
             new_edges = 0;
         }
@@ -196,7 +196,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     start_edges = start_from ? igraph_ecount(start_from) : 0;
     if (outseq) {
         if (igraph_vector_size(outseq) > 1) {
-            new_edges = (long int) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
+            new_edges = (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
         } else {
             new_edges = 0;
         }
@@ -303,7 +303,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
     start_edges = start_from ? igraph_ecount(start_from) : 0;
     if (outseq) {
         if (igraph_vector_size(outseq) > 1) {
-            new_edges = (long int) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
+            new_edges = (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
         } else {
             new_edges = 0;
         }

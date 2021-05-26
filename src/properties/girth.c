@@ -111,7 +111,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
             long int actlevel = VECTOR(level)[actnode];
             long int i, n;
 
@@ -173,7 +173,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
             IGRAPH_CHECK(igraph_dqueue_push(&q, minvertex));
             FATHER(minvertex) = minvertex;
             while (FATHER(t1) == 0 || FATHER(t2) == 0) {
-                long int actnode = (long int) igraph_dqueue_pop(&q);
+                long int actnode = igraph_dqueue_pop(&q);
                 neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
                 n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {

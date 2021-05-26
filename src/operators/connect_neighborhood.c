@@ -104,8 +104,8 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
         }
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
+            long int actnode = igraph_dqueue_pop(&q);
+            long int actdist = igraph_dqueue_pop(&q);
             long int n;
             igraph_neighbors(graph, &neis, (igraph_integer_t) actnode, mode);
             n = igraph_vector_size(&neis);
