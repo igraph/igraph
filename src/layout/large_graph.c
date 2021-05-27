@@ -35,7 +35,7 @@
 #include "core/math.h"
 
 static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
-    igraph_real_t len = sqrt((*x) * (*x) + (*y) * (*y));
+    igraph_real_t len = hypot(*x, *y);
     if (len != 0) {
         *x /= len;
         *y /= len;
@@ -269,7 +269,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_edge(graph, (igraph_integer_t) VECTOR(edges)[jj], &from, &to);
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
                 yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
-                dist = sqrt(xd * xd + yd * yd);
+                dist = hypot(xd, yd);
                 if (dist != 0) {
                     xd /= dist;
                     yd /= dist;
@@ -290,7 +290,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                                        MATRIX(*res, nei, 0);
                     igraph_real_t yd = MATRIX(*res, vid, 1) -
                                        MATRIX(*res, nei, 1);
-                    igraph_real_t dist = sqrt(xd * xd + yd * yd);
+                    igraph_real_t dist = hypot(xd, yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
                         pairs++;
@@ -315,7 +315,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 long int vvid = VECTOR(vids)[jj];
                 igraph_real_t fx = VECTOR(forcex)[vvid];
                 igraph_real_t fy = VECTOR(forcey)[vvid];
-                igraph_real_t ded = sqrt(fx * fx + fy * fy);
+                igraph_real_t ded = hypot(fx, fy);
                 if (ded > t) {
                     ded = t / ded;
                     fx *= ded; fy *= ded;

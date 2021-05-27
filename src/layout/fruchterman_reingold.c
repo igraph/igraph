@@ -144,7 +144,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
-            igraph_real_t dlen = sqrt(dx * dx + dy * dy) * w;
+            igraph_real_t dlen = hypot(dx, dy) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);
             VECTOR(dispx)[u] += (dx * dlen);
@@ -156,7 +156,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
         for (v = 0; v < no_nodes; v++) {
             igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+            igraph_real_t displen = hypot(dx, dy);
             igraph_real_t mx = fabs(dx) < temp ? dx : temp;
             igraph_real_t my = fabs(dy) < temp ? dy : temp;
             if (displen > 0) {
@@ -278,7 +278,7 @@ static int igraph_layout_i_grid_fr(
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
-            igraph_real_t dlen = sqrt(dx * dx + dy * dy) * w;
+            igraph_real_t dlen = hypot(dx, dy) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);
             VECTOR(dispx)[u] += (dx * dlen);
@@ -289,7 +289,7 @@ static int igraph_layout_i_grid_fr(
         for (v = 0; v < no_nodes; v++) {
             igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+            igraph_real_t displen = hypot(dx, dy);
             igraph_real_t mx = fabs(dx) < temp ? dx : temp;
             igraph_real_t my = fabs(dy) < temp ? dy : temp;
             if (displen > 0) {

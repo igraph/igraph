@@ -45,8 +45,7 @@ int main () {
     igraph_i_layout_sphere_2d(&m, &x, &y, &r);
 
     for (i = 0; i < igraph_matrix_nrow(&m); i++) {
-        igraph_real_t dist = sqrt((MATRIX(m, i, 0) - x) * (MATRIX(m, i, 0) - x) +
-                                  (MATRIX(m, i, 1) - y) * (MATRIX(m, i, 1) - y));
+        igraph_real_t dist = hypot(MATRIX(m, i, 0) - x, MATRIX(m, i, 1) - y);
         if (dist > r) {
             printf("x: %f y: %f r: %f\n", x, y, r);
             printf("x: %f y: %f dist: %f (%li)\n",

@@ -206,7 +206,7 @@ int igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
 
     *x = (xmin + xmax) / 2;
     *y = (ymin + ymax) / 2;
-    *r = sqrt( (xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) ) / 2;
+    *r = hypot(xmax - xmin, ymax - ymin) / 2;
 
     return 0;
 }

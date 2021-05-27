@@ -81,7 +81,7 @@ static igraph_real_t igraph_i_distance_between(
         long int a, long int b) {
     igraph_real_t diffx = MATRIX(*c, a, 0) - MATRIX(*c, b, 0);
     igraph_real_t diffy = MATRIX(*c, a, 1) - MATRIX(*c, b, 1);
-    return sqrt( diffx * diffx + diffy * diffy );
+    return hypot(diffx, diffy);
 }
 
 static int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
