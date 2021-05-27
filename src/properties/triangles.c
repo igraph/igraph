@@ -404,13 +404,15 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 /* This removes loop, multiple edges and edges that point
      "backwards" according to the rank vector. */
 /* Note: Also used in scan.c */
-int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_int_t *rank) {
     long int i;
     long int n = al->length;
     igraph_vector_int_t mark;
-    igraph_vector_int_init(&mark, n);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&mark, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         int j, l = igraph_vector_int_size(v);
@@ -431,7 +433,8 @@ int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
 
     igraph_vector_int_destroy(&mark);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 
 }
 

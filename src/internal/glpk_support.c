@@ -107,7 +107,7 @@ void igraph_i_glp_delete_prob(glp_prob *p) {
     }
 }
 
-int igraph_i_glpk_check(int retval, const char* message) {
+igraph_error_t igraph_i_glpk_check(int retval, const char* message) {
     char* code = "none";
     char message_and_code[4096];
 

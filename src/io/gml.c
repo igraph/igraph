@@ -72,7 +72,7 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
 static int igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_real_t *result) {
 
     igraph_real_t value = 0.0;
-    int type = igraph_gml_tree_type(node, pos);
+    igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
 
     switch (type) {
     case IGRAPH_I_GML_TREE_INTEGER:
@@ -92,7 +92,7 @@ static int igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_rea
 
 static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
 
-    int type = igraph_gml_tree_type(node, pos);
+    igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
     static char tmp[256];
     const char *p = tmp;
     long int i;
@@ -279,7 +279,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (trieid == triesize) {
                     /* new attribute */
                     igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-                    int type = igraph_gml_tree_type(node, j);
+                    igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, j);
                     if (!atrec) {
                         IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
                     }
@@ -294,7 +294,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     /* already seen, should we update type? */
                     igraph_attribute_record_t *atrec = VECTOR(vattrs)[trieid];
                     int type1 = atrec->type;
-                    int type2 = igraph_gml_tree_type(node, j);
+                    igraph_i_gml_tree_type_t type2 = igraph_gml_tree_type(node, j);
                     if (type1 == IGRAPH_ATTRIBUTE_NUMERIC && type2 == IGRAPH_I_GML_TREE_STRING) {
                         atrec->type = IGRAPH_ATTRIBUTE_STRING;
                     }
@@ -343,7 +343,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     if (trieid == triesize) {
                         /* new attribute */
                         igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-                        int type = igraph_gml_tree_type(edge, j);
+                        igraph_i_gml_tree_type_t type = igraph_gml_tree_type(edge, j);
                         if (!atrec) {
                             IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
                         }
@@ -358,7 +358,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         /* already seen, should we update type? */
                         igraph_attribute_record_t *atrec = VECTOR(eattrs)[trieid];
                         int type1 = atrec->type;
-                        int type2 = igraph_gml_tree_type(edge, j);
+                        igraph_i_gml_tree_type_t type2 = igraph_gml_tree_type(edge, j);
                         if (type1 == IGRAPH_ATTRIBUTE_NUMERIC && type2 == IGRAPH_I_GML_TREE_STRING) {
                             atrec->type = IGRAPH_ATTRIBUTE_STRING;
                         }
