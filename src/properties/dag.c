@@ -59,7 +59,7 @@
  *
  * \example examples/simple/igraph_topological_sorting.c
  */
-int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
+igraph_error_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
                                igraph_neimode_t mode) {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t degrees, neis;
@@ -140,7 +140,7 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
  * \sa \ref igraph_topological_sorting() to get a possible topological
  *     sorting of a DAG.
  */
-int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
+igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t degrees, neis;
     igraph_dqueue_t sources;
@@ -205,7 +205,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
    This is fairly simple, we just collect all ancestors of a vertex
    using a depth-first search.
  */
-int igraph_transitive_closure_dag(const igraph_t *graph,
+igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
                                   igraph_t *closure) {
 
     long int no_of_nodes = igraph_vcount(graph);

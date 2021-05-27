@@ -46,7 +46,7 @@
  * \example examples/simple/igraph_simplify.c
  */
 
-int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
+igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                     igraph_bool_t loops,
                     const igraph_attribute_combination_t *edge_comb) {
 

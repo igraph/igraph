@@ -96,7 +96,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
-int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                            igraph_strvector_t *predefnames,
                            igraph_bool_t names,
                            igraph_add_weights_t weights,
@@ -234,7 +234,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  *
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
  */
-int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                             const char *names, const char *weights) {
     igraph_eit_t it;
     igraph_attribute_type_t nametype, weighttype;

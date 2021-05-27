@@ -181,7 +181,7 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
  *
  * \example examples/simple/gml.c
  */
-int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
+igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     long int i, p;
     long int no_of_nodes = 0, no_of_edges = 0;
@@ -593,7 +593,7 @@ static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
  * \example examples/simple/gml.c
  */
 
-int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                            const igraph_vector_t *id, const char *creator) {
     int ret;
     igraph_strvector_t gnames, vnames, enames;

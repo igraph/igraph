@@ -55,7 +55,7 @@
  *
  * Time complexity: O(1).
  */
-int igraph_density(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
                    igraph_bool_t loops) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -120,7 +120,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V|+|E|), linear.
  *
  */
-int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
     int no_of_nodes = igraph_vcount(graph);
@@ -235,7 +235,7 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
  *
  * \example examples/simple/igraph_reciprocity.c
  */
-int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                        igraph_bool_t ignore_loops,
                        igraph_reciprocity_t mode) {
 

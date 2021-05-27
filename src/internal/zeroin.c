@@ -89,7 +89,7 @@
 
 #define EPSILON DBL_EPSILON
 
-int igraph_zeroin(              /* An estimate of the root */
+igraph_error_t igraph_zeroin(              /* An estimate of the root */
     igraph_real_t *ax,          /* Left border | of the range   */
     igraph_real_t *bx,          /* Right border| the root is seeked*/
     igraph_real_t (*f)(igraph_real_t x, void *info),    /* Function under investigation */

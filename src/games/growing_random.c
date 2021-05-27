@@ -52,7 +52,7 @@
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
  */
-int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
                                igraph_integer_t m, igraph_bool_t directed,
                                igraph_bool_t citation) {
 

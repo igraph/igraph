@@ -572,7 +572,7 @@ static int igraph_i_microscopic_standard_tests(const igraph_t *graph,
  * \example examples/simple/igraph_deterministic_optimal_imitation.c
  */
 
-int igraph_deterministic_optimal_imitation(const igraph_t *graph,
+igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
         igraph_integer_t vid,
         igraph_optimal_t optimality,
         const igraph_vector_t *quantities,
@@ -725,7 +725,7 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
  * \endclist
  */
 
-int igraph_moran_process(const igraph_t *graph,
+igraph_error_t igraph_moran_process(const igraph_t *graph,
                          const igraph_vector_t *weights,
                          igraph_vector_t *quantities,
                          igraph_vector_t *strategies,
@@ -965,7 +965,7 @@ int igraph_moran_process(const igraph_t *graph,
  * \example examples/simple/igraph_roulette_wheel_imitation.c
  */
 
-int igraph_roulette_wheel_imitation(const igraph_t *graph,
+igraph_error_t igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     igraph_integer_t vid,
                                     igraph_bool_t islocal,
                                     const igraph_vector_t *quantities,
@@ -1129,7 +1129,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
  * \example examples/simple/igraph_stochastic_imitation.c
  */
 
-int igraph_stochastic_imitation(const igraph_t *graph,
+igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
                                 igraph_integer_t vid,
                                 igraph_imitate_algorithm_t algo,
                                 const igraph_vector_t *quantities,

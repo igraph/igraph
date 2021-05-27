@@ -91,7 +91,7 @@
  * Time complexity: O(1).
  */
 
-int igraph_vs_all(igraph_vs_t *vs) {
+igraph_error_t igraph_vs_all(igraph_vs_t *vs) {
     vs->type = IGRAPH_VS_ALL;
     return 0;
 }
@@ -148,7 +148,7 @@ igraph_vs_t igraph_vss_all(void) {
  * Time complexity: O(1).
  */
 
-int igraph_vs_adj(igraph_vs_t *vs,
+igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
                   igraph_integer_t vid, igraph_neimode_t mode) {
     vs->type = IGRAPH_VS_ADJ;
     vs->data.adj.vid = vid;
@@ -193,7 +193,7 @@ int igraph_vs_adj(igraph_vs_t *vs,
  * \example examples/simple/igraph_vs_nonadj.c
  */
 
-int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
+igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
                      igraph_neimode_t mode) {
     vs->type = IGRAPH_VS_NONADJ;
     vs->data.adj.vid = vid;
@@ -214,7 +214,7 @@ int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
  * Time complexity: O(1).
  */
 
-int igraph_vs_none(igraph_vs_t *vs) {
+igraph_error_t igraph_vs_none(igraph_vs_t *vs) {
     vs->type = IGRAPH_VS_NONE;
     return 0;
 }
@@ -251,7 +251,7 @@ igraph_vs_t igraph_vss_none(void) {
  * Time complexity: O(1).
  */
 
-int igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
+igraph_error_t igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
     vs->type = IGRAPH_VS_1;
     vs->data.vid = vid;
     return 0;
@@ -299,7 +299,7 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * \example examples/simple/igraph_vs_vector.c
  */
 
-int igraph_vs_vector(igraph_vs_t *vs,
+igraph_error_t igraph_vs_vector(igraph_vs_t *vs,
                      const igraph_vector_t *v) {
     vs->type = IGRAPH_VS_VECTORPTR;
     vs->data.vecptr = v;
@@ -351,7 +351,7 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
  * Time complexity: O(n), the number of vertex ids supplied.
  */
 
-int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
+igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
     va_list ap;
     long int i, n = 0;
     vs->type = IGRAPH_VS_VECTOR;
@@ -402,7 +402,7 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
  * Time complexity: O(1).
  */
 
-int igraph_vs_vector_copy(igraph_vs_t *vs,
+igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs,
                           const igraph_vector_t *v) {
     vs->type = IGRAPH_VS_VECTOR;
     vs->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
@@ -436,7 +436,7 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
  * \example examples/simple/igraph_vs_seq.c
  */
 
-int igraph_vs_seq(igraph_vs_t *vs,
+igraph_error_t igraph_vs_seq(igraph_vs_t *vs,
                   igraph_integer_t from, igraph_integer_t to) {
     vs->type = IGRAPH_VS_SEQ;
     vs->data.seq.from = from;
@@ -523,7 +523,7 @@ igraph_bool_t igraph_vs_is_all(const igraph_vs_t *vs) {
     return vs->type == IGRAPH_VS_ALL;
 }
 
-int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
+igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
                         igraph_vector_t *v) {
     igraph_vit_t vit;
 
@@ -542,7 +542,7 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
  * \param src The selector being copied.
  * \param dest An uninitialized selector that will contain the copy.
  */
-int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
+igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     memcpy(dest, src, sizeof(igraph_vs_t));
     switch (dest->type) {
     case IGRAPH_VS_VECTOR:
@@ -575,7 +575,7 @@ int igraph_vs_type(const igraph_vs_t *vs) {
  * \param graph The graph over which we will iterate.
  * \param result The result will be returned here.
  */
-int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
+igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
                    igraph_integer_t *result) {
     igraph_vector_t vec;
     igraph_bool_t *seen;
@@ -671,7 +671,7 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * \ref igraph_vs_nonadj(), |V| is the number of vertices in the graph.
  */
 
-int igraph_vit_create(const igraph_t *graph,
+igraph_error_t igraph_vit_create(const igraph_t *graph,
                       igraph_vs_t vs, igraph_vit_t *vit) {
     igraph_vector_t vec;
     igraph_bool_t *seen;
@@ -803,7 +803,7 @@ void igraph_vit_destroy(const igraph_vit_t *vit) {
     }
 }
 
-int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
+igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
 
     long int i;
 
@@ -853,7 +853,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
  * Time complexity: O(1).
  */
 
-int igraph_es_all(igraph_es_t *es,
+igraph_error_t igraph_es_all(igraph_es_t *es,
                   igraph_edgeorder_type_t order) {
     switch (order) {
     case IGRAPH_EDGEORDER_ID:
@@ -910,7 +910,7 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  * Time complexity: O(1).
  */
 
-int igraph_es_incident(igraph_es_t *es,
+igraph_error_t igraph_es_incident(igraph_es_t *es,
                        igraph_integer_t vid, igraph_neimode_t mode) {
     es->type = IGRAPH_ES_INCIDENT;
     es->data.incident.vid = vid;
@@ -930,7 +930,7 @@ int igraph_es_incident(igraph_es_t *es,
  * Time complexity: O(1).
  */
 
-int igraph_es_none(igraph_es_t *es) {
+igraph_error_t igraph_es_none(igraph_es_t *es) {
     es->type = IGRAPH_ES_NONE;
     return 0;
 }
@@ -966,7 +966,7 @@ igraph_es_t igraph_ess_none(void) {
  * Time complexity: O(1).
  */
 
-int igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
+igraph_error_t igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
     es->type = IGRAPH_ES_1;
     es->data.eid = eid;
     return 0;
@@ -1009,7 +1009,7 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  * Time complexity: O(1).
  */
 
-int igraph_es_vector(igraph_es_t *es,
+igraph_error_t igraph_es_vector(igraph_es_t *es,
                      const igraph_vector_t *v) {
     es->type = IGRAPH_ES_VECTORPTR;
     es->data.vecptr = v;
@@ -1036,7 +1036,7 @@ int igraph_es_vector(igraph_es_t *es,
  * Time complexity: O(1).
  */
 
-int igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v) {
+igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v) {
     es->type = IGRAPH_ES_VECTOR;
     es->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
     if (es->data.vecptr == 0) {
@@ -1088,7 +1088,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * Time complexity: O(1).
  */
 
-int igraph_es_fromto(igraph_es_t *es,
+igraph_error_t igraph_es_fromto(igraph_es_t *es,
                      igraph_vs_t from, igraph_vs_t to) {
 
     IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
@@ -1113,7 +1113,7 @@ int igraph_es_fromto(igraph_es_t *es,
  * Time complexity: O(1).
  */
 
-int igraph_es_seq(igraph_es_t *es,
+igraph_error_t igraph_es_seq(igraph_es_t *es,
                   igraph_integer_t from, igraph_integer_t to) {
     es->type = IGRAPH_ES_SEQ;
     es->data.seq.from = from;
@@ -1163,7 +1163,7 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
  * \example examples/simple/igraph_es_pairs.c
  */
 
-int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
+igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
                     igraph_bool_t directed) {
     es->type = IGRAPH_ES_PAIRS;
     es->data.path.mode = directed;
@@ -1198,7 +1198,7 @@ int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
  * Time complexity: O(n), the number of edges being selected.
  */
 
-int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     va_list ap;
     long int i, n = 0;
     es->type = IGRAPH_ES_PAIRS;
@@ -1231,7 +1231,7 @@ int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     return 0;
 }
 
-int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
+igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
                          igraph_bool_t directed) {
     es->type = IGRAPH_ES_MULTIPAIRS;
     es->data.path.mode = directed;
@@ -1265,7 +1265,7 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
  *
  * Time complexity: O(n), the number of vertices.
  */
-int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v,
+igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_t *v,
                    igraph_bool_t directed) {
     es->type = IGRAPH_ES_PATH;
     es->data.path.mode = directed;
@@ -1281,7 +1281,7 @@ int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v,
     return 0;
 }
 
-int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     va_list ap;
     long int i, n = 0;
     es->type = IGRAPH_ES_PATH;
@@ -1376,7 +1376,7 @@ igraph_bool_t igraph_es_is_all(const igraph_es_t *es) {
  * \param dest An uninitialized selector that will contain the copy.
  * \sa \ref igraph_es_destroy()
  */
-int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
+igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     memcpy(dest, src, sizeof(igraph_es_t));
     switch (dest->type) {
     case IGRAPH_ES_VECTOR:
@@ -1416,7 +1416,7 @@ int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
  *
  * Time complexity: O(n), the number of edges in the selector.
  */
-int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
+igraph_error_t igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
                         igraph_vector_t *v) {
     igraph_eit_t eit;
 
@@ -1454,7 +1454,7 @@ static int igraph_i_es_multipairs_size(const igraph_t *graph,
  * \param graph The graph over which we will iterate.
  * \param result The result will be returned here.
  */
-int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
+igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
                    igraph_integer_t *result) {
     igraph_vector_t v;
 
@@ -1792,7 +1792,7 @@ static int igraph_i_eit_path(const igraph_t *graph,
  * incident edges of the vertex.
  */
 
-int igraph_eit_create(const igraph_t *graph,
+igraph_error_t igraph_eit_create(const igraph_t *graph,
                       igraph_es_t es, igraph_eit_t *eit) {
     switch (es.type) {
     case IGRAPH_ES_ALL:
@@ -1904,7 +1904,7 @@ void igraph_eit_destroy(const igraph_eit_t *eit) {
     }
 }
 
-int igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v) {
+igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v) {
 
     long int i;
 

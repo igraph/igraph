@@ -77,7 +77,7 @@
  * \example examples/simple/igraph_community_optimal_modularity.c
  */
 
-int igraph_community_optimal_modularity(const igraph_t *graph,
+igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
                                         igraph_real_t *modularity,
                                         igraph_vector_t *membership,
                                         const igraph_vector_t *weights) {

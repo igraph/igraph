@@ -175,7 +175,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  *
  */
 
-int igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
+igraph_error_t igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
     if (n < 2) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
         return IGRAPH_SUCCESS;

@@ -66,7 +66,7 @@
  *
  */
 
-int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                         const igraph_vector_t *weights,
                         igraph_neimode_t mode) {
     if (weights) {
@@ -358,7 +358,7 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
  *
  */
 
-int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
 
@@ -439,7 +439,7 @@ static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them
  *
  */
 
-int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
                              igraph_vector_t *res,
                              const igraph_vector_t *weights_them,
                              igraph_neimode_t mode) {
@@ -486,7 +486,7 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
  * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
  */
 
-int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
                                     igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
@@ -596,7 +596,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
  *
  */
 
-int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
+igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, int k,
                                igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
@@ -692,7 +692,7 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
  * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
  */
 
-int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
                                     int k, igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
@@ -815,7 +815,7 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
  * \return Error code.
  */
 
-int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
         const igraph_vector_ptr_t *neighborhoods) {

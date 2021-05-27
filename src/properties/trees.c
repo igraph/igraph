@@ -54,7 +54,7 @@
  * Time complexity: O(n+m), linear in the number vertices and edges.
  *
  */
-int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
+igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                        igraph_neimode_t mode, const igraph_vector_t *roots,
                        igraph_vector_t *vertex_index) {
 
@@ -243,7 +243,7 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
  *
  * \example examples/simple/igraph_tree.c
  */
-int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
     igraph_adjlist_t al;
     igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;

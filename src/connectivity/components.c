@@ -74,7 +74,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
  * edges in the graph.
  */
 
-int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
+igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
                     igraph_vector_t *csize, igraph_integer_t *no,
                     igraph_connectedness_t mode) {
     if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
@@ -356,7 +356,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  * plus the number of edges in the graph.
  */
 
-int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
+igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                         igraph_connectedness_t mode) {
     if (igraph_vcount(graph) == 0) {
         /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1538
@@ -516,7 +516,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
  * \example examples/simple/igraph_decompose.c
  */
 
-int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
+igraph_error_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
                      igraph_connectedness_t mode,
                      long int maxcompno, long int minelements) {
     if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
@@ -847,7 +847,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
  * \sa \ref igraph_biconnected_components(), \ref igraph_clusters(), \ref igraph_bridges()
  */
 
-int igraph_articulation_points(const igraph_t *graph,
+igraph_error_t igraph_articulation_points(const igraph_t *graph,
                                igraph_vector_t *res) {
 
     igraph_integer_t no;
@@ -923,7 +923,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * \example examples/simple/igraph_biconnected_components.c
  */
 
-int igraph_biconnected_components(const igraph_t *graph,
+igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                   igraph_integer_t *no,
                                   igraph_vector_ptr_t *tree_edges,
                                   igraph_vector_ptr_t *component_edges,
@@ -1213,7 +1213,7 @@ static int igraph_i_bridges_rec(
  * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(), \ref igraph_clusters()
  */
 
-int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
+igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     igraph_inclist_t il;
     igraph_vector_bool_t visited;
     igraph_vector_int_t disc, low;
@@ -1302,7 +1302,7 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
  * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
  * a given set of vertices and the edges between them.
  */
-int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vertex,
+igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vertex,
                         igraph_neimode_t mode) {
 
     long int no_of_nodes = igraph_vcount(graph);

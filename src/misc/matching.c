@@ -83,7 +83,7 @@ static void debug(const char* fmt, ...) {
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-int igraph_is_matching(const igraph_t* graph,
+igraph_error_t igraph_is_matching(const igraph_t* graph,
                        const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
                        igraph_bool_t* result) {
     long int i, j, no_of_nodes = igraph_vcount(graph);
@@ -165,7 +165,7 @@ int igraph_is_matching(const igraph_t* graph,
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-int igraph_is_maximal_matching(const igraph_t* graph,
+igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
                                const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
                                igraph_bool_t* result) {
     long int i, j, n, no_of_nodes = igraph_vcount(graph);
@@ -280,7 +280,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-int igraph_maximum_bipartite_matching(const igraph_t* graph,
+igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* graph,
                                       const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
                                       igraph_real_t* matching_weight, igraph_vector_long_t* matching,
                                       const igraph_vector_t* weights, igraph_real_t eps) {
@@ -1015,7 +1015,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
-int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
+igraph_error_t igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
                             igraph_real_t* matching_weight, igraph_vector_long_t* matching,
                             const igraph_vector_t* weights) {
     IGRAPH_UNUSED(graph);

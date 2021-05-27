@@ -80,7 +80,7 @@ static int igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
  *
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
-int igraph_minimum_spanning_tree(const igraph_t* graph,
+igraph_error_t igraph_minimum_spanning_tree(const igraph_t* graph,
                                  igraph_vector_t* res, const igraph_vector_t* weights) {
     if (weights == 0) {
         IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, res));
@@ -126,7 +126,7 @@ int igraph_minimum_spanning_tree(const igraph_t* graph,
  *     edges that constitute the spanning tree.
  */
 
-int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
+igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
         igraph_t *mst) {
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
 
@@ -190,7 +190,7 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
+igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
                                       const igraph_vector_t *weights) {
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
 
@@ -450,7 +450,7 @@ static int igraph_i_lerw(const igraph_t *graph, igraph_vector_t *res, igraph_int
  * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_random_walk()
  *
  */
-int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res, igraph_integer_t vid) {
+igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res, igraph_integer_t vid) {
     igraph_inclist_t il;
     igraph_vector_bool_t visited;
     igraph_integer_t vcount = igraph_vcount(graph);

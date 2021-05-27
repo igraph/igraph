@@ -81,7 +81,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
  *
  * Time complexity: depends on \p algo, see the time complexities there.
  */
-int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
                             const igraph_vector_t *weights, igraph_fas_algorithm_t algo) {
 
     if (weights && igraph_vector_size(weights) < igraph_ecount(graph))

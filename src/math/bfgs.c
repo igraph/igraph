@@ -39,8 +39,7 @@
 in J.C. Nash, `Compact Numerical Methods for Computers', 2nd edition,
 converted by p2c then re-crafted by B.D. Ripley */
 
-int
-igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
+igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
             igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
             int maxit, int trace,
             igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,

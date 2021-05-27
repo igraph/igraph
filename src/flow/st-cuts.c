@@ -82,7 +82,7 @@ typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
  * \example examples/simple/even_tarjan.c
  */
 
-int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
+igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
                                  igraph_vector_t *capacity) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -179,7 +179,7 @@ static int igraph_i_residual_graph(const igraph_t *graph,
     return 0;
 }
 
-int igraph_residual_graph(const igraph_t *graph,
+igraph_error_t igraph_residual_graph(const igraph_t *graph,
                           const igraph_vector_t *capacity,
                           igraph_t *residual,
                           igraph_vector_t *residual_capacity,
@@ -249,7 +249,7 @@ static int igraph_i_reverse_residual_graph(const igraph_t *graph,
     return 0;
 }
 
-int igraph_reverse_residual_graph(const igraph_t *graph,
+igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
                                   const igraph_vector_t *capacity,
                                   igraph_t *residual,
                                   const igraph_vector_t *flow) {
@@ -419,7 +419,7 @@ static long int igraph_i_dominator_EVAL(long int v,
  * \example examples/simple/dominator_tree.c
  */
 
-int igraph_dominator_tree(const igraph_t *graph,
+igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                           igraph_integer_t root,
                           igraph_vector_t *dom,
                           igraph_t *domtree,
@@ -1024,7 +1024,7 @@ int igraph_provan_shier_list(const igraph_t *graph,
  * vertices, |E| is the number of edges, and n is the number of cuts.
  */
 
-int igraph_all_st_cuts(const igraph_t *graph,
+igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
                        igraph_vector_ptr_t *cuts,
                        igraph_vector_ptr_t *partition1s,
                        igraph_integer_t source,
@@ -1358,7 +1358,7 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \example examples/simple/igraph_all_st_mincuts.c
  */
 
-int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
+igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
                           igraph_vector_ptr_t *cuts,
                           igraph_vector_ptr_t *partition1s,
                           igraph_integer_t source,

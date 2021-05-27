@@ -604,7 +604,7 @@ static int igraph_i_community_multilevel_step(
  * \example examples/simple/igraph_community_multilevel.c
  */
 
-int igraph_community_multilevel(const igraph_t *graph,
+igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                 const igraph_vector_t *weights,
                                 const igraph_real_t resolution,
                                 igraph_vector_t *membership,

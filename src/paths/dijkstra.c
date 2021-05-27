@@ -77,7 +77,7 @@
  *
  * \example examples/simple/dijkstra.c
  */
-int igraph_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
@@ -310,7 +310,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *
  * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
  */
-int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        igraph_vector_ptr_t *vertices,
                                        igraph_vector_ptr_t *edges,
                                        igraph_integer_t from,
@@ -576,7 +576,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  * more target vertices.
  */
 
-int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
                                       igraph_vector_t *vertices,
                                       igraph_vector_t *edges,
                                       igraph_integer_t from,
@@ -702,7 +702,7 @@ static int igraph_i_vector_tail_cmp(const void* a, const void* b) {
  *
  * \example examples/simple/igraph_get_all_shortest_paths_dijkstra.c
  */
-int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         igraph_vector_ptr_t *vertices,
         igraph_vector_ptr_t *edges,
         igraph_vector_t *nrgeo,

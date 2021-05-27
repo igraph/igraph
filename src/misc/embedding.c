@@ -855,7 +855,7 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
  *
  */
 
-int igraph_adjacency_spectral_embedding(const igraph_t *graph,
+igraph_error_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
                                         igraph_integer_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
@@ -1053,7 +1053,7 @@ static int igraph_i_lse_dir(const igraph_t *graph,
  * matrix.
  */
 
-int igraph_laplacian_spectral_embedding(const igraph_t *graph,
+igraph_error_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                         igraph_integer_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
@@ -1108,7 +1108,7 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
  * \sa \ref igraph_adjacency_spectral_embedding().
  */
 
-int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
+igraph_error_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
 
     int i, n = igraph_vector_size(sv);
     igraph_real_t x, x2, sum1 = 0.0, sum2 = igraph_vector_sum(sv);

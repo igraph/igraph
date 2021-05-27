@@ -130,7 +130,7 @@ void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
  * \example examples/simple/foreign.c
  */
 
-int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
+igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_vector_t edges;
     igraph_trie_t vattrnames;
@@ -413,7 +413,7 @@ static int igraph_i_pajek_escape(char* src, char** dest) {
  * \example examples/simple/igraph_write_graph_pajek.c
  */
 
-int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
+igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
     long int no_of_nodes = igraph_vcount(graph);
     long int i, j;
 

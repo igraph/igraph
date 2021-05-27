@@ -113,7 +113,7 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * Time complexity: O(n^2) for simple directed graphs, O(n log n) for graphs with self-loops,
  * and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
-int igraph_is_graphical(const igraph_vector_t *out_degrees,
+igraph_error_t igraph_is_graphical(const igraph_vector_t *out_degrees,
                         const igraph_vector_t *in_degrees,
                         const igraph_edge_type_sw_t allowed_edge_types,
                         igraph_bool_t *res)
@@ -216,7 +216,7 @@ int igraph_is_graphical(const igraph_vector_t *out_degrees,
  * Time complexity: O(n log n) for simple graphs, O(n) for multigraphs,
  * where n is the length of the larger degree sequence.
  */
-int igraph_is_bigraphical(const igraph_vector_t *degrees1,
+igraph_error_t igraph_is_bigraphical(const igraph_vector_t *degrees1,
                           const igraph_vector_t *degrees2,
                           const igraph_edge_type_sw_t allowed_edge_types,
                           igraph_bool_t *res)

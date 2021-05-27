@@ -549,7 +549,7 @@ static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igrap
  * \example examples/simple/eigenvector_centrality.c
  */
 
-int igraph_eigenvector_centrality(const igraph_t *graph,
+igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_vector_t *vector,
                                   igraph_real_t *value,
                                   igraph_bool_t directed, igraph_bool_t scale,
@@ -853,7 +853,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
 
-int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
+igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
                      igraph_real_t *value, igraph_bool_t scale,
                      const igraph_vector_t *weights,
                      igraph_arpack_options_t *options) {
@@ -899,7 +899,7 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
 
-int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
+igraph_error_t igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
                            igraph_real_t *value, igraph_bool_t scale,
                            const igraph_vector_t *weights,
                            igraph_arpack_options_t *options) {
@@ -1126,7 +1126,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \example examples/simple/igraph_pagerank.c
  */
 
-int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
                     igraph_vector_t *vector,
                     igraph_real_t *value, const igraph_vs_t vids,
                     igraph_bool_t directed, igraph_real_t damping,
@@ -1198,7 +1198,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * \sa \ref igraph_pagerank() for the non-personalized implementation.
  */
 
-int igraph_personalized_pagerank_vs(const igraph_t *graph,
+igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
                                     igraph_pagerank_algo_t algo, igraph_vector_t *vector,
                                     igraph_real_t *value, const igraph_vs_t vids,
                                     igraph_bool_t directed, igraph_real_t damping,
@@ -1289,7 +1289,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \ref igraph_personalized_pagerank_vs() for a personalized implementation
  * with resetting to specific vertices.
  */
-int igraph_personalized_pagerank(const igraph_t *graph,
+igraph_error_t igraph_personalized_pagerank(const igraph_t *graph,
                                  igraph_pagerank_algo_t algo, igraph_vector_t *vector,
                                  igraph_real_t *value, const igraph_vs_t vids,
                                  igraph_bool_t directed, igraph_real_t damping,

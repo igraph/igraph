@@ -101,7 +101,7 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
  * case.
  */
 
-int igraph_get_all_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
                                   igraph_vector_ptr_t *vertices,
                                   igraph_vector_ptr_t *edges,
                                   igraph_vector_t *nrgeo,

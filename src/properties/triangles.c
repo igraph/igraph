@@ -75,7 +75,7 @@
  * graph and d is the average degree.
  */
 
-int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
+igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         igraph_real_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -179,7 +179,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_transitivity_local_undirected1(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -191,7 +191,7 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_transitivity_local_undirected2(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -435,7 +435,7 @@ int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
 
 }
 
-int igraph_transitivity_local_undirected4(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -484,7 +484,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  * the transitivity is calculated, d is the average vertex degree.
  */
 
-int igraph_transitivity_local_undirected(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -546,7 +546,7 @@ static int igraph_adjacent_triangles4(const igraph_t *graph,
  * queried vertices, n is their number.
  */
 
-int igraph_adjacent_triangles(const igraph_t *graph,
+igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
                               igraph_vector_t *res,
                               const igraph_vs_t vids) {
     if (igraph_vs_is_all(&vids)) {
@@ -576,7 +576,7 @@ int igraph_adjacent_triangles(const igraph_t *graph,
  * of vertices.
  */
 
-int igraph_list_triangles(const igraph_t *graph,
+igraph_error_t igraph_list_triangles(const igraph_t *graph,
                           igraph_vector_int_t *res) {
 # define TRIANGLES
 # include "properties/triangles_template.h"
@@ -628,7 +628,7 @@ int igraph_list_triangles(const igraph_t *graph,
  * \example examples/simple/igraph_transitivity.c
  */
 
-int igraph_transitivity_undirected(const igraph_t *graph,
+igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
 
@@ -988,7 +988,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
  * (non-weighted) transitivity.
  */
 
-int igraph_transitivity_barrat(const igraph_t *graph,
+igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
                                igraph_vector_t *res,
                                const igraph_vs_t vids,
                                const igraph_vector_t *weights,

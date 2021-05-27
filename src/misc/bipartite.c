@@ -86,7 +86,7 @@
  * \example examples/simple/igraph_bipartite_projection.c
  */
 
-int igraph_bipartite_projection_size(const igraph_t *graph,
+igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
                                      const igraph_vector_bool_t *types,
                                      igraph_integer_t *vcount1,
                                      igraph_integer_t *ecount1,
@@ -318,7 +318,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
  * \example examples/simple/igraph_bipartite_projection.c
  */
 
-int igraph_bipartite_projection(const igraph_t *graph,
+igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                 const igraph_vector_bool_t *types,
                                 igraph_t *proj1,
                                 igraph_t *proj2,
@@ -407,7 +407,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
  * \sa \ref igraph_full() for non-bipartite full graphs.
  */
 
-int igraph_full_bipartite(igraph_t *graph,
+igraph_error_t igraph_full_bipartite(igraph_t *graph,
                           igraph_vector_bool_t *types,
                           igraph_integer_t n1, igraph_integer_t n2,
                           igraph_bool_t directed,
@@ -505,7 +505,7 @@ int igraph_full_bipartite(igraph_t *graph,
  * \example examples/simple/igraph_bipartite_create.c
  */
 
-int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
+igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
                             const igraph_vector_t *edges,
                             igraph_bool_t directed) {
 
@@ -588,7 +588,7 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
  * Time complexity: O(n*m), the size of the incidence matrix.
  */
 
-int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
                      const igraph_matrix_t *incidence,
                      igraph_bool_t directed,
                      igraph_neimode_t mode, igraph_bool_t multiple) {
@@ -709,7 +709,7 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  * \sa \ref igraph_incidence() for the opposite operation.
  */
 
-int igraph_get_incidence(const igraph_t *graph,
+igraph_error_t igraph_get_incidence(const igraph_t *graph,
                          const igraph_vector_bool_t *types,
                          igraph_matrix_t *res,
                          igraph_vector_t *row_ids,
@@ -814,7 +814,7 @@ int igraph_get_incidence(const igraph_t *graph,
  * edges.
  */
 
-int igraph_is_bipartite(const igraph_t *graph,
+igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                         igraph_bool_t *res,
                         igraph_vector_bool_t *types) {
 
@@ -891,7 +891,7 @@ int igraph_is_bipartite(const igraph_t *graph,
     return 0;
 }
 
-int igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_integer_t n1, igraph_integer_t n2,
                               igraph_real_t p, igraph_bool_t directed,
                               igraph_neimode_t mode) {
@@ -982,7 +982,7 @@ int igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
     return retval;
 }
 
-int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_integer_t n1, igraph_integer_t n2,
                               igraph_integer_t m, igraph_bool_t directed,
                               igraph_neimode_t mode) {
@@ -1128,7 +1128,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
  * edges.
  */
 
-int igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
                           igraph_erdos_renyi_t type,
                           igraph_integer_t n1, igraph_integer_t n2,
                           igraph_real_t p, igraph_integer_t m,

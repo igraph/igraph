@@ -79,7 +79,7 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
  * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
  */
-int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
+igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
     igraph_vector_int_t triangles, support;
     igraph_vector_t eid, unpacked_triangles;
     igraph_bool_t is_multigraph;

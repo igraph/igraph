@@ -92,7 +92,7 @@ static void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs
  * \ref igraph_establishment_game(), \ref igraph_callaway_traits_game()
  */
 
-int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                            igraph_integer_t types,
                            const igraph_vector_t *type_dist,
                            igraph_bool_t fixed_sizes,
@@ -391,7 +391,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * \sa \ref igraph_preference_game()
  */
 
-int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
                                       igraph_integer_t out_types,
                                       igraph_integer_t in_types,
                                       const igraph_matrix_t *type_dist_matrix,

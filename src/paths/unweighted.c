@@ -75,7 +75,7 @@
  * \sa \ref igraph_get_shortest_paths() to get the paths themselves,
  * \ref igraph_shortest_paths_dijkstra() for the weighted version.
  */
-int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
                           const igraph_vs_t from, const igraph_vs_t to,
                           igraph_neimode_t mode) {
 
@@ -266,7 +266,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_get_shortest_paths.c
  */
-int igraph_get_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                               igraph_vector_ptr_t *vertices,
                               igraph_vector_ptr_t *edges,
                               igraph_integer_t from, const igraph_vs_t to,
@@ -498,7 +498,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
  * vertices.
  */
 
-int igraph_get_shortest_path(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
                              igraph_vector_t *vertices,
                              igraph_vector_t *edges,
                              igraph_integer_t from,

@@ -50,7 +50,7 @@
  * \sa \ref igraph_correlated_pair_game() for generating a pair
  * of correlated random graphs in one go.
  */
-int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
+igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
                            igraph_real_t corr, igraph_real_t p,
                            const igraph_vector_t *permutation) {
 
@@ -269,7 +269,7 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
  * \sa \ref igraph_correlated_game() for generating a correlated pair
  * to a given graph.
  */
-int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
+igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                                 igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
                                 igraph_bool_t directed,
                                 const igraph_vector_t *permutation) {

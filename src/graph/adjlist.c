@@ -124,7 +124,7 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
  * edges.
  */
 
-int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
+igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode, igraph_loops_t loops,
                         igraph_multiple_t multiple) {
     igraph_integer_t i;
@@ -185,7 +185,7 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  *
  * Time complexity: O(|V|), linear in the number of vertices.
  */
-int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
+igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
     long int i;
 
     al->length = no_of_nodes;
@@ -223,7 +223,7 @@ int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes
  *
  * Time complexity: O(|V|^2+|E|), quadratic in the number of vertices.
  */
-int igraph_adjlist_init_complementer(const igraph_t *graph,
+igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_adjlist_t *al,
                                      igraph_neimode_t mode,
                                      igraph_bool_t loops) {
@@ -423,7 +423,7 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
  * Time complexity: O(|V|+|E|), linear in the number of edges and
  * vertices.
  */
-int igraph_adjlist_simplify(igraph_adjlist_t *al) {
+igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     long int i;
     long int n = al->length;
     igraph_vector_int_t mark;
@@ -451,7 +451,7 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
     return 0;
 }
 
-int igraph_adjlist_remove_duplicate(const igraph_t *graph,
+igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
                                     igraph_adjlist_t *al) {
     long int i, j, l, n, p;
     igraph_vector_int_t *v;
@@ -486,7 +486,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
 }
 
 #ifndef USING_R
-int igraph_adjlist_print(const igraph_adjlist_t *al) {
+igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
     long int i;
     long int n = al->length;
     for (i = 0; i < n; i++) {
@@ -497,7 +497,7 @@ int igraph_adjlist_print(const igraph_adjlist_t *al) {
 }
 #endif
 
-int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
+igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
     long int i;
     long int n = al->length;
     for (i = 0; i < n; i++) {
@@ -525,7 +525,7 @@ igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t fro
 
 }
 
-int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
+igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
     igraph_vector_int_t *oldfromvec, *newfromvec;
     int err1, err2;
     long int oldpos, newpos;
@@ -625,7 +625,7 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
     return IGRAPH_SUCCESS;
 }
 
-int igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il) {
+igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il) {
     long int i, n;
 
     IGRAPH_WARNING(
@@ -649,7 +649,7 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il)
 }
 
 #ifndef USING_R
-int igraph_inclist_print(const igraph_inclist_t *al) {
+igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
     long int i;
     long int n = al->length;
     for (i = 0; i < n; i++) {
@@ -660,7 +660,7 @@ int igraph_inclist_print(const igraph_inclist_t *al) {
 }
 #endif
 
-int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
+igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
     long int i;
     long int n = al->length;
     for (i = 0; i < n; i++) {
@@ -707,7 +707,7 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-int igraph_inclist_init(const igraph_t *graph,
+igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_inclist_t *il,
                         igraph_neimode_t mode,
                         igraph_loops_t loops) {
@@ -773,7 +773,7 @@ int igraph_inclist_init(const igraph_t *graph,
  * Time complexity: O(|V|), linear in the number of vertices.
  */
 
-int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
+igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
     long int i;
 
     il->length = n;
@@ -968,7 +968,7 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  * depends on the underlying memory management too.
  */
 
-int igraph_lazy_adjlist_init(const igraph_t *graph,
+igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                              igraph_lazy_adjlist_t *al,
                              igraph_neimode_t mode,
                              igraph_loops_t loops,
@@ -1130,7 +1130,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
  * also depends on the underlying memory management.
  */
 
-int igraph_lazy_inclist_init(const igraph_t *graph,
+igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                              igraph_lazy_inclist_t *il,
                              igraph_neimode_t mode,
                              igraph_loops_t loops) {

@@ -55,7 +55,7 @@
  * of vertices for which the degree will be calculated, and d is their
  * (average) degree.
  */
-int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                      igraph_vs_t vids, igraph_neimode_t mode,
                      igraph_bool_t loops) {
 
@@ -249,7 +249,7 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  *
  * \example examples/simple/igraph_knn.c
  */
-int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
+igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
                                        igraph_vs_t vids,
                                        igraph_neimode_t mode,
                                        igraph_neimode_t neighbor_degree_mode,
@@ -374,7 +374,7 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *
  * \sa \ref igraph_degree() for the traditional, non-weighted version.
  */
-int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
                     const igraph_vs_t vids, igraph_neimode_t mode,
                     igraph_bool_t loops, const igraph_vector_t *weights) {
 
@@ -470,7 +470,7 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  */
-int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
+igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
                                      igraph_vector_t *outvids,
                                      igraph_vs_t vids,
                                      igraph_neimode_t mode,

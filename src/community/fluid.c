@@ -62,7 +62,7 @@
  *
  * \example examples/simple/igraph_community_fluid_communities.c
  */
-int igraph_community_fluid_communities(const igraph_t *graph,
+igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_integer_t no_of_communities,
                                        igraph_vector_t *membership,
                                        igraph_real_t *modularity) {

@@ -2964,7 +2964,7 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
  * Time complexity: O(v), where v is the number of vertices in 'vids'.
  */
 
-int igraph_cattribute_VANV(const igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
                            igraph_vs_t vids, igraph_vector_t *result) {
 
     return igraph_i_cattribute_get_numeric_vertex_attr(graph, name, vids,
@@ -2985,7 +2985,7 @@ int igraph_cattribute_VANV(const igraph_t *graph, const char *name,
  * Time complexity: O(v), where v is the number of vertices in 'vids'.
  */
 
-int igraph_cattribute_VABV(const igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
                            igraph_vs_t vids, igraph_vector_bool_t *result) {
 
     return igraph_i_cattribute_get_bool_vertex_attr(graph, name, vids,
@@ -3006,7 +3006,7 @@ int igraph_cattribute_VABV(const igraph_t *graph, const char *name,
  * Time complexity: O(e), where e is the number of edges in 'eids'.
  */
 
-int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const char *name,
                            igraph_es_t eids, igraph_vector_t *result) {
 
     return igraph_i_cattribute_get_numeric_edge_attr(graph, name, eids,
@@ -3027,7 +3027,7 @@ int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
  * Time complexity: O(e), where e is the number of edges in 'eids'.
  */
 
-int igraph_cattribute_EABV(const igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
                            igraph_es_t eids, igraph_vector_bool_t *result) {
 
     return igraph_i_cattribute_get_bool_edge_attr(graph, name, eids,
@@ -3049,7 +3049,7 @@ int igraph_cattribute_EABV(const igraph_t *graph, const char *name,
  * (We assume that the string attributes have a bounded length.)
  */
 
-int igraph_cattribute_VASV(const igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
                            igraph_vs_t vids, igraph_strvector_t *result) {
 
     return igraph_i_cattribute_get_string_vertex_attr(graph, name, vids,
@@ -3071,7 +3071,7 @@ int igraph_cattribute_VASV(const igraph_t *graph, const char *name,
  * 'eids'. (We assume that the string attributes have a bounded length.)
  */
 
-int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
                            igraph_es_t eids, igraph_strvector_t *result) {
 
     return igraph_i_cattribute_get_string_edge_attr(graph, name, eids,
@@ -3098,7 +3098,7 @@ int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
  *
  * Time complexity: O(Ag+Av+Ae), the number of all attributes.
  */
-int igraph_cattribute_list(const igraph_t *graph,
+igraph_error_t igraph_cattribute_list(const igraph_t *graph,
                            igraph_strvector_t *gnames, igraph_vector_t *gtypes,
                            igraph_strvector_t *vnames, igraph_vector_t *vtypes,
                            igraph_strvector_t *enames, igraph_vector_t *etypes) {
@@ -3139,7 +3139,7 @@ igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
  *
  * Time complexity: O(1).
  */
-int igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
                               igraph_real_t value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3197,7 +3197,7 @@ int igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
  *
  * Time complexity: O(1).
  */
-int igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
                               igraph_bool_t value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3257,7 +3257,7 @@ int igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
  *
  * Time complexity: O(1).
  */
-int igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
                               const char *value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3319,7 +3319,7 @@ int igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
  * Time complexity: O(n), the number of vertices if the attribute is
  * new, O(|vid|) otherwise.
  */
-int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
                               igraph_integer_t vid, igraph_real_t value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3382,7 +3382,7 @@ int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
  * Time complexity: O(n), the number of vertices if the attribute is
  * new, O(|vid|) otherwise.
  */
-int igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
                               igraph_integer_t vid, igraph_bool_t value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3447,7 +3447,7 @@ int igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
  * length of the string to set. If the attribute if not new then only
  * O(|vid|*l).
  */
-int igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
                               igraph_integer_t vid, const char *value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3509,7 +3509,7 @@ int igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
  * Time complexity: O(e), the number of edges if the attribute is
  * new, O(|eid|) otherwise.
  */
-int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
                               igraph_integer_t eid, igraph_real_t value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3572,7 +3572,7 @@ int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
  * Time complexity: O(e), the number of edges if the attribute is
  * new, O(|eid|) otherwise.
  */
-int igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
                               igraph_integer_t eid, igraph_bool_t value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3637,7 +3637,7 @@ int igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
  * length of the string to set. If the attribute if not new then only
  * O(|eid|*l).
  */
-int igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
                               igraph_integer_t eid, const char *value) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3697,7 +3697,7 @@ int igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
  * Time complexity: O(n), the number of vertices.
  */
 
-int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
                                const igraph_vector_t *v) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
@@ -3762,7 +3762,7 @@ int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
  * Time complexity: O(n), the number of vertices.
  */
 
-int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
                                const igraph_vector_bool_t *v) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
@@ -3828,7 +3828,7 @@ int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
  * Time complexity: O(n+l), n is the number of vertices, l is the
  * total length of the strings.
  */
-int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
                                const igraph_strvector_t *sv) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3894,7 +3894,7 @@ int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
  *
  * Time complexity: O(e), the number of edges.
  */
-int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
                                const igraph_vector_t *v) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -3960,7 +3960,7 @@ int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
  *
  * Time complexity: O(e), the number of edges.
  */
-int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
                                const igraph_vector_bool_t *v) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -4027,7 +4027,7 @@ int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
  * Time complexity: O(e+l), e is the number of edges, l is the
  * total length of the strings.
  */
-int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
+igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
                                const igraph_strvector_t *sv) {
 
     igraph_i_cattributes_t *attr = graph->attr;

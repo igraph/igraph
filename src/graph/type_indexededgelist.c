@@ -78,7 +78,7 @@ static int igraph_i_create_start(
  *
  * \example examples/simple/igraph_empty.c
  */
-int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     return igraph_empty_attrs(graph, n, directed, 0);
 }
 
@@ -111,7 +111,7 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
  */
-int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
+igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
 
     if (n < 0) {
         IGRAPH_ERROR("cannot create empty graph with negative number of vertices",
@@ -199,7 +199,7 @@ void igraph_destroy(igraph_t *graph) {
  * \example examples/simple/igraph_copy.c
  */
 
-int igraph_copy(igraph_t *to, const igraph_t *from) {
+igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     to->n = from->n;
     to->directed = from->directed;
     IGRAPH_CHECK(igraph_vector_copy(&to->from, &from->from));
@@ -253,7 +253,7 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  *
  * \example examples/simple/igraph_add_edges.c
  */
-int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
+igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
                      void *attr) {
     long int no_of_edges = igraph_vector_size(&graph->from);
     long int edges_to_add = igraph_vector_size(edges) / 2;
@@ -359,7 +359,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
  *
  * \example examples/simple/igraph_add_vertices.c
  */
-int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
+igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     long int ec = igraph_ecount(graph);
     long int i;
 
@@ -411,7 +411,7 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
  *
  * \example examples/simple/igraph_delete_edges.c
  */
-int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
+igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     long int no_of_edges = igraph_ecount(graph);
     long int no_of_nodes = igraph_vcount(graph);
     long int edges_to_remove = 0;
@@ -526,12 +526,12 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  *
  * \example examples/simple/igraph_delete_vertices.c
  */
-int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
+igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
     return igraph_delete_vertices_idx(graph, vertices, /* idx= */ 0,
                                       /* invidx= */ 0);
 }
 
-int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
+igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
                                igraph_vector_t *idx,
                                igraph_vector_t *invidx) {
 
@@ -737,7 +737,7 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  *
  * \example examples/simple/igraph_neighbors.c
  */
-int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
+igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
         igraph_neimode_t mode) {
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
         return igraph_i_neighbors(graph, neis, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
@@ -997,7 +997,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  *
  * \example examples/simple/igraph_degree.c
  */
-int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_t *res,
                   const igraph_vs_t vids,
                   igraph_neimode_t mode, igraph_bool_t loops) {
 
@@ -1096,7 +1096,7 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  * Time complexity: O(1).
  */
 
-int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
+igraph_error_t igraph_edge(const igraph_t *graph, igraph_integer_t eid,
                 igraph_integer_t *from, igraph_integer_t *to) {
 
     if (igraph_is_directed(graph)) {
@@ -1129,7 +1129,7 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
  * Time complexity: O(k) where k is the number of edges in the selector.
  */
 
-int igraph_edges(const igraph_t *graph, igraph_es_t eids,
+igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
                  igraph_vector_t *edges) {
 
     igraph_eit_t eit;
@@ -1228,7 +1228,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * Added in version 0.2.</para><para>
  */
 
-int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
+igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
                    igraph_integer_t pfrom, igraph_integer_t pto,
                    igraph_bool_t directed, igraph_bool_t error) {
 
@@ -1429,7 +1429,7 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
  * \example examples/simple/igraph_get_eids.c
  */
 
-int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
+igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
                     const igraph_vector_t *pairs,
                     const igraph_vector_t *path,
                     igraph_bool_t directed, igraph_bool_t error) {
@@ -1695,7 +1695,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
  * multiple edges.
  */
 
-int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
+igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
                           const igraph_vector_t *pairs,
                           const igraph_vector_t *path,
                           igraph_bool_t directed, igraph_bool_t error) {
@@ -1732,7 +1732,7 @@ int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
  * Time complexity: O(d), the number of incident edges to \p pnode.
  */
 
-int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
+igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode) {
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
         return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
@@ -1915,7 +1915,7 @@ int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integ
  * \sa igraph_isomorphic() to test if two graphs are isomorphic.
  */
 
-int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res) {
+igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res) {
     long int nv1 = igraph_vcount(graph1);
     long int nv2 = igraph_vcount(graph2);
     long int ne1 = igraph_ecount(graph1);

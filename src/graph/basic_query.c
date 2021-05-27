@@ -45,7 +45,7 @@
  * Time complexity: O( min(log(d1), log(d2)) ),
  * d1 is the (out-)degree of \p v1 and d2 is the (in-)degree of \p v2.
  */
-int igraph_are_connected(const igraph_t *graph,
+igraph_error_t igraph_are_connected(const igraph_t *graph,
                          igraph_integer_t v1, igraph_integer_t v2,
                          igraph_bool_t *res) {
 

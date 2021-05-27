@@ -248,7 +248,7 @@ namespace drl {
  * Time complexity: O(1).
  */
 
-int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
+igraph_error_t igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
                                    igraph_layout_drl_default_t templ) {
 
     options->edge_cut = 32.0 / 40.0;
@@ -451,7 +451,7 @@ int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
  * Time complexity: ???.
  */
 
-int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_bool_t use_seed,
                       igraph_layout_drl_options_t *options,
                       const igraph_vector_t *weights,

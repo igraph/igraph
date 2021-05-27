@@ -60,7 +60,7 @@
  *
  * \example examples/simple/igraph_full.c
  */
-int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                 igraph_bool_t loops) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
@@ -134,7 +134,7 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  *
  * Time complexity: O(|V|^2), as we have many edges.
  */
-int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                          igraph_bool_t directed) {
     igraph_vector_t edges;
     long int i, j, ptr = 0;

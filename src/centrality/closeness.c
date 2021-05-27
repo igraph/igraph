@@ -116,7 +116,7 @@
  *   \ref igraph_harmonic_centrality().
  *   See \ref igraph_closeness_cutoff() for the range-limited closeness centrality.
  */
-int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                      igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
                      const igraph_vs_t vids, igraph_neimode_t mode,
                      const igraph_vector_t *weights,
@@ -401,7 +401,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * \sa \ref igraph_closeness() to calculate the exact closeness centrality.
  */
 
-int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                             igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
                             const igraph_vs_t vids, igraph_neimode_t mode,
                             const igraph_vector_t *weights,
@@ -792,7 +792,7 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
  * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
  */
 
-int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
                                       const igraph_vs_t vids, igraph_neimode_t mode,
                                       const igraph_vector_t *weights,
                                       igraph_bool_t normalized,
@@ -869,7 +869,7 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
  * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_degree(), \ref igraph_betweenness().
  */
 
-int igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vs_t vids, igraph_neimode_t mode,
                                const igraph_vector_t *weights,
                                igraph_bool_t normalized) {

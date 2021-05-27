@@ -61,7 +61,7 @@
  * vertices, |E| is the number of edges in the graph.
  *
  */
-int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
                               igraph_real_t power,
                               igraph_integer_t time_window,
                               igraph_integer_t m,
@@ -221,7 +221,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
  * Time complexity: O((|V|+|V|/aging_bins)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
-int igraph_recent_degree_aging_game(igraph_t *graph,
+igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_integer_t nodes,
                                     igraph_integer_t m,
                                     const igraph_vector_t *outseq,

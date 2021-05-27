@@ -56,7 +56,7 @@
  * like O(|V|+|E|). |V| is the number of vertices, |E| is the number
  * of edges and \c m and \c n are the corresponding arguments.
  */
-int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
+igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
 
     /* m+1 - number of symbols */
     /* n+1 - length of strings */

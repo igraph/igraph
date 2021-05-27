@@ -151,7 +151,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
  * \example examples/simple/igraph_eccentricity.c
  */
 
-int igraph_eccentricity(const igraph_t *graph,
+igraph_error_t igraph_eccentricity(const igraph_t *graph,
                         igraph_vector_t *res,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
@@ -193,7 +193,7 @@ int igraph_eccentricity(const igraph_t *graph,
  * \example examples/simple/igraph_radius.c
  */
 
-int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
+igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                   igraph_neimode_t mode) {
 
     int no_of_nodes = igraph_vcount(graph);
@@ -254,7 +254,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * \sa \ref igraph_eccentricity(), \ref igraph_diameter().
  *
  */
-int igraph_pseudo_diameter(const igraph_t *graph,
+igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_real_t *diameter,
                            igraph_integer_t vid_start,
                            igraph_integer_t *from,
@@ -573,7 +573,7 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
  *
  * \sa \ref igraph_diameter_dijkstra()
  */
-int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                                     const igraph_vector_t *weights,
                                     igraph_real_t *diameter,
                                     igraph_integer_t vid_start,

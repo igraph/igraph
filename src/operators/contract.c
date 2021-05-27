@@ -60,7 +60,7 @@ static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
  * or vertices plus edges.
  */
 
-int igraph_contract_vertices(igraph_t *graph,
+igraph_error_t igraph_contract_vertices(igraph_t *graph,
                              const igraph_vector_t *mapping,
                              const igraph_attribute_combination_t *vertex_comb) {
     igraph_vector_t edges;

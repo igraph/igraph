@@ -62,7 +62,7 @@
  * vertices.
  */
 
-int igraph_get_all_simple_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                 igraph_vector_int_t *res,
                                 igraph_integer_t from,
                                 const igraph_vs_t to,

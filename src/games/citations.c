@@ -85,7 +85,7 @@ static void igraph_i_citing_cited_type_game_free (
  * Time complexity: O(|V|*a+|E|*log|V|), |V| is the number of vertices,
  * |E| is the total number of edges, a is the \p agebins parameter.
  */
-int igraph_lastcit_game(igraph_t *graph,
+igraph_error_t igraph_lastcit_game(igraph_t *graph,
                         igraph_integer_t nodes, igraph_integer_t edges_per_node,
                         igraph_integer_t agebins,
                         const igraph_vector_t *preference,
@@ -238,7 +238,7 @@ int igraph_lastcit_game(igraph_t *graph,
  * vertices and edges, respectively.
  */
 
-int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
                            const igraph_vector_t *types,
                            const igraph_vector_t *pref,
                            igraph_integer_t edges_per_step,
@@ -377,7 +377,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  * vertices and edges, respectively.
  */
 
-int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
                                   const igraph_vector_t *types,
                                   const igraph_matrix_t *pref,
                                   igraph_integer_t edges_per_step,

@@ -64,7 +64,7 @@
  * performed.
  */
 
-int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_bool_t use_seed, igraph_integer_t maxiter,
                       igraph_real_t temp_max, igraph_real_t temp_min,
                       igraph_real_t temp_init) {

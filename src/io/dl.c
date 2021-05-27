@@ -58,7 +58,7 @@ void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
  * \example examples/simple/igraph_read_graph_dl.c
  */
 
-int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
     int i;

@@ -59,7 +59,7 @@
  * \example examples/simple/assortativity.c
  */
 
-int igraph_assortativity_nominal(const igraph_t *graph,
+igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
                                  const igraph_vector_t *types,
                                  igraph_real_t *res,
                                  igraph_bool_t directed) {
@@ -169,7 +169,7 @@ int igraph_assortativity_nominal(const igraph_t *graph,
  * \example examples/simple/assortativity.c
  */
 
-int igraph_assortativity(const igraph_t *graph,
+igraph_error_t igraph_assortativity(const igraph_t *graph,
                          const igraph_vector_t *types1,
                          const igraph_vector_t *types2,
                          igraph_real_t *res,
@@ -271,7 +271,7 @@ int igraph_assortativity(const igraph_t *graph,
  * \example examples/simple/assortativity.c
  */
 
-int igraph_assortativity_degree(const igraph_t *graph,
+igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                 igraph_real_t *res,
                                 igraph_bool_t directed) {
 

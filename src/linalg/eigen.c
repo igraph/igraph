@@ -1214,7 +1214,7 @@ static int igraph_i_eigen_checks(const igraph_matrix_t *A,
  * \example examples/simple/igraph_eigen_matrix_symmetric.c
  */
 
-int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
+igraph_error_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
                                   const igraph_sparsemat_t *sA,
                                   igraph_arpack_function_t *fun, int n,
                                   void *extra,
@@ -1274,7 +1274,7 @@ int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
  *
  */
 
-int igraph_eigen_matrix(const igraph_matrix_t *A,
+igraph_error_t igraph_eigen_matrix(const igraph_matrix_t *A,
                         const igraph_sparsemat_t *sA,
                         igraph_arpack_function_t *fun, int n,
                         void *extra,
@@ -1458,7 +1458,7 @@ static int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
  *
  */
 
-int igraph_eigen_adjacency(const igraph_t *graph,
+igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
                            igraph_eigen_algorithm_t algorithm,
                            const igraph_eigen_which_t *which,
                            igraph_arpack_options_t *options,
@@ -1524,7 +1524,7 @@ int igraph_eigen_adjacency(const igraph_t *graph,
  *
  */
 
-int igraph_eigen_laplacian(const igraph_t *graph,
+igraph_error_t igraph_eigen_laplacian(const igraph_t *graph,
                            igraph_eigen_algorithm_t algorithm,
                            const igraph_eigen_which_t *which,
                            igraph_arpack_options_t *options,

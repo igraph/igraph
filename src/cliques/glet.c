@@ -540,7 +540,7 @@ static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * See also: \ref igraph_graphlets() and \ref igraph_graphlets_project().
  */
 
-int igraph_graphlets_candidate_basis(const igraph_t *graph,
+igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
                                      const igraph_vector_t *weights,
                                      igraph_vector_ptr_t *cliques,
                                      igraph_vector_t *thresholds) {
@@ -782,7 +782,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
  * \ref igraph_graphlets_candidate_basis().
  */
 
-int igraph_graphlets_project(const igraph_t *graph,
+igraph_error_t igraph_graphlets_project(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              const igraph_vector_ptr_t *cliques,
                              igraph_vector_t *Mu, igraph_bool_t startMu,
@@ -836,7 +836,7 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \ref igraph_graphlets_project().
  */
 
-int igraph_graphlets(const igraph_t *graph,
+igraph_error_t igraph_graphlets(const igraph_t *graph,
                      const igraph_vector_t *weights,
                      igraph_vector_ptr_t *cliques,
                      igraph_vector_t *Mu, int niter) {

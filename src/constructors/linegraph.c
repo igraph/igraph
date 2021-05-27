@@ -154,7 +154,7 @@ static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegrap
  * Time complexity: O(|V|+|E|), the number of edges plus the number of vertices.
  */
 
-int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
+igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
 
     if (igraph_is_directed(graph)) {
         return igraph_i_linegraph_directed(graph, linegraph);

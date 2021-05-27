@@ -47,7 +47,7 @@
  *
  * Time complexity: O(|V|+|E|).
  */
-int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
+igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     long int vc = igraph_vcount(graph);
     long int ec = igraph_ecount(graph);
 
@@ -99,7 +99,7 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  *
  * \example examples/simple/igraph_has_multiple.c
  */
-int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
+igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     long int vc = igraph_vcount(graph);
     long int ec = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -166,7 +166,7 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  *
  * \example examples/simple/igraph_is_multiple.c
  */
-int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
+igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                        igraph_es_t es) {
     igraph_eit_t eit;
     long int i, j, n;
@@ -235,7 +235,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  * average degree (out-degree in directed graphs) of the vertices at the
  * tail of the edges.
  */
-int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
     igraph_eit_t eit;
     long int i, j, n;
     igraph_lazy_inclist_t inclist;
@@ -308,7 +308,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
  * |E| is the number of edges in the graph.
  */
-int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
+igraph_error_t igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;

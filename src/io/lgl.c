@@ -96,7 +96,7 @@ vertex3name [optionalWeight] \endverbatim
  *
  * \example examples/simple/igraph_read_graph_lgl.c
  */
-int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
                           igraph_bool_t names,
                           igraph_add_weights_t weights,
                           igraph_bool_t directed) {
@@ -216,7 +216,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  *
  * \example examples/simple/igraph_write_graph_lgl.c
  */
-int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                            const char *names, const char *weights,
                            igraph_bool_t isolates) {
     igraph_eit_t it;

@@ -116,7 +116,7 @@ using namespace igraph::walktrap;
  * \example examples/simple/walktrap.c
  */
 
-int igraph_community_walktrap(const igraph_t *graph,
+igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
                               int steps,
                               igraph_matrix_t *merges,

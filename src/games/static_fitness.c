@@ -88,7 +88,7 @@
  *
  * Time complexity: O(|V| + |E| log |E|).
  */
-int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
+igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
                                igraph_bool_t loops, igraph_bool_t multiple) {
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
@@ -355,7 +355,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
  *
  * Time complexity: O(|V| + |E| log |E|).
  */
-int igraph_static_power_law_game(igraph_t *graph,
+igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                  igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
                                  igraph_real_t exponent_out, igraph_real_t exponent_in,
                                  igraph_bool_t loops, igraph_bool_t multiple,

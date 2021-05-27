@@ -93,7 +93,7 @@ static igraph_error_t igraph_vector_int_copy_to_fortran(
  * Time complexity: TODO.
  */
 
-int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                          int *info) {
     int m = (int) igraph_matrix_nrow(a);
     int n = (int) igraph_matrix_ncol(a);
@@ -168,7 +168,7 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  * Time complexity: TODO.
  */
 
-int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
+igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
                          const igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
     char trans = transpose ? 'T' : 'N';
     int n = (int) igraph_matrix_nrow(a);
@@ -404,7 +404,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  * \example examples/simple/igraph_lapack_dsyevr.c
  */
 
-int igraph_lapack_dsyevr(const igraph_matrix_t *A,
+igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                          igraph_lapack_dsyev_which_t which,
                          igraph_real_t vl, igraph_real_t vu, int vestimate,
                          int il, int iu, igraph_real_t abstol,
@@ -582,7 +582,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * \example examples/simple/igraph_lapack_dgeev.c
  */
 
-int igraph_lapack_dgeev(const igraph_matrix_t *A,
+igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                         igraph_vector_t *valuesreal,
                         igraph_vector_t *valuesimag,
                         igraph_matrix_t *vectorsleft,
@@ -785,7 +785,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  * \example examples/simple/igraph_lapack_dgeevx.c
  */
 
-int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                          const igraph_matrix_t *A,
                          igraph_vector_t *valuesreal,
                          igraph_vector_t *valuesimag,
@@ -928,7 +928,7 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     return 0;
 }
 
-int igraph_lapack_dgehrd(const igraph_matrix_t *A,
+igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
                          int ilo, int ihi,
                          igraph_matrix_t *result) {
 

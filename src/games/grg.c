@@ -55,7 +55,7 @@
  *
  * \example examples/simple/igraph_grg_game.c
  */
-int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                     igraph_real_t radius, igraph_bool_t torus,
                     igraph_vector_t *x, igraph_vector_t *y) {
 

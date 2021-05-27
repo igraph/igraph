@@ -59,7 +59,7 @@
  *
  * \example examples/simple/igraph_atlas.c
  */
-int igraph_atlas(igraph_t *graph, int number) {
+igraph_error_t igraph_atlas(igraph_t *graph, int number) {
 
     igraph_integer_t pos, n, e;
     igraph_vector_t v = IGRAPH_VECTOR_NULL;

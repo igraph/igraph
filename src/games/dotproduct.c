@@ -56,7 +56,7 @@
  * for functions to generate the latent vectors.
  */
 
-int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
+igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                             igraph_bool_t directed) {
 
     igraph_integer_t nrow = igraph_matrix_nrow(vecs);
@@ -130,7 +130,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
  * igraph_sample_dirichlet() for other similar samplers.
  */
 
-int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
+igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
                                  igraph_real_t radius,
                                  igraph_bool_t positive,
                                  igraph_matrix_t *res) {
@@ -198,7 +198,7 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
  */
 
 
-int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
                                 igraph_real_t radius,
                                 igraph_bool_t positive,
                                 igraph_matrix_t *res) {
@@ -245,7 +245,7 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
  * latent vectors.
  */
 
-int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
+igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
                             igraph_matrix_t *res) {
 
     igraph_integer_t len = igraph_vector_size(alpha);

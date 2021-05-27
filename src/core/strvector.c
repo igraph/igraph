@@ -58,7 +58,7 @@
  * Time complexity: O(\p len).
  */
 
-int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
+igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, long int len) {
     long int i;
     sv->data = IGRAPH_CALLOC(len, char*);
     if (sv->data == 0) {
@@ -142,7 +142,7 @@ void igraph_strvector_get(const igraph_strvector_t *sv, long int idx,
  * depending on the memory management, if reallocation is needed.
  */
 
-int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
+igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, long int idx,
                          const char *value) {
     size_t value_len;
 
@@ -183,7 +183,7 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
  * Time complexity: O(l), the length of the new string. Maybe more,
  * depending on the memory management, if reallocation is needed.
  */
-int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
+igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
                           const char *value, int len) {
     if (idx < 0 || idx >= sv->len) {
         IGRAPH_ERROR("String vector index out of bounds.", IGRAPH_EINVAL);
@@ -297,7 +297,7 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
  * Time complexity: O(l), the total length of the strings in \p from.
  */
 
-int igraph_strvector_copy(igraph_strvector_t *to,
+igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
                           const igraph_strvector_t *from) {
     long int i;
     char *str;
@@ -335,7 +335,7 @@ int igraph_strvector_copy(igraph_strvector_t *to,
  * string vector.
  */
 
-int igraph_strvector_append(igraph_strvector_t *to,
+igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
                             const igraph_strvector_t *from) {
     long int len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
     long int i;
@@ -400,7 +400,7 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
  * smaller, maybe less, depending on memory management.
  */
 
-int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
+igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
     long int toadd = newsize - v->len, i, j;
     char **tmp;
     long int reallocsize = newsize;
@@ -484,7 +484,7 @@ long int igraph_strvector_size(const igraph_strvector_t *sv) {
  * length of the new string.
  */
 
-int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     long int s = igraph_strvector_size(v);
     long int value_len = strlen(value);
     char **tmp;
@@ -572,7 +572,7 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
  * \param sep The separator to print between strings.
  * \return Error code.
  */
-int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
+igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                            const char *sep) {
 
     long int i, n = igraph_strvector_size(v);
@@ -585,7 +585,7 @@ int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_strvector_index(const igraph_strvector_t *v,
+igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
                            igraph_strvector_t *newv,
                            const igraph_vector_t *idx) {
 

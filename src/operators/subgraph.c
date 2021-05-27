@@ -294,7 +294,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
  * \sa \ref igraph_delete_vertices() to delete the specified set of
  * vertices from a graph, the opposite of this function.
  */
-int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                             const igraph_vs_t vids, igraph_subgraph_implementation_t impl) {
     return igraph_induced_subgraph_map(graph, res, vids, impl, /* map= */ 0,
                                        /* invmap= */ 0);
@@ -323,7 +323,7 @@ static int igraph_i_induced_subgraph_suggest_implementation(
     return 0;
 }
 
-int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 const igraph_vs_t vids,
                                 igraph_subgraph_implementation_t impl,
                                 igraph_vector_t *map,
@@ -381,7 +381,7 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
  * edges from a graph, the opposite of this function.
  */
 
-int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                           const igraph_es_t eids, igraph_bool_t delete_vertices) {
 
     long int no_of_nodes = igraph_vcount(graph);

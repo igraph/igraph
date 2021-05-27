@@ -53,7 +53,7 @@
  *
  * Time complexity: worst case exponenital, often faster in practice.
  */
-int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
+igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
     igraph_integer_t girth, comp_girth;

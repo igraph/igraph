@@ -161,7 +161,7 @@ const char* igraph_strerror(const igraph_error_t igraph_errno) {
     return igraph_i_error_strings[igraph_errno];
 }
 
-int igraph_error(const char *reason, const char *file, int line,
+igraph_error_t igraph_error(const char *reason, const char *file, int line,
                  igraph_error_t igraph_errno) {
 
     if (igraph_i_error_handler) {
@@ -174,7 +174,7 @@ int igraph_error(const char *reason, const char *file, int line,
     return igraph_errno;
 }
 
-int igraph_errorf(const char *reason, const char *file, int line,
+igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
                   igraph_error_t igraph_errno, ...) {
     va_list ap;
     va_start(ap, igraph_errno);
@@ -183,7 +183,7 @@ int igraph_errorf(const char *reason, const char *file, int line,
     return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
 
-int igraph_errorvf(const char *reason, const char *file, int line,
+igraph_error_t igraph_errorvf(const char *reason, const char *file, int line,
                    igraph_error_t igraph_errno, va_list ap) {
     vsnprintf(igraph_i_errormsg_buffer,
               sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
@@ -316,7 +316,7 @@ void igraph_warning_handler_print(const char *reason, const char *file,
 }
 #endif
 
-int igraph_warning(const char *reason, const char *file, int line,
+igraph_error_t igraph_warning(const char *reason, const char *file, int line,
                    igraph_error_t igraph_errno) {
 
     if (igraph_i_warning_handler) {
@@ -329,7 +329,7 @@ int igraph_warning(const char *reason, const char *file, int line,
     return igraph_errno;
 }
 
-int igraph_warningf(const char *reason, const char *file, int line,
+igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
                     igraph_error_t igraph_errno, ...) {
     va_list ap;
     va_start(ap, igraph_errno);

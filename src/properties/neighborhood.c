@@ -67,7 +67,7 @@
  * Time complexity: O(n*d*o), where n is the number vertices for which
  * the calculation is performed, d is the average degree, o is the order.
  */
-int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
                              igraph_vs_t vids, igraph_integer_t order,
                              igraph_neimode_t mode,
                              igraph_integer_t mindist) {
@@ -199,7 +199,7 @@ int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
  * the calculation is performed, d is the average degree, o is the
  * order.
  */
-int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
+igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
                         igraph_vs_t vids, igraph_integer_t order,
                         igraph_neimode_t mode, igraph_integer_t mindist) {
 
@@ -346,7 +346,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
  * which the calculation is performed, |V| and |E| are the number of
  * vertices and edges in the original input graph.
  */
-int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
+igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
                                igraph_vs_t vids, igraph_integer_t order,
                                igraph_neimode_t mode,
                                igraph_integer_t mindist) {

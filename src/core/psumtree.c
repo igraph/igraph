@@ -89,7 +89,7 @@ static double igraph_i_log2(double f) {
  *
  * Time complexity: O(n) for a tree containing n elements
  */
-int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
+igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
     t->size = size;
     t->offset = (pow(2, ceil(igraph_i_log2(size))) - 1);
     IGRAPH_CHECK(igraph_vector_init(&t->v, t->offset + t->size));
@@ -167,7 +167,7 @@ igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
  *
  * Time complexity: O(log n), where n is the number of items in the tree.
  */
-int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
                            igraph_real_t search) {
     const igraph_vector_t *tree = &t->v;
     long int i = 1;
@@ -203,7 +203,7 @@ int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
  *
  * Time complexity: O(log n), where n is the number of items in the tree.
  */
-int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
+igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
                            igraph_real_t new_value) {
     const igraph_vector_t *tree = &t->v;
     igraph_real_t difference;

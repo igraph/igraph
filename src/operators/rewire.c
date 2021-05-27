@@ -262,7 +262,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
  *
  * Time complexity: TODO.
  */
-int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
+igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
     return igraph_i_rewire(graph, n, mode, use_adjlist);
 }

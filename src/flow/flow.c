@@ -481,7 +481,7 @@ static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
  * \example examples/simple/flow2.c
  */
 
-int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                    igraph_vector_t *flow, igraph_vector_t *cut,
                    igraph_vector_t *partition, igraph_vector_t *partition2,
                    igraph_integer_t source, igraph_integer_t target,
@@ -1075,7 +1075,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * properties based on the maximum flow.
  */
 
-int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
+igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
                          igraph_integer_t source, igraph_integer_t target,
                          const igraph_vector_t *capacity,
                          igraph_maxflow_stats_t *stats) {
@@ -1113,7 +1113,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
  * igraph_maxflow_value(), |V| is the number of vertices.
  */
 
-int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
+igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
                            igraph_integer_t source, igraph_integer_t target,
                            const igraph_vector_t *capacity) {
 
@@ -1161,7 +1161,7 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
  * Time complexity: see \ref igraph_maxflow().
  */
 
-int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
+igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
                      igraph_vector_t *cut, igraph_vector_t *partition,
                      igraph_vector_t *partition2,
                      igraph_integer_t source, igraph_integer_t target,
@@ -1651,7 +1651,7 @@ static int igraph_i_mincut_directed(const igraph_t *graph,
  * \example examples/simple/igraph_mincut.c
  */
 
-int igraph_mincut(const igraph_t *graph,
+igraph_error_t igraph_mincut(const igraph_t *graph,
                   igraph_real_t *value,
                   igraph_vector_t *partition,
                   igraph_vector_t *partition2,
@@ -1717,7 +1717,7 @@ static int igraph_i_mincut_value_undirected(const igraph_t *graph,
  * documentation of \ref igraph_maxflow_value().
  */
 
-int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
                         const igraph_vector_t *capacity) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -1935,7 +1935,7 @@ static int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
  * \ref igraph_maxflow_value().
  */
 
-int igraph_st_vertex_connectivity(const igraph_t *graph,
+igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
                                   igraph_integer_t *res,
                                   igraph_integer_t source,
                                   igraph_integer_t target,
@@ -2089,7 +2089,7 @@ static int igraph_i_connectivity_checks(const igraph_t *graph,
  * and \ref igraph_edge_connectivity().
  */
 
-int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                igraph_bool_t checks) {
 
     igraph_bool_t ret = 0;
@@ -2134,7 +2134,7 @@ int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * igraph_vertex_connectivity().
  */
 
-int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                 igraph_integer_t source,
                                 igraph_integer_t target) {
     igraph_real_t flow;
@@ -2181,7 +2181,7 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * \ref igraph_vertex_connectivity().
  */
 
-int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                              igraph_bool_t checks) {
     igraph_bool_t ret = 0;
     igraph_integer_t number_of_nodes = igraph_vcount(graph);
@@ -2235,7 +2235,7 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * igraph_st_edge_connectivity(), \ref igraph_maxflow_value().
  */
 
-int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
                                igraph_integer_t source,
                                igraph_integer_t target) {
 
@@ -2276,7 +2276,7 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
  * igraph_vertex_connectivity(), \ref igraph_maxflow_value().
  */
 
-int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
                                  igraph_integer_t source,
                                  igraph_integer_t target) {
 
@@ -2369,7 +2369,7 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
  * igraph_edge_connectivity(), \ref igraph_mincut_value().
  */
 
-int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
                     igraph_bool_t checks) {
     return igraph_edge_connectivity(graph, res, checks);
 }
@@ -2402,7 +2402,7 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
  * \ref igraph_maxflow_value().
  */
 
-int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
+igraph_error_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
                     igraph_bool_t checks) {
 
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
@@ -2447,7 +2447,7 @@ int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
  *
  * \sa \ref igraph_maxflow()
  */
-int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
+igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
                           igraph_vector_t *flows, const igraph_vector_t *capacity) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);

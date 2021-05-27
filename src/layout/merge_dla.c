@@ -54,7 +54,7 @@
  * Time complexity: TODO.
  */
 
-int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
+igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
                             igraph_vector_ptr_t *coords,
                             igraph_matrix_t *res) {
     long int graphs = igraph_vector_ptr_size(coords);

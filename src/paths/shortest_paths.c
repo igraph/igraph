@@ -312,7 +312,7 @@ static int igraph_i_average_path_length_dijkstra(
  * \example examples/simple/igraph_average_path_length.c
  */
 
-int igraph_average_path_length(const igraph_t *graph,
+igraph_error_t igraph_average_path_length(const igraph_t *graph,
                                igraph_real_t *res, igraph_real_t *unconn_pairs,
                                igraph_bool_t directed, igraph_bool_t unconn)
 {
@@ -364,7 +364,7 @@ int igraph_average_path_length(const igraph_t *graph,
  * \example examples/simple/igraph_grg_game.c
  */
 
-int igraph_average_path_length_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_average_path_length_dijkstra(const igraph_t *graph,
                                         igraph_real_t *res, igraph_real_t *unconn_pairs,
                                         const igraph_vector_t *weights,
                                         igraph_bool_t directed, igraph_bool_t unconn)
@@ -416,7 +416,7 @@ int igraph_average_path_length_dijkstra(const igraph_t *graph,
  *
  */
 
-int igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
                              const igraph_vector_t *weights,
                              igraph_bool_t directed)
 {
@@ -697,7 +697,7 @@ static int igraph_i_local_efficiency_dijkstra(
  *
  */
 
-int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
                             const igraph_vs_t vids,
                             const igraph_vector_t *weights,
                             igraph_bool_t directed, igraph_neimode_t mode)
@@ -853,7 +853,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
  *
  */
 
-int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
                                     const igraph_vector_t *weights,
                                     igraph_bool_t directed, igraph_neimode_t mode)
 {
@@ -928,7 +928,7 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
  * \example examples/simple/igraph_diameter.c
  */
 
-int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
+igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
                     igraph_integer_t *pfrom, igraph_integer_t *pto,
                     igraph_vector_t *vertex_path, igraph_vector_t *edge_path,
                     igraph_bool_t directed, igraph_bool_t unconn) {
@@ -1100,7 +1100,7 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
  */
 
 
-int igraph_diameter_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              igraph_real_t *pres,
                              igraph_integer_t *pfrom,

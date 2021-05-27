@@ -178,7 +178,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  * Time complexity: usually around O(|V|^2 dim).
  */
 
-int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
                       const igraph_matrix_t *dist, long int dim) {
     long int i, no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;

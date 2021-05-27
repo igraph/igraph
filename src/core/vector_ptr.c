@@ -87,7 +87,7 @@
  * time \endquote required to allocate \p size elements.
  */
 
-int igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
+igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
     long int alloc_size = size > 0 ? size : 1;
     IGRAPH_ASSERT(v != NULL);
     if (size < 0) {
@@ -215,7 +215,7 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) {
+igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) {
     long int actual_size = igraph_vector_ptr_size(v);
     void **tmp;
     IGRAPH_ASSERT(v != NULL);
@@ -310,7 +310,7 @@ void igraph_vector_ptr_clear(igraph_vector_ptr_t* v) {
  * push_back operations need O(n) time to complete.
  */
 
-int igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
+igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
@@ -351,7 +351,7 @@ void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
  * \param pos The position where the new element is inserted.
  * \param e The inserted element
  */
-int igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
+igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
     long int size = igraph_vector_ptr_size(v);
     IGRAPH_CHECK(igraph_vector_ptr_resize(v, size + 1));
     if (pos < size) {
@@ -431,7 +431,7 @@ void igraph_vector_ptr_null(igraph_vector_ptr_t* v) {
  * needed to allocate the memory for the vector elements.
  */
 
-int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
+igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
     IGRAPH_CHECK(igraph_vector_ptr_reserve(v, newsize));
     v->end = v->stor_begin + newsize;
     return 0;
@@ -445,7 +445,7 @@ int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
  *         \c IGRAPH_ENOMEM if out of memory
  */
 
-int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int length) {
+igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
@@ -498,7 +498,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  * done in O(n) time.
  */
 
-int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
     long int from_size;
 
     IGRAPH_ASSERT(from != NULL);
@@ -562,7 +562,7 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
           compar);
 }
 
-int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
+igraph_error_t igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
                                 const igraph_vector_int_t *idx) {
     void **tmp;
     int i, n = igraph_vector_int_size(idx);
@@ -583,7 +583,7 @@ int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
     return 0;
 }
 
-int igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
     long int origsize = igraph_vector_ptr_size(to);
     long int othersize = igraph_vector_ptr_size(from);
     long int i;

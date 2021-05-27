@@ -301,7 +301,7 @@ igraph_bool_t igraph_has_attribute_table() {
  *
  * Time complexity: O(1)
  */
-int igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
+igraph_error_t igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&comb->list, 0));
     return IGRAPH_SUCCESS;
 }
@@ -345,7 +345,7 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
  * Time complexity: O(n), where n is the number of current attribute
  *                  combinations.
  */
-int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
+igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
                                      const char *name,
                                      igraph_attribute_combination_type_t type,
                                      igraph_function_pointer_t func) {
@@ -401,7 +401,7 @@ int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
  * Time complexity: O(n), where n is the number of records in the attribute
                     combination list.
  */
-int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
+igraph_error_t igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
                                         const char *name) {
     long int i, n = igraph_vector_ptr_size(&comb->list);
 
@@ -429,7 +429,7 @@ int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
                                        const char *name,
                                        igraph_attribute_combination_type_t *type,
                                        igraph_function_pointer_t *func) {
@@ -462,7 +462,7 @@ int igraph_attribute_combination_query(const igraph_attribute_combination_t *com
     return 0;
 }
 
-int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
+igraph_error_t igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
 
     va_list ap;
 

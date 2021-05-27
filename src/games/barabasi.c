@@ -467,7 +467,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * \example examples/simple/igraph_barabasi_game.c
  * \example examples/simple/igraph_barabasi_game2.c
  */
-int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
                          igraph_real_t power,
                          igraph_integer_t m,
                          const igraph_vector_t *outseq,
@@ -608,7 +608,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  * Time complexity: O((|V|+|V|/aging_bins)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
-int igraph_barabasi_aging_game(igraph_t *graph,
+igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
                                igraph_integer_t nodes,
                                igraph_integer_t m,
                                const igraph_vector_t *outseq,

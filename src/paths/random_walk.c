@@ -60,7 +60,7 @@
  */
 
 
-int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
                        igraph_integer_t start, igraph_neimode_t mode,
                        igraph_integer_t steps,
                        igraph_random_walk_stuck_t stuck) {
@@ -156,7 +156,7 @@ static void vec_destr(igraph_vector_t *vec) {
  * \return Error code.
  *
  */
-int igraph_random_edge_walk(const igraph_t *graph,
+igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
                             const igraph_vector_t *weights,
                             igraph_vector_t *edgewalk,
                             igraph_integer_t start, igraph_neimode_t mode,

@@ -95,7 +95,7 @@
  * \example examples/simple/igraph_bfs.c
  * \example examples/simple/igraph_bfs_callback.c
  */
-int igraph_bfs(const igraph_t *graph,
+igraph_error_t igraph_bfs(const igraph_t *graph,
                igraph_integer_t root, const igraph_vector_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                const igraph_vector_t *restricted,
@@ -327,7 +327,7 @@ cleanup:
  *
  * \example examples/simple/igraph_bfs_simple.c
  */
-int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
                       igraph_vector_t *vids, igraph_vector_t *layers,
                       igraph_vector_t *parents) {
 
@@ -470,7 +470,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
  * edges.
  */
 
-int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
+igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                igraph_vector_t *order,
                igraph_vector_t *order_out, igraph_vector_t *father,

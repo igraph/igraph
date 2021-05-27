@@ -121,7 +121,7 @@ igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
  *
  * \example examples/simple/blas.c
  */
-int igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
+igraph_error_t igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
                        igraph_real_t *res) {
 
     int n = igraph_vector_size(v1);

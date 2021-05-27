@@ -46,7 +46,7 @@
  * number of vertices plus the number of edges in the graph.
  *
  */
-int igraph_simple_interconnected_islands_game(
+igraph_error_t igraph_simple_interconnected_islands_game(
         igraph_t *graph,
         igraph_integer_t islands_n,
         igraph_integer_t islands_size,

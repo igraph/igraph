@@ -60,7 +60,7 @@
  * \example examples/simple/igraph_write_graph_leda.c
  */
 
-int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                             const char* vertex_attr_name,
                             const char* edge_attr_name) {
     long int no_of_nodes = igraph_vcount(graph);

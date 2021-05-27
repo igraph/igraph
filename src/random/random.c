@@ -663,7 +663,7 @@ static double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
  * it should be O(1).
  */
 
-int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
+igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
     rng->type = type;
     IGRAPH_CHECK(rng->type->init(&rng->state));
     return IGRAPH_SUCCESS;
@@ -694,7 +694,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  * Time complexity: usually O(1), but may depend on the type of the
  * RNG.
  */
-int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
+igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
     const igraph_rng_type_t *type = rng->type;
     rng->def = 0;
     IGRAPH_CHECK(type->seed(rng->state, seed));
@@ -1066,7 +1066,7 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
  * \example examples/simple/igraph_random_sample.c
  */
 
-int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+igraph_error_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
                          igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
@@ -2396,7 +2396,7 @@ static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
 
 #endif
 
-int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                              const igraph_vector_t *alpha,
                              igraph_vector_t *result) {
 

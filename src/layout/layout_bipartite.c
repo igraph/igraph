@@ -49,7 +49,7 @@
  *
  * \sa \ref igraph_layout_sugiyama().
  */
-int igraph_layout_bipartite(const igraph_t *graph,
+igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                             const igraph_vector_bool_t *types,
                             igraph_matrix_t *res, igraph_real_t hgap,
                             igraph_real_t vgap, long int maxiter) {

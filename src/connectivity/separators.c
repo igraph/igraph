@@ -146,7 +146,7 @@ static int igraph_i_is_separator(const igraph_t *graph,
  * \example examples/simple/igraph_is_separator.c
  */
 
-int igraph_is_separator(const igraph_t *graph,
+igraph_error_t igraph_is_separator(const igraph_t *graph,
                         const igraph_vs_t candidate,
                         igraph_bool_t *res) {
 
@@ -205,7 +205,7 @@ int igraph_is_separator(const igraph_t *graph,
  * \example examples/simple/igraph_is_minimal_separator.c
  */
 
-int igraph_is_minimal_separator(const igraph_t *graph,
+igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
                                 const igraph_vs_t candidate,
                                 igraph_bool_t *res) {
 
@@ -430,7 +430,7 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
  * \example examples/simple/igraph_minimal_separators.c
  */
 
-int igraph_all_minimal_st_separators(const igraph_t *graph,
+igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
                                      igraph_vector_ptr_t *separators) {
 
     /*
@@ -654,7 +654,7 @@ static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  * \example examples/simple/igraph_minimum_size_separators.c
  */
 
-int igraph_minimum_size_separators(const igraph_t *graph,
+igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
                                    igraph_vector_ptr_t *separators) {
 
     long int no_of_nodes = igraph_vcount(graph);

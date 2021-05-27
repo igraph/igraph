@@ -110,7 +110,7 @@
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-int igraph_modularity(const igraph_t *graph,
+igraph_error_t igraph_modularity(const igraph_t *graph,
                       const igraph_vector_t *membership,
                       const igraph_vector_t *weights,
                       const igraph_real_t resolution,
@@ -296,7 +296,7 @@ static int igraph_i_modularity_matrix_get_adjacency(
  *
  * \sa \ref igraph_modularity()
  */
-int igraph_modularity_matrix(const igraph_t *graph,
+igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              const igraph_real_t resolution,
                              igraph_matrix_t *modmat,
