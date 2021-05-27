@@ -37,7 +37,7 @@ void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
     igraph_free(l->vecs);
 }
 
-int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
+igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_t *from,
                                     long int size) {
 
@@ -70,12 +70,12 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
         long int to = VECTOR(*from)[i];
         if (to >= 0) {
             igraph_vector_t *v = &(l->vecs[to]);
-            igraph_vector_push_back(v, i);
+            IGRAPH_CHECK(igraph_vector_push_back(v, i));
         }
     }
 
     igraph_vector_destroy(&sizes);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

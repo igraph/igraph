@@ -354,7 +354,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     if (no_of_nodes > 0) {
         igraph_vector_t inds;
         IGRAPH_VECTOR_INIT_FINALLY(&inds, 0);
-        IGRAPH_CHECK((int) igraph_vector_qsort_ind(&layers_own, &inds, 0));
+        IGRAPH_CHECK(igraph_vector_qsort_ind(&layers_own, &inds, 0));
         j = -1; dx = VECTOR(layers_own)[(long int)VECTOR(inds)[0]] - 1;
         for (i = 0; i < no_of_nodes; i++) {
             k = VECTOR(inds)[i];
@@ -796,8 +796,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
             printf("Vertices: "); igraph_vector_print(layer_members);
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
-            IGRAPH_CHECK((int) igraph_vector_qsort_ind(&barycenters,
-                         &sort_indices, 0));
+            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
             for (i = 0; i < n; i++) {
                 nei = (long)VECTOR(*layer_members)[(long)VECTOR(sort_indices)[i]];
                 VECTOR(barycenters)[i] = nei;
@@ -830,8 +829,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
 
-            IGRAPH_CHECK((int) igraph_vector_qsort_ind(&barycenters,
-                         &sort_indices, 0));
+            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
             for (i = 0; i < n; i++) {
                 nei = (long)VECTOR(*layer_members)[(long)VECTOR(sort_indices)[i]];
                 VECTOR(barycenters)[i] = nei;
@@ -1147,7 +1145,7 @@ static int igraph_i_layout_sugiyama_vertical_alignment(const igraph_t* graph,
                 for (k = 0; k < n; k++) {
                     VECTOR(xs)[k] = X_POS((long int)VECTOR(neis)[k]);
                 }
-                IGRAPH_CHECK((int) igraph_vector_qsort_ind(&xs, &inds, 0));
+                IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, 0));
 
                 if (n % 2 == 1) {
                     /* Odd number of neighbors, so the median is unique */

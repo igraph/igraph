@@ -42,7 +42,7 @@ typedef struct igraph_fixed_vectorlist_t {
 } igraph_fixed_vectorlist_t;
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l);
-int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
+igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_t *from,
                                     long int size);
 

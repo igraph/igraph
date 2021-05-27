@@ -46,7 +46,7 @@ typedef struct igraph_buckets_t {
     igraph_integer_t max, no;
 } igraph_buckets_t;
 
-int igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size);
+igraph_error_t igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size);
 void igraph_buckets_destroy(igraph_buckets_t *b);
 void igraph_buckets_clear(igraph_buckets_t *b);
 long int igraph_buckets_popmax(igraph_buckets_t *b);
@@ -63,7 +63,7 @@ typedef struct igraph_dbuckets_t {
     igraph_integer_t max, no;
 } igraph_dbuckets_t;
 
-int igraph_dbuckets_init(igraph_dbuckets_t *b, long int bsize, long int size);
+igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, long int bsize, long int size);
 void igraph_dbuckets_destroy(igraph_dbuckets_t *b);
 void igraph_dbuckets_clear(igraph_dbuckets_t *b);
 long int igraph_dbuckets_popmax(igraph_dbuckets_t *b);

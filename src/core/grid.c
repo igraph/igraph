@@ -29,9 +29,10 @@
 
 /* internal function */
 
-int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
-                        long int *x, long int *y) {
-
+static void igraph_i_2dgrid_which(
+    igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
+    long int *x, long int *y
+) {
     if (xc <= grid->minx) {
         *x = 0;
     } else if (xc >= grid->maxx) {
@@ -47,11 +48,9 @@ int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t y
     } else {
         *y = floor((yc - (grid->miny)) / (grid->deltay));
     }
-
-    return 0;
 }
 
-int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
+igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
                        igraph_real_t minx, igraph_real_t maxx, igraph_real_t deltax,
                        igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay) {
     long int i;
@@ -82,7 +81,7 @@ int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
     grid->vertices = 0;
 
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_2dgrid_destroy(igraph_2dgrid_t *grid) {
@@ -100,7 +99,7 @@ void igraph_2dgrid_add(igraph_2dgrid_t *grid, long int elem,
     MATRIX(*grid->coords, elem, 1) = yc;
 
     /* add to cell */
-    igraph_2dgrid_which(grid, xc, yc, &x, &y);
+    igraph_i_2dgrid_which(grid, xc, yc, &x, &y);
     first = MATRIX(grid->startidx, x, y);
     VECTOR(grid->prev)[elem] = 0;
     VECTOR(grid->next)[elem] = first;
@@ -123,7 +122,7 @@ void igraph_2dgrid_add2(igraph_2dgrid_t *grid, long int elem) {
     yc = MATRIX(*grid->coords, elem, 1);
 
     /* add to cell */
-    igraph_2dgrid_which(grid, xc, yc, &x, &y);
+    igraph_i_2dgrid_which(grid, xc, yc, &x, &y);
     first = MATRIX(grid->startidx, x, y);
     VECTOR(grid->prev)[elem] = 0;
     VECTOR(grid->next)[elem] = first;
@@ -147,8 +146,8 @@ void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem,
 
     xc = oldxc + xc; yc = oldyc + yc;
 
-    igraph_2dgrid_which(grid, oldxc, oldyc, &oldx, &oldy);
-    igraph_2dgrid_which(grid, xc, yc, &newx, &newy);
+    igraph_i_2dgrid_which(grid, oldxc, oldyc, &oldx, &oldy);
+    igraph_i_2dgrid_which(grid, xc, yc, &newx, &newy);
     if (oldx != newx || oldy != newy) {
         /* remove from this cell */
         if (VECTOR(grid->prev)[elem] != 0) {
@@ -195,7 +194,7 @@ igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid,
     igraph_real_t x = MATRIX(*grid->coords, e1, 0) - MATRIX(*grid->coords, e2, 0);
     igraph_real_t y = MATRIX(*grid->coords, e1, 1) - MATRIX(*grid->coords, e2, 1);
 
-    return sqrt(x * x + y * y);
+    return hypot(x, y);
 }
 
 igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid,
@@ -206,7 +205,7 @@ igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid,
     return x * x + y * y;
 }
 
-static int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
+static igraph_error_t igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
                                        igraph_integer_t vid, igraph_real_t r,
                                        long int x, long int y) {
     long int act;
@@ -223,49 +222,49 @@ static int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *e
     return 0;
 }
 
-int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
+igraph_error_t igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
                             igraph_integer_t vid, igraph_real_t r) {
     igraph_real_t xc = MATRIX(*grid->coords, vid, 0);
     igraph_real_t yc = MATRIX(*grid->coords, vid, 1);
     long int x, y;
     igraph_vector_clear(eids);
 
-    igraph_2dgrid_which(grid, xc, yc, &x, &y);
+    igraph_i_2dgrid_which(grid, xc, yc, &x, &y);
 
     /* this cell */
-    igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y);
+    IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y));
 
     /* left */
     if (x != 0) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y));
     }
     /* right */
     if (x != grid->stepsx - 1) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x + 1, y);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x + 1, y));
     }
     /* up */
     if (y != 0) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y - 1);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y - 1));
     }
     /* down */
     if (y != grid->stepsy - 1) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y + 1);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y + 1));
     }
     /* up & left */
     if (x != 0 && y != 0) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y - 1);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y - 1));
     }
     /* up & right */
     if (x != grid->stepsx - 1 && y != 0) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x + 1, y - 1);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x + 1, y - 1));
     }
     /* down & left */
     if (x != 0 && y != grid->stepsy - 1) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y + 1);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y + 1));
     }
     /* down & right */
     if (x != grid->stepsx - 1 && y != grid->stepsy - 1) {
-        igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y + 1);
+        IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y + 1));
     }
 
     return 0;

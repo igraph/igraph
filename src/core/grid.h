@@ -46,7 +46,7 @@ typedef struct igraph_2dgrid_t {
     long int vertices;        /* Number of active vertices  */
 } igraph_2dgrid_t;
 
-int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
+igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
                        igraph_real_t minx, igraph_real_t maxx, igraph_real_t deltax,
                        igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay);
 void igraph_2dgrid_destroy(igraph_2dgrid_t *grid);
@@ -60,7 +60,7 @@ void igraph_2dgrid_getcenter(const igraph_2dgrid_t *grid,
 igraph_bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, long int elem);
 igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid,
                                  long int e1, long int e2);
-int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
+igraph_error_t igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
                             igraph_integer_t vid, igraph_real_t r);
 
 typedef struct igraph_2dgrid_iterator_t {

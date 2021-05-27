@@ -45,12 +45,12 @@
  * _empty() and _popmax() operations.
  */
 
-int igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size) {
+igraph_error_t igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size) {
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->bptr, bsize);
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->buckets, size);
     b->max = -1; b->no = 0;
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_buckets_destroy(igraph_buckets_t *b) {
@@ -105,13 +105,13 @@ void igraph_buckets_clear(igraph_buckets_t *b) {
     b->no = 0;
 }
 
-int igraph_dbuckets_init(igraph_dbuckets_t *b, long int bsize, long int size) {
+igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, long int bsize, long int size) {
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->bptr, bsize);
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->next, size);
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->prev, size);
     b->max = -1; b->no = 0;
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_dbuckets_destroy(igraph_dbuckets_t *b) {
