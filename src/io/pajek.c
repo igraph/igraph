@@ -301,7 +301,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 #define E_COLOR            22
 #define E_LAST             23
 
-static int igraph_i_pajek_escape(char* src, char** dest) {
+static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
     long int destlen = 0;
     igraph_bool_t need_escape = 0;
 
@@ -767,5 +767,5 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     igraph_strvector_destroy(&strv);
     igraph_vector_destroy(&numv);
     IGRAPH_FINALLY_CLEAN(6);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

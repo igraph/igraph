@@ -34,7 +34,7 @@
 
 #include "core/math.h"
 
-static int igraph_i_layout_reingold_tilford_unreachable(
+static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     const igraph_t *graph,
     igraph_neimode_t mode,
     long int real_root,
@@ -122,16 +122,16 @@ struct igraph_i_reingold_tilford_vertex {
     igraph_real_t offset_to_right_extreme;  /* X offset when jumping to the right extreme node */
 };
 
-static int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
+static igraph_error_t igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
                                                       long int node, long int vcount);
-static int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
+static igraph_error_t igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
                                                         igraph_matrix_t *res, long int node,
                                                         long int vcount, igraph_real_t xpos);
 
 /* uncomment the next line for debugging the Reingold-Tilford layout */
 /* #define LAYOUT_RT_DEBUG 1 */
 
-static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
+static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
                                             igraph_matrix_t *res,
                                             igraph_neimode_t mode,
                                             long int root) {
@@ -225,10 +225,10 @@ static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     }
 #endif
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_layout_reingold_tilford_calc_coords(
+static igraph_error_t igraph_i_layout_reingold_tilford_calc_coords(
         struct igraph_i_reingold_tilford_vertex *vdata,
         igraph_matrix_t *res, long int node,
         long int vcount, igraph_real_t xpos) {
@@ -243,10 +243,10 @@ static int igraph_i_layout_reingold_tilford_calc_coords(
                     xpos + vdata[i].offset);
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_layout_reingold_tilford_postorder(
+static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
         struct igraph_i_reingold_tilford_vertex *vdata,
         long int node, long int vcount) {
     long int i, j, childcount, leftroot, leftrootidx;
@@ -271,7 +271,7 @@ static int igraph_i_layout_reingold_tilford_postorder(
     }
 
     if (childcount == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Here we can assume that all of the subtrees have been placed and their
@@ -443,7 +443,7 @@ static int igraph_i_layout_reingold_tilford_postorder(
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -761,7 +761,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

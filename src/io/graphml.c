@@ -1303,7 +1303,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler = {
 
 #define IS_FORBIDDEN_CONTROL_CHAR(x) ((x) < ' ' && (x) != '\t' && (x) != '\r' && (x) != '\n')
 
-static int igraph_i_xml_escape(char* src, char** dest) {
+static igraph_error_t igraph_i_xml_escape(char* src, char** dest) {
     long int destlen = 0;
     char *s, *d;
     unsigned char ch;
@@ -1349,7 +1349,7 @@ static int igraph_i_xml_escape(char* src, char** dest) {
         }
     }
     *d = 0;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1449,7 +1449,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
         IGRAPH_ERROR("Graph index was too large", IGRAPH_EINVAL);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 #else
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(instream);
@@ -1855,5 +1855,5 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     igraph_vector_bool_destroy(&boolv);
     IGRAPH_FINALLY_CLEAN(10);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -24,7 +24,7 @@
 
 #include "layout/merge_grid.h"
 
-static int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
+static igraph_error_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
                                     igraph_real_t xc, igraph_real_t yc,
                                     long int *x, long int *y) {
     if (xc <= grid->minx) {
@@ -43,12 +43,12 @@ static int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
         *y = floor((yc - (grid->miny)) / (grid->deltay));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
-                                   igraph_real_t minx, igraph_real_t maxx, long int stepsx,
-                                   igraph_real_t miny, igraph_real_t maxy, long int stepsy) {
+igraph_error_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+                                              igraph_real_t minx, igraph_real_t maxx, long int stepsx,
+                                              igraph_real_t miny, igraph_real_t maxy, long int stepsy) {
     grid->minx = minx;
     grid->maxx = maxx;
     grid->stepsx = stepsx;
@@ -62,7 +62,7 @@ int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
     if (grid->data == 0) {
         IGRAPH_ERROR("Cannot create grid", IGRAPH_ENOMEM);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
@@ -72,7 +72,7 @@ void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
 #define MAT(i,j) (grid->data[(grid->stepsy)*(j)+(i)])
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
 
-int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
                                        long int id) {
     long int cx, cy;
@@ -124,7 +124,7 @@ int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
 #undef DIST
 #undef DIST2
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,

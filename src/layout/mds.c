@@ -33,23 +33,23 @@
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
-static int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
                                     int n, void *extra);
 
-static int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
                                       igraph_matrix_t *dist, long int dim);
 
-static int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
                                     int n, void *extra) {
     igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
     IGRAPH_UNUSED(n);
     igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* MDS layout for a connected graph, with no error checking on the
  * input parameters. The distance matrix will be modified in-place. */
-int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
                                igraph_matrix_t *dist, long int dim) {
 
     long int no_of_nodes = igraph_vcount(graph);

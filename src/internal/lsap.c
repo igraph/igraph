@@ -43,11 +43,11 @@ static AP     *ap_create_problem(double *t, int n);
 /* static AP     *ap_read_problem(char *file); */
 static void    ap_free(AP *p);
 
-static int     ap_assignment(AP *p, igraph_integer_t *res);
+static int ap_assignment(AP *p, igraph_integer_t *res);
 /* static int     ap_costmatrix(AP *p, double **m); */
 /* static int     ap_datamatrix(AP *p, double **m); */
 /* static int     ap_iterations(AP *p); */
-static int     ap_hungarian(AP *p);
+static igraph_error_t     ap_hungarian(AP *p);
 /* static double  ap_mincost(AP *p); */
 /* static void    ap_print_solution(AP *p); */
 /* static void    ap_show_data(AP *p); */
@@ -63,7 +63,7 @@ static void    preassign(AP *p);
 static int     cover(AP *p, int *ri, int *ci);
 static void    reduce(AP *p, int *ri, int *ci);
 
-int ap_hungarian(AP *p) {
+igraph_error_t ap_hungarian(AP *p) {
     int      n;            /* size of problem */
     int    *ri;            /* covered rows    */
     int    *ci;            /* covered columns */
@@ -128,7 +128,7 @@ int ap_hungarian(AP *p) {
     free(ri);
     free(ci);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* abbreviated interface */

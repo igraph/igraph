@@ -35,7 +35,7 @@ static igraph_real_t igraph_i_distance_between(
         const igraph_matrix_t *c,
         long int a, long int b);
 
-static int igraph_i_determine_electric_axal_forces(
+static igraph_error_t igraph_i_determine_electric_axal_forces(
         const igraph_matrix_t *pos,
         igraph_real_t *x,
         igraph_real_t *y,
@@ -44,7 +44,7 @@ static int igraph_i_determine_electric_axal_forces(
         long int other_node,
         long int this_node);
 
-static int igraph_i_apply_electrical_force(
+static igraph_error_t igraph_i_apply_electrical_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -52,7 +52,7 @@ static int igraph_i_apply_electrical_force(
         igraph_real_t node_charge,
         igraph_real_t distance);
 
-static int igraph_i_determine_spring_axal_forces(
+static igraph_error_t igraph_i_determine_spring_axal_forces(
         const igraph_matrix_t *pos,
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
@@ -61,7 +61,7 @@ static int igraph_i_determine_spring_axal_forces(
         long int other_node,
         long int this_node);
 
-static int igraph_i_apply_spring_force(
+static igraph_error_t igraph_i_apply_spring_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -69,7 +69,7 @@ static int igraph_i_apply_spring_force(
         long int this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant);
 
-static int igraph_i_move_nodes(
+static igraph_error_t igraph_i_move_nodes(
         igraph_matrix_t *pos,
         const igraph_vector_t *pending_forces_x,
         const igraph_vector_t *pending_forces_y,
@@ -84,7 +84,7 @@ static igraph_real_t igraph_i_distance_between(
     return hypot(diffx, diffy);
 }
 
-static int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
+static igraph_error_t igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
         igraph_real_t *x,
         igraph_real_t *y,
         igraph_real_t directed_force,
@@ -134,10 +134,10 @@ static int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
         *y = *y * -1;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_apply_electrical_force(
+static igraph_error_t igraph_i_apply_electrical_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -158,10 +158,10 @@ static int igraph_i_apply_electrical_force(
     VECTOR(*pending_forces_x)[other_node] -= x_force;
     VECTOR(*pending_forces_y)[other_node] -= y_force;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_determine_spring_axal_forces(
+static igraph_error_t igraph_i_determine_spring_axal_forces(
         const igraph_matrix_t *pos,
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
@@ -197,10 +197,10 @@ static int igraph_i_determine_spring_axal_forces(
         *y = 0.5 * *y;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_apply_spring_force(
+static igraph_error_t igraph_i_apply_spring_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -222,7 +222,7 @@ static int igraph_i_apply_spring_force(
     // and when it does, electrical force will probably push one or both of them
     // one way or another anyway.
     if (distance == 0.0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     displacement = distance - spring_length;
@@ -244,10 +244,10 @@ static int igraph_i_apply_spring_force(
     VECTOR(*pending_forces_x)[other_node] -= x_force;
     VECTOR(*pending_forces_y)[other_node] -= y_force;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_move_nodes(
+static igraph_error_t igraph_i_move_nodes(
         igraph_matrix_t *pos,
         const igraph_vector_t *pending_forces_x,
         const igraph_vector_t *pending_forces_y,
@@ -292,7 +292,7 @@ static int igraph_i_move_nodes(
         MATRIX(*pos, this_node, 1) += y_movement;
 
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

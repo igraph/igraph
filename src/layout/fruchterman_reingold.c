@@ -29,7 +29,7 @@
 
 #include "core/grid.h"
 
-static int igraph_layout_i_fr(const igraph_t *graph,
+static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,
                               igraph_bool_t use_seed,
                               igraph_integer_t niter,
@@ -186,10 +186,10 @@ static int igraph_layout_i_fr(const igraph_t *graph,
     igraph_vector_float_destroy(&dispy);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_layout_i_grid_fr(
+static igraph_error_t igraph_layout_i_grid_fr(
         const igraph_t *graph,
         igraph_matrix_t *res, igraph_bool_t use_seed,
         igraph_integer_t niter, igraph_real_t start_temp,
@@ -317,7 +317,7 @@ static int igraph_layout_i_grid_fr(
     igraph_vector_float_destroy(&dispy);
     igraph_2dgrid_destroy(&grid);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -698,5 +698,5 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     igraph_vector_float_destroy(&dispz);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -114,5 +114,5 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
     igraph_vector_destroy(&edges);
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

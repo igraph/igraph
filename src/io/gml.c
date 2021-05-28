@@ -69,7 +69,7 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     }
 }
 
-static int igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_real_t *result) {
+static igraph_error_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_real_t *result) {
 
     igraph_real_t value = 0.0;
     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
@@ -510,7 +510,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
+static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) {
     int no = 1;
     char strno[50];
     size_t i, len = strlen(orig), newlen = 0, plen = 0;

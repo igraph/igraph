@@ -36,7 +36,7 @@
 
 #define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write DOT format failed.", IGRAPH_EFILE); } while (0)
 
-static int igraph_i_dot_escape(const char *orig, char **result) {
+static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
     long int i, j, len = strlen(orig), newlen = 0;
     igraph_bool_t need_quote = 0, is_number = 1;
