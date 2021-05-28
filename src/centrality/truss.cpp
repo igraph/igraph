@@ -42,10 +42,10 @@
 using namespace std;
 
 /* helper functions */
-static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
+static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
 static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
-static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
-                              igraph_vector_int_t *trussness);
+static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+                                         igraph_vector_int_t *trussness);
 
 /**
  * \function igraph_trussness
@@ -128,7 +128,7 @@ igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trus
 // Unpack the triangles as a vector of vertices to be a vector of edges.
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
-static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
+static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
     long int i, j, num_triangles;
 
     num_triangles = igraph_vector_int_size(tri);
@@ -155,8 +155,8 @@ static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_ve
 
 
 /* internal function doing the computations once the support is defined */
-static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
-                              igraph_vector_int_t *trussness) {
+static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+                                         igraph_vector_int_t *trussness) {
 
     igraph_integer_t fromVertex, toVertex, e1, e2;
     igraph_adjlist_t adjlist;

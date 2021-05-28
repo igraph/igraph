@@ -187,7 +187,7 @@ static void igraph_i_maximal_cliques_free_full(void *ptr) {
 }
 #endif
 
-static int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
+static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     igraph_vector_int_t *PX, int PS, int PE,
     int XS, int XE, int oldPS, int oldXE,
     igraph_vector_int_t *R,
@@ -242,10 +242,10 @@ static int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     /* Putting back vertices from X to P, see notes in H */
     igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int FUNCTION(igraph_maximal_cliques, SUFFIX)(
+igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     const igraph_t *graph,
     RESTYPE,
     igraph_integer_t min_size,

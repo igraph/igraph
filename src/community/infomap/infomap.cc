@@ -39,7 +39,7 @@
 #include "infomap_Greedy.h"
 
 /****************************************************************************/
-int infomap_partition(FlowGraph * fgraph, bool rcall) {
+igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
     Greedy * greedy;
 
     // save the original graph

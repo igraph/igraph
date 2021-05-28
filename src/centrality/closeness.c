@@ -332,11 +332,11 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
  */
 
-int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
-                              const igraph_vs_t vids, igraph_neimode_t mode,
-                              igraph_real_t cutoff,
-                              const igraph_vector_t *weights,
-                              igraph_bool_t normalized) {
+igraph_error_t igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
+                                         const igraph_vs_t vids, igraph_neimode_t mode,
+                                         igraph_real_t cutoff,
+                                         const igraph_vector_t *weights,
+                                         igraph_bool_t normalized) {
     IGRAPH_WARNING("igraph_closeness_estimate is deprecated, use igraph_closeness_cutoff.");
     return igraph_closeness_cutoff(graph, res, NULL, NULL, vids, mode, weights, normalized, cutoff);
 }

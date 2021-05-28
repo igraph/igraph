@@ -35,12 +35,12 @@
  * IGRAPH_THREAD_LOCAL to the following declaration */
 igraph_attribute_table_t *igraph_i_attribute_table = 0;
 
-int igraph_i_attribute_init(igraph_t *graph, void *attr) {
+igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr) {
     graph->attr = 0;
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->init(graph, attr);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
@@ -50,35 +50,35 @@ void igraph_i_attribute_destroy(igraph_t *graph) {
     }
 }
 
-int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
+igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
                             igraph_bool_t va, igraph_bool_t ea) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->copy(to, from, ga, va, ea);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
+igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_vertices(graph, nv, attr);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_permute_vertices(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_t *idx) {
 
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_combine_vertices(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_ptr_t *merges,
                                         const igraph_attribute_combination_t *comb) {
@@ -87,30 +87,30 @@ int igraph_i_attribute_combine_vertices(const igraph_t *graph,
                 merges,
                 comb);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_add_edges(igraph_t *graph,
+igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
                                  const igraph_vector_t *edges, void *attr) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_edges(graph, edges, attr);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_permute_edges(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_t *idx) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_edges(graph, newgraph, idx);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_combine_edges(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_ptr_t *merges,
                                      const igraph_attribute_combination_t *comb) {
@@ -119,11 +119,11 @@ int igraph_i_attribute_combine_edges(const igraph_t *graph,
                 merges,
                 comb);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_info(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_info(const igraph_t *graph,
                                 igraph_strvector_t *gnames,
                                 igraph_vector_t *gtypes,
                                 igraph_strvector_t *vnames,
@@ -135,7 +135,7 @@ int igraph_i_attribute_get_info(const igraph_t *graph,
                 vnames, vtypes,
                 enames, etypes);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
@@ -145,115 +145,115 @@ igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph,
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->has_attr(graph, type, name);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_gettype(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_gettype(const igraph_t *graph,
                                igraph_attribute_type_t *type,
                                igraph_attribute_elemtype_t elemtype,
                                const char *name) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->gettype(graph, type, elemtype, name);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
 }
 
-int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
         const char *name,
         igraph_vector_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_numeric_graph_attr(graph, name, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph,
         const char *name,
         igraph_vs_t vs,
         igraph_vector_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_numeric_vertex_attr(graph, name, vs, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
         const char *name,
         igraph_es_t es,
         igraph_vector_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_numeric_edge_attr(graph, name, es, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
         const char *name,
         igraph_strvector_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_string_graph_attr(graph, name, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph,
         const char *name,
         igraph_vs_t vs,
         igraph_strvector_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_string_vertex_attr(graph, name, vs, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
         const char *name,
         igraph_es_t es,
         igraph_strvector_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_string_edge_attr(graph, name, es, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
         const char *name,
         igraph_vector_bool_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_bool_graph_attr(graph, name, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph,
         const char *name,
         igraph_vs_t vs,
         igraph_vector_bool_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_bool_vertex_attr(graph, name, vs, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
-int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
         const char *name,
         igraph_es_t es,
         igraph_vector_bool_t *value) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->get_bool_edge_attr(graph, name, es, value);
     } else {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
@@ -442,7 +442,7 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
              (name && n && !strcmp(n, name)) ) {
             *type = rec->type;
             *func = rec->func;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         if (!n) {
             def = i;
@@ -459,7 +459,7 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
         *func = rec->func;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
@@ -494,5 +494,5 @@ igraph_error_t igraph_attribute_combination(igraph_attribute_combination_t *comb
 
     va_end(ap);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

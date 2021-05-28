@@ -277,56 +277,56 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  */
 
 typedef struct igraph_attribute_table_t {
-    int (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
+    igraph_error_t (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
     void (*destroy)(igraph_t *graph);
-    int (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
-                igraph_bool_t va, igraph_bool_t ea);
-    int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
-    int (*permute_vertices)(const igraph_t *graph,
+    igraph_error_t (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
+                           igraph_bool_t va, igraph_bool_t ea);
+    igraph_error_t (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
+    igraph_error_t (*permute_vertices)(const igraph_t *graph,
                             igraph_t *newgraph,
                             const igraph_vector_t *idx);
-    int (*combine_vertices)(const igraph_t *graph,
+    igraph_error_t (*combine_vertices)(const igraph_t *graph,
                             igraph_t *newgraph,
                             const igraph_vector_ptr_t *merges,
                             const igraph_attribute_combination_t *comb);
-    int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges,
+    igraph_error_t (*add_edges)(igraph_t *graph, const igraph_vector_t *edges,
                      igraph_vector_ptr_t *attr);
-    int (*permute_edges)(const igraph_t *graph,
+    igraph_error_t (*permute_edges)(const igraph_t *graph,
                          igraph_t *newgraph, const igraph_vector_t *idx);
-    int (*combine_edges)(const igraph_t *graph,
+    igraph_error_t (*combine_edges)(const igraph_t *graph,
                          igraph_t *newgraph,
                          const igraph_vector_ptr_t *merges,
                          const igraph_attribute_combination_t *comb);
-    int (*get_info)(const igraph_t *graph,
+    igraph_error_t (*get_info)(const igraph_t *graph,
                     igraph_strvector_t *gnames, igraph_vector_t *gtypes,
                     igraph_strvector_t *vnames, igraph_vector_t *vtypes,
                     igraph_strvector_t *enames, igraph_vector_t *etypes);
     igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
                               const char *name);
-    int (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
+    igraph_error_t (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
                    igraph_attribute_elemtype_t elemtype, const char *name);
-    int (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
                                   igraph_vector_t *value);
-    int (*get_string_graph_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_string_graph_attr)(const igraph_t *graph, const char *name,
                                  igraph_strvector_t *value);
-    int (*get_bool_graph_attr)(const igraph_t *igraph, const char *name,
+    igraph_error_t (*get_bool_graph_attr)(const igraph_t *igraph, const char *name,
                                igraph_vector_bool_t *value);
-    int (*get_numeric_vertex_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_numeric_vertex_attr)(const igraph_t *graph, const char *name,
                                    igraph_vs_t vs,
                                    igraph_vector_t *value);
-    int (*get_string_vertex_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_string_vertex_attr)(const igraph_t *graph, const char *name,
                                   igraph_vs_t vs,
                                   igraph_strvector_t *value);
-    int (*get_bool_vertex_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_bool_vertex_attr)(const igraph_t *graph, const char *name,
                                 igraph_vs_t vs,
                                 igraph_vector_bool_t *value);
-    int (*get_numeric_edge_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_numeric_edge_attr)(const igraph_t *graph, const char *name,
                                  igraph_es_t es,
                                  igraph_vector_t *value);
-    int (*get_string_edge_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_string_edge_attr)(const igraph_t *graph, const char *name,
                                 igraph_es_t es,
                                 igraph_strvector_t *value);
-    int (*get_bool_edge_attr)(const igraph_t *graph, const char *name,
+    igraph_error_t (*get_bool_edge_attr)(const igraph_t *graph, const char *name,
                               igraph_es_t es,
                               igraph_vector_bool_t *value);
 } igraph_attribute_table_t;

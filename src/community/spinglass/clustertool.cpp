@@ -58,7 +58,7 @@
 #include "core/interruption.h"
 #include "core/exceptions.h"
 
-static int igraph_i_community_spinglass_orig(
+static igraph_error_t igraph_i_community_spinglass_orig(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -73,7 +73,7 @@ static int igraph_i_community_spinglass_orig(
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma);
 
-static int igraph_i_community_spinglass_negative(
+static igraph_error_t igraph_i_community_spinglass_negative(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -231,7 +231,7 @@ igraph_error_t igraph_community_spinglass(const igraph_t *graph,
     );
 }
 
-static int igraph_i_community_spinglass_orig(
+static igraph_error_t igraph_i_community_spinglass_orig(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -371,7 +371,7 @@ static int igraph_i_community_spinglass_orig(
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -504,10 +504,10 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         RNG_END();
     );
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_community_spinglass_negative(
+static igraph_error_t igraph_i_community_spinglass_negative(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -664,5 +664,5 @@ static int igraph_i_community_spinglass_negative(
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

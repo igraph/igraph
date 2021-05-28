@@ -434,7 +434,7 @@ void graph_molloy_hash::print(FILE *f) {
     }
 }
 
-int graph_molloy_hash::print(igraph_t *graph) {
+igraph_error_t graph_molloy_hash::print(igraph_t *graph) {
     int i, j;
     long int ptr = 0;
     igraph_vector_t edges;
@@ -456,7 +456,7 @@ int graph_molloy_hash::print(igraph_t *graph) {
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 //_________________________________________________________________________
