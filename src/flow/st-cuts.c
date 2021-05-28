@@ -721,14 +721,11 @@ static int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 }
 
 /* not 'static' because used in igraph_all_st_cuts.c test program */
-int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
-                               const igraph_marked_queue_t *S,
-                               const igraph_estack_t *T,
-                               long int source,
-                               long int target,
-                               long int *v,
-                               igraph_vector_t *Isv,
-                               void *arg) {
+igraph_error_t igraph_i_all_st_cuts_pivot(
+    const igraph_t *graph, const igraph_marked_queue_t *S,
+    const igraph_estack_t *T, long int source, long int target,
+    long int *v, igraph_vector_t *Isv, void *arg
+) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_t Sbar;
@@ -925,61 +922,59 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
     igraph_vector_destroy(&Sbar_invmap);
     IGRAPH_FINALLY_CLEAN(7);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* TODO: This is a temporary recursive version, without proper error
    handling */
 
-int igraph_provan_shier_list(const igraph_t *graph,
-                             igraph_marked_queue_t *S,
-                             igraph_estack_t *T,
-                             long int source,
-                             long int target,
-                             igraph_vector_ptr_t *result,
-                             igraph_provan_shier_pivot_t *pivot,
-                             void *pivot_arg) {
+igraph_error_t igraph_provan_shier_list(
+    const igraph_t *graph, igraph_marked_queue_t *S,
+    igraph_estack_t *T, long int source, long int target,
+    igraph_vector_ptr_t *result, igraph_provan_shier_pivot_t *pivot,
+    void *pivot_arg
+) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t Isv;
     long int v = 0;
     long int i, n;
 
-    igraph_vector_init(&Isv, 0);
+    IGRAPH_CHECK(igraph_vector_init(&Isv, 0));
 
     pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
     if (igraph_vector_size(&Isv) == 0) {
         if (igraph_marked_queue_size(S) != 0 &&
             igraph_marked_queue_size(S) != no_of_nodes) {
             igraph_vector_t *vec = IGRAPH_CALLOC(1, igraph_vector_t);
-            igraph_vector_init(vec, igraph_marked_queue_size(S));
-            igraph_marked_queue_as_vector(S, vec);
+            IGRAPH_CHECK(igraph_vector_init(vec, igraph_marked_queue_size(S)));
+            IGRAPH_CHECK(igraph_marked_queue_as_vector(S, vec));
             IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
         }
     } else {
         /* Put v into T */
-        igraph_estack_push(T, v);
+        IGRAPH_CHECK(igraph_estack_push(T, v));
 
         /* Go down left in the search tree */
-        igraph_provan_shier_list(graph, S, T, source, target,
-                                 result, pivot, pivot_arg);
+        IGRAPH_CHECK(igraph_provan_shier_list(
+            graph, S, T, source, target, result, pivot, pivot_arg));
 
         /* Take out v from T */
         igraph_estack_pop(T);
 
         /* Add Isv to S */
-        igraph_marked_queue_start_batch(S);
+        IGRAPH_CHECK(igraph_marked_queue_start_batch(S));
         n = igraph_vector_size(&Isv);
         for (i = 0; i < n; i++) {
             if (!igraph_marked_queue_iselement(S, (long int) VECTOR(Isv)[i])) {
-                igraph_marked_queue_push(S, (long int) VECTOR(Isv)[i]);
+                IGRAPH_CHECK(igraph_marked_queue_push(S, (long int) VECTOR(Isv)[i]));
             }
         }
 
         /* Go down right in the search tree */
 
-        igraph_provan_shier_list(graph, S, T, source, target,
-                                 result, pivot, pivot_arg);
+        IGRAPH_CHECK(igraph_provan_shier_list(
+            graph, S, T, source, target, result, pivot, pivot_arg));
 
         /* Take out Isv from S */
         igraph_marked_queue_pop_back_batch(S);
@@ -987,7 +982,7 @@ int igraph_provan_shier_list(const igraph_t *graph,
 
     igraph_vector_destroy(&Isv);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

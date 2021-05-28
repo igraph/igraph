@@ -45,7 +45,7 @@
  * Time complexity: operating system dependent, should be around
  * O(n), n is the expected size of the set.
  */
-int igraph_set_init(igraph_set_t *set, int long size) {
+igraph_error_t igraph_set_init(igraph_set_t *set, int long size) {
     long int alloc_size;
 
     if (size < 0) {
@@ -56,7 +56,7 @@ int igraph_set_init(igraph_set_t *set, int long size) {
     set->stor_end = set->stor_begin + alloc_size;
     set->end = set->stor_begin;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -106,13 +106,13 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set) {
  * Time complexity: operating system dependent, should be around
  * O(n), n is the new allocated size of the set.
  */
-int igraph_set_reserve(igraph_set_t* set, long int size) {
+igraph_error_t igraph_set_reserve(igraph_set_t* set, long int size) {
     long int actual_size = igraph_set_size(set);
     igraph_integer_t *tmp;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(set->stor_begin, (size_t) size, igraph_integer_t);
@@ -123,7 +123,7 @@ int igraph_set_reserve(igraph_set_t* set, long int size) {
     set->stor_end = set->stor_begin + size;
     set->end = set->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -193,7 +193,7 @@ long int igraph_set_size(const igraph_set_t* set) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
+igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     long int left, right, middle;
     long int size;
     IGRAPH_ASSERT(set != NULL);
@@ -242,7 +242,7 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
         set->end += 1;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

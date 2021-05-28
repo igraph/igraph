@@ -56,7 +56,7 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
-int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
+igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     t->maxvalue = -1;
     t->storekeys = storekeys;
     IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *) t ));
@@ -66,7 +66,7 @@ int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -129,7 +129,7 @@ static long int igraph_i_strdiff(const char *str, const char *key) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
+igraph_error_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
                          igraph_real_t newvalue, long int *id) {
     char *str;
     long int i;
@@ -155,11 +155,11 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             /* They are exactly the same */
             if (VECTOR(t->values)[i] != -1) {
                 *id = VECTOR(t->values)[i];
-                return 0;
+                return IGRAPH_SUCCESS;
             } else {
                 VECTOR(t->values)[i] = newvalue;
                 *id = newvalue;
-                return 0;
+                return IGRAPH_SUCCESS;
             }
 
         } else if (str[diff] == '\0') {
@@ -185,10 +185,10 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
                 *id = newvalue;
                 IGRAPH_FINALLY_CLEAN(3);
-                return 0;
+                return IGRAPH_SUCCESS;
             } else {
                 *id = -1;
-                return 0;
+                return IGRAPH_SUCCESS;
             }
 
         } else if (key[diff] == '\0' && add) {
@@ -223,7 +223,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             VECTOR(t->children)[i] = node;
 
             *id = newvalue;
-            return 0;
+            return IGRAPH_SUCCESS;
 
         } else if (add) {
 
@@ -259,13 +259,13 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             VECTOR(t->children)[i] = node;
 
             *id = newvalue;
-            return 0;
+            return IGRAPH_SUCCESS;
         } else {
 
             /* ------------------------------------------------- */
             /* No match, but we requested not to add the new key */
             *id = -1;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
@@ -285,7 +285,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
         *id = -1;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -293,14 +293,13 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
  * \brief Search/insert in a trie.
  */
 
-int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
+igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
     if (!t->storekeys) {
         IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t,
                                            key, t->maxvalue + 1, id));
         if (*id > t->maxvalue) {
             t->maxvalue = *id;
         }
-        return 0;
     } else {
         int ret;
         igraph_error_handler_t *oldhandler;
@@ -328,7 +327,7 @@ int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
         igraph_set_error_handler(oldhandler);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -339,7 +338,7 @@ int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
+igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
                      long int *id) {
     char *tmp = IGRAPH_CALLOC(length + 1, char);
 
@@ -353,7 +352,8 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     IGRAPH_FREE(tmp);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -363,10 +363,10 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
  * In this case, a negative id is returned.
  */
 
-int igraph_trie_check(igraph_trie_t *t, const char *key, long int *id) {
+igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, long int *id) {
     IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t,
                                        key, -1, id));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -389,7 +389,7 @@ long int igraph_trie_size(igraph_trie_t *t) {
 
 /* Hmmm, very dirty.... */
 
-int igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
+igraph_error_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
     *strv = &t->keys;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
