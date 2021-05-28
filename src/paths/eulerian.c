@@ -40,7 +40,7 @@ The function returns one of the following values
 has_path is set to 1 if a path exists, 0 otherwise
 has_cycle is set to 1 if a cycle exists, 0 otherwise
 */
-static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
+static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_integer_t odd;
     igraph_vector_t degree, csize;
     /* boolean vector to mark singletons: */
@@ -161,7 +161,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
 }
 
 
-static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle,                                         igraph_integer_t *start_of_path) {
+static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle,                                         igraph_integer_t *start_of_path) {
     igraph_integer_t incoming_excess, outgoing_excess, n;
     long int i, vsize;
     long int cluster_count;
@@ -338,7 +338,7 @@ igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path
 }
 
 
-static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
+static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
     long int curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
@@ -451,7 +451,7 @@ static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vecto
 }
 
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
-static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
+static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
     long int curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;

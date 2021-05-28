@@ -32,7 +32,7 @@
 #include <math.h>
 #include <float.h>
 
-static int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
+static igraph_error_t igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
                                     int n, void *extra,
                                     igraph_matrix_t *res) {
 
@@ -54,10 +54,10 @@ static int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
     igraph_vector_destroy(&v);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -132,10 +132,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
     igraph_vector_destroy(&val1);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -208,10 +208,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
     igraph_vector_destroy(&val);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -225,10 +225,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
                                       /*il=*/ il, /*iu=*/ n,
                                       /*abstol=*/ 1e-14, values, vectors,
                                       /*support=*/ 0));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -241,10 +241,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_matrix_t *A,
                                       /*abstol=*/ 1e-14, values, vectors,
                                       /*support=*/ 0));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -320,10 +320,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
     igraph_vector_destroy(&val1);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
 
@@ -333,10 +333,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
                                       /*abstol=*/ 1e-14, values, vectors,
                                       /*support=*/ 0));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -348,10 +348,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_matrix_t *A,
                                       /*abstol=*/ 1e-14, values, vectors,
                                       /*support=*/ 0));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -362,10 +362,10 @@ static int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
                                       /*abstol=*/ 1e-14, values, vectors,
                                       /*support=*/ 0));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
         igraph_arpack_function_t *fun,
         int n, void *extra,
@@ -438,7 +438,7 @@ static int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct igraph_i_eigen_matrix_sym_arpack_data_t {
@@ -446,7 +446,7 @@ typedef struct igraph_i_eigen_matrix_sym_arpack_data_t {
     const igraph_sparsemat_t *sA;
 } igraph_i_eigen_matrix_sym_arpack_data_t;
 
-static int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
+static igraph_error_t igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
                                         const igraph_real_t *from,
                                         int n, void *extra) {
 
@@ -463,10 +463,10 @@ static int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
         igraph_vector_null(&vto);
         igraph_sparsemat_gaxpy(data->sA, &vfrom, &vto);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
         igraph_arpack_function_t *fun,
         int n, void *extra,
@@ -538,10 +538,10 @@ static int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
     igraph_vector_destroy(&tmpvalues);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
         igraph_arpack_function_t *fun,
         int n, void *extra,
@@ -617,7 +617,7 @@ static int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 
         IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage,
                                            values, vectors));
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
@@ -897,7 +897,7 @@ static int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
         }                                   \
     } while (0)
 
-static int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
+static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
         const igraph_vector_t *imag,
         const igraph_matrix_t *compressed,
         const igraph_eigen_which_t *which,
@@ -1017,10 +1017,10 @@ static int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     igraph_vector_int_destroy(&idx);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
                                         const igraph_eigen_which_t *which,
                                         igraph_vector_complex_t *values,
                                         igraph_matrix_complex_t *vectors) {
@@ -1052,25 +1052,25 @@ static int igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
     igraph_vector_destroy(&valuesreal);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
-static int igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
@@ -1078,42 +1078,42 @@ static int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
 }
 
 
-static int igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack_li(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_li(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack_si(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_si(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
                                         const igraph_eigen_which_t *which,
                                         igraph_vector_complex_t *values,
                                         igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
                                      const igraph_eigen_which_t *which,
                                      igraph_vector_complex_t *values,
                                      igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-static int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
                                  const igraph_sparsemat_t *sA,
                                  igraph_arpack_function_t *fun,
                                  int n, void *extra,
@@ -1183,10 +1183,10 @@ static int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_checks(const igraph_matrix_t *A,
+static igraph_error_t igraph_i_eigen_checks(const igraph_matrix_t *A,
                           const igraph_sparsemat_t *sA,
                           igraph_arpack_function_t *fun, int n) {
 
@@ -1205,7 +1205,7 @@ static int igraph_i_eigen_checks(const igraph_matrix_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1266,7 +1266,7 @@ igraph_error_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
         IGRAPH_ERROR("Unknown 'algorithm'", IGRAPH_EINVAL);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1336,10 +1336,10 @@ igraph_error_t igraph_eigen_matrix(const igraph_matrix_t *A,
         IGRAPH_ERROR("Unknown `algorithm'", IGRAPH_EINVAL);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
+static igraph_error_t igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
         const igraph_real_t *from,
         int n, void *extra) {
     igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
@@ -1356,10 +1356,10 @@ static int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
+static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
                                     const igraph_eigen_which_t *which,
                                     igraph_arpack_options_t *options,
                                     igraph_arpack_storage_t* storage,
@@ -1450,7 +1450,7 @@ static int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1516,7 +1516,7 @@ igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
     }
 
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

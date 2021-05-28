@@ -184,7 +184,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     IGRAPH_CHECK(igraph_cocitation_real(graph, res, vids, mode0, &weights));
     igraph_vector_destroy(&weights);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
@@ -254,11 +254,11 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
-static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
+static igraph_error_t igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
                                       const igraph_vector_int_t *v2, long int *len_union,
                                       long int *len_intersection) {
     /* ASSERT: v1 and v2 are sorted */
@@ -276,7 +276,7 @@ static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
             j++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -381,7 +381,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
     igraph_vit_destroy(&vit2);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -500,7 +500,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
     igraph_lazy_adjlist_destroy(&al);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

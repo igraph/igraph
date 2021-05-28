@@ -206,11 +206,11 @@ igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_maximum_bipartite_matching_unweighted(
+static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_vector_long_t* matching);
-static int igraph_i_maximum_bipartite_matching_weighted(
+static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,
@@ -307,7 +307,7 @@ igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* graph,
     }
 }
 
-static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
+static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_long_t* matching, igraph_bool_t smaller_set);
@@ -325,7 +325,7 @@ static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * Avancée en Calcul Scientifique).
  * http://www.cerfacs.fr/algor/reports/2011/TR_PA_11_33.pdf
  */
-static int igraph_i_maximum_bipartite_matching_unweighted(
+static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_vector_long_t* matching) {
@@ -463,7 +463,7 @@ static int igraph_i_maximum_bipartite_matching_unweighted(
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
+static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_long_t* match, igraph_bool_t smaller_set) {
@@ -533,7 +533,7 @@ static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * an edge falls below \c eps, it will be considered tight. If all your
  * weights are integers, you can safely set \c eps to zero.
  */
-static int igraph_i_maximum_bipartite_matching_weighted(
+static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,

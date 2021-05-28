@@ -33,7 +33,7 @@
 
 /* The ARPACK example file dssimp.f is used as a template */
 
-static int igraph_i_arpack_err_dsaupd(int error) {
+static igraph_error_t igraph_i_arpack_err_dsaupd(int error) {
     switch (error) {
     case  1:      return IGRAPH_ARPACK_MAXIT;
     case  3:      return IGRAPH_ARPACK_NOSHIFT;
@@ -55,7 +55,7 @@ static int igraph_i_arpack_err_dsaupd(int error) {
     }
 }
 
-static int igraph_i_arpack_err_dseupd(int error) {
+static igraph_error_t igraph_i_arpack_err_dseupd(int error) {
     switch (error) {
     case -1:      return IGRAPH_ARPACK_NPOS;
     case -2:      return IGRAPH_ARPACK_NEVNPOS;
@@ -77,7 +77,7 @@ static int igraph_i_arpack_err_dseupd(int error) {
 
 }
 
-static int igraph_i_arpack_err_dnaupd(int error) {
+static igraph_error_t igraph_i_arpack_err_dnaupd(int error) {
     switch (error) {
     case  1:      return IGRAPH_ARPACK_MAXIT;
     case  3:      return IGRAPH_ARPACK_NOSHIFT;
@@ -98,7 +98,7 @@ static int igraph_i_arpack_err_dnaupd(int error) {
     }
 }
 
-static int igraph_i_arpack_err_dneupd(int error) {
+static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
     switch (error) {
     case  1:      return IGRAPH_ARPACK_REORDER;
     case -1:      return IGRAPH_ARPACK_NPOS;
@@ -224,7 +224,7 @@ igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int m
 #undef CHECKMEM
 
     IGRAPH_FINALLY_CLEAN(7);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -259,7 +259,7 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
  * "Solver" for 1x1 eigenvalue problems since ARPACK sometimes blows up with
  * these.
  */
-static int igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
+static igraph_error_t igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options,
                                        igraph_vector_t* values, igraph_matrix_t* vectors) {
     igraph_real_t a, b;
@@ -295,7 +295,7 @@ static int igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extr
  * "Solver" for 1x1 eigenvalue problems since ARPACK sometimes blows up with
  * these.
  */
-static int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
+static igraph_error_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options,
                                        igraph_matrix_t* values, igraph_matrix_t* vectors) {
     igraph_real_t a, b;
@@ -331,7 +331,7 @@ static int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extr
  * "Solver" for 2x2 nonsymmetric eigenvalue problems since ARPACK sometimes
  * blows up with these.
  */
-static int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
+static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options, igraph_matrix_t* values,
                                        igraph_matrix_t* vectors) {
     igraph_real_t vec[2], mat[4];
@@ -485,7 +485,7 @@ static int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extr
  * "Solver" for symmetric 2x2 eigenvalue problems since ARPACK sometimes blows
  * up with these.
  */
-static int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
+static igraph_error_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options, igraph_vector_t* values,
                                        igraph_matrix_t* vectors) {
     igraph_real_t vec[2], mat[4];
@@ -576,9 +576,9 @@ static int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extr
     return IGRAPH_SUCCESS;
 }
 
-int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
-                         const igraph_arpack_options_t *options,
-                         igraph_real_t *d, const igraph_real_t *v) {
+igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
+                                    const igraph_arpack_options_t *options,
+                                    igraph_real_t *d, const igraph_real_t *v) {
 
     igraph_vector_t order;
     char sort[2];
@@ -655,7 +655,7 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
     igraph_vector_destroy(&order);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
@@ -1063,7 +1063,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
         IGRAPH_FREE(v);
         IGRAPH_FINALLY_CLEAN(7);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1329,7 +1329,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
         IGRAPH_FREE(v);
         IGRAPH_FINALLY_CLEAN(8);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -30,7 +30,7 @@
 
 #include "graph/attributes.h"
 
-static int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
+static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
                                              igraph_bool_t loops,
                                              igraph_vector_t *edges) {
 
@@ -181,7 +181,7 @@ static int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob
     igraph_vector_destroy(&eorder);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef ADD_STUB
@@ -279,7 +279,7 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
     igraph_destroy(graph);
     *graph = newgraph;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -388,5 +388,5 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
         IGRAPH_CHECK(igraph_rewire_edges(graph, prob, loops, /* multiple = */ 0));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

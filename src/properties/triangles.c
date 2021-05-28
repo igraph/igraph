@@ -340,7 +340,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(8);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* We don't use this, it is theoretically good, but practically not.
@@ -398,7 +398,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*   igraph_vit_destroy(&vit); */
 /*   IGRAPH_FINALLY_CLEAN(2); */
 
-/*   return 0; */
+/*   return IGRAPH_SUCCESS; */
 /* } */
 
 /* This removes loop, multiple edges and edges that point
@@ -446,7 +446,7 @@ igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
 #include "properties/triangles_template.h"
 #undef TRANSIT
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -521,17 +521,17 @@ igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
     }
 }
 
-static int igraph_adjacent_triangles1(const igraph_t *graph,
+static igraph_error_t igraph_adjacent_triangles1(const igraph_t *graph,
                                       igraph_vector_t *res,
                                       const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_adjacent_triangles4(const igraph_t *graph,
+static igraph_error_t igraph_adjacent_triangles4(const igraph_t *graph,
                                       igraph_vector_t *res) {
 # include "properties/triangles_template.h"
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -717,7 +717,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
         *res = triangles / triples * 2.0;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_transitivity_barrat1(const igraph_t *graph,

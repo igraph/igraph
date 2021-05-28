@@ -27,7 +27,7 @@
 
 #include <math.h>
 
-static int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                                        igraph_sparsemat_t *sparseres,
                                        igraph_bool_t normalized,
                                        const igraph_vector_t *weights) {
@@ -227,7 +227,7 @@ static int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *r
     igraph_eit_destroy(&edgeit);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -432,5 +432,5 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&degree);
     igraph_eit_destroy(&edgeit);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

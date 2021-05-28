@@ -25,18 +25,18 @@
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
 
-static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *degrees, igraph_bool_t *res);
-static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t *degrees, igraph_bool_t *res);
-static int igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *degrees, igraph_bool_t *res);
-static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t *degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res);
 
-static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
-static int igraph_i_is_graphical_directed_loopless_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
-static int igraph_i_is_graphical_directed_loopy_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
-static int igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_directed_loopless_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res);
 
-static int igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res);
-static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res);
 
 
 /**
@@ -238,7 +238,7 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_t *degrees1,
  *
  * These conditions are valid regardless of whether multi-edges are allowed between distinct vertices.
  */
-static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *degrees, igraph_bool_t *res) {
     long int sum_parity = 0; /* 0 if the degree sum is even, 1 if it is odd */
     long int n = igraph_vector_size(degrees);
     long int i;
@@ -264,7 +264,7 @@ static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *d
  *  - The sum of degrees must be even.
  *  - The sum of degrees must be no smaller than 2*d_max.
  */
-static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t *degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t *degrees, igraph_bool_t *res) {
     long int i;
     long int n = igraph_vector_size(degrees);
     long int dsum, dmax;
@@ -300,7 +300,7 @@ static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t
  *  - The sum of degrees must be even.
  *  - Use the modification of the Erdős-Gallai theorem due to Cairns and Mendan.
  */
-static int igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_t work;
     long int w, b, s, c, n, k;
 
@@ -378,7 +378,7 @@ static int igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *
  *  - The sum of degrees must be even.
  *  - Use the Erdős-Gallai theorem.
  */
-static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_int_t num_degs; /* num_degs[d] is the # of vertices with degree d */
     const long int p = igraph_vector_size(degrees);
     long int dmin, dmax, dsum;
@@ -503,7 +503,7 @@ finish:
  *  - Degrees must be non-negative.
  *  - The sum of in- and out-degrees must be the same.
  */
-static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     long int sumdiff; /* difference between sum of in- and out-degrees */
     long int n = igraph_vector_size(out_degrees);
     long int i;
@@ -537,7 +537,7 @@ static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out
  *  - The sum of out-degrees must be no smaller than d_max,
  *    where d_max is the largest total degree.
  */
-static int igraph_i_is_graphical_directed_loopless_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_directed_loopless_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     long int i, sumin, sumout, dmax;
     long int n = igraph_vector_size(out_degrees);
 
@@ -574,7 +574,7 @@ static int igraph_i_is_graphical_directed_loopless_multi(const igraph_vector_t *
  *  - Degrees must be non-negative.
  *  - Equivalent to bipartite simple graph.
  */
-static int igraph_i_is_graphical_directed_loopy_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     long int n = igraph_vector_size(out_degrees);
 
     if (igraph_vector_size(in_degrees) != n) {
@@ -616,7 +616,7 @@ static int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const
     return 0;
 }
 
-static int igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     igraph_vector_long_t index_array;
     long int i, j, vcount, lhs, rhs;
     igraph_i_qsort_dual_vector_cmp_data_t sort_data;
@@ -700,7 +700,7 @@ static int igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degr
  *  - Degrees must be non-negative.
  *  - Sum of degrees must be the same in the two partitions.
  */
-static int igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res) {
     long int i;
     long int sum1, sum2;
     long int n1 = igraph_vector_size(degrees1), n2 = igraph_vector_size(degrees2);
@@ -740,7 +740,7 @@ static int igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const 
  *  - Sum of degrees must be the same in the two partitions.
  *  - Use the Gale-Ryser theorem.
  */
-static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res) {
     igraph_vector_t sorted_deg1, sorted_deg2;
     long int n1 = igraph_vector_size(degrees1), n2 = igraph_vector_size(degrees2);
     long int i, k;

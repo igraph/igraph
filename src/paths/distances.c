@@ -35,7 +35,7 @@
  * vid_ecc will then return the id of the vertex farthest from the one in
  * vids. If unconn == FALSE and not all other vertices were reachable from
  * the single given vertex, -1 is returned in vid_ecc. */
-static int igraph_i_eccentricity(const igraph_t *graph,
+static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
                                  igraph_lazy_adjlist_t *adjlist,
@@ -210,7 +210,7 @@ igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

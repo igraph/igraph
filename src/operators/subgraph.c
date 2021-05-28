@@ -33,7 +33,7 @@
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+static igraph_error_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
                                              const igraph_vs_t vids,
                                              igraph_vector_t *map,
                                              igraph_vector_t *invmap) {
@@ -80,14 +80,14 @@ static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *re
     igraph_vector_destroy(&delete);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * Subgraph creation, new version: creates the new graph instead of
  * copying the old one.
  */
-static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
+static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                                                  igraph_t *res,
                                                  const igraph_vs_t vids,
                                                  igraph_vector_t *map,
@@ -247,7 +247,7 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     igraph_vector_destroy(&eids_new2old);
     IGRAPH_FINALLY_CLEAN(2);   /* 1 + 1 since we don't need to destroy res */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -300,7 +300,7 @@ igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                        /* invmap= */ 0);
 }
 
-static int igraph_i_induced_subgraph_suggest_implementation(
+static igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
         const igraph_t *graph, const igraph_vs_t vids,
         igraph_subgraph_implementation_t *result) {
     double ratio;
@@ -320,7 +320,7 @@ static int igraph_i_induced_subgraph_suggest_implementation(
         *result = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
@@ -455,5 +455,5 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     igraph_vector_destroy(&delete);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

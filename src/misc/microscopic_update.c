@@ -94,7 +94,7 @@
  * of \p vid.
  */
 
-static int igraph_i_ecumulative_proportionate_values(const igraph_t *graph,
+static igraph_error_t igraph_i_ecumulative_proportionate_values(const igraph_t *graph,
                                                      const igraph_vector_t *U,
                                                      igraph_vector_t *V,
                                                      igraph_bool_t islocal,
@@ -243,7 +243,7 @@ static int igraph_i_ecumulative_proportionate_values(const igraph_t *graph,
  * perspective of vid.
  */
 
-static int igraph_i_vcumulative_proportionate_values(const igraph_t *graph,
+static igraph_error_t igraph_i_vcumulative_proportionate_values(const igraph_t *graph,
                                                      const igraph_vector_t *U,
                                                      igraph_vector_t *V,
                                                      igraph_bool_t islocal,
@@ -417,7 +417,7 @@ static int igraph_i_vcumulative_proportionate_values(const igraph_t *graph,
  *         \endclist
  */
 
-static int igraph_i_microscopic_standard_tests(const igraph_t *graph,
+static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
                                                igraph_integer_t vid,
                                                const igraph_vector_t *quantities,
                                                const igraph_vector_t *strategies,

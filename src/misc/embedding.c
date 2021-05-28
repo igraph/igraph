@@ -41,7 +41,7 @@ typedef struct {
 
 /* Adjacency matrix, unweighted, undirected.
    Eigendecomposition is used */
-static int igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
                           int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
@@ -61,12 +61,12 @@ static int igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
         to[i] += VECTOR(*cvec)[i] * from[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Adjacency matrix, weighted, undirected.
    Eigendecomposition is used. */
-static int igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real_t *from,
                            int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -90,11 +90,11 @@ static int igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real_t *from,
         to[i] += VECTOR(*cvec)[i] * from[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Adjacency matrix, unweighted, directed. SVD. */
-static int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
                          int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
@@ -128,11 +128,11 @@ static int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
         to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Adjacency matrix, unweighted, directed. SVD, right eigenvectors */
-static int igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *from,
                                int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *inlist = data->inlist;
@@ -152,11 +152,11 @@ static int igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *fr
         to[i] += VECTOR(*cvec)[i] * from[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Adjacency matrix, weighted, directed. SVD. */
-static int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
                           int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -196,11 +196,11 @@ static int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
         to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Adjacency matrix, weighted, directed. SVD, right eigenvectors. */
-static int igraph_i_asembeddingw_right(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_asembeddingw_right(igraph_real_t *to, const igraph_real_t *from,
                                 int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *inlist = data->einlist;
@@ -224,11 +224,11 @@ static int igraph_i_asembeddingw_right(igraph_real_t *to, const igraph_real_t *f
         to[i] += VECTOR(*cvec)[i] * from[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian D-A, unweighted, undirected. Eigendecomposition. */
-static int igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
                             int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
@@ -248,11 +248,11 @@ static int igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
         to[i] += VECTOR(*cvec)[i] * from[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian D-A, weighted, undirected. Eigendecomposition. */
-static int igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
                              int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -276,11 +276,11 @@ static int igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from
         to[i] += VECTOR(*cvec)[i] * from[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian DAD, unweighted, undirected. Eigendecomposition. */
-static int igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
                              int n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
@@ -311,10 +311,10 @@ static int igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from
         to[i] = VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
                               int n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
@@ -367,11 +367,11 @@ static int igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *fro
         to[i] = VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian I-DAD, unweighted, undirected. Eigendecomposition. */
-static int igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
                               int n, void *extra) {
 
     int i;
@@ -381,10 +381,10 @@ static int igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *fro
         to[i] = from[i] - to[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
                                int n, void *extra) {
     int i;
 
@@ -393,11 +393,11 @@ static int igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *fr
         to[i] = from[i] - to[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian OAP, unweighted, directed. SVD. */
-static int igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *from,
                               int n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
@@ -451,11 +451,11 @@ static int igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *fro
         to[i] = VECTOR(*deg_out)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian OAP, unweighted, directed. SVD, right eigenvectors. */
-static int igraph_i_lseembedding_oap_right(igraph_real_t *to,
+static igraph_error_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
                                     const igraph_real_t *from,
                                     int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
@@ -487,11 +487,11 @@ static int igraph_i_lseembedding_oap_right(igraph_real_t *to,
         to[i] = VECTOR(*deg_in)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian OAP, weighted, directed. SVD. */
-static int igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *from,
                                int n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
@@ -551,11 +551,11 @@ static int igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *fr
         to[i] = VECTOR(*deg_out)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Laplacian OAP, weighted, directed. SVD, right eigenvectors. */
-static int igraph_i_lseembedding_oapw_right(igraph_real_t *to,
+static igraph_error_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
                                      const igraph_real_t *from,
                                      int n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
@@ -591,10 +591,10 @@ static int igraph_i_lseembedding_oapw_right(igraph_real_t *to,
         to[i] = VECTOR(*deg_in)[i] * VECTOR(*tmp)[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_spectral_embedding(const igraph_t *graph,
+static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
                                 igraph_integer_t no,
                                 const igraph_vector_t *weights,
                                 igraph_eigen_which_position_t which,
@@ -664,7 +664,7 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
         if (Y) {
             igraph_matrix_null(Y);
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     igraph_vector_init(&tmp, vc);
@@ -786,7 +786,7 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -885,7 +885,7 @@ igraph_error_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
                                        /*eigen=*/ !directed, /*zapsmall=*/ 1);
 }
 
-static int igraph_i_lse_und(const igraph_t *graph,
+static igraph_error_t igraph_i_lse_und(const igraph_t *graph,
                      igraph_integer_t no,
                      const igraph_vector_t *weights,
                      igraph_eigen_which_position_t which,
@@ -942,10 +942,10 @@ static int igraph_i_lse_und(const igraph_t *graph,
     igraph_vector_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_lse_dir(const igraph_t *graph,
+static igraph_error_t igraph_i_lse_dir(const igraph_t *graph,
                      igraph_integer_t no,
                      const igraph_vector_t *weights,
                      igraph_eigen_which_position_t which,
@@ -990,7 +990,7 @@ static int igraph_i_lse_dir(const igraph_t *graph,
     igraph_vector_destroy(&deg_out);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1124,7 +1124,7 @@ igraph_error_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *di
 
     if (n == 1) {
         *dim = 1;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     for (i = 0; i < n; i++) {
@@ -1172,5 +1172,5 @@ igraph_error_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *di
         *dim = n;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

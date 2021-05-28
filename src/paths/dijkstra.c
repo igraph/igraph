@@ -221,7 +221,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vit_destroy(&fromvit);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -534,7 +534,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -615,7 +615,7 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Compares two paths based on their last elements. Required by

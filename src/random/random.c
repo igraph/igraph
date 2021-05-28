@@ -180,7 +180,7 @@ static void igraph_i_rng_glibc2_init(long int *x, int n,
     }
 }
 
-static int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     int i;
@@ -197,7 +197,7 @@ static int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_rng_glibc2_init(void **state) {
+static igraph_error_t igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
@@ -261,13 +261,13 @@ static igraph_real_t igraph_rng_rand_get_real(void *vstate) {
     return igraph_rng_rand_get (vstate) / 2147483648.0 ;
 }
 
-static int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = seed;
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_rng_rand_init(void **state) {
+static igraph_error_t igraph_rng_rand_init(void **state) {
     igraph_i_rng_rand_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_rand_state_t);
@@ -391,7 +391,7 @@ static igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
     return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
 }
 
-static int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_mt19937_state_t *state = vstate;
     int i;
 
@@ -415,7 +415,7 @@ static int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_rng_mt19937_init(void **state) {
+static igraph_error_t igraph_rng_mt19937_init(void **state) {
     igraph_i_rng_mt19937_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_mt19937_state_t);
@@ -983,7 +983,7 @@ float rintf (float x) {
  * result vector.
  */
 
-static int igraph_i_random_sample_alga(igraph_vector_t *res,
+static igraph_error_t igraph_i_random_sample_alga(igraph_vector_t *res,
                                        igraph_integer_t l, igraph_integer_t h,
                                        igraph_integer_t length) {
     igraph_real_t N = h - l + 1;

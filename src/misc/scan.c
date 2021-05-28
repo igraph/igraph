@@ -75,14 +75,14 @@ igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
     } else {
         igraph_degree(graph, res, igraph_vss_all(), mode, /*loops=*/ 1);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* This removes loop, multiple edges and edges that point
    "backwards" according to the rank vector. It works on
    edge lists */
 
-static int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
+static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
                                        const igraph_vector_int_t *rank) {
 
     long int i;
@@ -112,13 +112,13 @@ static int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *
 
     igraph_vector_int_destroy(&mark);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
 /* This one handles both weighted and unweighted cases */
 
-static int igraph_i_local_scan_1_directed(const igraph_t *graph,
+static igraph_error_t igraph_i_local_scan_1_directed(const igraph_t *graph,
                                           igraph_vector_t *res,
                                           const igraph_vector_t *weights,
                                           igraph_neimode_t mode) {
@@ -176,10 +176,10 @@ static int igraph_i_local_scan_1_directed(const igraph_t *graph,
     igraph_inclist_destroy(&incs);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
+static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
                                               igraph_vector_t *res,
                                               const igraph_vector_t *weights) {
 
@@ -246,10 +246,10 @@ static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
     igraph_inclist_destroy(&incs);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
+static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
                                             igraph_vector_t *res,
                                             const igraph_vector_t *weights) {
 
@@ -338,7 +338,7 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -380,10 +380,10 @@ igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
+static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
                                         igraph_vector_t *res,
                                         const igraph_vector_t *weights_them,
                                         igraph_neimode_t mode) {
@@ -417,7 +417,7 @@ static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them
     igraph_vector_destroy(&map2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -465,7 +465,7 @@ igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them
     igraph_destroy(&is);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -574,7 +574,7 @@ igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_
     igraph_adjlist_destroy(&adj_us);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -669,7 +669,7 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, int k,
     igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -795,7 +795,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
     igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -876,5 +876,5 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
     igraph_vector_int_destroy(&marked);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -76,7 +76,7 @@ igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vs_t vids,
         igraph_neimode_t mode,
         igraph_neimode_t neighbor_degree_mode,
@@ -189,7 +189,7 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -347,7 +347,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -433,7 +433,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -495,5 +495,5 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
         igraph_vector_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(2);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }

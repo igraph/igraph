@@ -149,10 +149,10 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
     igraph_vector_long_destroy(&added);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_bipartite_projection(const igraph_t *graph,
+static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                                          const igraph_vector_bool_t *types,
                                          igraph_t *proj,
                                          int which,
@@ -170,7 +170,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
     igraph_vector_t mult;
 
     if (which < 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_perm, 0);
@@ -272,7 +272,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
     igraph_vector_destroy(&vertex_perm);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -361,7 +361,7 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj2, t2, multiplicity2));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -475,7 +475,7 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -543,7 +543,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
     IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -679,7 +679,7 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -888,7 +888,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     igraph_vector_char_destroy(&seen);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,

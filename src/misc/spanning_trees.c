@@ -35,9 +35,9 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
-static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t *graph,
+static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t *graph,
                                                      igraph_vector_t *result);
-static int igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
+static igraph_error_t igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
                                                igraph_vector_t *result, const igraph_vector_t *weights);
 
 /**
@@ -137,7 +137,7 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -201,11 +201,11 @@ igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
-static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igraph_vector_t* res) {
+static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igraph_vector_t* res) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -270,7 +270,7 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_minimum_spanning_tree_prim(
+static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         const igraph_t* graph, igraph_vector_t* res, const igraph_vector_t *weights) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -381,7 +381,7 @@ static int igraph_i_minimum_spanning_tree_prim(
  * The walk is started from vertex start. comp_size must be the size of the connected
  * component containing start.
  */
-static int igraph_i_lerw(const igraph_t *graph, igraph_vector_t *res, igraph_integer_t start,
+static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_t *res, igraph_integer_t start,
                          igraph_integer_t comp_size, igraph_vector_bool_t *visited, const igraph_inclist_t *il) {
     igraph_integer_t visited_count;
 
