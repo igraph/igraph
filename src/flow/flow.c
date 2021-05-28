@@ -157,7 +157,7 @@
  * undirected edge.
  */
 
-static int igraph_i_maxflow_undirected(const igraph_t *graph,
+static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
                                        igraph_real_t *value,
                                        igraph_vector_t *flow,
                                        igraph_vector_t *cut,
@@ -223,7 +223,7 @@ static int igraph_i_maxflow_undirected(const igraph_t *graph,
     igraph_vector_destroy(&newcapacity);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define FIRST(i)       (VECTOR(*first)[(i)])
@@ -514,7 +514,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_CHECK(igraph_i_maxflow_undirected(graph, value, flow, cut,
                      partition, partition2, source,
                      target, capacity, stats));
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (capacity && igraph_vector_size(capacity) != no_of_orig_edges) {
@@ -1022,7 +1022,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     igraph_dqueue_long_destroy(&bfsq);
     IGRAPH_FINALLY_CLEAN(10);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1123,7 +1123,7 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity, 0));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1222,7 +1222,7 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
  * It can also calculate the cut itself, not just the cut value.
  */
 
-static int igraph_i_mincut_undirected(const igraph_t *graph,
+static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                                       igraph_real_t *res,
                                       igraph_vector_t *partition,
                                       igraph_vector_t *partition2,
@@ -1486,10 +1486,10 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_mincut_directed(const igraph_t *graph,
+static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
                                     igraph_real_t *value,
                                     igraph_vector_t *partition,
                                     igraph_vector_t *partition2,
@@ -1600,7 +1600,7 @@ static int igraph_i_mincut_directed(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1671,11 +1671,11 @@ igraph_error_t igraph_mincut(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
-static int igraph_i_mincut_value_undirected(const igraph_t *graph,
+static igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph,
                                             igraph_real_t *res,
                                             const igraph_vector_t *capacity) {
     return igraph_i_mincut_undirected(graph, res, 0, 0, 0, capacity);
@@ -1728,7 +1728,7 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
 
     if (!igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, res, capacity));
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     for (i = 1; i < no_of_nodes; i++) {
@@ -1754,10 +1754,10 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
         *res = minmaxflow;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
+static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
                                                     igraph_integer_t *res,
                                                     igraph_integer_t source,
                                                     igraph_integer_t target,
@@ -1838,10 +1838,10 @@ static int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
+static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
                                                       igraph_integer_t *res,
                                                       igraph_integer_t source,
                                                       igraph_integer_t target,
@@ -1894,7 +1894,7 @@ static int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1955,10 +1955,10 @@ igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
                      neighbors));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
+static igraph_error_t igraph_i_vertex_connectivity_directed(const igraph_t *graph,
                                                  igraph_integer_t *res) {
 
     igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
@@ -1993,10 +1993,10 @@ static int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
         *res = minconn;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
+static igraph_error_t igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
                                                    igraph_integer_t *res) {
     igraph_t newgraph;
 
@@ -2009,11 +2009,11 @@ static int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
-static int igraph_i_connectivity_checks(const igraph_t *graph,
+static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
                                         igraph_integer_t *res,
                                         igraph_bool_t *found) {
     igraph_bool_t conn;
@@ -2058,7 +2058,7 @@ static int igraph_i_connectivity_checks(const igraph_t *graph,
         igraph_vector_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2107,7 +2107,7 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2146,7 +2146,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
     *res = (igraph_integer_t) flow;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -2192,7 +2192,7 @@ igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t 
      * This is consistent with what other software packages return. */
     if (number_of_nodes <= 1) {
         *res = 0;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
@@ -2206,7 +2206,7 @@ igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t 
         *res = (igraph_integer_t)real_res;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2249,7 +2249,7 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_
 
     *res = (igraph_integer_t) flow;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2338,7 +2338,7 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
                      IGRAPH_VCONN_NEI_IGNORE));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2406,7 +2406,7 @@ igraph_error_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
                     igraph_bool_t checks) {
 
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

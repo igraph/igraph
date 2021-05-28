@@ -93,7 +93,7 @@
 
 igraph_error_t igraph_vs_all(igraph_vs_t *vs) {
     vs->type = IGRAPH_VS_ALL;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -153,7 +153,7 @@ igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
     vs->type = IGRAPH_VS_ADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -198,7 +198,7 @@ igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
     vs->type = IGRAPH_VS_NONADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -216,7 +216,7 @@ igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
 
 igraph_error_t igraph_vs_none(igraph_vs_t *vs) {
     vs->type = IGRAPH_VS_NONE;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -254,7 +254,7 @@ igraph_vs_t igraph_vss_none(void) {
 igraph_error_t igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
     vs->type = IGRAPH_VS_1;
     vs->data.vid = vid;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -303,7 +303,7 @@ igraph_error_t igraph_vs_vector(igraph_vs_t *vs,
                      const igraph_vector_t *v) {
     vs->type = IGRAPH_VS_VECTORPTR;
     vs->data.vecptr = v;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -380,7 +380,7 @@ igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -412,7 +412,7 @@ igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs,
     IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)vs->data.vecptr);
     IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)vs->data.vecptr, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -441,7 +441,7 @@ igraph_error_t igraph_vs_seq(igraph_vs_t *vs,
     vs->type = IGRAPH_VS_SEQ;
     vs->data.seq.from = from;
     vs->data.seq.to = to + 1;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -533,7 +533,7 @@ igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -554,7 +554,7 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
                                         (igraph_vector_t*)src->data.vecptr));
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -583,21 +583,21 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
 
     switch (vs->type) {
     case IGRAPH_VS_NONE:
-        *result = 0; return 0;
+        *result = 0; return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_1:
         *result = 0;
         if (vs->data.vid < igraph_vcount(graph) && vs->data.vid >= 0) {
             *result = 1;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_SEQ:
         *result = vs->data.seq.to - vs->data.seq.from;
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_ALL:
-        *result = igraph_vcount(graph); return 0;
+        *result = igraph_vcount(graph); return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_ADJ:
         IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
@@ -605,7 +605,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         *result = (igraph_integer_t) igraph_vector_size(&vec);
         igraph_vector_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_NONADJ:
         IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
@@ -625,12 +625,12 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         igraph_free(seen);
         igraph_vector_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(2);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_VECTOR:
     case IGRAPH_VS_VECTORPTR:
         *result = (igraph_integer_t) igraph_vector_size((igraph_vector_t*)vs->data.vecptr);
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
@@ -772,7 +772,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -827,7 +827,7 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v)
         break;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /*******************************************************/
@@ -869,7 +869,7 @@ igraph_error_t igraph_es_all(igraph_es_t *es,
         IGRAPH_ERROR("Invalid edge order, cannot create selector", IGRAPH_EINVAL);
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -915,7 +915,7 @@ igraph_error_t igraph_es_incident(igraph_es_t *es,
     es->type = IGRAPH_ES_INCIDENT;
     es->data.incident.vid = vid;
     es->data.incident.mode = mode;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -932,7 +932,7 @@ igraph_error_t igraph_es_incident(igraph_es_t *es,
 
 igraph_error_t igraph_es_none(igraph_es_t *es) {
     es->type = IGRAPH_ES_NONE;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -969,7 +969,7 @@ igraph_es_t igraph_ess_none(void) {
 igraph_error_t igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
     es->type = IGRAPH_ES_1;
     es->data.eid = eid;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1013,7 +1013,7 @@ igraph_error_t igraph_es_vector(igraph_es_t *es,
                      const igraph_vector_t *v) {
     es->type = IGRAPH_ES_VECTORPTR;
     es->data.vecptr = v;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1045,7 +1045,7 @@ igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v) 
     IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.vecptr);
     IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)es->data.vecptr, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1118,7 +1118,7 @@ igraph_error_t igraph_es_seq(igraph_es_t *es,
     es->type = IGRAPH_ES_SEQ;
     es->data.seq.from = from;
     es->data.seq.to = to;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1176,7 +1176,7 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
     IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1228,7 +1228,7 @@ igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ..
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
@@ -1244,7 +1244,7 @@ igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
     IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1278,7 +1278,7 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_t *v,
     IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
@@ -1311,7 +1311,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1398,7 +1398,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
                                         (igraph_vector_t*)src->data.path.ptr));
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1426,7 +1426,7 @@ igraph_error_t igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
 
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1437,11 +1437,11 @@ int igraph_es_type(const igraph_es_t *es) {
     return es->type;
 }
 
-static int igraph_i_es_pairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
                                   const igraph_es_t *es, igraph_integer_t *result);
-static int igraph_i_es_path_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_path_size(const igraph_t *graph,
                                  const igraph_es_t *es, igraph_integer_t *result);
-static int igraph_i_es_multipairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_multipairs_size(const igraph_t *graph,
                                        const igraph_es_t *es, igraph_integer_t *result);
 
 /**
@@ -1461,15 +1461,15 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
     switch (es->type) {
     case IGRAPH_ES_ALL:
         *result = igraph_ecount(graph);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_ALLFROM:
         *result = igraph_ecount(graph);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_ALLTO:
         *result = igraph_ecount(graph);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_INCIDENT:
         IGRAPH_VECTOR_INIT_FINALLY(&v, 0);
@@ -1478,11 +1478,11 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         *result = (igraph_integer_t) igraph_vector_size(&v);
         igraph_vector_destroy(&v);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_NONE:
         *result = 0;
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_1:
         if (es->data.eid < igraph_ecount(graph) && es->data.eid >= 0) {
@@ -1490,28 +1490,28 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         } else {
             *result = 0;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_VECTOR:
     case IGRAPH_ES_VECTORPTR:
         *result = (igraph_integer_t) igraph_vector_size((igraph_vector_t*)es->data.vecptr);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_SEQ:
         *result = es->data.seq.to - es->data.seq.from;
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_PAIRS:
         IGRAPH_CHECK(igraph_i_es_pairs_size(graph, es, result));
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_PATH:
         IGRAPH_CHECK(igraph_i_es_path_size(graph, es, result));
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_MULTIPAIRS:
         IGRAPH_CHECK(igraph_i_es_multipairs_size(graph, es, result));
-        return 0;
+        return IGRAPH_SUCCESS;
 
     default:
         IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
@@ -1519,7 +1519,7 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
     }
 }
 
-static int igraph_i_es_pairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
                                   const igraph_es_t *es, igraph_integer_t *result) {
     long int n = igraph_vector_size(es->data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1544,10 +1544,10 @@ static int igraph_i_es_pairs_size(const igraph_t *graph,
                                     /*error=*/ 1));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_es_path_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_path_size(const igraph_t *graph,
                                  const igraph_es_t *es, igraph_integer_t *result) {
     long int n = igraph_vector_size(es->data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1571,10 +1571,10 @@ static int igraph_i_es_path_size(const igraph_t *graph,
                                     /*error=*/ 1));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_es_multipairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_multipairs_size(const igraph_t *graph,
                                        const igraph_es_t *es, igraph_integer_t *result) {
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(es); IGRAPH_UNUSED(result);
     IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_UNIMPLEMENTED);
@@ -1582,17 +1582,17 @@ static int igraph_i_es_multipairs_size(const igraph_t *graph,
 
 /**************************************************/
 
-static int igraph_i_eit_create_allfromto(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
                                          igraph_eit_t *eit,
                                          igraph_neimode_t mode);
-static int igraph_i_eit_pairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
                               igraph_es_t es, igraph_eit_t *eit);
-static int igraph_i_eit_multipairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_multipairs(const igraph_t *graph,
                                    igraph_es_t es, igraph_eit_t *eit);
-static int igraph_i_eit_path(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_path(const igraph_t *graph,
                              igraph_es_t es, igraph_eit_t *eit);
 
-static int igraph_i_eit_create_allfromto(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
                                          igraph_eit_t *eit,
                                          igraph_neimode_t mode) {
     igraph_vector_t *vec;
@@ -1650,10 +1650,10 @@ static int igraph_i_eit_create_allfromto(const igraph_t *graph,
     eit->end = igraph_vector_size(eit->vec);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eit_pairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
                               igraph_es_t es, igraph_eit_t *eit) {
     long int n = igraph_vector_size(es.data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1689,10 +1689,10 @@ static int igraph_i_eit_pairs(const igraph_t *graph,
     }
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eit_multipairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_multipairs(const igraph_t *graph,
                                    igraph_es_t es, igraph_eit_t *eit) {
     long int n = igraph_vector_size(es.data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1721,10 +1721,10 @@ static int igraph_i_eit_multipairs(const igraph_t *graph,
                                        es.data.path.mode, /*error=*/ 1));
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eit_path(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_path(const igraph_t *graph,
                              igraph_es_t es, igraph_eit_t *eit) {
     long int n = igraph_vector_size(es.data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1763,7 +1763,7 @@ static int igraph_i_eit_path(const igraph_t *graph,
     }
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1876,7 +1876,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         IGRAPH_ERROR("Cannot create iterator, invalid selector.", IGRAPH_EINVAL);
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1928,5 +1928,5 @@ igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v)
         break;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

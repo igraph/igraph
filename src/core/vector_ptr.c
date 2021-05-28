@@ -101,7 +101,7 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
     v->end = v->stor_begin + size;
     v->item_destructor = 0;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -222,7 +222,7 @@ igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) 
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
     if (size <= igraph_vector_ptr_size(v)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, void*);
@@ -233,7 +233,7 @@ igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) 
     v->stor_end = v->stor_begin + size;
     v->end = v->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -326,7 +326,7 @@ igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
     *(v->end) = e;
     v->end += 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
@@ -359,7 +359,7 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, vo
                 sizeof(void*) * (size_t) (size - pos));
     }
     v->stor_begin[pos] = e;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -434,7 +434,7 @@ void igraph_vector_ptr_null(igraph_vector_ptr_t* v) {
 igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
     IGRAPH_CHECK(igraph_vector_ptr_reserve(v, newsize));
     v->end = v->stor_begin + newsize;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -455,7 +455,7 @@ igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data,
     v->item_destructor = 0;
     memcpy(v->stor_begin, data, (size_t) length * sizeof(void*));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -516,7 +516,7 @@ igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vect
     memcpy(to->stor_begin, from->stor_begin,
            (size_t) igraph_vector_ptr_size(from)*sizeof(void*));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -580,7 +580,7 @@ igraph_error_t igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
     v->stor_begin = tmp;
     v->stor_end = v->end = tmp + n;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
@@ -593,7 +593,7 @@ igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_ve
         to->stor_begin[origsize] = from->stor_begin[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 

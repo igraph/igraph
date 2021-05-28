@@ -33,7 +33,7 @@
  * them to trees.
  */
 
-static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+static igraph_error_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_int_t prufer;
     long i;
 
@@ -74,7 +74,7 @@ static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph
         VECTOR(vec)[j] = temp; \
     }
 
-static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_t edges;
     igraph_vector_int_t vertices;
     igraph_vector_bool_t visited;

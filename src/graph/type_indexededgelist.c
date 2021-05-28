@@ -30,7 +30,7 @@
 
 /* Internal functions */
 
-static int igraph_i_create_start(
+static igraph_error_t igraph_i_create_start(
         igraph_vector_t *res, igraph_vector_t *el,
         igraph_vector_t *index, igraph_integer_t nodes);
 
@@ -142,7 +142,7 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));
 
     IGRAPH_FINALLY_CLEAN(6);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -218,7 +218,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */
 
     IGRAPH_FINALLY_CLEAN(6);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -333,7 +333,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
     graph->ii = newii;
     igraph_set_error_handler(oldhandler);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -383,7 +383,7 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
         IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -497,7 +497,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
                           (igraph_integer_t) no_of_nodes);
 
     /* Nothing to deallocate... */
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -673,7 +673,7 @@ igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t ver
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -896,7 +896,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, 
  *
  */
 
-static int igraph_i_create_start(
+static igraph_error_t igraph_i_create_start(
         igraph_vector_t *res, igraph_vector_t *el,
         igraph_vector_t *iindex, igraph_integer_t nodes) {
 
@@ -938,7 +938,7 @@ static int igraph_i_create_start(
     /* clean */
 
 # undef EDGE
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1071,7 +1071,7 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_t *res,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1320,7 +1320,7 @@ int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
@@ -1368,7 +1368,7 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1436,7 +1436,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 
     if (!pairs && !path) {
         igraph_vector_clear(eids);
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (pairs && !path) {
         return igraph_get_eids_pairs(graph, eids, pairs, directed, error);
     } else if (!pairs && path) {
@@ -1450,7 +1450,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
         IGRAPH_CHECK(igraph_vector_append(eids, &tmp));
         igraph_vector_destroy(&tmp);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 }
 
@@ -1573,7 +1573,7 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
 
     IGRAPH_FREE(seen);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
@@ -1634,7 +1634,7 @@ int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
 
     IGRAPH_FREE(seen);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef BINSEARCH
@@ -1702,7 +1702,7 @@ igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eid
 
     if (!pairs && !path) {
         igraph_vector_clear(eids);
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (pairs && !path) {
         return igraph_get_eids_multipairs(graph, eids, pairs, directed, error);
     } else if (!pairs && path) {

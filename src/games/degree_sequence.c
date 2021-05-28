@@ -34,7 +34,7 @@
 #include "core/interruption.h"
 #include "core/set.h"
 
-static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
+static igraph_error_t igraph_i_degree_sequence_game_simple(igraph_t *graph,
                                        const igraph_vector_t *out_seq,
                                        const igraph_vector_t *in_seq) {
 
@@ -128,10 +128,10 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_degree_sequence_game_no_multiple_undirected(
+static igraph_error_t igraph_i_degree_sequence_game_no_multiple_undirected(
     igraph_t *graph, const igraph_vector_t *seq) {
 
     igraph_vector_t stubs = IGRAPH_VECTOR_NULL;
@@ -273,7 +273,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected(
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
+static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
         const igraph_vector_t *out_seq, const igraph_vector_t *in_seq) {
     igraph_adjlist_t al;
     igraph_bool_t deg_seq_ok, failed, finished;
@@ -427,7 +427,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
         VECTOR(vec)[j] = temp; \
     }
 
-static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, const igraph_vector_t *degseq) {
+static igraph_error_t igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, const igraph_vector_t *degseq) {
     igraph_vector_int_t stubs;
     igraph_vector_t edges;
     igraph_bool_t degseq_ok;
@@ -538,7 +538,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
 }
 
 
-static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
+static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed_uniform(
     igraph_t *graph, const igraph_vector_t *out_deg, const igraph_vector_t *in_deg) {
     igraph_vector_int_t out_stubs, in_stubs;
     igraph_vector_t edges;

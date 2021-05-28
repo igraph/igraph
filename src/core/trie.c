@@ -39,12 +39,12 @@
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
-static int igraph_i_trie_init_node(igraph_trie_node_t *t) {
+static igraph_error_t igraph_i_trie_init_node(igraph_trie_node_t *t) {
     IGRAPH_STRVECTOR_INIT_FINALLY(&t->strs, 0);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&t->values, 0);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);

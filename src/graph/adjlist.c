@@ -34,7 +34,7 @@
  * Helper function that simplifies a sorted adjacency vector by removing
  * duplicate elements and optionally self-loops.
  */
-static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_multiple_t multiple
 );
@@ -43,7 +43,7 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  * Helper function that removes loops from an incidence vector (either both
  * occurrences or only one of them).
  */
-static int igraph_i_remove_loops_from_incidence_vector_in_place(
+static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
     igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
 );
 
@@ -169,7 +169,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -200,7 +200,7 @@ igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t 
     }
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -282,7 +282,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
     IGRAPH_FREE(seen);
     igraph_vector_destroy(&vec);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -448,7 +448,7 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
 
     igraph_vector_int_destroy(&mark);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
@@ -482,7 +482,7 @@ igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef USING_R
@@ -493,7 +493,7 @@ igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_vector_int_print(v);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -504,7 +504,7 @@ igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) 
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_vector_int_fprint(v, outfile);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define ADJLIST_CANON_EDGE(from, to, directed) \
@@ -551,11 +551,11 @@ igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_
     }
     IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
-static int igraph_i_remove_loops_from_incidence_vector_in_place(
+static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
     igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
 ) {
     long int i, length, eid, write_ptr;
@@ -645,7 +645,7 @@ igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inc
         );
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef USING_R
@@ -656,7 +656,7 @@ igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
         igraph_vector_int_t *v = &al->incs[i];
         igraph_vector_int_print(v);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -667,7 +667,7 @@ igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) 
         igraph_vector_int_t *v = &al->incs[i];
         igraph_vector_int_fprint(v, outfile);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -755,7 +755,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
 
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -788,7 +788,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -839,7 +839,7 @@ igraph_integer_t igraph_inclist_size(const igraph_inclist_t *il) {
     return il->length;
 }
 
-static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_multiple_t multiple
 ) {
@@ -998,7 +998,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_init(&al->dummy, 0));
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1158,7 +1158,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_init(&il->dummy, 0));
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 

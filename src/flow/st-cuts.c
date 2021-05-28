@@ -134,10 +134,10 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_residual_graph(const igraph_t *graph,
+static igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
                                    const igraph_vector_t *capacity,
                                    igraph_t *residual,
                                    igraph_vector_t *residual_capacity,
@@ -176,7 +176,7 @@ static int igraph_i_residual_graph(const igraph_t *graph,
     IGRAPH_CHECK(igraph_create(residual, tmp, (igraph_integer_t) no_of_nodes,
                                IGRAPH_DIRECTED));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_residual_graph(const igraph_t *graph,
@@ -203,10 +203,10 @@ igraph_error_t igraph_residual_graph(const igraph_t *graph,
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_reverse_residual_graph(const igraph_t *graph,
+static igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
                                            const igraph_vector_t *capacity,
                                            igraph_t *residual,
                                            const igraph_vector_t *flow,
@@ -246,7 +246,7 @@ static int igraph_i_reverse_residual_graph(const igraph_t *graph,
     IGRAPH_CHECK(igraph_create(residual, tmp, (igraph_integer_t) no_of_nodes,
                                IGRAPH_DIRECTED));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
@@ -270,7 +270,7 @@ igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct igraph_i_dbucket_t {
@@ -278,12 +278,12 @@ typedef struct igraph_i_dbucket_t {
     igraph_vector_long_t next;
 } igraph_i_dbucket_t;
 
-static int igraph_i_dbucket_init(igraph_i_dbucket_t *buck, long int size) {
+static igraph_error_t igraph_i_dbucket_init(igraph_i_dbucket_t *buck, long int size) {
     IGRAPH_CHECK(igraph_vector_long_init(&buck->head, size));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &buck->head);
     IGRAPH_CHECK(igraph_vector_long_init(&buck->next, size));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_dbucket_destroy(igraph_i_dbucket_t *buck) {
@@ -291,12 +291,12 @@ static void igraph_i_dbucket_destroy(igraph_i_dbucket_t *buck) {
     igraph_vector_long_destroy(&buck->next);
 }
 
-static int igraph_i_dbucket_insert(igraph_i_dbucket_t *buck, long int bid,
+static igraph_error_t igraph_i_dbucket_insert(igraph_i_dbucket_t *buck, long int bid,
                                    long int elem) {
     /* Note: we can do this, since elem is not in any buckets */
     VECTOR(buck->next)[elem] = VECTOR(buck->head)[bid];
     VECTOR(buck->head)[bid] = elem + 1;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static long int igraph_i_dbucket_empty(const igraph_i_dbucket_t *buck,
@@ -310,15 +310,15 @@ static long int igraph_i_dbucket_delete(igraph_i_dbucket_t *buck, long int bid) 
     return elem;
 }
 
-static int igraph_i_dominator_LINK(long int v, long int w,
+static igraph_error_t igraph_i_dominator_LINK(long int v, long int w,
                                    igraph_vector_long_t *ancestor) {
     VECTOR(*ancestor)[w] = v + 1;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* TODO: don't always reallocate path */
 
-static int igraph_i_dominator_COMPRESS(long int v,
+static igraph_error_t igraph_i_dominator_COMPRESS(long int v,
                                        igraph_vector_long_t *ancestor,
                                        igraph_vector_long_t *label,
                                        igraph_vector_long_t *semi) {
@@ -350,7 +350,7 @@ static int igraph_i_dominator_COMPRESS(long int v,
     igraph_stack_long_destroy(&path);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static long int igraph_i_dominator_EVAL(long int v,
@@ -602,7 +602,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct igraph_i_all_st_cuts_minimal_dfs_data_t {
@@ -659,7 +659,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_outcb(
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
+static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                                         const igraph_t *domtree,
                                         long int root,
                                         const igraph_marked_queue_t *X,
@@ -717,7 +717,7 @@ static int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
     igraph_stack_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* not 'static' because used in igraph_all_st_cuts.c test program */
@@ -1133,7 +1133,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* We need to find the minimal active elements of Sbar. I.e. all
@@ -1148,7 +1148,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
    zero-indegree vertices.
 */
 
-static int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
+static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
                                            const igraph_vector_bool_t *active,
                                            const igraph_vector_t *invmap,
                                            igraph_vector_t *minimal) {
@@ -1201,14 +1201,14 @@ static int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct igraph_i_all_st_mincuts_data_t {
     const igraph_vector_bool_t *active;
 } igraph_i_all_st_mincuts_data_t;
 
-static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
+static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
                                          const igraph_marked_queue_t *S,
                                          const igraph_estack_t *T,
                                          long int source,
@@ -1306,7 +1306,7 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_vector_destroy(&Sbar_map);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1583,5 +1583,5 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -59,7 +59,7 @@ igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long in
     IGRAPH_FINALLY_CLEAN(3);
     m->nrow = nrow;
     m->ncol = ncol;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -107,7 +107,7 @@ igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix
     IGRAPH_CHECK(igraph_vector_copy(&to->ridx, &from->ridx));
     IGRAPH_CHECK(igraph_vector_copy(&to->cidx, &from->cidx));
     IGRAPH_CHECK(igraph_vector_copy(&to->data, &from->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -187,14 +187,14 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
     if (end < start) {
         /* First element in the column */
         if (value == 0.0) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         IGRAPH_CHECK(igraph_vector_insert(&m->ridx, start, row));
         IGRAPH_CHECK(igraph_vector_insert(&m->data, start, value));
         for (start = col + 1; start < m->ncol + 1; start++) {
             VECTOR(m->cidx)[start]++;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Elements residing in column col are between m->data[start] and
@@ -234,7 +234,7 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
         } else {
             VECTOR(m->data)[end] = value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* New element has to be inserted, but only if not a zero is
@@ -254,7 +254,7 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
             VECTOR(m->cidx)[start]++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -286,14 +286,14 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long in
     if (end < start) {
         /* First element in the column */
         if (value == 0.0) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         IGRAPH_CHECK(igraph_vector_insert(&m->ridx, start, row));
         IGRAPH_CHECK(igraph_vector_insert(&m->data, start, value));
         for (start = col + 1; start < m->ncol + 1; start++) {
             VECTOR(m->cidx)[start]++;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Elements residing in column col are between m->data[start] and
@@ -321,7 +321,7 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long in
         } else {
             VECTOR(m->data)[start] += value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (VECTOR(m->ridx)[end] == row) {
         /* Overwriting a value */
         if (VECTOR(m->data)[end] == -1) {
@@ -333,7 +333,7 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long in
         } else {
             VECTOR(m->data)[end] += value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* New element has to be inserted, but only if not a zero is
@@ -353,7 +353,7 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long in
             VECTOR(m->cidx)[start]++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -525,7 +525,7 @@ igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t
             to[dest_idx + (long)VECTOR(m->ridx)[idx]] = VECTOR(m->data)[idx];
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -544,7 +544,7 @@ igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
     igraph_vector_clear(&m->data);
     igraph_vector_clear(&m->ridx);
     igraph_vector_null(&m->cidx);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -560,7 +560,7 @@ igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
 
 igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
     igraph_spmatrix_resize(m, m->nrow, m->ncol + n);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -576,7 +576,7 @@ igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
 
 igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
     igraph_spmatrix_resize(m, m->nrow + n, m->ncol);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -626,7 +626,7 @@ igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
 
 /* Unused local functions---temporarily disabled */
 #if 0
-static int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
+static igraph_error_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
     long int ei, n;
 
     IGRAPH_ASSERT(m != NULL);
@@ -636,10 +636,10 @@ static int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) 
             VECTOR(m->data)[ei] = 0.0;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
+static igraph_error_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
@@ -668,7 +668,7 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     igraph_vector_permdelete(&m->data, &permvec, nremove);
     igraph_vector_destroy(&permvec);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -736,7 +736,7 @@ igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector
             VECTOR(*res)[c] += VECTOR(m->data)[i];
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -759,7 +759,7 @@ igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector
     for (i = 0; i < n; i++) {
         VECTOR(*res)[(long int)VECTOR(m->ridx)[i]] += VECTOR(m->data)[i];
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -877,7 +877,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
 
 /* Unused function, temporarily disabled */
 /*
-static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
+static igraph_error_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
                                                      igraph_vector_t *res, long int col) {
     long int i, n;
     IGRAPH_ASSERT(m != NULL);
@@ -920,7 +920,7 @@ static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
 igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
     mit->m = m;
     IGRAPH_CHECK(igraph_spmatrix_iter_reset(mit));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -949,7 +949,7 @@ igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
 
     IGRAPH_CHECK(igraph_spmatrix_iter_next(mit));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -969,7 +969,7 @@ igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
     mit->pos++;
 
     if (igraph_spmatrix_iter_end(mit)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     mit->ri = VECTOR(mit->m->ridx)[mit->pos];
@@ -979,7 +979,7 @@ igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
         mit->ci++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1062,5 +1062,5 @@ igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *fil
     igraph_spmatrix_iter_destroy(&mit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

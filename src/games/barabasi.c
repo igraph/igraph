@@ -32,14 +32,14 @@
 
 #include "core/interruption.h"
 
-static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
+static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
                                       igraph_integer_t m,
                                       const igraph_vector_t *outseq,
                                       igraph_bool_t outpref,
                                       igraph_bool_t directed,
                                       const igraph_t *start_from);
 
-static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
+static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_integer_t n,
                                                     igraph_real_t power,
                                                     igraph_integer_t m,
@@ -49,7 +49,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_bool_t directed,
                                                     const igraph_t *start_from);
 
-static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
+static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_integer_t n,
                                            igraph_real_t power,
                                            igraph_integer_t m,
@@ -59,7 +59,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_bool_t directed,
                                            const igraph_t *start_from);
 
-static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
+static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
                                       igraph_integer_t m,
                                       const igraph_vector_t *outseq,
                                       igraph_bool_t outpref,
@@ -166,10 +166,10 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
+static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_integer_t n,
                                                     igraph_real_t power,
                                                     igraph_integer_t m,
@@ -273,10 +273,10 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
+static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_integer_t n,
                                            igraph_real_t power,
                                            igraph_integer_t m,
@@ -394,7 +394,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -554,7 +554,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
                 directed, start_from);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
