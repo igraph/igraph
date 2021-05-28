@@ -124,7 +124,7 @@ igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
     return igraph_closeness_cutoff(graph, res, reachable_count, all_reachable, vids, mode, weights, normalized, -1);
 }
 
-static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
+static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                                                 igraph_vector_t *res,
                                                 igraph_vector_t *reachable_count,
                                                 igraph_bool_t *all_reachable,
@@ -261,7 +261,7 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -524,7 +524,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
 
 /***** Harmonic centrality *****/
 
-static int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
+static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
                                                    const igraph_vs_t vids, igraph_neimode_t mode,
                                                    igraph_bool_t normalized,
                                                    igraph_real_t cutoff) {
@@ -619,7 +619,7 @@ static int igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph
 }
 
 
-static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
+static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
                                                  igraph_vector_t *res,
                                                  const igraph_vs_t vids,
                                                  igraph_neimode_t mode,

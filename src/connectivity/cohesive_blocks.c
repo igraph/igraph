@@ -65,7 +65,7 @@ static void igraph_i_cohesive_blocks_free_vectors(igraph_vector_ptr_t *ptr) {
  * all neighboring components.
  */
 
-static int igraph_i_cb_components(igraph_t *graph,
+static igraph_error_t igraph_i_cb_components(igraph_t *graph,
                                   const igraph_vector_bool_t *excluded,
                                   igraph_vector_long_t *components,
                                   long int *no,
@@ -124,7 +124,7 @@ static int igraph_i_cb_components(igraph_t *graph,
 
     *no = cno;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
@@ -598,5 +598,5 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     IGRAPH_STATUS("Cohesive blocking done.\n", 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

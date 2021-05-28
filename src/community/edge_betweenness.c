@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-static int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
+static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
     long int no = igraph_vector_max(membership) + 1;
     igraph_vector_t idx;
     long int realno = 0;
@@ -56,10 +56,10 @@ static int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
     igraph_vector_destroy(&idx);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
+static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              const igraph_bool_t directed,
                                              const igraph_vector_t *edges,
                                              const igraph_vector_t *weights,
@@ -163,7 +163,7 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
     igraph_vector_destroy(&mymembership);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -746,5 +746,5 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -50,7 +50,7 @@ static void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
     igraph_vector_ptr_clear(res);
 }
 
-static int igraph_i_find_k_cliques(
+static igraph_error_t igraph_i_find_k_cliques(
         const igraph_t *graph,
         long int size,
         const igraph_real_t *member_storage,
@@ -182,14 +182,14 @@ static int igraph_i_find_k_cliques(
     *clique_count = n / size;
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Internal function for calculating cliques or independent vertex sets.
  * They are practically the same except that the complementer of the graph
  * should be used in the latter case.
  */
-static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                             igraph_integer_t min_size, igraph_integer_t max_size,
                             igraph_bool_t independent_vertices) {
 
@@ -299,7 +299,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(4); /* 3 here, +1 is igraph_i_cliques_free_res */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -521,9 +521,9 @@ typedef struct {
     igraph_integer_t max_size;
 } igraph_i_maximal_clique_data_t;
 
-static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data);
+static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data);
 
-static int igraph_i_maximal_or_largest_cliques_or_indsets(
+static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
         const igraph_t *graph,
         igraph_vector_ptr_t *res,
         igraph_integer_t *clique_number,
@@ -617,7 +617,7 @@ typedef struct igraph_i_max_ind_vsets_data_t {
     igraph_bool_t keep_only_largest;     /* True if we keep only the largest sets */
 } igraph_i_max_ind_vsets_data_t;
 
-static int igraph_i_maximal_independent_vertex_sets_backtrack(
+static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
         const igraph_t *graph,
         igraph_vector_ptr_t *res,
         igraph_i_max_ind_vsets_data_t *clqdata,
@@ -759,7 +759,7 @@ static int igraph_i_maximal_independent_vertex_sets_backtrack(
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_free_set_array(igraph_set_t* array) {
@@ -860,7 +860,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     igraph_free(clqdata.IS);
     igraph_free(clqdata.buckets);
     IGRAPH_FINALLY_CLEAN(4);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -939,14 +939,14 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     igraph_free(clqdata.buckets);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /*************************************************************************/
 /* MAXIMAL CLIQUES, LARGEST CLIQUES                                      */
 /*************************************************************************/
 
-static int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void* data,
+static igraph_error_t igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void* data,
                                                    igraph_bool_t* cont) {
     igraph_integer_t* result = (igraph_integer_t*)data;
     IGRAPH_UNUSED(cont);
@@ -957,7 +957,7 @@ static int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique
 }
 
 /*
-static int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
+static igraph_error_t igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
     igraph_vector_t* vec;
 
@@ -973,7 +973,7 @@ static int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* d
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* clique, void* data_, igraph_bool_t* cont) {
+static igraph_error_t igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* clique, void* data_, igraph_bool_t* cont) {
     igraph_i_maximal_clique_data_t* data = (igraph_i_maximal_clique_data_t*)data_;
     igraph_vector_t* vec;
     igraph_integer_t size = (igraph_integer_t) igraph_vector_size(clique);
@@ -995,7 +995,7 @@ static int igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* cliq
 }
 */
 
-static int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
+static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
     igraph_vector_t* vec;
     long int i, n;
@@ -1114,7 +1114,7 @@ static void igraph_i_maximal_cliques_stack_destroy(igraph_stack_ptr_t *stack) {
     igraph_stack_ptr_destroy(stack);
 }
 
-static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data) {
+static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data) {
     int directed = igraph_is_directed(graph);
     long int i, j, k, l;
     igraph_integer_t no_of_nodes, nodes_to_check, nodes_done;
@@ -1337,7 +1337,7 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
+static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
         igraph_vector_ptr_t *res,
         igraph_integer_t *clique_number,
         igraph_bool_t keep_only_largest,

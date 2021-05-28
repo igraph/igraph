@@ -40,7 +40,7 @@
 #include <math.h>
 #include <string.h>    /* memset */
 
-static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
+static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
                                                  igraph_vector_t *vector,
                                                  igraph_real_t *value, const igraph_vs_t vids,
                                                  igraph_bool_t directed, igraph_real_t damping,
@@ -79,7 +79,7 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
     return (-mi/ma > 1);
 }
 
-static int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
                                            int n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_int_t *neis;
@@ -96,7 +96,7 @@ static int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_
     }
 
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct igraph_i_eigenvector_centrality_t {
@@ -105,7 +105,7 @@ typedef struct igraph_i_eigenvector_centrality_t {
     const igraph_vector_t *weights;
 } igraph_i_eigenvector_centrality_t;
 
-static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
                                             int n, void *extra) {
 
     igraph_i_eigenvector_centrality_t *data = extra;
@@ -130,7 +130,7 @@ static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
+static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
                                                       igraph_real_t *value, igraph_bool_t scale,
                                                       const igraph_vector_t *weights,
                                                       igraph_arpack_options_t *options) {
@@ -297,7 +297,7 @@ static int igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igr
 /*   return 0; */
 /* } */
 
-static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
+static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
                                                     igraph_real_t *value, igraph_bool_t scale,
                                                     const igraph_vector_t *weights,
                                                     igraph_arpack_options_t *options) {
@@ -582,7 +582,7 @@ typedef struct igraph_i_kleinberg_data2_t {
 } igraph_i_kleinberg_data2_t;
 
 /* ARPACK auxiliary routine for the unweighted HITS algorithm */
-static int igraph_i_kleinberg_unweighted(igraph_real_t *to,
+static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
                                          const igraph_real_t *from,
                                          int n, void *extra) {
     igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
@@ -612,11 +612,11 @@ static int igraph_i_kleinberg_unweighted(igraph_real_t *to,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* ARPACK auxiliary routine for the weighted HITS algorithm */
-static int igraph_i_kleinberg_weighted(igraph_real_t *to,
+static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
                                        const igraph_real_t *from,
                                        int n, void *extra) {
 
@@ -651,10 +651,10 @@ static int igraph_i_kleinberg_weighted(igraph_real_t *to,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
+static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
                               igraph_real_t *value, igraph_bool_t scale,
                               const igraph_vector_t *weights,
                               igraph_arpack_options_t *options, int inout) {
@@ -812,7 +812,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     igraph_vector_destroy(&values);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -926,7 +926,7 @@ typedef struct igraph_i_pagerank_data2_t {
     igraph_vector_t *reset;
 } igraph_i_pagerank_data2_t;
 
-static int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
                              int n, void *extra) {
 
     igraph_i_pagerank_data_t *data = extra;
@@ -985,10 +985,10 @@ static int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
                               int n, void *extra) {
 
     igraph_i_pagerank_data2_t *data = extra;
@@ -1047,7 +1047,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
     printf("\n");
     */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1227,7 +1227,7 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
     igraph_vector_destroy(&reset);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1319,7 +1319,7 @@ igraph_error_t igraph_personalized_pagerank(const igraph_t *graph,
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
+static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
                                                  igraph_real_t *value, const igraph_vs_t vids,
                                                  igraph_bool_t directed, igraph_real_t damping,
                                                  const igraph_vector_t *reset,

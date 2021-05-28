@@ -252,7 +252,7 @@ const igraph_real_t igraph_i_famous_zachary[] = {
     32, 33
 };
 
-static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
+static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
     long int no_of_nodes = data[0];
     long int no_of_edges = data[1];
     igraph_bool_t directed = (igraph_bool_t) data[2];
@@ -261,7 +261,7 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
     igraph_vector_view(&edges, data + 3, 2 * no_of_edges);
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

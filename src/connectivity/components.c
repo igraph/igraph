@@ -37,10 +37,10 @@
 
 #include <limits.h>
 
-static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
+static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
                                   igraph_vector_t *csize, igraph_integer_t *no);
 
-static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
+static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
                                     igraph_vector_t *csize, igraph_integer_t *no);
 
 /**
@@ -86,7 +86,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membershi
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
 }
 
-static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
+static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
                                   igraph_vector_t *csize, igraph_integer_t *no) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -164,10 +164,10 @@ static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *member
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
+static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
                                     igraph_vector_t *csize, igraph_integer_t *no) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -472,11 +472,11 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
     }
 }
 
-static int igraph_i_decompose_weak(const igraph_t *graph,
+static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
                                    igraph_vector_ptr_t *components,
                                    long int maxcompno, long int minelements);
 
-static int igraph_i_decompose_strong(const igraph_t *graph,
+static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
                                      igraph_vector_ptr_t *components,
                                      long int maxcompno, long int minelements);
 
@@ -528,7 +528,7 @@ igraph_error_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *comp
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
 }
 
-static int igraph_i_decompose_weak(const igraph_t *graph,
+static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
                                    igraph_vector_ptr_t *components,
                                    long int maxcompno, long int minelements) {
 
@@ -622,10 +622,10 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     IGRAPH_FREE(already_added);
     IGRAPH_FINALLY_CLEAN(5);  /* + components */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_decompose_strong(const igraph_t *graph,
+static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
                                      igraph_vector_ptr_t *components,
                                      long int maxcompno, long int minelements) {
 
@@ -827,7 +827,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     igraph_vector_destroy(&next_nei);
     IGRAPH_FINALLY_CLEAN(6);  /* + components */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
@@ -1148,7 +1148,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_vector_long_destroy(&nextptr);
     IGRAPH_FINALLY_CLEAN(8);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -1157,7 +1157,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
    but instead of keeping track of the parent of each vertex in the DFS tree
    we keep track of its incoming edge. This is necessary to support multigraphs. */
 
-static int igraph_i_bridges_rec(
+static igraph_error_t igraph_i_bridges_rec(
         const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u,
         igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited,
         igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *incoming_edge)

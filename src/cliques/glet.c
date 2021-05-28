@@ -125,7 +125,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
  *
  */
 
-static int igraph_i_subclique_next(const igraph_t *graph,
+static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    const igraph_vector_int_t *ids,
                                    const igraph_vector_ptr_t *cliques,
@@ -293,7 +293,7 @@ static int igraph_i_subclique_next(const igraph_t *graph,
     igraph_vector_destroy(&newedges);
     IGRAPH_FINALLY_CLEAN(6);  /* + freedata */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
@@ -307,7 +307,7 @@ static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
     igraph_vector_ptr_destroy(vl);
 }
 
-static int igraph_i_graphlets(const igraph_t *graph,
+static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
                               const igraph_vector_t *weights,
                               igraph_vector_ptr_t *cliques,
                               igraph_vector_t *thresholds,
@@ -395,7 +395,7 @@ static int igraph_i_graphlets(const igraph_t *graph,
     igraph_vector_ptr_destroy(&mycliques); /* contents was copied over */
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct {
@@ -432,7 +432,7 @@ static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *
     }
 }
 
-static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
+static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
                                      igraph_vector_t *thresholds) {
 
     /* Filter out non-maximal cliques. Every non-maximal clique is
@@ -518,7 +518,7 @@ static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -582,7 +582,7 @@ igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
 
     igraph_i_graphlets_filter(cliques, thresholds);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* TODO: not made static because it is used by the R interface */
@@ -869,5 +869,5 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

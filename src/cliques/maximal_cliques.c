@@ -36,13 +36,13 @@
 #define CONCAT2(a,b) CONCAT2x(a,b)
 #define FUNCTION(name,sfx) CONCAT2(name,sfx)
 
-static int igraph_i_maximal_cliques_reorder_adjlists(
+static igraph_error_t igraph_i_maximal_cliques_reorder_adjlists(
         const igraph_vector_int_t *PX,
         int PS, int PE, int XS, int XE,
         const igraph_vector_int_t *pos,
         igraph_adjlist_t *adjlist);
 
-static int igraph_i_maximal_cliques_select_pivot(
+static igraph_error_t igraph_i_maximal_cliques_select_pivot(
         const igraph_vector_int_t *PX,
         int PS, int PE, int XS, int XE,
         const igraph_vector_int_t *pos,
@@ -51,7 +51,7 @@ static int igraph_i_maximal_cliques_select_pivot(
         igraph_vector_int_t *nextv,
         int oldPS, int oldXE);
 
-static int igraph_i_maximal_cliques_down(
+static igraph_error_t igraph_i_maximal_cliques_down(
         igraph_vector_int_t *PX,
         int PS, int PE, int XS, int XE,
         igraph_vector_int_t *pos,
@@ -59,13 +59,13 @@ static int igraph_i_maximal_cliques_down(
         igraph_vector_int_t *R,
         int *newPS, int *newXE);
 
-static int igraph_i_maximal_cliques_PX(
+static igraph_error_t igraph_i_maximal_cliques_PX(
         igraph_vector_int_t *PX, int PS, int *PE,
         int *XS, int XE, igraph_vector_int_t *pos,
         igraph_adjlist_t *adjlist, int v,
         igraph_vector_int_t *H);
 
-static int igraph_i_maximal_cliques_up(
+static igraph_error_t igraph_i_maximal_cliques_up(
         igraph_vector_int_t *PX, int PS, int PE,
         int XS, int XE, igraph_vector_int_t *pos,
         igraph_adjlist_t *adjlist,
@@ -114,7 +114,7 @@ static int igraph_i_maximal_cliques_up(
         printf("\n");                              \
     } while (0)
 
-static int igraph_i_maximal_cliques_reorder_adjlists(
+static igraph_error_t igraph_i_maximal_cliques_reorder_adjlists(
         const igraph_vector_int_t *PX,
         int PS, int PE, int XS, int XE,
         const igraph_vector_int_t *pos,
@@ -145,10 +145,10 @@ static int igraph_i_maximal_cliques_reorder_adjlists(
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_maximal_cliques_select_pivot(
+static igraph_error_t igraph_i_maximal_cliques_select_pivot(
         const igraph_vector_int_t *PX,
         int PS, int PE, int XS, int XE,
         const igraph_vector_int_t *pos,
@@ -215,7 +215,7 @@ static int igraph_i_maximal_cliques_select_pivot(
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define SWAP(p1,p2) do {            \
@@ -227,7 +227,7 @@ static int igraph_i_maximal_cliques_select_pivot(
         VECTOR(*pos)[v2] = (p1)+1;          \
     } while (0)
 
-static int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
+static igraph_error_t igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
                                          int PS, int PE, int XS, int XE,
                                          igraph_vector_int_t *pos,
                                          igraph_adjlist_t *adjlist, int mynextv,
@@ -253,12 +253,12 @@ static int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
 
     igraph_vector_int_push_back(R, mynextv);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef SWAP
 
-static int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
+static igraph_error_t igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
                                        int *XS, int XE, igraph_vector_int_t *pos,
                                        igraph_adjlist_t *adjlist, int v,
                                        igraph_vector_int_t *H) {
@@ -277,10 +277,10 @@ static int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
     (*PE)--; (*XS)--;
     igraph_vector_int_push_back(H, v);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
+static igraph_error_t igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
                                        int XS, int XE, igraph_vector_int_t *pos,
                                        igraph_adjlist_t *adjlist,
                                        igraph_vector_int_t *R,
@@ -303,7 +303,7 @@ static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
         PE++; XS++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

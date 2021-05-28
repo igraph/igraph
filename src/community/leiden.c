@@ -49,7 +49,7 @@
  * and is updated in-place.
  *
  */
-static int igraph_i_community_leiden_fastmovenodes(
+static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         const igraph_t *graph,
         const igraph_inclist_t *edges_per_node,
         const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
@@ -221,7 +221,7 @@ static int igraph_i_community_leiden_fastmovenodes(
  * resulting \c nb_refined_clusters, then nodes in \c node_subset are numbered
  * C, C + 1, ..., C' - 1.
  */
-static int igraph_i_community_leiden_clean_refined_membership(
+static igraph_error_t igraph_i_community_leiden_clean_refined_membership(
         const igraph_vector_t* node_subset,
         igraph_vector_t *refined_membership,
         igraph_integer_t* nb_refined_clusters) {
@@ -289,7 +289,7 @@ static int igraph_i_community_leiden_clean_refined_membership(
  * igraph_i_community_leiden_clean_refined_membership for more information about
  * this aspect.
  */
-static int igraph_i_community_leiden_mergenodes(
+static igraph_error_t igraph_i_community_leiden_mergenodes(
         const igraph_t *graph,
         const igraph_inclist_t *edges_per_node,
         const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
@@ -489,7 +489,7 @@ static int igraph_i_community_leiden_mergenodes(
  * should be ensured that all clusters are always properly empty (or
  * non-existing) before calling this function.
  */
-static int igraph_i_community_get_clusters(const igraph_vector_t *membership, igraph_vector_ptr_t *clusters) {
+static igraph_error_t igraph_i_community_get_clusters(const igraph_vector_t *membership, igraph_vector_ptr_t *clusters) {
     long int i, c, n = igraph_vector_size(membership);
     igraph_vector_t *cluster;
     for (i = 0; i < n; i++) {
@@ -528,7 +528,7 @@ static int igraph_i_community_get_clusters(const igraph_vector_t *membership, ig
  * aggregated_membership are all expected to be initialized.
  *
  */
-static int igraph_i_community_leiden_aggregate(
+static igraph_error_t igraph_i_community_leiden_aggregate(
     const igraph_t *graph, const igraph_inclist_t *edges_per_node, const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
     const igraph_vector_t *membership, const igraph_vector_t *refined_membership, const igraph_integer_t nb_refined_clusters,
     igraph_t *aggregated_graph, igraph_vector_t *aggregated_edge_weights, igraph_vector_t *aggregated_node_weights, igraph_vector_t *aggregated_membership) {
@@ -656,7 +656,7 @@ static int igraph_i_community_leiden_aggregate(
  * weights inside cluster c. This is how the quality is calculated in practice.
  *
  */
-static int igraph_i_community_leiden_quality(
+static igraph_error_t igraph_i_community_leiden_quality(
         const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
         const igraph_vector_t *membership, const igraph_integer_t nb_comms, const igraph_real_t resolution_parameter,
         igraph_real_t *quality) {
@@ -712,7 +712,7 @@ static int igraph_i_community_leiden_quality(
  * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network.
  */
-static int igraph_i_community_leiden(
+static igraph_error_t igraph_i_community_leiden(
         const igraph_t *graph,
         igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
         const igraph_real_t resolution_parameter, const igraph_real_t beta,

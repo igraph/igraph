@@ -216,7 +216,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_modularity_matrix_get_adjacency(
+static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
            const igraph_t *graph, igraph_matrix_t *res,
            const igraph_vector_t *weights, igraph_bool_t directed) {
     /* Specifically used to handle weights and/or ignore direction */

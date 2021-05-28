@@ -91,7 +91,7 @@ typedef struct igraph_i_community_leading_eigenvector_data_t {
     igraph_real_t sumweights;
 } igraph_i_community_leading_eigenvector_data_t;
 
-static int igraph_i_community_leading_eigenvector(igraph_real_t *to,
+static igraph_error_t igraph_i_community_leading_eigenvector(igraph_real_t *to,
                                                   const igraph_real_t *from,
                                                   int n, void *extra) {
 
@@ -149,10 +149,10 @@ static int igraph_i_community_leading_eigenvector(igraph_real_t *to,
         to[j] -= VECTOR(*tmp)[j] * from[j];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
+static igraph_error_t igraph_i_community_leading_eigenvector2(igraph_real_t *to,
                                                    const igraph_real_t *from,
                                                    int n, void *extra) {
 
@@ -215,10 +215,10 @@ static int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
         to[j] -= VECTOR(*tmp)[j] * from[j];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
+static igraph_error_t igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
                                                            const igraph_real_t *from,
                                                            int n, void *extra) {
 
@@ -279,10 +279,10 @@ static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
         to[j] -= VECTOR(*tmp)[j] * from[j];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
+static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
                                                             const igraph_real_t *from,
                                                             int n, void *extra) {
 
@@ -348,7 +348,7 @@ static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
         to[j] -= VECTOR(*tmp)[j] * from[j];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
@@ -980,7 +980,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1067,5 +1067,5 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
 
     igraph_vector_destroy(&fake_memb);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -35,7 +35,7 @@
 
 #include "core/interruption.h"
 
-static int igraph_i_is_separator(const igraph_t *graph,
+static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
                                  igraph_vit_t *vit,
                                  long int except,
                                  igraph_bool_t *res,
@@ -65,7 +65,7 @@ static int igraph_i_is_separator(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
         if (nohit >= no_of_nodes - 1) {
             *res = 0;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
@@ -127,7 +127,7 @@ static int igraph_i_is_separator(const igraph_t *graph,
     /* If there is another component, then we have a separator */
     *res = (start < no_of_nodes);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -173,7 +173,7 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -254,7 +254,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* --------------------------------------------------------------------*/
@@ -267,7 +267,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
         }                                                  \
     } while (0)
 
-static int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
+static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
                                       igraph_vector_t *components,
                                       igraph_vector_t *leaveout,
                                       unsigned long int *mark,
@@ -312,7 +312,7 @@ static int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
 
     UPDATEMARK();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps,
@@ -331,7 +331,7 @@ static igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps
     return 1;
 }
 
-static int igraph_i_separators_store(igraph_vector_ptr_t *separators,
+static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
                                      const igraph_adjlist_t *adjlist,
                                      igraph_vector_t *components,
                                      igraph_vector_t *leaveout,
@@ -385,7 +385,7 @@ static int igraph_i_separators_store(igraph_vector_ptr_t *separators,
         }
     } /* while cptr < complen */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
@@ -554,12 +554,12 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     igraph_vector_destroy(&leaveout);
     IGRAPH_FINALLY_CLEAN(7);  /* +1 for separators */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef UPDATEMARK
 
-static int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
+static igraph_error_t igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
                                                    igraph_vector_ptr_t *new) {
 
     long int olen = igraph_vector_ptr_size(old);
@@ -586,10 +586,10 @@ static int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
     }
     igraph_vector_ptr_clear(new);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
+static igraph_error_t igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
                                                     igraph_vector_t *res,
                                                     long int k) {
     long int no_of_nodes = igraph_vcount(graph);
@@ -611,7 +611,7 @@ static int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
     igraph_vector_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
@@ -686,7 +686,7 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
     if (conn == 0) {
         /* Nothing to do */
         IGRAPH_FINALLY_CLEAN(1);    /* separators */
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (conn == 1) {
         igraph_vector_t ap;
         long int i, n;
@@ -707,7 +707,7 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
         }
         igraph_vector_destroy(&ap);
         IGRAPH_FINALLY_CLEAN(2);    /* +1 for separators */
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (conn == no_of_nodes - 1) {
         long int k;
         IGRAPH_CHECK(igraph_vector_ptr_resize(separators, no_of_nodes));
@@ -727,7 +727,7 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
             IGRAPH_FINALLY_CLEAN(1);
         }
         IGRAPH_FINALLY_CLEAN(1);    /* separators */
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Work on a copy of 'graph' */
@@ -836,5 +836,5 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
     igraph_destroy(&graph_copy);
     IGRAPH_FINALLY_CLEAN(6);  /* +1 for separators */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

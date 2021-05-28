@@ -76,7 +76,7 @@ igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
     return igraph_betweenness_cutoff(graph, res, vids, directed, weights, -1);
 }
 
-static int igraph_i_betweenness_cutoff_weighted(
+static igraph_error_t igraph_i_betweenness_cutoff_weighted(
         const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,

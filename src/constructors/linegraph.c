@@ -29,7 +29,7 @@
 /* Note to self: tried using adjacency lists instead of igraph_incident queries,
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
-static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
+static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     long int no_of_edges = igraph_ecount(graph);
     long int i, j, n;
     igraph_vector_t adjedges, adjedges2;
@@ -82,10 +82,10 @@ static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegr
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
+static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
     long int no_of_edges = igraph_ecount(graph);
     long int i, j, n;
     igraph_vector_t adjedges;
@@ -120,7 +120,7 @@ static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegrap
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

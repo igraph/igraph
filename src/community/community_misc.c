@@ -221,7 +221,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -301,13 +301,13 @@ igraph_error_t igraph_reindex_membership(igraph_vector_t *membership,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_compare_communities_vi(const igraph_vector_t *v1,
+static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_t *v1,
                                            const igraph_vector_t *v2, igraph_real_t* result);
-static int igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
+static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
                                             const igraph_vector_t *v2, igraph_real_t* result);
-static int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
+static igraph_error_t igraph_i_compare_communities_rand(const igraph_vector_t *v1,
                                              const igraph_vector_t *v2, igraph_real_t* result, igraph_bool_t adjust);
-static int igraph_i_split_join_distance(const igraph_vector_t *v1,
+static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1,
                                         const igraph_vector_t *v2, igraph_integer_t* distance12,
                                         igraph_integer_t* distance21);
 
@@ -416,7 +416,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_t *comm1,
     igraph_vector_destroy(&c2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -496,7 +496,7 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
     igraph_vector_destroy(&c2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -504,7 +504,7 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
  * membership vectors v1 and v2. This is needed by both Meila's and Danon's
  * community comparison measure.
  */
-static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
+static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
         const igraph_vector_t* v2, double* h1, double* h2, double* mut_inf) {
     long int i, n;
     long int k1;
@@ -583,7 +583,7 @@ static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
 
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -598,7 +598,7 @@ static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
  * </para><para>
  * Time complexity: O(n log(n))
  */
-static int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                      igraph_real_t* result) {
     double h1, h2, mut_inf;
 
@@ -628,7 +628,7 @@ static int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igr
  * </para><para>
  * Time complexity: O(n log(n))
  */
-static int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                     igraph_real_t* result) {
     double h1, h2, mut_inf;
 
@@ -649,7 +649,7 @@ static int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igra
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-static int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
                               igraph_spmatrix_t *m) {
     long int k1;
     long int k2;
@@ -687,7 +687,7 @@ static int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vec
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-static int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                  igraph_integer_t* distance12, igraph_integer_t* distance21) {
     long int n = igraph_vector_size(v1);
     igraph_vector_t rowmax, colmax;
@@ -757,7 +757,7 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-static int igraph_i_compare_communities_rand(
+static igraph_error_t igraph_i_compare_communities_rand(
         const igraph_vector_t *v1, const igraph_vector_t *v2,
         igraph_real_t *result, igraph_bool_t adjust) {
     igraph_spmatrix_t m;
