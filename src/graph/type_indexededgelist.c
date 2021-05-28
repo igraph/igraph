@@ -746,7 +746,7 @@ igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, ig
     }
 }
 
-int igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
+igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
     if (should_filter_duplicates) {                                                        \
@@ -1741,7 +1741,7 @@ igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igr
     }
 }
 
-int igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
+igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
     if (should_filter_duplicates) {                                                        \

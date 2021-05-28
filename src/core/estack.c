@@ -23,13 +23,13 @@
 
 #include "core/estack.h"
 
-int igraph_estack_init(igraph_estack_t *s, long int setsize,
+igraph_error_t igraph_estack_init(igraph_estack_t *s, long int setsize,
                        long int stacksize) {
     IGRAPH_CHECK(igraph_vector_bool_init(&s->isin, setsize));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &s->isin);
     IGRAPH_CHECK(igraph_stack_long_init(&s->stack, stacksize));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_estack_destroy(igraph_estack_t *s) {
@@ -37,12 +37,12 @@ void igraph_estack_destroy(igraph_estack_t *s) {
     igraph_vector_bool_destroy(&s->isin);
 }
 
-int igraph_estack_push(igraph_estack_t *s,  long int elem) {
+igraph_error_t igraph_estack_push(igraph_estack_t *s,  long int elem) {
     if ( !VECTOR(s->isin)[elem] ) {
         IGRAPH_CHECK(igraph_stack_long_push(&s->stack, elem));
         VECTOR(s->isin)[elem] = 1;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 long int igraph_estack_pop(igraph_estack_t *s) {
@@ -61,7 +61,7 @@ long int igraph_estack_size(const igraph_estack_t *s) {
 }
 
 #ifndef USING_R
-int igraph_estack_print(const igraph_estack_t *s) {
+igraph_error_t igraph_estack_print(const igraph_estack_t *s) {
     return igraph_stack_long_print(&s->stack);
 }
 #endif

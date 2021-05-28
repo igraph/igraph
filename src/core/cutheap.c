@@ -79,14 +79,14 @@ static void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, long int hidx) {
     }
 }
 
-int igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes) {
+igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes) {
     ch->dnodes = nodes;
     IGRAPH_VECTOR_INIT_FINALLY(&ch->heap, nodes); /* all zero */
     IGRAPH_CHECK(igraph_vector_init_seq(&ch->index, 0, nodes - 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &ch->index);
     IGRAPH_CHECK(igraph_vector_init_seq(&ch->hptr, INDEXINC, nodes + INDEXINC - 1));
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_i_cutheap_destroy(igraph_i_cutheap_t *ch) {
@@ -131,8 +131,8 @@ igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
 
 /* Update the value of an active vertex, if not active it will be ignored */
 
-int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
-                            igraph_real_t add) {
+igraph_error_t igraph_i_cutheap_update(
+    igraph_i_cutheap_t *ch, igraph_integer_t index, igraph_real_t add) {
     igraph_real_t hidx = VECTOR(ch->hptr)[(long int)index];
     if (hidx != INACTIVE && hidx != UNDEFINED) {
         long int hidx2 = (hidx - INDEXINC);
@@ -141,12 +141,12 @@ int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
         igraph_i_cutheap_sink(ch, hidx2);
         igraph_i_cutheap_shift_up(ch, hidx2);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Reset the value of all vertices to zero and make them active */
 
-int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
+igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
     long int i, j, n = igraph_vector_size(&ch->hptr);
     /* undefine */
     VECTOR(ch->hptr)[vertex] = UNDEFINED;
@@ -166,5 +166,5 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
