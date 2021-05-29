@@ -882,8 +882,8 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_t *degr
  *
  * Time complexity: O(n), where n is the length of the degree sequence.
  */
-int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
-                              const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+igraph_error_t igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+                                         const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     IGRAPH_WARNING("igraph_is_degree_sequence is deprecated, use igraph_is_graphical.");
 
     /* degrees must be non-negative */
@@ -952,8 +952,8 @@ int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
  * Time complexity: O(n log n) for undirected graphs, O(n^2) for directed
  *                  graphs, where n is the length of the degree sequence.
  */
-int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
-                                        const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+igraph_error_t igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+                                                   const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     IGRAPH_WARNING("igraph_is_graphical_degree_sequence is deprecated, use igraph_is_graphical.");
     return igraph_is_graphical(out_degrees, in_degrees, IGRAPH_SIMPLE_SW, res);
 }

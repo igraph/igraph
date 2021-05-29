@@ -79,7 +79,7 @@ struct pblock {
 };
 }
 
-static int markovChainMonteCarlo(dendro *d, unsigned int period,
+static igraph_error_t markovChainMonteCarlo(dendro *d, unsigned int period,
                           igraph_hrg_t *hrg) {
 
     igraph_real_t bestL = d->getLikelihood();
@@ -115,10 +115,10 @@ static int markovChainMonteCarlo(dendro *d, unsigned int period,
     // corrects floating-point errors O(n)
     d->refreshLikelihood();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int markovChainMonteCarlo2(dendro *d, int num_samples) {
+static igraph_error_t markovChainMonteCarlo2(dendro *d, int num_samples) {
     bool flag_taken;
     double dL, ptest = 1.0 / (50.0 * (double)(d->g->numNodes()));
     int sample_num = 0, t = 1, thresh = 200 * d->g->numNodes();
@@ -144,10 +144,10 @@ static int markovChainMonteCarlo2(dendro *d, int num_samples) {
         d->refreshLikelihood(); // TODO: less frequently
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
+static igraph_error_t MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
 
     // We want to run the MCMC until we've found equilibrium; we
     // use the heuristic of the average log-likelihood (which is
@@ -181,10 +181,10 @@ static int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
         d->recordDendrogramStructure(hrg);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_hrg_getgraph(const igraph_t *igraph,
+static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
                                  dendro *d) {
 
     int no_of_nodes = igraph_vcount(igraph);
@@ -211,10 +211,10 @@ static int igraph_i_hrg_getgraph(const igraph_t *igraph,
 
     d->buildDendrogram();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
+static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
                                        dendro *d, simpleGraph **sg,
                                        int num_bins) {
 
@@ -249,7 +249,7 @@ static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
 
     d->buildDendrogram();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -273,7 +273,7 @@ igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, int n) {
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->edges,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->vertices,  n - 1);
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -344,7 +344,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
         IGRAPH_ERROR("Cannot resize HRG", ret);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -406,7 +406,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
@@ -530,7 +530,7 @@ igraph_error_t igraph_hrg_sample(const igraph_t *input_graph,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -619,7 +619,7 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
     igraph_vector_destroy(&prob);
     IGRAPH_FINALLY_CLEAN(4);  // + 1 for graph
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -687,10 +687,10 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int MCMCEquilibrium_Sample(dendro *d, int num_samples) {
+static igraph_error_t MCMCEquilibrium_Sample(dendro *d, int num_samples) {
 
     // Because moves in the dendrogram space are chosen (Monte
     // Carlo) so that we sample dendrograms with probability
@@ -719,7 +719,7 @@ static int MCMCEquilibrium_Sample(dendro *d, int num_samples) {
         t++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static int QsortPartition (pblock* array, int left, int right, int index) {
@@ -779,7 +779,7 @@ static void QsortMain (pblock* array, int left, int right) {
     return;
 }
 
-static int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
+static igraph_error_t rankCandidatesByProbability(simpleGraph *sg, dendro *d,
                                 pblock *br_list, int mk) {
     int mkk = 0;
     int n = sg->getNumNodes();
@@ -798,10 +798,10 @@ static int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
     // Sort the candidates by their average probability
     QsortMain(br_list, 0, mk - 1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int recordPredictions(pblock *br_list, igraph_vector_t *edges,
+static igraph_error_t recordPredictions(pblock *br_list, igraph_vector_t *edges,
                       igraph_vector_t *prob, int mk) {
 
     IGRAPH_CHECK(igraph_vector_resize(edges, mk * 2));
@@ -813,7 +813,7 @@ static int recordPredictions(pblock *br_list, igraph_vector_t *edges,
         VECTOR(*prob)[idx2++] = br_list[i].L;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -892,7 +892,7 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1067,5 +1067,5 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     igraph_vector_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

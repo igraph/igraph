@@ -514,7 +514,7 @@ igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
     return igraph_i_weighted_clique_number(graph, vertex_weights, res);
 }
 
-typedef int(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);
+typedef igraph_error_t(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);
 typedef struct {
     igraph_vector_ptr_t* result;
     igraph_integer_t min_size;

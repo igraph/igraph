@@ -69,7 +69,7 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 // Generate simple undirected realization as edge-list.
 // If largest=true, always choose the vertex with the largest remaining degree to connect up next.
 // Otherwise, always choose the one with the smallest remaining degree.
-static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *edges, bool largest) {
+static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *edges, bool largest) {
     long n = igraph_vector_size(deg);
 
     long ec = 0; // number of edges added so far
@@ -130,7 +130,7 @@ fail:
 
 
 // Choose vertices in the order of their IDs.
-static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector_t *edges) {
+static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector_t *edges) {
     long n = igraph_vector_size(deg);
 
     long ec = 0; // number of edges added so far
@@ -213,7 +213,7 @@ static void bubble_up(It first, It last, Compare comp) {
 // by adding loops on the last vertex.
 // If largest=false, and the degree sequence was potentially connected, the resulting
 // graph will be connected.
-static int igraph_i_realize_undirected_multi(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops, bool largest) {
+static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops, bool largest) {
     long vcount = igraph_vector_size(deg);
 
     if (vcount == 0)
@@ -287,7 +287,7 @@ static int igraph_i_realize_undirected_multi(const igraph_vector_t *deg, igraph_
 }
 
 
-static int igraph_i_realize_undirected_multi_index(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
+static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
     long vcount = igraph_vector_size(deg);
 
     if (vcount == 0)
@@ -369,7 +369,7 @@ inline bool is_nonzero_outdeg(const vbd_pair &vd) {
 // Realize bi-degree sequence as edge list
 // If smallest=true, always choose the vertex with "smallest" bi-degree for connecting up next,
 // otherwise choose the "largest" (based on lexicographic bi-degree ordering).
-static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges, bool smallest) {
+static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges, bool smallest) {
     long n = igraph_vector_size(indeg); // number of vertices
 
     long ec = 0; // number of edges added so far
@@ -440,7 +440,7 @@ fail:
 
 
 // Choose vertices in the order of their IDs.
-static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges) {
+static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges) {
     long n = igraph_vector_size(indeg); // number of vertices
 
     long ec = 0; // number of edges added so far
@@ -506,7 +506,7 @@ fail:
 /***** Main functions *****/
 /**************************/
 
-static int igraph_i_realize_undirected_degree_sequence(
+static igraph_error_t igraph_i_realize_undirected_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *deg,
         igraph_edge_type_sw_t allowed_edge_types,
@@ -598,7 +598,7 @@ static int igraph_i_realize_undirected_degree_sequence(
 }
 
 
-static int igraph_i_realize_directed_degree_sequence(
+static igraph_error_t igraph_i_realize_directed_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *outdeg,
         const igraph_vector_t *indeg,

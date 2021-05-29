@@ -145,7 +145,7 @@ typedef struct {
     igraph_real_t weight;
 } igraph_i_multilevel_community_link;
 
-static igraph_error_t igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
+static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
     return (int) (((igraph_i_multilevel_community_link*)a)->community -
                   ((igraph_i_multilevel_community_link*)b)->community);
 }

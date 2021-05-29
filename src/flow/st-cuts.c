@@ -40,14 +40,14 @@
 #include "graph/attributes.h"
 #include "flow/flow_internal.h"
 
-typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
-                                        const igraph_marked_queue_t *S,
-                                        const igraph_estack_t *T,
-                                        long int source,
-                                        long int target,
-                                        long int *v,
-                                        igraph_vector_t *Isv,
-                                        void *arg);
+typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
+                                                   const igraph_marked_queue_t *S,
+                                                   const igraph_estack_t *T,
+                                                   long int source,
+                                                   long int target,
+                                                   long int *v,
+                                                   igraph_vector_t *Isv,
+                                                   void *arg);
 
 /**
  * \function igraph_even_tarjan_reduction

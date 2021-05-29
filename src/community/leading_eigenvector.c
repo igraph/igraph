@@ -363,7 +363,7 @@ static void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
 }
 
 static void igraph_i_error_handler_none(const char *reason, const char *file,
-                                        int line, int igraph_errno) {
+                                        int line, igraph_error_t igraph_errno) {
     IGRAPH_UNUSED(reason);
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);

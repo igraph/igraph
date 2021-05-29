@@ -38,13 +38,13 @@
  * Callback function for igraph_motifs_randesu that counts the motifs by
  * isomorphism class in a histogram.
  */
-static igraph_bool_t igraph_i_motifs_randesu_update_hist(
+static igraph_error_t igraph_i_motifs_randesu_update_hist(
         const igraph_t *graph,
         igraph_vector_t *vids, int isoclass, void* extra) {
     igraph_vector_t *hist = (igraph_vector_t*)extra;
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(vids);
     VECTOR(*hist)[isoclass]++;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

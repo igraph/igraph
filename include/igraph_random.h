@@ -40,9 +40,9 @@ typedef struct igraph_rng_type_t {
     const char *name;
     unsigned long int min; /* 'min' must always be set to 0 */
     unsigned long int max;
-    int (*init)(void **state);
+    igraph_error_t (*init)(void **state);
     void (*destroy)(void *state);
-    int (*seed)(void *state, unsigned long int seed);
+    igraph_error_t (*seed)(void *state, unsigned long int seed);
     unsigned long int (*get)(void *state);
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
