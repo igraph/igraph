@@ -1264,15 +1264,15 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
-                          const igraph_vector_t *pairs,
-                          igraph_bool_t directed, igraph_bool_t error);
+igraph_error_t igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
+                                     const igraph_vector_t *pairs,
+                                     igraph_bool_t directed, igraph_bool_t error);
 
-int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
-                         const igraph_vector_t *path,
-                         igraph_bool_t directed, igraph_bool_t error);
+igraph_error_t igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
+                                    const igraph_vector_t *path,
+                                    igraph_bool_t directed, igraph_bool_t error);
 
-int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
+igraph_error_t igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
                           const igraph_vector_t *pairs,
                           igraph_bool_t directed, igraph_bool_t error) {
     long int n = igraph_vector_size(pairs);
@@ -1323,9 +1323,9 @@ int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
-                         const igraph_vector_t *path,
-                         igraph_bool_t directed, igraph_bool_t error) {
+igraph_error_t igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
+                                    const igraph_vector_t *path,
+                                    igraph_bool_t directed, igraph_bool_t error) {
 
     long int n = igraph_vector_size(path);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1503,17 +1503,17 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
     } while (0)
 
 
-int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
-                               const igraph_vector_t *pairs,
-                               igraph_bool_t directed, igraph_bool_t error);
+igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
+                                          const igraph_vector_t *pairs,
+                                          igraph_bool_t directed, igraph_bool_t error);
 
-int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
+igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
                               const igraph_vector_t *path,
                               igraph_bool_t directed, igraph_bool_t error);
 
-int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
-                               const igraph_vector_t *pairs,
-                               igraph_bool_t directed, igraph_bool_t error) {
+igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
+                                          const igraph_vector_t *pairs,
+                                          igraph_bool_t directed, igraph_bool_t error) {
 
     long int n = igraph_vector_size(pairs);
     long int no_of_nodes = igraph_vcount(graph);
@@ -1576,9 +1576,9 @@ int igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
-                              const igraph_vector_t *path,
-                              igraph_bool_t directed, igraph_bool_t error) {
+igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
+                                         const igraph_vector_t *path,
+                                         igraph_bool_t directed, igraph_bool_t error) {
 
     long int n = igraph_vector_size(path);
     long int no_of_nodes = igraph_vcount(graph);
