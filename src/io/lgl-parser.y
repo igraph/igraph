@@ -59,7 +59,7 @@
 #include "internal/hacks.h"
 
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
-		       const char *s);
+                       const char *s);
 igraph_real_t igraph_lgl_get_number(const char *str, long int len);
 
 #define scanner context->scanner
@@ -107,29 +107,29 @@ edge :   edgeid NEWLINE             {
              igraph_vector_push_back(context->weights, 0);
            }
        | edgeid weight NEWLINE      {
-	     igraph_vector_push_back(context->vector, context->actvertex);
+             igraph_vector_push_back(context->vector, context->actvertex);
              igraph_vector_push_back(context->vector, $1);
              igraph_vector_push_back(context->weights, $2);
-	     context->has_weights = 1;
+             context->has_weights = 1;
            }
 ;
 
 
 edgeid : ALNUM  { igraph_trie_get2(context->trie,
-				   igraph_lgl_yyget_text(scanner),
-				   igraph_lgl_yyget_leng(scanner),
-				   &$$); };
+                                   igraph_lgl_yyget_text(scanner),
+                                   igraph_lgl_yyget_leng(scanner),
+                                   &$$); };
 
 weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yyget_text(scanner),
-					   igraph_lgl_yyget_leng(scanner)); } ;
+                                           igraph_lgl_yyget_leng(scanner)); } ;
 
 %%
 
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
-		       const char *s) {
+                       const char *s) {
   snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char),
-	   "Parse error in LGL file, line %i (%s)",
-	   locp->first_line, s);
+           "Parse error in LGL file, line %i (%s)",
+           locp->first_line, s);
   return 0;
 }
 
