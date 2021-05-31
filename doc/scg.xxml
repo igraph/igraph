@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-SCG">
-<title>Spectral Coarse Graining</title>
+<title>Spectral coarse graining</title>
 
 <section id="about-scg"><title>Introduction</title>
 <!-- doxrox-include about_scg -->

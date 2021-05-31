@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Error">
-<title>Error Handling</title>
+<title>Error handling</title>
 
 <section id="error-handling-basics">
 <!-- doxrox-include error_handling_basics -->

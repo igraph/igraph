@@ -48,7 +48,7 @@ __BEGIN_DECLS
  * </para>
  *
  * <para>
- * Igraph functions report their status via a call to the
+ * igraph functions report their status via a call to the
  * \ref IGRAPH_STATUS() or the \ref IGRAPH_STATUSF() macro.
  * </para>
  */

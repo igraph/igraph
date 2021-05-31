@@ -5,11 +5,11 @@
 ]>
 
 <chapter id="igraph-Generators">
-<title>Graph Generators</title>
+<title>Graph generators</title>
 
 <!-- doxrox-include about_generators -->
 
-<section id="deterministic-graph-generators"><title>Deterministic Graph Generators</title>
+<section id="deterministic-graph-generators"><title>Deterministic graph generators</title>
 <!-- doxrox-include igraph_create -->
 <!-- doxrox-include igraph_small -->
 <!-- doxrox-include igraph_adjacency -->
@@ -32,7 +32,7 @@
 <!-- doxrox-include igraph_extended_chordal_ring -->
 </section>
 
-<section id="games-randomized-graph-generators"><title>Games: Randomized Graph Generators</title>
+<section id="games-randomized-graph-generators"><title>Games: randomized graph generators</title>
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->

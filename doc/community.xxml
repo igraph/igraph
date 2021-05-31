@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Community">
-<title>Detecting Community Structure</title>
+<title>Detecting community structure</title>
 
 <section id="common-functions-related-to-community-detection"><title>Common functions related to community structure</title>
 <!-- doxrox-include igraph_modularity -->
@@ -29,7 +29,7 @@
 <!-- doxrox-include igraph_le_community_to_membership -->
 </section>
 
-<section id="walktrap-community-structure-based-on-random-walks"><title>Walktrap: community structure based on random walks</title>
+<section id="walktrap-community-structure-based-on-random-walks"><title>Walktrap: Community structure based on random walks</title>
 <!-- doxrox-include igraph_community_walktrap -->
 </section>
 
@@ -44,7 +44,7 @@
 <!-- doxrox-include igraph_community_leiden -->
 </section>
 
-<section id="fluid-communities"><title>Fluid Communities</title>
+<section id="fluid-communities"><title>Fluid communities</title>
 <!-- doxrox-include igraph_community_fluid_communities -->
 </section>
 

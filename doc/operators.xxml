@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Operators">
-<title>Graph Operators</title>
+<title>Graph operators</title>
 
 <section id="union-and-intersection"><title>Union and intersection</title>
 <!-- doxrox-include igraph_disjoint_union -->
