@@ -645,26 +645,13 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     return 0;
 }
 
-int igraph_transitivity_barrat1(const igraph_t *graph,
-                                igraph_vector_t *res,
-                                const igraph_vs_t vids,
-                                const igraph_vector_t *weights,
-                                igraph_transitivity_mode_t mode);
-
-int igraph_transitivity_barrat4(const igraph_t *graph,
-                                igraph_vector_t *res,
-                                const igraph_vs_t vids,
-                                const igraph_vector_t *weights,
-                                igraph_transitivity_mode_t mode);
-
-int igraph_transitivity_barrat1(const igraph_t *graph,
-                                igraph_vector_t *res,
-                                const igraph_vs_t vids,
-                                const igraph_vector_t *weights,
-                                igraph_transitivity_mode_t mode) {
+static int igraph_i_transitivity_barrat1(const igraph_t *graph,
+                                         igraph_vector_t *res,
+                                         const igraph_vs_t vids,
+                                         const igraph_vector_t *weights,
+                                         igraph_transitivity_mode_t mode) {
 
     long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
     long int nodes_to_calc;
     igraph_vector_int_t *adj1, *adj2;
@@ -674,22 +661,10 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     long int i;
     igraph_vector_t strength;
 
-    if (!weights) {
-        if (no_of_edges != 0) {
-            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
-        }
-        return igraph_transitivity_local_undirected(graph, res, vids, mode);
-    }
-
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
-                      "number of edges (%ld).", IGRAPH_EINVAL,
-                      igraph_vector_size(weights), no_of_edges);
-    }
-    if (no_of_nodes == 0) {
-        igraph_vector_clear(res);
-        return IGRAPH_SUCCESS;
-    }
+    /* Precondition: weight vector is not null, its length equals the number of
+     * edges, and the graph has at least one vertex. The graph must not have
+     * multi-edges. These must be ensured by the caller.
+     */
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -759,14 +734,13 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_transitivity_barrat4(const igraph_t *graph,
-                                igraph_vector_t *res,
-                                const igraph_vs_t vids,
-                                const igraph_vector_t *weights,
-                                igraph_transitivity_mode_t mode) {
+static int igraph_i_transitivity_barrat4(const igraph_t *graph,
+                                         igraph_vector_t *res,
+                                         const igraph_vs_t vids,
+                                         const igraph_vector_t *weights,
+                                         igraph_transitivity_mode_t mode) {
 
     long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
     igraph_vector_t order, degree, rank;
     long int maxdegree;
     igraph_inclist_t incident;
@@ -775,21 +749,10 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     igraph_vector_t actw;
     long int i, nn;
 
-    if (!weights) {
-        if (no_of_edges != 0) {
-            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
-        }
-        return igraph_transitivity_local_undirected(graph, res, vids, mode);
-    }
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
-                      "number of edges (%ld).", IGRAPH_EINVAL,
-                      igraph_vector_size(weights), no_of_edges);
-    }
-    if (no_of_nodes == 0) {
-        igraph_vector_clear(res);
-        return IGRAPH_SUCCESS;
-    }
+    /* Precondition: weight vector is not null, its length equals the number of
+     * edges, and the graph has at least one vertex. The graph must not have
+     * multi-edges. These must be ensured by the caller.
+     */
 
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
@@ -892,8 +855,8 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
  * weighted networks, Proc. Natl. Acad. Sci. USA 101, 3747 (2004) at
  * http://arxiv.org/abs/cond-mat/0311416 for the exact formula.
  *
- * \param graph The input graph, edge directions are ignored for
- *   directed graphs. Note that the function does NOT work for
+ * \param graph The input graph. Edge directions are ignored for
+ *   directed graphs. Note that the function does \em not work for
  *   non-simple graphs.
  * \param res Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed.
@@ -921,9 +884,42 @@ int igraph_transitivity_barrat(const igraph_t *graph,
                                const igraph_vs_t vids,
                                const igraph_vector_t *weights,
                                igraph_transitivity_mode_t mode) {
+    long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
+    igraph_bool_t has_multiple;
+
+    /* Handle fallback to unweighted version and common cases */
+    if (!weights) {
+        if (no_of_edges != 0) {
+            IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used.");
+        }
+        return igraph_transitivity_local_undirected(graph, res, vids, mode);
+    }
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
+                      "number of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (no_of_nodes == 0) {
+        igraph_vector_clear(res);
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
+    if (has_multiple) {
+        IGRAPH_ERROR(
+            "Barrat's weighted transitivity measure works only if the graph "
+            "has no multiple edges.", IGRAPH_EINVAL
+        );
+    }
+
+    /* Preconditions validated, now we can call the real implementation */
+
     if (igraph_vs_is_all(&vids)) {
-        return igraph_transitivity_barrat4(graph, res, vids, weights, mode);
+        return igraph_i_transitivity_barrat4(graph, res, vids, weights, mode);
     } else {
-        return igraph_transitivity_barrat1(graph, res, vids, weights, mode);
+        return igraph_i_transitivity_barrat1(graph, res, vids, weights, mode);
     }
 }
