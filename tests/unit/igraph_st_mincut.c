@@ -31,8 +31,6 @@ int main() {
     igraph_real_t value;
     int source = 0;
     int target = 4;
-    int cut_edge;
-    int partition_vertex;
 
     igraph_vector_init(&partition, 0);
     igraph_vector_init(&partition2, 0);

@@ -43,7 +43,6 @@ void compare_and_print(igraph_vector_t *comm1, igraph_vector_t *comm2, igraph_co
 
 int main() {
     igraph_vector_t comm1, comm2;
-    igraph_real_t result;
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
