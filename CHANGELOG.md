@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [0.9.4] - 2021-05-31
 
 ### Changed
 
