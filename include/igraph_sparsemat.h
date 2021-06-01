@@ -29,11 +29,14 @@
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
+#include "igraph_config.h"
 
 #include <stdio.h>
 
 __BEGIN_DECLS
 
+#if IGRAPH_INTEGER_SIZE == 64
+#define CS_LONG
 struct cs_dl_sparse;
 struct cs_dl_symbolic;
 struct cs_dl_numeric;
@@ -49,6 +52,23 @@ typedef struct {
 typedef struct {
     struct cs_dl_numeric *numeric;
 } igraph_sparsemat_numeric_t;
+#else
+struct cs_di_sparse;
+struct cs_di_symbolic;
+struct cs_di_numeric;
+
+typedef struct {
+    struct cs_di_sparse *cs;
+} igraph_sparsemat_t;
+
+typedef struct {
+    struct cs_di_symbolic *symbolic;
+} igraph_sparsemat_symbolic_t;
+
+typedef struct {
+    struct cs_di_numeric *numeric;
+} igraph_sparsemat_numeric_t;
+#endif
 
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET,
                IGRAPH_SPARSEMAT_CC

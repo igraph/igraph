@@ -40,7 +40,6 @@
  * need to use the cs_di_* variants of CXSparse functions instead of cs_dl_*
  */
 
-#define CS_LONG  /* we need the "long" versions of CXSparse functions */
 
 #include <cs.h>
 #undef cs  /* because otherwise it messes up the name of the 'cs' member in igraph_sparsemat_t */
@@ -3080,7 +3079,11 @@ igraph_error_t igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_integer_t nzmax, igraph_integer_t m, igraph_integer_t n,
                           igraph_integer_t *p, igraph_integer_t *i, igraph_real_t *x, igraph_integer_t nz) {
 
+#ifdef CS_LONG
     A->cs = IGRAPH_CALLOC(1, cs_dl);
+#else
+    A->cs = IGRAPH_CALLOC(1, cs_di);
+#endif
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
