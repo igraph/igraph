@@ -132,7 +132,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -273,7 +273,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -317,7 +317,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     igraph_vector_destroy(&v);
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -395,7 +395,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

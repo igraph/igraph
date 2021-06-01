@@ -96,7 +96,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                                directed_left));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -172,5 +172,5 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) shift, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -132,7 +132,7 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     if (ambs == 0) {
         IGRAPH_CHECK(igraph_empty(graph, nodes, directed));
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);

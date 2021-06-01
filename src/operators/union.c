@@ -257,5 +257,5 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

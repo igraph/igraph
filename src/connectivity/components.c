@@ -324,7 +324,7 @@ static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vec
     igraph_vector_destroy(&next_nei);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);

@@ -674,7 +674,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     igraph_stack_destroy(&stack);
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(5);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1014,7 +1014,7 @@ igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2
     igraph_vector_long_destroy(&seen);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1145,5 +1145,5 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

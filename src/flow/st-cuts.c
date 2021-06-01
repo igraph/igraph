@@ -1232,7 +1232,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     if (igraph_marked_queue_size(S) == no_of_nodes) {
         igraph_vector_clear(Isv);
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Create the graph induced by Sbar */

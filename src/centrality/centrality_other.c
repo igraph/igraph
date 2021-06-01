@@ -473,7 +473,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_matrix_destroy(&values);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

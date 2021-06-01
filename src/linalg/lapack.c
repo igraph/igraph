@@ -141,7 +141,7 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
     igraph_vector_fortran_int_destroy(&vipiv);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -240,7 +240,7 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -521,7 +521,7 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -664,7 +664,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -925,7 +925,7 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
@@ -952,7 +952,7 @@ igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
 
     if (n <= 1) {
         IGRAPH_CHECK(igraph_matrix_update(result, A));
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
@@ -994,5 +994,5 @@ igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

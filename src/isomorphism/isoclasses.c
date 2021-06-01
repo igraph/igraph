@@ -714,7 +714,7 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
     }
 
     *isoclass = (igraph_integer_t) arr_code[code];
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -793,7 +793,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
     *isoclass = (igraph_integer_t) arr_code[code];
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -893,5 +893,5 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     IGRAPH_CHECK(igraph_create(graph, &edges, size, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

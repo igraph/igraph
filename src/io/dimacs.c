@@ -243,7 +243,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -314,5 +314,5 @@ igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

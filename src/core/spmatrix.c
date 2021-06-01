@@ -222,7 +222,7 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
         } else {
             VECTOR(m->data)[start] = value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (VECTOR(m->ridx)[end] == row) {
         /* Overwriting a value - or deleting it if it has been overwritten by zero */
         if (value == 0) {
@@ -430,7 +430,7 @@ igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long 
     }
     m->nrow = nrow;
     m->ncol = ncol;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -690,7 +690,7 @@ igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
     IGRAPH_ASSERT(m != NULL);
     n = (long)VECTOR(m->cidx)[col + 1] - (long)VECTOR(m->cidx)[col];
     if (n == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     igraph_vector_remove_section(&m->ridx, (long int) VECTOR(m->cidx)[col],
                                  (long int) VECTOR(m->cidx)[col + 1]);
@@ -888,7 +888,7 @@ static igraph_error_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spm
         if (VECTOR(m->data)[i] != 0.0) {
             VECTOR(*res)[n] = VECTOR(m->ridx)[i];
         }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 */
 
@@ -941,7 +941,7 @@ igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
     if (igraph_spmatrix_count_nonzero(mit->m) == 0) {
         mit->pos = mit->ri = mit->ci = -1L;
         mit->value = -1;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     mit->ci = 0;

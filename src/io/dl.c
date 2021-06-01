@@ -171,5 +171,5 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     igraph_dl_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

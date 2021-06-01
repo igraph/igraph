@@ -111,13 +111,13 @@ igraph_error_t igraph_zeroin(              /* An estimate of the root */
         *Tol = 0.0;
         *Maxit = 0;
         *res = a;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     if (fb ==  0.0) {
         *Tol = 0.0;
         *Maxit = 0;
         *res = b;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     while (maxit--) {   /* Main iteration loop  */
@@ -144,7 +144,7 @@ igraph_error_t igraph_zeroin(              /* An estimate of the root */
             *Maxit -= maxit;
             *Tol = fabs(c - b);
             *res = b;
-            return 0;           /* Acceptable approx. is found  */
+            return IGRAPH_SUCCESS;           /* Acceptable approx. is found  */
         }
 
         /* Decide if the interpolation can be tried */

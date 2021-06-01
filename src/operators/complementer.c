@@ -100,5 +100,5 @@ igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
     IGRAPH_I_ATTRIBUTE_DESTROY(res);
     IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/1, /*vertex=*/1, /*edge=*/0);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

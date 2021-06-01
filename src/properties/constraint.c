@@ -302,5 +302,5 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_destroy(&contrib);
     IGRAPH_FINALLY_CLEAN(7);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

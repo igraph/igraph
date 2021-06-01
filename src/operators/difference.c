@@ -179,5 +179,5 @@ igraph_error_t igraph_difference(igraph_t *res,
     igraph_vector_destroy(&edge_ids);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

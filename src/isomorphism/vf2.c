@@ -152,7 +152,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
 
     if (no_of_nodes != igraph_vcount(graph2) ||
         no_of_edges != igraph_ecount(graph2)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (vertex_color1) {
@@ -184,7 +184,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
         igraph_vector_int_destroy(&tmp2);
         IGRAPH_FINALLY_CLEAN(2);
         if (ret) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
@@ -203,7 +203,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
         igraph_vector_int_destroy(&tmp2);
         IGRAPH_FINALLY_CLEAN(2);
         if (ret) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
@@ -654,7 +654,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct {
@@ -777,7 +777,7 @@ igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *gra
             igraph_vector_clear(map21);
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_count_isomorphisms_vf2(
@@ -850,7 +850,7 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
                  (igraph_isohandler_t*)
                  igraph_i_count_isomorphisms_vf2,
                  ncb, ecb, &data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
@@ -1043,7 +1043,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 
     if (no_of_nodes1 < no_of_nodes2 ||
         no_of_edges1 < no_of_edges2) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if ( (vertex_color1 && !vertex_color2) || (!vertex_color1 && vertex_color2) ) {
@@ -1481,7 +1481,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_subisomorphic_vf2(
@@ -1569,7 +1569,7 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
             igraph_vector_clear(map21);
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_count_subisomorphisms_vf2(
@@ -1645,7 +1645,7 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
                  (igraph_isohandler_t*)
                  igraph_i_count_subisomorphisms_vf2,
                  ncb, ecb, &data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {

@@ -56,7 +56,7 @@ igraph_error_t FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long i
     s->stor_end = s->stor_begin + alloc_size;
     s->end = s->stor_begin;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -103,7 +103,7 @@ igraph_error_t FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long i
     IGRAPH_ASSERT(s->stor_begin != NULL);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(s->stor_begin, (size_t) size, BASE);
@@ -114,7 +114,7 @@ igraph_error_t FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long i
     s->stor_end = s->stor_begin + size;
     s->end = s->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -211,7 +211,7 @@ igraph_error_t FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
         *(s->end) = elem;
         (s->end) += 1;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -274,7 +274,7 @@ igraph_error_t FUNCTION(igraph_stack, print)(const TYPE(igraph_stack) *s) {
         printf(" " OUT_FORMAT, s->stor_begin[i]);
     }
     printf("\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -287,7 +287,7 @@ igraph_error_t FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack) *s, FILE 
         fprintf(file, " " OUT_FORMAT, s->stor_begin[i]);
     }
     fprintf(file, "\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif

@@ -404,7 +404,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     igraph_vector_destroy(&csizes);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -617,5 +617,5 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     igraph_vector_destroy(&csizes);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

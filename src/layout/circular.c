@@ -67,7 +67,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
     }
     igraph_vit_destroy(&vit);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -124,7 +124,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -181,5 +181,5 @@ igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res)
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

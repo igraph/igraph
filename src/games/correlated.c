@@ -106,7 +106,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         IGRAPH_CHECK(igraph_create(new_graph, &edges, no_of_nodes, directed));
         igraph_vector_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&newedges, 0);
@@ -235,7 +235,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_vector_destroy(&newedges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef D_CODE
@@ -277,5 +277,5 @@ igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
     IGRAPH_CHECK(igraph_erdos_renyi_game(graph1, IGRAPH_ERDOS_RENYI_GNP, n, p,
                                          directed, IGRAPH_NO_LOOPS));
     IGRAPH_CHECK(igraph_correlated_game(graph1, graph2, corr, p, permutation));
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -67,7 +67,7 @@ igraph_error_t FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, long int s
     q->begin = q->stor_begin;
     q->end = NULL;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -326,7 +326,7 @@ igraph_error_t FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem)
         IGRAPH_FREE(old);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #if defined (OUT_FORMAT)
@@ -365,7 +365,7 @@ igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FIL
 
     fprintf(file, "\n");
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif

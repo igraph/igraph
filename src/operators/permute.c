@@ -92,5 +92,5 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

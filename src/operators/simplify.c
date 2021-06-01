@@ -173,5 +173,5 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     igraph_destroy(graph);
     *graph = res;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

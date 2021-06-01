@@ -185,7 +185,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     }
 
     if (no_nodes == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
@@ -460,5 +460,5 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     igraph_vector_int_destroy(&perm);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

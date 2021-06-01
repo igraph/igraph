@@ -78,5 +78,5 @@ igraph_error_t igraph_atlas(igraph_t *graph, int number) {
                                        e * 2),
                                n, IGRAPH_UNDIRECTED));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

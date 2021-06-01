@@ -86,7 +86,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -145,5 +145,5 @@ igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t d
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

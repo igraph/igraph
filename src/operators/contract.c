@@ -161,5 +161,5 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     igraph_destroy(graph);
     *graph = res;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

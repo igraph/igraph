@@ -119,7 +119,7 @@ igraph_error_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t
     igraph_dqueue_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -292,5 +292,5 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
     igraph_vector_destroy(&new_edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

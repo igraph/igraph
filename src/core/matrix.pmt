@@ -152,7 +152,7 @@ igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, long int 
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol));
     m->nrow = nrow;
     m->ncol = ncol;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -181,7 +181,7 @@ igraph_error_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
     long int size = FUNCTION(igraph_matrix, size)(m);
     long int capacity = FUNCTION(igraph_matrix, capacity)(m);
     if (size == capacity) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&tmp, size));
@@ -189,7 +189,7 @@ igraph_error_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
     FUNCTION(igraph_vector, destroy)(&m->data);
     m->data = tmp;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -292,7 +292,7 @@ void FUNCTION(igraph_matrix, null)(TYPE(igraph_matrix) *m) {
 
 igraph_error_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, long int n) {
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -316,7 +316,7 @@ igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, long in
                                                 (m->nrow + n)*i);
     }
     m->nrow += n;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -335,7 +335,7 @@ igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, long in
 igraph_error_t FUNCTION(igraph_matrix, remove_col)(TYPE(igraph_matrix) *m, long int col) {
     FUNCTION(igraph_vector, remove_section)(&m->data, (m->nrow)*col, (m->nrow) * (col + 1));
     m->ncol--;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -362,7 +362,7 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m, 
                                                 (i + 1) * (m->nrow - nremove), (i + 1) * (m->nrow - nremove) + nremove);
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -387,7 +387,7 @@ igraph_error_t FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
     }
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -482,7 +482,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -521,7 +521,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matri
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -548,7 +548,7 @@ igraph_error_t FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
     }
     IGRAPH_CHECK(FUNCTION(igraph_vector, get_interval)(&m->data, res,
                  nrow * index, nrow * (index + 1)));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -737,7 +737,7 @@ igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
     m->nrow = ncol;
     m->ncol = nrow;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -829,7 +829,7 @@ igraph_error_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
 
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(to, from->nrow, from->ncol));
     FUNCTION(igraph_vector, update)(&to->data, &from->data);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -876,7 +876,7 @@ igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
         offset += fromrows + torows;
         offset2 += fromrows;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -902,7 +902,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
     }
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(to, torows, tocols + fromcols));
     FUNCTION(igraph_vector, copy_to)(&from->data, VECTOR(to->data) + tocols * torows);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -952,7 +952,7 @@ igraph_error_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
     for (i = index, j = 0; j < cols; i += rows, j++) {
         VECTOR(*res)[j] = VECTOR(m->data)[i];
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -985,7 +985,7 @@ igraph_error_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
     for (i = index, j = 0; j < cols; i += rows, j++) {
         VECTOR(m->data)[i] = VECTOR(*v)[j];
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1018,7 +1018,7 @@ igraph_error_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
     for (i = index * rows, j = 0; j < rows; i++, j++) {
         VECTOR(m->data)[i] = VECTOR(*v)[j];
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1043,7 +1043,7 @@ igraph_error_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
         IGRAPH_ERROR("Cannot swap rows, index out of range", IGRAPH_EINVAL);
     }
     if (i == j) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     for (index1 = i, index2 = j; index1 < n; index1 += nrow, index2 += nrow) {
         BASE tmp;
@@ -1051,7 +1051,7 @@ igraph_error_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
         VECTOR(m->data)[index1] = VECTOR(m->data)[index2];
         VECTOR(m->data)[index2] = tmp;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1075,14 +1075,14 @@ igraph_error_t FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
         IGRAPH_ERROR("Cannot swap columns, index out of range", IGRAPH_EINVAL);
     }
     if (i == j) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     for (index1 = i * nrow, index2 = j * nrow, k = 0; k < nrow; k++, index1++, index2++) {
         BASE tmp = VECTOR(m->data)[index1];
         VECTOR(m->data)[index1] = VECTOR(m->data)[index2];
         VECTOR(m->data)[index2] = tmp;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1223,7 +1223,7 @@ igraph_error_t FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
     long int vmin = FUNCTION(igraph_vector, which_min)(&m->data);
     *i = vmin % m->nrow;
     *j = vmin / m->nrow;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1249,7 +1249,7 @@ igraph_error_t FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
     long int vmax = FUNCTION(igraph_vector, which_max)(&m->data);
     *i = vmax % m->nrow;
     *j = vmax / m->nrow;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1306,7 +1306,7 @@ igraph_error_t FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *
     *jmin = vmin / m->nrow;
     *imax = vmax % m->nrow;
     *jmax = vmax / m->nrow;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -1428,7 +1428,7 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
         }
         VECTOR(*res)[r] = sum;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1461,7 +1461,7 @@ igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
         }
         VECTOR(*res)[c] = sum;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1545,7 +1545,7 @@ igraph_error_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, long 
     }
     m->nrow--;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, m->nrow * m->ncol));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1579,7 +1579,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
             MATRIX(*res, i, j) = MATRIX(*m, i, (long int)VECTOR(*cols)[j]);
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifdef OUT_FORMAT
@@ -1600,7 +1600,7 @@ igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
         printf("\n");
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
@@ -1618,7 +1618,7 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
         printf("\n");
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -1639,7 +1639,7 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
         fprintf(file, "\n");
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif

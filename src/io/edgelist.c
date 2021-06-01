@@ -110,7 +110,7 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -155,5 +155,5 @@ igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstrea
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

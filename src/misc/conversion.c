@@ -321,7 +321,7 @@ igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, 
 
     igraph_eit_destroy(&edgeit);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -508,7 +508,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
     }
 
     if (!igraph_is_directed(graph)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -776,7 +776,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -832,7 +832,7 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -870,7 +870,7 @@ igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
 
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 

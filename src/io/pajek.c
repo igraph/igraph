@@ -240,7 +240,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_pajek_yylex_destroy(context.scanner);
 
     IGRAPH_FINALLY_CLEAN(7);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Order matters here! */

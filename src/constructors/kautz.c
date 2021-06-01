@@ -182,5 +182,5 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

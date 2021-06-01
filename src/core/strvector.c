@@ -74,7 +74,7 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, long int len) {
     }
     sv->len = len;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -164,7 +164,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, long int idx,
     }
     strcpy(sv->data[idx], value);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -319,7 +319,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -355,7 +355,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
         igraph_strvector_resize(to, len1);
         IGRAPH_ERROR("Cannot append string vector", IGRAPH_ENOMEM);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -451,7 +451,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, long int newsize) 
     }
     v->len = newsize;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -502,7 +502,7 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     strcpy(v->data[s], value);
     v->len += 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -599,5 +599,5 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
         igraph_strvector_set(newv, i, str);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

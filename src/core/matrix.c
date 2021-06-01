@@ -77,7 +77,7 @@ igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
         printf("\n");
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -98,7 +98,7 @@ igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
         fprintf(file, "\n");
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
@@ -107,7 +107,7 @@ igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
     long int ncol = igraph_matrix_complex_ncol(v);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_real(&v->data, &real->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
@@ -116,7 +116,7 @@ igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
     long int ncol = igraph_matrix_complex_ncol(v);
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_imag(&v->data, &imag->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
@@ -128,7 +128,7 @@ igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_realimag(&v->data, &real->data,
                  &imag->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
@@ -136,7 +136,7 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
                                  const igraph_matrix_t *imag) {
     IGRAPH_CHECK(igraph_vector_complex_create(&v->data, &real->data,
                  &imag->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
@@ -144,7 +144,7 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
                                        const igraph_matrix_t *theta) {
     IGRAPH_CHECK(igraph_vector_complex_create_polar(&v->data, &r->data,
                  &theta->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,

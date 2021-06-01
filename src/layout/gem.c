@@ -112,7 +112,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (no_nodes == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_vector_float_init(&impulse_x, no_nodes));
@@ -246,5 +246,5 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_float_destroy(&impulse_x);
     IGRAPH_FINALLY_CLEAN(7);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

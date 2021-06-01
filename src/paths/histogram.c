@@ -145,5 +145,5 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
         *unconnected = unconn;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

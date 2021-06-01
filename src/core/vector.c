@@ -107,7 +107,7 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_lo
     for (i = 0; i < n; i++) {
         VECTOR(*to)[i] = round(VECTOR(*from)[i]);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
@@ -125,7 +125,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_destroy(&heap);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -211,7 +211,7 @@ igraph_error_t igraph_vector_order(const igraph_vector_t* v,
     igraph_vector_destroy(&rad);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_order1(const igraph_vector_t* v,
@@ -252,7 +252,7 @@ igraph_error_t igraph_vector_order1(const igraph_vector_t* v,
     igraph_vector_destroy(&rad);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
@@ -294,7 +294,7 @@ igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
     igraph_vector_destroy(&rad);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
@@ -326,7 +326,7 @@ igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res
     igraph_vector_destroy(&ptr);
     igraph_vector_destroy(&rad);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef USING_R
@@ -341,7 +341,7 @@ igraph_error_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
         printf(" %g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
     printf("\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -357,7 +357,7 @@ igraph_error_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
         fprintf(file, " %g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
     }
     fprintf(file, "\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
@@ -368,7 +368,7 @@ igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
         VECTOR(*real)[i] = IGRAPH_REAL(VECTOR(*v)[i]);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
@@ -379,7 +379,7 @@ igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
         VECTOR(*imag)[i] = IGRAPH_IMAG(VECTOR(*v)[i]);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
@@ -394,7 +394,7 @@ igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
         VECTOR(*imag)[i] = IGRAPH_IMAG(z);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
@@ -412,7 +412,7 @@ igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
         VECTOR(*v)[i] = igraph_complex(VECTOR(*real)[i], VECTOR(*imag)[i]);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
@@ -430,7 +430,7 @@ igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
         VECTOR(*v)[i] = igraph_complex_polar(VECTOR(*r)[i], VECTOR(*theta)[i]);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
@@ -474,7 +474,7 @@ igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
             VECTOR(*v)[i] = 0.0;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

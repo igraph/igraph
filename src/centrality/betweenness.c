@@ -260,7 +260,7 @@ static igraph_error_t igraph_i_betweenness_cutoff_weighted(
     igraph_2wheap_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(7);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -492,7 +492,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     igraph_adjlist_destroy(&adjlist_in);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -726,7 +726,7 @@ static igraph_error_t igraph_i_edge_betweenness_cutoff_weighted(
     igraph_vector_long_destroy(&nrgeo);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -965,7 +965,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

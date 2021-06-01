@@ -156,7 +156,7 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -245,7 +245,7 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -310,7 +310,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -370,7 +370,7 @@ igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
         *res = (real_nodes - 1) * (real_nodes - 1) * (real_nodes - 2) / 2.0;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -439,7 +439,7 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -503,7 +503,7 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
         *res = (real_nodes - 1) * (real_nodes - 2) / (2.0 * real_nodes - 3);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -588,7 +588,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -654,5 +654,5 @@ igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

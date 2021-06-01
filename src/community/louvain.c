@@ -235,7 +235,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
     igraph_free(links);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_real_t igraph_i_multilevel_community_modularity_gain(

@@ -123,7 +123,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     igraph_vector_destroy(&ai);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -243,7 +243,7 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
         *res = num / den;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -297,5 +297,5 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
         igraph_vector_destroy(&degree);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

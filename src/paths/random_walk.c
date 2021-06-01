@@ -111,7 +111,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
     igraph_lazy_adjlist_destroy(&adj);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 

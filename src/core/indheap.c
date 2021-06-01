@@ -286,7 +286,7 @@ igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, long int size) {
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
@@ -310,7 +310,7 @@ igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, long int size) {
     h->end = h->stor_begin + actual_size;
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -582,7 +582,7 @@ igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, long int size) {
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp1 = IGRAPH_CALLOC(size, igraph_real_t);

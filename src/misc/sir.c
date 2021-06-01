@@ -41,7 +41,7 @@ igraph_error_t igraph_sir_init(igraph_sir_t *sir) {
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_i);
     IGRAPH_CHECK(igraph_vector_int_init(&sir->no_r, 1));
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

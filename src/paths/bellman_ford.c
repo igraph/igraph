@@ -207,7 +207,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 

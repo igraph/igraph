@@ -176,7 +176,7 @@ igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     igraph_vector_destroy(&ny);
     igraph_vector_destroy(&nr);
     IGRAPH_FINALLY_CLEAN(8);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
@@ -208,7 +208,7 @@ igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
     *y = (ymin + ymax) / 2;
     *r = hypot(xmax - xmin, ymax - ymin) / 2;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
@@ -249,7 +249,7 @@ igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
     *r = sqrt( (xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) +
                (zmax - zmin) * (zmax - zmin) ) / 2;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
@@ -291,5 +291,5 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     }
 
     /*   fprintf(stderr, "%li ", steps); */
-    return 0;
+    return IGRAPH_SUCCESS;
 }

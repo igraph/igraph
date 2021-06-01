@@ -415,5 +415,5 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     igraph_vector_ptr_destroy(&path_edge);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(7);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

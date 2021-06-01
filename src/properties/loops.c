@@ -52,7 +52,7 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -91,5 +91,5 @@ igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

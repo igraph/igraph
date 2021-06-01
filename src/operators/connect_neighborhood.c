@@ -159,5 +159,5 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

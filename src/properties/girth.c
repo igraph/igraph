@@ -204,5 +204,5 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     igraph_lazy_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

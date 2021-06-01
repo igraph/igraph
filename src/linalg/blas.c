@@ -134,5 +134,5 @@ igraph_error_t igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t
 
     *res = igraphddot_(&n, VECTOR(*v1), &one, VECTOR(*v2), &one);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

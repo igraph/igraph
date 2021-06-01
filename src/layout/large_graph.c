@@ -344,6 +344,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&forcex);
     igraph_vector_destroy(&forcey);
     IGRAPH_FINALLY_CLEAN(9);
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }

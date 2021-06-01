@@ -204,5 +204,5 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
     igraph_dqueue_destroy(&q);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

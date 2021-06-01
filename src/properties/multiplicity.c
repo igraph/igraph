@@ -75,7 +75,7 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -137,7 +137,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -207,7 +207,7 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
     igraph_lazy_inclist_destroy(&inclist);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 

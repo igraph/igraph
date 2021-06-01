@@ -131,5 +131,5 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

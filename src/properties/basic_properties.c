@@ -64,7 +64,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 
     if (no_of_nodes == 0) {
         *res = IGRAPH_NAN;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (!loops) {
@@ -83,7 +83,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -189,7 +189,7 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
     igraph_vector_destroy(&incident);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -252,7 +252,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     /* THIS IS AN EXIT HERE !!!!!!!!!!!!!! */
     if (!igraph_is_directed(graph)) {
         *res = 1.0;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&inneis, 0);
@@ -305,5 +305,5 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     igraph_vector_destroy(&inneis);
     igraph_vector_destroy(&outneis);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

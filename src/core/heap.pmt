@@ -64,7 +64,7 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, long int alloc_
     h->end = h->stor_begin;
     h->destroy = 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -95,7 +95,7 @@ igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* dat
 
     FUNCTION(igraph_heap, i_build) (h->stor_begin, h->end - h->stor_begin, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -189,7 +189,7 @@ igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
     FUNCTION(igraph_heap, i_shift_up)(h->stor_begin, FUNCTION(igraph_heap, size)(h),
                                       FUNCTION(igraph_heap, size)(h) - 1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -282,7 +282,7 @@ igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int siz
     IGRAPH_ASSERT(h->stor_begin != NULL);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(h->stor_begin, (size_t) size, BASE);
@@ -293,7 +293,7 @@ igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int siz
     h->stor_end = h->stor_begin + size;
     h->end = h->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -138,7 +138,7 @@ igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *
             IGRAPH_CHECK(igraph_matrix_resize(rescoords, 0, 2));
         }
         /**************************** this is an exit here *********/
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&angles, no_of_nodes);
@@ -257,7 +257,7 @@ igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *
     igraph_vector_destroy(&angles);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -430,5 +430,5 @@ igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_re
         result->p = plfit_result.p;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

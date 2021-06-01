@@ -292,5 +292,5 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

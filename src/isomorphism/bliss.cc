@@ -472,7 +472,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         if (map21) {
             igraph_vector_clear(map21);
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (map12) {
@@ -590,5 +590,5 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

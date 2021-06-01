@@ -160,5 +160,5 @@ igraph_error_t igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
     igraph_free(pos);
     igraph_free(vert);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

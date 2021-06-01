@@ -219,7 +219,7 @@ static igraph_error_t igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_
         }
         act = v[act - 1];
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
@@ -267,7 +267,7 @@ igraph_error_t igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *e
         IGRAPH_CHECK(igraph_i_2dgrid_addvertices(grid, eids, vid, r, x - 1, y + 1));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it) {

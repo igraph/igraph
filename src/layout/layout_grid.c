@@ -60,7 +60,7 @@ igraph_error_t igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, l
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -109,5 +109,5 @@ igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

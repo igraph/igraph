@@ -58,7 +58,7 @@ igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
         *Fmin = fminfn(b, 0, ex);
         *fncount = 1;
         *grcount = 0;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (nREPORT <= 0) {

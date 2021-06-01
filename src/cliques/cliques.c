@@ -1403,5 +1403,5 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     if (clique_number) {
         *clique_number = clqdata.largest_set_size;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }

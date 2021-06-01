@@ -185,7 +185,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -457,7 +457,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -535,5 +535,5 @@ igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -155,7 +155,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     }
 
     if (no_nodes <= 1) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -325,7 +325,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     igraph_matrix_destroy(&dij);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -480,7 +480,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     }
 
     if (no_nodes <= 1) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -688,5 +688,5 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     igraph_matrix_destroy(&dij);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

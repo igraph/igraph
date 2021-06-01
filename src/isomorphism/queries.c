@@ -128,7 +128,7 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
                                              0, 0, /*sh=*/ IGRAPH_BLISS_FL, 0, 0));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -153,7 +153,7 @@ igraph_error_t igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *grap
     IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
     IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
     *iso = (class1 == class2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -55,7 +55,7 @@ igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
     VECTOR(t->children)[0] = p;
 
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
@@ -86,7 +86,7 @@ igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
     VECTOR(t->children)[0] = p;
 
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
@@ -111,7 +111,7 @@ igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
     VECTOR(t->children)[0] = (void*)value;
 
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
@@ -135,7 +135,7 @@ igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
     VECTOR(t->children)[0] = value;
 
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 

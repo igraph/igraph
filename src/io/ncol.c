@@ -200,7 +200,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     igraph_ncol_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -373,5 +373,5 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

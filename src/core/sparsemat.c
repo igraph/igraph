@@ -379,7 +379,7 @@ static igraph_error_t igraph_i_sparsemat_index_rows(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
@@ -2200,7 +2200,7 @@ igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
     if (n == 0) {
         *min = IGRAPH_POSINFINITY;
         *max = IGRAPH_NEGINFINITY;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     *min = *max = *ptr;
     for (i = 1; i < n; i++, ptr++) {

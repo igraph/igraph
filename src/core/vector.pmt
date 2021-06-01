@@ -133,7 +133,7 @@ igraph_error_t FUNCTION(igraph_vector, init)      (TYPE(igraph_vector)* v, int l
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -211,7 +211,7 @@ igraph_error_t FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector) *v, int no
     }
     va_end(ap);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -264,7 +264,7 @@ igraph_error_t FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector) *v,
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -301,7 +301,7 @@ igraph_error_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector) *v, int no,
     }
     va_end(ap);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -353,7 +353,7 @@ igraph_error_t FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, int
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif /* ifndef BASE_COMPLEX */
@@ -437,7 +437,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, long 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     if (size <= FUNCTION(igraph_vector, size)(v)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, BASE);
@@ -448,7 +448,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, long 
     v->stor_end = v->stor_begin + size;
     v->end = v->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -547,7 +547,7 @@ igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE 
     *(v->end) = e;
     v->end += 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -576,7 +576,7 @@ igraph_error_t FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, long int 
                 sizeof(BASE) * (size - (size_t) pos));
     }
     v->stor_begin[pos] = value;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1100,7 +1100,7 @@ igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, long int 
     IGRAPH_ASSERT(v->stor_begin != NULL);
     IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, newsize));
     v->end = v->stor_begin + newsize;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1123,7 +1123,7 @@ igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     size_t size;
     BASE *tmp;
     if (v->stor_end == v->end) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     size = (size_t) (v->end - v->stor_begin);
@@ -1135,7 +1135,7 @@ igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
         v->stor_end = v->end = v->stor_begin + size;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED
@@ -1339,7 +1339,7 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector) *v,
     v->end = v->stor_end;
     memcpy(v->stor_begin, data, (size_t) length * sizeof(BASE));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1400,7 +1400,7 @@ igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
     memcpy(to->stor_begin, from->stor_begin,
            (size_t) FUNCTION(igraph_vector, size)(from) * sizeof(BASE));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1512,7 +1512,7 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
         *p2 = res;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED
@@ -1544,7 +1544,7 @@ igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
         *p = from++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -1653,7 +1653,7 @@ igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
     memcpy(v->stor_begin + to, v->stor_begin + begin,
            sizeof(BASE) * (size_t) (end - begin));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
@@ -1664,7 +1664,7 @@ igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
     memmove(v->stor_begin + to, v->stor_begin + begin,
             sizeof(BASE) * (size_t) (end - begin));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2254,7 +2254,7 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
     }
 
     FUNCTION(igraph_vector, remove_section)(v, 0, i + (s - i) / 2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -2282,7 +2282,7 @@ igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
            sizeof(BASE) * (size_t) fromsize);
     to->end = to->stor_begin + tosize + fromsize;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2295,7 +2295,7 @@ igraph_error_t FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, to - from));
     memcpy(res->stor_begin, v->stor_begin + from,
            (size_t) (to - from) * sizeof(BASE));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED
@@ -2361,7 +2361,7 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
     size_t n = (size_t) FUNCTION(igraph_vector, size)(from);
     FUNCTION(igraph_vector, resize)(to, (long) n);
     memcpy(to->stor_begin, from->stor_begin, sizeof(BASE)*n);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2392,7 +2392,7 @@ igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igrap
         VECTOR(*v1)[i] = VECTOR(*v2)[i];
         VECTOR(*v2)[i] = tmp;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2415,7 +2415,7 @@ igraph_error_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
     VECTOR(*v)[i] = VECTOR(*v)[j];
     VECTOR(*v)[j] = tmp;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2440,7 +2440,7 @@ igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
         VECTOR(*v)[i] = VECTOR(*v)[j];
         VECTOR(*v)[j] = tmp;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2526,7 +2526,7 @@ igraph_error_t FUNCTION(igraph_vector, add)(TYPE(igraph_vector) *v1,
 #endif
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2562,7 +2562,7 @@ igraph_error_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v1,
 #endif
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2597,7 +2597,7 @@ igraph_error_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
 #endif
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2634,7 +2634,7 @@ igraph_error_t FUNCTION(igraph_vector, div)(TYPE(igraph_vector) *v1,
 #endif
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOABS
@@ -2650,7 +2650,7 @@ igraph_error_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
     }
 #endif
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -2834,12 +2834,12 @@ igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vecto
     FUNCTION(igraph_vector, clear)(result);
 
     if (size1 == 0 || size2 == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
                      v1, 0, size1, v2, 0, size2, result));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int FUNCTION(igraph_i_vector, intersect_sorted)(
@@ -2952,7 +2952,7 @@ igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vect
                sizeof(BASE) * (size_t) (i0 - i));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -2977,7 +2977,7 @@ igraph_error_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v) {
 #endif
     }
     printf("\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
@@ -2990,7 +2990,7 @@ igraph_error_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
         putchar(' '); printf(format, VECTOR(*v)[i]);
     }
     printf("\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -3012,7 +3012,7 @@ igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FIL
 #endif
     }
     fprintf(file, "\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -3029,7 +3029,7 @@ igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
         VECTOR(*newv)[i] = VECTOR(*v)[j];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
@@ -3050,5 +3050,5 @@ igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
     v->stor_begin = tmp;
     v->stor_end = v->end = tmp + n;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

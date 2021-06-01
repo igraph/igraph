@@ -56,7 +56,7 @@ igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res)
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -1070,7 +1070,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifdef IGRAPH_FASTCOMM_DEBUG

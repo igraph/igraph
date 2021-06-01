@@ -86,5 +86,5 @@ igraph_error_t FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
                                     const TYPE(igraph_array3) *from) {
     IGRAPH_CHECK(FUNCTION(igraph_array3, resize)(to, from->n1, from->n2, from->n3));
     FUNCTION(igraph_vector, update)(&to->data, &from->data);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

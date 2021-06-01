@@ -1288,7 +1288,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
 
         if (no != 1) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
@@ -1786,14 +1786,14 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
         IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
         if (conn1) {
             *res = -1;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         break;
     case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
         IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
         if (conn1) {
             *res = no_of_nodes;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
@@ -1866,14 +1866,14 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
         IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
         if (conn) {
             *res = -1;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         break;
     case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
         IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
         if (conn) {
             *res = no_of_nodes;
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
@@ -2022,7 +2022,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
     if (igraph_vcount(graph) == 0) {
         *res = 0;
         *found = 1;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_STRONG));

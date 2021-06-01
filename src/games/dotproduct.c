@@ -104,7 +104,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -171,7 +171,7 @@ igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -221,7 +221,7 @@ igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -276,5 +276,5 @@ igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
