@@ -694,7 +694,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
 static int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    int *aa = (int*) a, *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t a_m = VECTOR(*myextra->mag)[*aa];
     igraph_real_t b_m = VECTOR(*myextra->mag)[*bb];
 
@@ -738,7 +739,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    int *aa = (int*) a, *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t a_r = VECTOR(*myextra->real)[*aa];
     igraph_real_t b_r = VECTOR(*myextra->real)[*bb];
 
@@ -777,7 +779,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    int *aa = (int*) a, *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t a_r = VECTOR(*myextra->real)[*aa];
     igraph_real_t b_r = VECTOR(*myextra->real)[*bb];
 
@@ -814,7 +817,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    int *aa = (int*) a, *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t a_i = VECTOR(*myextra->imag)[*aa];
     igraph_real_t b_i = VECTOR(*myextra->imag)[*bb];
 
@@ -852,7 +856,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    int *aa = (int*) a, *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t a_i = VECTOR(*myextra->imag)[*aa];
     igraph_real_t b_i = VECTOR(*myextra->imag)[*bb];
 
