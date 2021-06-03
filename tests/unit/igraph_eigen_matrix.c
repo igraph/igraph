@@ -97,6 +97,7 @@ int main() {
                         /*options=*/ 0, /*storage=*/ 0, &values2, &vectors2);
 
 #define DUMP() do {             \
+        printf("Element-wise difference of the following two vectors is too large:\n"); \
         igraph_vector_complex_print(&values);   \
         igraph_vector_complex_print(&values2);  \
     } while(0)
