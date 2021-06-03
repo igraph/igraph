@@ -33,15 +33,20 @@
 
 #include <string.h>
 
-/* CXSparse tries hard to ensure that a cs_long_t is 64-bit on a 64-bit platform
- * and 32-bit on a 32-bit platform, so we can simply make use of cs_long_t by
- * defining CS_LONG before including <cs.h>, except in the special case when we
- * want igraph_integer_t to be 32-bit on a 64-bit platform. In this case, we
- * need to use the cs_di_* variants of CXSparse functions instead of cs_dl_*
+/*
+ * We have modified SuiteSparse_config.h (which CXSparse includes) to always
+ * define cs_long_t to igraph_integer_t so we can safely use the cs_dl_*
+ * variants in this file and be sure that it uses the correct integer size
+ * for igraph (64-bit or 32-bit, depending on how the user configured it).
+ * The downside is that we cannot use an external CXSparse because that may
+ * use a different bit width for cs_long_t.
  */
 
+#ifndef CS_LONG
+#  define CS_LONG 1
+#endif
 
-#include <cs.h>
+#include <cs/cs.h>
 #undef cs  /* because otherwise it messes up the name of the 'cs' member in igraph_sparsemat_t */
 
 /* Magic macro to fail the build if certain condition does not hold. See:
@@ -3079,11 +3084,7 @@ igraph_error_t igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_integer_t nzmax, igraph_integer_t m, igraph_integer_t n,
                           igraph_integer_t *p, igraph_integer_t *i, igraph_real_t *x, igraph_integer_t nz) {
 
-#ifdef CS_LONG
     A->cs = IGRAPH_CALLOC(1, cs_dl);
-#else
-    A->cs = IGRAPH_CALLOC(1, cs_di);
-#endif
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
