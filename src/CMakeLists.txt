@@ -283,7 +283,6 @@ add_library(
   $<IF:$<OR:$<BOOL:${ARPACK_IS_VENDORED}>,$<BOOL:${BLAS_IS_VENDORED}>,$<BOOL:${LAPACK_IS_VENDORED}>>,$<TARGET_OBJECTS:f2c_vendored>,>
   $<IF:$<BOOL:${ARPACK_IS_VENDORED}>,$<TARGET_OBJECTS:arpack_vendored>,>
   $<IF:$<BOOL:${BLAS_IS_VENDORED}>,$<TARGET_OBJECTS:blas_vendored>,>
-  $<IF:$<BOOL:${CXSPARSE_IS_VENDORED}>,$<TARGET_OBJECTS:cxsparse_vendored>,>
   $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_OBJECTS:glpk_vendored>,>
   $<IF:$<BOOL:${GMP_IS_VENDORED}>,$<TARGET_OBJECTS:gmp_vendored>,>
   $<IF:$<BOOL:${LAPACK_IS_VENDORED}>,$<TARGET_OBJECTS:lapack_vendored>,>
@@ -321,7 +320,6 @@ target_include_directories(
   ${PROJECT_SOURCE_DIR}/vendor
 
   # Vendored library include paths
-  $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
   $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
 
   # Include paths for dependencies
@@ -367,15 +365,8 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer plfit prpack
+  bliss cliquer cxsparse_vendored plfit prpack
 )
-
-# Disable complex number support for CXSparse because:
-#   - It is necessary to compile with MSVC
-#   - igraph does not need complex number support from CXSparse on any platform
-# This is needed here (in addition to the cxsparse_vendored target) because
-# igraph may be compiled with an external CXSparse.
-target_compile_definitions(igraph PRIVATE NCOMPLEX)
 
 if (NOT BUILD_SHARED_LIBS)
   target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
@@ -423,7 +414,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer plfit prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored plfit prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
