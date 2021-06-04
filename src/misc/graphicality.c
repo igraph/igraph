@@ -642,7 +642,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     sort_data.second = out_degrees;
 
     /* Sort the index vector */
-    igraph_qsort_r(VECTOR(index_array), vcount, sizeof(long int), &sort_data,
+    igraph_qsort_r(VECTOR(index_array), vcount, sizeof(VECTOR(index_array)[0]), &sort_data,
                    igraph_i_qsort_dual_vector_cmp_desc);
 
     /* Be optimistic, then check whether the Fulkerson–Chen–Anstee condition

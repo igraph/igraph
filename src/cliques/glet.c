@@ -453,7 +453,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
         VECTOR(order)[i] = i;
     }
 
-    igraph_qsort_r(VECTOR(order), nocliques, sizeof(int), &sortdata,
+    igraph_qsort_r(VECTOR(order), nocliques, sizeof(VECTOR(order)[0]), &sortdata,
                    igraph_i_graphlets_filter_cmp);
 
     for (i = 0; i < nocliques - 1; i++) {
@@ -860,7 +860,7 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
     for (i = 0; i < nocliques; i++) {
         VECTOR(order)[i] = i;
     }
-    igraph_qsort_r(VECTOR(order), nocliques, sizeof(int), &sortdata,
+    igraph_qsort_r(VECTOR(order), nocliques, sizeof(VECTOR(order)[0]), &sortdata,
                    igraph_i_graphlets_order_cmp);
 
     igraph_vector_ptr_index_int(cliques, &order);

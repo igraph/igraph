@@ -704,7 +704,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
 
     first = vind[0];
 
-    igraph_qsort_r(vind, n, sizeof(uintptr_t), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
+    igraph_qsort_r(vind, n, sizeof(vind[0]), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
 
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = (vind[i] - first) / sizeof(uintptr_t);
