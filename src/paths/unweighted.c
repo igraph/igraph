@@ -271,8 +271,8 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                               igraph_vector_ptr_t *edges,
                               igraph_integer_t from, const igraph_vs_t to,
                               igraph_neimode_t mode,
-                              igraph_vector_long_t *predecessors,
-                              igraph_vector_long_t *inbound_edges) {
+                              igraph_vector_int_t *predecessors,
+                              igraph_vector_int_t *inbound_edges) {
 
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
@@ -369,7 +369,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
 
     /* Create `predecessors' if needed */
     if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (father[i] <= 0) {
@@ -387,7 +387,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
 
     /* Create `inbound_edges' if needed */
     if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (father[i] <= 1) {

@@ -482,7 +482,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     igraph_lazy_adjlist_t adjlist;
     igraph_stack_t stack;
     igraph_vector_char_t added;
-    igraph_vector_long_t nptr;
+    igraph_vector_int_t nptr;
     igraph_error_t ret;
     long int actroot;
     long int act_rank = 0;
@@ -508,11 +508,11 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     IGRAPH_FINALLY(igraph_stack_destroy, &stack);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
+    IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
 
 # define FREE_ALL() do {            \
-        igraph_vector_long_destroy(&nptr);            \
+        igraph_vector_int_destroy(&nptr);            \
         igraph_lazy_adjlist_destroy(&adjlist);        \
         igraph_stack_destroy(&stack);                 \
         igraph_vector_char_destroy(&added);           \
@@ -585,15 +585,15 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
         }
 
         while (!igraph_stack_empty(&stack)) {
-            long int actvect = igraph_stack_top(&stack);
+            igraph_integer_t actvect = igraph_stack_top(&stack);
             igraph_vector_int_t *neis =
                 igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actvect);
-            long int n = igraph_vector_int_size(neis);
-            long int *ptr = igraph_vector_long_e_ptr(&nptr, actvect);
+            igraph_integer_t n = igraph_vector_int_size(neis);
+            igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, actvect);
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = 0;
-            long int nei = 0;
+            igraph_integer_t nei = 0;
             while (!any && (*ptr) < n) {
                 nei = VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];

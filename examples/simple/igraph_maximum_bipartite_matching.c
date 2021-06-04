@@ -30,7 +30,7 @@ int test_graph_from_leda_tutorial() {
      */
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_integer_t matching_size;
     igraph_real_t matching_weight;
     igraph_bool_t is_matching;
@@ -50,7 +50,7 @@ int test_graph_from_leda_tutorial() {
     for (i = 0; i < 15; i++) {
         VECTOR(types)[i] = (i >= 8);
     }
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, 0, 0);
@@ -65,11 +65,11 @@ int test_graph_from_leda_tutorial() {
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
     if (!is_matching) {
         printf("not a matching: ");
-        igraph_vector_long_print(&matching);
+        igraph_vector_int_print(&matching);
         return 3;
     }
 
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&graph);
 
@@ -82,7 +82,7 @@ int test_weighted_graph_from_mit_notes() {
      */
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_vector_t weights;
     igraph_integer_t matching_size;
     igraph_real_t matching_weight;
@@ -105,7 +105,7 @@ int test_weighted_graph_from_mit_notes() {
     for (i = 0; i < 10; i++) {
         VECTOR(types)[i] = (i >= 5);
     }
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
     igraph_vector_init_copy(&weights, weight_array,
                             sizeof(weight_array) / sizeof(weight_array[0]));
 
@@ -122,12 +122,12 @@ int test_weighted_graph_from_mit_notes() {
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
     if (!is_matching) {
         printf("not a matching: ");
-        igraph_vector_long_print(&matching);
+        igraph_vector_int_print(&matching);
         return 3;
     }
 
     igraph_vector_destroy(&weights);
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&graph);
 
@@ -138,7 +138,7 @@ int test_weighted_graph_generated() {
     /* Several randomly generated small test graphs */
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_vector_t weights;
     igraph_integer_t matching_size;
     igraph_real_t matching_weight;
@@ -150,7 +150,7 @@ int test_weighted_graph_generated() {
     for (i = 0; i < 10; i++) {
         VECTOR(types)[i] = (i >= 5);
     }
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     /* Case 1 */
 
@@ -180,7 +180,7 @@ int test_weighted_graph_generated() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
 
     return 0;
@@ -189,7 +189,7 @@ int test_weighted_graph_generated() {
 int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_weight) {
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_vector_t weights;
     igraph_real_t matching_weight;
     FILE* f;
@@ -209,7 +209,7 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
         VECTOR(types)[i] = (i >= type1_count);
     }
 
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     igraph_vector_init(&weights, 0);
     EANV(&graph, "weight", &weights);
@@ -217,7 +217,7 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
                                       &matching, &weights, 0);
     igraph_vector_destroy(&weights);
 
-    igraph_vector_long_print(&matching);
+    igraph_vector_int_print(&matching);
     if (matching_weight != exp_weight) {
         printf("matching_weight is %ld, expected: %ld\n", (long)matching_weight,
                (long)exp_weight);
@@ -225,7 +225,7 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
     }
 
     igraph_vector_destroy(&weights);
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&graph);
 
@@ -243,7 +243,7 @@ int test_incorrect_types() {
     igraph_integer_t matching_size;
     igraph_real_t weighted_size;
 
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
 
     igraph_error_type_t err;
 
@@ -258,7 +258,7 @@ int test_incorrect_types() {
     VECTOR(types)[2] = 0;
     VECTOR(types)[3] = 1;
 
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     igraph_vector_init(&weights, igraph_vcount(&g));
     igraph_vector_fill(&weights, 1.0);
@@ -293,7 +293,7 @@ int test_incorrect_types() {
     }
 
     igraph_vector_destroy(&weights);
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
 
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&g);

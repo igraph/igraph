@@ -40,7 +40,7 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
 void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v);
-void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v);
+void igraph_i_union_intersection_destroy_vector_ints(igraph_vector_ptr_t *v);
 
 __END_DECLS
 

@@ -274,21 +274,20 @@ igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
 }
 
 typedef struct igraph_i_dbucket_t {
-    igraph_vector_long_t head;
-    igraph_vector_long_t next;
+    igraph_vector_int_t head;
+    igraph_vector_int_t next;
 } igraph_i_dbucket_t;
 
 static igraph_error_t igraph_i_dbucket_init(igraph_i_dbucket_t *buck, long int size) {
-    IGRAPH_CHECK(igraph_vector_long_init(&buck->head, size));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &buck->head);
-    IGRAPH_CHECK(igraph_vector_long_init(&buck->next, size));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&buck->head, size);
+    IGRAPH_CHECK(igraph_vector_int_init(&buck->next, size));
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_dbucket_destroy(igraph_i_dbucket_t *buck) {
-    igraph_vector_long_destroy(&buck->head);
-    igraph_vector_long_destroy(&buck->next);
+    igraph_vector_int_destroy(&buck->head);
+    igraph_vector_int_destroy(&buck->next);
 }
 
 static igraph_error_t igraph_i_dbucket_insert(igraph_i_dbucket_t *buck, long int bid,
@@ -311,7 +310,7 @@ static long int igraph_i_dbucket_delete(igraph_i_dbucket_t *buck, long int bid) 
 }
 
 static igraph_error_t igraph_i_dominator_LINK(long int v, long int w,
-                                   igraph_vector_long_t *ancestor) {
+                                   igraph_vector_int_t *ancestor) {
     VECTOR(*ancestor)[w] = v + 1;
     return IGRAPH_SUCCESS;
 }
@@ -319,24 +318,24 @@ static igraph_error_t igraph_i_dominator_LINK(long int v, long int w,
 /* TODO: don't always reallocate path */
 
 static igraph_error_t igraph_i_dominator_COMPRESS(long int v,
-                                       igraph_vector_long_t *ancestor,
-                                       igraph_vector_long_t *label,
-                                       igraph_vector_long_t *semi) {
-    igraph_stack_long_t path;
+                                       igraph_vector_int_t *ancestor,
+                                       igraph_vector_int_t *label,
+                                       igraph_vector_int_t *semi) {
+    igraph_stack_int_t path;
     long int w = v;
     long int top, pretop;
 
-    IGRAPH_CHECK(igraph_stack_long_init(&path, 10));
-    IGRAPH_FINALLY(igraph_stack_long_destroy, &path);
+    IGRAPH_CHECK(igraph_stack_int_init(&path, 10));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
 
     while (VECTOR(*ancestor)[w] != 0) {
-        IGRAPH_CHECK(igraph_stack_long_push(&path, w));
+        IGRAPH_CHECK(igraph_stack_int_push(&path, w));
         w = VECTOR(*ancestor)[w] - 1;
     }
 
-    top = igraph_stack_long_pop(&path);
-    while (!igraph_stack_long_empty(&path)) {
-        pretop = igraph_stack_long_pop(&path);
+    top = igraph_stack_int_pop(&path);
+    while (!igraph_stack_int_empty(&path)) {
+        pretop = igraph_stack_int_pop(&path);
 
         if (VECTOR(*semi)[VECTOR(*label)[top]] <
             VECTOR(*semi)[VECTOR(*label)[pretop]]) {
@@ -347,16 +346,16 @@ static igraph_error_t igraph_i_dominator_COMPRESS(long int v,
         top = pretop;
     }
 
-    igraph_stack_long_destroy(&path);
+    igraph_stack_int_destroy(&path);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
 
 static long int igraph_i_dominator_EVAL(long int v,
-                                        igraph_vector_long_t *ancestor,
-                                        igraph_vector_long_t *label,
-                                        igraph_vector_long_t *semi) {
+                                        igraph_vector_int_t *ancestor,
+                                        igraph_vector_int_t *label,
+                                        igraph_vector_int_t *semi) {
     if (VECTOR(*ancestor)[v] == 0) {
         return v;
     } else {
@@ -430,11 +429,11 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     igraph_adjlist_t succ, pred;
     igraph_vector_t parent;
-    igraph_vector_long_t semi;    /* +1 always */
+    igraph_vector_int_t semi;    /* +1 always */
     igraph_vector_t vertex;   /* +1 always */
     igraph_i_dbucket_t bucket;
-    igraph_vector_long_t ancestor;
-    igraph_vector_long_t label;
+    igraph_vector_int_t ancestor;
+    igraph_vector_int_t label;
 
     igraph_neimode_t invmode = mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN;
 
@@ -469,14 +468,14 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_init(&parent, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_destroy, &parent);
-    IGRAPH_CHECK(igraph_vector_long_init(&semi, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &semi);
+    IGRAPH_CHECK(igraph_vector_int_init(&semi, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &semi);
     IGRAPH_CHECK(igraph_vector_init(&vertex, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_destroy, &vertex);
-    IGRAPH_CHECK(igraph_vector_long_init(&ancestor, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &ancestor);
-    IGRAPH_CHECK(igraph_vector_long_init_seq(&label, 0, no_of_nodes - 1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &label);
+    IGRAPH_CHECK(igraph_vector_int_init(&ancestor, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &ancestor);
+    IGRAPH_CHECK(igraph_vector_int_init_seq(&label, 0, no_of_nodes - 1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &label);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &succ);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &pred, invmode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
@@ -565,10 +564,10 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     igraph_i_dbucket_destroy(&bucket);
     igraph_adjlist_destroy(&pred);
     igraph_adjlist_destroy(&succ);
-    igraph_vector_long_destroy(&label);
-    igraph_vector_long_destroy(&ancestor);
+    igraph_vector_int_destroy(&label);
+    igraph_vector_int_destroy(&ancestor);
     igraph_vector_destroy(&vertex);
-    igraph_vector_long_destroy(&semi);
+    igraph_vector_int_destroy(&semi);
     igraph_vector_destroy(&parent);
     IGRAPH_FINALLY_CLEAN(8);
 
@@ -1070,9 +1069,9 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
     nocuts = igraph_vector_ptr_size(mypartition1s);
 
     if (cuts) {
-        igraph_vector_long_t inS;
-        IGRAPH_CHECK(igraph_vector_long_init(&inS, no_of_nodes));
-        IGRAPH_FINALLY(igraph_vector_long_destroy, &inS);
+        igraph_vector_int_t inS;
+        IGRAPH_CHECK(igraph_vector_int_init(&inS, no_of_nodes));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &inS);
         IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
         for (i = 0; i < nocuts; i++) {
             igraph_vector_t *cut;
@@ -1114,7 +1113,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
             IGRAPH_FINALLY_CLEAN(1);
         }
 
-        igraph_vector_long_destroy(&inS);
+        igraph_vector_int_destroy(&inS);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -1530,9 +1529,9 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* Create cuts in original graph */
     if (cuts) {
-        igraph_vector_long_t memb;
-        IGRAPH_CHECK(igraph_vector_long_init(&memb, no_of_nodes));
-        IGRAPH_FINALLY(igraph_vector_long_destroy, &memb);
+        igraph_vector_int_t memb;
+        IGRAPH_CHECK(igraph_vector_int_init(&memb, no_of_nodes));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &memb);
         IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
         for (i = 0; i < nocuts; i++) {
             igraph_vector_t *part = VECTOR(*mypartition1s)[i];
@@ -1559,7 +1558,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
             VECTOR(*cuts)[i] = v;
             IGRAPH_FINALLY_CLEAN(1);
         }
-        igraph_vector_long_destroy(&memb);
+        igraph_vector_int_destroy(&memb);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

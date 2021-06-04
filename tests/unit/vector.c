@@ -29,9 +29,9 @@
 int main() {
 
     igraph_vector_t v, v2, v3;
-    int i;
+    igraph_integer_t i;
     igraph_real_t *ptr;
-    long int pos;
+    igraph_integer_t pos;
     igraph_real_t min, max, min2, max2;
     igraph_integer_t which_min, which_max, which_min2, which_max2;
 
@@ -275,7 +275,6 @@ int main() {
         VECTOR(v)[i] = 2 * i;
     }
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        long int pos;
         IGRAPH_ASSERT(igraph_vector_binsearch(&v, VECTOR(v)[i], &pos));
         IGRAPH_ASSERT(pos == i);
         IGRAPH_ASSERT(!igraph_vector_binsearch(&v, VECTOR(v)[i] + 1, &pos));

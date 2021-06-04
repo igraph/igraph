@@ -107,7 +107,7 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
                             igraph_real_t fw_prob, igraph_real_t bw_factor,
                             igraph_integer_t pambs, igraph_bool_t directed) {
 
-    igraph_vector_long_t visited;
+    igraph_vector_int_t visited;
     long int no_of_nodes = nodes, actnode, i;
     igraph_vector_t edges;
     igraph_vector_t *inneis, *outneis;
@@ -156,8 +156,8 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
         IGRAPH_CHECK(igraph_vector_init(outneis + i, 0));
     }
 
-    IGRAPH_CHECK(igraph_vector_long_init(&visited, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &visited);
+    IGRAPH_CHECK(igraph_vector_int_init(&visited, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &visited);
     IGRAPH_DQUEUE_INIT_FINALLY(&neiq, 10);
 
     RNG_BEGIN();
@@ -249,7 +249,7 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_PROGRESS("Forest fire: ", 100.0, NULL);
 
     igraph_dqueue_destroy(&neiq);
-    igraph_vector_long_destroy(&visited);
+    igraph_vector_int_destroy(&visited);
     igraph_i_forest_fire_free(&data);
     igraph_free(outneis);
     igraph_free(inneis);

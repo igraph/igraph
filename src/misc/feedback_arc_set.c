@@ -194,16 +194,16 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
  */
 igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
                                     const igraph_vector_t *weights, igraph_vector_t *layers) {
-    long int i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
+    igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
     igraph_dqueue_t sources, sinks;
     igraph_vector_t neis;
     igraph_vector_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
-    long int* ordering;
+    igraph_integer_t* ordering;
     long int order_next_pos = 0, order_next_neg = -1;
     igraph_real_t diff, maxdiff;
 
-    ordering = IGRAPH_CALLOC(no_of_nodes, long int);
+    ordering = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_FINALLY(igraph_free, ordering);
 
     IGRAPH_VECTOR_INIT_FINALLY(&indegrees, no_of_nodes);
@@ -395,17 +395,17 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     /* If we have also requested a layering, return that as well */
     if (layers != 0) {
         igraph_vector_int_t ranks;
-        igraph_vector_long_t order_vec;
+        igraph_vector_int_t order_vec;
 
         IGRAPH_CHECK(igraph_vector_resize(layers, no_of_nodes));
         igraph_vector_null(layers);
 
-        igraph_vector_long_view(&order_vec, ordering, no_of_nodes);
+        igraph_vector_int_view(&order_vec, ordering, no_of_nodes);
 
         IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&ranks, 0);
 
-        IGRAPH_CHECK(igraph_vector_long_qsort_ind(&order_vec, &ranks, 0));
+        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&order_vec, &ranks, 0));
 
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t from = VECTOR(ranks)[i];

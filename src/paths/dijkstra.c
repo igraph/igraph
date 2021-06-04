@@ -317,8 +317,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        igraph_vs_t to,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode,
-                                       igraph_vector_long_t *predecessors,
-                                       igraph_vector_long_t *inbound_edges) {
+                                       igraph_vector_int_t *predecessors,
+                                       igraph_vector_int_t *inbound_edges) {
     /* Implementation details. This is the basic Dijkstra algorithm,
        with a binary heap. The heap is indexed, i.e. it stores not only
        the distances, but also which vertex they belong to. The other
@@ -449,7 +449,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
     /* Create `predecessors' if needed */
     if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (i == from) {
@@ -467,7 +467,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
     /* Create `inbound_edges' if needed */
     if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (parents[i] <= 0) {

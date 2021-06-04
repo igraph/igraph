@@ -61,13 +61,13 @@ void check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
     }
 }
 
-void check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
-                        const igraph_vector_long_t* inbound, int start) {
+void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
+                        const igraph_vector_int_t* inbound, int start) {
 
     long int i, n = igraph_vcount(graph);
 
-    IGRAPH_ASSERT(igraph_vector_long_size(pred) == n);
-    IGRAPH_ASSERT(igraph_vector_long_size(inbound) == n);
+    IGRAPH_ASSERT(igraph_vector_int_size(pred) == n);
+    IGRAPH_ASSERT(igraph_vector_int_size(inbound) == n);
 
     IGRAPH_ASSERT(VECTOR(*pred)[start] == start && VECTOR(*inbound)[start] == -1);
 
@@ -97,7 +97,7 @@ void check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
 int main() {
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;
-    igraph_vector_long_t pred, inbound;
+    igraph_vector_int_t pred, inbound;
     long int i;
     igraph_real_t weights_data_0[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_real_t weights_data_1[] = { 6, 7, 8, -4, -2, -3, 9, 2, 7 };
@@ -115,8 +115,8 @@ int main() {
                 2, 1,
                 -1);
 
-    igraph_vector_long_init(&pred, 0);
-    igraph_vector_long_init(&inbound, 0);
+    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&inbound, 0);
 
     printf("Paths to only some vertices\n");
 
@@ -185,8 +185,8 @@ int main() {
     igraph_vector_ptr_destroy(&vecs);
     igraph_vector_ptr_destroy(&evecs);
 
-    igraph_vector_long_destroy(&pred);
-    igraph_vector_long_destroy(&inbound);
+    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&inbound);
 
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
@@ -200,8 +200,8 @@ int main() {
 
     igraph_vector_ptr_init(&vecs, 5);
     igraph_vector_ptr_init(&evecs, 5);
-    igraph_vector_long_init(&pred, 0);
-    igraph_vector_long_init(&inbound, 0);
+    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&inbound, 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
         VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
@@ -246,8 +246,8 @@ int main() {
 
     igraph_vector_ptr_destroy(&vecs);
     igraph_vector_ptr_destroy(&evecs);
-    igraph_vector_long_destroy(&pred);
-    igraph_vector_long_destroy(&inbound);
+    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&inbound);
 
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);

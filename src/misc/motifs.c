@@ -954,14 +954,13 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
                            igraph_real_t *res4) {
 
-    long int vc = igraph_vcount(graph);
-    igraph_vector_long_t seen;
+    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_vector_int_t seen;
     igraph_vector_int_t *neis, *neis2;
-    long int i, j, k, s, neilen, neilen2, ign;
+    igraph_integer_t i, j, k, s, neilen, neilen2, ign;
     igraph_adjlist_t adjlist;
 
-    IGRAPH_CHECK(igraph_vector_long_init(&seen, vc));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &seen);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vc);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     *res2 = *res4 = 0;
@@ -1011,7 +1010,7 @@ igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2
     }
 
     igraph_adjlist_destroy(&adjlist);
-    igraph_vector_long_destroy(&seen);
+    igraph_vector_int_destroy(&seen);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

@@ -301,8 +301,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                         igraph_vs_t to,
                                         const igraph_vector_t *weights,
                                         igraph_neimode_t mode,
-                                        igraph_vector_long_t *predecessors,
-                                        igraph_vector_long_t *inbound_edges) {
+                                        igraph_vector_int_t *predecessors,
+                                        igraph_vector_int_t *inbound_edges) {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
     long int *parents;
@@ -394,7 +394,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     /* Create `predecessors' if needed */
     if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (i == from) {
@@ -412,7 +412,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     /* Create `inbound_edges' if needed */
     if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (parents[i] <= 0) {

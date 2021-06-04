@@ -32,7 +32,7 @@ int main() {
     igraph_t g;
     igraph_vector_t edgev;
     igraph_vector_ptr_t resvertices, resedges;
-    igraph_vector_long_t predecessors, inbound_edges;
+    igraph_vector_int_t predecessors, inbound_edges;
     int vcount, i;
 
     igraph_vector_view(&edgev, edges, sizeof(edges) / sizeof(igraph_real_t));
@@ -41,8 +41,8 @@ int main() {
 
     igraph_vector_ptr_init(&resvertices, vcount);
     igraph_vector_ptr_init(&resedges, vcount);
-    igraph_vector_long_init(&predecessors, 0);
-    igraph_vector_long_init(&inbound_edges, 0);
+    igraph_vector_int_init(&predecessors, 0);
+    igraph_vector_int_init(&inbound_edges, 0);
 
     for (i = 0; i < vcount; i++) {
         igraph_vector_t *v1 = malloc(sizeof(igraph_vector_t));
@@ -69,12 +69,12 @@ int main() {
         igraph_vector_print(v2);
     }
     printf("pred: ");
-    igraph_vector_long_print(&predecessors);
+    igraph_vector_int_print(&predecessors);
     printf("inbe: ");
-    igraph_vector_long_print(&inbound_edges);
+    igraph_vector_int_print(&inbound_edges);
 
-    igraph_vector_long_destroy(&inbound_edges);
-    igraph_vector_long_destroy(&predecessors);
+    igraph_vector_int_destroy(&inbound_edges);
+    igraph_vector_int_destroy(&predecessors);
     for (i = 0; i < vcount; i++) {
         igraph_vector_t *v1 = VECTOR(resvertices)[i];
         igraph_vector_t *v2 = VECTOR(resedges)[i];

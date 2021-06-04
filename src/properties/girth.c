@@ -79,7 +79,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     long int node;
     igraph_bool_t triangle = 0;
     igraph_vector_int_t *neis;
-    igraph_vector_long_t level;
+    igraph_vector_int_t level;
     long int stoplevel = no_of_nodes + 1;
     igraph_bool_t anycircle = 0;
     long int t1 = 0, t2 = 0;
@@ -87,8 +87,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-    IGRAPH_CHECK(igraph_vector_long_init(&level, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &level);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&level, no_of_nodes);
 
     for (node = 0; !triangle && node < no_of_nodes; node++) {
 
@@ -104,7 +103,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 
         anycircle = 0;
         igraph_dqueue_clear(&q);
-        igraph_vector_long_null(&level);
+        igraph_vector_int_null(&level);
         IGRAPH_CHECK(igraph_dqueue_push(&q, node));
         VECTOR(level)[node] = 1;
 
@@ -168,7 +167,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         if (mincirc != 0) {
             long int i, n, idx = 0;
             igraph_dqueue_clear(&q);
-            igraph_vector_long_null(&level); /* used for father pointers */
+            igraph_vector_int_null(&level); /* used for father pointers */
 #define FATHER(x) (VECTOR(level)[(x)])
             IGRAPH_CHECK(igraph_dqueue_push(&q, minvertex));
             FATHER(minvertex) = minvertex;
@@ -199,7 +198,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     } /* circle */
 #undef FATHER
 
-    igraph_vector_long_destroy(&level);
+    igraph_vector_int_destroy(&level);
     igraph_dqueue_destroy(&q);
     igraph_lazy_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(3);

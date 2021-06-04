@@ -331,7 +331,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
         while (! igraph_d_indheap_empty(&heap)) {
             /* Get minimal edge */
-            long int from, edge;
+            igraph_integer_t from, edge;
             igraph_d_indheap_max_index(&heap, &from, &edge);
 
             /* Erase it */

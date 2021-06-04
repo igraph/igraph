@@ -930,25 +930,25 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                   igraph_vector_ptr_t *components,
                                   igraph_vector_t *articulation_points) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    igraph_vector_long_t nextptr;
-    igraph_vector_long_t num, low;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t nextptr;
+    igraph_vector_int_t num, low;
     igraph_vector_bool_t found;
     igraph_vector_int_t *adjedges;
     igraph_stack_t path;
     igraph_vector_t edgestack;
     igraph_inclist_t inclist;
-    long int i, counter, rootdfs = 0;
-    igraph_vector_long_t vertex_added;
-    long int comps = 0;
+    igraph_integer_t i, counter, rootdfs = 0;
+    igraph_vector_int_t vertex_added;
+    igraph_integer_t comps = 0;
     igraph_vector_ptr_t *mycomponents = components, vcomponents;
 
-    IGRAPH_CHECK(igraph_vector_long_init(&nextptr, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &nextptr);
-    IGRAPH_CHECK(igraph_vector_long_init(&num, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &num);
-    IGRAPH_CHECK(igraph_vector_long_init(&low, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &low);
+    IGRAPH_CHECK(igraph_vector_int_init(&nextptr, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &nextptr);
+    IGRAPH_CHECK(igraph_vector_int_init(&num, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &num);
+    IGRAPH_CHECK(igraph_vector_int_init(&low, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
     IGRAPH_CHECK(igraph_vector_bool_init(&found, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &found);
 
@@ -960,8 +960,8 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_vector_long_init(&vertex_added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &vertex_added);
+    IGRAPH_CHECK(igraph_vector_int_init(&vertex_added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &vertex_added);
 
     if (no) {
         *no = 0;
@@ -1138,14 +1138,14 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_long_destroy(&vertex_added);
+    igraph_vector_int_destroy(&vertex_added);
     igraph_inclist_destroy(&inclist);
     igraph_vector_destroy(&edgestack);
     igraph_stack_destroy(&path);
     igraph_vector_bool_destroy(&found);
-    igraph_vector_long_destroy(&low);
-    igraph_vector_long_destroy(&num);
-    igraph_vector_long_destroy(&nextptr);
+    igraph_vector_int_destroy(&low);
+    igraph_vector_int_destroy(&num);
+    igraph_vector_int_destroy(&nextptr);
     IGRAPH_FINALLY_CLEAN(8);
 
     return IGRAPH_SUCCESS;

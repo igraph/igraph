@@ -137,8 +137,8 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     /* See igraph_shortest_paths_dijkstra() for the implementation
        details and the dirty tricks. */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     igraph_2wheap_t Q;
     igraph_vit_t vit;
@@ -148,7 +148,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     long int i, j;
 
     igraph_vector_t dist;
-    igraph_vector_long_t which;
+    igraph_vector_int_t which;
     long int nodes_reached;
 
     igraph_real_t mindist = 0;
@@ -185,8 +185,8 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_long_init(&which, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &which);
+    IGRAPH_CHECK(igraph_vector_int_init(&which, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &which);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     igraph_vector_null(res);
@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
         nodes_reached = 0;
 
         while (!igraph_2wheap_empty(&Q)) {
-            igraph_integer_t minnei = (igraph_integer_t) igraph_2wheap_max_index(&Q);
+            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
             igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
             long int nlen = igraph_vector_int_size(neis);
@@ -254,7 +254,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
         }
     } /* !IGRAPH_VIT_END(vit) */
 
-    igraph_vector_long_destroy(&which);
+    igraph_vector_int_destroy(&which);
     igraph_vector_destroy(&dist);
     igraph_lazy_inclist_destroy(&inclist);
     igraph_2wheap_destroy(&Q);
@@ -641,7 +641,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
     long int i, j;
 
     igraph_vector_t dist;
-    igraph_vector_long_t which;
+    igraph_vector_int_t which;
 
     igraph_real_t mindist = 0;
 
@@ -669,8 +669,8 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_long_init(&which, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &which);
+    IGRAPH_CHECK(igraph_vector_int_init(&which, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &which);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     igraph_vector_null(res);
@@ -684,7 +684,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
         VECTOR(dist)[source] = 1.0;     /* actual distance is zero but we need to store distance + 1 */
 
         while (!igraph_2wheap_empty(&Q)) {
-            igraph_integer_t minnei = (igraph_integer_t) igraph_2wheap_max_index(&Q);
+            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
             igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
             long int nlen = igraph_vector_int_size(neis);
@@ -726,7 +726,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
         igraph_vector_scale(res, 1.0 / (no_of_nodes - 1));
     }
 
-    igraph_vector_long_destroy(&which);
+    igraph_vector_int_destroy(&which);
     igraph_vector_destroy(&dist);
     igraph_lazy_inclist_destroy(&inclist);
     igraph_2wheap_destroy(&Q);

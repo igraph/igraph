@@ -61,7 +61,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
 
     long int no_of_nodes = igraph_vcount(graph);
     long int i, j, n;
-    igraph_vector_long_t already_added;
+    igraph_vector_int_t already_added;
     long int nodes_reached;
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
@@ -77,8 +77,8 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
         dirmode = IGRAPH_ALL;
     }
 
-    IGRAPH_CHECK(igraph_vector_long_init(&already_added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &already_added);
+    IGRAPH_CHECK(igraph_vector_int_init(&already_added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &already_added);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
@@ -136,7 +136,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
         unconn /= 2;
     }
 
-    igraph_vector_long_destroy(&already_added);
+    igraph_vector_int_destroy(&already_added);
     igraph_dqueue_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);

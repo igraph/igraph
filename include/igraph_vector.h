@@ -46,12 +46,6 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_FLOAT
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_vector_type.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
-
 #define BASE_CHAR
 #include "igraph_pmt.h"
 #include "igraph_vector_type.h"
@@ -87,12 +81,6 @@ __BEGIN_DECLS
 #include "igraph_vector_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_FLOAT
-
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_vector_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
@@ -146,18 +134,13 @@ __BEGIN_DECLS
     do { IGRAPH_CHECK(igraph_vector_int_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_int_destroy, v); } while (0)
 #endif
-#ifndef IGRAPH_VECTOR_LONG_INIT_FINALLY
-#define IGRAPH_VECTOR_LONG_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
-        IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
-#endif
 
 /* -------------------------------------------------- */
 /* Type-specific vector functions                     */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
-IGRAPH_EXPORT igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
+IGRAPH_EXPORT igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_int_t *to);
+IGRAPH_EXPORT igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_int_t *to);
 
 IGRAPH_EXPORT igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
                                                 const igraph_vector_t *rhs,

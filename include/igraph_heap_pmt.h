@@ -25,7 +25,7 @@ typedef struct TYPE(igraph_heap) {
     BASE* stor_begin;
     BASE* stor_end;
     BASE* end;
-    int destroy;
+    igraph_bool_t destroy;
 } TYPE(igraph_heap);
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t size);

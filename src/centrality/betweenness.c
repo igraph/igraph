@@ -566,7 +566,7 @@ static igraph_error_t igraph_i_edge_betweenness_cutoff_weighted(
     igraph_inclist_t fathers;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t distance, tmpscore;
-    igraph_vector_long_t nrgeo;
+    igraph_vector_int_t nrgeo;
     long int source, j;
     int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
@@ -593,8 +593,8 @@ static igraph_error_t igraph_i_edge_betweenness_cutoff_weighted(
 
     IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&tmpscore, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_long_init(&nrgeo, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &nrgeo);
+    IGRAPH_CHECK(igraph_vector_int_init(&nrgeo, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &nrgeo);
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
@@ -690,7 +690,7 @@ static igraph_error_t igraph_i_edge_betweenness_cutoff_weighted(
             for (j = 0; j < fatv_len; j++) {
                 long int fedge = VECTOR(*fatv)[j];
                 long int neighbor = IGRAPH_OTHER(graph, fedge, w);
-                VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
+                VECTOR(tmpscore)[neighbor] += ((igraph_real_t) VECTOR(nrgeo)[neighbor]) /
                                               VECTOR(nrgeo)[w] * (1.0 + VECTOR(tmpscore)[w]);
                 /* printf("Scoring %li (edge %li)\n", neighbor, fedge); */
                 VECTOR(*result)[fedge] +=
@@ -723,7 +723,7 @@ static igraph_error_t igraph_i_edge_betweenness_cutoff_weighted(
     igraph_inclist_destroy(&fathers);
     igraph_vector_destroy(&distance);
     igraph_vector_destroy(&tmpscore);
-    igraph_vector_long_destroy(&nrgeo);
+    igraph_vector_int_destroy(&nrgeo);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;

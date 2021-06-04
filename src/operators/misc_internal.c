@@ -39,11 +39,11 @@ void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
     igraph_vector_ptr_destroy(v);
 }
 
-void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
+void igraph_i_union_intersection_destroy_vector_ints(igraph_vector_ptr_t *v) {
     long int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
-            igraph_vector_long_destroy(VECTOR(*v)[i]);
+            igraph_vector_int_destroy(VECTOR(*v)[i]);
             IGRAPH_FREE(VECTOR(*v)[i]);
         }
     }
@@ -52,17 +52,17 @@ void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
 
 int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     igraph_vector_t *edgelist = edges;
-    long int edge1 = (*(const long int*) e1) * 2;
-    long int edge2 = (*(const long int*) e2) * 2;
-    long int from1 = VECTOR(*edgelist)[edge1];
-    long int from2 = VECTOR(*edgelist)[edge2];
+    igraph_integer_t edge1 = (*(const igraph_integer_t*) e1) * 2;
+    igraph_integer_t edge2 = (*(const igraph_integer_t*) e2) * 2;
+    igraph_integer_t from1 = VECTOR(*edgelist)[edge1];
+    igraph_integer_t from2 = VECTOR(*edgelist)[edge2];
     if (from1 < from2) {
         return -1;
     } else if (from1 > from2) {
         return 1;
     } else {
-        long int to1 = VECTOR(*edgelist)[edge1 + 1];
-        long int to2 = VECTOR(*edgelist)[edge2 + 1];
+        igraph_integer_t to1 = VECTOR(*edgelist)[edge1 + 1];
+        igraph_integer_t to2 = VECTOR(*edgelist)[edge2 + 1];
         if (to1 < to2) {
             return -1;
         } else if (to1 > to2) {
@@ -77,17 +77,17 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 
-    long int no_of_nodes_left = igraph_vcount(left);
-    long int no_of_nodes_right = igraph_vcount(right);
-    long int no_of_nodes;
-    long int no_edges_left = igraph_ecount(left);
-    long int no_edges_right = igraph_ecount(right);
+    igraph_integer_t no_of_nodes_left = igraph_vcount(left);
+    igraph_integer_t no_of_nodes_right = igraph_vcount(right);
+    igraph_integer_t no_of_nodes;
+    igraph_integer_t no_edges_left = igraph_ecount(left);
+    igraph_integer_t no_edges_right = igraph_ecount(right);
     igraph_bool_t directed = igraph_is_directed(left);
     igraph_vector_t edges;
     igraph_vector_t edges1, edges2;
-    igraph_vector_long_t order1, order2;
-    long int i, j, eptr = 0;
-    long int idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
+    igraph_vector_int_t order1, order2;
+    igraph_integer_t i, j, eptr = 0;
+    igraph_integer_t idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
     igraph_bool_t l;
 
     if (directed != igraph_is_directed(right)) {
@@ -98,10 +98,10 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&edges1, no_edges_left * 2);
     IGRAPH_VECTOR_INIT_FINALLY(&edges2, no_edges_right * 2);
-    IGRAPH_CHECK(igraph_vector_long_init(&order1, no_edges_left));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &order1);
-    IGRAPH_CHECK(igraph_vector_long_init(&order2, no_edges_right));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &order2);
+    IGRAPH_CHECK(igraph_vector_int_init(&order1, no_edges_left));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &order1);
+    IGRAPH_CHECK(igraph_vector_int_init(&order2, no_edges_right));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &order2);
 
     if (edge_map1) {
         switch (mode) {
@@ -246,8 +246,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
 #undef INC1
 #undef INC2
 
-    igraph_vector_long_destroy(&order2);
-    igraph_vector_long_destroy(&order1);
+    igraph_vector_int_destroy(&order2);
+    igraph_vector_int_destroy(&order1);
     igraph_vector_destroy(&edges2);
     igraph_vector_destroy(&edges1);
     IGRAPH_FINALLY_CLEAN(4);

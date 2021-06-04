@@ -743,7 +743,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     igraph_vit_t vit;
     long int nodes_to_calc;
     igraph_vector_int_t *adj1, *adj2;
-    igraph_vector_long_t neis;
+    igraph_vector_int_t neis;
     igraph_vector_t actw;
     igraph_lazy_inclist_t incident;
     long int i;
@@ -770,8 +770,8 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
-    IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &neis);
+    IGRAPH_CHECK(igraph_vector_int_init(&neis, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
 
     IGRAPH_VECTOR_INIT_FINALLY(&actw, no_of_nodes);
 
@@ -827,7 +827,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
     igraph_lazy_inclist_destroy(&incident);
     igraph_vector_destroy(&strength);
     igraph_vector_destroy(&actw);
-    igraph_vector_long_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(5);
 
@@ -845,7 +845,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     igraph_vector_t order, degree, rank;
     long int maxdegree;
     igraph_inclist_t incident;
-    igraph_vector_long_t neis;
+    igraph_vector_int_t neis;
     igraph_vector_int_t *adj1, *adj2;
     igraph_vector_t actw;
     long int i, nn;
@@ -885,8 +885,8 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     IGRAPH_CHECK(igraph_inclist_init(graph, &incident, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incident);
 
-    IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &neis);
+    IGRAPH_CHECK(igraph_vector_int_init(&neis, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
 
     IGRAPH_VECTOR_INIT_FINALLY(&actw, no_of_nodes);
 
@@ -943,7 +943,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     }
 
     igraph_vector_destroy(&actw);
-    igraph_vector_long_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_inclist_destroy(&incident);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&degree);

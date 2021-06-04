@@ -96,11 +96,11 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
     long int no_of_nodes = igraph_vcount(graph);
     long int vc1 = 0, ec1 = 0, vc2 = 0, ec2 = 0;
     igraph_adjlist_t adjlist;
-    igraph_vector_long_t added;
+    igraph_vector_int_t added;
     long int i;
 
-    IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
+    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -146,7 +146,7 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
     *ecount2 = (igraph_integer_t) ec2;
 
     igraph_adjlist_destroy(&adjlist);
-    igraph_vector_long_destroy(&added);
+    igraph_vector_int_destroy(&added);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
@@ -166,7 +166,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     igraph_adjlist_t adjlist;
     igraph_vector_int_t *neis1, *neis2;
     long int neilen1, neilen2;
-    igraph_vector_long_t added;
+    igraph_vector_int_t added;
     igraph_vector_t mult;
 
     if (which < 0) {
@@ -177,8 +177,8 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_reserve(&vertex_perm, no_of_nodes));
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_index, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
+    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
@@ -256,7 +256,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
     igraph_vector_destroy(&mult);
     igraph_adjlist_destroy(&adjlist);
-    igraph_vector_long_destroy(&added);
+    igraph_vector_int_destroy(&added);
     igraph_vector_int_destroy(&vertex_index);
     IGRAPH_FINALLY_CLEAN(4);
 

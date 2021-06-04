@@ -26,10 +26,10 @@
 #define BATCH_MARKER -1
 
 igraph_error_t igraph_marked_queue_init(igraph_marked_queue_t *q,
-                             long int size) {
+                             igraph_integer_t size) {
     IGRAPH_CHECK(igraph_dqueue_init(&q->Q, 0));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &q->Q);
-    IGRAPH_CHECK(igraph_vector_long_init(&q->set, size));
+    IGRAPH_CHECK(igraph_vector_int_init(&q->set, size));
     q->mark = 1;
     q->size = 0;
     IGRAPH_FINALLY_CLEAN(1);
@@ -37,7 +37,7 @@ igraph_error_t igraph_marked_queue_init(igraph_marked_queue_t *q,
 }
 
 void igraph_marked_queue_destroy(igraph_marked_queue_t *q) {
-    igraph_vector_long_destroy(&q->set);
+    igraph_vector_int_destroy(&q->set);
     igraph_dqueue_destroy(&q->Q);
 }
 
@@ -46,7 +46,7 @@ void igraph_marked_queue_reset(igraph_marked_queue_t *q) {
     q->size = 0;
     q->mark += 1;
     if (q->mark == 0) {
-        igraph_vector_long_null(&q->set);
+        igraph_vector_int_null(&q->set);
         q->mark += 1;
     }
 }
@@ -55,16 +55,16 @@ igraph_bool_t igraph_marked_queue_empty(const igraph_marked_queue_t *q) {
     return q->size == 0;
 }
 
-long int igraph_marked_queue_size(const igraph_marked_queue_t *q) {
+igraph_integer_t igraph_marked_queue_size(const igraph_marked_queue_t *q) {
     return q->size;
 }
 
 igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q,
-        long int elem) {
+        igraph_integer_t elem) {
     return (VECTOR(q->set)[elem] == q->mark);
 }
 
-igraph_error_t igraph_marked_queue_push(igraph_marked_queue_t *q, long int elem) {
+igraph_error_t igraph_marked_queue_push(igraph_marked_queue_t *q, igraph_integer_t elem) {
     if (VECTOR(q->set)[elem] != q->mark) {
         IGRAPH_CHECK(igraph_dqueue_push(&q->Q, elem));
         VECTOR(q->set)[elem] = q->mark;
@@ -79,8 +79,8 @@ igraph_error_t igraph_marked_queue_start_batch(igraph_marked_queue_t *q) {
 }
 
 void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q) {
-    long int size = igraph_dqueue_size(&q->Q);
-    long int elem;
+    igraph_integer_t size = igraph_dqueue_size(&q->Q);
+    igraph_integer_t elem;
     while (size > 0 &&
            (elem = igraph_dqueue_pop_back(&q->Q)) != BATCH_MARKER) {
         VECTOR(q->set)[elem] = 0;
@@ -103,7 +103,7 @@ igraph_error_t igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *
 
 igraph_error_t igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
                                              igraph_vector_t *vec) {
-    long int i, p, n = igraph_dqueue_size(&q->Q);
+    igraph_integer_t i, p, n = igraph_dqueue_size(&q->Q);
     IGRAPH_CHECK(igraph_vector_resize(vec, q->size));
     for (i = 0, p = 0; i < n; i++) {
         igraph_real_t e = igraph_dqueue_e(&q->Q, i);

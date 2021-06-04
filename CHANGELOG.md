@@ -10,6 +10,12 @@
    also have the option to compile a 32-bit igraph variant on a 64-bit platform
    by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
 
+ - Since `igraph_integer_t` aims to be the largest integer size that is feasible
+   on a particular platform, there is no need for generic data types based on
+   `long int` any more. The `long` variants of generic data types (e.g.,
+   `igraph_vector_long_t`) are therefore removed; you should use the corresponding
+   `int` variant instead, whose elements are of type `igraph_integer_t`.
+
  - Several igraph functions that used to take a `long int` or return a
    `long int` now takes or returns an `igraph_integer_t` instead to make the
    APIs more consistent. Similarly, igraph functions that used `igraph_vector_t`
@@ -17,11 +23,25 @@
    edge indices) now take `igraph_vector_int_t` instead. Graph-related functions
    where the API was changed due to this reason are listed below, one by one.
 
+ - Similarly, igraph functions that used to accept the `long` variant of a
+   generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
+   variant of the same data type.
+
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
 
  - `igraph_convex_hull()` now uses an `igraph_vector_int_t` to return the
    indices of the input vertices that were chosen to be in the convex hull.
+
+ - `igraph_get_shortest_paths()`, `igraph_get_shortest_paths_dijkstra()` and
+   `igraph_get_shortest_paths_bellman_ford()` now use an `igraph_vector_int_t`
+   to return the predecessors and inbound edges instead of an
+   `igraph_vector_long_t`.
+
+ - `igraph_is_matching()`, `igraph_is_maximal_matching()`,
+   `igraph_maximum_bipartite_matching` and `igraph_maximum_matching()` now
+   use an `igraph_vector_int_t` to return the matching instead of an
+   `igraph_vector_long_t`.
 
  - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
    use an `igraph_vector_int_t` to return the vertex IDs instead of an

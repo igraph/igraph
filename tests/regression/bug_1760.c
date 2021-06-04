@@ -8,8 +8,8 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     igraph_vector_ptr_t vpath, epath;
     igraph_integer_t i;
     igraph_integer_t num_paths;
-    igraph_vector_long_t predecessors;
-    igraph_vector_long_t inbound_edges;
+    igraph_vector_int_t predecessors;
+    igraph_vector_int_t inbound_edges;
 
     printf("Unweighted case\n");
     printf("---------------\n\n");
@@ -17,8 +17,8 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     IGRAPH_CHECK(igraph_vs_size(g, to, &num_paths));
     IGRAPH_CHECK(igraph_vector_ptr_init(&vpath, num_paths));
     IGRAPH_CHECK(igraph_vector_ptr_init(&epath, num_paths));
-    IGRAPH_CHECK(igraph_vector_long_init(&predecessors, 0));
-    IGRAPH_CHECK(igraph_vector_long_init(&inbound_edges, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&predecessors, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
         VECTOR(vpath)[i] = igraph_Calloc(1, igraph_vector_t);
@@ -47,15 +47,15 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     printf("\n");
 
     printf("Predecessors:\n");
-    print_vector_long(&predecessors);
+    print_vector_int(&predecessors);
     printf("\n");
 
     printf("Inbound edges:\n");
-    print_vector_long(&inbound_edges);
+    print_vector_int(&inbound_edges);
     printf("\n");
 
-    igraph_vector_long_destroy(&inbound_edges);
-    igraph_vector_long_destroy(&predecessors);
+    igraph_vector_int_destroy(&inbound_edges);
+    igraph_vector_int_destroy(&predecessors);
     igraph_vector_ptr_destroy_all(&epath);
     igraph_vector_ptr_destroy_all(&vpath);
 
@@ -69,8 +69,8 @@ int test_weighted(
     igraph_vector_ptr_t vpath, epath;
     igraph_integer_t i;
     igraph_integer_t num_paths;
-    igraph_vector_long_t predecessors;
-    igraph_vector_long_t inbound_edges;
+    igraph_vector_int_t predecessors;
+    igraph_vector_int_t inbound_edges;
 
     printf("Weighted case\n");
     printf("-------------\n\n");
@@ -80,8 +80,8 @@ int test_weighted(
     IGRAPH_CHECK(igraph_vs_size(g, to, &num_paths));
     IGRAPH_CHECK(igraph_vector_ptr_init(&vpath, num_paths));
     IGRAPH_CHECK(igraph_vector_ptr_init(&epath, num_paths));
-    IGRAPH_CHECK(igraph_vector_long_init(&predecessors, 0));
-    IGRAPH_CHECK(igraph_vector_long_init(&inbound_edges, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&predecessors, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
         VECTOR(vpath)[i] = igraph_Calloc(1, igraph_vector_t);
@@ -117,15 +117,15 @@ int test_weighted(
     printf("\n");
 
     printf("Predecessors:\n");
-    print_vector_long(&predecessors);
+    print_vector_int(&predecessors);
     printf("\n");
 
     printf("Inbound edges:\n");
-    print_vector_long(&inbound_edges);
+    print_vector_int(&inbound_edges);
     printf("\n");
 
-    igraph_vector_long_destroy(&inbound_edges);
-    igraph_vector_long_destroy(&predecessors);
+    igraph_vector_int_destroy(&inbound_edges);
+    igraph_vector_int_destroy(&predecessors);
     igraph_vector_ptr_destroy_all(&epath);
     igraph_vector_ptr_destroy_all(&vpath);
 

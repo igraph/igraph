@@ -78,12 +78,12 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
     return 0;
 }
 
-int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
-                       const igraph_vector_long_t* inbound, int start, int error_code) {
+int check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
+                       const igraph_vector_int_t* inbound, int start, int error_code) {
     long int i, n = igraph_vcount(graph);
 
-    if (igraph_vector_long_size(pred) != n ||
-        igraph_vector_long_size(inbound) != n) {
+    if (igraph_vector_int_size(pred) != n ||
+        igraph_vector_int_size(inbound) != n) {
         exit(error_code);
     }
 
@@ -126,7 +126,7 @@ int main() {
 
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;
-    igraph_vector_long_t pred, inbound;
+    igraph_vector_int_t pred, inbound;
     long int i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
@@ -139,8 +139,8 @@ int main() {
 
     igraph_vector_ptr_init(&vecs, 6);
     igraph_vector_ptr_init(&evecs, 6);
-    igraph_vector_long_init(&pred, 0);
-    igraph_vector_long_init(&inbound, 0);
+    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&inbound, 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
         VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
@@ -212,8 +212,8 @@ int main() {
 
     igraph_vector_ptr_destroy(&vecs);
     igraph_vector_ptr_destroy(&evecs);
-    igraph_vector_long_destroy(&pred);
-    igraph_vector_long_destroy(&inbound);
+    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&inbound);
 
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);

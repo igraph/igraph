@@ -40,12 +40,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_FLOAT
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "vector.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
-
 #define BASE_CHAR
 #include "igraph_pmt.h"
 #include "vector.pmt"
@@ -77,36 +71,37 @@
 /**
  * \ingroup vector
  * \function igraph_vector_floor
- * \brief Transform a real vector to a long vector by flooring each element.
+ * \brief Transform a real vector to an integer vector by flooring each element.
  *
  * </para><para>
  * Flooring means rounding down to the nearest integer.
  *
  * \param from The original real vector object.
- * \param to Pointer to an initialized long vector. The result will
- *           be stored here.
+ * \param to Pointer to an initialized integer vector. The result will be stored here.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: out of memory
  *
  * Time complexity: O(n), where n is the number of elements in the vector.
  */
-igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
+igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_int_t *to) {
     igraph_integer_t i, n = igraph_vector_size(from);
 
-    IGRAPH_CHECK(igraph_vector_long_resize(to, n));
+    IGRAPH_CHECK(igraph_vector_int_resize(to, n));
     for (i = 0; i < n; i++) {
         VECTOR(*to)[i] = floor(VECTOR(*from)[i]);
     }
+
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
+igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_int_t *to) {
     igraph_integer_t i, n = igraph_vector_size(from);
 
-    IGRAPH_CHECK(igraph_vector_long_resize(to, n));
+    IGRAPH_CHECK(igraph_vector_int_resize(to, n));
     for (i = 0; i < n; i++) {
         VECTOR(*to)[i] = round(VECTOR(*from)[i]);
     }
+
     return IGRAPH_SUCCESS;
 }
 

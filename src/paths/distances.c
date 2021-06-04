@@ -42,15 +42,15 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_integer_t *vid_ecc,
                                  igraph_bool_t unconn) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_long_t q;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_dqueue_int_t q;
     igraph_vit_t vit;
     igraph_vector_int_t counted;
     long int i, mark = 1;
     igraph_integer_t min_degree = 0;
 
-    IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -65,18 +65,18 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
          !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), mark++, i++) {
 
-        long int source;
-        long int nodes_reached = 1;
+        igraph_integer_t source;
+        igraph_integer_t nodes_reached = 1;
         source = IGRAPH_VIT_GET(vit);
-        IGRAPH_CHECK(igraph_dqueue_long_push(&q, source));
-        IGRAPH_CHECK(igraph_dqueue_long_push(&q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         VECTOR(counted)[source] = mark;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_long_empty(&q)) {
-            long int act = igraph_dqueue_long_pop(&q);
-            long int dist = igraph_dqueue_long_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            igraph_integer_t dist = igraph_dqueue_int_pop(&q);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(adjlist, act);
             long int j, n;
 
@@ -86,8 +86,8 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
                 if (VECTOR(counted)[nei] != mark) {
                     VECTOR(counted)[nei] = mark;
                     nodes_reached++;
-                    IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
-                    IGRAPH_CHECK(igraph_dqueue_long_push(&q, dist + 1));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, dist + 1));
                 }
             }
             if (vid_ecc) {
@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
             } else if (dist > VECTOR(*res)[i]) {
                 VECTOR(*res)[i] = dist;
             }
-        } /* while !igraph_dqueue_long_empty(dqueue) */
+        } /* while !igraph_dqueue_int_empty(dqueue) */
 
         if (nodes_reached != no_of_nodes && !unconn && vid_ecc) {
             *vid_ecc = -1;
@@ -113,7 +113,7 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
 
     igraph_vector_int_destroy(&counted);
     igraph_vit_destroy(&vit);
-    igraph_dqueue_long_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -262,7 +262,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_bool_t directed,
                            igraph_bool_t unconn) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
@@ -451,10 +451,10 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
  * wil be set to infinity, and \p vid_ecc to -1;
  */
 int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_lazy_inclist_t *inclist) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_2wheap_t Q;
     igraph_vector_t vec_dist;
-    long int i;
+    igraph_integer_t i;
 
     IGRAPH_VECTOR_INIT_FINALLY(&vec_dist, no_of_nodes);
     igraph_vector_fill(&vec_dist, IGRAPH_INFINITY);
@@ -583,8 +583,8 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                                     igraph_bool_t unconn) {
 
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;

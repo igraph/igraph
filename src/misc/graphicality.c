@@ -617,7 +617,7 @@ static int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const
 }
 
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
-    igraph_vector_long_t index_array;
+    igraph_vector_int_t index_array;
     long int i, j, vcount, lhs, rhs;
     igraph_i_qsort_dual_vector_cmp_data_t sort_data;
 
@@ -634,8 +634,8 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     }
 
     /* Create an index vector that sorts the vertices by decreasing in-degree */
-    IGRAPH_CHECK(igraph_vector_long_init_seq(&index_array, 0, vcount - 1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &index_array);
+    IGRAPH_CHECK(igraph_vector_int_init_seq(&index_array, 0, vcount - 1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &index_array);
 
     /* Set up the auxiliary struct for sorting */
     sort_data.first  = in_degrees;
@@ -686,7 +686,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 #undef INDEGREE
 #undef OUTDEGREE
 
-    igraph_vector_long_destroy(&index_array);
+    igraph_vector_int_destroy(&index_array);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
