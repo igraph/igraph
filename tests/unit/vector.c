@@ -311,7 +311,6 @@ int main() {
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_permdelete\n");
-    printf("Test igraph_vector_remove_negidx\n");
 
     printf("Test order2\n");
     igraph_vector_init_int_end(&v, -1, 10, 9, 8, 7, 6, 7, 8, 9, 10, -1);

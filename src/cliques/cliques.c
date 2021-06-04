@@ -626,7 +626,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
     igraph_integer_t j1;
-    long int it_state;
+    igraph_integer_t it_state;
 
     IGRAPH_ALLOW_INTERRUPTION();
 
@@ -1115,8 +1115,8 @@ static void igraph_i_maximal_cliques_stack_destroy(igraph_stack_ptr_t *stack) {
 }
 
 static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func_t func, void* data) {
-    int directed = igraph_is_directed(graph);
-    long int i, j, k, l;
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t i, j, k, l;
     igraph_integer_t no_of_nodes, nodes_to_check, nodes_done;
     igraph_integer_t best_cand = 0, best_cand_degree = 0, best_fini_cand_degree;
     igraph_adjlist_t adj_list;

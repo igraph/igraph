@@ -284,7 +284,7 @@ typedef struct igraph_attribute_table_t {
     igraph_error_t (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
     igraph_error_t (*permute_vertices)(const igraph_t *graph,
                             igraph_t *newgraph,
-                            const igraph_vector_t *idx);
+                            const igraph_vector_int_t *idx);
     igraph_error_t (*combine_vertices)(const igraph_t *graph,
                             igraph_t *newgraph,
                             const igraph_vector_ptr_t *merges,
@@ -292,7 +292,7 @@ typedef struct igraph_attribute_table_t {
     igraph_error_t (*add_edges)(igraph_t *graph, const igraph_vector_t *edges,
                      igraph_vector_ptr_t *attr);
     igraph_error_t (*permute_edges)(const igraph_t *graph,
-                         igraph_t *newgraph, const igraph_vector_t *idx);
+                         igraph_t *newgraph, const igraph_vector_int_t *idx);
     igraph_error_t (*combine_edges)(const igraph_t *graph,
                          igraph_t *newgraph,
                          const igraph_vector_ptr_t *merges,

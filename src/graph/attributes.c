@@ -69,7 +69,7 @@ igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, voi
 
 igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
-                                        const igraph_vector_t *idx) {
+                                        const igraph_vector_int_t *idx) {
 
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
@@ -102,7 +102,7 @@ igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
 
 igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
-                                     const igraph_vector_t *idx) {
+                                     const igraph_vector_int_t *idx) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_edges(graph, newgraph, idx);
     } else {

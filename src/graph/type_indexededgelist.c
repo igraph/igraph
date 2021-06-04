@@ -466,15 +466,15 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
        original edges for every new edge.
     */
     if (graph->attr) {
-        igraph_vector_t idx;
-        IGRAPH_VECTOR_INIT_FINALLY(&idx, remaining_edges);
+        igraph_vector_int_t idx;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, remaining_edges);
         for (i = 0, j = 0; i < no_of_edges; i++) {
             if (mark[i] == 0) {
                 VECTOR(idx)[j++] = i;
             }
         }
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, graph, &idx));
-        igraph_vector_destroy(&idx);
+        igraph_vector_int_destroy(&idx);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -627,8 +627,8 @@ igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t ver
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     if (newgraph.attr) {
-        igraph_vector_t iidx;
-        IGRAPH_VECTOR_INIT_FINALLY(&iidx, remaining_vertices);
+        igraph_vector_int_t iidx;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&iidx, remaining_vertices);
         for (i = 0; i < no_of_nodes; i++) {
             long int jj = VECTOR(*my_vertex_recoding)[i];
             if (jj != 0) {
@@ -638,7 +638,7 @@ igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t ver
         IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph,
                      &newgraph,
                      &iidx));
-        IGRAPH_CHECK(igraph_vector_resize(&iidx, remaining_edges));
+        IGRAPH_CHECK(igraph_vector_int_resize(&iidx, remaining_edges));
         for (i = 0; i < no_of_edges; i++) {
             long int jj = VECTOR(edge_recoding)[i];
             if (jj != 0) {
@@ -646,7 +646,7 @@ igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t ver
             }
         }
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &iidx));
-        igraph_vector_destroy(&iidx);
+        igraph_vector_int_destroy(&iidx);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

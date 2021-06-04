@@ -660,7 +660,7 @@ igraph_neighborhood_graphs:
         IGNORE: RR, RC, RNamespace
 
 igraph_topological_sorting:
-        PARAMS: GRAPH graph, OUT VECTOR res, NEIMODE mode=OUT
+        PARAMS: GRAPH graph, OUT VECTOR_INT res, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
 igraph_is_loop:
@@ -1859,7 +1859,7 @@ igraph_cohesive_blocks:
 #######################################
 
 igraph_coreness:
-        PARAMS: GRAPH graph, OUT VECTOR cores, NEIMODE mode=ALL
+        PARAMS: GRAPH graph, OUT VECTOR_INT cores, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
 
 #######################################
@@ -1950,7 +1950,7 @@ igraph_canonical_permutation:
         NAME-R: canonical_permutation
 
 igraph_permute_vertices:
-        PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
+        PARAMS: GRAPH graph, OUT GRAPH res, VECTOR_INT_M1 permutation
         NAME-R: permute
 
 igraph_isomorphic_bliss:
@@ -2134,7 +2134,7 @@ igraph_random_sample:
         IGNORE: RR, RC, RNamespace
 
 igraph_convex_hull:
-        PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
+        PARAMS: MATRIX data, OUT VECTOR_INT resverts, OUT MATRIX rescoords
         NAME-R: convex_hull
 
 igraph_dim_select:

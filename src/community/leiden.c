@@ -429,7 +429,7 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
              */
             if (total_cum_trans_diff < IGRAPH_INFINITY) {
                 igraph_real_t r = RNG_UNIF(0, total_cum_trans_diff);
-                long int chosen_idx;
+                igraph_integer_t chosen_idx;
                 igraph_vector_binsearch_slice(&cum_trans_diff, r, &chosen_idx, 0, nb_neigh_clusters);
                 chosen_cluster = VECTOR(neighbor_clusters)[chosen_idx];
             } else {

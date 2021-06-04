@@ -538,7 +538,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,
         const igraph_vector_t* weights, igraph_real_t eps) {
-    long int i, j, k, n, no_of_nodes, no_of_edges;
+    igraph_integer_t i, j, k, n, no_of_nodes, no_of_edges;
     igraph_integer_t u, v, w, msize;
     igraph_t newgraph;
     igraph_vector_long_t match;       /* will store the matching */
@@ -550,8 +550,8 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     igraph_bool_t smaller_set_type;   /* denotes which part of the bipartite graph is smaller */
     igraph_vector_t smaller_set;      /* stores the vertex IDs of the smaller set */
     igraph_vector_t larger_set;       /* stores the vertex IDs of the larger set */
-    long int smaller_set_size;        /* size of the smaller set */
-    long int larger_set_size;         /* size of the larger set */
+    igraph_integer_t smaller_set_size;        /* size of the smaller set */
+    igraph_integer_t larger_set_size;         /* size of the larger set */
     igraph_real_t dual;               /* solution of the dual problem */
     igraph_adjlist_t tight_phantom_edges; /* adjacency list to manage tight phantom edges */
     igraph_integer_t alternating_path_endpoint;

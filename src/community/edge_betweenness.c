@@ -407,7 +407,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_vector_int_t *neip;
     long int neino;
     igraph_vector_t eb;
-    long int maxedge, pos;
+    igraph_integer_t maxedge, pos;
     igraph_integer_t from, to;
     igraph_bool_t result_owned = 0;
     igraph_stack_t stack = IGRAPH_STACK_NULL;

@@ -119,20 +119,23 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  *
  * \example examples/simple/igraph_convex_hull.c
  */
-igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
-                       igraph_matrix_t *rescoords) {
+igraph_error_t igraph_convex_hull(
+    const igraph_matrix_t *data, igraph_vector_int_t *resverts,
+    igraph_matrix_t *rescoords
+) {
     igraph_integer_t no_of_nodes;
-    long int i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
-    igraph_vector_t angles, stack, order;
+    igraph_integer_t i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
+    igraph_vector_t angles;
+    igraph_vector_int_t order, stack;
     igraph_real_t px, py, cp;
 
-    no_of_nodes = (igraph_integer_t) igraph_matrix_nrow(data);
+    no_of_nodes = igraph_matrix_nrow(data);
     if (igraph_matrix_ncol(data) != 2) {
         IGRAPH_ERROR("matrix must have 2 columns", IGRAPH_EINVAL);
     }
     if (no_of_nodes == 0) {
         if (resverts != 0) {
-            IGRAPH_CHECK(igraph_vector_resize(resverts, 0));
+            igraph_vector_int_clear(resverts);
         }
         if (rescoords != 0) {
             IGRAPH_CHECK(igraph_matrix_resize(rescoords, 0, 2));
@@ -142,7 +145,7 @@ igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&angles, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&stack, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&stack, 0);
 
     /* Search for the pivot vertex */
     for (i = 1; i < no_of_nodes; i++) {
@@ -170,7 +173,7 @@ igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *
     }
 
     /* Sort points by angles */
-    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_CHECK(igraph_vector_qsort_ind(&angles, &order, 0));
 
     /* Check if two points have the same angle. If so, keep only the point that
@@ -203,11 +206,11 @@ igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *
     j = 0;
     last_idx = -1;
     before_last_idx = -1;
-    while (!igraph_vector_empty(&order)) {
-        next_idx = VECTOR(order)[igraph_vector_size(&order) - 1];
+    while (!igraph_vector_int_empty(&order)) {
+        next_idx = igraph_vector_int_tail(&order);
         if (next_idx < 0) {
             /* This vertex should be skipped; was excluded in an earlier step */
-            igraph_vector_pop_back(&order);
+            igraph_vector_int_pop_back(&order);
             continue;
         }
         /* Determine whether we are at a left or right turn */
@@ -228,32 +231,32 @@ igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *
         */
         if (cp < 0) {
             /* We are turning into the right direction */
-            igraph_vector_pop_back(&order);
-            IGRAPH_CHECK(igraph_vector_push_back(&stack, next_idx));
+            igraph_vector_int_pop_back(&order);
+            IGRAPH_CHECK(igraph_vector_int_push_back(&stack, next_idx));
             before_last_idx = last_idx;
             last_idx = next_idx;
             j++;
         } else {
             /* No, skip back and try again in the next iteration */
-            igraph_vector_pop_back(&stack);
+            igraph_vector_int_pop_back(&stack);
             j--;
             last_idx = before_last_idx;
-            before_last_idx = (j >= 2) ? (long int) VECTOR(stack)[j - 2] : -1;
+            before_last_idx = (j >= 2) ? VECTOR(stack)[j - 2] : -1;
         }
     }
 
     /* Create result vector */
     if (resverts != 0) {
-        igraph_vector_clear(resverts);
-        IGRAPH_CHECK(igraph_vector_append(resverts, &stack));
+        igraph_vector_int_clear(resverts);
+        IGRAPH_CHECK(igraph_vector_int_append(resverts, &stack));
     }
     if (rescoords != 0) {
         igraph_matrix_select_rows(data, rescoords, &stack);
     }
 
     /* Free everything */
-    igraph_vector_destroy(&order);
-    igraph_vector_destroy(&stack);
+    igraph_vector_int_destroy(&order);
+    igraph_vector_int_destroy(&stack);
     igraph_vector_destroy(&angles);
     IGRAPH_FINALLY_CLEAN(3);
 

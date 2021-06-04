@@ -58,14 +58,14 @@ int vector_tail_cmp(const void *path1, const void *path2) {
 void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
                  const igraph_vector_ptr_t *paths,
                  const igraph_vector_t *nrgeo) {
-    long int i, n;
+    igraph_integer_t i, n;
     igraph_vector_t nrgeo2, *path;
     igraph_vit_t vit;
 
     n = igraph_vcount(graph);
     igraph_vector_init(&nrgeo2, n);
     if (igraph_vector_size(nrgeo) != n) {
-        printf("nrgeo vector length must be %ld, was %ld", n, igraph_vector_size(nrgeo));
+        printf("nrgeo vector length must be %" IGRAPH_PRId ", was %" IGRAPH_PRId, n, igraph_vector_size(nrgeo));
         return;
     }
 
@@ -73,11 +73,11 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
     for (i = 0; i < n; i++) {
         path = VECTOR(*paths)[i];
         if (path == 0) {
-            printf("Null path found in result vector at index %ld\n", i);
+            printf("Null path found in result vector at index %" IGRAPH_PRId "\n", i);
             return;
         }
         if (igraph_vector_size(path) == 0) {
-            printf("Empty path found in result vector at index %ld\n", i);
+            printf("Empty path found in result vector at index %" IGRAPH_PRId "\n", i);
             return;
         }
         VECTOR(nrgeo2)[(long int)igraph_vector_tail(path)] += 1;

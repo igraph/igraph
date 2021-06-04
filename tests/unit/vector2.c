@@ -30,7 +30,7 @@ int main() {
 
     igraph_vector_t v1, v2, v3;
     igraph_real_t min, max;
-    long int imin, imax;
+    igraph_integer_t imin, imax;
     int i;
 
     igraph_vector_init_seq(&v1, 1, 10);
@@ -68,7 +68,7 @@ int main() {
 
     igraph_vector_minmax(&v1, &min, &max);
     igraph_vector_which_minmax(&v1, &imin, &imax);
-    printf("%g %g %li %li\n", min, max, imin, imax);
+    printf("%g %g %" IGRAPH_PRId " %" IGRAPH_PRId "\n", min, max, imin, imax);
 
     igraph_vector_destroy(&v1);
     igraph_vector_destroy(&v2);
@@ -81,10 +81,10 @@ int main() {
 
     igraph_vector_minmax(&v1, &min, &max);
     igraph_vector_which_minmax(&v1, &imin, &imax);
-    printf("%g %g %li %li\n", min, max, imin, imax);
+    printf("%g %g %" IGRAPH_PRId " %" IGRAPH_PRId "\n", min, max, imin, imax);
     igraph_vector_minmax(&v2, &min, &max);
     igraph_vector_which_minmax(&v2, &imin, &imax);
-    printf("%g %g %li %li\n", min, max, imin, imax);
+    printf("%g %g %" IGRAPH_PRId " %" IGRAPH_PRId "\n", min, max, imin, imax);
 
     if (igraph_vector_isnull(&v1)) {
         return 1;

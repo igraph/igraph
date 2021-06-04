@@ -161,7 +161,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
-    long int i, j, v, index, nlen, neighbor, cluster;
+    long int i, j, v, nlen, neighbor, cluster;
     double sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
     igraph_vector_t clustering, lightest_eid, lightest_weight;
     igraph_vector_bool_t is_cluster_sampled;
@@ -173,6 +173,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     igraph_adjlist_t adjlist;
     igraph_inclist_t inclist;
     igraph_integer_t edge;
+    igraph_integer_t index;
 
     if (spanner == 0) {
         return IGRAPH_SUCCESS;

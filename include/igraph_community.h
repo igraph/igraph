@@ -37,9 +37,10 @@ __BEGIN_DECLS
 /* K-Cores and K-Truss                                */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
-                igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness);
+IGRAPH_EXPORT igraph_error_t igraph_coreness(
+    const igraph_t *graph, igraph_vector_int_t *cores, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_trussness(
+    const igraph_t* graph, igraph_vector_int_t* trussness);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */

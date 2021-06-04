@@ -27,8 +27,8 @@
 #include "test_utilities.inc"
 
 void byrow(igraph_matrix_t *m) {
-    long int r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
-    long int n = 0, i, j;
+    igraph_integer_t r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
+    igraph_integer_t n = 0, i, j;
     for (i = 0; i < r; i++) {
         for (j = 0; j < c; j++) {
             MATRIX(*m, i, j) = n++;
@@ -48,7 +48,8 @@ void byrow(igraph_matrix_t *m) {
 int main() {
     igraph_matrix_t m, m2;
     igraph_vector_t v;
-    long int i, j, i2, j2;
+    igraph_vector_int_t index;
+    igraph_integer_t i, j, i2, j2;
     igraph_real_t r1, r2;
 
     igraph_matrix_init(&m, 4, 3);
@@ -315,22 +316,24 @@ int main() {
 
     /* igraph_matrix_select_cols */
     printf("igraph_matrix_select_cols\n");
+    igraph_vector_int_init(&index, 0);
     igraph_matrix_resize(&m, 6, 5);
     apply(m, igraph_matrix_set(&m, i, j, j), (void) 0 );
-    igraph_vector_resize(&v, 3);
-    VECTOR(v)[0] = 0;
-    VECTOR(v)[1] = 4;
-    VECTOR(v)[2] = 2;
-    igraph_matrix_select_cols(&m, &m2, &v);
+    igraph_vector_int_resize(&index, 3);
+    VECTOR(index)[0] = 0;
+    VECTOR(index)[1] = 4;
+    VECTOR(index)[2] = 2;
+    igraph_matrix_select_cols(&m, &m2, &index);
     print_matrix(&m2);
-    igraph_vector_resize(&v, 1);
-    igraph_matrix_select_cols(&m, &m2, &v);
+    igraph_vector_int_resize(&index, 1);
+    igraph_matrix_select_cols(&m, &m2, &index);
     print_matrix(&m2);
-    igraph_vector_clear(&v);
-    igraph_matrix_select_cols(&m, &m2, &v);
+    igraph_vector_int_clear(&index);
+    igraph_matrix_select_cols(&m, &m2, &index);
     if (!igraph_matrix_empty(&m2)) {
         return 9;
     }
+    igraph_vector_int_destroy(&index);
 
     igraph_vector_destroy(&v);
     igraph_matrix_destroy(&m2);

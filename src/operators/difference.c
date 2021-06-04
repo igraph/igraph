@@ -66,7 +66,7 @@ igraph_error_t igraph_difference(igraph_t *res,
     long int smaller_nodes;
     igraph_bool_t directed = igraph_is_directed(orig);
     igraph_vector_t edges;
-    igraph_vector_t edge_ids;
+    igraph_vector_int_t edge_ids;
     igraph_vector_int_t *nei1, *nei2;
     igraph_inclist_t inc_orig, inc_sub;
     long int i;
@@ -77,7 +77,7 @@ igraph_error_t igraph_difference(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edge_ids, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_ids, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_inclist_init(orig, &inc_orig, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inc_orig);
@@ -88,7 +88,7 @@ igraph_error_t igraph_difference(igraph_t *res,
                     no_of_nodes_sub : no_of_nodes_orig;
 
     for (i = 0; i < smaller_nodes; i++) {
-        long int n1, n2, e1, e2;
+        igraph_integer_t n1, n2, e1, e2;
         IGRAPH_ALLOW_INTERRUPTION();
         nei1 = igraph_inclist_get(&inc_orig, i);
         nei2 = igraph_inclist_get(&inc_sub, i);
@@ -105,7 +105,7 @@ igraph_error_t igraph_difference(igraph_t *res,
             } else if (!directed && v2 < i) {
                 n2--;
             } else if (v1 > v2) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edge_ids, e1));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
                 n1--;
@@ -126,7 +126,7 @@ igraph_error_t igraph_difference(igraph_t *res,
             e1 = VECTOR(*nei1)[n1];
             v1 = IGRAPH_OTHER(orig, e1, i);
             if (directed || v1 >= i) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edge_ids, e1));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
 
@@ -148,7 +148,7 @@ igraph_error_t igraph_difference(igraph_t *res,
             e1 = VECTOR(*nei1)[n1];
             v1 = IGRAPH_OTHER(orig, e1, i);
             if (directed || v1 >= i) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edge_ids, e1));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
 
@@ -176,7 +176,7 @@ igraph_error_t igraph_difference(igraph_t *res,
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(orig, res, &edge_ids));
     }
 
-    igraph_vector_destroy(&edge_ids);
+    igraph_vector_int_destroy(&edge_ids);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

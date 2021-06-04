@@ -59,13 +59,13 @@
  *
  * \example examples/simple/igraph_topological_sorting.c
  */
-igraph_error_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
-                               igraph_neimode_t mode) {
-    long int no_of_nodes = igraph_vcount(graph);
+igraph_error_t igraph_topological_sorting(
+        const igraph_t* graph, igraph_vector_int_t *res, igraph_neimode_t mode) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t degrees, neis;
     igraph_dqueue_t sources;
     igraph_neimode_t deg_mode;
-    long int node, i, j;
+    igraph_integer_t node, i, j;
 
     if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
         IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
@@ -83,7 +83,7 @@ igraph_error_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t
     IGRAPH_FINALLY(igraph_dqueue_destroy, &sources);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), deg_mode, 0));
 
-    igraph_vector_clear(res);
+    igraph_vector_int_clear(res);
 
     /* Do we have nodes with no incoming vertices? */
     for (i = 0; i < no_of_nodes; i++) {
@@ -96,7 +96,7 @@ igraph_error_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t
     while (!igraph_dqueue_empty(&sources)) {
         igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (long) tmp;
         /* Add the node to the result vector */
-        igraph_vector_push_back(res, node);
+        IGRAPH_CHECK(igraph_vector_int_push_back(res, node));
         /* Exclude the node from further source searches */
         VECTOR(degrees)[node] = -1;
         /* Get the neighbors and decrease their degrees by one */
@@ -110,7 +110,7 @@ igraph_error_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t
         }
     }
 
-    if (igraph_vector_size(res) < no_of_nodes) {
+    if (igraph_vector_int_size(res) < no_of_nodes) {
         IGRAPH_ERROR("The graph has cycles; topological sorting is only possible in acyclic graphs", IGRAPH_EINVAL);
     }
 

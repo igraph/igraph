@@ -258,11 +258,12 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 }
 
 
-static igraph_error_t igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
-                                      const igraph_vector_int_t *v2, long int *len_union,
-                                      long int *len_intersection) {
+static igraph_error_t igraph_i_neisets_intersect(
+    const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
+    igraph_integer_t *len_union, igraph_integer_t *len_intersection
+) {
     /* ASSERT: v1 and v2 are sorted */
-    long int i, j, i0, jj0;
+    igraph_integer_t i, j, i0, jj0;
     i0 = igraph_vector_int_size(v1); jj0 = igraph_vector_int_size(v2);
     *len_union = i0 + jj0; *len_intersection = 0;
     i = 0; j = 0;
@@ -332,9 +333,10 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
                               const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_vit_t vit, vit2;
-    long int i, j, k;
-    long int len_union, len_intersection;
+    igraph_integer_t i, j;
+    igraph_integer_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
+    igraph_integer_t k;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -349,7 +351,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
     if (loops) {
         for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
             i = IGRAPH_VIT_GET(vit);
-            v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) i);
+            v1 = igraph_lazy_adjlist_get(&al, i);
             if (!igraph_vector_int_binsearch(v1, i, &k)) {
                 igraph_vector_int_insert(v1, k, i);
             }
@@ -439,8 +441,8 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
 igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                     const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
-    long int i, j, k, u, v;
-    long int len_union, len_intersection;
+    igraph_integer_t i, j, k, u, v;
+    igraph_integer_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
     igraph_bool_t *seen;
 
@@ -468,7 +470,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
                 continue;
             }
             seen[j] = 1;
-            v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) j);
+            v1 = igraph_lazy_adjlist_get(&al, j);
             if (!igraph_vector_int_binsearch(v1, j, &u)) {
                 igraph_vector_int_insert(v1, u, j);
             }
@@ -487,9 +489,9 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
             continue;
         }
 
-        v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) u);
-        v2 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) v);
-        igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+        v1 = igraph_lazy_adjlist_get(&al, u);
+        v2 = igraph_lazy_adjlist_get(&al, v);
+        IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
         if (len_union > 0) {
             VECTOR(*res)[j] = ((igraph_real_t)len_intersection) / len_union;
         } else {

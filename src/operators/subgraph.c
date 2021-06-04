@@ -93,37 +93,24 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
                                                  igraph_vector_t *map,
                                                  igraph_vector_t *invmap) {
     igraph_bool_t directed = igraph_is_directed(graph);
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_new_nodes = 0;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_new_nodes = 0;
     long int i, j, n;
     long int to;
     igraph_integer_t eid;
-    igraph_vector_t vids_old2new, vids_new2old;
-    igraph_vector_t eids_new2old;
+    igraph_vector_int_t vids_old2new, vids_new2old;
+    igraph_vector_int_t eids_new2old;
     igraph_vector_t nei_edges;
     igraph_vector_t new_edges;
     igraph_vit_t vit;
-    igraph_vector_t *my_vids_old2new = &vids_old2new,
-                     *my_vids_new2old = &vids_new2old;
 
     /* The order of initialization is important here, they will be destroyed in the
      * opposite order */
-    IGRAPH_VECTOR_INIT_FINALLY(&eids_new2old, 0);
-    if (invmap) {
-        my_vids_new2old = invmap;
-        igraph_vector_clear(my_vids_new2old);
-    } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&vids_new2old, 0);
-    }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids_new2old, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_new2old, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&new_edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&nei_edges, 0);
-    if (map) {
-        my_vids_old2new = map;
-        IGRAPH_CHECK(igraph_vector_resize(map, no_of_nodes));
-        igraph_vector_null(map);
-    } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&vids_old2new, no_of_nodes);
-    }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -144,17 +131,17 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
     n = igraph_vector_size(&nei_edges);
     for (i = 0; i < n; i++) {
         long int vid = VECTOR(nei_edges)[i];
-        if (VECTOR(*my_vids_old2new)[vid] == 0) {
-            IGRAPH_CHECK(igraph_vector_push_back(my_vids_new2old, vid));
+        if (VECTOR(vids_old2new)[vid] == 0) {
+            IGRAPH_CHECK(igraph_vector_int_push_back(&vids_new2old, vid));
             no_of_new_nodes++;
-            VECTOR(*my_vids_old2new)[vid] = no_of_new_nodes;
+            VECTOR(vids_old2new)[vid] = no_of_new_nodes;
         }
     }
 
     /* Create the new edge list */
     for (i = 0; i < no_of_new_nodes; i++) {
-        long int old_vid = VECTOR(*my_vids_new2old)[i];
-        long int new_vid = i;
+        igraph_integer_t old_vid = VECTOR(vids_new2old)[i];
+        igraph_integer_t new_vid = i;
         igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
@@ -165,14 +152,14 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-                to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
+                to = VECTOR(vids_old2new)[ IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
 
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to - 1));
-                IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
             }
         } else {
             /* undirected graph. We need to be careful with loop edges as each
@@ -187,7 +174,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
                     continue;
                 }
 
-                to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
+                to = VECTOR(vids_old2new)[ IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
@@ -203,22 +190,26 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
 
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to));
-                IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
             }
         }
     }
 
-    /* Get rid of some vectors that are not needed anymore */
-    if (!map) {
-        igraph_vector_destroy(&vids_old2new);
-        IGRAPH_FINALLY_CLEAN(1);
+    /* Fill "map" from "vids_old2new" if needed */
+    if (map) {
+        IGRAPH_CHECK(igraph_vector_resize(map, no_of_nodes));
+        for (i = 0; i < no_of_nodes; i++) {
+            VECTOR(*map)[i] = VECTOR(vids_old2new)[i];
+        }
     }
+
+    /* Get rid of some vectors that are not needed anymore */
+    igraph_vector_int_destroy(&vids_old2new);
     igraph_vector_destroy(&nei_edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     /* Create the new graph */
-    IGRAPH_CHECK(igraph_create(res, &new_edges, (igraph_integer_t)
-                               no_of_new_nodes, directed));
+    IGRAPH_CHECK(igraph_create(res, &new_edges, no_of_new_nodes, directed));
     IGRAPH_I_ATTRIBUTE_DESTROY(res);
 
     /* Now we can also get rid of the new_edges vector */
@@ -234,18 +225,23 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
                                          /* ga = */ 1, /* va = */ 0, /* ea = */ 0));
 
     /* Copy the vertex attributes */
-    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res,
-                 my_vids_new2old));
+    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &vids_new2old));
 
     /* Copy the edge attributes */
     IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, res, &eids_new2old));
 
-    if (!invmap) {
-        igraph_vector_destroy(my_vids_new2old);
-        IGRAPH_FINALLY_CLEAN(1);
+    /* Fill "invmap" from "vids_new2old" if needed */
+    if (invmap) {
+        IGRAPH_CHECK(igraph_vector_resize(invmap, no_of_new_nodes));
+        for (i = 0; i < no_of_new_nodes; i++) {
+            VECTOR(*invmap)[i] = VECTOR(vids_new2old)[i];
+        }
     }
-    igraph_vector_destroy(&eids_new2old);
-    IGRAPH_FINALLY_CLEAN(2);   /* 1 + 1 since we don't need to destroy res */
+
+    /* Get rid of the remaining stuff */
+    igraph_vector_int_destroy(&vids_new2old);
+    igraph_vector_int_destroy(&eids_new2old);
+    IGRAPH_FINALLY_CLEAN(3);   /* 1 + 1 since we don't need to destroy res */
 
     return IGRAPH_SUCCESS;
 }

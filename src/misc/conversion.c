@@ -424,14 +424,14 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
       {
         igraph_t newgraph;
         igraph_vector_t edges;
-        igraph_vector_t index;
+        igraph_vector_int_t index;
         long int size = no_of_edges * 4;
         long int i;
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&edges, size));
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
         IGRAPH_CHECK(igraph_vector_resize(&edges, no_of_edges * 4));
-        IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_edges * 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_edges * 2);
         for (i = 0; i < no_of_edges; i++) {
             VECTOR(edges)[no_of_edges * 2 + i * 2]  = VECTOR(edges)[i * 2 + 1];
             VECTOR(edges)[no_of_edges * 2 + i * 2 + 1] = VECTOR(edges)[i * 2];
@@ -446,7 +446,7 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
         IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1, 1,/*edges=*/0);
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &index));
 
-        igraph_vector_destroy(&index);
+        igraph_vector_int_destroy(&index);
         igraph_vector_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(3);
 

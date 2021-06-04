@@ -446,7 +446,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
  *
  * \param graph The input graph.
  * \param outvids Pointer to an initialized vector that will be
- *        resized and will contain the ordered vertex ids.
+ *        resized and will contain the ordered vertex IDs.
  * \param vids Input vertex selector of vertex ids to include in
  *        calculation.
  * \param mode Defines the type of the degree.
@@ -471,13 +471,13 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
  *
  */
 igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
-                                     igraph_vector_t *outvids,
+                                     igraph_vector_int_t *outvids,
                                      igraph_vs_t vids,
                                      igraph_neimode_t mode,
                                      igraph_bool_t loops,
                                      igraph_order_t order,
                                      igraph_bool_t only_indices) {
-    long int i;
+    igraph_integer_t i, n;
     igraph_vector_t degrees, vs_vec;
     IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
@@ -488,8 +488,9 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&vs_vec, 0);
         IGRAPH_CHECK(igraph_vs_as_vector(graph, vids, &vs_vec));
-        for (i = 0; i < igraph_vector_size(outvids); i++) {
-            VECTOR(*outvids)[i] = VECTOR(vs_vec)[(long int)VECTOR(*outvids)[i]];
+        n = igraph_vector_int_size(outvids);
+        for (i = 0; i < n; i++) {
+            VECTOR(*outvids)[i] = VECTOR(vs_vec)[VECTOR(*outvids)[i]];
         }
         igraph_vector_destroy(&vs_vec);
         igraph_vector_destroy(&degrees);

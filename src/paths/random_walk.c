@@ -220,7 +220,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
     RNG_BEGIN();
 
     for (i = 0; i < steps; ++i) {
-        long degree, edge, idx;
+        igraph_integer_t degree, edge, idx;
         igraph_vector_int_t *edges = igraph_inclist_get(&il, start);
 
         degree = igraph_vector_int_size(edges);

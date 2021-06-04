@@ -594,10 +594,10 @@ igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
        IGRAPH_ERROR("The row does not exist.", IGRAPH_EINVAL);
     }
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
-    igraph_vector_t permvec;
+    igraph_vector_int_t permvec;
 
     IGRAPH_ASSERT(m != NULL);
-    IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
         for (ei = VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
             if (VECTOR(m->ridx)[ei] == row) {
@@ -619,7 +619,7 @@ igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     VECTOR(m->cidx)[m->ncol] -= nremove;
     igraph_vector_permdelete(&m->ridx, &permvec, nremove);
     igraph_vector_permdelete(&m->data, &permvec, nremove);
-    igraph_vector_destroy(&permvec);
+    igraph_vector_int_destroy(&permvec);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
@@ -776,7 +776,7 @@ igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector
 igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
         igraph_real_t *ridx, igraph_real_t *cidx) {
     igraph_real_t res;
-    long int i, n, maxidx;
+    igraph_integer_t i, n, maxidx;
 
     IGRAPH_ASSERT(m != NULL);
     n = igraph_vector_size(&m->data);
@@ -823,7 +823,7 @@ igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
 igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
                                   igraph_real_t *ridx, igraph_real_t *cidx) {
     igraph_real_t res;
-    long int i, j, k, maxidx;
+    igraph_integer_t i, j, k, maxidx;
 
     IGRAPH_ASSERT(m != NULL);
     i = igraph_vector_size(&m->data);

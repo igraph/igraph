@@ -67,7 +67,7 @@ IGRAPH_EXPORT igraph_error_t igraph_strength(const igraph_t *graph, igraph_vecto
                                   const igraph_vs_t vids, igraph_neimode_t mode,
                                   igraph_bool_t loops, const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
-                                                   igraph_vector_t *outvids,
+                                                   igraph_vector_int_t *outvids,
                                                    igraph_vs_t vids,
                                                    igraph_neimode_t mode,
                                                    igraph_bool_t loops,

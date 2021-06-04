@@ -101,7 +101,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     igraph_bool_t is_directed = (fitness_in != 0);
     float num_steps;
     igraph_integer_t step_counter = 0;
-    long int i, from, to, pos;
+    igraph_integer_t i, from, to, pos;
 
     if (fitness_out == 0) {
         IGRAPH_ERROR("fitness_out must not be null.", IGRAPH_EINVAL);

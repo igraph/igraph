@@ -2,6 +2,42 @@
 
 ## [Unreleased]
 
+### Breaking changes
+
+ - In order to facilitate the usage of graphs with more than 2 billion vertices
+   and edges, we have made the size of the `igraph_integer_t` data type to be
+   32 bits on 32-bit platforms and 64 bits on 64-bit platforms by default. You
+   also have the option to compile a 32-bit igraph variant on a 64-bit platform
+   by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
+
+ - Several igraph functions that used to take a `long int` or return a
+   `long int` now takes or returns an `igraph_integer_t` instead to make the
+   APIs more consistent. Similarly, igraph functions that used `igraph_vector_t`
+   for arguments that take or return _integral_ vectors (e.g., vertex or
+   edge indices) now take `igraph_vector_int_t` instead. Graph-related functions
+   where the API was changed due to this reason are listed below, one by one.
+
+ - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
+   values.
+
+ - `igraph_convex_hull()` now uses an `igraph_vector_int_t` to return the
+   indices of the input vertices that were chosen to be in the convex hull.
+
+ - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
+   use an `igraph_vector_int_t` to return the vertex IDs instead of an
+   `igraph_vector_t`.
+
+ - `igraph_vector_*()`, `igraph_matrix_*()`, `igraph_stack_*()`, `igraph_array_*()`
+   and several other generic igraph data types now use `igraph_integer_t` for
+   indexing, _not_ `long int`. Please refer to the headers for the exact details;
+   the list of affected functions is too large to include here.
+
+ - The `permute_vertices()` and `permute_edges()` functions in the attribute
+   handler tables now take an `igraph_vector_int_t` instead of an
+   `igraph_vector_t` for the index vectors. This is relevant only to maintainers
+   of higher level interfaces to igraph; they should update their attribute
+   handlers accordingly.
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

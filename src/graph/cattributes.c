@@ -443,7 +443,7 @@ static void igraph_i_cattribute_permute_free(igraph_vector_ptr_t *v) {
 
 static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph,
         igraph_t *newgraph,
-        const igraph_vector_t *idx) {
+        const igraph_vector_int_t *idx) {
 
     if (graph == newgraph) {
 
@@ -1844,7 +1844,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
 
 static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                                              igraph_t *newgraph,
-                                             const igraph_vector_t *idx) {
+                                             const igraph_vector_int_t *idx) {
 
     if (graph == newgraph) {
 

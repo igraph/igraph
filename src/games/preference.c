@@ -202,7 +202,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         maxcum = igraph_vector_tail(&cumdist);
 
         for (i = 0; i < nodes; i++) {
-            long int type1;
+            igraph_integer_t type1;
             igraph_real_t uni1 = RNG_UNIF(0, maxcum);
             igraph_vector_binsearch(&cumdist, uni1, &type1);
             VECTOR(*nodetypes)[i] = type1 - 1;
@@ -217,7 +217,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         long int an = 0;
         if (type_dist) {
             for (i = 0; i < types; i++) {
-                long int no = VECTOR(*type_dist)[i];
+                igraph_integer_t no = VECTOR(*type_dist)[i];
                 igraph_vector_t *v = VECTOR(vids_by_type)[i];
                 for (j = 0; j < no && an < nodes; j++) {
                     VECTOR(*nodetypes)[an] = i;
@@ -516,7 +516,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     RNG_BEGIN();
 
     for (i = 0; i < nodes; i++) {
-        long int type1, type2;
+        igraph_integer_t type1, type2;
         igraph_real_t uni1 = RNG_UNIF(0, maxcum);
         igraph_vector_binsearch(&cumdist, uni1, &type1);
         type2 = (type1 - 1) % out_types;
@@ -537,7 +537,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     IGRAPH_VECTOR_INIT_FINALLY(&intersect, 0);
     for (i = 0; i < out_types; i++) {
         for (j = 0; j < in_types; j++) {
-            long int kk, l, c = 0;
+            long int kk, l;
+            igraph_integer_t c = 0;
             igraph_real_t p, last;
             igraph_vector_t *v1, *v2;
             long int v1_size, v2_size;

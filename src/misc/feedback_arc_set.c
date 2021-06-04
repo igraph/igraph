@@ -106,7 +106,7 @@ igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *r
 igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights, igraph_vector_t *layering) {
     igraph_vector_t edges;
-    long int i, j, n, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes - 1);
     if (weights) {
@@ -145,13 +145,24 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
     if (layering != 0) {
         igraph_vector_t degrees;
         igraph_vector_t roots;
+        igraph_vector_int_t roots_tmp;
 
         IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&roots, no_of_nodes);
-
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&roots_tmp, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
                                      IGRAPH_ALL, 0, weights));
-        IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, &roots, /* descending = */ 1));
+        IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, &roots_tmp, /* descending = */ 1));
+
+        /* TODO(ntamas): temporary conversion until we migrate igraph_bfs()'s
+         * interface to use igraph_vector_int_t for vertex indices */
+        for (i = 0; i < no_of_nodes; i++) {
+            VECTOR(roots)[i] = VECTOR(roots_tmp)[i];
+        }
+
+        igraph_vector_int_destroy(&roots_tmp);
+        IGRAPH_FINALLY_CLEAN(1);
+
         IGRAPH_CHECK(igraph_bfs(graph,
                                 /* root = */ 0,
                                 /* roots = */ &roots,
@@ -383,7 +394,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
     /* If we have also requested a layering, return that as well */
     if (layers != 0) {
-        igraph_vector_t ranks;
+        igraph_vector_int_t ranks;
         igraph_vector_long_t order_vec;
 
         IGRAPH_CHECK(igraph_vector_resize(layers, no_of_nodes));
@@ -392,14 +403,13 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         igraph_vector_long_view(&order_vec, ordering, no_of_nodes);
 
         IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&ranks, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&ranks, 0);
 
-        IGRAPH_CHECK((int) igraph_vector_long_qsort_ind(&order_vec, &ranks, 0));
+        IGRAPH_CHECK(igraph_vector_long_qsort_ind(&order_vec, &ranks, 0));
 
         for (i = 0; i < no_of_nodes; i++) {
-            long int from = VECTOR(ranks)[i];
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) from,
-                                          IGRAPH_OUT));
+            igraph_integer_t from = VECTOR(ranks)[i];
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
             k = igraph_vector_size(&neis);
             for (j = 0; j < k; j++) {
                 long int to = VECTOR(neis)[j];
@@ -416,7 +426,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         }
 
         igraph_vector_destroy(&neis);
-        igraph_vector_destroy(&ranks);
+        igraph_vector_int_destroy(&ranks);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

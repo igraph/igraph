@@ -1029,9 +1029,9 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
      * smallest decrease in modularity every step. Now we're simply deleting
      * the excess rows from the merge matrix */
     if (no_of_joins < total_joins) {
-        long int *ivec;
-        long int merges_nrow = igraph_matrix_nrow(merges);
-        ivec = IGRAPH_CALLOC(merges_nrow, long int);
+        igraph_integer_t *ivec;
+        igraph_integer_t merges_nrow = igraph_matrix_nrow(merges);
+        ivec = IGRAPH_CALLOC(merges_nrow, igraph_integer_t);
         if (ivec == 0) {
             IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
         }

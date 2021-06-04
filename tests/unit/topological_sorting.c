@@ -28,7 +28,8 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t v, res;
+    igraph_vector_t v;
+    igraph_vector_int_t res;
     igraph_bool_t is_dag;
     int ret;
 
@@ -38,7 +39,7 @@ int main() {
                  0, 3, 0, 4, 1, 3, 2, 4, 2, 7, 3, 5, 3, 6, 3, 7, 4, 6,
                  -1);
 
-    igraph_vector_init(&res, 0);
+    igraph_vector_int_init(&res, 0);
 
     igraph_is_dag(&g, &is_dag);
     if (!is_dag) {
@@ -46,9 +47,9 @@ int main() {
     }
 
     igraph_topological_sorting(&g, &res, IGRAPH_OUT);
-    print_vector_round(&res);
+    print_vector_int(&res);
     igraph_topological_sorting(&g, &res, IGRAPH_IN);
-    print_vector_round(&res);
+    print_vector_int(&res);
 
     /* Error handling */
     VERIFY_FINALLY_STACK();
@@ -91,7 +92,7 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&res);
+    igraph_vector_int_destroy(&res);
 
     VERIFY_FINALLY_STACK();
 

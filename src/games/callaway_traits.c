@@ -164,7 +164,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
 
     for (i = 0; i < nodes; i++) {
         igraph_real_t uni = RNG_UNIF(0, maxcum);
-        long int type;
+        igraph_integer_t type;
         igraph_vector_binsearch(&cumdist, uni, &type);
         VECTOR(*nodetypes)[i] = type - 1;
     }

@@ -288,7 +288,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     for (i = 1; i < nodes; i++) {
         for (j = 0; j < edges_per_step; j++) {
-            long int to;
+            igraph_integer_t to;
             if (sum > 0) {
                 igraph_vector_binsearch(&cumsum, RNG_UNIF(0, sum), &to);
             } else {

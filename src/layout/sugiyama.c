@@ -352,10 +352,10 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
     /* Normalize layering, eliminate empty layers */
     if (no_of_nodes > 0) {
-        igraph_vector_t inds;
-        IGRAPH_VECTOR_INIT_FINALLY(&inds, 0);
+        igraph_vector_int_t inds;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
         IGRAPH_CHECK(igraph_vector_qsort_ind(&layers_own, &inds, 0));
-        j = -1; dx = VECTOR(layers_own)[(long int)VECTOR(inds)[0]] - 1;
+        j = -1; dx = VECTOR(layers_own)[VECTOR(inds)[0]] - 1;
         for (i = 0; i < no_of_nodes; i++) {
             k = VECTOR(inds)[i];
             if (VECTOR(layers_own)[k] > dx) {
@@ -366,7 +366,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
             }
             VECTOR(layers_own)[k] = j;
         }
-        igraph_vector_destroy(&inds);
+        igraph_vector_int_destroy(&inds);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -756,7 +756,8 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     long int no_of_layers = igraph_i_layering_num_layers(layering);
     long int iter, layer_index;
     igraph_vector_t* layer_members;
-    igraph_vector_t neis, barycenters, sort_indices;
+    igraph_vector_t neis, barycenters;
+    igraph_vector_int_t sort_indices;
     igraph_bool_t changed;
 
     /* The first column of the matrix will serve as the ordering */
@@ -774,7 +775,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
 
     IGRAPH_VECTOR_INIT_FINALLY(&barycenters, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&sort_indices, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sort_indices, 0);
 
     /* Start the effective part of the Sugiyama algorithm */
     iter = 0; changed = 1;
@@ -798,7 +799,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
 #endif
             IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
             for (i = 0; i < n; i++) {
-                nei = (long)VECTOR(*layer_members)[(long)VECTOR(sort_indices)[i]];
+                nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(barycenters)[i] = nei;
                 MATRIX(*layout, nei, 0) = i;
             }
@@ -831,7 +832,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
 
             IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
             for (i = 0; i < n; i++) {
-                nei = (long)VECTOR(*layer_members)[(long)VECTOR(sort_indices)[i]];
+                nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(barycenters)[i] = nei;
                 MATRIX(*layout, nei, 0) = i;
             }
@@ -857,7 +858,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
 
     igraph_vector_destroy(&barycenters);
     igraph_vector_destroy(&neis);
-    igraph_vector_destroy(&sort_indices);
+    igraph_vector_int_destroy(&sort_indices);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -1082,11 +1083,12 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
     long int no_of_layers = igraph_i_layering_num_layers(layering);
     long int no_of_nodes = igraph_vcount(graph);
     igraph_neimode_t neimode = (reverse ? IGRAPH_OUT : IGRAPH_IN);
-    igraph_vector_t neis, xs, inds;
+    igraph_vector_t neis, xs;
+    igraph_vector_int_t inds;
 
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&xs, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&inds, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
 
     IGRAPH_CHECK(igraph_vector_resize(roots, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_resize(align, no_of_nodes));
@@ -1149,18 +1151,18 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
 
                 if (n % 2 == 1) {
                     /* Odd number of neighbors, so the median is unique */
-                    medians[0] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2]];
+                    medians[0] = VECTOR(neis)[VECTOR(inds)[n / 2]];
                     medians[1] = -1;
                 } else {
                     /* Even number of neighbors, so we have two medians. The order
                      * depends on whether we are processing the layer in leftmost
                      * or rightmost fashion. */
                     if (align_right) {
-                        medians[0] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2]];
-                        medians[1] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2 - 1]];
+                        medians[0] = VECTOR(neis)[VECTOR(inds)[n / 2]];
+                        medians[1] = VECTOR(neis)[VECTOR(inds)[n / 2 - 1]];
                     } else {
-                        medians[0] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2 - 1]];
-                        medians[1] = VECTOR(neis)[(long int)VECTOR(inds)[n / 2]];
+                        medians[0] = VECTOR(neis)[VECTOR(inds)[n / 2 - 1]];
+                        medians[1] = VECTOR(neis)[VECTOR(inds)[n / 2]];
                     }
                 }
             }
@@ -1194,7 +1196,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
         }
     }
 
-    igraph_vector_destroy(&inds);
+    igraph_vector_int_destroy(&inds);
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&xs);
     IGRAPH_FINALLY_CLEAN(3);

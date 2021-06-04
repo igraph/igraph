@@ -141,8 +141,8 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_undirected(
     igraph_adjlist_t al;
     igraph_bool_t finished, failed;
     igraph_integer_t from, to, dummy;
-    long int i, j, k;
-    long int no_of_nodes, outsum = 0;
+    igraph_integer_t i, j, k;
+    igraph_integer_t no_of_nodes, outsum = 0;
     igraph_bool_t degseq_ok;
 
     IGRAPH_CHECK(igraph_is_graphical(seq, 0, IGRAPH_SIMPLE_SW, &degseq_ok));
@@ -285,8 +285,8 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed(igraph_
     igraph_set_t incomplete_in_vertices;
     igraph_set_t incomplete_out_vertices;
     igraph_integer_t from, to;
-    long int i, j, k;
-    long int no_of_nodes, outsum;
+    igraph_integer_t i, j, k;
+    igraph_integer_t no_of_nodes, outsum;
 
     IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_SIMPLE_SW, &deg_seq_ok));
     if (!deg_seq_ok) {
