@@ -33,7 +33,7 @@ int main() {
     igraph_real_t *ptr;
     long int pos;
     igraph_real_t min, max, min2, max2;
-    long int which_min, which_max, which_min2, which_max2;
+    igraph_integer_t which_min, which_max, which_min2, which_max2;
 
     printf("Initialise empty vector\n");
     igraph_vector_init(&v, 0);
