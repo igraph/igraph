@@ -126,12 +126,12 @@ whitespace [ \t\v\f]
 
 <<EOF>>                 {
                           if (yyextra->eof) {
-			    yyterminate();
-			  } else {
-			    yyextra->eof=1;
-			    BEGIN(INITIAL);
-			    return EOFF;
-			  }
+                            yyterminate();
+                          } else {
+                            yyextra->eof=1;
+                            BEGIN(INITIAL);
+                            return EOFF;
+                          }
                         }
 
 <*>. { return 0; }

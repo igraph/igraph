@@ -25,31 +25,31 @@
 int main() {
     int i;
 
-	/* Seed the RNG, generate 10 random integers */
+    /* Seed the RNG, generate 10 random integers */
     igraph_rng_seed(igraph_rng_default(), 42);
     for (i = 0; i < 10; i++) {
         printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
     }
 
-	printf("========\n");
+    printf("========\n");
 
-	/* Seed the RNG again with the same seed, verify that we get the same
-	 * numbers */
+    /* Seed the RNG again with the same seed, verify that we get the same
+     * numbers */
     igraph_rng_seed(igraph_rng_default(), 42);
     for (i = 0; i < 10; i++) {
         printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
     }
 
-	printf("========\n");
+    printf("========\n");
 
-	/* Seed the RNG again with a different seed, verify that we get different
-	 * numbers */
+    /* Seed the RNG again with a different seed, verify that we get different
+     * numbers */
     igraph_rng_seed(igraph_rng_default(), 84);
     for (i = 0; i < 10; i++) {
         printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
     }
 
-	printf("========\n");
+    printf("========\n");
 
     return 0;
 }

@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Coloring">
-<title>Graph Coloring</title>
+<title>Graph coloring</title>
 
 <!-- doxrox-include igraph_vertex_coloring_greedy -->
 <!-- doxrox-include igraph_coloring_greedy_t -->

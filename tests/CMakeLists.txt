@@ -258,6 +258,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   efficiency
+  global_transitivity
+  igraph_adjacent_triangles
   igraph_are_connected
   igraph_average_path_length
   igraph_average_path_length_dijkstra
@@ -279,6 +281,7 @@ add_legacy_tests(
   igraph_is_mutual
   igraph_is_tree
   igraph_list_triangles
+  igraph_local_scan_k_ecount
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs

@@ -113,42 +113,42 @@ int main() {
     BENCH_INIT();
 
     generate_continuous(1, 3, 100000);
-	BENCH(" 1 Continuous, xmin = 1, alpha = 3, samples = 100K, fitting alpha only", fit_continuous(1));
+    BENCH(" 1 Continuous, xmin = 1, alpha = 3, samples = 100K, fitting alpha only", fit_continuous(1));
 
     generate_continuous(1, 3, 200000);
-	BENCH(" 2 Continuous, xmin = 1, alpha = 3, samples = 200K, fitting alpha only", fit_continuous(1));
+    BENCH(" 2 Continuous, xmin = 1, alpha = 3, samples = 200K, fitting alpha only", fit_continuous(1));
 
     generate_continuous(1, 3, 500000);
-	BENCH(" 3 Continuous, xmin = 1, alpha = 3, samples = 500K, fitting alpha only", fit_continuous(1));
+    BENCH(" 3 Continuous, xmin = 1, alpha = 3, samples = 500K, fitting alpha only", fit_continuous(1));
 
     generate_continuous(1, 3, 5000);
-	BENCH(" 4 Continuous, xmin = 1, alpha = 3, samples = 5K, fitting xmin and alpha", fit_continuous(-1));
+    BENCH(" 4 Continuous, xmin = 1, alpha = 3, samples = 5K, fitting xmin and alpha", fit_continuous(-1));
 
     generate_continuous(1, 3, 10000);
-	BENCH(" 5 Continuous, xmin = 1, alpha = 3, samples = 10K, fitting xmin and alpha", fit_continuous(-1));
+    BENCH(" 5 Continuous, xmin = 1, alpha = 3, samples = 10K, fitting xmin and alpha", fit_continuous(-1));
 
     generate_continuous(1, 3, 15000);
-	BENCH(" 6 Continuous, xmin = 1, alpha = 3, samples = 15K, fitting xmin and alpha", fit_continuous(-1));
+    BENCH(" 6 Continuous, xmin = 1, alpha = 3, samples = 15K, fitting xmin and alpha", fit_continuous(-1));
 
     generate_discrete(3, 3, 1000000);
-	BENCH(" 7 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting alpha only", fit_discrete(3));
+    BENCH(" 7 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting alpha only", fit_discrete(3));
 
     generate_discrete(3, 3, 5000000);
-	BENCH(" 8 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting alpha only", fit_discrete(3));
+    BENCH(" 8 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting alpha only", fit_discrete(3));
 
     generate_discrete(3, 3, 10000000);
-	BENCH(" 9 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting alpha only", fit_discrete(3));
+    BENCH(" 9 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting alpha only", fit_discrete(3));
 
     generate_discrete(3, 3, 1000000);
-	BENCH("10 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting xmin and alpha", fit_discrete(-1));
+    BENCH("10 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting xmin and alpha", fit_discrete(-1));
 
     generate_discrete(3, 3, 5000000);
-	BENCH("11 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting xmin and alpha", fit_discrete(-1));
+    BENCH("11 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting xmin and alpha", fit_discrete(-1));
 
     generate_discrete(3, 3, 10000000);
-	BENCH("12 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting xmin and alpha", fit_discrete(-1));
+    BENCH("12 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting xmin and alpha", fit_discrete(-1));
 
     igraph_vector_destroy(&data);
 
-	return 0;
+    return 0;
 }
