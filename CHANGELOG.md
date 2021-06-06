@@ -434,3 +434,16 @@
  - igraph now uses the high-performance [Cliquer library](https://users.aalto.fi/~pat/cliquer.html) to find (non-maximal) cliques
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
+
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.4..HEAD
+[0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4
+[0.9.3]: https://github.com/igraph/igraph/compare/0.9.2...0.9.3
+[0.9.2]: https://github.com/igraph/igraph/compare/0.9.1...0.9.2
+[0.9.1]: https://github.com/igraph/igraph/compare/0.9.0...0.9.1
+[0.9.0]: https://github.com/igraph/igraph/compare/0.8.5...0.9.0
+[0.8.5]: https://github.com/igraph/igraph/compare/0.8.4...0.8.5
+[0.8.4]: https://github.com/igraph/igraph/compare/0.8.3...0.8.4
+[0.8.3]: https://github.com/igraph/igraph/compare/0.8.2...0.8.3
+[0.8.2]: https://github.com/igraph/igraph/compare/0.8.1...0.8.2
+[0.8.1]: https://github.com/igraph/igraph/compare/0.8.0...0.8.1
+[0.8.0]: https://github.com/igraph/igraph/releases/tag/0.8.0
