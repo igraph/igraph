@@ -69,6 +69,23 @@
 
  - `igraph_version()` no longer returns an error code.
 
+## [0.9.4] - 2021-05-31
+
+### Changed
+
+ - Unweighted transitivity (i.e. clustering coefficient) calculations now ignore multi-edges and edge directions instead of rejecting multigraphs and directed graphs.
+ - `igraph_transitivity_barrat()` now returns an error code if the input graph has multiple edges (which is not handled correctly by the implementation yet).
+
+### Fixed
+
+ - `igraph_local_scan_k_ecount()` now handles loops correctly.
+ - `igraph_transitivity_avglocal_undirected()` is no longer slower than `igraph_transitivity_local_undirected()`.
+ - Worked around an invalid warning issued by Clang 9.0 when compiling with OpenMP.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.9.3] - 2021-05-05
 
 ### Added
@@ -485,3 +502,16 @@
  - igraph now uses the high-performance [Cliquer library](https://users.aalto.fi/~pat/cliquer.html) to find (non-maximal) cliques
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
+
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.4..HEAD
+[0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4
+[0.9.3]: https://github.com/igraph/igraph/compare/0.9.2...0.9.3
+[0.9.2]: https://github.com/igraph/igraph/compare/0.9.1...0.9.2
+[0.9.1]: https://github.com/igraph/igraph/compare/0.9.0...0.9.1
+[0.9.0]: https://github.com/igraph/igraph/compare/0.8.5...0.9.0
+[0.8.5]: https://github.com/igraph/igraph/compare/0.8.4...0.8.5
+[0.8.4]: https://github.com/igraph/igraph/compare/0.8.3...0.8.4
+[0.8.3]: https://github.com/igraph/igraph/compare/0.8.2...0.8.3
+[0.8.2]: https://github.com/igraph/igraph/compare/0.8.1...0.8.2
+[0.8.1]: https://github.com/igraph/igraph/compare/0.8.0...0.8.1
+[0.8.0]: https://github.com/igraph/igraph/releases/tag/0.8.0

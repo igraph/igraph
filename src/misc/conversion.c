@@ -198,9 +198,9 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  * \sa igraph_get_adjacency if you would like to get a normal matrix
  *   ( \type igraph_matrix_t )
  *
- * Time complexity: O(|V||V|),
- * |V| is the
- * number of vertices in the graph.
+ * \deprecated-by igraph_get_sparsemat 0.10
+ *
+ * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  */
 
 igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,

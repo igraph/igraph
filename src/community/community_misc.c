@@ -32,7 +32,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
-#include "igraph_spmatrix.h"
+#include "igraph_sparsemat.h"
 #include "igraph_statusbar.h"
 #include "igraph_conversion.h"
 #include "igraph_centrality.h"
@@ -510,8 +510,9 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     long int k1;
     long int k2;
     double *p1, *p2;
-    igraph_spmatrix_t m;
-    igraph_spmatrix_iter_t mit;
+    igraph_sparsemat_t m;
+    igraph_sparsemat_t mu; /* uncompressed */
+    igraph_sparsemat_iterator_t mit;
 
     n = igraph_vector_size(v1);
     if (n == 0) {
@@ -563,22 +564,25 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
 
     /* Calculate the mutual information of v1 and v2 */
     *mut_inf = 0.0;
-    IGRAPH_CHECK(igraph_spmatrix_init(&m, k1, k2));
-    IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
+    IGRAPH_CHECK(igraph_sparsemat_init(&mu, k1, k2, n));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &mu);
     for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(igraph_spmatrix_add_e(&m,
+        IGRAPH_CHECK(igraph_sparsemat_entry(&mu,
                                            (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
     }
-    IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
-    IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
-    while (!igraph_spmatrix_iter_end(&mit)) {
-        double p = mit.value / n;
-        *mut_inf += p * (log(p) - p1[mit.ri] - p2[mit.ci]);
-        igraph_spmatrix_iter_next(&mit);
-    }
 
-    igraph_spmatrix_iter_destroy(&mit);
-    igraph_spmatrix_destroy(&m);
+    igraph_sparsemat_compress(&mu, &m);
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
+    igraph_sparsemat_dupl(&m);
+
+    IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
+    while (!igraph_sparsemat_iterator_end(&mit)) {
+        double p = igraph_sparsemat_iterator_get(&mit)/ n;
+        *mut_inf += p * (log(p) - p1[igraph_sparsemat_iterator_row(&mit)] - p2[igraph_sparsemat_iterator_col(&mit)]);
+        igraph_sparsemat_iterator_next(&mit);
+    }
+    igraph_sparsemat_destroy(&m);
+    igraph_sparsemat_destroy(&mu);
     IGRAPH_FREE(p1); IGRAPH_FREE(p2);
 
     IGRAPH_FINALLY_CLEAN(4);
@@ -650,22 +654,22 @@ static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_t *v1,
  * and k2 are the number of clusters in each of the clusterings.
  */
 static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
-                              igraph_spmatrix_t *m) {
-    long int k1;
-    long int k2;
-    long int i, n;
+                              igraph_sparsemat_t *m) {
+    igraph_integer_t k1, k2, i, n;
 
     n = igraph_vector_size(v1);
-    if (n == 0 ) {
-        IGRAPH_CHECK(igraph_spmatrix_resize(m, 0, 0));
+    if (n == 0) {
+        IGRAPH_CHECK(igraph_sparsemat_resize(m, 0, 0, 0));
         return IGRAPH_SUCCESS;
     }
+
     k1 = igraph_vector_max(v1) + 1;
     k2 = igraph_vector_max(v2) + 1;
-    IGRAPH_CHECK(igraph_spmatrix_resize(m, k1, k2));
+    IGRAPH_CHECK(igraph_sparsemat_resize(m, k1, k2, n));
     for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(igraph_spmatrix_add_e(m,
-                                           (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
+        IGRAPH_CHECK(igraph_sparsemat_entry(
+            m, (igraph_integer_t)VECTOR(*v1)[i], (igraph_integer_t)VECTOR(*v2)[i], 1
+        ));
     }
 
     return IGRAPH_SUCCESS;
@@ -691,8 +695,9 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, co
                                  igraph_integer_t* distance12, igraph_integer_t* distance21) {
     long int n = igraph_vector_size(v1);
     igraph_vector_t rowmax, colmax;
-    igraph_spmatrix_t m;
-    igraph_spmatrix_iter_t mit;
+    igraph_sparsemat_t m;
+    igraph_sparsemat_t mu; /* uncompressed */
+    igraph_sparsemat_iterator_t mit;
 
     if (n == 0) {
         *distance12 = 0;
@@ -700,28 +705,31 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, co
         return IGRAPH_SUCCESS;
     }
     /* Calculate the confusion matrix */
-    IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
-    IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
-    IGRAPH_CHECK(igraph_i_confusion_matrix(v1, v2, &m));
+    IGRAPH_CHECK(igraph_sparsemat_init(&mu, 1, 1, 0));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &mu);
+    IGRAPH_CHECK(igraph_i_confusion_matrix(v1, v2, &mu));
 
     /* Initialize vectors that will store the row/columnwise maxima */
-    IGRAPH_VECTOR_INIT_FINALLY(&rowmax, igraph_spmatrix_nrow(&m));
-    IGRAPH_VECTOR_INIT_FINALLY(&colmax, igraph_spmatrix_ncol(&m));
+    IGRAPH_VECTOR_INIT_FINALLY(&rowmax, igraph_sparsemat_nrow(&mu));
+    IGRAPH_VECTOR_INIT_FINALLY(&colmax, igraph_sparsemat_ncol(&mu));
 
     /* Find the row/columnwise maxima */
-    IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
-    IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
-    while (!igraph_spmatrix_iter_end(&mit)) {
-        if (mit.value > VECTOR(rowmax)[mit.ri]) {
-            VECTOR(rowmax)[mit.ri] = mit.value;
+    igraph_sparsemat_compress(&mu, &m);
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
+    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
+    while (!igraph_sparsemat_iterator_end(&mit)) {
+        igraph_real_t value = igraph_sparsemat_iterator_get(&mit);
+        int row = igraph_sparsemat_iterator_row(&mit);
+        int col = igraph_sparsemat_iterator_col(&mit);
+        if (value > VECTOR(rowmax)[row]) {
+            VECTOR(rowmax)[row] = value;
         }
-        if (mit.value > VECTOR(colmax)[mit.ci]) {
-            VECTOR(colmax)[mit.ci] = mit.value;
+        if (value > VECTOR(colmax)[col]) {
+            VECTOR(colmax)[col] = value;
         }
-        igraph_spmatrix_iter_next(&mit);
+        igraph_sparsemat_iterator_next(&mit);
     }
-    igraph_spmatrix_iter_destroy(&mit);
-    IGRAPH_FINALLY_CLEAN(1);
 
     /* Calculate the distances */
     *distance12 = (igraph_integer_t) (n - igraph_vector_sum(&rowmax));
@@ -729,8 +737,9 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, co
 
     igraph_vector_destroy(&rowmax);
     igraph_vector_destroy(&colmax);
-    igraph_spmatrix_destroy(&m);
-    IGRAPH_FINALLY_CLEAN(3);
+    igraph_sparsemat_destroy(&m);
+    igraph_sparsemat_destroy(&mu);
+    IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
 }
@@ -760,8 +769,9 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, co
 static igraph_error_t igraph_i_compare_communities_rand(
         const igraph_vector_t *v1, const igraph_vector_t *v2,
         igraph_real_t *result, igraph_bool_t adjust) {
-    igraph_spmatrix_t m;
-    igraph_spmatrix_iter_t mit;
+    igraph_sparsemat_t m;
+    igraph_sparsemat_t mu; /* uncompressed */
+    igraph_sparsemat_iterator_t mit;
     igraph_vector_t rowsums, colsums;
     long int i, nrow, ncol;
     double rand, n;
@@ -773,9 +783,9 @@ static igraph_error_t igraph_i_compare_communities_rand(
     }
 
     /* Calculate the confusion matrix */
-    IGRAPH_CHECK(igraph_spmatrix_init(&m, 1, 1));
-    IGRAPH_FINALLY(igraph_spmatrix_destroy, &m);
-    IGRAPH_CHECK(igraph_i_confusion_matrix(v1, v2, &m));
+    IGRAPH_CHECK(igraph_sparsemat_init(&mu, 1, 1, 0));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &mu);
+    IGRAPH_CHECK(igraph_i_confusion_matrix(v1, v2, &mu));
 
     /* The unadjusted Rand index is defined as (a+d) / (a+b+c+d), where:
      *
@@ -807,24 +817,26 @@ static igraph_error_t igraph_i_compare_communities_rand(
      */
 
     /* Calculate row and column sums */
-    nrow = igraph_spmatrix_nrow(&m);
-    ncol = igraph_spmatrix_ncol(&m);
+    nrow = igraph_sparsemat_nrow(&mu);
+    ncol = igraph_sparsemat_ncol(&mu);
     n = igraph_vector_size(v1) + 0.0;
     IGRAPH_VECTOR_INIT_FINALLY(&rowsums, nrow);
     IGRAPH_VECTOR_INIT_FINALLY(&colsums, ncol);
-    IGRAPH_CHECK(igraph_spmatrix_rowsums(&m, &rowsums));
-    IGRAPH_CHECK(igraph_spmatrix_colsums(&m, &colsums));
+    IGRAPH_CHECK(igraph_sparsemat_rowsums(&mu, &rowsums));
+    IGRAPH_CHECK(igraph_sparsemat_colsums(&mu, &colsums));
 
     /* Start calculating the unadjusted Rand index */
     rand = 0.0;
-    IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, &m));
-    IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
-    while (!igraph_spmatrix_iter_end(&mit)) {
-        rand += (mit.value / n) * (mit.value - 1) / (n - 1);
-        igraph_spmatrix_iter_next(&mit);
+    igraph_sparsemat_compress(&mu, &m);
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
+    igraph_sparsemat_dupl(&m);
+
+    IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
+    while (!igraph_sparsemat_iterator_end(&mit)) {
+        igraph_real_t value = igraph_sparsemat_iterator_get(&mit);
+        rand += (value / n) * (value - 1) / (n - 1);
+        igraph_sparsemat_iterator_next(&mit);
     }
-    igraph_spmatrix_iter_destroy(&mit);
-    IGRAPH_FINALLY_CLEAN(1);
 
     frac_pairs_in_1 = frac_pairs_in_2 = 0.0;
     for (i = 0; i < nrow; i++) {
@@ -844,8 +856,9 @@ static igraph_error_t igraph_i_compare_communities_rand(
 
     igraph_vector_destroy(&rowsums);
     igraph_vector_destroy(&colsums);
-    igraph_spmatrix_destroy(&m);
-    IGRAPH_FINALLY_CLEAN(3);
+    igraph_sparsemat_destroy(&m);
+    igraph_sparsemat_destroy(&mu);
+    IGRAPH_FINALLY_CLEAN(4);
 
     *result = rand;
 

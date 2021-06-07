@@ -59,8 +59,8 @@
 #include "internal/hacks.h"
 
 int igraph_ncol_yyerror(YYLTYPE* locp,
-			igraph_i_ncol_parsedata_t *context,
-			const char *s);
+                        igraph_i_ncol_parsedata_t *context,
+                        const char *s);
 igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 
 #define scanner context->scanner
@@ -104,36 +104,36 @@ edge :   edgeid edgeid NEWLINE        {
            igraph_vector_push_back(context->vector, $1);
            igraph_vector_push_back(context->vector, $2);
            igraph_vector_push_back(context->weights, $3);
-	   context->has_weights = 1;
+           context->has_weights = 1;
        }
 ;
 
 edgeid : ALNUM  { igraph_trie_get2(context->trie,
-				   igraph_ncol_yyget_text(scanner),
-				   igraph_ncol_yyget_leng(scanner),
-				   &$$); };
+                  igraph_ncol_yyget_text(scanner),
+                  igraph_ncol_yyget_leng(scanner),
+                  &$$); };
 
 weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yyget_text(scanner),
-					    igraph_ncol_yyget_leng(scanner)); } ;
+                        igraph_ncol_yyget_leng(scanner)); } ;
 
 %%
 
 int igraph_ncol_yyerror(YYLTYPE* locp,
-			igraph_i_ncol_parsedata_t *context,
-			const char *s) {
-  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
-	   "Parse error in NCOL file, line %i (%s)",
-	   locp->first_line, s);
-  return 0;
+            igraph_i_ncol_parsedata_t *context,
+            const char *s) {
+    snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
+            "Parse error in NCOL file, line %i (%s)",
+            locp->first_line, s);
+    return 0;
 }
 
 igraph_real_t igraph_ncol_get_number(const char *str, long int length) {
-  igraph_real_t num;
-  char *tmp=IGRAPH_CALLOC(length+1, char);
+    igraph_real_t num;
+    char *tmp=IGRAPH_CALLOC(length+1, char);
 
-  strncpy(tmp, str, length);
-  tmp[length]='\0';
-  sscanf(tmp, "%lf", &num);
-  IGRAPH_FREE(tmp);
-  return num;
+    strncpy(tmp, str, length);
+    tmp[length]='\0';
+    sscanf(tmp, "%lf", &num);
+    IGRAPH_FREE(tmp);
+    return num;
 }

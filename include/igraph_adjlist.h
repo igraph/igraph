@@ -56,7 +56,7 @@ IGRAPH_EXPORT void igraph_adjlist_destroy(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_clear(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_sort(igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al);
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
                                                                     igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
@@ -88,7 +88,7 @@ IGRAPH_EXPORT igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igr
 IGRAPH_EXPORT igraph_integer_t igraph_inclist_size(const igraph_inclist_t *al);
 IGRAPH_EXPORT void igraph_inclist_destroy(igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_inclist_clear(igraph_inclist_t *il);
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph,
                                                                     igraph_inclist_t *il);
 IGRAPH_EXPORT igraph_error_t igraph_inclist_print(const igraph_inclist_t *il);
 IGRAPH_EXPORT igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);

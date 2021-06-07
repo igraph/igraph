@@ -4,8 +4,17 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<section id="igraph-SparseMatrices">
-<title>Sparse matrices</title>
+<section id="igraph-SparseMatrices-deprecated">
+<title>Sparse matrices (deprecated variant)</title>
+
+<warning>
+<para>
+All the functions and data types described in this section are deprecated from
+igraph 0.10. Do not use them in new code. They will be removed in igraph 0.11
+or igraph 1.0, whichever comes first. Replacements to the functions are provided
+in the documentation below where a replacement exists.
+</para>
+</warning>
 
 <section id="about-spmatrix">
 <!-- doxrox-include about_igraph_spmatrix_t_objects -->

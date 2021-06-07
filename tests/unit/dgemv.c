@@ -80,5 +80,7 @@ int main() {
     igraph_vector_destroy(&x);
     igraph_matrix_destroy(&A);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

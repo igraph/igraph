@@ -85,14 +85,11 @@ add_legacy_tests(
   igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
-  igraph_spmatrix_add_col_values
   igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
-  spmatrix
-  spmatrix_clear
   stack
   strvector_set2_remove_print
   vector
@@ -258,10 +255,13 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   efficiency
+  global_transitivity
+  igraph_adjacent_triangles
   igraph_are_connected
   igraph_average_path_length
   igraph_average_path_length_dijkstra
   igraph_betweenness
+  igraph_betweenness_subset
   igraph_closeness
   igraph_convergence_degree
   igraph_count_multiple
@@ -269,6 +269,7 @@ add_legacy_tests(
   igraph_diversity
   igraph_eccentricity
   igraph_edge_betweenness
+  igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
@@ -277,6 +278,7 @@ add_legacy_tests(
   igraph_is_mutual
   igraph_is_tree
   igraph_list_triangles
+  igraph_local_scan_k_ecount
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs
@@ -467,7 +469,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
-  igraph_get_adjacency_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist

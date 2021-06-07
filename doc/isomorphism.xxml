@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Isomorphism">
-<title>Graph Isomorphism</title>
+<title>Graph isomorphism</title>
 
 <section id="isomorphism-simple-interface"><title>The simple interface</title>
 <!-- doxrox-include about_graph_isomorphism -->

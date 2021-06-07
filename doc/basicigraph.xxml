@@ -88,14 +88,14 @@ To eliminate multiple edges from a graph, you can use
 <section id="basic-interface"><title>The basic interface</title>
 <!-- doxrox-include about_basic_interface -->
 
-<section id="graph-constructors-and-destructors"><title>Graph Constructors and Destructors</title>
+<section id="graph-constructors-and-destructors"><title>Graph constructors and destructors</title>
 <!-- doxrox-include igraph_empty -->
 <!-- doxrox-include igraph_empty_attrs -->
 <!-- doxrox-include igraph_copy -->
 <!-- doxrox-include igraph_destroy -->
 </section>
 
-<section id="basic-query-operations"><title>Basic Query Operations</title>
+<section id="basic-query-operations"><title>Basic query operations</title>
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
 <!-- doxrox-include igraph_edge -->
@@ -113,7 +113,7 @@ To eliminate multiple edges from a graph, you can use
 <!-- doxrox-include igraph_degree -->
 </section>
 
-<section id="adding-and-deleting-vertices-and-edges"><title>Adding and Deleting Vertices and Edges</title>
+<section id="adding-and-deleting-vertices-and-edges"><title>Adding and deleting vertices and edges</title>
 <!-- doxrox-include igraph_add_edge -->
 <!-- doxrox-include igraph_add_edges -->
 <!-- doxrox-include igraph_add_vertices -->

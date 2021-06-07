@@ -5,9 +5,9 @@
 ]>
 
 <chapter id="igraph-Flows">
-<title>Maximum Flows, Minimum Cuts and related measures</title>
+<title>Maximum flows, minimum cuts and related measures</title>
 
-<section id="maximum-flows"><title>Maximum Flows</title>
+<section id="maximum-flows"><title>Maximum flows</title>
 <!-- doxrox-include igraph_maxflow -->
 <!-- doxrox-include igraph_maxflow_value -->
 <!-- doxrox-include igraph_dominator_tree -->
@@ -31,17 +31,17 @@
 <!-- doxrox-include igraph_vertex_connectivity -->
 </section>
 
-<section id="edge-and-vertex-disjoint-paths"><title>Edge- and Vertex-Disjoint Paths</title>
+<section id="edge-and-vertex-disjoint-paths"><title>Edge- and vertex-disjoint paths</title>
 <!-- doxrox-include igraph_edge_disjoint_paths -->
 <!-- doxrox-include igraph_vertex_disjoint_paths -->
 </section>
 
-<section id="graph-adhesion-and-cohesion"><title>Graph Adhesion and Cohesion</title>
+<section id="graph-adhesion-and-cohesion"><title>Graph adhesion and cohesion</title>
 <!-- doxrox-include igraph_adhesion -->
 <!-- doxrox-include igraph_cohesion -->
 </section>
 
-<section id="cohesive-blocks"><title>Cohesive Blocks</title>
+<section id="cohesive-blocks"><title>Cohesive blocks</title>
 <!-- doxrox-include igraph_cohesive_blocks -->
 </section>
 

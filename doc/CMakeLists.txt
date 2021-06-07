@@ -46,7 +46,7 @@ set(
   random.xxml
   separators.xxml
   sparsemat.xxml
-  sparsematrix.xxml
+  spmatrix.xxml
   spatialgames.xxml
   stack.xxml
   status.xxml

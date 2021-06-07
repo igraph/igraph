@@ -13,7 +13,7 @@ working with large graphs.
 See https://igraph.org for installation instructions
 and documentation.
 
-Igraph can also be used from:
+igraph can also be used from:
 
  - R — https://github.com/igraph/rigraph
  - Python — https://github.com/igraph/python-igraph

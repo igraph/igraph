@@ -48,6 +48,8 @@
  * \param ncol The number of columns in the matrix.
  * \return Error code.
  *
+ * \deprecated-by igraph_sparsemat_init 0.10.0
+ *
  * Time complexity: operating system dependent.
  */
 
@@ -73,6 +75,8 @@ igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long in
  * it again.
  * \param m The matrix to destroy.
  *
+ * \deprecated-by igraph_sparsemat_destroy 0.10.0
+ *
  * Time complexity: operating system dependent.
  */
 
@@ -97,6 +101,8 @@ void igraph_spmatrix_destroy(igraph_spmatrix_t *m) {
  *
  * Time complexity: O(n), the number
  * of elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_copy 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
@@ -126,6 +132,8 @@ igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix
  *
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
+ *
+ * \deprecated-by igraph_sparsemat_index 0.10.0
  */
 igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
                                 long int row, long int col) {
@@ -175,6 +183,8 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
  *
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
+ *
+ * \deprecated-by igraph_sparsemat_entry 0.10.0
  */
 igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
                         igraph_real_t value) {
@@ -274,6 +284,8 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
  *
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
+ *
+ * \deprecated-by igraph_sparsemat_entry 0.10.0
  */
 igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
                           igraph_real_t value) {
@@ -363,6 +375,8 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long in
  * \param to The index of the column to be added to.
  * \param from The index of the column to be added.
  * \return Error code.
+ *
+ * \deprecated 0.10.0
  */
 igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from) {
     long int i;
@@ -399,6 +413,8 @@ igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to,
  *
  * Time complexity: O(n).
  * n is the number of elements in the old matrix.
+ *
+ * \deprecated-by igraph_sparsemat_resize 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
@@ -442,6 +458,8 @@ igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long 
  * \return The size of the matrix.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_count_nonzero 0.10.0
  */
 
 long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
@@ -475,6 +493,8 @@ long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
  * \return The number of rows in the matrix.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_nrow 0.10.0
  */
 
 long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
@@ -491,6 +511,8 @@ long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
  * \return The number of columns in the sparse matrix.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_ncol 0.10.0
  */
 
 long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
@@ -511,9 +533,9 @@ long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
  * \param to Pointer to a C array, the place to copy the data to.
  * \return Error code.
  *
- * Time complexity: O(n),
- * n is the number of
- * elements in the matrix.
+ * Time complexity: O(n), n is the number of elements in the matrix.
+ *
+ * \deprecated 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
@@ -537,6 +559,8 @@ igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t
  *
  * Time complexity: O(n),
  * n is the number of columns in the matrix
+ *
+ * \deprecated-by igraph_sparsemat_droptol 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
@@ -556,6 +580,8 @@ igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
  * \return Error code.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_add_cols 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
@@ -572,6 +598,8 @@ igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
  * \return Error code.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_add_rows 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
@@ -587,6 +615,8 @@ igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
  * \return Error code.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_scale_rows 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
@@ -680,6 +710,8 @@ static igraph_error_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
  * \return Error code.
  *
  * Time complexity: TODO
+ *
+ * \deprecated-by igraph_sparsemat_scale_cols 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
@@ -709,6 +741,8 @@ igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
  * \param by The constant.
  *
  * Time complexity: O(n), the number of elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_scale 0.10.0
  */
 
 void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
@@ -724,6 +758,8 @@ void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
  *   The vector will be resized as needed.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_colsums 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
@@ -747,6 +783,8 @@ igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector
  *   The vector will be resized as needed.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_rowsums 0.10.0
  */
 
 igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
@@ -772,6 +810,8 @@ igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector
  * \param cidx the column index of the maximum element if not \c NULL.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated 0.10.0
  */
 igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
         igraph_real_t *ridx, igraph_real_t *cidx) {
@@ -819,6 +859,8 @@ igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
  * \param cidx the column index of the maximum element if not \c NULL.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated 0.10.0
  */
 igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
                                   igraph_real_t *ridx, igraph_real_t *cidx) {
@@ -916,6 +958,8 @@ static igraph_error_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spm
  * \return  Error code. The current implementation is always successful.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_init 0.10.0
  */
 igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
     mit->m = m;
@@ -934,6 +978,8 @@ igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const ig
  * \return  Error code. The current implementation is always successful.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_reset 0.10.0
  */
 igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
     IGRAPH_ASSERT(mit->m);
@@ -964,6 +1010,8 @@ igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
  * \return  Error code. The current implementation is always successful.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_next 0.10.0
  */
 igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
     mit->pos++;
@@ -995,6 +1043,8 @@ igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
  *           FALSE (0) otherwise.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_end 0.10.0
  */
 igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
     return mit->pos >= igraph_spmatrix_count_nonzero(mit->m);
@@ -1015,6 +1065,8 @@ igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
  * \param  mit  pointer to the matrix iterator being destroyed
  *
  * Time complexity: O(1).
+ *
+ * \deprecated 0.10.0
  */
 void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
     IGRAPH_UNUSED(mit);
@@ -1032,6 +1084,8 @@ void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
  * \return Error code.
  *
  * Time complexity: O(n), the number of non-zero elements.
+ *
+ * \deprecated-by igraph_sparsemat_print 0.10.0
  */
 igraph_error_t igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
     return igraph_spmatrix_fprint(matrix, stdout);
@@ -1048,6 +1102,8 @@ igraph_error_t igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
  * \return Error code.
  *
  * Time complexity: O(n), the number of non-zero elements.
+ *
+ * \deprecated-by igraph_sparsemat_print 0.10.0
  */
 igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
     igraph_spmatrix_iter_t mit;
