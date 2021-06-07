@@ -906,14 +906,6 @@ igraph_random_walk:
 # Degree sequences
 #######################################
 
-igraph_is_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
-        NAME-R: is_degseq
-
-igraph_is_graphical_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
-        NAME-R: is_graphical
-
 #######################################
 # Visitors
 #######################################

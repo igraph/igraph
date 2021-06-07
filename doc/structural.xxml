@@ -85,8 +85,6 @@
 <section id="degree-sequences"><title>Degree sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
-<!-- doxrox-include igraph_is_degree_sequence -->
-<!-- doxrox-include igraph_is_graphical_degree_sequence -->
 </section>
 
 <section id="centrality-measures"><title>Centrality measures</title>

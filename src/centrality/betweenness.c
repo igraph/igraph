@@ -36,7 +36,7 @@
  * avoid an expensive IGRAPH_OTHER() lookup on edge IDs. The cost of this macro
  * comes from the inability of the branch predictor to predict accurately whether
  * the condition in the macro will be true or not.
- * 
+ *
  * The following four functions are very similar in their structure. If you make
  * a modification to one of them, consider whether the same modification makes
  * sense in the context of the remaining three functions as well.
@@ -62,7 +62,7 @@
 static int igraph_i_sspf(
     const igraph_t *graph,
     long int source,
-    igraph_vector_t *dist, 
+    igraph_vector_t *dist,
     double *nrgeo,
     igraph_stack_t *stack,
     igraph_adjlist_t *fathers,
@@ -75,7 +75,7 @@ static int igraph_i_sspf(
     long int nlen;
 
     IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
-    
+
     IGRAPH_CHECK(igraph_dqueue_push(&queue, source));
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
@@ -120,7 +120,7 @@ static int igraph_i_sspf(
     igraph_dqueue_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return IGRAPH_SUCCESS; 
+    return IGRAPH_SUCCESS;
 }
 
 /*
@@ -140,7 +140,7 @@ static int igraph_i_sspf(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_vector_t *dist, 
+static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_vector_t *dist,
     double *nrgeo,
     igraph_stack_t *stack,
     igraph_inclist_t *fathers,
@@ -153,7 +153,7 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
     long int nlen;
 
     IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
-    
+
     IGRAPH_CHECK(igraph_dqueue_push(&queue, source));
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
@@ -199,7 +199,7 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
     igraph_dqueue_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return IGRAPH_SUCCESS; 
+    return IGRAPH_SUCCESS;
 }
 
 /*
@@ -222,9 +222,9 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
  */
 static int igraph_i_sspf_weighted(
     const igraph_t *graph,
-    long int source, 
-    igraph_vector_t *dist, 
-    double *nrgeo, 
+    long int source,
+    igraph_vector_t *dist,
+    double *nrgeo,
     const igraph_vector_t *weights,
     igraph_stack_t *stack,
     igraph_adjlist_t *fathers,
@@ -232,13 +232,13 @@ static int igraph_i_sspf_weighted(
     igraph_real_t cutoff
 ) {
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
-    
+
     int cmp_result;
     igraph_2wheap_t queue;
     const igraph_vector_int_t *neis;
     igraph_vector_int_t *v;
     long int nlen;
-    
+
     /* TODO: this is an O|V| step here. We could save some time by pre-allocating
      * the two-way heap in the caller and re-using it here */
     IGRAPH_CHECK(igraph_2wheap_init(&queue, (long int) igraph_vcount(graph)));
@@ -332,8 +332,8 @@ static int igraph_i_sspf_weighted(
 static int igraph_i_sspf_weighted_edge(
     const igraph_t *graph,
     long int source,
-    igraph_vector_t *dist, 
-    double *nrgeo, 
+    igraph_vector_t *dist,
+    double *nrgeo,
     const igraph_vector_t *weights,
     igraph_stack_t *stack,
     igraph_inclist_t *fathers,
@@ -347,7 +347,7 @@ static int igraph_i_sspf_weighted_edge(
     const igraph_vector_int_t *neis;
     igraph_vector_int_t *v;
     long int nlen;
-    
+
     /* TODO: this is an O|V| step here. We could save some time by pre-allocating
      * the two-way heap in the caller and re-using it here */
     IGRAPH_CHECK(igraph_2wheap_init(&queue, (long int) igraph_vcount(graph)));
@@ -682,61 +682,6 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     return IGRAPH_SUCCESS;
 }
 
-
-/**
- * \ingroup structural
- * \function igraph_betweenness_estimate
- * \brief Estimated betweenness centrality of some vertices.
- *
- * \deprecated-by igraph_betweenness_cutoff 0.9
- *
- * </para><para>
- * The betweenness centrality of a vertex is the number of geodesics
- * going through it. If there are more than one geodesic between two
- * vertices, the value of these geodesics are weighted by one over the
- * number of geodesics. When estimating betweenness centrality, igraph
- * takes into consideration only those paths that are shorter than or
- * equal to a prescribed length. Note that the estimated centrality
- * will always be less than the real one.
- *
- * \param graph The graph object.
- * \param res The result of the computation, a vector containing the
- *        estimated betweenness scores for the specified vertices.
- * \param vids The vertices of which the betweenness centrality scores
- *        will be estimated.
- * \param directed Logical, if true directed paths will be considered
- *        for directed graphs. It is ignored for undirected graphs.
- * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact betweenness will be calculated, and
- *        there will be no upper limit on path lengths.
- * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. No edge weight may be NaN.
- *        Supply a null pointer here for unweighted betweenness.
- * \return Error code:
- *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex id passed in
- *        \p vids.
- *
- * Time complexity: O(|V||E|),
- * |V| and
- * |E| are the number of vertices and
- * edges in the graph.
- * Note that the time complexity is independent of the number of
- * vertices for which the score is calculated.
- *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
- *     See \ref igraph_edge_betweenness() for calculating the betweenness score
- *     of the edges in a graph.
- */
-
-int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
-                                const igraph_vs_t vids, igraph_bool_t directed,
-                                igraph_real_t cutoff, const igraph_vector_t *weights) {
-    IGRAPH_WARNING("igraph_betweenness_estimate is deprecated, use igraph_betweenness_cutoff.");
-    return igraph_betweenness_cutoff(graph, res, vids, directed, weights, cutoff);
-}
-
 /***** Edge betweenness *****/
 
 
@@ -919,52 +864,6 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
 /**
  * \ingroup structural
- * \function igraph_edge_betweenness_estimate
- * \brief Estimated betweenness centrality of the edges.
- *
- * \deprecated-by igraph_edge_betweenness_cutoff 0.9
- *
- * The betweenness centrality of an edge is the number of geodesics
- * going through it. If there are more than one geodesics between two
- * vertices, the value of these geodesics are weighted by one over the
- * number of geodesics. When estimating betweenness centrality, igraph
- * takes into consideration only those paths that are shorter than or
- * equal to a prescribed length. Note that the estimated centrality
- * will always be less than the real one.
- *
- * \param graph The graph object.
- * \param result The result of the computation, vector containing the
- *        betweenness scores for the edges.
- * \param directed Logical, if true directed paths will be considered
- *        for directed graphs. It is ignored for undirected graphs.
- * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact betweenness will be calculated (no
- *        upper limit on path lengths).
- * \param weights An optional weight vector for weighted betweenness.
- *        No edge weight may be NaN. Supply a null pointer here for
- *        unweighted betweenness.
- * \return Error code:
- *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
- *
- * Time complexity: O(|V||E|),
- * |V| and
- * |E| are the number of vertices and
- * edges in the graph.
- *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
- *     See \ref igraph_betweenness() for calculating the betweenness score
- *     of the vertices in a graph.
- */
-int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                                   igraph_bool_t directed, igraph_real_t cutoff,
-                                   const igraph_vector_t *weights) {
-    IGRAPH_WARNING("igraph_edge_betweenness_estimate is deprecated, use igraph_edge_betweenness_cutoff.");
-    return igraph_edge_betweenness_cutoff(graph, result, directed, weights, cutoff);
-}
-
-/**
- * \ingroup structural
  * \function igraph_betweenness_subset
  * \brief Betweenness centrality for a subset of source and target vertices.
  *
@@ -1058,7 +957,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     if (is_target == 0) {
         IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, is_target); 
+    IGRAPH_FINALLY(igraph_free, is_target);
 
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -1135,7 +1034,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                 father = (long int) VECTOR(*fatv)[j];
                 tmpscore[father] += nrgeo[father] * coeff;
             }
-            
+
             if (actnode != source) {
                 VECTOR(*tmpres)[actnode] += tmpscore[actnode];
             }
