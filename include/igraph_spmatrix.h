@@ -58,36 +58,39 @@ typedef struct s_spmatrix {
     do { IGRAPH_CHECK(igraph_spmatrix_init(m, nr, nc)); \
         IGRAPH_FINALLY(igraph_spmatrix_destroy, m); } while (0)
 
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol);
-IGRAPH_EXPORT void igraph_spmatrix_destroy(igraph_spmatrix_t *m);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol);
+IGRAPH_EXPORT IGRAPH_DEPRECATED void igraph_spmatrix_destroy(igraph_spmatrix_t *m);
+/* igraph_spmatrix_resize not marked as deprecated yet because igraph_get_adjacency_sparse() uses it */
 IGRAPH_EXPORT igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol);
+/* igraph_spmatrix_e not marked as deprecated yet because igraph_get_adjacency_sparse() uses it */
 IGRAPH_EXPORT igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m, long int row, long int col);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
                                       igraph_real_t value);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
                                         igraph_real_t value);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from);
-IGRAPH_EXPORT long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m);
-IGRAPH_EXPORT long int igraph_spmatrix_size(const igraph_spmatrix_t *m);
-IGRAPH_EXPORT long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m);
-IGRAPH_EXPORT long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m);
+IGRAPH_EXPORT IGRAPH_DEPRECATED long int igraph_spmatrix_size(const igraph_spmatrix_t *m);
+IGRAPH_EXPORT IGRAPH_DEPRECATED long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m);
+IGRAPH_EXPORT IGRAPH_DEPRECATED long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to);
+/* igraph_spmatrix_null not marked as deprecated yet because igraph_get_adjacency_sparse() uses it */
 IGRAPH_EXPORT igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from);
-IGRAPH_EXPORT igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
                                                         igraph_real_t *ridx, igraph_real_t *cidx);
-IGRAPH_EXPORT igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
                                                 igraph_real_t *ridx, igraph_real_t *cidx);
-IGRAPH_EXPORT void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
+IGRAPH_EXPORT IGRAPH_DEPRECATED void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_print(const igraph_spmatrix_t *matrix);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t *matrix, FILE* file);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_print(const igraph_spmatrix_t *matrix);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t *matrix, FILE* file);
 
 
 typedef struct s_spmatrix_iter {
@@ -98,11 +101,11 @@ typedef struct s_spmatrix_iter {
     igraph_real_t value;        /* value at the given cell */
 } igraph_spmatrix_iter_t;
 
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit);
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit);
-IGRAPH_EXPORT igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit);
-IGRAPH_EXPORT void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit);
+IGRAPH_EXPORT IGRAPH_DEPRECATED void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit);
 
 __END_DECLS
 

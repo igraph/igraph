@@ -85,14 +85,11 @@ add_legacy_tests(
   igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
-  igraph_spmatrix_add_col_values
   igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
-  spmatrix
-  spmatrix_clear
   stack
   strvector_set2_remove_print
   vector
@@ -472,7 +469,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
-  igraph_get_adjacency_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist

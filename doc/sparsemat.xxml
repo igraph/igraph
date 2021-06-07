@@ -4,8 +4,8 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<section id="igraph-SparseMatrices2">
-<title>Sparse matrices, another kind</title>
+<section id="igraph-SparseMatrices">
+<title>Sparse matrices</title>
 
 <section id="about-sparsemat">
 <!-- doxrox-include about_sparsemat -->

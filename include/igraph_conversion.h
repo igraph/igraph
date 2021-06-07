@@ -41,7 +41,7 @@ __BEGIN_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
                                        igraph_get_adjacency_t type, igraph_bool_t eids);
-IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
                                               igraph_get_adjacency_t type);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_stochastic(const igraph_t *graph,
