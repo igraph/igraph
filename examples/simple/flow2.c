@@ -32,8 +32,8 @@ int check_flow(int errorinc,
                const igraph_vector_t *capacity,
                igraph_bool_t print) {
 
-    long int i, n = igraph_vcount(graph), m = igraph_ecount(graph);
-    long int nc = igraph_vector_size(cut);
+    igraph_integer_t i, n = igraph_vcount(graph), m = igraph_ecount(graph);
+    igraph_integer_t nc = igraph_vector_size(cut);
     igraph_vector_t inedges, outedges;
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_real_t cutsize;

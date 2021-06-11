@@ -80,7 +80,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
 
 int check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
                        const igraph_vector_int_t* inbound, int start, int error_code) {
-    long int i, n = igraph_vcount(graph);
+    igraph_integer_t i, n = igraph_vcount(graph);
 
     if (igraph_vector_int_size(pred) != n ||
         igraph_vector_int_size(inbound) != n) {

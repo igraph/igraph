@@ -330,18 +330,18 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
                             igraph_bool_t normalized,
                             igraph_real_t cutoff) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t already_counted;
     igraph_vector_int_t *neis;
-    long int i, j;
-    long int nodes_reached;
+    igraph_integer_t i, j;
+    igraph_integer_t nodes_reached;
     igraph_adjlist_t allneis;
 
-    long int actdist = 0;
+    igraph_integer_t actdist = 0;
 
     igraph_dqueue_t q;
 
-    long int nodes_to_calc;
+    igraph_integer_t nodes_to_calc;
     igraph_vit_t vit;
 
     if (weights) {
@@ -451,17 +451,17 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
                                                    igraph_bool_t normalized,
                                                    igraph_real_t cutoff) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t already_counted;
     igraph_vector_int_t *neis;
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_adjlist_t allneis;
 
-    long int actdist = 0;
+    igraph_integer_t actdist = 0;
 
     igraph_dqueue_t q;
 
-    long int nodes_to_calc;
+    igraph_integer_t nodes_to_calc;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -552,15 +552,15 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
     /* See igraph_shortest_paths_dijkstra() for the implementation
        details and the dirty tricks. */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     igraph_2wheap_t Q;
     igraph_vit_t vit;
-    long int nodes_to_calc;
+    igraph_integer_t nodes_to_calc;
 
     igraph_lazy_inclist_t inclist;
-    long int i, j;
+    igraph_integer_t i, j;
 
     igraph_vector_t dist;
     igraph_vector_int_t which;
@@ -609,7 +609,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
             igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
             igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            long int nlen = igraph_vector_int_size(neis);
+            igraph_integer_t nlen = igraph_vector_int_size(neis);
 
             mindist = -igraph_2wheap_delete_max(&Q);
 
@@ -623,8 +623,8 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
             }
 
             for (j = 0; j < nlen; j++) {
-                long int edge = VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t edge = VECTOR(*neis)[j];
+                igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
 

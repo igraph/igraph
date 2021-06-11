@@ -37,7 +37,7 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
                                           igraph_bool_t directed, igraph_real_t damping,
                                           const igraph_vector_t *reset,
                                           const igraph_vector_t *weights) {
-    long int i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
     igraph_vit_t vit;
     double *u = nullptr;
     double *v = nullptr;

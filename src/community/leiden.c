@@ -663,7 +663,7 @@ static igraph_error_t igraph_i_community_leiden_quality(
     igraph_vector_t cluster_weights;
     igraph_real_t total_edge_weight = 0.0;
     igraph_eit_t eit;
-    long int i, c, n = igraph_vcount(graph);;
+    igraph_integer_t i, c, n = igraph_vcount(graph);;
 
     *quality = 0.0;
 
@@ -718,7 +718,7 @@ static igraph_error_t igraph_i_community_leiden(
         const igraph_real_t resolution_parameter, const igraph_real_t beta,
         igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_integer_t nb_refined_clusters;
-    long int i, c, n = igraph_vcount(graph);
+    igraph_integer_t i, c, n = igraph_vcount(graph);
     igraph_t aggregated_graph, *i_graph;
     igraph_vector_t aggregated_edge_weights, aggregated_node_weights, aggregated_membership;
     igraph_vector_t *i_edge_weights, *i_node_weights, *i_membership;

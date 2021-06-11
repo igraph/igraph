@@ -1333,9 +1333,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_vector_t tmp;
     igraph_vector_t normalized_reset;
 
-    long int i;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (reset && igraph_vector_size(reset) != no_of_nodes) {
         IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
@@ -1492,8 +1492,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         /* Weighted degree */
         for (i = 0; i < no_of_edges; i++) {
-            long int from = IGRAPH_FROM(graph, i);
-            long int to = IGRAPH_TO(graph, i);
+            igraph_integer_t from = IGRAPH_FROM(graph, i);
+            igraph_integer_t to = IGRAPH_TO(graph, i);
             igraph_real_t weight = VECTOR(*weights)[i];
             if (weight < 0 && !negative_weight_warned) {
                 IGRAPH_WARNING("Replacing negative weights with zeros during PageRank calculation.");
@@ -1541,9 +1541,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     }
 
     if (vector) {
-        long int i;
+        igraph_integer_t i;
         igraph_vit_t vit;
-        long int nodes_to_calc;
+        igraph_integer_t nodes_to_calc;
         igraph_real_t sum = 0;
 
         for (i = 0; i < no_of_nodes; i++) {

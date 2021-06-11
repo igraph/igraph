@@ -25,12 +25,12 @@
 #include <igraph.h>
 
 void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *memberships, igraph_vector_t *modularity, FILE* f) {
-    long int i, j, no_of_nodes = igraph_vcount(g);
+    igraph_integer_t i, j, no_of_nodes = igraph_vcount(g);
 
     j = igraph_vector_which_max(modularity);
     for (i = 0; i < igraph_vector_size(membership); i++) {
         if (VECTOR(*membership)[i] != MATRIX(*memberships, j, i)) {
-            fprintf(f, "WARNING: best membership vector element %li does not match the best one in the membership matrix\n", i);
+            fprintf(f, "WARNING: best membership vector element %" IGRAPH_PRId " does not match the best one in the membership matrix\n", i);
         }
     }
 

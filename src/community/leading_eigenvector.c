@@ -487,16 +487,16 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         igraph_community_leading_eigenvector_callback_t *callback,
         void *callback_extra) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_dqueue_t tosplit;
     igraph_vector_t idx, idx2, mymerges;
     igraph_vector_t strength, tmp;
-    long int staken = 0;
+    igraph_integer_t staken = 0;
     igraph_adjlist_t adjlist;
     igraph_inclist_t inclist;
-    long int i, j, k, l;
-    long int communities;
+    igraph_integer_t i, j, k, l;
+    igraph_integer_t communities;
     igraph_vector_t vmembership, *mymembership = membership;
     igraph_i_community_leading_eigenvector_data_t extra;
     igraph_arpack_storage_t storage;
@@ -652,9 +652,9 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     extra.mymembership = mymembership;
 
     while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
-        long int comm = igraph_dqueue_pop_back(&tosplit);
+        igraph_integer_t comm = igraph_dqueue_pop_back(&tosplit);
         /* depth first search */
-        long int size = 0;
+        igraph_integer_t size = 0;
         igraph_real_t tmpev;
 
         IGRAPH_STATUSF(("Trying to split community %li... ", 0, comm));
@@ -742,7 +742,6 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
 
         {
-            int i;
             igraph_error_handler_t *errh =
                 igraph_set_error_handler(igraph_i_error_handler_none);
             igraph_arpack_rssolve(arpcb1, &extra, options, &storage,
@@ -1010,9 +1009,9 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
                                       igraph_vector_t *membership,
                                       igraph_vector_t *csize) {
 
-    long int no_of_nodes = igraph_vector_size(membership);
+    igraph_integer_t no_of_nodes = igraph_vector_size(membership);
     igraph_vector_t fake_memb;
-    long int components, i;
+    igraph_integer_t components, i;
 
     if (no_of_nodes > 0) {
         components = igraph_vector_max(membership) + 1;

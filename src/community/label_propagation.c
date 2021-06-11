@@ -76,10 +76,10 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                        const igraph_vector_t *initial,
                                        igraph_vector_bool_t *fixed,
                                        igraph_real_t *modularity) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int no_of_not_fixed_nodes = no_of_nodes;
-    long int i, j, k;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_not_fixed_nodes = no_of_nodes;
+    igraph_integer_t i, j, k;
     igraph_adjlist_t al;
     igraph_inclist_t il;
     igraph_bool_t running = 1;
@@ -187,7 +187,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
 
     running = 1;
     while (running) {
-        long int v1, num_neis;
+        igraph_integer_t v1, num_neis;
         igraph_real_t max_count;
         igraph_vector_int_t *neis;
         igraph_vector_int_t *ineis;
