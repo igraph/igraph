@@ -116,14 +116,14 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_push_back(&dist, 0);
     VECTOR(added)[from] = 1;
     while (!igraph_vector_int_empty(&stack)) {
-        int act = igraph_vector_int_tail(&stack);
-        int curdist = igraph_vector_int_tail(&dist);
+        igraph_integer_t act = igraph_vector_int_tail(&stack);
+        igraph_integer_t curdist = igraph_vector_int_tail(&dist);
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        int n = igraph_vector_int_size(neis);
+        igraph_integer_t n = igraph_vector_int_size(neis);
         igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
-        int nei;
+        igraph_integer_t nei;
 
         if (iteration == 0) {
             IGRAPH_ALLOW_INTERRUPTION();
@@ -151,7 +151,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
             }
         } else {
             /* There is no such neighbor, finished with the subtree */
-            int up = igraph_vector_int_pop_back(&stack);
+            igraph_integer_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
             VECTOR(added)[up] = 0;
             VECTOR(nptr)[up] = 0;

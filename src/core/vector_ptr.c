@@ -258,7 +258,7 @@ igraph_bool_t igraph_vector_ptr_empty(const igraph_vector_ptr_t* v) {
  * Time complexity: O(1).
  */
 
-long int igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
+igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
     IGRAPH_ASSERT(v != NULL);
     /*  IGRAPH_ASSERT(v->stor_begin != NULL);       */ /* TODO */
     return v->end - v->stor_begin;
@@ -565,7 +565,7 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
 igraph_error_t igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
                                 const igraph_vector_int_t *idx) {
     void **tmp;
-    int i, n = igraph_vector_int_size(idx);
+    igraph_integer_t i, n = igraph_vector_int_size(idx);
 
     tmp = IGRAPH_CALLOC(n, void*);
     if (!tmp) {
@@ -584,9 +584,9 @@ igraph_error_t igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
 }
 
 igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    long int origsize = igraph_vector_ptr_size(to);
-    long int othersize = igraph_vector_ptr_size(from);
-    long int i;
+    igraph_integer_t origsize = igraph_vector_ptr_size(to);
+    igraph_integer_t othersize = igraph_vector_ptr_size(from);
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_ptr_resize(to, origsize + othersize));
     for (i = 0; i < othersize; i++, origsize++) {
@@ -686,7 +686,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
         igraph_vector_t *inds, cmp_t cmp) {
     unsigned long int i;
     uintptr_t *vind, first;
-    size_t n = (size_t) igraph_vector_ptr_size(v);
+    igraph_integer_t n = igraph_vector_ptr_size(v);
 
     IGRAPH_CHECK(igraph_vector_resize(inds, (long) n));
     if (n == 0) {

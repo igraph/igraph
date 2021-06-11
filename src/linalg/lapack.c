@@ -21,6 +21,8 @@
 
 */
 
+#include <limits.h>
+
 #include "igraph_lapack.h"
 
 #include "igraph_memory.h"
@@ -39,11 +41,11 @@
 static igraph_error_t igraph_vector_int_update_from_fortran(
     igraph_vector_int_t* vec, const igraph_vector_fortran_int_t* fortran_vec
 ) {
-    size_t size = igraph_vector_fortran_int_size(fortran_vec);
+    igraph_integer_t size = igraph_vector_fortran_int_size(fortran_vec);
 
     IGRAPH_CHECK(igraph_vector_int_resize(vec, size));
 
-    for (size_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < size; i++) {
         VECTOR(*vec)[i] = VECTOR(*fortran_vec)[i];
     }
 
@@ -54,12 +56,18 @@ static igraph_error_t igraph_vector_int_update_from_fortran(
 static igraph_error_t igraph_vector_int_copy_to_fortran(
     const igraph_vector_int_t* vec, igraph_vector_fortran_int_t* fortran_vec
 ) {
-    size_t i, size = igraph_vector_int_size(vec);
+    igraph_integer_t i, size = igraph_vector_int_size(vec);
 
     IGRAPH_CHECK(igraph_vector_fortran_int_resize(fortran_vec, size));
 
     for (i = 0; i < size; i++) {
-        VECTOR(*fortran_vec)[i] = VECTOR(*vec)[i];
+        if (VECTOR(*vec)[i] > INT_MAX) {
+            IGRAPH_ERROR(
+                "Overflow error while copying an igraph integer vector to a "
+                "Fortran integer vector.", IGRAPH_EOVERFLOW
+            );
+        }
+        VECTOR(*fortran_vec)[i] = (int) VECTOR(*vec)[i];
     }
 
     return IGRAPH_SUCCESS;

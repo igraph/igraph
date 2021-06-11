@@ -43,7 +43,7 @@ static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_r
                                     int n, void *extra) {
     igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
     IGRAPH_UNUSED(n);
-    igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
+    IGRAPH_CHECK(igraph_blas_dgemv_array(0, 1, matrix, from, 0, to));
     return IGRAPH_SUCCESS;
 }
 
@@ -90,7 +90,7 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
     /* Double centering of the distance matrix */
     IGRAPH_VECTOR_INIT_FINALLY(&row_means, no_of_nodes);
     igraph_vector_fill(&values, 1.0 / no_of_nodes);
-    igraph_blas_dgemv(0, 1, dist, &values, 0, &row_means);
+    IGRAPH_CHECK(igraph_blas_dgemv(0, 1, dist, &values, 0, &row_means));
     grand_mean = igraph_vector_sum(&row_means) / no_of_nodes;
     igraph_matrix_add_constant(dist, grand_mean);
     for (i = 0; i < no_of_nodes; i++) {

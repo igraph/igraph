@@ -58,6 +58,13 @@
    of higher level interfaces to igraph; they should update their attribute
    handlers accordingly.
 
+ - igraph functions that interface with external libraries such as BLAS or LAPACK
+   may now fail if the underlying BLAS or LAPACK implementation cannot handle
+   the size of input vectors or matrices (BLAS and LAPACK are usually limited to
+   vectors whose size fits in an `int`). `igraph_blas_dgemv()` and
+   `igraph_blas_dgemv_array()` thus now return an `igraph_error_t`, which may be
+   set to `IGRAPH_EOVERFLOW` if the input vectors or matrices are too large.
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

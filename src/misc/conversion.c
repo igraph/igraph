@@ -803,9 +803,9 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
                           igraph_matrix_t *matrix,
                           igraph_bool_t column_wise) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t sum;
-    int i, j;
+    igraph_integer_t i, j;
 
     IGRAPH_CHECK(igraph_get_adjacency(graph, matrix,
                                       IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0));

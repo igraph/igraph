@@ -454,8 +454,8 @@ static igraph_error_t igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
         (igraph_i_eigen_matrix_sym_arpack_data_t *) extra;
 
     if (data->A) {
-        igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
-                                               data->A, from, /*beta=*/ 0.0, to);
+        IGRAPH_CHECK(igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
+                                               data->A, from, /*beta=*/ 0.0, to));
     } else { /* data->sA */
         igraph_vector_t vto, vfrom;
         igraph_vector_view(&vto, to, n);
@@ -914,7 +914,7 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
     igraph_bool_t hasmag = 0;
     int nev = (int) igraph_vector_size(real);
     int howmany = 0, start = 0;
-    int i;
+    igraph_integer_t i;
     igraph_i_eigen_matrix_lapack_cmp_t cmpfunc = 0;
     igraph_i_eml_cmp_t vextra;
     void *extra;
@@ -987,17 +987,17 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
     if (values) {
         IGRAPH_CHECK(igraph_vector_complex_resize(values, howmany));
         for (i = 0; i < howmany; i++) {
-            int x = VECTOR(idx)[start + i];
+            igraph_integer_t x = VECTOR(idx)[start + i];
             VECTOR(*values)[i] = igraph_complex(VECTOR(*real)[x],
                                                 VECTOR(*imag)[x]);
         }
     }
 
     if (vectors) {
-        int n = (int) igraph_matrix_nrow(compressed);
+        igraph_integer_t n = igraph_matrix_nrow(compressed);
         IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, howmany));
         for (i = 0; i < howmany; i++) {
-            int j, x = VECTOR(idx)[start + i];
+            igraph_integer_t j, x = VECTOR(idx)[start + i];
             if (VECTOR(*imag)[x] == 0) {
                 /* real eigenvalue */
                 for (j = 0; j < n; j++) {
@@ -1033,7 +1033,7 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t 
 
     igraph_vector_t valuesreal, valuesimag;
     igraph_matrix_t vectorsright, *myvectors = vectors ? &vectorsright : 0;
-    int n = (int) igraph_matrix_nrow(A);
+    igraph_integer_t n = igraph_matrix_nrow(A);
     int info = 1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
@@ -1350,14 +1350,14 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
         int n, void *extra) {
     igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(adjlist, i);
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            int nei = VECTOR(*neis)[j];
+            igraph_integer_t nei = VECTOR(*neis)[j];
             to[i] += from[nei];
         }
     }
@@ -1379,7 +1379,7 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
 
     igraph_adjlist_t adjlist;
     void *extra = (void*) &adjlist;
-    int n = igraph_vcount(graph);
+    igraph_integer_t n = igraph_vcount(graph);
 
     if (!options) {
         IGRAPH_ERROR("`options' must be given for ARPACK algorithm",

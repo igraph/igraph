@@ -127,9 +127,8 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
 igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode, igraph_loops_t loops,
                         igraph_multiple_t multiple) {
-    igraph_integer_t i;
+    igraph_integer_t i, j, n;
     igraph_vector_t tmp;
-    int j, n;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view", IGRAPH_EINVMODE);
@@ -317,8 +316,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 igraph_error_t igraph_adjlist_init_from_inclist(
     const igraph_t *graph, igraph_adjlist_t *al, const igraph_inclist_t *il) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
-    long int j, num_neis;
+    igraph_integer_t i, j, num_neis;
 
     igraph_vector_int_t *neis;
     igraph_vector_int_t *incs;
@@ -326,6 +324,7 @@ igraph_error_t igraph_adjlist_init_from_inclist(
     if (igraph_inclist_size(il) != no_of_nodes) {
         IGRAPH_ERRORF(
             "Incidence list has " IGRAPH_PRId " entries but the graph has " IGRAPH_PRId " vertices.",
+            IGRAPH_EINVAL,
             igraph_inclist_size(il),
             no_of_nodes
         );
@@ -711,7 +710,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_inclist_t *il,
                         igraph_neimode_t mode,
                         igraph_loops_t loops) {
-    igraph_integer_t i;
+    igraph_integer_t i, j, n;
     igraph_vector_t tmp;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
@@ -733,8 +732,6 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
     for (i = 0; i < il->length; i++) {
-        int j, n;
-
         IGRAPH_ALLOW_INTERRUPTION();
 
         IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));

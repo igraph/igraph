@@ -59,7 +59,7 @@ IGRAPH_EXPORT void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size);
 IGRAPH_EXPORT igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v);
-IGRAPH_EXPORT long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);
+IGRAPH_EXPORT igraph_integer_t igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_null      (igraph_vector_ptr_t* v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e);

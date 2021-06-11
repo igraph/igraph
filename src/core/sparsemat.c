@@ -637,7 +637,7 @@ igraph_error_t igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
 static igraph_error_t igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     igraph_sparsemat_t t, tt;
     igraph_bool_t res;
-    int nz;
+    igraph_integer_t nz;
 
     IGRAPH_CHECK(igraph_sparsemat_transpose(A, &t, /*values=*/ 1));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
@@ -1416,9 +1416,11 @@ igraph_error_t igraph_sparsemat_print(const igraph_sparsemat_t *A,
 
 #undef CHECK
 
-static igraph_error_t igraph_i_sparsemat_eye_triplet(igraph_sparsemat_t *A, int n, int nzmax,
-                                          igraph_real_t value) {
-    long int i;
+static igraph_error_t igraph_i_sparsemat_eye_triplet(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value
+) {
+    CS_INT i;
 
     IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
 
@@ -1429,8 +1431,9 @@ static igraph_error_t igraph_i_sparsemat_eye_triplet(igraph_sparsemat_t *A, int 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
-                                     igraph_real_t value) {
+static igraph_error_t igraph_i_sparsemat_eye_cc(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_real_t value
+) {
     CS_INT i;
 
     A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0);
@@ -1466,13 +1469,14 @@ static igraph_error_t igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
  * Time complexity: O(n).
  */
 
-igraph_error_t igraph_sparsemat_eye(igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
-                         igraph_real_t value,
-                         igraph_bool_t compress) {
+igraph_error_t igraph_sparsemat_eye(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value, igraph_bool_t compress
+) {
     if (compress) {
-        return (igraph_i_sparsemat_eye_cc(A, n, value));
+        return igraph_i_sparsemat_eye_cc(A, n, value);
     } else {
-        return (igraph_i_sparsemat_eye_triplet(A, n, nzmax, value));
+        return igraph_i_sparsemat_eye_triplet(A, n, nzmax, value);
     }
 }
 

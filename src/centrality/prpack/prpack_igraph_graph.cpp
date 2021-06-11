@@ -21,8 +21,8 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
 
     // Get the number of vertices and edges. For undirected graphs, we add
     // an edge in both directions.
-    num_vs = igraph_vcount(g);
-    num_es = igraph_ecount(g);
+    num_vs = (int) igraph_vcount(g);
+    num_es = (int) igraph_ecount(g);
     num_self_es = 0;
     if (!treat_as_directed) {
         num_es *= 2;

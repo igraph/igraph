@@ -51,10 +51,10 @@ __BEGIN_DECLS
  * </para>
  */
 
-IGRAPH_EXPORT void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
+IGRAPH_EXPORT igraph_error_t igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
                                      const igraph_matrix_t* a, const igraph_vector_t* x,
                                      igraph_real_t beta, igraph_vector_t* y);
-IGRAPH_EXPORT void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
+IGRAPH_EXPORT igraph_error_t igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
                                            const igraph_matrix_t* a, const igraph_real_t* x,
                                            igraph_real_t beta, igraph_real_t* y);
 
