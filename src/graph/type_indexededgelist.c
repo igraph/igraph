@@ -701,7 +701,7 @@ igraph_integer_t igraph_vcount(const igraph_t *graph) {
  * Time complexity: O(1)
  */
 igraph_integer_t igraph_ecount(const igraph_t *graph) {
-    return (igraph_integer_t) igraph_vector_size(&graph->from);
+    return igraph_vector_size(&graph->from);
 }
 
 /**

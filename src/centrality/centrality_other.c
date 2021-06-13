@@ -37,6 +37,7 @@
 
 #include "config.h"
 
+#include <limits.h>
 #include <math.h>
 #include <string.h>    /* memset */
 
@@ -139,8 +140,13 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     igraph_matrix_t vectors;
     igraph_vector_t degree;
     long int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    options->n = igraph_vcount(graph);
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    options->n = (int) no_of_nodes;
     options->start = 1;   /* no random start vector */
 
     if (igraph_ecount(graph) == 0) {
@@ -195,7 +201,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
-    options->n = igraph_vcount(graph);
+    options->n = (int) igraph_vcount(graph);
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     options->which[0] = 'L'; options->which[1] = 'A';
@@ -306,6 +312,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_matrix_t vectors;
     igraph_vector_t indegree;
     igraph_bool_t dag;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
 
     if (igraph_ecount(graph) == 0) {
@@ -367,7 +374,11 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         }
     }
 
-    options->n = igraph_vcount(graph);
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    options->n = (int) no_of_nodes;
     options->start = 1;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
@@ -663,6 +674,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
     igraph_inclist_t myininclist, myoutinclist;
     igraph_adjlist_t *inadjlist, *outadjlist;
     igraph_inclist_t *ininclist, *outinclist;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t tmp;
     igraph_vector_t values;
     igraph_matrix_t vectors;
@@ -670,13 +682,13 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
     igraph_i_kleinberg_data2_t extra2;
     long int i;
 
-    if (igraph_ecount(graph) == 0 || igraph_vcount(graph) == 1) {
+    if (igraph_ecount(graph) == 0 || no_of_nodes == 1) {
         /* special case: empty graph or single vertex */
         if (value) {
             *value = igraph_ecount(graph) ? 1.0 : IGRAPH_NAN;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            igraph_vector_resize(vector, no_of_nodes);
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -697,14 +709,18 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
                 *value = IGRAPH_NAN;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                igraph_vector_resize(vector, no_of_nodes);
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;
         }
     }
 
-    options->n = igraph_vcount(graph);
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    options->n = (int) no_of_nodes;
     options->start = 1;   /* no random start vector */
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);

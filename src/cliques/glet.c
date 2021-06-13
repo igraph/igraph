@@ -590,7 +590,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                const igraph_vector_ptr_t *cliques,
                                igraph_vector_t *Mu, igraph_bool_t startMu,
-                               int niter, int vid1) {
+                               int niter, igraph_integer_t vid1) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -654,8 +654,8 @@ int igraph_i_graphlets_project(const igraph_t *graph,
         igraph_vector_t *v = VECTOR(*cliques)[i];
         igraph_integer_t j, n = igraph_vector_size(v);
         for (j = 0; j < n; j++) {
-            int vv = VECTOR(*v)[j] - vid1;
-            int p = VECTOR(vclidx)[vv + 1];
+            igraph_integer_t vv = VECTOR(*v)[j] - vid1;
+            igraph_integer_t p = VECTOR(vclidx)[vv + 1];
             VECTOR(vcl)[p] = i;
             VECTOR(vclidx)[vv + 1] += 1;
         }

@@ -129,7 +129,7 @@ igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trus
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
 static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
-    long int i, j, num_triangles;
+    igraph_integer_t i, j, num_triangles;
 
     num_triangles = igraph_vector_int_size(tri);
 
@@ -147,9 +147,9 @@ static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igra
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
 static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
-    long int m = igraph_vector_size(eid);
-    for (long int i = 0; i < m; ++i) {
-        VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
+    igraph_integer_t m = igraph_vector_size(eid);
+    for (igraph_integer_t i = 0; i < m; ++i) {
+        VECTOR(*support)[(igraph_integer_t) VECTOR(*eid)[i]] += 1;
     }
 }
 
@@ -163,8 +163,8 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     igraph_vector_int_t *fromNeighbors, *toNeighbors, *q1, *q2;
     igraph_vector_int_t commonNeighbors;
     bool e1_complete, e2_complete;
-    int j, n, level, newLevel, max;
-    long int i, seed, ncommon, nedges;
+    igraph_integer_t j, n, level, newLevel, max;
+    igraph_integer_t i, seed, ncommon, nedges;
 
     // C++ data structures
     vector<bool> completed;

@@ -27,7 +27,7 @@
 #define SUFFIX
 #define RECORD do {                         \
         igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
-        int j;                              \
+        igraph_integer_t j;                              \
         if (!cl) {                              \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
         }                                   \
@@ -77,7 +77,7 @@
 #define RECORD do {                         \
         if (res) {                                \
             igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
-            int j;                              \
+            igraph_integer_t j;                              \
             if (!cl) {                              \
                 IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
             }                                   \
@@ -112,7 +112,7 @@
 #define SUFFIX _callback
 #define RECORD do { \
         igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t); \
-        long j; \
+        igraph_integer_t j; \
         if (!cl) { \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
         } \
@@ -132,11 +132,11 @@
 #define RESNAME hist
 #define SUFFIX _hist
 #define RECORD do { \
-        long hsize = igraph_vector_size(hist); \
+        igraph_integer_t hsize = igraph_vector_size(hist); \
         if (clsize > hsize) { \
-            long hcapacity = igraph_vector_capacity(hist); \
-            long j; \
-            int err; \
+            igraph_integer_t hcapacity = igraph_vector_capacity(hist); \
+            igraph_integer_t j; \
+            igraph_error_t err; \
             if (hcapacity < clsize && clsize < 2*hcapacity) \
                 err = igraph_vector_reserve(hist, 2*hcapacity); \
             err = igraph_vector_resize(hist, clsize); \
@@ -158,7 +158,7 @@
 #ifdef IGRAPH_MC_ORIG
 static void igraph_i_maximal_cliques_free(void *ptr) {
     igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
-    int i, n = igraph_vector_ptr_size(res);
+    igraph_integer_t i, n = igraph_vector_ptr_size(res);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*res)[i];
         if (v) {
@@ -174,7 +174,7 @@ static void igraph_i_maximal_cliques_free(void *ptr) {
 static void igraph_i_maximal_cliques_free_full(void *ptr) {
     if (ptr) {
         igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
-        int i, n = igraph_vector_ptr_size(res);
+        igraph_integer_t i, n = igraph_vector_ptr_size(res);
         for (i = 0; i < n; i++) {
             igraph_vector_t *v = VECTOR(*res)[i];
             if (v) {
@@ -188,15 +188,15 @@ static void igraph_i_maximal_cliques_free_full(void *ptr) {
 #endif
 
 static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
-    igraph_vector_int_t *PX, int PS, int PE,
-    int XS, int XE, int oldPS, int oldXE,
+    igraph_vector_int_t *PX, igraph_integer_t PS, igraph_integer_t PE,
+    igraph_integer_t XS, igraph_integer_t XE, igraph_integer_t oldPS, igraph_integer_t oldXE,
     igraph_vector_int_t *R,
     igraph_vector_int_t *pos,
     igraph_adjlist_t *adjlist,
     RESTYPE,
     igraph_vector_int_t *nextv,
     igraph_vector_int_t *H,
-    int min_size, int max_size) {
+    igraph_integer_t min_size, igraph_integer_t max_size) {
 
     int err;
 
@@ -204,18 +204,18 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
 
     if (PS > PE && XS > XE) {
         /* Found a maximum clique, report it */
-        int clsize = igraph_vector_int_size(R);
+        igraph_integer_t clsize = igraph_vector_int_size(R);
         if (min_size <= clsize && (clsize <= max_size || max_size <= 0)) {
             RECORD;
         }
     } else if (PS <= PE) {
         /* Select a pivot element */
-        int pivot, mynextv;
+        igraph_integer_t pivot, mynextv;
         igraph_i_maximal_cliques_select_pivot(PX, PS, PE, XS, XE, pos,
                                               adjlist, &pivot, nextv,
                                               oldPS, oldXE);
         while ((mynextv = igraph_vector_int_pop_back(nextv)) != -1) {
-            int newPS, newXE;
+            igraph_integer_t newPS, newXE;
 
             /* Going down, prepare */
             igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
@@ -257,10 +257,10 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_vector_int_t coreness;
     igraph_vector_int_t order;
     igraph_vector_int_t rank; /* TODO: this is not needed */
-    int i, ii, nn, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, ii, nn, no_of_nodes = igraph_vcount(graph);
     igraph_adjlist_t adjlist, fulladjlist;
     igraph_real_t pgreset = round(no_of_nodes / 100.0), pg = pgreset, pgc = 0;
-    int err;
+    igraph_error_t err;
     IGRAPH_UNUSED(nn);
 
     if (igraph_is_directed(graph)) {
@@ -296,12 +296,12 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     FINALLY;
 
     FOR_LOOP_OVER_VERTICES {
-        int v;
-        int vrank;
+        igraph_integer_t v;
+        igraph_integer_t vrank;
         igraph_vector_int_t *vneis;
-        int vdeg;
-        int Pptr, Xptr, PS, PE, XS, XE;
-        int j;
+        igraph_integer_t vdeg;
+        igraph_integer_t Pptr, Xptr, PS, PE, XS, XE;
+        igraph_integer_t j;
 
         FOR_LOOP_OVER_VERTICES_PREPARE;
 
@@ -334,7 +334,7 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
         VECTOR(R)[0] = v;
         for (j = 0; j < vdeg; j++) {
-            int vx = VECTOR(*vneis)[j];
+            igraph_integer_t vx = VECTOR(*vneis)[j];
             if (VECTOR(rank)[vx] > vrank) {
                 VECTOR(PX)[Pptr] = vx;
                 VECTOR(pos)[vx] = Pptr + 1;
@@ -356,14 +356,14 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
             igraph_adjlist_get(&fulladjlist, v)
         ));
         for (j = 0; j <= vdeg - 1; j++) {
-            int vv = VECTOR(PX)[j];
+            igraph_integer_t vv = VECTOR(PX)[j];
             igraph_vector_int_t *fadj = igraph_adjlist_get(&fulladjlist, vv);
             igraph_vector_int_t *radj = igraph_adjlist_get(&adjlist, vv);
-            int k, fn = igraph_vector_int_size(fadj);
+            igraph_integer_t k, fn = igraph_vector_int_size(fadj);
             igraph_vector_int_clear(radj);
             for (k = 0; k < fn; k++) {
-                int nei = VECTOR(*fadj)[k];
-                int neipos = VECTOR(pos)[nei] - 1;
+                igraph_integer_t nei = VECTOR(*fadj)[k];
+                igraph_integer_t neipos = VECTOR(pos)[nei] - 1;
                 if (neipos >= PS && neipos <= XE) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(radj, nei));
                 }

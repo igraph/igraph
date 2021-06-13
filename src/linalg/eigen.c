@@ -28,6 +28,7 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 
+#include <limits.h>
 #include <string.h>
 #include <math.h>
 #include <float.h>
@@ -1402,6 +1403,9 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
         IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
                      "`ALL' eigenvalues", IGRAPH_UNIMPLEMENTED);
     }
+    if (n > INT_MAX) {
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+    }
 
     switch (which->pos) {
     case IGRAPH_EIGEN_LM:
@@ -1422,7 +1426,7 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
         break;
     case IGRAPH_EIGEN_ALL:
         options->which[0] = 'L'; options->which[1] = 'M';
-        options->nev = n;
+        options->nev = (int) n;
         break;
     case IGRAPH_EIGEN_BE:
         IGRAPH_ERROR("Eigenvectors from both ends with ARPACK",
@@ -1444,8 +1448,8 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
         break;
     }
 
-    options->n = n;
-    options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
+    options->n = (int) n;
+    options->ncv = 2 * options->nev < options->n ? 2 * options->nev : options->n;
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
