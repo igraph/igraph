@@ -29,6 +29,8 @@
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
+#include <limits.h>
+
 typedef struct {
     const igraph_t *graph;
     const igraph_vector_t *cvec;
@@ -407,7 +409,7 @@ static igraph_error_t igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_
     const igraph_vector_t *deg_out = data->cvec2;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* tmp = O' from */
     for (i = 0; i < n; i++) {
@@ -464,7 +466,7 @@ static igraph_error_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
     const igraph_vector_t *deg_out = data->cvec2;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* to = O' from */
     for (i = 0; i < n; i++) {
@@ -503,7 +505,7 @@ static igraph_error_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
     igraph_integer_t edge, nei;
     igraph_real_t w;
 
@@ -568,7 +570,7 @@ static igraph_error_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
     igraph_integer_t edge, nei;
     igraph_real_t w;
 
@@ -657,6 +659,14 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
                      "the number of vertices or scalar", IGRAPH_EINVAL);
     }
 
+    if (vc > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    if (no > INT_MAX) {
+        IGRAPH_ERROR("Too many eigenvectors requested from ARPACK", IGRAPH_EOVERFLOW);
+    }
+
     IGRAPH_CHECK(igraph_matrix_resize(X, vc, no));
     if (Y) {
         IGRAPH_CHECK(igraph_matrix_resize(Y, vc, no));
@@ -690,9 +700,9 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
     }
     IGRAPH_VECTOR_INIT_FINALLY(&tmpD, no);
 
-    options->n = vc;
+    options->n = (int) vc;
     options->start = 0;   /* random start vector */
-    options->nev = no;
+    options->nev = (int) no;
     switch (which) {
     case IGRAPH_EIGEN_LM:
         options->which[0] = 'L'; options->which[1] = 'M';
@@ -706,9 +716,9 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
     default:
         break;
     }
-    options->ncv = no + 3;
-    if (options->ncv > vc) {
-        options->ncv = vc;
+    options->ncv = options->nev + 3;
+    if (options->ncv > options->n) {
+        options->ncv = options->n;
     }
 
     IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &tmpD, X));
@@ -719,7 +729,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
         for (i = 0; i < no; i++) {
             igraph_real_t norm;
             igraph_vector_t v;
-            callback_right(&MATRIX(*Y, 0, i), &MATRIX(*X, 0, i), vc, &data);
+            callback_right(&MATRIX(*Y, 0, i), &MATRIX(*X, 0, i), (int) vc, &data);
             igraph_vector_view(&v, &MATRIX(*Y, 0, i), vc);
             norm = 1.0 / igraph_blas_dnrm2(&v);
             igraph_vector_scale(&v, norm);
@@ -1144,7 +1154,7 @@ igraph_error_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *di
     }
 
     for (i = 0; i < n - 1; i++) {
-        int n1 = i + 1, n2 = n - i - 1, n1m1 = n1 - 1, n2m1 = n2 - 1;
+        igraph_integer_t n1 = i + 1, n2 = n - i - 1, n1m1 = n1 - 1, n2m1 = n2 - 1;
         x = VECTOR(*sv)[i]; x2 = x * x;
         sum1 += x; sum2 -= x;
         sumsq1 += x2; sumsq2 -= x2;

@@ -31,6 +31,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_ptr.h"
 
+#include <limits.h>
 #include <string.h>
 
 /*
@@ -1632,7 +1633,11 @@ igraph_error_t igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
     }
 
-    options->n = n;
+    if (n > INT_MAX) {
+        IGRAPH_ERROR("Matrix too large for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    options->n = (int) n;
 
     if (options->mode == 1) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_sparsemat_arpack_multiply,
@@ -1875,7 +1880,7 @@ igraph_error_t igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
                              const igraph_sparsemat_numeric_t *din,
                              const igraph_vector_t *b,
                              igraph_vector_t *res) {
-    int n = din->numeric->L->n;
+    igraph_integer_t n = din->numeric->L->n;
     igraph_real_t *workspace;
 
     if (res != b) {
@@ -1930,9 +1935,9 @@ igraph_error_t igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
                              const igraph_sparsemat_numeric_t *din,
                              const igraph_vector_t *b,
                              igraph_vector_t *res) {
-    int n = din->numeric->L->n;
+    igraph_integer_t n = din->numeric->L->n;
     igraph_real_t *workspace;
-    int k;
+    igraph_integer_t k;
 
     if (res != b) {
         IGRAPH_CHECK(igraph_vector_update(res, b));
@@ -2017,9 +2022,9 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
 igraph_error_t igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
                                const igraph_matrix_t *mat,
                                igraph_real_t tol) {
-    int nrow = (int) igraph_matrix_nrow(mat);
-    int ncol = (int) igraph_matrix_ncol(mat);
-    int i, j, nzmax = 0;
+    igraph_integer_t nrow = igraph_matrix_nrow(mat);
+    igraph_integer_t ncol = igraph_matrix_ncol(mat);
+    igraph_integer_t i, j, nzmax = 0;
 
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
@@ -2045,8 +2050,8 @@ igraph_error_t igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
 static igraph_error_t igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
                                            const igraph_sparsemat_t *spmat) {
 
-    long int nrow = igraph_sparsemat_nrow(spmat);
-    long int ncol = igraph_sparsemat_ncol(spmat);
+    igraph_integer_t nrow = igraph_sparsemat_nrow(spmat);
+    igraph_integer_t ncol = igraph_sparsemat_ncol(spmat);
     CS_INT from = 0, to = 0;
     CS_INT *p = spmat->cs->p;
     CS_INT *i = spmat->cs->i;
@@ -2072,8 +2077,8 @@ static igraph_error_t igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
 
 static igraph_error_t igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
                                                 const igraph_sparsemat_t *spmat) {
-    long int nrow = igraph_sparsemat_nrow(spmat);
-    long int ncol = igraph_sparsemat_ncol(spmat);
+    igraph_integer_t nrow = igraph_sparsemat_nrow(spmat);
+    igraph_integer_t ncol = igraph_sparsemat_ncol(spmat);
     CS_INT *i = spmat->cs->p;
     CS_INT *j = spmat->cs->i;
     CS_ENTRY *x = spmat->cs->x;
@@ -2881,7 +2886,7 @@ igraph_error_t igraph_sparsemat_resize(igraph_sparsemat_t *A, igraph_integer_t n
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
+igraph_integer_t igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
     if (A->cs->nz < 0) {
         return A->cs->p[A->cs->n];
     } else {
@@ -3023,7 +3028,7 @@ igraph_error_t igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 
     for (c = 0; c < p; c++) {
         for (r = 0; r < m; r++) {
-            int idx = *Bp;
+            igraph_integer_t idx = *Bp;
             while (idx < * (Bp + 1)) {
                 MATRIX(*res, r, c) += MATRIX(*A, r, B->cs->i[idx]) * B->cs->x[idx];
                 idx++;

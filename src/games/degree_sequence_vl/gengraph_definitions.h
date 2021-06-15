@@ -46,7 +46,7 @@ void SET_VERBOSE(int v);
 
 // Random number generator
 void my_srandom(int);
-int my_random();
+long my_random();
 int my_binomial(double pp, int n);
 double my_random01(); // (0,1]
 
@@ -164,7 +164,7 @@ inline unsigned char prev_dist(const unsigned char c) {
 
 // random number in ]0,1[, _very_ accurate around 0
 inline double random_float() {
-    int r = my_random();
+    long r = my_random();
     double mul = inv_RANDMAX;
     while (r <= 0x7FFFFF) {
         r <<= 8;
@@ -179,10 +179,10 @@ inline double random_float() {
 
 // Random bit generator, sparwise.
 static int _random_bits_stored = 0;
-static int _random_bits = 0;
+static long _random_bits = 0;
 
 inline int random_bit() {
-    int a = _random_bits;
+    long a = _random_bits;
     _random_bits = a >> 1;
     if (_random_bits_stored--) {
         return a & 0x1;

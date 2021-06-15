@@ -34,11 +34,11 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
                                              igraph_bool_t loops,
                                              igraph_vector_t *edges) {
 
-    int no_verts = igraph_vcount(graph);
-    int no_edges = igraph_ecount(graph);
+    igraph_integer_t no_verts = igraph_vcount(graph);
+    igraph_integer_t no_edges = igraph_ecount(graph);
     igraph_vector_t eorder, tmp;
     igraph_vector_int_t first, next, prev, marked;
-    int i, to_rewire, last_other = -1;
+    igraph_integer_t i, to_rewire, last_other = -1;
 
     /* Create our special graph representation */
 
@@ -96,22 +96,22 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
 
     /* Rewire the stubs, part I */
 
-    to_rewire = (int) RNG_GEOM(prob);
+    to_rewire = (igraph_integer_t) RNG_GEOM(prob);
     while (to_rewire < no_edges) {
-        int stub = (int) (2 * VECTOR(eorder)[to_rewire] + 1);
-        int v = (int) VECTOR(*edges)[stub];
-        int ostub = stub - 1;
-        int other = (int) VECTOR(*edges)[ostub];
-        int pot;
+        igraph_integer_t stub = (igraph_integer_t) (2 * VECTOR(eorder)[to_rewire] + 1);
+        igraph_integer_t v = (igraph_integer_t) VECTOR(*edges)[stub];
+        igraph_integer_t ostub = stub - 1;
+        igraph_integer_t other = (igraph_integer_t) VECTOR(*edges)[ostub];
+        igraph_integer_t pot;
         if (last_other != other) {
             MARK_NEIGHBORS(other);
         }
         /* Do the rewiring */
         do {
             if (loops) {
-                pot = (int) RNG_INTEGER(0, no_verts - 1);
+                pot = (igraph_integer_t) RNG_INTEGER(0, no_verts - 1);
             } else {
-                pot = (int) RNG_INTEGER(0, no_verts - 2);
+                pot = (igraph_integer_t) RNG_INTEGER(0, no_verts - 2);
                 pot = pot != other ? pot : no_verts - 1;
             }
         } while (VECTOR(marked)[pot] == other + 1 && pot != v);
@@ -143,13 +143,13 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
     igraph_vector_int_null(&marked);
     last_other = -1;
 
-    to_rewire = (int) RNG_GEOM(prob);
+    to_rewire = (igraph_integer_t) RNG_GEOM(prob);
     while (to_rewire < no_edges) {
-        int stub = (int) (2 * VECTOR(eorder)[to_rewire]);
-        int v = (int) VECTOR(*edges)[stub];
-        int ostub = stub + 1;
-        int other = (int) VECTOR(*edges)[ostub];
-        int pot;
+        igraph_integer_t stub = (igraph_integer_t) (2 * VECTOR(eorder)[to_rewire]);
+        igraph_integer_t v = (igraph_integer_t) VECTOR(*edges)[stub];
+        igraph_integer_t ostub = stub + 1;
+        igraph_integer_t other = (igraph_integer_t) VECTOR(*edges)[ostub];
+        igraph_integer_t pot;
         if (last_other != other) {
             MARK_NEIGHBORS(other);
         }
@@ -219,10 +219,10 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
                         igraph_bool_t loops, igraph_bool_t multiple) {
 
     igraph_t newgraph;
-    long int no_of_edges = igraph_ecount(graph);
-    long int no_of_nodes = igraph_vcount(graph);
-    long int endpoints = no_of_edges * 2;
-    long int to_rewire;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t endpoints = no_of_edges * 2;
+    igraph_integer_t to_rewire;
     igraph_vector_t edges;
 
     if (prob < 0 || prob > 1) {
@@ -251,9 +251,9 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
                 if (loops) {
                     VECTOR(edges)[to_rewire] = RNG_INTEGER(0, no_of_nodes - 1);
                 } else {
-                    long int opos = to_rewire % 2 ? to_rewire - 1 : to_rewire + 1;
-                    long int nei = VECTOR(edges)[opos];
-                    long int r = RNG_INTEGER(0, no_of_nodes - 2);
+                    igraph_integer_t opos = to_rewire % 2 ? to_rewire - 1 : to_rewire + 1;
+                    igraph_integer_t nei = VECTOR(edges)[opos];
+                    igraph_integer_t r = RNG_INTEGER(0, no_of_nodes - 2);
                     VECTOR(edges)[ to_rewire ] = (r != nei ? r : no_of_nodes - 1);
                 }
                 to_rewire += RNG_GEOM(prob) + 1;
@@ -335,10 +335,10 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
 
     if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
         igraph_t newgraph;
-        long int no_of_edges = igraph_ecount(graph);
-        long int no_of_nodes = igraph_vcount(graph);
-        long int to_rewire;
-        long int offset = 0;
+        igraph_integer_t no_of_edges = igraph_ecount(graph);
+        igraph_integer_t no_of_nodes = igraph_vcount(graph);
+        igraph_integer_t to_rewire;
+        igraph_integer_t offset = 0;
         igraph_vector_t edges;
 
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * no_of_edges);
@@ -363,8 +363,8 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
             if (loops) {
                 VECTOR(edges)[2 * to_rewire + offset] = RNG_INTEGER(0, no_of_nodes - 1);
             } else {
-                long int nei = VECTOR(edges)[2 * to_rewire + (1 - offset)];
-                long int r = RNG_INTEGER(0, no_of_nodes - 2);
+                igraph_integer_t nei = VECTOR(edges)[2 * to_rewire + (1 - offset)];
+                igraph_integer_t r = RNG_INTEGER(0, no_of_nodes - 2);
                 VECTOR(edges)[2 * to_rewire + offset] = (r != nei ? r : no_of_nodes - 1);
             }
             to_rewire += RNG_GEOM(prob) + 1;

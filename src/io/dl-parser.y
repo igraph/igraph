@@ -273,7 +273,7 @@ int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
   return 0;
 }
 
-int igraph_i_dl_add_str(char *newstr, int length,
+int igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
   int tmp=newstr[length];
   newstr[length]='\0';

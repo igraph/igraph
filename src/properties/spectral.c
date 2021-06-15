@@ -275,13 +275,13 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                      const igraph_vector_t *weights) {
 
     igraph_eit_t edgeit;
-    int no_of_nodes = (int) igraph_vcount(graph);
-    int no_of_edges = (int) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    int from, to;
+    igraph_integer_t from, to;
     igraph_integer_t ffrom, fto;
     igraph_vector_t degree;
-    int i;
+    igraph_integer_t i;
 
     if (!res && !sparseres) {
         IGRAPH_ERROR("Laplacian: give at least one of `res' or `sparseres'",
@@ -338,7 +338,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
             }
         } else {
             for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_integer_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }
@@ -399,7 +399,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
             }
         } else {
             for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_integer_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }

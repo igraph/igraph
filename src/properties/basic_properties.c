@@ -123,12 +123,12 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
-    int no_of_nodes = igraph_vcount(graph);
-    int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t incident;
     igraph_vit_t vit;
     igraph_real_t s, ent, w;
-    int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_bool_t has_multiple;
 
     if (igraph_is_directed(graph)) {
@@ -155,8 +155,8 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
         for (i = 0; i < no_of_nodes; i++) {
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = (int) igraph_vector_size(&incident); j < k; j++) {
-                w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
+            for (j = 0, k = igraph_vector_size(&incident); j < k; j++) {
+                w = VECTOR(*weights)[(igraph_integer_t) VECTOR(incident)[j]];
                 s += w;
                 ent += (w * log(w));
             }
@@ -174,8 +174,8 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, (igraph_integer_t) v,
                                          /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = (int) igraph_vector_size(&incident); j < k; j++) {
-                w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
+            for (j = 0, k = igraph_vector_size(&incident); j < k; j++) {
+                w = VECTOR(*weights)[(igraph_integer_t) VECTOR(incident)[j]];
                 s += w;
                 ent += (w * log(w));
             }
