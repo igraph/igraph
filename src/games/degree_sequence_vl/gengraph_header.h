@@ -27,7 +27,7 @@
 namespace gengraph {
 
 static KW_RNG::RNG _my_random;
-int my_random() {
+long my_random() {
     return _my_random.rand_int31();
 }
 void my_srandom(int x) {

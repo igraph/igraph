@@ -94,7 +94,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
 
-extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
+extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 extern long int igraph_i_pajek_actvertex;
 extern long int igraph_i_pajek_actedge;
 
@@ -522,7 +522,7 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
   return 0;
 }
 
-igraph_real_t igraph_pajek_get_number(const char *str, long int length) {
+igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t length) {
   igraph_real_t num;
   char *tmp=IGRAPH_CALLOC(length+1, char);
 

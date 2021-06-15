@@ -56,7 +56,7 @@
 
 int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
                       const char *s);
-int igraph_i_dl_add_str(char *newstr, int length,
+int igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context);
 int igraph_i_dl_add_edge(long int from, long int to,
                          igraph_i_dl_parsedata_t *context);
@@ -64,7 +64,7 @@ int igraph_i_dl_add_edge_w(long int from, long int to,
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context);
 
-extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
+extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
 

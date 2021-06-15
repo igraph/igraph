@@ -61,7 +61,7 @@
 int igraph_ncol_yyerror(YYLTYPE* locp,
                         igraph_i_ncol_parsedata_t *context,
                         const char *s);
-igraph_real_t igraph_ncol_get_number(const char *str, long int len);
+igraph_real_t igraph_ncol_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
 %}
@@ -127,7 +127,7 @@ int igraph_ncol_yyerror(YYLTYPE* locp,
     return 0;
 }
 
-igraph_real_t igraph_ncol_get_number(const char *str, long int length) {
+igraph_real_t igraph_ncol_get_number(const char *str, yy_size_t length) {
     igraph_real_t num;
     char *tmp=IGRAPH_CALLOC(length+1, char);
 
