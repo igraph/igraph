@@ -27,6 +27,11 @@
    generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
    variant of the same data type.
 
+ - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
+   `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
+   an `igraph_vector_int_t` for the out-degree sequence of the nodes being
+   generated instead of an `igraph_vector_t`.
+
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
 

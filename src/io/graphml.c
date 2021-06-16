@@ -560,7 +560,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
 #define XML_ATTR_URI(it) (*(it+2))
 #define XML_ATTR_VALUE_START(it) (*(it+3))
 #define XML_ATTR_VALUE_END(it) (*(it+4))
-#define XML_ATTR_VALUE(it) *(it+3), (*(it+4))-(*(it+3))
+#define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
 
 static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         const xmlChar** attrs, int nb_attrs,

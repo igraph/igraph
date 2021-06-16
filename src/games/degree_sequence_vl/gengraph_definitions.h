@@ -61,14 +61,14 @@ double my_random01(); // (0,1]
     defmin(int)
     defmin(double)
     defmin(unsigned long)
-    defmin(igraph_integer_t)
+    defmin(long long)
 #endif //min
 #ifndef max
     #define defmax(type) inline type max(type a, type b) { return a>b ? a : b; }
     defmax(int)
     defmax(double)
     defmax(unsigned long)
-    defmax(igraph_integer_t)
+    defmax(long long)
 #endif //max
 
 // Debug definitions

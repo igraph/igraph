@@ -90,7 +90,10 @@ inline igraph_integer_t HASH_EXPAND(igraph_integer_t x) {
      * x == 2^64, starts to break down afterwards */
     _HASH_EXP_CALL();
     x += x;
-    x |= x >> 1;  x |= x >> 2;  x |= x >> 4;  x |= x >> 8;  x |= x >> 16; x |= x >> 32;
+    x |= x >> 1;  x |= x >> 2;  x |= x >> 4;  x |= x >> 8;  x |= x >> 16;
+#if IGRAPH_INTEGER_SIZE == 64
+    x |= x >> 32;
+#endif
     return x + 1;
 }
 #define HASH_KEY(x,size) ((x*2198737)&((size)-1))
