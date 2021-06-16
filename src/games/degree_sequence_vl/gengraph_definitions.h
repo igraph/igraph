@@ -53,12 +53,6 @@ double my_random01(); // (0,1]
 
 #define MY_RAND_MAX 0x7FFFFFFF
 
-// IPv4 address direct translation into 32-bit uint + special IP defs
-typedef unsigned int ip_addr;
-#define IP_NONE   0x7FFFFFFF
-#define IP_STAR   0x00000000
-#define IP_MYSELF 0x7F000001
-
 //inline double round(double x) throw () { return (floor(0.5+x)); }
 
 // Min & Max
@@ -67,18 +61,15 @@ typedef unsigned int ip_addr;
     defmin(int)
     defmin(double)
     defmin(unsigned long)
+    defmin(igraph_integer_t)
 #endif //min
 #ifndef max
     #define defmax(type) inline type max(type a, type b) { return a>b ? a : b; }
     defmax(int)
     defmax(double)
     defmax(unsigned long)
+    defmax(igraph_integer_t)
 #endif //max
-
-// Traceroute Sampling
-#define MODE_USP 0
-#define MODE_ASP 1
-#define MODE_RSP 2
 
 // Debug definitions
 //#define PERFORMANCE_MONITOR
@@ -91,8 +82,8 @@ typedef unsigned int ip_addr;
 
 //Edge type
 typedef struct {
-    int from;
-    int to;
+    igraph_integer_t from;
+    igraph_integer_t to;
 } edge;
 
 // Tag Int

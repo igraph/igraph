@@ -782,7 +782,7 @@ void graph_molloy_opt::sort() {
 // }
 
 bool graph_molloy_opt::verify(int mode) {
-    int i, j, k;
+    igraph_integer_t i, j, k;
     assert(neigh[0] == links);
     // verify edges count
     if ((mode & VERIFY_NOARCS) == 0) {
@@ -806,8 +806,8 @@ bool graph_molloy_opt::verify(int mode) {
 //    assert(neigh[i][j]!=neigh[i][k]);
     // verify symmetry
     for (i = 0; i < n; i++) for (j = 0; j < deg[i]; j++) {
-            int v = neigh[i][j];
-            int nb = 0;
+            igraph_integer_t v = neigh[i][j];
+            igraph_integer_t nb = 0;
             for (k = 0; k < deg[v]; k++) if (neigh[v][k] == i) {
                     nb++;
                 }

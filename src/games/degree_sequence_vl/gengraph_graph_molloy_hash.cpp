@@ -324,7 +324,7 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
             all_swaps++;
             // Verbose
             if (nb_swaps + swaps > next) {
-                next = (nb_swaps + swaps) + max(100, times / 1000);
+                next = (nb_swaps + swaps) + max((igraph_integer_t) 100, times / 1000);
                 int progress = int(double(nb_swaps + swaps) / double(times));
                 igraph_progress("Shuffle",  progress, 0);
             }
