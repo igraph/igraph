@@ -896,9 +896,9 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
                               igraph_real_t p, igraph_bool_t directed,
                               igraph_neimode_t mode) {
 
-    int retval = 0;
+    igraph_error_t retval = 0;
     igraph_vector_t edges, s;
-    int i;
+    igraph_integer_t i;
 
     if (p < 0.0 || p > 1.0) {
         IGRAPH_ERROR("Invalid connection probability", IGRAPH_EINVAL);
@@ -919,7 +919,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
                               mode));
     } else {
 
-        long int to, from, slen;
+        igraph_integer_t to, from, slen;
         double maxedges, last;
         if (!directed || mode != IGRAPH_ALL) {
             maxedges = (double) n1 * (double) n2;
@@ -929,7 +929,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, (long) (maxedges * p * 1.1)));
+        IGRAPH_CHECK(igraph_vector_reserve(&s, (igraph_integer_t) (maxedges * p * 1.1)));
 
         RNG_BEGIN();
 
@@ -947,18 +947,18 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         for (i = 0; i < slen; i++) {
             if (!directed || mode != IGRAPH_ALL) {
-                to = (long) floor(VECTOR(s)[i] / n1);
-                from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                to = (igraph_integer_t) floor(VECTOR(s)[i] / n1);
+                from = (igraph_integer_t) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
                 to += n1;
             } else {
-                long int n1n2 = n1 * n2;
+                igraph_integer_t n1n2 = n1 * n2;
                 if (VECTOR(s)[i] < n1n2) {
-                    to = (long) floor(VECTOR(s)[i] / n1);
-                    from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                    to = (igraph_integer_t) floor(VECTOR(s)[i] / n1);
+                    from = (igraph_integer_t) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
                     to += n1;
                 } else {
-                    to = (long) floor( (VECTOR(s)[i] - n1n2) / n2);
-                    from = (long) (VECTOR(s)[i] - n1n2 - ((igraph_real_t) to) * n2);
+                    to = (igraph_integer_t) floor( (VECTOR(s)[i] - n1n2) / n2);
+                    from = (igraph_integer_t) (VECTOR(s)[i] - n1n2 - ((igraph_real_t) to) * n2);
                     from += n1;
                 }
             }
@@ -988,7 +988,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                               igraph_neimode_t mode) {
     igraph_vector_t edges;
     igraph_vector_t s;
-    int retval = 0;
+    igraph_error_t retval = 0;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -998,7 +998,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     }
 
     if (types) {
-        long int i;
+        igraph_integer_t i;
         IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
         igraph_vector_bool_null(types);
         for (i = n1; i < n1 + n2; i++) {
@@ -1014,7 +1014,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     } else {
 
 
-        long int i;
+        igraph_integer_t i;
         double maxedges;
         if (!directed || mode != IGRAPH_ALL) {
             maxedges = (double) n1 * (double) n2;
@@ -1031,7 +1031,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                                   directed, mode));
         } else {
 
-            long int to, from;
+            igraph_integer_t to, from;
             IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
             IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
             IGRAPH_CHECK(igraph_random_sample(&s, 0, maxedges - 1, m));
@@ -1039,18 +1039,18 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
 
             for (i = 0; i < m; i++) {
                 if (!directed || mode != IGRAPH_ALL) {
-                    to = (long) floor(VECTOR(s)[i] / n1);
-                    from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                    to = (igraph_integer_t) floor(VECTOR(s)[i] / n1);
+                    from = (igraph_integer_t) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
                     to += n1;
                 } else {
-                    long int n1n2 = n1 * n2;
+                    igraph_integer_t n1n2 = n1 * n2;
                     if (VECTOR(s)[i] < n1n2) {
-                        to = (long) floor(VECTOR(s)[i] / n1);
-                        from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                        to = (igraph_integer_t) floor(VECTOR(s)[i] / n1);
+                        from = (igraph_integer_t) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
                         to += n1;
                     } else {
-                        to = (long) floor( (VECTOR(s)[i] - n1n2) / n2);
-                        from = (long) (VECTOR(s)[i] - n1n2 - ((igraph_real_t) to) * n2);
+                        to = (igraph_integer_t) floor( (VECTOR(s)[i] - n1n2) / n2);
+                        from = (igraph_integer_t) (VECTOR(s)[i] - n1n2 - ((igraph_real_t) to) * n2);
                         from += n1;
                     }
                 }

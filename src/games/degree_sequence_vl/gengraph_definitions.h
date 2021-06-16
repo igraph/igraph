@@ -25,6 +25,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "igraph_types.h"
 #include "internal/hacks.h"
 
 namespace gengraph {
@@ -113,18 +114,20 @@ inline double logp(double x) {
 
 
 //Fast search or replace
-inline int* fast_rpl(int *m, const int a, const int b) {
+inline igraph_integer_t* fast_rpl(igraph_integer_t *m, igraph_integer_t a, igraph_integer_t b) {
     while (*m != a) {
         m++;
     }
     *m = b;
     return m;
 }
-inline int* fast_search(int *m, const int size, const int a) {
-    int *p = m + size;
-    while (m != p--) if (*p == a) {
+inline igraph_integer_t* fast_search(igraph_integer_t *m, igraph_integer_t size, igraph_integer_t a) {
+    igraph_integer_t *p = m + size;
+    while (m != p--) {
+        if (*p == a) {
             return p;
         }
+    }
     return NULL;
 }
 

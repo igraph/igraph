@@ -3,14 +3,15 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t outdeg, indeg, vec;
+    igraph_vector_int_t outdeg, indeg;
+    igraph_vector_t vec;
     igraph_bool_t is_simple;
 
     /* Set random seed for reproducibility */
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    igraph_vector_init_real(&outdeg, 10, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0);
-    igraph_vector_init_real(&indeg, 10, 4.0, 4.0, 2.0, 2.0, 4.0, 4.0, 2.0, 2.0, 3.0, 3.0);
+    igraph_vector_int_init_int(&outdeg, 10, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+    igraph_vector_int_init_int(&indeg, 10, 4, 4, 2, 2, 4, 4, 2, 2, 3, 3);
     igraph_vector_init(&vec, 0);
 
     /* checking the simple method, undirected graphs */
@@ -86,8 +87,8 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&vec);
-    igraph_vector_destroy(&outdeg);
-    igraph_vector_destroy(&indeg);
+    igraph_vector_int_destroy(&outdeg);
+    igraph_vector_int_destroy(&indeg);
 
     return 0;
 }

@@ -328,7 +328,7 @@ igraph_error_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector) *v, int no,
  * complexity of the memory allocation.
  */
 
-igraph_error_t FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, int endmark, ...) {
+igraph_error_t FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector) *v, int endmark, ...) {
     int i = 0, n = 0;
     va_list ap;
 

@@ -290,7 +290,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
         igraph_matrix_null(res);
     }
     if (sparseres) {
-        int nz = directed ? no_of_edges + no_of_nodes :
+        igraph_integer_t nz = directed ? no_of_edges + no_of_nodes :
                  no_of_edges * 2 + no_of_nodes;
         IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes,
                                              no_of_nodes, nz));

@@ -98,12 +98,10 @@ add_library(
   games/callaway_traits.c
   games/citations.c
   games/correlated.c
-  games/degree_sequence_vl/gengraph_box_list.cpp
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
   games/degree_sequence_vl/gengraph_graph_molloy_hash.cpp
   games/degree_sequence_vl/gengraph_graph_molloy_optimized.cpp
   games/degree_sequence_vl/gengraph_mr-connected.cpp
-  games/degree_sequence_vl/gengraph_powerlaw.cpp
   games/degree_sequence.c
   games/dotproduct.c
   games/erdos_renyi.c
@@ -298,6 +296,10 @@ target_compile_definitions(
   PRIVATE
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
+# target_compile_options(
+#   # -Wconversion could be useful?
+#   igraph PRIVATE -Werror=shorten-64-to-32
+# )
 
 # Make sure that a macro named IGRAPH_FILE_BASENAME is provided in every
 # compiler call so we can use these in debug messages without revealing the

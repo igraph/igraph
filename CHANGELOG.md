@@ -33,10 +33,16 @@
  - `igraph_convex_hull()` now uses an `igraph_vector_int_t` to return the
    indices of the input vertices that were chosen to be in the convex hull.
 
+ - `igraph_degree_sequnce_game()` now takes degree sequences represented as
+   `igraph_vector_int_t` instead of `igraph_vector_t`.
+
  - `igraph_get_shortest_paths()`, `igraph_get_shortest_paths_dijkstra()` and
    `igraph_get_shortest_paths_bellman_ford()` now use an `igraph_vector_int_t`
    to return the predecessors and inbound edges instead of an
    `igraph_vector_long_t`.
+
+ - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
+   sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.
 
  - `igraph_is_matching()`, `igraph_is_maximal_matching()`,
    `igraph_maximum_bipartite_matching` and `igraph_maximum_matching()` now
