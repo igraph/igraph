@@ -1138,7 +1138,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     igraph_bool_t updates;
     igraph_integer_t u;
     igraph_vector_t adj;
-    int i;
+    igraph_integer_t i;
 
     /* sanity checks */
     if (algo != IGRAPH_IMITATE_AUGMENTED &&
@@ -1167,7 +1167,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     if (algo == IGRAPH_IMITATE_BLIND) {
         IGRAPH_CHECK(igraph_vector_push_back(&adj, vid));
         RNG_BEGIN();
-        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
@@ -1179,7 +1179,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     /* retains its current strategy. */
     else if (algo == IGRAPH_IMITATE_AUGMENTED) {
         RNG_BEGIN();
-        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid]) {
@@ -1193,7 +1193,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     /* Otherwise v retains its current strategy. */
     else if (algo == IGRAPH_IMITATE_CONTRACTED) {
         RNG_BEGIN();
-        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid]) {

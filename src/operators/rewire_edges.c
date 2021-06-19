@@ -81,8 +81,9 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
     IGRAPH_VECTOR_INIT_FINALLY(&eorder, no_edges);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, no_edges);
     for (i = 0; i < no_edges; i++) {
-        igraph_integer_t idx1 = 2 * i, idx2 = idx1 + 1,
-            from = (int) VECTOR(*edges)[idx1], to = (int) VECTOR(*edges)[idx2];
+        igraph_integer_t idx1 = 2 * i, idx2 = idx1 + 1;
+        igraph_integer_t from = VECTOR(*edges)[idx1];
+        igraph_integer_t to = VECTOR(*edges)[idx2];
         VECTOR(tmp)[i] = from;
         ADD_STUB(from, idx1);
         ADD_STUB(to, idx2);
@@ -156,9 +157,9 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
         /* Do the rewiring */
         do {
             if (loops) {
-                pot = (int) RNG_INTEGER(0, no_verts - 1);
+                pot = RNG_INTEGER(0, no_verts - 1);
             } else {
-                pot = (int) RNG_INTEGER(0, no_verts - 2);
+                pot = RNG_INTEGER(0, no_verts - 2);
                 pot = pot != other ? pot : no_verts - 1;
             }
         } while (VECTOR(marked)[pot] == other + 1 && pot != v);

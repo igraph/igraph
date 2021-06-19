@@ -827,11 +827,6 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        /*
-        printf("Reached vertex %ld, is_target[%ld] = %d, %ld to go\n",
-            minnei, minnei, (int)is_target[minnei], to_reach - is_target[minnei]);
-        */
-
         if (is_target[minnei]) {
             is_target[minnei] = 0;
             to_reach--;

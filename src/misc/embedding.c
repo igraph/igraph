@@ -49,12 +49,12 @@ static igraph_error_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_real
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* to = (A+cD) from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(neis);
+        nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
@@ -76,12 +76,12 @@ static igraph_error_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_rea
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
     igraph_vector_int_t *incs;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* to = (A+cD) from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
@@ -104,12 +104,12 @@ static igraph_error_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_
     const igraph_vector_t *cvec = data->cvec;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* tmp = (A+cD)' from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(inlist, i);
-        nlen = (int) igraph_vector_int_size(neis);
+        nlen = igraph_vector_int_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_
     /* to = (A+cD) tmp */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(neis);
+        nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
@@ -140,12 +140,12 @@ static igraph_error_t igraph_i_asembedding_right(igraph_real_t *to, const igraph
     igraph_adjlist_t *inlist = data->inlist;
     const igraph_vector_t *cvec = data->cvec;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* to = (A+cD)' from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(inlist, i);
-        nlen = (int) igraph_vector_int_size(neis);
+        nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
@@ -168,12 +168,12 @@ static igraph_error_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_real
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *incs;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* tmp = (A+cD)' from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(inlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
@@ -187,7 +187,7 @@ static igraph_error_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_real
     /* to = (A+cD) tmp */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
@@ -210,12 +210,12 @@ static igraph_error_t igraph_i_asembeddingw_right(igraph_real_t *to, const igrap
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
     igraph_vector_int_t *incs;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* to = (A+cD)' from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(inlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
@@ -236,12 +236,12 @@ static igraph_error_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_re
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
     igraph_vector_int_t *neis;
-    int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     /* to = (D-A) from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(neis);
+        nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
@@ -267,7 +267,7 @@ static igraph_error_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_r
     /* to = (D-A) from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
@@ -300,7 +300,7 @@ static igraph_error_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_r
     /* tmp = A to */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(neis);
+        nlen = igraph_vector_int_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
@@ -336,7 +336,7 @@ static igraph_error_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_
     /* tmp = A' to */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
@@ -354,7 +354,7 @@ static igraph_error_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_
     /* tmp = A to */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = (int) igraph_vector_int_size(incs);
+        nlen = igraph_vector_int_size(incs);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];

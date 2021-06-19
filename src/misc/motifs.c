@@ -331,7 +331,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                     }
 
                     IGRAPH_CHECK_CALLBACK(
-                        callback(graph, &vids, (int) arr_code[code], extra),
+                        callback(graph, &vids, arr_code[code], extra),
                         &ret
                     );
 

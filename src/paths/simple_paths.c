@@ -134,7 +134,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
             /* Search for a neighbor that was not yet visited */
             any = 0;
             while (!any && (*ptr) < n) {
-                nei = (int) VECTOR(*neis)[(*ptr)];
+                nei = VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];
                 (*ptr) ++;
             }

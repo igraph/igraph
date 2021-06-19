@@ -699,7 +699,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         /* (8) Run the BFS */
         alternating_path_endpoint = -1;
         while (!igraph_dqueue_int_empty(&q)) {
-            v = (int) igraph_dqueue_int_pop(&q);
+            v = igraph_dqueue_int_pop(&q);
 
             debug("Considering vertex %ld\n", v);
 
@@ -729,7 +729,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
                 debug("  Reached vertex %ld via edge %ld\n", (long)u, (long)j);
                 VECTOR(parent)[u] = v;
                 IGRAPH_CHECK(igraph_vector_push_back(&vec2, u));
-                w = (int) VECTOR(match)[u];
+                w = VECTOR(match)[u];
                 if (w == -1) {
                     /* u is unmatched and it is in the larger set. Therefore, we
                      * could improve the matching by following the parents back
@@ -763,7 +763,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
                 debug("  Reached vertex %ld via tight phantom edge\n", (long)u);
                 VECTOR(parent)[u] = v;
                 IGRAPH_CHECK(igraph_vector_push_back(&vec2, u));
-                w = (int) VECTOR(match)[u];
+                w = VECTOR(match)[u];
                 if (w == -1) {
                     /* u is unmatched and it is in the larger set. Therefore, we
                      * could improve the matching by following the parents back
@@ -791,14 +791,14 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
             debug("Extending matching with alternating path ending in %ld.\n", v);
 
             while (u != v) {
-                w = (int) VECTOR(match)[v];
+                w = VECTOR(match)[v];
                 if (w != -1) {
                     VECTOR(match)[w] = -1;
                 }
                 VECTOR(match)[v] = u;
 
                 VECTOR(match)[v] = u;
-                w = (int) VECTOR(match)[u];
+                w = VECTOR(match)[u];
                 if (w != -1) {
                     VECTOR(match)[w] = -1;
                 }
@@ -896,7 +896,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
                       VECTOR(slack)[v], min_slack);
             }
         }
-        debug("Minimum slack: %.4f on edge %d--%d\n", min_slack, (int)min_slack_u, (int)min_slack_v);
+        debug("Minimum slack: %.4f on edge %" IGRAPH_PRId "--%" IGRAPH_PRId "\n", min_slack, min_slack_u, min_slack_v);
 
         if (min_slack > 0) {
             /* Decrease the label of reachable nodes in A by min_slack.
