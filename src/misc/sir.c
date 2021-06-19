@@ -198,7 +198,7 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
         neis = igraph_adjlist_get(&adjlist, infected);
         neilen = igraph_vector_int_size(neis);
         for (i = 0; i < neilen; i++) {
-            int nei = VECTOR(*neis)[i];
+            igraph_integer_t nei = VECTOR(*neis)[i];
             IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, beta));
         }
 

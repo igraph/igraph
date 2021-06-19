@@ -196,7 +196,7 @@ igraph_error_t igraph_eccentricity(const igraph_t *graph,
 igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                   igraph_neimode_t mode) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes == 0) {
         *radius = IGRAPH_NAN;
