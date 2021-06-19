@@ -124,7 +124,7 @@ static igraph_error_t igraph_i_local_scan_1_directed(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
-    int i, node;
+    igraph_integer_t i, node;
 
     igraph_vector_int_t neis;
 
@@ -187,7 +187,7 @@ static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
-    int i, node;
+    igraph_integer_t i, node;
 
     igraph_vector_int_t neis;
 
@@ -493,7 +493,7 @@ igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_
     igraph_adjlist_t adj_us;
     igraph_inclist_t incs_them;
     igraph_vector_int_t neis;
-    int node;
+    igraph_integer_t node;
 
     if (igraph_vcount(them) != no_of_nodes) {
         IGRAPH_ERROR("Number of vertices must match in scan-1", IGRAPH_EINVAL);
@@ -525,7 +525,7 @@ igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_
         igraph_vector_int_t *edges1_them = igraph_inclist_get(&incs_them, node);
         igraph_integer_t len1_us = igraph_vector_int_size(neis_us);
         igraph_integer_t len1_them = igraph_vector_int_size(edges1_them);
-        int i;
+        igraph_integer_t i;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -591,13 +591,13 @@ igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_
  *
  */
 
-igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, int k,
+igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_t k,
                                igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    int node;
+    igraph_integer_t node;
     igraph_dqueue_int_t Q;
     igraph_vector_int_t marked;
     igraph_inclist_t incs;
@@ -691,12 +691,12 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, int k,
  */
 
 igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
-                                    int k, igraph_vector_t *res,
+                                    igraph_integer_t k, igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(us);
-    int node;
+    igraph_integer_t node;
     igraph_dqueue_int_t Q;
     igraph_vector_int_t marked;
     igraph_stack_int_t ST;
