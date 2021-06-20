@@ -32,6 +32,8 @@
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
 
+#include <limits.h>
+
 /**
  * \ingroup structural
  * \function igraph_feedback_arc_set
@@ -451,7 +453,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t membership, ordering, vertex_remapping;
     igraph_vector_ptr_t vertices_by_components, edges_by_components;
-    long int i, j, k, l, m, n, from, to;
+    long int i, j, k, l, m, n, from, to, no_of_rows;
     igraph_real_t weight;
     glp_prob *ip;
     glp_iocp parm;
@@ -557,6 +559,10 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
         /* Set up variables */
         k = n * (n - 1) / 2;
+        if (k > INT_MAX) {
+            IGRAPH_ERROR("Feedback arc set problem too large for GLPK", IGRAPH_EOVERFLOW);
+        }
+
         if (k > 0) {
             glp_add_cols(ip, (int) k);
             for (j = 1; j <= k; j++) {
@@ -587,7 +593,11 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
         /* Add constraints */
         if (n > 1) {
-            glp_add_rows(ip, (int)(n * (n - 1) / 2 + n * (n - 1) * (n - 2) / 3));
+            no_of_rows = n * (n - 1) / 2 + n * (n - 1) * (n - 2) / 3;
+            if (no_of_rows > INT_MAX) {
+                IGRAPH_ERROR("Feedback arc set problem too large for GLPK", IGRAPH_EOVERFLOW);
+            }
+            glp_add_rows(ip, (int) no_of_rows);
             m = 1;
             for (j = 0; j < n; j++) {
                 int ind[4];
