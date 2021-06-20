@@ -103,11 +103,23 @@ static igraph_error_t igraph_vector_int_copy_to_fortran(
 
 igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                          int *info) {
-    int m = (int) igraph_matrix_nrow(a);
-    int n = (int) igraph_matrix_ncol(a);
-    size_t num_elts = m < n ? m : n;
-    int lda = m > 0 ? m : 1;
+    int m;
+    int n;
+    size_t num_elts;
+    int lda;
     igraph_vector_fortran_int_t vipiv;
+
+    if (igraph_matrix_nrow(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (igraph_matrix_ncol(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of columns in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+
+    m = (int) igraph_matrix_nrow(a);
+    n = (int) igraph_matrix_ncol(a);
+    num_elts = m < n ? m : n;
+    lda = m > 0 ? m : 1;
 
     IGRAPH_CHECK(igraph_vector_fortran_int_init(&vipiv, num_elts));
     IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &vipiv);
@@ -179,12 +191,24 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
 igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
                          const igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
     char trans = transpose ? 'T' : 'N';
-    int n = (int) igraph_matrix_nrow(a);
-    int nrhs = (int) igraph_matrix_ncol(b);
-    int lda = n > 0 ? n : 1;
-    int ldb = n > 0 ? n : 1;
+    int n;
+    int nrhs;
+    int lda;
+    int ldb;
     int info;
     igraph_vector_fortran_int_t vipiv;
+
+    if (igraph_matrix_nrow(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (igraph_matrix_ncol(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of columns in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+
+    n = (int) igraph_matrix_nrow(a);
+    nrhs = (int) igraph_matrix_ncol(b);
+    lda = n > 0 ? n : 1;
+    ldb = n > 0 ? n : 1;
 
     if (n != igraph_matrix_ncol(a)) {
         IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
@@ -289,6 +313,12 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
 igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                                    igraph_matrix_t *b, int *info) {
 
+    if (igraph_matrix_nrow(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (igraph_matrix_ncol(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of columns in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(a);
     int nrhs = (int) igraph_matrix_ncol(b);
     int lda = n > 0 ? n : 1;
@@ -421,6 +451,9 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
 
     igraph_matrix_t Acopy;
     char jobz = vectors ? 'V' : 'N', range, uplo = 'U';
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A), lda = n, ldz = n;
     int m, info;
     igraph_vector_t *myvalues = values, vvalues;
@@ -599,6 +632,9 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A);
     int lda = n, ldvl = n, ldvr = n, lwork = -1;
     igraph_vector_t work;
@@ -809,6 +845,9 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
     char sense;
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A);
     int lda = n, ldvl = n, ldvr = n, lwork = -1;
     igraph_vector_t work;
@@ -940,6 +979,9 @@ igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
                          int ilo, int ihi,
                          igraph_matrix_t *result) {
 
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A);
     int lda = n;
     int lwork = -1;

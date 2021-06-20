@@ -65,8 +65,13 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_mat
 
     igraph_matrix_t vec1, vec2;
     igraph_vector_t val1, val2;
-    int n = (int) igraph_matrix_nrow(A);
     int p1 = 0, p2 = which->howmany - 1, pr = 0;
+    int n;
+
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    n = (int) igraph_matrix_nrow(A);
 
     IGRAPH_VECTOR_INIT_FINALLY(&val1, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&val2, 0);
@@ -143,9 +148,14 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_mat
 
     igraph_vector_t val;
     igraph_matrix_t vec;
-    int i, w = 0, n = (int) igraph_matrix_nrow(A);
+    int i, w = 0, n;
     igraph_real_t small;
     int p1, p2, pr = 0;
+
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    n = (int) igraph_matrix_nrow(A);
 
     IGRAPH_VECTOR_INIT_FINALLY(&val, 0);
 
@@ -218,6 +228,9 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_mat
         igraph_matrix_t *vectors) {
 
     /* TODO: ordering? */
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+                IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
 
     int n = (int) igraph_matrix_nrow(A);
     int il = n - which->howmany + 1;
@@ -254,8 +267,13 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_mat
 
     igraph_matrix_t vec1, vec2;
     igraph_vector_t val1, val2;
-    int n = (int) igraph_matrix_nrow(A);
+    int n;
     int p1 = 0, p2 = which->howmany / 2, pr = 0;
+
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+                IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    n = (int) igraph_matrix_nrow(A);
 
     IGRAPH_VECTOR_INIT_FINALLY(&val1, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&val2, 0);
@@ -380,9 +398,15 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix
     /* First we need to create a dense square matrix */
 
     if (A) {
-        n = (int) igraph_matrix_nrow(A);
+        if (igraph_matrix_nrow(A) > INT_MAX) {
+                    IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+        }
+        n = (int) igraph_matrix_nrow(A); /* TODO: n isn't used after this assignment */
     } else if (sA) {
-        n = (int) igraph_sparsemat_nrow(sA);
+        if (igraph_sparsemat_nrow(sA) > INT_MAX) {
+                    IGRAPH_ERROR("Number of rows in sparse matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+        }
+        n = (int) igraph_sparsemat_nrow(sA); /* TODO: n isn't used after this assignment */
         IGRAPH_CHECK(igraph_matrix_init(&mA, 0, 0));
         IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
         IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
@@ -913,12 +937,17 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
     igraph_vector_int_t idx;
     igraph_vector_t mag;
     igraph_bool_t hasmag = 0;
-    int nev = (int) igraph_vector_size(real);
+    int nev;
     int howmany = 0, start = 0;
     igraph_integer_t i;
     igraph_i_eigen_matrix_lapack_cmp_t cmpfunc = 0;
     igraph_i_eml_cmp_t vextra;
     void *extra;
+
+    if (igraph_vector_size(real) > INT_MAX) {
+                IGRAPH_ERROR("Number of eigenvalues too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    nev = (int) igraph_vector_size(real);
 
     vextra.mag = &mag;
     vextra.real = real;
@@ -1134,8 +1163,14 @@ static igraph_error_t igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
     /* We need to create a dense square matrix first */
 
     if (A) {
+        if (igraph_matrix_nrow(A) > INT_MAX) {
+                    IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+        }
         n = (int) igraph_matrix_nrow(A);
     } else if (sA) {
+        if (igraph_sparsemat_nrow(sA) > INT_MAX) {
+                    IGRAPH_ERROR("Number of rows in sparse matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+        }
         n = (int) igraph_sparsemat_nrow(sA);
         IGRAPH_CHECK(igraph_matrix_init(&mA, 0, 0));
         IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
@@ -1404,7 +1439,7 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
                      "`ALL' eigenvalues", IGRAPH_UNIMPLEMENTED);
     }
     if (n > INT_MAX) {
-        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     switch (which->pos) {

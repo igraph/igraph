@@ -30,6 +30,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 /* The ARPACK example file dssimp.f is used as a template */
 
@@ -188,11 +189,21 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
  * Time complexity: O(maxncv*(maxldv+maxn)).
  */
 
-igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
-                               long int maxncv, long int maxldv,
+igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
+                               igraph_integer_t maxncv, igraph_integer_t maxldv,
                                igraph_bool_t symm) {
 
     /* TODO: check arguments */
+    if (maxn > INT_MAX) {
+        IGRAPH_ERROR("Maximum order of matrices too large for ARPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (maxncv > INT_MAX) {
+        IGRAPH_ERROR("Maximum NCV parameter too large for ARPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (maxldv > INT_MAX) {
+        IGRAPH_ERROR("Maximum LDV parameter too large for ARPACK.", IGRAPH_EOVERFLOW);
+    }
+
     s->maxn = (int) maxn;
     s->maxncv = (int) maxncv;
     s->maxldv = (int) maxldv;
