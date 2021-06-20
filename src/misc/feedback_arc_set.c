@@ -202,7 +202,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     igraph_vector_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
     igraph_integer_t* ordering;
-    long int order_next_pos = 0, order_next_neg = -1;
+    igraph_integer_t order_next_pos = 0, order_next_neg = -1;
     igraph_real_t diff, maxdiff;
 
     ordering = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
@@ -387,7 +387,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         igraph_vector_clear(result);
         j = igraph_ecount(graph);
         for (i = 0; i < j; i++) {
-            long int from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
+            igraph_integer_t from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
             if (from == to || ordering[from] > ordering[to]) {
                 IGRAPH_CHECK(igraph_vector_push_back(result, i));
             }
@@ -414,7 +414,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
             k = igraph_vector_size(&neis);
             for (j = 0; j < k; j++) {
-                long int to = VECTOR(neis)[j];
+                igraph_integer_t to = VECTOR(neis)[j];
                 if (from == to) {
                     continue;
                 }
@@ -453,7 +453,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t membership, ordering, vertex_remapping;
     igraph_vector_ptr_t vertices_by_components, edges_by_components;
-    long int i, j, k, l, m, n, from, to, no_of_rows;
+    igraph_integer_t i, j, k, l, m, n, from, to, no_of_rows;
     igraph_real_t weight;
     glp_prob *ip;
     glp_iocp parm;
@@ -554,7 +554,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
         /* Construct a mapping from vertex IDs to the [0; n-1] range */
         for (j = 0; j < n; j++) {
-            VECTOR(vertex_remapping)[(long)VECTOR(*vertices_in_comp)[j]] = j;
+            VECTOR(vertex_remapping)[(igraph_integer_t)VECTOR(*vertices_in_comp)[j]] = j;
         }
 
         /* Set up variables */

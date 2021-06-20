@@ -81,8 +81,8 @@ IGRAPH_EXPORT igraph_error_t igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
                                 void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
                               igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-                              int maxit, int trace,
-                              igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
+                              igraph_integer_t maxit, igraph_integer_t trace,
+                              igraph_real_t abstol, igraph_real_t reltol, igraph_integer_t nREPORT, void *ex,
                               igraph_integer_t *fncount, igraph_integer_t *grcount);
 IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
                                        igraph_real_t xmin, igraph_bool_t force_continuous);
