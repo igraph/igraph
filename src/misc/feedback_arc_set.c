@@ -252,7 +252,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     while (nodes_left > 0) {
         /* (1) Remove the sources one by one */
         while (!igraph_dqueue_empty(&sources)) {
-            i = (long)igraph_dqueue_pop(&sources);
+            i = igraph_dqueue_pop(&sources);
             /* Add the node to the ordering */
             ordering[i] = order_next_pos++;
             /* Exclude the node from further searches */
@@ -279,7 +279,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         /* (2) Remove the sinks one by one */
         while (!igraph_dqueue_empty(&sinks)) {
-            i = (long)igraph_dqueue_pop(&sinks);
+            i = igraph_dqueue_pop(&sinks);
             /* Maybe the vertex became sink and source at the same time, hence it
              * was already removed in the previous iteration. Check it. */
             if (VECTOR(indegrees)[i] < 0) {
@@ -502,7 +502,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_CHECK(igraph_vector_push_back(VECTOR(vertices_by_components)[j], i));
     }
     for (i = 0; i < no_of_edges; i++) {
-        j = VECTOR(membership)[(long)IGRAPH_FROM(graph, i)];
+        j = VECTOR(membership)[IGRAPH_FROM(graph, i)];
         IGRAPH_CHECK(igraph_vector_push_back(VECTOR(edges_by_components)[j], i));
     }
 
@@ -574,8 +574,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         k = igraph_vector_size(edges_in_comp);
         for (j = 0; j < k; j++) {
             l = VECTOR(*edges_in_comp)[j];
-            from = VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
-            to = VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
+            from = VECTOR(vertex_remapping)[IGRAPH_FROM(graph, l)];
+            to = VECTOR(vertex_remapping)[IGRAPH_TO(graph, l)];
             if (from == to) {
                 continue;
             }
@@ -652,8 +652,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         k = igraph_vector_size(edges_in_comp);
         for (j = 0; j < k; j++) {
             l = VECTOR(*edges_in_comp)[j];
-            from = VECTOR(vertex_remapping)[(long)IGRAPH_FROM(graph, l)];
-            to = VECTOR(vertex_remapping)[(long)IGRAPH_TO(graph, l)];
+            from = VECTOR(vertex_remapping)[IGRAPH_FROM(graph, l)];
+            to = VECTOR(vertex_remapping)[IGRAPH_TO(graph, l)];
             if (from == to || VECTOR(ordering)[from] < VECTOR(ordering)[to]) {
                 IGRAPH_CHECK(igraph_vector_push_back(result, l));
             }
