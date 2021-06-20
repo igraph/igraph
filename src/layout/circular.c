@@ -61,7 +61,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vit_create(graph, order, &vit);
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_real_t phi = 2 * M_PI / vs_size * i;
-        int idx = IGRAPH_VIT_GET(vit);
+        igraph_integer_t idx = IGRAPH_VIT_GET(vit);
         MATRIX(*res, idx, 0) = cos(phi);
         MATRIX(*res, idx, 1) = sin(phi);
     }

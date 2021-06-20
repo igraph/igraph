@@ -590,8 +590,8 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
 static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igraph_t* graph,
         const igraph_vector_t* weights, igraph_vector_t* membership) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
 
     if (no_of_edges == 0) {
@@ -603,10 +603,14 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
     if (igraph_is_directed(graph) && no_of_nodes <= 1000) {
         /* Network simplex algorithm of Gansner et al, using the original linear
          * programming formulation */
-        long int i, j;
+        igraph_integer_t i, j;
         igraph_vector_t outdegs, indegs, feedback_edges;
         glp_prob *ip;
         glp_smcp parm;
+
+        if (no_of_edges > INT_MAX) {
+            IGRAPH_ERROR("Number of edges in graph too large for GLPK.", IGRAPH_EOVERFLOW);
+        }
 
         /* Allocate storage and create the problem */
         ip = glp_create_prob();
@@ -626,9 +630,9 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
                                      IGRAPH_IN, 1, weights));
         j = igraph_vector_size(&feedback_edges);
         for (i = 0; i < j; i++) {
-            long int eid = VECTOR(feedback_edges)[i];
-            long int from = IGRAPH_FROM(graph, eid);
-            long int to = IGRAPH_TO(graph, eid);
+            igraph_integer_t eid = VECTOR(feedback_edges)[i];
+            igraph_integer_t from = IGRAPH_FROM(graph, eid);
+            igraph_integer_t to = IGRAPH_TO(graph, eid);
             VECTOR(outdegs)[from] -= weights ? VECTOR(*weights)[eid] : 1;
             VECTOR(indegs)[to] -= weights ? VECTOR(*weights)[eid] : 1;
         }
@@ -659,8 +663,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
         for (i = 0; i < no_of_edges; i++) {
             int ind[3];
             double val[3] = {0, -1, 1};
-            ind[1] = IGRAPH_FROM(graph, i) + 1;
-            ind[2] = IGRAPH_TO(graph, i) + 1;
+            ind[1] = (int) IGRAPH_FROM(graph, i) + 1;
+            ind[2] = (int) IGRAPH_TO(graph, i) + 1;
 
             if (ind[1] == ind[2]) {
                 if (VECTOR(feedback_edges)[j] == i) {

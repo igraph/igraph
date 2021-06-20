@@ -262,7 +262,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
             for (t = 0; t < no_tries; t++) {
                 float diff_energy = 0.0;
-                int ti = VECTOR(try_idx)[t];
+                igraph_integer_t ti = VECTOR(try_idx)[t];
 
                 /* Try moving it */
                 float old_x = MATRIX(*res, v, 0);
