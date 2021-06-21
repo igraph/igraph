@@ -501,7 +501,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
         igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX,
                                    "type");
         if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            int bptr = 0, tptr = 0;
+            igraph_integer_t bptr = 0, tptr = 0;
             bipartite = 1; write_vertex_attrs = 1;
             /* Count top and bottom vertices, we go over them twice,
             because we want to keep their original order */
@@ -520,15 +520,15 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                     nobottom++;
                 }
             }
-            for (i = 0, bptr = 0, tptr = (int) nobottom; i < no_of_nodes; i++) {
+            for (i = 0, bptr = 0, tptr = nobottom; i < no_of_nodes; i++) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph,
                              "type", igraph_vss_1(i), &bvec));
                 if (VECTOR(bvec)[0]) {
-                    VECTOR(bip_index)[tptr] = (int) i;
+                    VECTOR(bip_index)[tptr] = i;
                     VECTOR(bip_index2)[i] = tptr;
                     tptr++;
                 } else {
-                    VECTOR(bip_index)[bptr] = (int) i;
+                    VECTOR(bip_index)[bptr] = i;
                     VECTOR(bip_index2)[i] = bptr;
                     bptr++;
                 }
@@ -640,7 +640,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
             /* numeric parameters */
             for (j = 0; j < igraph_vector_size(&vx_numa); j++) {
-                int idx = (int) VECTOR(vx_numa)[j];
+                igraph_integer_t idx = VECTOR(vx_numa)[j];
                 igraph_i_attribute_get_numeric_vertex_attr(graph, vnumnames[idx],
                         igraph_vss_1(id), &numv);
                 fprintf(outstream, " %s ", vnumnames2[idx]);
@@ -649,7 +649,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
             /* string parameters */
             for (j = 0; j < igraph_vector_size(&vx_stra); j++) {
-                int idx = (int) VECTOR(vx_stra)[j];
+                igraph_integer_t idx = VECTOR(vx_stra)[j];
                 igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
                         igraph_vss_1(id), &strv);
                 igraph_strvector_get(&strv, 0, &s);
@@ -728,7 +728,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
         /* numeric parameters */
         for (j = 0; j < igraph_vector_size(&ex_numa); j++) {
-            int idx = (int) VECTOR(ex_numa)[j];
+            igraph_integer_t idx = VECTOR(ex_numa)[j];
             igraph_i_attribute_get_numeric_edge_attr(graph, enumnames[idx],
                     igraph_ess_1(edge), &numv);
             fprintf(outstream, " %s ", enumnames2[idx]);
@@ -737,7 +737,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
         /* string parameters */
         for (j = 0; j < igraph_vector_size(&ex_stra); j++) {
-            int idx = (int) VECTOR(ex_stra)[j];
+            igraph_integer_t idx = VECTOR(ex_stra)[j];
             igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
                                                     igraph_ess_1(edge), &strv);
             igraph_strvector_get(&strv, 0, &s);

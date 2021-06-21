@@ -165,7 +165,7 @@ public:
             return (fast_search(neigh[u], deg[u], v) != NULL);
         }
     }
-    // Backup graph [sizeof(int) bytes per edge]
+    // Backup graph [sizeof(igraph_integer_t) bytes per edge]
     igraph_integer_t* backup(igraph_integer_t *here = NULL);
     // Restore from backup. Assume that degrees haven't changed
     void restore(igraph_integer_t* back);

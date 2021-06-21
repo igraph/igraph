@@ -72,14 +72,25 @@ typedef struct {
 } igraph_i_multilevel_link;
 
 static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
-    long int r = (((igraph_i_multilevel_link*)a)->from -
-                  ((igraph_i_multilevel_link*)b)->from);
-    if (r != 0) {
-        return (int) r;
+    long int diff;
+
+    diff = ((igraph_i_multilevel_link*)a)->from - ((igraph_i_multilevel_link*)b)->from;
+
+    if (diff < 0) {
+        return -1;
+    } else if (diff > 0) {
+        return 1;
     }
 
-    return (int) (((igraph_i_multilevel_link*)a)->to -
-                  ((igraph_i_multilevel_link*)b)->to);
+    diff = ((igraph_i_multilevel_link*)a)->to - ((igraph_i_multilevel_link*)b)->to;
+
+    if (diff < 0) {
+        return -1;
+    } else if (diff > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 /* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
@@ -146,8 +157,11 @@ typedef struct {
 } igraph_i_multilevel_community_link;
 
 static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
-    return (int) (((igraph_i_multilevel_community_link*)a)->community -
-                  ((igraph_i_multilevel_community_link*)b)->community);
+    long int diff = (
+        ((igraph_i_multilevel_community_link*)a)->community -
+        ((igraph_i_multilevel_community_link*)b)->community
+    );
+    return diff < 0 ? -1 : diff > 0 ? 1 : 0;
 }
 
 /**
@@ -182,7 +196,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
     igraph_vector_clear(links_weight);
 
     /* Get the list of incident edges */
-    igraph_incident(graph, edges, vertex, IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_incident(graph, edges, vertex, IGRAPH_ALL));
 
     n = igraph_vector_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);

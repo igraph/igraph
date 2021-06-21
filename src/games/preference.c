@@ -30,10 +30,10 @@
 #include "core/interruption.h"
 
 static void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
-    int i = 0, n;
+    igraph_integer_t i = 0, n;
     igraph_vector_t *v;
 
-    n = (int) igraph_vector_ptr_size(vecs);
+    n = igraph_vector_ptr_size(vecs);
     for (i = 0; i < n; i++) {
         v = (igraph_vector_t*)VECTOR(*vecs)[i];
         if (v) {
@@ -101,7 +101,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                            igraph_bool_t directed,
                            igraph_bool_t loops) {
 
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_vector_t edges, s;
     igraph_vector_t* nodetypes;
     igraph_vector_ptr_t vids_by_type;
@@ -214,7 +214,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         IGRAPH_FINALLY_CLEAN(1);
 
     } else {
-        long int an = 0;
+        igraph_integer_t an = 0;
         if (type_dist) {
             for (i = 0; i < types; i++) {
                 igraph_integer_t no = VECTOR(*type_dist)[i];
@@ -226,7 +226,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 }
             }
         } else {
-            long int fixno = ceil( (double)nodes / types);
+            igraph_integer_t fixno = ceil( (double)nodes / types);
             for (i = 0; i < types; i++) {
                 igraph_vector_t *v = VECTOR(vids_by_type)[i];
                 for (j = 0; j < fixno && an < nodes; j++) {
@@ -244,10 +244,10 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     for (i = 0; i < types; i++) {
         for (j = 0; j < types; j++) {
             /* Generating the random subgraph between vertices of type i and j */
-            long int k, l;
+            igraph_integer_t k, l;
             igraph_real_t p, last;
             igraph_vector_t *v1, *v2;
-            long int v1_size, v2_size;
+            igraph_integer_t v1_size, v2_size;
 
             IGRAPH_ALLOW_INTERRUPTION();
 
@@ -291,8 +291,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             if (i != j) {
                 /* Generating the subgraph between vertices of type i and j */
                 for (k = 0; k < l; k++) {
-                    long int to = floor(VECTOR(s)[k] / v1_size);
-                    long int from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
+                    igraph_integer_t to = floor(VECTOR(s)[k] / v1_size);
+                    igraph_integer_t from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
                     igraph_vector_push_back(&edges, VECTOR(*v1)[from]);
                     igraph_vector_push_back(&edges, VECTOR(*v2)[to]);
                 }
@@ -300,15 +300,15 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 /* Generating the subgraph among vertices of type i */
                 if (directed && loops) {
                     for (k = 0; k < l; k++) {
-                        long int to = floor(VECTOR(s)[k] / v1_size);
-                        long int from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
+                        igraph_integer_t to = floor(VECTOR(s)[k] / v1_size);
+                        igraph_integer_t from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
                         igraph_vector_push_back(&edges, VECTOR(*v1)[from]);
                         igraph_vector_push_back(&edges, VECTOR(*v1)[to]);
                     }
                 } else if (directed && !loops) {
                     for (k = 0; k < l; k++) {
-                        long int to = floor(VECTOR(s)[k] / v1_size);
-                        long int from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
+                        igraph_integer_t to = floor(VECTOR(s)[k] / v1_size);
+                        igraph_integer_t from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
                         if (from == to) {
                             to = v1_size - 1;
                         }
@@ -317,15 +317,15 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                     }
                 } else if (!directed && loops) {
                     for (k = 0; k < l; k++) {
-                        long int to = floor((sqrt(8 * VECTOR(s)[k] + 1) - 1) / 2);
-                        long int from = (VECTOR(s)[k] - (((igraph_real_t)to) * (to + 1)) / 2);
+                        igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[k] + 1) - 1) / 2);
+                        igraph_integer_t from = (VECTOR(s)[k] - (((igraph_real_t)to) * (to + 1)) / 2);
                         igraph_vector_push_back(&edges, VECTOR(*v1)[from]);
                         igraph_vector_push_back(&edges, VECTOR(*v1)[to]);
                     }
                 } else {
                     for (k = 0; k < l; k++) {
-                        long int to = floor((sqrt(8 * VECTOR(s)[k] + 1) + 1) / 2);
-                        long int from = (VECTOR(s)[k] - (((igraph_real_t)to) * (to - 1)) / 2);
+                        igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[k] + 1) + 1) / 2);
+                        igraph_integer_t from = (VECTOR(s)[k] - (((igraph_real_t)to) * (to - 1)) / 2);
                         igraph_vector_push_back(&edges, VECTOR(*v1)[from]);
                         igraph_vector_push_back(&edges, VECTOR(*v1)[to]);
                     }
@@ -400,7 +400,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
                                       igraph_vector_t *node_type_in_vec,
                                       igraph_bool_t loops) {
 
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_vector_t edges, cumdist, s, intersect;
     igraph_vector_t *nodetypes_in;
     igraph_vector_t *nodetypes_out;
@@ -537,11 +537,11 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     IGRAPH_VECTOR_INIT_FINALLY(&intersect, 0);
     for (i = 0; i < out_types; i++) {
         for (j = 0; j < in_types; j++) {
-            long int kk, l;
+            igraph_integer_t kk, l;
             igraph_integer_t c = 0;
             igraph_real_t p, last;
             igraph_vector_t *v1, *v2;
-            long int v1_size, v2_size;
+            igraph_integer_t v1_size, v2_size;
 
             IGRAPH_ALLOW_INTERRUPTION();
 
@@ -573,8 +573,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
 
             if (!loops && c > 0) {
                 for (kk = 0; kk < l; kk++) {
-                    long int to = floor(VECTOR(s)[kk] / v1_size);
-                    long int from = (VECTOR(s)[kk] - ((igraph_real_t)to) * v1_size);
+                    igraph_integer_t to = floor(VECTOR(s)[kk] / v1_size);
+                    igraph_integer_t from = (VECTOR(s)[kk] - ((igraph_real_t)to) * v1_size);
                     if (VECTOR(*v1)[from] == VECTOR(*v2)[to]) {
                         /* remap loop edges */
                         to = v2_size - 1;
@@ -595,8 +595,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
                 }
             } else {
                 for (kk = 0; kk < l; kk++) {
-                    long int to = floor(VECTOR(s)[kk] / v1_size);
-                    long int from = (VECTOR(s)[kk] - ((igraph_real_t)to) * v1_size);
+                    igraph_integer_t to = floor(VECTOR(s)[kk] / v1_size);
+                    igraph_integer_t from = (VECTOR(s)[kk] - ((igraph_real_t)to) * v1_size);
                     igraph_vector_push_back(&edges, VECTOR(*v1)[from]);
                     igraph_vector_push_back(&edges, VECTOR(*v2)[to]);
                 }

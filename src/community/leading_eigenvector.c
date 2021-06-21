@@ -34,6 +34,8 @@
 
 #include "core/interruption.h"
 
+#include <limits.h>
+
 /**
  * \section about_leading_eigenvector_methods
  *
@@ -509,6 +511,10 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         igraph_i_community_leading_eigenvector2;
     igraph_real_t sumweights = 0.0;
 
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
     if (weights && no_of_edges != igraph_vector_size(weights)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
@@ -533,7 +539,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     if (steps < 0 || steps > no_of_nodes - 1) {
-        steps = (igraph_integer_t) no_of_nodes - 1;
+        steps = no_of_nodes - 1;
     }
 
     if (!membership) {
@@ -559,7 +565,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
          * an initial split */
         IGRAPH_CHECK(igraph_clusters(graph, mymembership, &idx, 0, IGRAPH_WEAK));
         communities = igraph_vector_size(&idx);
-        IGRAPH_STATUSF(("Starting from %li component(s).\n", 0, communities));
+        IGRAPH_STATUSF(("Starting from %" IGRAPH_PRId " component(s).\n", 0, communities));
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history,
                                                  IGRAPH_LEVC_HIST_START_FULL));
@@ -567,8 +573,8 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     } else {
         /* Just create the idx vector for the given membership vector */
         communities = igraph_vector_max(mymembership) + 1;
-        IGRAPH_STATUSF(("Starting from given membership vector with %li "
-                        "communities.\n", 0, communities));
+        IGRAPH_STATUSF(("Starting from given membership vector with %" IGRAPH_PRId
+                        " communities.\n", 0, communities));
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history,
                                                  IGRAPH_LEVC_HIST_START_GIVEN));
@@ -577,7 +583,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_resize(&idx, communities));
         igraph_vector_null(&idx);
         for (i = 0; i < no_of_nodes; i++) {
-            int t = (int) VECTOR(*mymembership)[i];
+            igraph_integer_t t = (igraph_integer_t) VECTOR(*mymembership)[i];
             VECTOR(idx)[t] += 1;
         }
     }
@@ -657,7 +663,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         igraph_integer_t size = 0;
         igraph_real_t tmpev;
 
-        IGRAPH_STATUSF(("Trying to split community %li... ", 0, comm));
+        IGRAPH_STATUSF(("Trying to split community %" IGRAPH_PRId "... ", 0, comm));
         IGRAPH_ALLOW_INTERRUPTION();
 
         for (i = 0; i < no_of_nodes; i++) {
@@ -946,8 +952,8 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         j = 0;
         IGRAPH_CHECK(igraph_matrix_resize(merges, l / 2, 2));
         for (i = l; i > 0; i -= 2) {
-            long int from = VECTOR(mymerges)[i - 1];
-            long int to = VECTOR(mymerges)[i - 2];
+            igraph_integer_t from = VECTOR(mymerges)[i - 1];
+            igraph_integer_t to = VECTOR(mymerges)[i - 2];
             MATRIX(*merges, j, 0) = VECTOR(mymerges)[i - 2];
             MATRIX(*merges, j, 1) = VECTOR(mymerges)[i - 1];
             if (VECTOR(idx)[from] != 0) {
@@ -1019,11 +1025,11 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
         components = 0;
     }
     if (components > no_of_nodes) {
-        IGRAPH_ERRORF("Invalid membership vector: number of components (%ld) must "
-         "not be greater than the number of nodes (%ld).", IGRAPH_EINVAL, components, no_of_nodes);
+        IGRAPH_ERRORF("Invalid membership vector: number of components (%" IGRAPH_PRId ") must "
+         "not be greater than the number of nodes (%" IGRAPH_PRId ").", IGRAPH_EINVAL, components, no_of_nodes);
     }
     if (steps >= components) {
-        IGRAPH_ERRORF("Number of steps (%" IGRAPH_PRId ") must be smaller than number of components (%ld).",
+        IGRAPH_ERRORF("Number of steps (%" IGRAPH_PRId ") must be smaller than number of components (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, steps, components);
     }
 
@@ -1045,9 +1051,7 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
         }
     }
 
-    IGRAPH_CHECK(igraph_community_to_membership(merges, (igraph_integer_t)
-                 components, steps,
-                 &fake_memb, 0));
+    IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, &fake_memb, 0));
 
     /* Ok, now we have the membership of the initial components,
        rewrite the original membership vector. */

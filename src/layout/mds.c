@@ -33,6 +33,8 @@
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
+#include <limits.h>
+
 static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
                                     int n, void *extra);
 
@@ -59,6 +61,14 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
     igraph_real_t grand_mean;
     long int i, j, k;
     igraph_eigen_which_t which;
+
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for eigenvector calculations", IGRAPH_EOVERFLOW);
+    }
+
+    if (nev > INT_MAX) {
+        IGRAPH_ERROR("Dimensionality too large for eigenvector calculations", IGRAPH_EOVERFLOW);
+    }
 
     /* Handle the trivial cases */
     if (no_of_nodes == 1) {
