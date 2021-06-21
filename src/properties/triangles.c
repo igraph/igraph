@@ -739,7 +739,6 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
 
 static int igraph_i_transitivity_barrat4(const igraph_t *graph,
                                          igraph_vector_t *res,
-                                         const igraph_vs_t vids,
                                          const igraph_vector_t *weights,
                                          igraph_transitivity_mode_t mode) {
 
@@ -921,7 +920,7 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     /* Preconditions validated, now we can call the real implementation */
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_i_transitivity_barrat4(graph, res, vids, weights, mode);
+        return igraph_i_transitivity_barrat4(graph, res, weights, mode);
     } else {
         return igraph_i_transitivity_barrat1(graph, res, vids, weights, mode);
     }
