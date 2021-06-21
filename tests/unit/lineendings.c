@@ -67,7 +67,7 @@ int main() {
     igraph_write_graph_pajek(&g, stdout);
     igraph_destroy(&g);
 
-    IGRAPH_VERIFY_FINALLY_STACK();
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
