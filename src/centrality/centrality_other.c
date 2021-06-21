@@ -122,7 +122,7 @@ static igraph_error_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const 
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int edge = VECTOR(*edges)[j];
-            long int nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
         }
@@ -646,7 +646,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int nei_edge = VECTOR(*neis)[j];
-            long int nei = IGRAPH_OTHER(g, nei_edge, i);
+            igraph_integer_t nei = IGRAPH_OTHER(g, nei_edge, i);
             VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
         }
     }
@@ -657,7 +657,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int nei_edge = VECTOR(*neis)[j];
-            long int nei = IGRAPH_OTHER(g, nei_edge, i);
+            igraph_integer_t nei = IGRAPH_OTHER(g, nei_edge, i);
             to[i] += VECTOR(*tmp)[nei] * VECTOR(*weights)[nei_edge];
         }
     }
@@ -1036,7 +1036,7 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int edge = VECTOR(*neis)[j];
-            long int nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
             to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;

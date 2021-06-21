@@ -235,7 +235,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = VECTOR(*neis)[j];
-                long int tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
@@ -610,7 +610,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
                 igraph_real_t altdist, curdist;
                 igraph_bool_t active, has;
                 long int edge = VECTOR(*neis)[j];
-                long int tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
 
                 if (tto == vertex)
                     continue;
@@ -1213,7 +1213,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = VECTOR(*neis)[j];
-                long int tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);

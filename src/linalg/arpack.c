@@ -1379,8 +1379,8 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
                                  long int nev) {
 
-    long int nodes = igraph_matrix_nrow(vectors);
-    long int no_evs = igraph_matrix_nrow(values);
+    igraph_integer_t nodes = igraph_matrix_nrow(vectors);
+    igraph_integer_t no_evs = igraph_matrix_nrow(values);
     long int i, j;
     long int new_vector_pos;
     long int vector_pos;

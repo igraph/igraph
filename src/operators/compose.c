@@ -100,7 +100,7 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
                                      IGRAPH_OUT));
         while (!igraph_vector_empty(&neis1)) {
             long int con = igraph_vector_pop_back(&neis1);
-            long int v1 = IGRAPH_OTHER(g1, con, i);
+            igraph_integer_t v1 = IGRAPH_OTHER(g1, con, i);
             if (v1 < no_of_nodes_right) {
                 IGRAPH_CHECK(igraph_incident(g2, &neis2, (igraph_integer_t) v1,
                                              IGRAPH_OUT));
@@ -109,7 +109,7 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
             }
             while (!igraph_vector_empty(&neis2)) {
                 long int con2 = igraph_vector_pop_back(&neis2);
-                long int v2 = IGRAPH_OTHER(g2, con2, v1);
+                igraph_integer_t v2 = IGRAPH_OTHER(g2, con2, v1);
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v2));
                 if (edge_map1) {

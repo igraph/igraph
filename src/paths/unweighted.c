@@ -352,7 +352,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         vsize = igraph_vector_size(&tmp);
         for (j = 0; j < vsize; j++) {
             long int edge = VECTOR(tmp)[j];
-            long int neighbor = IGRAPH_OTHER(graph, edge, act);
+            igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, act);
             if (father[neighbor] > 0) {
                 continue;
             } else if (father[neighbor] < 0) {

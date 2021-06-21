@@ -74,7 +74,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
 
     while (1) {
         igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, vertex);
-        long neigh_count = igraph_vector_int_size(neighbors);
+        igraph_integer_t neigh_count = igraph_vector_int_size(neighbors);
 
         /* colour current vertex */
         {

@@ -217,7 +217,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
             for (j = 0; j < nlen; j++) {
                 long int edge = VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
 

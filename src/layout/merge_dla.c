@@ -86,7 +86,7 @@ igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
 
     for (i = 0; i < igraph_vector_ptr_size(coords); i++) {
         igraph_matrix_t *mat = VECTOR(*coords)[i];
-        long int size = igraph_matrix_nrow(mat);
+        igraph_integer_t size = igraph_matrix_nrow(mat);
 
         if (igraph_matrix_ncol(mat) != 2) {
             IGRAPH_ERROR("igraph_layout_merge_dla works for 2D layouts only",
@@ -147,7 +147,7 @@ igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));
     respos = 0;
     for (i = 0; i < graphs; i++) {
-        long int size = igraph_matrix_nrow(VECTOR(*coords)[i]);
+        igraph_integer_t size = igraph_matrix_nrow(VECTOR(*coords)[i]);
         igraph_real_t xx = VECTOR(x)[i];
         igraph_real_t yy = VECTOR(y)[i];
         igraph_real_t rr = VECTOR(r)[i] / VECTOR(nr)[i];
@@ -182,7 +182,7 @@ igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
 igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r) {
-    long int nodes = igraph_matrix_nrow(coords);
+    igraph_integer_t nodes = igraph_matrix_nrow(coords);
     long int i;
     igraph_real_t xmin, xmax, ymin, ymax;
 
@@ -214,7 +214,7 @@ igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
 igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *z, igraph_real_t *r) {
-    long int nodes = igraph_matrix_nrow(coords);
+    igraph_integer_t nodes = igraph_matrix_nrow(coords);
     long int i;
     igraph_real_t xmin, xmax, ymin, ymax, zmin, zmax;
 

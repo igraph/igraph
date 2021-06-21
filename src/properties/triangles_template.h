@@ -26,7 +26,7 @@
 #define TRANSIT_TRIEDGES
 #endif
 
-long int no_of_nodes = igraph_vcount(graph);
+igraph_integer_t no_of_nodes = igraph_vcount(graph);
 long int node, i, j, nn;
 igraph_adjlist_t allneis;
 igraph_vector_int_t *neis1, *neis2;

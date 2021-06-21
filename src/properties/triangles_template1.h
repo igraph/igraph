@@ -22,7 +22,7 @@
 
 */
 
-long int no_of_nodes = igraph_vcount(graph);
+igraph_integer_t no_of_nodes = igraph_vcount(graph);
 igraph_vit_t vit;
 long int nodes_to_calc;
 igraph_vector_int_t *neis1, *neis2;

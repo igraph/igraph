@@ -178,7 +178,7 @@ static int igraph_i_sspf_edge( const igraph_t *graph, long int source, igraph_ve
         nlen = igraph_vector_int_size(neis);
         for (int j = 0; j < nlen; j++) {
             long int edge = (long int) VECTOR(*neis)[j];
-            long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
+            igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, actnode);
 
             if (VECTOR(*dist)[neighbor] == 0) {
                 /* We have found 'neighbor' for the first time */
@@ -269,7 +269,7 @@ static int igraph_i_sspf_weighted(
         nlen = igraph_vector_int_size(neis);
         for (int j = 0; j < nlen; j++) {
             long int edge = (long int) VECTOR(*neis)[j];
-            long int to = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(*dist)[to];
 
@@ -378,7 +378,7 @@ static int igraph_i_sspf_weighted_edge(
         nlen = igraph_vector_int_size(neis);
         for (int j = 0; j < nlen; j++) {
             long int edge = (long int) VECTOR(*neis)[j];
-            long int to = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(*dist)[to];
 

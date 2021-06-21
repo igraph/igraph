@@ -97,7 +97,7 @@ static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
             long int edge = VECTOR(*v)[j];
-            long int e = IGRAPH_OTHER(graph, edge, i);
+            igraph_integer_t e = IGRAPH_OTHER(graph, edge, i);
             if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
                 j++;
@@ -316,13 +316,13 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
         for (i = 0; i < neilen1; i++) {
             long int edge = VECTOR(*neis1)[i];
-            long int nei = IGRAPH_OTHER(graph, edge, node);
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
             igraph_real_t w = VECTOR(*weights)[edge];
             neis2 = igraph_inclist_get(&allinc, nei);
             neilen2 = igraph_vector_int_size(neis2);
             for (j = 0; j < neilen2; j++) {
                 long int edge2 = VECTOR(*neis2)[j];
-                long int nei2 = IGRAPH_OTHER(graph, edge2, nei);
+                igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge2, nei);
                 igraph_real_t w2 = VECTOR(*weights)[edge2];
                 if (neis[nei2] == node + 1) {
                     VECTOR(*res)[node] += w2;

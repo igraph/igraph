@@ -192,7 +192,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = VECTOR(*neis)[j];
-                long int tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
@@ -426,7 +426,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             long int edge = VECTOR(*neis)[i];
-            long int tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(dists)[tto];
             if (curdist < 0) {
@@ -840,7 +840,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             long int edge = VECTOR(*neis)[i];
-            long int tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(dists)[tto];
             igraph_vector_t *parent_vec, *parent_edge_vec;

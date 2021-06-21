@@ -441,8 +441,8 @@ igraph_error_t igraph_extended_chordal_ring(
     igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_t *W,
     igraph_bool_t directed) {
     igraph_vector_t edges;
-    long int period = igraph_matrix_ncol(W);
-    long int nrow   = igraph_matrix_nrow(W);
+    igraph_integer_t period = igraph_matrix_ncol(W);
+    igraph_integer_t nrow   = igraph_matrix_nrow(W);
     long int i, j, mpos = 0, epos = 0;
 
     if (nodes < 3) {

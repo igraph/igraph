@@ -133,7 +133,7 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
                 eids = igraph_inclist_get(&inclist, actnode);
                 n = igraph_vector_int_size(eids);
                 for (j = 0; j < n; j++) {
-                    long int neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
+                    igraph_integer_t neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
                     if (geodist[neighbor] != 0) {
                         /* we've already seen this node, another shortest path? */
                         if (geodist[neighbor] - 1 == actdist + 1) {

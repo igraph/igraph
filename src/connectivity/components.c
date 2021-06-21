@@ -1006,7 +1006,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
             if (actnext < n) {
                 /* Step down (maybe) */
                 long int edge = VECTOR(*adjedges)[actnext];
-                long int nei = IGRAPH_OTHER(graph, edge, act);
+                igraph_integer_t nei = IGRAPH_OTHER(graph, edge, act);
                 if (VECTOR(low)[nei] == 0) {
                     if (act == i) {
                         rootdfs++;
@@ -1109,7 +1109,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                     igraph_integer_t j, nn = igraph_vector_int_size(edges);
                                     for (j = 0; j < nn; j++) {
                                         long int e = VECTOR(*edges)[j];
-                                        long int nei = IGRAPH_OTHER(graph, e, vert);
+                                        igraph_integer_t nei = IGRAPH_OTHER(graph, e, vert);
                                         if (VECTOR(vertex_added)[nei] == comps && nei < vert) {
                                             IGRAPH_CHECK(igraph_vector_push_back(vv, e));
                                         }

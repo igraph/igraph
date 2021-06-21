@@ -246,7 +246,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(igraph_rea
         for (k = 0; k < nlen; k++) {
             long int edge = VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
-            long int nei = IGRAPH_OTHER(graph, edge, oldid);
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, oldid);
             long int neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 to[j] += from[ (long int) VECTOR(*idx2)[nei] ] * w;
@@ -310,7 +310,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(igraph_re
         for (k = 0; k < nlen; k++) {
             long int edge = VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
-            long int nei = IGRAPH_OTHER(graph, edge, oldid);
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, oldid);
             long int neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 long int fi = VECTOR(*idx2)[nei];

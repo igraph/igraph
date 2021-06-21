@@ -104,7 +104,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                 long int edge = VECTOR(neis)[i];
                 igraph_integer_t from = IGRAPH_FROM(graph, edge);
                 igraph_integer_t to = IGRAPH_TO(graph, edge);
-                long int nei = IGRAPH_OTHER(graph, edge, actnode);
+                igraph_integer_t nei = IGRAPH_OTHER(graph, edge, actnode);
 
                 if (! VECTOR(seen_edges)[edge]) {
 

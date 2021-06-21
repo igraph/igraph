@@ -477,7 +477,7 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             long int edge = VECTOR(*neis)[i];
-            long int tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
             igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
