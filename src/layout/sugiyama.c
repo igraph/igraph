@@ -163,7 +163,7 @@ typedef struct {
  */
 static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
                                   const igraph_vector_t* membership) {
-    long int i, n, num_layers;
+    igraph_integer_t i, n, num_layers;
 
     if (igraph_vector_size(membership) == 0) {
         num_layers = 0;
@@ -184,7 +184,7 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
 
     n = igraph_vector_size(membership);
     for (i = 0; i < n; i++) {
-        long int l = VECTOR(*membership)[i];
+        igraph_integer_t l = VECTOR(*membership)[i];
         igraph_vector_t* vec = VECTOR(layering->layers)[l];
         IGRAPH_CHECK(igraph_vector_push_back(vec, i));
     }
@@ -204,8 +204,8 @@ static void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
 /**
  * Returns the number of layers in a layering.
  */
-static int igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
-    return (int) igraph_vector_ptr_size(&layering->layers);
+static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
+    return igraph_vector_ptr_size(&layering->layers);
 }
 
 /**
@@ -755,10 +755,10 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
 static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* graph,
         igraph_matrix_t* layout, const igraph_i_layering_t* layering,
         long int maxiter) {
-    long int i, n, nei;
+    igraph_integer_t i, n, nei;
     igraph_integer_t no_of_vertices = igraph_vcount(graph);
-    long int no_of_layers = igraph_i_layering_num_layers(layering);
-    long int iter, layer_index;
+    igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
+    igraph_integer_t iter, layer_index;
     igraph_vector_t* layer_members;
     igraph_vector_t neis, barycenters;
     igraph_vector_int_t sort_indices;
@@ -891,8 +891,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         igraph_matrix_t* layout, const igraph_i_layering_t* layering,
         igraph_real_t hgap, igraph_integer_t no_of_real_nodes) {
 
-    long int i, j, k, l, n;
-    long int no_of_layers = igraph_i_layering_num_layers(layering);
+    igraph_integer_t i, j, k, l, n;
+    igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t neis1, neis2;
@@ -1083,8 +1083,8 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
         const igraph_vector_bool_t* ignored_edges,
         igraph_bool_t reverse, igraph_bool_t align_right,
         igraph_vector_t* roots, igraph_vector_t* align) {
-    long int i, j, k, n, di, dj, i_limit, j_limit, r;
-    long int no_of_layers = igraph_i_layering_num_layers(layering);
+    igraph_integer_t i, j, k, n, di, dj, i_limit, j_limit, r;
+    igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_neimode_t neimode = (reverse ? IGRAPH_OUT : IGRAPH_IN);
     igraph_vector_t neis, xs;

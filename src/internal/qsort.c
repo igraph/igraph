@@ -56,7 +56,7 @@
     typedef int      cmp_t(const void *, const void *);
 #endif
 static inline char  *med3(char *, char *, char *, cmp_t *, void *);
-static inline void   swapfunc(char *, char *, int, int);
+static inline void   swapfunc(char *, char *, size_t, int);
 
 #define igraph_min(a, b)    (a) < (b) ? a : b
 
@@ -78,7 +78,7 @@ static inline void   swapfunc(char *, char *, int, int);
                                    es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;
 
 static inline void
-swapfunc(char *a, char *b, int n, int swaptype)
+swapfunc(char *a, char *b, size_t n, int swaptype)
 {
     if (swaptype <= 1)
         swapcode(long, a, b, n)
