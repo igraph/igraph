@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../../tests/unit/test_utilities.inc"
+
 int main() {
 
     igraph_t g;
