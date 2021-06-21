@@ -78,7 +78,7 @@ public:
     std::vector<double> mod_size;
     std::vector<double> mod_danglingSize;
     std::vector<double> mod_teleportWeight;
-    std::vector<int> mod_members;
+    std::vector<size_t> mod_members;
 };
 
 void delete_Greedy(Greedy *greedy);

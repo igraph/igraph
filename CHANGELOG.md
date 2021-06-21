@@ -46,6 +46,8 @@
    to return the predecessors and inbound edges instead of an
    `igraph_vector_long_t`.
 
+ - `igraph_hrg_size()` now returns an `igraph_integer_t` instead of an `int`.
+
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
    sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.
 

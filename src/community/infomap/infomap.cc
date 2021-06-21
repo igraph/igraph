@@ -85,7 +85,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
                 for (int i = 0 ; i < fgraph->Nnode ; i++) {
                     // partition each non trivial module
-                    int sub_Nnode = fgraph->node[i]->members.size();
+                    size_t sub_Nnode = fgraph->node[i]->members.size();
                     if (sub_Nnode > 1) { // If the module is not trivial
                         int *sub_members  = new int[sub_Nnode];      // id_sub --> id
                         IGRAPH_FINALLY(operator delete [], sub_members);
@@ -105,8 +105,8 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
                         // Record membership changes
                         for (int j = 0; j < sub_fgraph->Nnode; j++) {
-                            int Nmembers = sub_fgraph->node[j]->members.size();
-                            for (int k = 0; k < Nmembers; k++) {
+                            size_t Nmembers = sub_fgraph->node[j]->members.size();
+                            for (size_t k = 0; k < Nmembers; k++) {
                                 subMoveTo[sub_members[sub_fgraph->node[j]->members[k]]] =
                                     subModIndex;
                             }
@@ -128,8 +128,8 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
                 // 1/ Single-node movements : allows each node to move (again)
                 // save current modules
                 for (int i = 0; i < fgraph->Nnode; i++) { // for each module
-                    int Nmembers = fgraph->node[i]->members.size(); // Module size
-                    for (int j = 0; j < Nmembers; j++) { // for each vertex (of the module)
+                    size_t Nmembers = fgraph->node[i]->members.size(); // Module size
+                    for (size_t j = 0; j < Nmembers; j++) { // for each vertex (of the module)
                         initial_move[fgraph->node[i]->members[j]] = i;
                     }
                 }
@@ -302,8 +302,8 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
             shortestCodeLength = cpy_fgraph->codeLength;
             // ... store the partition
             for (int i = 0 ; i < cpy_fgraph->Nnode ; i++) {
-                int Nmembers = cpy_fgraph->node[i]->members.size();
-                for (int k = 0; k < Nmembers; k++) {
+                size_t Nmembers = cpy_fgraph->node[i]->members.size();
+                for (size_t k = 0; k < Nmembers; k++) {
                     //cluster[ cpy_fgraph->node[i]->members[k] ] = i;
                     VECTOR(*membership)[cpy_fgraph->node[i]->members[k]] = i;
                 }

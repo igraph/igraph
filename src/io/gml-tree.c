@@ -189,13 +189,13 @@ void igraph_gml_tree_destroy(igraph_gml_tree_t *t) {
     IGRAPH_FREE(t);
 }
 
-long int igraph_gml_tree_length(const igraph_gml_tree_t *t) {
+igraph_integer_t igraph_gml_tree_length(const igraph_gml_tree_t *t) {
     return igraph_vector_ptr_size(&t->names);
 }
 
-long int igraph_gml_tree_find(const igraph_gml_tree_t *t,
-                              const char *name, long int from) {
-
+igraph_integer_t igraph_gml_tree_find(
+    const igraph_gml_tree_t *t, const char *name, igraph_integer_t from
+) {
     igraph_integer_t size = igraph_vector_ptr_size(&t->names);
     while ( from < size && (! VECTOR(t->names)[from] ||
                             strcmp(VECTOR(t->names)[from], name)) ) {
@@ -208,8 +208,9 @@ long int igraph_gml_tree_find(const igraph_gml_tree_t *t,
     return from;
 }
 
-long int igraph_gml_tree_findback(const igraph_gml_tree_t *t,
-                                  const char *name, long int from) {
+igraph_integer_t igraph_gml_tree_findback(
+    const igraph_gml_tree_t *t, const char *name, igraph_integer_t from
+) {
     while ( from >= 0 && (! VECTOR(t->names)[from] ||
                           strcmp(VECTOR(t->names)[from], name)) ) {
         from--;
@@ -218,39 +219,39 @@ long int igraph_gml_tree_findback(const igraph_gml_tree_t *t,
     return from;
 }
 
-igraph_i_gml_tree_type_t igraph_gml_tree_type(const igraph_gml_tree_t *t, long int pos) {
+igraph_i_gml_tree_type_t igraph_gml_tree_type(const igraph_gml_tree_t *t, igraph_integer_t pos) {
     return (igraph_i_gml_tree_type_t) VECTOR(t->types)[pos];
 }
 
-const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, long int pos) {
+const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, igraph_integer_t pos) {
     return VECTOR(t->names)[pos];
 }
 
 igraph_integer_t igraph_gml_tree_get_integer(const igraph_gml_tree_t *t,
-        long int pos) {
+        igraph_integer_t pos) {
     igraph_integer_t *i = VECTOR(t->children)[pos];
     return *i;
 }
 
 igraph_real_t igraph_gml_tree_get_real(const igraph_gml_tree_t *t,
-                                       long int pos) {
+                                       igraph_integer_t pos) {
     igraph_real_t *d = VECTOR(t->children)[pos];
     return *d;
 }
 
 const char *igraph_gml_tree_get_string(const igraph_gml_tree_t *t,
-                                       long int pos) {
+                                       igraph_integer_t pos) {
     const char *s = VECTOR(t->children)[pos];
     return s;
 }
 
 igraph_gml_tree_t *igraph_gml_tree_get_tree(const igraph_gml_tree_t *t,
-        long int pos) {
+        igraph_integer_t pos) {
     igraph_gml_tree_t *tree = VECTOR(t->children)[pos];
     return tree;
 }
 
-void igraph_gml_tree_delete(igraph_gml_tree_t *t, long int pos) {
+void igraph_gml_tree_delete(igraph_gml_tree_t *t, igraph_integer_t pos) {
     if (VECTOR(t->types)[pos] == IGRAPH_I_GML_TREE_TREE) {
         igraph_gml_tree_destroy(VECTOR(t->children)[pos]);
     }

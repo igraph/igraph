@@ -91,7 +91,7 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 %union {
    struct {
       char *s;
-      int len;
+      size_t len;
    } str;
    void *tree;
    double real;

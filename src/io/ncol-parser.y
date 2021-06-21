@@ -108,10 +108,15 @@ edge :   edgeid edgeid NEWLINE        {
        }
 ;
 
-edgeid : ALNUM  { igraph_trie_get2(context->trie,
-                  igraph_ncol_yyget_text(scanner),
-                  igraph_ncol_yyget_leng(scanner),
-                  &$$); };
+edgeid : ALNUM  {
+  igraph_integer_t trie_id;
+  igraph_trie_get2(context->trie,
+    igraph_ncol_yyget_text(scanner),
+    igraph_ncol_yyget_leng(scanner),
+    &trie_id
+  );
+  $$ = (long) trie_id;
+};
 
 weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yyget_text(scanner),
                         igraph_ncol_yyget_leng(scanner)); } ;

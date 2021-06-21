@@ -252,7 +252,7 @@ private:
     int computeEdgeCount(const int, const short int, const int,
                          const short int);
     // (consensus tree) counts children
-    int countChildren(const std::string);
+    size_t countChildren(const std::string);
     // find internal node of D that is common ancestor of i,j
     elementd* findCommonAncestor(list**, const int, const int);
     // return reverse of path to leaf from root

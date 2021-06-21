@@ -187,17 +187,17 @@ static igraph_error_t MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
 static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
                                  dendro *d) {
 
-    int no_of_nodes = igraph_vcount(igraph);
-    int no_of_edges = igraph_ecount(igraph);
-    int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(igraph);
+    igraph_integer_t no_of_edges = igraph_ecount(igraph);
+    igraph_integer_t i;
 
     // Create graph
     d->g = new graph(no_of_nodes);
 
     // Add edges
     for (i = 0; i < no_of_edges; i++) {
-        int from = IGRAPH_FROM(igraph, i);
-        int to = IGRAPH_TO(igraph, i);
+        igraph_integer_t from = IGRAPH_FROM(igraph, i);
+        igraph_integer_t to = IGRAPH_TO(igraph, i);
         if (from == to) {
             continue;
         }
@@ -218,9 +218,9 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
                                        dendro *d, simpleGraph **sg,
                                        int num_bins) {
 
-    int no_of_nodes = igraph_vcount(igraph);
-    int no_of_edges = igraph_ecount(igraph);
-    int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(igraph);
+    igraph_integer_t no_of_edges = igraph_ecount(igraph);
+    igraph_integer_t i;
 
     // Create graphs
     d->g = new graph(no_of_nodes, true);
@@ -228,8 +228,8 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
     (*sg) = new simpleGraph(no_of_nodes);
 
     for (i = 0; i < no_of_edges; i++) {
-        int from = IGRAPH_FROM(igraph, i);
-        int to = IGRAPH_TO(igraph, i);
+        igraph_integer_t from = IGRAPH_FROM(igraph, i);
+        igraph_integer_t to = IGRAPH_TO(igraph, i);
         if (from == to) {
             continue;
         }
@@ -305,7 +305,7 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
  * Time complexity: O(1).
  */
 
-int igraph_hrg_size(const igraph_hrg_t *hrg) {
+igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
     return igraph_vector_size(&hrg->left) + 1;
 }
 
@@ -321,8 +321,8 @@ int igraph_hrg_size(const igraph_hrg_t *hrg) {
  * Time complexity: O(n), n is the new size.
  */
 
-igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
-    int origsize = igraph_hrg_size(hrg);
+igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
+    igraph_integer_t origsize = igraph_hrg_size(hrg);
     int ret = 0;
     igraph_error_handler_t *oldhandler =
         igraph_set_error_handler(igraph_error_handler_ignore);
@@ -372,7 +372,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                    igraph_bool_t start,
                    int steps) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     dendro *d;
 
     RNG_BEGIN();
@@ -449,7 +449,7 @@ igraph_error_t igraph_hrg_sample(const igraph_t *input_graph,
                       igraph_hrg_t *hrg,
                       igraph_bool_t start) {
 
-    int i;
+    igraph_integer_t i;
     dendro *d;
 
     if (no_samples < 0) {
@@ -573,11 +573,11 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
 igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
                           const igraph_hrg_t *hrg) {
 
-    int orig_nodes = igraph_hrg_size(hrg);
-    int no_of_nodes = orig_nodes * 2 - 1;
-    int no_of_edges = no_of_nodes - 1;
+    igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
+    igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
+    igraph_integer_t no_of_edges = no_of_nodes - 1;
     igraph_vector_t edges;
-    int i, idx = 0;
+    igraph_integer_t i, idx = 0;
     igraph_vector_ptr_t vattrs;
     igraph_vector_t prob;
     igraph_attribute_record_t rec = { "probability",
@@ -705,8 +705,8 @@ static igraph_error_t MCMCEquilibrium_Sample(dendro *d, int num_samples) {
 
     double dL;
     bool flag_taken;
-    int sample_num = 0;
-    int t = 1, thresh = 100 * d->g->numNodes();
+    igraph_integer_t sample_num = 0;
+    igraph_integer_t t = 1, thresh = 100 * d->g->numNodes();
     double ptest = 1.0 / 10.0 / d->g->numNodes();
 
     while (sample_num < num_samples) {
@@ -916,12 +916,12 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                       const igraph_t *graph,
                       const igraph_vector_t *prob) {
 
-    int no_of_nodes = igraph_vcount(graph);
-    int no_of_internal = (no_of_nodes - 1) / 2;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_internal = (no_of_nodes - 1) / 2;
     igraph_vector_t deg, idx;
-    int root = 0;
-    int d0 = 0, d1 = 0, d2 = 0;
-    int ii = 0, il = 0;
+    igraph_integer_t root = 0;
+    igraph_integer_t d0 = 0, d1 = 0, d2 = 0;
+    igraph_integer_t ii = 0, il = 0;
     igraph_vector_t neis;
     igraph_vector_t path;
 
@@ -962,8 +962,8 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     // Every vertex, except for the root must have in-degree one.
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_IN,
                                IGRAPH_LOOPS));
-    for (int i = 0; i < no_of_nodes; i++) {
-        int d = VECTOR(deg)[i];
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        igraph_integer_t d = VECTOR(deg)[i];
         switch (d) {
         case 0: d0++; root = i; break;
         case 1: d1++; break;
@@ -983,7 +983,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_OUT,
                                IGRAPH_LOOPS));
     for (int i = 0; i < no_of_nodes; i++) {
-        int d = VECTOR(deg)[i];
+        igraph_integer_t d = VECTOR(deg)[i];
         switch (d) {
         case 0: d0++; break;
         case 2: d2++; break;
@@ -1008,8 +1008,8 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     // the internal nodes, then the leaf nodes
     IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
     VECTOR(idx)[root] = - (ii++) - 1;
-    for (int i = 0; i < no_of_nodes; i++) {
-        int d = VECTOR(deg)[i];
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        igraph_integer_t d = VECTOR(deg)[i];
         if (i == root) {
             continue;
         }
@@ -1023,8 +1023,8 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     igraph_hrg_resize(hrg, no_of_internal + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    for (int i = 0; i < no_of_nodes; i++) {
-        int ri = VECTOR(idx)[i];
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        igraph_integer_t ri = VECTOR(idx)[i];
         if (ri >= 0) {
             continue;
         }
@@ -1040,9 +1040,9 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     IGRAPH_VECTOR_INIT_FINALLY(&path, 0);
     IGRAPH_CHECK(igraph_vector_push_back(&path, VECTOR(idx)[root]));
     while (!igraph_vector_empty(&path)) {
-        int ri = igraph_vector_tail(&path);
-        int lc = VECTOR(hrg->left)[-ri - 1];
-        int rc = VECTOR(hrg->right)[-ri - 1];
+        igraph_integer_t ri = igraph_vector_tail(&path);
+        igraph_integer_t lc = VECTOR(hrg->left)[-ri - 1];
+        igraph_integer_t rc = VECTOR(hrg->right)[-ri - 1];
         if (lc < 0 && VECTOR(hrg->vertices)[-lc - 1] == 0) {
             // Go left
             IGRAPH_CHECK(igraph_vector_push_back(&path, lc));

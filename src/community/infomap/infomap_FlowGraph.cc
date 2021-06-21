@@ -142,12 +142,12 @@ FlowGraph::FlowGraph(FlowGraph * fgraph, int sub_Nnode, int * sub_members) {
         node[j]->selfLink       = fgraph->node[orig_nr]->selfLink;
         // Take care of self-link
 
-        int orig_NoutLinks = fgraph->node[orig_nr]->outLinks.size();
-        int orig_NinLinks  = fgraph->node[orig_nr]->inLinks.size();
+        size_t orig_NoutLinks = fgraph->node[orig_nr]->outLinks.size();
+        size_t orig_NinLinks  = fgraph->node[orig_nr]->inLinks.size();
 
         sub_renumber[orig_nr] = j;
 
-        for (int k = 0; k < orig_NoutLinks; k++) {
+        for (size_t k = 0; k < orig_NoutLinks; k++) {
             int to = fgraph->node[orig_nr]->outLinks[k].first;
             int to_newnr = sub_renumber[to];
             double link_weight = fgraph->node[orig_nr]->outLinks[k].second;
@@ -166,7 +166,7 @@ FlowGraph::FlowGraph(FlowGraph * fgraph, int sub_Nnode, int * sub_members) {
             }
         }
 
-        for (int k = 0; k < orig_NinLinks; k++) {
+        for (size_t k = 0; k < orig_NinLinks; k++) {
             int to = fgraph->node[orig_nr]->inLinks[k].first;
             int to_newnr = sub_renumber[to];
             double link_weight = fgraph->node[orig_nr]->inLinks[k].second;
@@ -235,13 +235,13 @@ void FlowGraph::initiate() {
             danglings.push_back(i);
             Ndanglings++;
         } else { // Normalize the weights
-            int NoutLinks = node[i]->outLinks.size();
+            size_t NoutLinks = node[i]->outLinks.size();
             double sum = node[i]->selfLink; // Take care of self-links
-            for (int j = 0; j < NoutLinks; j++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
                 sum += node[i]->outLinks[j].second;
             }
             node[i]->selfLink /= sum;
-            for (int j = 0; j < NoutLinks; j++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
                 node[i]->outLinks[j].second /= sum;
             }
         }
@@ -256,17 +256,17 @@ void FlowGraph::initiate() {
         //            (1 - \tau) *     \pi_i     *      P_{ii}
 
         if (!node[i]->outLinks.empty()) {
-            int NoutLinks = node[i]->outLinks.size();
-            for (int j = 0; j < NoutLinks; j++) {
+            size_t NoutLinks = node[i]->outLinks.size();
+            for (size_t j = 0; j < NoutLinks; j++) {
                 node[i]->outLinks[j].second = beta * node[i]->size *
                                               node[i]->outLinks[j].second;
                 //                      (1 - \tau) *     \pi_i     *          P_{ij}
             }
 
             // Update values for corresponding inlink
-            for (int j = 0; j < NoutLinks; j++) {
-                int NinLinks = node[node[i]->outLinks[j].first]->inLinks.size();
-                for (int k = 0; k < NinLinks; k++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
+                size_t NinLinks = node[node[i]->outLinks[j].first]->inLinks.size();
+                for (size_t k = 0; k < NinLinks; k++) {
                     if (node[node[i]->outLinks[j].first]->inLinks[k].first == i) {
                         node[node[i]->outLinks[j].first]->inLinks[k].second =
                             node[i]->outLinks[j].second;
@@ -328,8 +328,8 @@ void FlowGraph::eigenvector() {
         // Flow from network steps
         for (int i = 0; i < Nnode; i++) {
             node[i]->size += beta * node[i]->selfLink * size_tmp[i];
-            int Nlinks = node[i]->outLinks.size();
-            for (int j = 0; j < Nlinks; j++)
+            size_t Nlinks = node[i]->outLinks.size();
+            for (size_t j = 0; j < Nlinks; j++)
                 node[node[i]->outLinks[j].first]->size += beta *
                         node[i]->outLinks[j].second * size_tmp[i];
         }

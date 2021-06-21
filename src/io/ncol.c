@@ -105,7 +105,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     igraph_vector_t edges, ws;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
     igraph_integer_t no_of_nodes;
-    long int no_predefined = 0;
+    igraph_integer_t no_predefined = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
     igraph_attribute_record_t namerec, weightrec;
@@ -121,7 +121,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     /* Add the predefined names, if any */
     if (predefnames != 0) {
-        long int i, id, n;
+        igraph_integer_t i, id, n;
         char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
@@ -279,9 +279,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t from, to;
             int ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-            ret = fprintf(outstream, "%li %li\n",
-                          (long int) from,
-                          (long int) to);
+            ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n", from, to);
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
@@ -323,8 +321,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t from, to;
             int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
-            ret1 = fprintf(outstream, "%li %li ",
-                           (long int)from, (long int)to);
+            ret1 = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " ", from, to);
             ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
             ret3 = fputc('\n', outstream);
             if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {

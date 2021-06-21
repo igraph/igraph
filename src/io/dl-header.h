@@ -33,8 +33,8 @@ typedef struct {
     void *scanner;
     int eof;
     int mode;
-    long int n;
-    long int from, to;
+    igraph_integer_t n;
+    igraph_integer_t from, to;
     igraph_vector_t edges;
     igraph_vector_t weights;
     igraph_strvector_t labels;

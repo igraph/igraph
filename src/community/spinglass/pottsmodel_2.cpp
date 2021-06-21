@@ -1778,7 +1778,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 
     double exp_old_spin; //The expectation value for the old spin
     double exp_spin; //The expectation value for the other spin(s)
-    int v; //The node we will be investigating
+    long v; //The node we will be investigating
 
     //The variables required for the calculations
     double delta_pos_out, delta_pos_in, delta_neg_out, delta_neg_in;

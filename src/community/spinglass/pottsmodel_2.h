@@ -73,7 +73,7 @@ private:
     DL_Indexed_List<unsigned long*> *previous_spins;
     HugeArray<HugeArray<double>*> correlation;
     network *net;
-    unsigned int q;
+    unsigned long q;
     unsigned int operation_mode;
     // FILE *Qfile, *Magfile;
     SimpleMatrix Qmatrix;

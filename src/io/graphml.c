@@ -103,10 +103,13 @@ typedef struct igraph_i_graphml_attribute_record_t {
     igraph_attribute_record_t record;
 } igraph_i_graphml_attribute_record_t;
 
+typedef enum {
+    START, INSIDE_GRAPHML, INSIDE_GRAPH, INSIDE_NODE, INSIDE_EDGE,
+    INSIDE_KEY, INSIDE_DEFAULT, INSIDE_DATA, FINISH, UNKNOWN, ERROR
+} igraph_i_graphml_parser_state_index_t;
+
 struct igraph_i_graphml_parser_state {
-    enum { START, INSIDE_GRAPHML, INSIDE_GRAPH, INSIDE_NODE, INSIDE_EDGE,
-           INSIDE_KEY, INSIDE_DEFAULT, INSIDE_DATA, FINISH, UNKNOWN, ERROR
-         } st;
+    igraph_i_graphml_parser_state_index_t st;
     igraph_t *g;
     igraph_trie_t node_trie;
     igraph_strvector_t edgeids;
@@ -420,23 +423,23 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
             if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *vec = (igraph_vector_t*)rec->value;
                 igraph_integer_t origsize = igraph_vector_size(vec);
-                long int nodes = igraph_trie_size(&state->node_trie);
+                igraph_integer_t nodes = igraph_trie_size(&state->node_trie);
                 igraph_vector_resize(vec, nodes);
                 for (l = origsize; l < nodes; l++) {
                     VECTOR(*vec)[l] = graphmlrec->default_value.as_numeric;
                 }
             } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-                long int origsize = igraph_strvector_size(strvec);
-                long int nodes = igraph_trie_size(&state->node_trie);
+                igraph_integer_t origsize = igraph_strvector_size(strvec);
+                igraph_integer_t nodes = igraph_trie_size(&state->node_trie);
                 igraph_strvector_resize(strvec, nodes);
                 for (l = origsize; l < nodes; l++) {
                     igraph_strvector_set(strvec, l, graphmlrec->default_value.as_string);
                 }
             } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 igraph_vector_bool_t *boolvec = (igraph_vector_bool_t*)rec->value;
-                long int origsize = igraph_vector_bool_size(boolvec);
-                long int nodes = igraph_trie_size(&state->node_trie);
+                igraph_integer_t origsize = igraph_vector_bool_size(boolvec);
+                igraph_integer_t nodes = igraph_trie_size(&state->node_trie);
                 igraph_vector_bool_resize(boolvec, nodes);
                 for (l = origsize; l < nodes; l++) {
                     VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
@@ -539,8 +542,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
         }
 
         igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr);
-        igraph_add_vertices(state->g, (igraph_integer_t)
-                            igraph_trie_size(&state->node_trie), &vattr);
+        igraph_add_vertices(state->g, igraph_trie_size(&state->node_trie), &vattr);
         igraph_add_edges(state->g, &state->edgelist, &eattr);
 
         igraph_vector_ptr_destroy(&vattr);
@@ -569,7 +571,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     xmlChar *localname;
     igraph_trie_t *trie = 0;
     igraph_vector_ptr_t *ptrvector = 0;
-    long int id;
+    igraph_integer_t id;
     unsigned short int skip = 0;
     int i, ret;
     igraph_i_graphml_attribute_record_t *rec;
@@ -815,8 +817,8 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
     igraph_vector_ptr_t *ptrvector = 0;
     igraph_i_graphml_attribute_record_t *graphmlrec;
     igraph_attribute_record_t *rec;
-    long int recid, id = 0;
-    int ret;
+    igraph_integer_t recid, id = 0;
+    igraph_error_t ret;
 
     switch (type) {
     case IGRAPH_ATTRIBUTE_GRAPH:
@@ -876,7 +878,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
         s = igraph_vector_bool_size(boolvec);
         if (id >= s) {
             ret = igraph_vector_bool_resize(boolvec, id + 1);
-            if (ret) {
+            if (ret != IGRAPH_SUCCESS) {
                 RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
             }
             for (i = s; i < id; i++) {
@@ -891,7 +893,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
         s = igraph_vector_size(vec);
         if (id >= s) {
             ret = igraph_vector_resize(vec, id + 1);
-            if (ret) {
+            if (ret != IGRAPH_SUCCESS) {
                 RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
             }
             for (i = s; i < id; i++) {
@@ -906,7 +908,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
         s = igraph_strvector_size(strvec);
         if (id >= s) {
             ret = igraph_strvector_resize(strvec, id + 1);
-            if (ret) {
+            if (ret != IGRAPH_SUCCESS) {
                 RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
             }
             strvalue = graphmlrec->default_value.as_string;
@@ -920,7 +922,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
             strvalue = graphmlrec->default_value.as_string;
         }
         ret = igraph_strvector_set(strvec, id, strvalue);
-        if (ret) {
+        if (ret != IGRAPH_SUCCESS) {
             RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
         }
         break;
@@ -982,7 +984,7 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
         (struct igraph_i_graphml_parser_state*)state0;
     xmlChar** it;
     char* attr_value;
-    long int id1, id2;
+    igraph_integer_t id1, id2;
     int i;
     igraph_bool_t tag_is_unknown = 0;
 
@@ -1226,13 +1228,13 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
 
     case INSIDE_DATA:
         igraph_i_graphml_attribute_data_finish(state);
-        state->st = igraph_vector_int_pop_back(&state->prev_state_stack);
+        state->st = (igraph_i_graphml_parser_state_index_t) igraph_vector_int_pop_back(&state->prev_state_stack);
         break;
 
     case UNKNOWN:
         state->unknown_depth--;
         if (!state->unknown_depth) {
-            state->st = igraph_vector_int_pop_back(&state->prev_state_stack);
+            state->st = (igraph_i_graphml_parser_state_index_t) igraph_vector_int_pop_back(&state->prev_state_stack);
         }
         break;
 

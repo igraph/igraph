@@ -55,8 +55,8 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
 igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                             const char *key, const char *def,
                             const char *elem) {
-    long int size = igraph_trie_size(&ht->keys);
-    long int newid;
+    igraph_integer_t size = igraph_trie_size(&ht->keys);
+    igraph_integer_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     if (newid == size) {
@@ -78,8 +78,8 @@ igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
 igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
                              const char *key, const char *def,
                              const char *elem, int elemlen) {
-    long int size = igraph_trie_size(&ht->keys);
-    long int newid;
+    igraph_integer_t size = igraph_trie_size(&ht->keys);
+    igraph_integer_t newid;
     char *tmp;
 
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
@@ -109,7 +109,7 @@ igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
 
 igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
                          const char *key, char **elem) {
-    long int newid;
+    igraph_integer_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     igraph_strvector_get(&ht->elements, newid, elem);

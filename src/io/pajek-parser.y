@@ -117,7 +117,7 @@ extern long int igraph_i_pajek_actedge;
   double   realnum;
   struct {
     char *str;
-    int len;
+    size_t len;
   } string;
 }
 
@@ -541,8 +541,8 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
                                          const char *attrname,
                                          igraph_integer_t vid,
                                          igraph_real_t number) {
-  long int attrsize=igraph_trie_size(names);
-  long int id;
+  igraph_integer_t attrsize = igraph_trie_size(names);
+  igraph_integer_t id;
   igraph_vector_t *na;
   igraph_attribute_record_t *rec;
 
@@ -583,8 +583,8 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                         const char *attrname,
                                         igraph_integer_t vid,
                                         const char *str) {
-  long int attrsize=igraph_trie_size(names);
-  long int id;
+  igraph_integer_t attrsize=igraph_trie_size(names);
+  igraph_integer_t id;
   igraph_strvector_t *na;
   igraph_attribute_record_t *rec;
   long int i;
@@ -700,8 +700,8 @@ int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
   const char *attrname="type";
   igraph_trie_t *names=context->vertex_attribute_names;
   igraph_vector_ptr_t *attrs=context->vertex_attributes;
-  int i, n=context->vcount, n1=context->vcount2;
-  long int attrid, attrsize=igraph_trie_size(names);
+  igraph_integer_t i, n=context->vcount, n1=context->vcount2;
+  igraph_integer_t attrid, attrsize = igraph_trie_size(names);
   igraph_attribute_record_t *rec;
   igraph_vector_t *na;
 

@@ -43,7 +43,7 @@ Greedy::Greedy(FlowGraph * fgraph) {
     vector<double>(Nnode).swap(mod_size);
     vector<double>(Nnode).swap(mod_danglingSize);
     vector<double>(Nnode).swap(mod_teleportWeight);
-    vector<int>(Nnode).swap(mod_members);
+    vector<size_t>(Nnode).swap(mod_members);
 
     nodeSize_log_nodeSize = graph->nodeSize_log_nodeSize;
     exit_log_exit         = graph->exit_log_exit;
@@ -92,7 +92,7 @@ bool Greedy::optimize() {
 
     for (int i = 0; i < Nnode - 1; i++) {
         //int randPos = i ; //XXX
-        int randPos = RNG_INTEGER(i, Nnode - 1);
+        int randPos = static_cast<int>(RNG_INTEGER(i, Nnode - 1));
         // swap i & randPos
         int tmp              = randomOrder[i];
         randomOrder[i]       = randomOrder[randPos];
@@ -119,7 +119,7 @@ bool Greedy::optimize() {
         // Size of vector with module links
         int NmodLinks = 0;
         // For all outLinks
-        int NoutLinks = node[flip]->outLinks.size();
+        size_t NoutLinks = node[flip]->outLinks.size();
         if (NoutLinks == 0) { //dangling node, add node to calculate flow below
             redirect[oldM] = offset + NmodLinks;
             flowNtoM[NmodLinks].first = oldM;
@@ -127,7 +127,7 @@ bool Greedy::optimize() {
             flowNtoM[NmodLinks].second.second = 0.0;
             NmodLinks++;
         } else {
-            for (int j = 0; j < NoutLinks; j++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
                 int nb_M       = node_index[node[flip]->outLinks[j].first];
                 // index destination du lien
                 double nb_flow = node[flip]->outLinks[j].second;
@@ -144,8 +144,8 @@ bool Greedy::optimize() {
             }
         }
         // For all inLinks
-        int NinLinks = node[flip]->inLinks.size();
-        for (int j = 0; j < NinLinks; j++) {
+        size_t NinLinks = node[flip]->inLinks.size();
+        for (size_t j = 0; j < NinLinks; j++) {
             int nb_M = node_index[node[flip]->inLinks[j].first];
             double nb_flow = node[flip]->inLinks[j].second;
 
@@ -196,7 +196,7 @@ bool Greedy::optimize() {
         }
 
         // Option to move to empty module (if node not already alone)
-        if (mod_members[oldM] > static_cast<int>(node[flip]->members.size())) {
+        if (mod_members[oldM] > node[flip]->members.size()) {
             if (Nempty > 0) {
                 flowNtoM[NmodLinks].first = mod_empty[Nempty - 1];
                 flowNtoM[NmodLinks].second.first = 0.0;
@@ -208,7 +208,7 @@ bool Greedy::optimize() {
         // Randomize link order for optimized search
         for (int j = 0; j < NmodLinks - 1; j++) {
             //int randPos = j ; // XXX
-            int randPos = RNG_INTEGER(j, NmodLinks - 1);
+            int randPos = static_cast<int>(RNG_INTEGER(j, NmodLinks - 1));
             int tmp_M = flowNtoM[j].first;
             double tmp_outFlow = flowNtoM[j].second.first;
             double tmp_inFlow = flowNtoM[j].second.second;
@@ -268,7 +268,7 @@ bool Greedy::optimize() {
             if (mod_members[bestM] == 0) {
                 Nempty--;
             }
-            if (mod_members[oldM] == static_cast<int>(node[flip]->members.size())) {
+            if (mod_members[oldM] == node[flip]->members.size()) {
                 mod_empty[Nempty] = oldM;
                 Nempty++;
             }
@@ -380,8 +380,8 @@ void Greedy::apply(bool sort) {
         copy( node[i]->members.begin(), node[i]->members.end(),
               back_inserter( node_tmp[i_M]->members ) );
 
-        int NoutLinks = node[i]->outLinks.size();
-        for (int j = 0; j < NoutLinks; j++) {
+        size_t NoutLinks = node[i]->outLinks.size();
+        for (size_t j = 0; j < NoutLinks; j++) {
             int nb         = node[i]->outLinks[j].first;
             int nb_M       = nodeInMod[node_index[nb]];
             double nb_flow = node[i]->outLinks[j].second;
@@ -410,8 +410,8 @@ void Greedy::apply(bool sort) {
 
     for (int i = 0; i < Nnode; i++) {
         int i_M = nodeInMod[node_index[i]];
-        int NinLinks = node[i]->inLinks.size();
-        for (int j = 0; j < NinLinks; j++) {
+        size_t NinLinks = node[i]->inLinks.size();
+        for (size_t j = 0; j < NinLinks; j++) {
             int nb         = node[i]->inLinks[j].first;
             int nb_M       = nodeInMod[node_index[nb]];
             double nb_flow = node[i]->inLinks[j].second;
@@ -481,14 +481,14 @@ void Greedy::tune(void) {
     // Update all values except contribution from teleportation
     for (int i = 0; i < Nnode; i++) {
         int i_M = node_index[i]; // module id of node i
-        int Nlinks = node[i]->outLinks.size();
+        size_t Nlinks = node[i]->outLinks.size();
 
         mod_size[i_M]           += node[i]->size;
         mod_danglingSize[i_M]   += node[i]->danglingSize;
         mod_teleportWeight[i_M] += node[i]->teleportWeight;
         mod_members[i_M]++;
 
-        for (int j = 0; j < Nlinks; j++) {
+        for (size_t j = 0; j < Nlinks; j++) {
             int neighbor      = node[i]->outLinks[j].first;
             double neighbor_w = node[i]->outLinks[j].second;
             int neighbor_M    = node_index[neighbor];
@@ -544,8 +544,8 @@ void Greedy::setMove(int *moveTo) {
                                  node[i]->teleportWeight;
 
             // For all outLinks
-            int NoutLinks = node[i]->outLinks.size();
-            for (int j = 0; j < NoutLinks; j++) {
+            size_t NoutLinks = node[i]->outLinks.size();
+            for (size_t j = 0; j < NoutLinks; j++) {
                 int nb_M = node_index[node[i]->outLinks[j].first];
                 double nb_flow = node[i]->outLinks[j].second;
                 if (nb_M == oldM) {
@@ -556,8 +556,8 @@ void Greedy::setMove(int *moveTo) {
             }
 
             // For all inLinks
-            int NinLinks = node[i]->inLinks.size();
-            for (int j = 0; j < NinLinks; j++) {
+            size_t NinLinks = node[i]->inLinks.size();
+            for (size_t j = 0; j < NinLinks; j++) {
                 int nb_M = node_index[node[i]->inLinks[j].first];
                 double nb_flow = node[i]->inLinks[j].second;
                 if (nb_M == oldM) {
@@ -573,7 +573,7 @@ void Greedy::setMove(int *moveTo) {
                 // si le nouveau etait vide, on a un vide de moins...
                 Nempty--;
             }
-            if (mod_members[oldM] == static_cast<int>(node[i]->members.size())) {
+            if (mod_members[oldM] == node[i]->members.size()) {
                 // si l'ancien avait la taille de celui qui bouge, un vide de plus
                 mod_empty[Nempty] = oldM;
                 Nempty++;

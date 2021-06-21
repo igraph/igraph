@@ -95,13 +95,13 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) 
     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
     static char tmp[256];
     const char *p = tmp;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t d;
 
     switch (type) {
     case IGRAPH_I_GML_TREE_INTEGER:
         i = igraph_gml_tree_get_integer(node, pos);
-        snprintf(tmp, sizeof(tmp) / sizeof(char), "%li", i);
+        snprintf(tmp, sizeof(tmp) / sizeof(char), "%" IGRAPH_PRId, i);
         break;
     case IGRAPH_I_GML_TREE_REAL:
         d = igraph_gml_tree_get_real(node, pos);
@@ -183,20 +183,20 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
  */
 igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
-    long int i, p;
-    long int no_of_nodes = 0, no_of_edges = 0;
+    igraph_integer_t i, p;
+    igraph_integer_t no_of_nodes = 0, no_of_edges = 0;
     igraph_trie_t trie;
     igraph_vector_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
     igraph_gml_tree_t *gtree;
-    long int gidx;
+    igraph_integer_t gidx;
     igraph_trie_t vattrnames;
     igraph_trie_t eattrnames;
     igraph_trie_t gattrnames;
     igraph_vector_ptr_t gattrs = IGRAPH_VECTOR_PTR_NULL,
                         vattrs = IGRAPH_VECTOR_PTR_NULL, eattrs = IGRAPH_VECTOR_PTR_NULL;
     igraph_vector_ptr_t *attrs[3];
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;
 
     attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
@@ -260,7 +260,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     /* Now we go over all objects in the graph and collect the attribute names and
        types. Plus we collect node ids. We also do some checks. */
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
-        long int j;
+        igraph_integer_t j;
         char cname[100];
         const char *name = igraph_gml_tree_name(gtree, i);
         if (!strcmp(name, "node")) {
@@ -274,7 +274,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             hasid = 0;
             for (j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *name = igraph_gml_tree_name(node, j);
-                long int trieid, triesize = igraph_trie_size(&vattrnames);
+                igraph_integer_t trieid, triesize = igraph_trie_size(&vattrnames);
                 IGRAPH_CHECK(igraph_trie_get(&vattrnames, name, &trieid));
                 if (trieid == triesize) {
                     /* new attribute */
@@ -301,12 +301,12 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 }
                 /* check id */
                 if (!hasid && !strcmp(name, "id")) {
-                    long int id;
+                    igraph_integer_t id;
                     if (igraph_gml_tree_type(node, j) != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERROR("Non-integer node id in GML file.", IGRAPH_PARSEERROR);
                     }
                     id = igraph_gml_tree_get_integer(node, j);
-                    snprintf(cname, sizeof(cname) / sizeof(char) -1, "%li", id);
+                    snprintf(cname, sizeof(cname) / sizeof(char) -1, "%" IGRAPH_PRId, id);
                     IGRAPH_CHECK(igraph_trie_get(&trie, cname, &id));
                     hasid = 1;
                 }
@@ -338,7 +338,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                      IGRAPH_PARSEERROR);
                     }
                 } else {
-                    long int trieid, triesize = igraph_trie_size(&eattrnames);
+                    igraph_integer_t trieid, triesize = igraph_trie_size(&eattrnames);
                     IGRAPH_CHECK(igraph_trie_get(&eattrnames, name, &trieid));
                     if (trieid == triesize) {
                         /* new attribute */
@@ -419,9 +419,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     p = -1;
     while ( (p = igraph_gml_tree_find(gtree, "edge", p + 1)) != -1) {
         igraph_gml_tree_t *edge;
-        long int from, to, fromidx = 0, toidx = 0;
+        igraph_integer_t from, to, fromidx = 0, toidx = 0;
         char name[100];
-        long int j;
+        igraph_integer_t j;
         edge = igraph_gml_tree_get_tree(gtree, p);
         for (j = 0; j < igraph_gml_tree_length(edge); j++) {
             const char *n = igraph_gml_tree_name(edge, j);
@@ -430,8 +430,8 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             } else if (!strcmp(n, "target")) {
                 toidx = igraph_gml_tree_find(edge, "target", 0);
             } else {
-                long int edgeid = edgeptr / 2;
-                long int trieidx;
+                igraph_integer_t edgeid = edgeptr / 2;
+                igraph_integer_t trieidx;
                 igraph_attribute_record_t *atrec;
                 int type;
                 igraph_trie_get(&eattrnames, n, &trieidx);
@@ -449,9 +449,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
         from = igraph_gml_tree_get_integer(edge, fromidx);
         to = igraph_gml_tree_get_integer(edge, toidx);
-        snprintf(name, sizeof(name) / sizeof(char) -1, "%li", from);
+        snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, from);
         IGRAPH_CHECK(igraph_trie_get(&trie, name, &from));
-        snprintf(name, sizeof(name) / sizeof(char) -1, "%li", to);
+        snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, to);
         IGRAPH_CHECK(igraph_trie_get(&trie, name, &to));
         if (igraph_trie_size(&trie) != no_of_nodes) {
             IGRAPH_ERROR("Unknown node id found in an edge in GML file.", IGRAPH_PARSEERROR);
@@ -464,13 +464,13 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
         const char *n;
         char name[100];
-        long int j, k;
+        igraph_integer_t j, k;
         n = igraph_gml_tree_name(gtree, i);
         if (!strcmp(n, "node")) {
             igraph_gml_tree_t *node = igraph_gml_tree_get_tree(gtree, i);
-            long int iidx = igraph_gml_tree_find(node, "id", 0);
-            long int id = igraph_gml_tree_get_integer(node, iidx);
-            snprintf(name, sizeof(name) / sizeof(char) -1, "%li", id);
+            igraph_integer_t iidx = igraph_gml_tree_find(node, "id", 0);
+            igraph_integer_t id = igraph_gml_tree_get_integer(node, iidx);
+            snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, id);
             igraph_trie_get(&trie, name, &id);
             for (j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *aname = igraph_gml_tree_name(node, j);

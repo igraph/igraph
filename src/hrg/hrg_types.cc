@@ -1316,10 +1316,10 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 
 // ***********************************************************************
 
-int dendro::countChildren(const string s) {
-    int len = s.size();
-    int numC = 0;
-    for (int i = 0; i < len; i++) {
+size_t dendro::countChildren(const string s) {
+    size_t len = s.size();
+    size_t numC = 0;
+    for (size_t i = 0; i < len; i++) {
         if (s[i] == 'C') {
             numC++;
         }
@@ -3123,7 +3123,7 @@ int splittree::returnNodecount() {
 
 keyValuePairSplit* splittree::returnTheseSplits(const int target) {
     keyValuePairSplit *head, *curr, *prev, *newhead, *newtail, *newpair;
-    int count, len;
+    size_t count, len;
 
     head = returnTreeAsList();
     prev = newhead = newtail = newpair = NULL;

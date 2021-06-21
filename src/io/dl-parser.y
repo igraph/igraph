@@ -208,9 +208,11 @@ weight: NUM { $$=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
                                          igraph_dl_yyget_leng(scanner)); };
 
 elabel: LABEL {
+  igraph_integer_t trie_id;
+
   /* Copy label list to trie, if needed */
   if (igraph_strvector_size(&context->labels) != 0) {
-    long int i, id, n=igraph_strvector_size(&context->labels);
+    igraph_integer_t i, id, n=igraph_strvector_size(&context->labels);
     for (i=0; i<n; i++) {
       igraph_trie_get(&context->trie,
                       STR(context->labels, i), &id);
@@ -218,7 +220,8 @@ elabel: LABEL {
     igraph_strvector_clear(&context->labels);
   }
   igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
-                   igraph_dl_yyget_leng(scanner), &$$);
+                   igraph_dl_yyget_leng(scanner), &trie_id);
+  $$ = (long) trie_id;
  };
 
 /*-----------------------------------------------------------*/
