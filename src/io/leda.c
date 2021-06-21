@@ -137,7 +137,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
 
     /* Start writing vertices */
     CHECK(fprintf(outstream, "# Vertices\n"));
-    CHECK(fprintf(outstream, "%ld\n", no_of_nodes));
+    CHECK(fprintf(outstream, "%" IGRAPH_PRId "\n", no_of_nodes));
 
     if (vertex_attr_type == IGRAPH_ATTRIBUTE_NUMERIC) {
         /* Vertices with numeric attributes */
@@ -184,7 +184,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
     }
 
     CHECK(fprintf(outstream, "# Edges\n"));
-    CHECK(fprintf(outstream, "%ld\n", no_of_edges));
+    CHECK(fprintf(outstream, "%" IGRAPH_PRId "\n", no_of_edges));
 
     if (edge_attr_type == IGRAPH_ATTRIBUTE_NUMERIC) {
         /* Edges with numeric attributes */

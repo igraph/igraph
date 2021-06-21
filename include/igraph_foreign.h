@@ -72,7 +72,7 @@ IGRAPH_EXPORT igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, F
                                              igraph_bool_t prefixattr);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
-                                            long int source, long int target,
+                                            igraph_integer_t source, igraph_integer_t target,
                                             const igraph_vector_t *capacity);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                          const igraph_vector_t *id, const char *creator);

@@ -272,7 +272,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  * \sa igraph_read_graph_dimacs()
  */
 igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
-                              long int source, long int target,
+                              igraph_integer_t source, igraph_integer_t target,
                               const igraph_vector_t *capacity) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -290,7 +290,7 @@ igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
 
     ret = fprintf(outstream,
-                  "c created by igraph\np max %li %li\nn %li s\nn %li t\n",
+                  "c created by igraph\np max %" IGRAPH_PRId " %" IGRAPH_PRId "\nn %" IGRAPH_PRId " s\nn %" IGRAPH_PRId " t\n",
                   no_of_nodes, no_of_edges, source + 1, target + 1);
     if (ret < 0) {
         IGRAPH_ERROR("Write error", IGRAPH_EFILE);

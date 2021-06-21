@@ -58,6 +58,9 @@
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
    `igraph_vector_t`.
 
+ - `igraph_write_graph_dimacs()` now uses `igraph_integer_t` for the source and
+   target vertex index instead of a `long int`.
+
  - `igraph_vector_*()`, `igraph_matrix_*()`, `igraph_stack_*()`, `igraph_array_*()`
    and several other generic igraph data types now use `igraph_integer_t` for
    indexing, _not_ `long int`. Please refer to the headers for the exact details;
