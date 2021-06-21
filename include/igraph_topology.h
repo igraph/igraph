@@ -62,7 +62,7 @@ IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, c
                                            const igraph_vector_ptr_t *domains,
                                            igraph_bool_t *iso, igraph_vector_t *map,
                                            igraph_vector_ptr_t *maps,
-                                           igraph_bool_t induced, int time_limit);
+                                           igraph_bool_t induced, igraph_integer_t time_limit);
 
 /* VF2 family*/
 /**
