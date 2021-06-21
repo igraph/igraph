@@ -105,7 +105,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
                              const igraph_vector_ptr_t *graphs,
                              igraph_vector_ptr_t *edgemaps) {
 
-    long int no_of_graphs = igraph_vector_ptr_size(graphs);
+    igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     long int no_of_nodes = 0;
     igraph_bool_t directed = 1;
     igraph_vector_t edges;
@@ -138,7 +138,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
 
     /* Calculate number of nodes, query number of edges */
     for (i = 0; i < no_of_graphs; i++) {
-        long int n = igraph_vcount(VECTOR(*graphs)[i]);
+        igraph_integer_t n = igraph_vcount(VECTOR(*graphs)[i]);
         if (n > no_of_nodes) {
             no_of_nodes = n;
         }

@@ -216,7 +216,7 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
  */
 
 igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) {
-    long int actual_size = igraph_vector_ptr_size(v);
+    igraph_integer_t actual_size = igraph_vector_ptr_size(v);
     void **tmp;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
@@ -316,7 +316,7 @@ igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
 
     /* full, allocate more storage */
     if (v->stor_end == v->end) {
-        long int new_size = igraph_vector_ptr_size(v) * 2;
+        igraph_integer_t new_size = igraph_vector_ptr_size(v) * 2;
         if (new_size == 0) {
             new_size = 1;
         }
@@ -352,7 +352,7 @@ void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
  * \param e The inserted element
  */
 igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
-    long int size = igraph_vector_ptr_size(v);
+    igraph_integer_t size = igraph_vector_ptr_size(v);
     IGRAPH_CHECK(igraph_vector_ptr_resize(v, size + 1));
     if (pos < size) {
         memmove(v->stor_begin + pos + 1, v->stor_begin + pos,
@@ -684,7 +684,7 @@ static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const v
 
 igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
         igraph_vector_t *inds, cmp_t cmp) {
-    unsigned long int i;
+    igraph_integer_t i;
     uintptr_t *vind, first;
     igraph_integer_t n = igraph_vector_ptr_size(v);
 

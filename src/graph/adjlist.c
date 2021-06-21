@@ -430,7 +430,7 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
-        long int j, l = igraph_vector_int_size(v);
+        igraph_integer_t j, l = igraph_vector_int_size(v);
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
             long int e = VECTOR(*v)[j];
@@ -841,7 +841,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_loops_t loops, igraph_multiple_t multiple
 ) {
     long int i, p = 0;
-    long int n = igraph_vector_int_size(v);
+    igraph_integer_t n = igraph_vector_int_size(v);
 
     if (
         multiple == IGRAPH_MULTIPLE &&

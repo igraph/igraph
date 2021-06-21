@@ -99,8 +99,8 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
          and we want to spare that. -1 will denote infinity instead.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_vit_t fromvit, tovit;
     long int no_of_from, no_of_to;
@@ -338,8 +338,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
          edge ID + 1 is stored, zero means unreachable vertices.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
@@ -713,8 +713,8 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
        it's basically the same.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;

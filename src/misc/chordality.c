@@ -69,7 +69,7 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
                                       igraph_vector_t *alpha,
                                       igraph_vector_t *alpham1) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t size;
     igraph_vector_int_t head, next, prev; /* doubly linked list with head */
     long int i;
@@ -275,7 +275,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                       igraph_vector_t *fill_in,
                       igraph_t *newgraph) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_vector_t *my_alpha = alpha, *my_alpham1 = alpham1;
     igraph_vector_t v_alpha, v_alpham1;
     igraph_vector_int_t f, index;

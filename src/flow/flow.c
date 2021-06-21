@@ -711,8 +711,8 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         if (cut) {
             igraph_vector_clear(cut);
             for (i = 0; i < no_of_orig_edges; i++) {
-                long int f = IGRAPH_FROM(graph, i);
-                long int t = IGRAPH_TO(graph, i);
+                igraph_integer_t f = IGRAPH_FROM(graph, i);
+                igraph_integer_t t = IGRAPH_TO(graph, i);
                 if (!VECTOR(added)[f] && VECTOR(added)[t]) {
                     IGRAPH_CHECK(igraph_vector_push_back(cut, i));
                 }
@@ -976,7 +976,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                 /* If non-empty, then it contains a path from source to target
                    in the residual graph. We factor out this path from the flow. */
                 if (!igraph_vector_int_empty(&stack)) {
-                    long int pl = igraph_vector_int_size(&stack);
+                    igraph_integer_t pl = igraph_vector_int_size(&stack);
                     igraph_real_t thisflow = EXCESS(target);
                     for (i = 2; i < pl; i += 2) {
                         long int edge = VECTOR(stack)[i];
@@ -1498,7 +1498,7 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
                                     igraph_vector_t *cut,
                                     const igraph_vector_t *capacity) {
     long int i;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t flow;
     igraph_real_t minmaxflow = IGRAPH_INFINITY;
     igraph_vector_t mypartition, mypartition2, mycut;
@@ -1722,7 +1722,7 @@ static igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph,
 igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
                         const igraph_vector_t *capacity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t minmaxflow, flow;
     long int i;
 

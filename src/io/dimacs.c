@@ -275,8 +275,8 @@ igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
                               long int source, long int target,
                               const igraph_vector_t *capacity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
     long int i = 0;
     int ret, ret1, ret2, ret3;

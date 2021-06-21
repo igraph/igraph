@@ -79,7 +79,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
                           const igraph_vs_t from, const igraph_vs_t to,
                           igraph_neimode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int no_of_from, no_of_to;
     long int *already_counted;
     igraph_adjlist_t adjlist;
@@ -276,7 +276,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
 
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int *father;
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;

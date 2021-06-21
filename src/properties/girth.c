@@ -72,7 +72,7 @@
 igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
                  igraph_vector_t *circle) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_lazy_adjlist_t adjlist;
     long int mincirc = LONG_MAX, minvertex = 0;

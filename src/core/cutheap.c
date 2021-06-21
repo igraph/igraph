@@ -50,7 +50,7 @@ static void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
 }
 
 static void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, long int hidx) {
-    long int size = igraph_vector_size(&ch->heap);
+    igraph_integer_t size = igraph_vector_size(&ch->heap);
     if (LEFTCHILD(hidx) >= size) {
         /* leaf node */
     } else if (RIGHTCHILD(hidx) == size ||
@@ -116,7 +116,7 @@ igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch) {
 }
 
 igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
-    long int size = igraph_vector_size(&ch->heap);
+    igraph_integer_t size = igraph_vector_size(&ch->heap);
     igraph_integer_t maxindex = (igraph_integer_t) VECTOR(ch->index)[0];
     /* put the last element to the top */
     igraph_i_cutheap_switch(ch, 0, size - 1);
@@ -147,7 +147,7 @@ igraph_error_t igraph_i_cutheap_update(
 /* Reset the value of all vertices to zero and make them active */
 
 igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
-    long int i, j, n = igraph_vector_size(&ch->hptr);
+    igraph_integer_t i, j, n = igraph_vector_size(&ch->hptr);
     /* undefine */
     VECTOR(ch->hptr)[vertex] = UNDEFINED;
     ch->dnodes -= 1;

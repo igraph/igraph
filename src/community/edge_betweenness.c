@@ -41,7 +41,7 @@ static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_t *member
     igraph_vector_t idx;
     long int realno = 0;
     long int i;
-    long int len = igraph_vector_size(membership);
+    igraph_integer_t len = igraph_vector_size(membership);
 
     IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
     for (i = 0; i < len; i++) {

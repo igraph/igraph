@@ -39,7 +39,7 @@
 
 static igraph_bool_t igraph_i_cattribute_find(const igraph_vector_ptr_t *ptrvec,
                                               const char *name, long int *idx) {
-    long int i, n = igraph_vector_ptr_size(ptrvec);
+    igraph_integer_t i, n = igraph_vector_ptr_size(ptrvec);
     igraph_bool_t l = 0;
     for (i = 0; !l && i < n; i++) {
         igraph_attribute_record_t *rec = VECTOR(*ptrvec)[i];
@@ -260,9 +260,9 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, long int
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
-    long int length = igraph_vector_ptr_size(val);
+    igraph_integer_t length = igraph_vector_ptr_size(val);
     long int nattrno = nattr == NULL ? 0 : igraph_vector_ptr_size(nattr);
-    long int origlen = igraph_vcount(graph) - nv;
+    igraph_integer_t origlen = igraph_vcount(graph) - nv;
     long int newattrs = 0, i;
     igraph_vector_t news;
 
@@ -419,7 +419,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, long int
 }
 
 static void igraph_i_cattribute_permute_free(igraph_vector_ptr_t *v) {
-    long int i, n = igraph_vector_ptr_size(v);
+    igraph_integer_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         igraph_attribute_record_t *rec = VECTOR(*v)[i];
         IGRAPH_FREE(rec->name);
@@ -449,7 +449,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
 
         igraph_i_cattributes_t *attr = graph->attr;
         igraph_vector_ptr_t *val = &attr->val;
-        long int valno = igraph_vector_ptr_size(val);
+        igraph_integer_t valno = igraph_vector_ptr_size(val);
         long int i;
 
         for (i = 0; i < valno; i++) {
@@ -508,7 +508,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
     } else {
         igraph_i_cattributes_t *attr = graph->attr;
         igraph_vector_ptr_t *val = &attr->val;
-        long int valno = igraph_vector_ptr_size(val);
+        igraph_integer_t valno = igraph_vector_ptr_size(val);
         long int i;
 
         /* New vertex attributes */
@@ -600,7 +600,7 @@ static igraph_error_t igraph_i_cattributes_cn_sum(const igraph_attribute_record_
                                        const igraph_vector_ptr_t *merges) {
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
 
     if (!newv) {
@@ -612,7 +612,7 @@ static igraph_error_t igraph_i_cattributes_cn_sum(const igraph_attribute_record_
     for (i = 0; i < newlen; i++) {
         igraph_real_t s = 0.0;
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         for (j = 0; j < n; j++) {
             long int x = VECTOR(*idx)[j];
             s += VECTOR(*oldv)[x];
@@ -631,7 +631,7 @@ static igraph_error_t igraph_i_cattributes_cn_prod(const igraph_attribute_record
                                         const igraph_vector_ptr_t *merges) {
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
 
     if (!newv) {
@@ -643,7 +643,7 @@ static igraph_error_t igraph_i_cattributes_cn_prod(const igraph_attribute_record
     for (i = 0; i < newlen; i++) {
         igraph_real_t s = 1.0;
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         for (j = 0; j < n; j++) {
             long int x = VECTOR(*idx)[j];
             s *= VECTOR(*oldv)[x];
@@ -662,7 +662,7 @@ static igraph_error_t igraph_i_cattributes_cn_min(const igraph_attribute_record_
                                        const igraph_vector_ptr_t *merges) {
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_real_t nan = IGRAPH_NAN;
 
@@ -674,7 +674,7 @@ static igraph_error_t igraph_i_cattributes_cn_min(const igraph_attribute_record_
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         igraph_real_t m = n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
         for (j = 1; j < n; j++) {
             long int x = VECTOR(*idx)[j];
@@ -697,7 +697,7 @@ static igraph_error_t igraph_i_cattributes_cn_max(const igraph_attribute_record_
                                        const igraph_vector_ptr_t *merges) {
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_real_t nan = IGRAPH_NAN;
 
@@ -709,7 +709,7 @@ static igraph_error_t igraph_i_cattributes_cn_max(const igraph_attribute_record_
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         igraph_real_t m = n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
         for (j = 1; j < n; j++) {
             long int x = VECTOR(*idx)[j];
@@ -733,7 +733,7 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
 
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_real_t nan = IGRAPH_NAN;
 
@@ -747,7 +747,7 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             VECTOR(*newv)[i] = nan;
         } else if (n == 1) {
@@ -772,7 +772,7 @@ static igraph_error_t igraph_i_cattributes_cn_first(const igraph_attribute_recor
 
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_real_t nan = IGRAPH_NAN;
 
@@ -784,7 +784,7 @@ static igraph_error_t igraph_i_cattributes_cn_first(const igraph_attribute_recor
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             VECTOR(*newv)[i] = nan;
         } else {
@@ -804,7 +804,7 @@ static igraph_error_t igraph_i_cattributes_cn_last(const igraph_attribute_record
 
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_real_t nan = IGRAPH_NAN;
 
@@ -816,7 +816,7 @@ static igraph_error_t igraph_i_cattributes_cn_last(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             VECTOR(*newv)[i] = nan;
         } else {
@@ -835,7 +835,7 @@ static igraph_error_t igraph_i_cattributes_cn_mean(const igraph_attribute_record
                                         const igraph_vector_ptr_t *merges) {
     const igraph_vector_t *oldv = oldrec->value;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_real_t nan = IGRAPH_NAN;
 
@@ -847,7 +847,7 @@ static igraph_error_t igraph_i_cattributes_cn_mean(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         igraph_real_t s = n > 0 ? 0.0 : nan;
         for (j = 0; j < n; j++) {
             long int x = VECTOR(*idx)[j];
@@ -871,7 +871,7 @@ static igraph_error_t igraph_i_cattributes_cn_func(const igraph_attribute_record
                                         igraph_cattributes_combine_num_t *func) {
 
     const igraph_vector_t *oldv = oldrec->value;
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_vector_t values;
@@ -886,7 +886,7 @@ static igraph_error_t igraph_i_cattributes_cn_func(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         igraph_real_t res;
         IGRAPH_CHECK(igraph_vector_resize(&values, n));
         for (j = 0; j < n; j++) {
@@ -910,7 +910,7 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
 
     if (!newv) {
@@ -924,7 +924,7 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             VECTOR(*newv)[i] = 0;
         } else if (n == 1) {
@@ -949,7 +949,7 @@ static igraph_error_t igraph_i_cattributes_cb_first(const igraph_attribute_recor
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
 
     if (!newv) {
@@ -961,7 +961,7 @@ static igraph_error_t igraph_i_cattributes_cb_first(const igraph_attribute_recor
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             VECTOR(*newv)[i] = 0;
         } else {
@@ -981,7 +981,7 @@ static igraph_error_t igraph_i_cattributes_cb_last(const igraph_attribute_record
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
 
     if (!newv) {
@@ -993,7 +993,7 @@ static igraph_error_t igraph_i_cattributes_cb_last(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             VECTOR(*newv)[i] = 0;
         } else {
@@ -1013,7 +1013,7 @@ static igraph_error_t igraph_i_cattributes_cb_all_is_true(const igraph_attribute
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i, j, n, x;
 
     if (!newv) {
@@ -1048,7 +1048,7 @@ static igraph_error_t igraph_i_cattributes_cb_any_is_true(const igraph_attribute
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i, j, n, x;
 
     if (!newv) {
@@ -1083,7 +1083,7 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i, j, n, x, num_trues;
 
     if (!newv) {
@@ -1133,7 +1133,7 @@ static igraph_error_t igraph_i_cattributes_cb_func(const igraph_attribute_record
                                         igraph_cattributes_combine_bool_t *func) {
 
     const igraph_vector_bool_t *oldv = oldrec->value;
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
     igraph_vector_bool_t values;
@@ -1150,7 +1150,7 @@ static igraph_error_t igraph_i_cattributes_cb_func(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         igraph_bool_t res;
 
         IGRAPH_CHECK(igraph_vector_bool_resize(&values, n));
@@ -1175,7 +1175,7 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
                                           const igraph_vector_ptr_t *merges) {
 
     const igraph_strvector_t *oldv = oldrec->value;
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
@@ -1190,7 +1190,7 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         char *tmp;
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
@@ -1217,7 +1217,7 @@ static igraph_error_t igraph_i_cattributes_sn_first(const igraph_attribute_recor
                                          const igraph_vector_ptr_t *merges) {
 
     const igraph_strvector_t *oldv = oldrec->value;
-    long int i, newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t i, newlen = igraph_vector_ptr_size(merges);
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
@@ -1229,7 +1229,7 @@ static igraph_error_t igraph_i_cattributes_sn_first(const igraph_attribute_recor
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else {
@@ -1250,7 +1250,7 @@ static igraph_error_t igraph_i_cattributes_sn_last(const igraph_attribute_record
                                         const igraph_vector_ptr_t *merges) {
 
     const igraph_strvector_t *oldv = oldrec->value;
-    long int i, newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t i, newlen = igraph_vector_ptr_size(merges);
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
@@ -1262,7 +1262,7 @@ static igraph_error_t igraph_i_cattributes_sn_last(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int n = igraph_vector_size(idx);
+        igraph_integer_t n = igraph_vector_size(idx);
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else {
@@ -1283,7 +1283,7 @@ static igraph_error_t igraph_i_cattributes_sn_concat(const igraph_attribute_reco
                                           const igraph_vector_ptr_t *merges) {
 
     const igraph_strvector_t *oldv = oldrec->value;
-    long int i, newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t i, newlen = igraph_vector_ptr_size(merges);
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
@@ -1295,7 +1295,7 @@ static igraph_error_t igraph_i_cattributes_sn_concat(const igraph_attribute_reco
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         size_t len = 0;
         char *tmp, *tmp2;
         for (j = 0; j < n; j++) {
@@ -1331,7 +1331,7 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
                                         igraph_cattributes_combine_str_t *func) {
 
     const igraph_strvector_t *oldv = oldrec->value;
-    long int newlen = igraph_vector_ptr_size(merges);
+    igraph_integer_t newlen = igraph_vector_ptr_size(merges);
     long int i;
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
     igraph_strvector_t values;
@@ -1348,7 +1348,7 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
 
     for (i = 0; i < newlen; i++) {
         igraph_vector_t *idx = VECTOR(*merges)[i];
-        long int j, n = igraph_vector_size(idx);
+        igraph_integer_t j, n = igraph_vector_size(idx);
         char *res;
         IGRAPH_CHECK(igraph_strvector_resize(&values, n));
         for (j = 0; j < n; j++) {
@@ -1381,7 +1381,7 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     igraph_i_cattributes_t *toattr = newgraph->attr;
     igraph_vector_ptr_t *val = &attr->val;
     igraph_vector_ptr_t *new_val = &toattr->val;
-    long int valno = igraph_vector_ptr_size(val);
+    igraph_integer_t valno = igraph_vector_ptr_size(val);
     long int i, j, keepno = 0;
     int *TODO;
     igraph_function_pointer_t *funcs;
@@ -1650,9 +1650,9 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;
-    long int ealno = igraph_vector_ptr_size(eal);
-    long int ne = igraph_vector_size(edges) / 2;
-    long int origlen = igraph_ecount(graph) - ne;
+    igraph_integer_t ealno = igraph_vector_ptr_size(eal);
+    igraph_integer_t ne = igraph_vector_size(edges) / 2;
+    igraph_integer_t origlen = igraph_ecount(graph) - ne;
     long int nattrno = nattr == 0 ? 0 : igraph_vector_ptr_size(nattr);
     igraph_vector_t news;
     long int newattrs, i;
@@ -1850,7 +1850,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
 
         igraph_i_cattributes_t *attr = graph->attr;
         igraph_vector_ptr_t *eal = &attr->eal;
-        long int ealno = igraph_vector_ptr_size(eal);
+        igraph_integer_t ealno = igraph_vector_ptr_size(eal);
         long int i;
 
         for (i = 0; i < ealno; i++) {
@@ -1910,7 +1910,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
 
         igraph_i_cattributes_t *attr = graph->attr;
         igraph_vector_ptr_t *eal = &attr->eal;
-        long int ealno = igraph_vector_ptr_size(eal);
+        igraph_integer_t ealno = igraph_vector_ptr_size(eal);
         long int i;
 
         /* New edge attributes */
@@ -1992,7 +1992,7 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
     igraph_i_cattributes_t *toattr = newgraph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;
     igraph_vector_ptr_t *new_eal = &toattr->eal;
-    long int ealno = igraph_vector_ptr_size(eal);
+    igraph_integer_t ealno = igraph_vector_ptr_size(eal);
     long int i, j, keepno = 0;
     int *TODO;
     igraph_function_pointer_t *funcs;
@@ -2210,7 +2210,7 @@ static igraph_error_t igraph_i_cattribute_get_info(const igraph_t *graph,
         igraph_strvector_t *n = names[i];
         igraph_vector_t *t = types[i];
         igraph_vector_ptr_t *al = attr[i];
-        long int len = igraph_vector_ptr_size(al);
+        igraph_integer_t len = igraph_vector_ptr_size(al);
 
         if (n) {
             IGRAPH_CHECK(igraph_strvector_resize(n, len));
@@ -2503,7 +2503,7 @@ static igraph_error_t igraph_i_cattribute_get_numeric_edge_attr(const igraph_t *
         IGRAPH_FINALLY(igraph_eit_destroy, &it);
         IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
         for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
-            long int e = IGRAPH_EIT_GET(it);
+            igraph_integer_t e = IGRAPH_EIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*num)[e];
         }
         igraph_eit_destroy(&it);
@@ -2540,7 +2540,7 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(const igraph_t *g
         IGRAPH_FINALLY(igraph_eit_destroy, &it);
         IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
         for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
-            long int e = IGRAPH_EIT_GET(it);
+            igraph_integer_t e = IGRAPH_EIT_GET(it);
             char *s;
             igraph_strvector_get(str, e, &s);
             IGRAPH_CHECK(igraph_strvector_set(value, i, s));
@@ -2579,7 +2579,7 @@ static igraph_error_t igraph_i_cattribute_get_bool_edge_attr(const igraph_t *gra
         IGRAPH_FINALLY(igraph_eit_destroy, &it);
         IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_EIT_SIZE(it)));
         for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
-            long int e = IGRAPH_EIT_GET(it);
+            igraph_integer_t e = IGRAPH_EIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*log)[e];
         }
         igraph_eit_destroy(&it);
@@ -4189,7 +4189,7 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 
     if (g) {
         igraph_vector_ptr_t *gal = &attr->gal;
-        long int i, n = igraph_vector_ptr_size(gal);
+        igraph_integer_t i, n = igraph_vector_ptr_size(gal);
         for (i = 0; i < n; i++) {
             igraph_i_cattribute_free_rec(VECTOR(*gal)[i]);
         }
@@ -4197,7 +4197,7 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
     }
     if (v) {
         igraph_vector_ptr_t *val = &attr->val;
-        long int i, n = igraph_vector_ptr_size(val);
+        igraph_integer_t i, n = igraph_vector_ptr_size(val);
         for (i = 0; i < n; i++) {
             igraph_i_cattribute_free_rec(VECTOR(*val)[i]);
         }
@@ -4205,7 +4205,7 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
     }
     if (e) {
         igraph_vector_ptr_t *eal = &attr->eal;
-        long int i, n = igraph_vector_ptr_size(eal);
+        igraph_integer_t i, n = igraph_vector_ptr_size(eal);
         for (i = 0; i < n; i++) {
             igraph_i_cattribute_free_rec(VECTOR(*eal)[i]);
         }

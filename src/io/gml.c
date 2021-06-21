@@ -602,8 +602,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     igraph_strvector_t strv;
     igraph_vector_bool_t boolv;
     long int i;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     igraph_vector_t v_myid;
     const igraph_vector_t *myid = id;
@@ -724,8 +724,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* The edges too */
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
         long int j;
         CHECK(fprintf(outstream, "  edge\n  [\n"));
         /* source and target */

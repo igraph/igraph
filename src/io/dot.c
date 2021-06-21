@@ -134,8 +134,8 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
 igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     int ret;
     long int i, j;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     char edgeop[3];
     igraph_strvector_t gnames, vnames, enames;
     igraph_vector_t gtypes, vtypes, etypes;
@@ -254,8 +254,8 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     /* Write the edges */
     if (igraph_vector_size(&etypes) > 0) {
         for (i = 0; i < no_of_edges; i++) {
-            long int from = IGRAPH_FROM(graph, i);
-            long int to = IGRAPH_TO(graph, i);
+            igraph_integer_t from = IGRAPH_FROM(graph, i);
+            igraph_integer_t to = IGRAPH_TO(graph, i);
             CHECK(fprintf(outstream, "  %ld %s %ld [\n", from, edgeop, to));
             for (j = 0; j < igraph_vector_size(&etypes); j++) {
                 char *name, *newname;
@@ -295,8 +295,8 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
         }
     } else {
         for (i = 0; i < no_of_edges; i++) {
-            long int from = IGRAPH_FROM(graph, i);
-            long int to = IGRAPH_TO(graph, i);
+            igraph_integer_t from = IGRAPH_FROM(graph, i);
+            igraph_integer_t to = IGRAPH_TO(graph, i);
             CHECK(fprintf(outstream, "  %ld %s %ld;\n", from, edgeop, to));
         }
     }

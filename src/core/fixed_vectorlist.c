@@ -26,7 +26,7 @@
 #include "core/fixed_vectorlist.h"
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
-    long int i, n = igraph_vector_ptr_size(&l->v);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&l->v);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(l->v)[i];
         if (v) {
@@ -42,7 +42,7 @@ igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     long int size) {
 
     igraph_vector_t sizes;
-    long int i, no = igraph_vector_size(from);
+    igraph_integer_t i, no = igraph_vector_size(from);
 
     l->vecs = IGRAPH_CALLOC(size, igraph_vector_t);
     if (!l->vecs) {

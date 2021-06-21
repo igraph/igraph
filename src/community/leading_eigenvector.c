@@ -128,7 +128,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector(igraph_real_t *to,
     for (j = 0; j < size; j++) {
         long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
-        long int degree = igraph_vector_int_size(neis);
+        igraph_integer_t degree = igraph_vector_int_size(neis);
         ktx += from[j] * degree;
         ktx2 += degree;
     }
@@ -192,7 +192,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector2(igraph_real_t *to,
     for (j = 0; j < size + 1; j++) {
         long int oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
-        long int degree = igraph_vector_int_size(neis);
+        igraph_integer_t degree = igraph_vector_int_size(neis);
         if (j < size) {
             ktx += from[j] * degree;
         }
@@ -352,7 +352,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(igraph_re
 }
 
 static void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
-    long int i, n = igraph_vector_ptr_size(ptr);
+    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*ptr)[i];
         if (v) {

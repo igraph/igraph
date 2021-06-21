@@ -59,7 +59,7 @@
 igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
                             igraph_real_t *unconnected, igraph_bool_t directed) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, j, n;
     igraph_vector_int_t already_added;
     long int nodes_reached;

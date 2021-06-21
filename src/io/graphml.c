@@ -378,7 +378,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
     if (state->index < 0) {
 
         igraph_vector_ptr_t vattr, eattr, gattr;
-        long int esize = igraph_vector_ptr_size(&state->e_attrs);
+        igraph_integer_t esize = igraph_vector_ptr_size(&state->e_attrs);
         const void **tmp;
         r = igraph_vector_ptr_init(&vattr,
                                    igraph_vector_ptr_size(&state->v_attrs) + 1);
@@ -419,7 +419,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
 
             if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-                long int origsize = igraph_vector_size(vec);
+                igraph_integer_t origsize = igraph_vector_size(vec);
                 long int nodes = igraph_trie_size(&state->node_trie);
                 igraph_vector_resize(vec, nodes);
                 for (l = origsize; l < nodes; l++) {
@@ -465,8 +465,8 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
 
             if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-                long int origsize = igraph_vector_size(vec);
-                long int edges = igraph_vector_size(&state->edgelist) / 2;
+                igraph_integer_t origsize = igraph_vector_size(vec);
+                igraph_integer_t edges = igraph_vector_size(&state->edgelist) / 2;
                 igraph_vector_resize(vec, edges);
                 for (l = origsize; l < edges; l++) {
                     VECTOR(*vec)[l] = graphmlrec->default_value.as_numeric;
@@ -474,7 +474,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
             } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
                 long int origsize = igraph_strvector_size(strvec);
-                long int edges = igraph_vector_size(&state->edgelist) / 2;
+                igraph_integer_t edges = igraph_vector_size(&state->edgelist) / 2;
                 igraph_strvector_resize(strvec, edges);
                 for (l = origsize; l < edges; l++) {
                     igraph_strvector_set(strvec, l, graphmlrec->default_value.as_string);
@@ -482,7 +482,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
             } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 igraph_vector_bool_t *boolvec = (igraph_vector_bool_t*)rec->value;
                 long int origsize = igraph_vector_bool_size(boolvec);
-                long int edges = igraph_vector_size(&state->edgelist) / 2;
+                igraph_integer_t edges = igraph_vector_size(&state->edgelist) / 2;
                 igraph_vector_bool_resize(boolvec, edges);
                 for (l = origsize; l < edges; l++) {
                     VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
@@ -515,7 +515,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
             igraph_attribute_record_t *rec = &graphmlrec->record;
             if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-                long int origsize = igraph_vector_size(vec);
+                igraph_integer_t origsize = igraph_vector_size(vec);
                 igraph_vector_resize(vec, 1);
                 for (l = origsize; l < 1; l++) {
                     VECTOR(*vec)[l] = graphmlrec->default_value.as_numeric;
@@ -1098,7 +1098,7 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
                     igraph_trie_get(&state->node_trie, attr_value, &id2);
                     free(attr_value);
                 } else if (xmlStrEqual(*it, toXmlChar("id"))) {
-                    long int edges = igraph_vector_size(&state->edgelist) / 2 + 1;
+                    igraph_integer_t edges = igraph_vector_size(&state->edgelist) / 2 + 1;
                     long int origsize = igraph_strvector_size(&state->edgeids);
                     attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
                     igraph_strvector_resize(&state->edgeids, edges);
@@ -1759,7 +1759,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     while (!IGRAPH_EIT_END(it)) {
         igraph_integer_t from, to;
         char *name, *name_escaped;
-        long int edge = IGRAPH_EIT_GET(it);
+        igraph_integer_t edge = IGRAPH_EIT_GET(it);
         igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
         ret = fprintf(outstream, "    <edge source=\"n%ld\" target=\"n%ld\">\n",
                       (long int)from, (long int)to);

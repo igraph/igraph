@@ -63,10 +63,10 @@
 igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                           const igraph_t *right) {
 
-    long int no_of_nodes_left = igraph_vcount(left);
-    long int no_of_nodes_right = igraph_vcount(right);
-    long int no_of_edges_left = igraph_ecount(left);
-    long int no_of_edges_right = igraph_ecount(right);
+    igraph_integer_t no_of_nodes_left = igraph_vcount(left);
+    igraph_integer_t no_of_nodes_right = igraph_vcount(right);
+    igraph_integer_t no_of_edges_left = igraph_ecount(left);
+    igraph_integer_t no_of_edges_right = igraph_ecount(right);
     igraph_vector_t edges;
     igraph_bool_t directed_left = igraph_is_directed(left);
     igraph_integer_t from, to;
@@ -132,7 +132,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  */
 igraph_error_t igraph_disjoint_union_many(igraph_t *res,
                                const igraph_vector_ptr_t *graphs) {
-    long int no_of_graphs = igraph_vector_ptr_size(graphs);
+    igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = 1;
     igraph_vector_t edges;
     long int no_of_edges = 0;

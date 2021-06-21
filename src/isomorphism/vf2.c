@@ -120,8 +120,8 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                                    igraph_isocompat_t *edge_compat_fn,
                                    void *arg) {
 
-    long int no_of_nodes = igraph_vcount(graph1);
-    long int no_of_edges = igraph_ecount(graph1);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph1);
+    igraph_integer_t no_of_edges = igraph_ecount(graph1);
     igraph_vector_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
     igraph_vector_t in_1, in_2, out_1, out_2;
     long int in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
@@ -854,7 +854,7 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
 }
 
 static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
-    long int i, n = igraph_vector_ptr_size(data);
+    igraph_integer_t i, n = igraph_vector_ptr_size(data);
     for (i = 0; i < n; i++) {
         igraph_vector_t *vec = VECTOR(*data)[i];
         igraph_vector_destroy(vec);
@@ -1019,9 +1019,9 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                                       igraph_isocompat_t *edge_compat_fn,
                                       void *arg) {
 
-    long int no_of_nodes1 = igraph_vcount(graph1),
+    igraph_integer_t no_of_nodes1 = igraph_vcount(graph1),
              no_of_nodes2 = igraph_vcount(graph2);
-    long int no_of_edges1 = igraph_ecount(graph1),
+    igraph_integer_t no_of_edges1 = igraph_ecount(graph1),
              no_of_edges2 = igraph_ecount(graph2);
     igraph_vector_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
     igraph_vector_t in_1, in_2, out_1, out_2;
@@ -1649,7 +1649,7 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
 }
 
 static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
-    long int i, n = igraph_vector_ptr_size(data);
+    igraph_integer_t i, n = igraph_vector_ptr_size(data);
     for (i = 0; i < n; i++) {
         igraph_vector_t *vec = VECTOR(*data)[i];
         igraph_vector_destroy(vec);

@@ -71,8 +71,8 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
                                   const igraph_vs_t to,
                                   const igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_t newgraph;
     igraph_vector_t edges, newweights;
     igraph_matrix_t bfres;
@@ -156,8 +156,8 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
 
     igraph_vector_resize(&newweights, no_of_edges);
     for (i = 0; i < no_of_edges; i++) {
-        long int ffrom = IGRAPH_FROM(graph, i);
-        long int tto = IGRAPH_TO(graph, i);
+        igraph_integer_t ffrom = IGRAPH_FROM(graph, i);
+        igraph_integer_t tto = IGRAPH_TO(graph, i);
         VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
     }
 

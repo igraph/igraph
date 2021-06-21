@@ -193,8 +193,8 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
             long int actamb = igraph_dqueue_pop(&neiq);
             igraph_vector_t *outv = outneis + actamb;
             igraph_vector_t *inv = inneis + actamb;
-            long int no_in = igraph_vector_size(inv);
-            long int no_out = igraph_vector_size(outv);
+            igraph_integer_t no_in = igraph_vector_size(inv);
+            igraph_integer_t no_out = igraph_vector_size(outv);
             long int neis_out = RNG_GEOM(param_geom_out);
             long int neis_in = RNG_GEOM(param_geom_in);
             /* outgoing neighbors */

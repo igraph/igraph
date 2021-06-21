@@ -268,7 +268,7 @@ static igraph_error_t igraph_i_move_nodes(
     //   velocity     = force / mass
     //   displacement = force / mass
 
-    long int this_node, no_of_nodes = igraph_vector_size(pending_forces_x);
+    igraph_integer_t this_node, no_of_nodes = igraph_vector_size(pending_forces_x);
 
     for (this_node = 0; this_node < no_of_nodes; this_node++) {
 
@@ -354,8 +354,8 @@ igraph_error_t igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *re
                            igraph_real_t max_sa_movement,
                            igraph_bool_t use_seed) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t pending_forces_x, pending_forces_y;
     /* Set a flag to calculate (or not) the electrical forces that the nodes */
     /* apply on each other based on if both node types' charges are zero. */
@@ -422,8 +422,8 @@ igraph_error_t igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *re
 
         // Apply force from springs
         for (edge = 0; edge < no_of_edges; edge++) {
-            long int tthis_node = IGRAPH_FROM(graph, edge);
-            long int oother_node = IGRAPH_TO(graph, edge);
+            igraph_integer_t tthis_node = IGRAPH_FROM(graph, edge);
+            igraph_integer_t oother_node = IGRAPH_TO(graph, edge);
             // Apply spring force on both nodes
             igraph_i_apply_spring_force(res, &pending_forces_x, &pending_forces_y,
                                         oother_node, tthis_node, spring_length,

@@ -71,7 +71,7 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     igraph_real_t lightest_weight_to_sampled = INFINITY;
     igraph_vector_int_t* adjacent_nodes = igraph_adjlist_get(adjlist, v);
     igraph_vector_int_t* incident_edges = igraph_inclist_get(inclist, v);
-    long int i, nlen = igraph_vector_int_size(incident_edges);
+    igraph_integer_t i, nlen = igraph_vector_int_size(incident_edges);
 
     for (i = 0; i < nlen; i++) {
         long int neighbor_node = VECTOR(*adjacent_nodes)[i];
@@ -108,7 +108,7 @@ static void igraph_i_clear_lightest_edges_to_clusters(
     igraph_vector_t *lightest_eid,
     igraph_vector_t *lightest_weight
 ) {
-    long int i, n = igraph_vector_int_size(dirty_vids);
+    igraph_integer_t i, n = igraph_vector_int_size(dirty_vids);
     for (i = 0; i < n; i++) {
         long int vid = VECTOR(*dirty_vids)[i];
         VECTOR(*lightest_weight)[vid] = INFINITY;
@@ -159,8 +159,8 @@ static void igraph_i_clear_lightest_edges_to_clusters(
 int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
         igraph_real_t stretch, igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i, j, v, nlen, neighbor, cluster;
     double sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
     igraph_vector_t clustering, lightest_eid, lightest_weight;

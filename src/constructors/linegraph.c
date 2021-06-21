@@ -30,7 +30,7 @@
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
 static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i, j, n;
     igraph_vector_t adjedges, adjedges2;
     igraph_vector_t edges;
@@ -41,8 +41,8 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
     IGRAPH_VECTOR_INIT_FINALLY(&adjedges2, 0);
 
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -86,7 +86,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
 }
 
 static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i, j, n;
     igraph_vector_t adjedges;
     igraph_vector_t edges;
@@ -96,7 +96,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
     IGRAPH_VECTOR_INIT_FINALLY(&adjedges, 0);
 
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
 
         IGRAPH_ALLOW_INTERRUPTION();
 

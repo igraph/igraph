@@ -36,7 +36,7 @@
 #include "core/interruption.h"
 
 static void igraph_i_cohesive_blocks_free_graphs(igraph_vector_ptr_t *ptr) {
-    long int i, n = igraph_vector_ptr_size(ptr);
+    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
         igraph_t *g = VECTOR(*ptr)[i];
@@ -48,7 +48,7 @@ static void igraph_i_cohesive_blocks_free_graphs(igraph_vector_ptr_t *ptr) {
 }
 
 static void igraph_i_cohesive_blocks_free_vectors(igraph_vector_ptr_t *ptr) {
-    long int i, n = igraph_vector_ptr_size(ptr);
+    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*ptr)[i];
@@ -74,7 +74,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
                                   igraph_dqueue_t *Q,
                                   igraph_vector_t *neis) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
     long int cno = 0;
 
@@ -129,8 +129,8 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
 
 static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
                                       const igraph_vector_t *haystack) {
-    long int nlen = igraph_vector_size(needle);
-    long int hlen = igraph_vector_size(haystack);
+    igraph_integer_t nlen = igraph_vector_size(needle);
+    igraph_integer_t hlen = igraph_vector_size(haystack);
     long int np = 0, hp = 0;
 
     if (hlen < nlen) {
@@ -308,7 +308,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     while (Qptr < igraph_vector_ptr_size(&Q)) {
         igraph_t *mygraph = VECTOR(Q)[Qptr];
         igraph_bool_t mycheck = VECTOR(Qcheck)[Qptr];
-        long int mynodes = igraph_vcount(mygraph);
+        igraph_integer_t mynodes = igraph_vcount(mygraph);
         long int i, nsep;
         long int no, kept = 0;
         long int cptr = 0;
@@ -331,7 +331,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_vector_bool_null(&marked);
         for (i = 0; i < nsep; i++) {
             igraph_vector_t *v = VECTOR(separators)[i];
-            long int j, n = igraph_vector_size(v);
+            igraph_integer_t j, n = igraph_vector_size(v);
             for (j = 0; j < n; j++) {
                 long int vv = VECTOR(*v)[j];
                 if (!VECTOR(marked)[vv]) {
@@ -468,7 +468,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             long int p = VECTOR(Qparent)[i];
             igraph_vector_t *mapping = VECTOR(Qmapping)[i];
             igraph_vector_t *pmapping = VECTOR(Qmapping)[p];
-            long int j, n = igraph_vector_size(mapping);
+            igraph_integer_t j, n = igraph_vector_size(mapping);
 
             if (!pmapping) {
                 continue;

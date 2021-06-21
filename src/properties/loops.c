@@ -41,7 +41,7 @@
  * \example examples/simple/igraph_has_loop.c
  */
 igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
-    long int i, m = igraph_ecount(graph);
+    igraph_integer_t i, m = igraph_ecount(graph);
 
     *res = 0;
 
@@ -84,7 +84,7 @@ igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
     IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
 
     for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
-        long int e = IGRAPH_EIT_GET(eit);
+        igraph_integer_t e = IGRAPH_EIT_GET(eit);
         VECTOR(*res)[i] = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e)) ? 1 : 0;
     }
 

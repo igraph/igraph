@@ -1021,7 +1021,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         while (!igraph_stack_empty(&S)) {
             long int actnode = (long int) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, actnode);
-            long int fatv_len = igraph_vector_int_size(fatv);
+            igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             double coeff;
 
             if (is_target[actnode]) {
@@ -1276,7 +1276,7 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
         for (j = 0, IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit);
              IGRAPH_EIT_NEXT(eit), j++) {
-            long int edge = IGRAPH_EIT_GET(eit);
+            igraph_integer_t edge = IGRAPH_EIT_GET(eit);
             VECTOR(*res)[j] = VECTOR(*tmpres)[edge];
         }
 

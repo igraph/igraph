@@ -119,7 +119,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 
     igraph_vector_t e, k_out, k_in;
     long int types;
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i;
     igraph_real_t m;
     long int c1, c2;
@@ -221,7 +221,7 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
            const igraph_vector_t *weights, igraph_bool_t directed) {
     /* Specifically used to handle weights and/or ignore direction */
     igraph_eit_t edgeit;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t from, to;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
@@ -302,8 +302,8 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                              igraph_matrix_t *modmat,
                              igraph_bool_t directed) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
     igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
     long int i, j;

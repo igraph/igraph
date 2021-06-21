@@ -673,8 +673,8 @@ const unsigned int igraph_i_classedges_4u[] = { 2, 3, 1, 3, 0, 3, 1, 2, 0, 2, 0,
  */
 igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
     long int e;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t from, to;
     unsigned char idx, mul;
     const unsigned int *arr_idx, *arr_code;

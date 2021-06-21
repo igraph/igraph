@@ -108,7 +108,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
     igraph_error_t ret;
 
     igraph_dqueue_t Q;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int actroot = 0;
     igraph_vector_char_t added;
 
@@ -161,7 +161,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
        found. Special care must be taken for vertices that are not in
        the restricted set, but are to be used as 'root' vertices. */
     if (restricted) {
-        long int i, n = igraph_vector_size(restricted);
+        igraph_integer_t i, n = igraph_vector_size(restricted);
         igraph_vector_char_fill(&added, 1);
         for (i = 0; i < n; i++) {
             long int v = VECTOR(*restricted)[i];
@@ -226,7 +226,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
             long int succ_vec;
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                     (igraph_integer_t) actvect);
-            long int i, n = igraph_vector_int_size(neis);
+            igraph_integer_t i, n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -334,7 +334,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
     igraph_dqueue_t q;
     long int num_visited = 0;
     igraph_vector_t neis;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
     char *added;
     long int lastlayer = -1;
@@ -478,7 +478,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_dfshandler_t *out_callback,
                void *extra) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t adjlist;
     igraph_stack_t stack;
     igraph_vector_char_t added;

@@ -130,7 +130,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     long int nodes_to_calc, affected_nodes;
     long int maxdegree = 0;
@@ -255,7 +255,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         long int idx = VECTOR(indexv)[node] - 1;
         igraph_vector_int_t *neis2 =
             igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);
-        long int deg = igraph_vector_int_size(neis2);
+        igraph_integer_t deg = igraph_vector_int_size(neis2);
         if (mode == IGRAPH_TRANSITIVITY_ZERO && deg < 2) {
             VECTOR(*res)[i] = 0.0;
         } else {

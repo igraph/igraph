@@ -1521,8 +1521,8 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
 
 static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
                                   const igraph_es_t *es, igraph_integer_t *result) {
-    long int n = igraph_vector_size(es->data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t n = igraph_vector_size(es->data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
 
     if (n % 2 != 0) {
@@ -1549,8 +1549,8 @@ static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
 
 static igraph_error_t igraph_i_es_path_size(const igraph_t *graph,
                                  const igraph_es_t *es, igraph_integer_t *result) {
-    long int n = igraph_vector_size(es->data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t n = igraph_vector_size(es->data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
 
     if (!igraph_vector_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
@@ -1596,8 +1596,8 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
                                          igraph_eit_t *eit,
                                          igraph_neimode_t mode) {
     igraph_vector_t *vec;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_t);
@@ -1655,8 +1655,8 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
 
 static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
                               igraph_es_t es, igraph_eit_t *eit) {
-    long int n = igraph_vector_size(es.data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t n = igraph_vector_size(es.data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
 
     if (n % 2 != 0) {
@@ -1694,8 +1694,8 @@ static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
 
 static igraph_error_t igraph_i_eit_multipairs(const igraph_t *graph,
                                    igraph_es_t es, igraph_eit_t *eit) {
-    long int n = igraph_vector_size(es.data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t n = igraph_vector_size(es.data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (n % 2 != 0) {
         IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
@@ -1726,8 +1726,8 @@ static igraph_error_t igraph_i_eit_multipairs(const igraph_t *graph,
 
 static igraph_error_t igraph_i_eit_path(const igraph_t *graph,
                              igraph_es_t es, igraph_eit_t *eit) {
-    long int n = igraph_vector_size(es.data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t n = igraph_vector_size(es.data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, len;
 
     if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {

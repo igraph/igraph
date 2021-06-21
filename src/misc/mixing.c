@@ -64,8 +64,8 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
                                  igraph_real_t *res,
                                  igraph_bool_t directed) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int no_of_types;
     igraph_vector_t ai, bi, eii;
     long int e, i;
@@ -87,8 +87,8 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&eii, no_of_types);
 
     for (e = 0; e < no_of_edges; e++) {
-        long int from = IGRAPH_FROM(graph, e);
-        long int to = IGRAPH_TO(graph, e);
+        igraph_integer_t from = IGRAPH_FROM(graph, e);
+        igraph_integer_t to = IGRAPH_TO(graph, e);
         long int from_type = VECTOR(*types)[from];
         long int to_type = VECTOR(*types)[to];
 
@@ -175,8 +175,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
                          igraph_real_t *res,
                          igraph_bool_t directed) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int e;
 
     directed = directed && igraph_is_directed(graph);
@@ -197,8 +197,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
         igraph_real_t num1 = 0.0, num2 = 0.0, den1 = 0.0;
 
         for (e = 0; e < no_of_edges; e++) {
-            long int from = IGRAPH_FROM(graph, e);
-            long int to = IGRAPH_TO(graph, e);
+            igraph_integer_t from = IGRAPH_FROM(graph, e);
+            igraph_integer_t to = IGRAPH_TO(graph, e);
             igraph_real_t from_type = VECTOR(*types1)[from];
             igraph_real_t to_type = VECTOR(*types1)[to];
 
@@ -224,8 +224,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
         }
 
         for (e = 0; e < no_of_edges; e++) {
-            long int from = IGRAPH_FROM(graph, e);
-            long int to = IGRAPH_TO(graph, e);
+            igraph_integer_t from = IGRAPH_FROM(graph, e);
+            igraph_integer_t to = IGRAPH_TO(graph, e);
             igraph_real_t from_type = VECTOR(*types1)[from];
             igraph_real_t to_type = VECTOR(*types2)[to];
 

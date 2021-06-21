@@ -193,7 +193,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                                    const igraph_vector_t *cut_prob, igraph_motifs_handler_t *callback,
                                    void* extra) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_adjlist_t allneis, alloutneis;
     igraph_vector_int_t *neis;
     long int father;
@@ -487,7 +487,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
                                    igraph_integer_t sample_size,
                                    const igraph_vector_t *parsample) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t neis;
 
     igraph_vector_t vids;     /* this is G */
@@ -702,7 +702,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
                              int size, const igraph_vector_t *cut_prob) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t neis;
 
     igraph_vector_t vids;     /* this is G */

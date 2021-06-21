@@ -192,7 +192,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int no_of_vids;
     long int from, i, j, k, l, u, v;
     igraph_vector_t neis = IGRAPH_VECTOR_NULL;
@@ -568,7 +568,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     while (!IGRAPH_EIT_END(eit)) {
-        long int eid = IGRAPH_EIT_GET(eit);
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         igraph_vector_push_back(&v, IGRAPH_FROM(graph, eid));
         igraph_vector_push_back(&v, IGRAPH_TO(graph, eid));
         IGRAPH_EIT_NEXT(eit);

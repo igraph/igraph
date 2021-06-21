@@ -60,7 +60,7 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
      * the values are relatively large negative numbers, in which case we should
      * negate the eigenvector.
      */
-    long int n = igraph_vector_size(vector);
+    igraph_integer_t n = igraph_vector_size(vector);
     igraph_real_t mi, ma;
 
     if (n == 0) {

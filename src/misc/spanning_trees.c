@@ -207,8 +207,8 @@ igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t
 
 static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igraph_vector_t* res) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     char *already_added;
     char *added_edges;
 
@@ -273,8 +273,8 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         const igraph_t* graph, igraph_vector_t* res, const igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     char *already_added;
     char *added_edges;
 

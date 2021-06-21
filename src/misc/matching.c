@@ -86,7 +86,7 @@ static void debug(const char* fmt, ...) {
 igraph_error_t igraph_is_matching(const igraph_t* graph,
                        const igraph_vector_bool_t* types, const igraph_vector_int_t* matching,
                        igraph_bool_t* result) {
-    long int i, j, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, no_of_nodes = igraph_vcount(graph);
     igraph_bool_t conn;
 
     /* Checking match vector length */
@@ -168,7 +168,7 @@ igraph_error_t igraph_is_matching(const igraph_t* graph,
 igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
                                const igraph_vector_bool_t* types, const igraph_vector_int_t* matching,
                                igraph_bool_t* result) {
-    long int i, j, n, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
     igraph_vector_t neis;
     igraph_bool_t valid;
 
@@ -329,7 +329,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_vector_int_t* matching) {
-    long int i, j, k, n, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, k, n, no_of_nodes = igraph_vcount(graph);
     long int num_matched;             /* number of matched vertex pairs */
     igraph_vector_int_t match;       /* will store the matching */
     igraph_vector_t labels;           /* will store the labels */
@@ -467,7 +467,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_int_t* match, igraph_bool_t smaller_set) {
-    long int i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
+    igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
     igraph_dqueue_int_t q;
     igraph_vector_t neis;
 

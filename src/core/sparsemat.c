@@ -356,7 +356,7 @@ static igraph_error_t igraph_i_sparsemat_index_rows(const igraph_sparsemat_t *A,
 
     igraph_sparsemat_t II, II2;
     CS_INT nrow = A->cs->m;
-    long int idx_rows = igraph_vector_int_size(p);
+    igraph_integer_t idx_rows = igraph_vector_int_size(p);
     long int k;
 
     /* Create index matrix */
@@ -394,7 +394,7 @@ static igraph_error_t igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
 
     igraph_sparsemat_t JJ, JJ2;
     CS_INT ncol = A->cs->n;
-    long int idx_cols = igraph_vector_int_size(q);
+    igraph_integer_t idx_cols = igraph_vector_int_size(q);
     long int k;
 
     /* Create index matrix */
@@ -1350,8 +1350,8 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
 
 igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
     long int nzmax = directed ? no_of_edges : no_of_edges * 2;
     long int i;
@@ -1361,8 +1361,8 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
                                        (igraph_integer_t) nzmax));
 
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
         IGRAPH_CHECK(igraph_sparsemat_entry(res, (int) from, (int) to, 1.0));
         if (!directed && from != to) {
             IGRAPH_CHECK(igraph_sparsemat_entry(res, (int) to, (int) from, 1.0));

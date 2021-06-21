@@ -77,8 +77,8 @@
 igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                       igraph_vs_t vids, const igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
     long int nodes_to_calc;
     long int a, b, c, i, j, q, vsize, vsize2;

@@ -84,7 +84,7 @@ static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
 
 /* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
 static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids) {
-    long int ecount = igraph_ecount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
     long int i, l = -1, last_from = -1, last_to = -1;
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t edges;
@@ -256,8 +256,8 @@ static igraph_real_t igraph_i_multilevel_community_modularity_gain(
  * igraph_membership_reindex call */
 static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
     igraph_vector_t edges;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     long int i;
@@ -337,8 +337,8 @@ static igraph_error_t igraph_i_community_multilevel_step(
         const igraph_real_t resolution) {
 
     long int i, j;
-    long int vcount = igraph_vcount(graph);
-    long int ecount = igraph_ecount(graph);
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
     int pass;
     igraph_bool_t changed = 0;
@@ -614,7 +614,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     igraph_vector_t w, m, level_membership;
     igraph_real_t prev_q = -1, q = -1;
     int i, level = 1;
-    long int vcount = igraph_vcount(graph);
+    igraph_integer_t vcount = igraph_vcount(graph);
 
     /* Make a copy of the original graph, we will do the merges on the copy */
     IGRAPH_CHECK(igraph_copy(&g, graph));

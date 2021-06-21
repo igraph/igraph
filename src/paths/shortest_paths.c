@@ -45,7 +45,7 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
         const igraph_bool_t invert, /* average inverse distances instead of distances */
         const igraph_bool_t unconn  /* average over connected pairs instead of all pairs */)
 {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int source, j, n;
     long int *already_added;
     igraph_real_t no_of_pairs = no_of_nodes > 0 ? no_of_nodes * (no_of_nodes - 1.0) : 0.0; /* no. of ordered vertex pairs */
@@ -166,8 +166,8 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
          and we want to spare that. -1 will denote infinity instead.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     long int source, j;
@@ -440,7 +440,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
         igraph_neimode_t mode)
 {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int vertex_neis_size;
     long int neighbor_count; /* unlike 'vertex_neis_size', 'neighbor_count' does not count self-loops and multi-edges */
     long int i, j;
@@ -702,8 +702,8 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
                             const igraph_vector_t *weights,
                             igraph_bool_t directed, igraph_neimode_t mode)
 {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int nodes_to_calc; /* no. of vertices includes in computation */
     igraph_vit_t vit;
     igraph_vector_t vertex_neis;
@@ -857,7 +857,7 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
                                     const igraph_vector_t *weights,
                                     igraph_bool_t directed, igraph_neimode_t mode)
 {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t local_eff;
 
     /* If there are fewer than 3 vertices, no vertex has more than one neighbour, thus all
@@ -933,7 +933,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
                     igraph_vector_t *vertex_path, igraph_vector_t *edge_path,
                     igraph_bool_t directed, igraph_bool_t unconn) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, j, n;
     long int *already_added;
     long int nodes_reached;
@@ -1125,8 +1125,8 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
          infinity instead.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     igraph_2wheap_t Q;
     igraph_inclist_t inclist;

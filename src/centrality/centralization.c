@@ -74,7 +74,7 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
                                     igraph_real_t theoretical_max,
                                     igraph_bool_t normalized) {
 
-    long int no_of_nodes = igraph_vector_size(scores);
+    igraph_integer_t no_of_nodes = igraph_vector_size(scores);
     igraph_real_t maxscore = 0.0;
     igraph_real_t cent = 0.0;
 

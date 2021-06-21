@@ -374,7 +374,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     }
 
     if (isolates) {
-        long int nov = igraph_vcount(graph);
+        igraph_integer_t nov = igraph_vcount(graph);
         long int i;
         int ret = 0;
         igraph_vector_t deg;

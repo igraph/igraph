@@ -50,8 +50,8 @@
 igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                             const igraph_vector_t *permutation) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t edges;
     long int i, p = 0;
 

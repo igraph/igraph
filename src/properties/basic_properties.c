@@ -242,7 +242,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     igraph_integer_t nonrec = 0, rec = 0, loops = 0;
     igraph_vector_t inneis, outneis;
     long int i;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_RECIPROCITY_DEFAULT &&
         mode != IGRAPH_RECIPROCITY_RATIO) {

@@ -48,7 +48,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
                       igraph_integer_t repeats) {
 
     igraph_vector_t edges;
-    long int no_of_shifts = igraph_vector_size(shifts);
+    igraph_integer_t no_of_shifts = igraph_vector_size(shifts);
     long int ptr = 0, i, sptr = 0;
     long int no_of_nodes = n;
     long int no_of_edges = n + no_of_shifts * repeats;

@@ -89,7 +89,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membershi
 static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
                                   igraph_vector_t *csize, igraph_integer_t *no) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     char *already_added;
     long int first_node, act_cluster_size = 0, no_of_clusters = 1;
 
@@ -170,7 +170,7 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
 static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
                                     igraph_vector_t *csize, igraph_integer_t *no) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t next_nei = IGRAPH_VECTOR_NULL;
 
     long int i, n, num_seen;
@@ -399,7 +399,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 
 int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     char *already_added;
     igraph_vector_t neis = IGRAPH_VECTOR_NULL;
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
@@ -533,7 +533,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
                                    long int maxcompno, long int minelements) {
 
     long int actstart;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int resco = 0;   /* number of graphs created so far */
     char *already_added;
     igraph_dqueue_t q;
@@ -630,7 +630,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
                                      long int maxcompno, long int minelements) {
 
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     /* this is a heap used twice for checking what nodes have
      * been counted already */
@@ -857,7 +857,7 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph,
 void igraph_i_free_vectorlist(igraph_vector_ptr_t *list);
 
 void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
-    long int i, n = igraph_vector_ptr_size(list);
+    igraph_integer_t i, n = igraph_vector_ptr_size(list);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*list)[i];
         if (v) {
@@ -1065,8 +1065,8 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
 
                             while (!igraph_vector_empty(&edgestack)) {
                                 long int e = igraph_vector_pop_back(&edgestack);
-                                long int from = IGRAPH_FROM(graph, e);
-                                long int to = IGRAPH_TO(graph, e);
+                                igraph_integer_t from = IGRAPH_FROM(graph, e);
+                                igraph_integer_t to = IGRAPH_TO(graph, e);
                                 if (tree_edges) {
                                     IGRAPH_CHECK(igraph_vector_push_back(v, e));
                                 }
@@ -1096,7 +1096,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                             if (component_edges) {
                                 igraph_vector_t *nodes = VECTOR(*mycomponents)[comps - 1];
                                 igraph_vector_t *vv = IGRAPH_CALLOC(1, igraph_vector_t);
-                                long int ii, no_vert = igraph_vector_size(nodes);
+                                igraph_integer_t ii, no_vert = igraph_vector_size(nodes);
                                 if (!vv) {
                                     IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
                                 }
@@ -1106,7 +1106,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                     long int vert = VECTOR(*nodes)[ii];
                                     igraph_vector_int_t *edges = igraph_inclist_get(&inclist,
                                                                  vert);
-                                    long int j, nn = igraph_vector_int_size(edges);
+                                    igraph_integer_t j, nn = igraph_vector_int_size(edges);
                                     for (j = 0; j < nn; j++) {
                                         long int e = VECTOR(*edges)[j];
                                         long int nei = IGRAPH_OTHER(graph, e, vert);
@@ -1305,7 +1305,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
 igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vertex,
                         igraph_neimode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     char *already_added;
     long int i, vsize;

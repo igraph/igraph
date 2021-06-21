@@ -173,7 +173,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                                          int which,
                                          igraph_vector_t *multiplicity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, j, k;
     igraph_integer_t remaining_nodes = 0;
     igraph_vector_int_t vertex_perm, vertex_index;
@@ -256,7 +256,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
             if (multiplicity) {
                 /* OK, we need to go through all the edges added for vertex new_i
                    and check their multiplicity */
-                long int now = igraph_vector_size(&edges);
+                igraph_integer_t now = igraph_vector_size(&edges);
                 long int from = now - iedges * 2;
                 for (j = from; j < now; j += 2) {
                     long int nei2 = VECTOR(edges)[j + 1];

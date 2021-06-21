@@ -77,8 +77,8 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
                                        const igraph_vs_t to,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_lazy_inclist_t inclist;
     long int i, j, k;
     long int no_of_from, no_of_to;
@@ -303,8 +303,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                         igraph_neimode_t mode,
                                         igraph_vector_int_t *predecessors,
                                         igraph_vector_int_t *inbound_edges) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int *parents;
     igraph_lazy_inclist_t inclist;
     long int i, j, k;

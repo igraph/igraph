@@ -630,7 +630,7 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, i);
-        long int j, n = igraph_vector_int_size(neis);
+        igraph_integer_t j, n = igraph_vector_int_size(neis);
         long int loops = 0;
 
         for (j = 0; j < n; j++) {

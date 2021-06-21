@@ -180,7 +180,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                    igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
                    igraph_bool_t circular) {
 
-    long int dims = igraph_vector_size(dimvector);
+    igraph_integer_t dims = igraph_vector_size(dimvector);
     long int no_of_nodes = igraph_vector_prod(dimvector);
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int *coords, *weights;

@@ -52,7 +52,7 @@ static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_r
 igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
                                igraph_matrix_t *dist, long int dim) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int nev = dim;
     igraph_matrix_t vectors;
     igraph_vector_t values, row_means;
@@ -180,7 +180,7 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
 
 igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
                       const igraph_matrix_t *dist, long int dim) {
-    long int i, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;
     igraph_bool_t conn;
 

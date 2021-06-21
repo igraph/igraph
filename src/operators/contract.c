@@ -29,7 +29,7 @@
 #include "graph/attributes.h"
 
 static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
-    long int i, n = igraph_vector_ptr_size(p);
+    igraph_integer_t i, n = igraph_vector_ptr_size(p);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*p)[i];
         if (v) {
@@ -64,8 +64,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
                              const igraph_vector_t *mapping,
                              const igraph_attribute_combination_t *vertex_comb) {
     igraph_vector_t edges;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t vattr = vertex_comb && igraph_has_attribute_table();
     igraph_t res;
     long int e, last = -1;
@@ -84,8 +84,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     }
 
     for (e = 0; e < no_of_edges; e++) {
-        long int from = IGRAPH_FROM(graph, e);
-        long int to = IGRAPH_TO(graph, e);
+        igraph_integer_t from = IGRAPH_FROM(graph, e);
+        igraph_integer_t to = IGRAPH_TO(graph, e);
 
         long int nfrom = VECTOR(*mapping)[from];
         long int nto = VECTOR(*mapping)[to];

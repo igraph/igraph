@@ -37,7 +37,7 @@ static igraph_error_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, i
                                              const igraph_vs_t vids,
                                              igraph_vector_t *map,
                                              igraph_vector_t *invmap) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *remain;
     long int i;
@@ -380,8 +380,8 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                           const igraph_es_t eids, igraph_bool_t delete_vertices) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *vremain, *eremain;
     long int i;
@@ -406,7 +406,7 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t from, to;
-        long int eid = IGRAPH_EIT_GET(eit);
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) eid, &from, &to));
         eremain[eid] = vremain[from] = vremain[to] = 1;
     }

@@ -62,7 +62,7 @@
 igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
                                 igraph_neimode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_vector_t edges;
     long int i, j, in;

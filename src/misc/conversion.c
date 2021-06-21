@@ -75,7 +75,7 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_get_adjacency_t type, igraph_bool_t eids) {
 
     igraph_eit_t edgeit;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
     int retval = 0;
     long int from, to;
@@ -88,7 +88,7 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 
     if (directed) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            long int edge = IGRAPH_EIT_GET(edgeit);
+            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
             igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
@@ -101,7 +101,7 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            long int edge = IGRAPH_EIT_GET(edgeit);
+            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
             igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
@@ -122,7 +122,7 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            long int edge = IGRAPH_EIT_GET(edgeit);
+            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
             igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
@@ -143,7 +143,7 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            long int edge = IGRAPH_EIT_GET(edgeit);
+            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
             igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
@@ -207,7 +207,7 @@ igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatri
                                 igraph_get_adjacency_t type) {
 
     igraph_eit_t edgeit;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
     long int from, to;
     igraph_integer_t ffrom, fto;
@@ -293,7 +293,7 @@ igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatri
 igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
 
     igraph_eit_t edgeit;
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int vptr = 0;
     igraph_integer_t from, to;
 
@@ -357,8 +357,8 @@ igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, 
 
 igraph_error_t igraph_to_directed(igraph_t *graph,
                        igraph_to_directed_t mode) {
-    long int no_of_edges = igraph_ecount(graph);
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
         return IGRAPH_SUCCESS;
@@ -495,8 +495,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
                          igraph_to_undirected_t mode,
                          const igraph_attribute_combination_t *edge_comb) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t edges;
     igraph_t newgraph;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
@@ -524,7 +524,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
         while (!IGRAPH_EIT_END(eit)) {
-            long int edge = IGRAPH_EIT_GET(eit);
+            igraph_integer_t edge = IGRAPH_EIT_GET(eit);
             igraph_integer_t from, to;
             igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
             IGRAPH_CHECK(igraph_vector_push_back(&edges, from));

@@ -85,8 +85,8 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
 igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
                                  igraph_vector_t *capacity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     long int new_no_of_nodes = no_of_nodes * 2;
     long int new_no_of_edges = no_of_nodes + no_of_edges * 2;
@@ -116,8 +116,8 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     /* Two news edges for each original edge
        (from,to) becomes (from'',to'), (to'',from') */
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
         VECTOR(edges)[edgeptr++] = from + no_of_nodes;
         VECTOR(edges)[edgeptr++] = to;
         VECTOR(edges)[edgeptr++] = to + no_of_nodes;
@@ -144,8 +144,8 @@ static igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
                                    const igraph_vector_t *flow,
                                    igraph_vector_t *tmp) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i, no_new_edges = 0;
     long int edgeptr = 0, capptr = 0;
 
@@ -163,8 +163,8 @@ static igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
     for (i = 0; i < no_of_edges; i++) {
         igraph_real_t c = VECTOR(*capacity)[i] - VECTOR(*flow)[i];
         if (c > 0) {
-            long int from = IGRAPH_FROM(graph, i);
-            long int to = IGRAPH_TO(graph, i);
+            igraph_integer_t from = IGRAPH_FROM(graph, i);
+            igraph_integer_t to = IGRAPH_TO(graph, i);
             VECTOR(*tmp)[edgeptr++] = from;
             VECTOR(*tmp)[edgeptr++] = to;
             if (residual_capacity) {
@@ -186,7 +186,7 @@ igraph_error_t igraph_residual_graph(const igraph_t *graph,
                           const igraph_vector_t *flow) {
 
     igraph_vector_t tmp;
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (igraph_vector_size(capacity) != no_of_edges) {
         IGRAPH_ERROR("Invalid `capacity' vector size", IGRAPH_EINVAL);
@@ -212,8 +212,8 @@ static igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
                                            const igraph_vector_t *flow,
                                            igraph_vector_t *tmp) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i, no_new_edges = 0;
     long int edgeptr = 0;
 
@@ -230,8 +230,8 @@ static igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(tmp, no_new_edges * 2));
 
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
         igraph_real_t cap = capacity ? VECTOR(*capacity)[i] : 1.0;
         if (VECTOR(*flow)[i] > 0) {
             VECTOR(*tmp)[edgeptr++] = from;
@@ -254,7 +254,7 @@ igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
                                   igraph_t *residual,
                                   const igraph_vector_t *flow) {
     igraph_vector_t tmp;
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (capacity && igraph_vector_size(capacity) != no_of_edges) {
         IGRAPH_ERROR("Invalid `capacity' vector size", IGRAPH_EINVAL);
@@ -425,7 +425,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                           igraph_vector_t *leftout,
                           igraph_neimode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     igraph_adjlist_t succ, pred;
     igraph_vector_t parent;
@@ -514,7 +514,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
        edges towards the target vertex. */
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *v = igraph_adjlist_get(&pred, i);
-        long int j, n = igraph_vector_int_size(v);
+        igraph_integer_t j, n = igraph_vector_int_size(v);
         for (j = 0; j < n; ) {
             long int v2 = VECTOR(*v)[j];
             if (IGRAPH_FINITE(VECTOR(parent)[v2])) {
@@ -532,7 +532,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     for (i = component_size - 1; i > 0; i--) {
         long int w = VECTOR(vertex)[i] - 1;
         igraph_vector_int_t *predw = igraph_adjlist_get(&pred, w);
-        long int j, n = igraph_vector_int_size(predw);
+        igraph_integer_t j, n = igraph_vector_int_size(predw);
         for (j = 0; j < n; j++) {
             long int v = VECTOR(*predw)[j];
             long int u = igraph_i_dominator_EVAL(v, &ancestor, &label, &semi);
@@ -666,7 +666,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                                         const igraph_vector_t *invmap,
                                         igraph_vector_t *minimal) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_stack_t stack;
     igraph_vector_bool_t nomark;
     igraph_i_all_st_cuts_minimal_dfs_data_t data;
@@ -726,7 +726,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     long int *v, igraph_vector_t *Isv, void *arg
 ) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_t Sbar;
     igraph_vector_t Sbar_map, Sbar_invmap;
     igraph_vector_t keep;
@@ -934,7 +934,7 @@ igraph_error_t igraph_provan_shier_list(
     void *pivot_arg
 ) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t Isv;
     long int v = 0;
     long int i, n;
@@ -1031,8 +1031,8 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
        Every element is included at most once.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_marked_queue_t S;
     igraph_estack_t T;
     igraph_vector_ptr_t *mypartition1s = partition1s, vpartition1s;
@@ -1077,7 +1077,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
             igraph_vector_t *cut;
             igraph_vector_t *part = VECTOR(*mypartition1s)[i];
             long int cutsize = 0;
-            long int j, partlen = igraph_vector_size(part);
+            igraph_integer_t j, partlen = igraph_vector_size(part);
             /* Mark elements */
             for (j = 0; j < partlen; j++) {
                 long int v = VECTOR(*part)[j];
@@ -1085,8 +1085,8 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
             }
             /* Check how many edges */
             for (j = 0; j < no_of_edges; j++) {
-                long int from = IGRAPH_FROM(graph, j);
-                long int to = IGRAPH_TO(graph, j);
+                igraph_integer_t from = IGRAPH_FROM(graph, j);
+                igraph_integer_t to = IGRAPH_TO(graph, j);
                 long int pfrom = VECTOR(inS)[from];
                 long int pto = VECTOR(inS)[to];
                 if (pfrom == i + 1 && pto != i + 1) {
@@ -1101,8 +1101,8 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
             IGRAPH_VECTOR_INIT_FINALLY(cut, cutsize);
             cutsize = 0;
             for (j = 0; j < no_of_edges; j++) {
-                long int from = IGRAPH_FROM(graph, j);
-                long int to = IGRAPH_TO(graph, j);
+                igraph_integer_t from = IGRAPH_FROM(graph, j);
+                igraph_integer_t to = IGRAPH_TO(graph, j);
                 long int pfrom = VECTOR(inS)[from];
                 long int pto = VECTOR(inS)[to];
                 if ((pfrom == i + 1 && pto != i + 1)) {
@@ -1152,7 +1152,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
                                            const igraph_vector_t *invmap,
                                            igraph_vector_t *minimal) {
 
-    long int no_of_nodes = igraph_vcount(Sbar);
+    igraph_integer_t no_of_nodes = igraph_vcount(Sbar);
     igraph_vector_t indeg;
     long int i, minsize;
     igraph_vector_t neis;
@@ -1219,7 +1219,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_i_all_st_mincuts_data_t *data = arg;
     const igraph_vector_bool_t *active = data->active;
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, j;
     igraph_vector_t Sbar_map, Sbar_invmap;
     igraph_vector_t keep;
@@ -1359,8 +1359,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
                           igraph_integer_t target,
                           const igraph_vector_t *capacity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t flow;
     igraph_t residual;
     igraph_vector_t NtoL;
@@ -1441,8 +1441,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &VE1bool);
     for (i = 0; i < no_of_edges; i++) {
         if (VECTOR(flow)[i] > 0) {
-            long int from = IGRAPH_FROM(graph, i);
-            long int to = IGRAPH_TO(graph, i);
+            igraph_integer_t from = IGRAPH_FROM(graph, i);
+            igraph_integer_t to = IGRAPH_TO(graph, i);
             long int pfrom = VECTOR(NtoL)[from];
             long int pto = VECTOR(NtoL)[to];
             if (!VECTOR(VE1bool)[pfrom]) {
@@ -1502,7 +1502,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     IGRAPH_CHECK(igraph_vector_ptr_reserve(mypartition1s, nocuts));
     for (i = 0; i < nocuts; i++) {
         igraph_vector_t *supercut = VECTOR(closedsets)[i];
-        long int j, supercutsize = igraph_vector_size(supercut);
+        igraph_integer_t j, supercutsize = igraph_vector_size(supercut);
         igraph_vector_t *cut = IGRAPH_CALLOC(1, igraph_vector_t);
         IGRAPH_VECTOR_INIT_FINALLY(cut, 0); /* TODO: better allocation */
         for (j = 0; j < supercutsize; j++) {
@@ -1535,7 +1535,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
         IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
         for (i = 0; i < nocuts; i++) {
             igraph_vector_t *part = VECTOR(*mypartition1s)[i];
-            long int j, n = igraph_vector_size(part);
+            igraph_integer_t j, n = igraph_vector_size(part);
             igraph_vector_t *v;
             v = IGRAPH_CALLOC(1, igraph_vector_t);
             if (!v) {
@@ -1548,8 +1548,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
             }
             for (j = 0; j < no_of_edges; j++) {
                 if (VECTOR(flow)[j] > 0) {
-                    long int from = IGRAPH_FROM(graph, j);
-                    long int to = IGRAPH_TO(graph, j);
+                    igraph_integer_t from = IGRAPH_FROM(graph, j);
+                    igraph_integer_t to = IGRAPH_TO(graph, j);
                     if (VECTOR(memb)[from] == i + 1 && VECTOR(memb)[to] != i + 1) {
                         IGRAPH_CHECK(igraph_vector_push_back(v, j)); /* TODO: allocation */
                     }

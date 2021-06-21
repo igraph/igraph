@@ -49,7 +49,7 @@ igraph_error_t igraph_are_connected(const igraph_t *graph,
                          igraph_integer_t v1, igraph_integer_t v2,
                          igraph_bool_t *res) {
 
-    long int nov = igraph_vcount(graph);
+    igraph_integer_t nov = igraph_vcount(graph);
     igraph_integer_t eid = -1;
 
     if (v1 < 0 || v2 < 0 || v1 > nov - 1 || v2 > nov - 1) {

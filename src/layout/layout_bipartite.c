@@ -54,7 +54,7 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                             igraph_matrix_t *res, igraph_real_t hgap,
                             igraph_real_t vgap, long int maxiter) {
 
-    long int i, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
     igraph_vector_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {

@@ -225,7 +225,7 @@ static igraph_error_t igraph_i_community_leiden_clean_refined_membership(
         const igraph_vector_t* node_subset,
         igraph_vector_t *refined_membership,
         igraph_integer_t* nb_refined_clusters) {
-    long int i, n = igraph_vector_size(node_subset);
+    igraph_integer_t i, n = igraph_vector_size(node_subset);
     igraph_vector_t new_cluster;
 
     IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
@@ -490,7 +490,7 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
  * non-existing) before calling this function.
  */
 static igraph_error_t igraph_i_community_get_clusters(const igraph_vector_t *membership, igraph_vector_ptr_t *clusters) {
-    long int i, c, n = igraph_vector_size(membership);
+    igraph_integer_t i, c, n = igraph_vector_size(membership);
     igraph_vector_t *cluster;
     for (i = 0; i < n; i++) {
         /* Get cluster for node i */
@@ -568,7 +568,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     /* Check per cluster */
     for (c = 0; c < nb_refined_clusters; c++) {
         igraph_vector_t* refined_cluster = (igraph_vector_t*)VECTOR(refined_clusters)[c];
-        long int n_c = igraph_vector_size(refined_cluster);
+        igraph_integer_t n_c = igraph_vector_size(refined_cluster);
         long int v = -1;
 
         /* Calculate the total edge weight to other clusters */

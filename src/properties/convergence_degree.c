@@ -72,8 +72,8 @@
  */
 igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                               igraph_vector_t *ins, igraph_vector_t *outs) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int i, j, k, n;
     long int *geodist;
     igraph_vector_int_t *eids;

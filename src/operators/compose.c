@@ -67,8 +67,8 @@
 igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 
-    long int no_of_nodes_left = igraph_vcount(g1);
-    long int no_of_nodes_right = igraph_vcount(g2);
+    igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
+    igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
     long int no_of_nodes;
     igraph_bool_t directed = igraph_is_directed(g1);
     igraph_vector_t edges;

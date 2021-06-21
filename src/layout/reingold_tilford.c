@@ -135,7 +135,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
                                             igraph_matrix_t *res,
                                             igraph_neimode_t mode,
                                             long int root) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, n, j;
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     igraph_adjlist_t allneis;
@@ -498,7 +498,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                                    const igraph_vector_t *roots,
                                    const igraph_vector_t *rootlevel) {
 
-    long int no_of_nodes_orig = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes_orig = igraph_vcount(graph);
     long int no_of_nodes = no_of_nodes_orig;
     long int real_root;
     igraph_t extended;
@@ -804,7 +804,7 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         const igraph_vector_t *roots,
         const igraph_vector_t *rootlevel) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
     igraph_real_t ratio;
     igraph_real_t minx, maxx;

@@ -60,8 +60,8 @@ igraph_error_t igraph_difference(igraph_t *res,
        contains the vertices according to the order of the
        vertex ids at the "other" end of the edge. */
 
-    long int no_of_nodes_orig = igraph_vcount(orig);
-    long int no_of_nodes_sub = igraph_vcount(sub);
+    igraph_integer_t no_of_nodes_orig = igraph_vcount(orig);
+    igraph_integer_t no_of_nodes_sub = igraph_vcount(sub);
     long int no_of_nodes = no_of_nodes_orig;
     long int smaller_nodes;
     igraph_bool_t directed = igraph_is_directed(orig);

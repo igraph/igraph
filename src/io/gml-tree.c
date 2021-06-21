@@ -141,7 +141,7 @@ igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
 
 /* merge is destructive, the _second_ tree is destroyed */
 igraph_error_t igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_t *t2) {
-    long int i, n = igraph_vector_ptr_size(&t2->children);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&t2->children);
 
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_vector_ptr_push_back(&t1->names, VECTOR(t2->names)[i]));
@@ -159,7 +159,7 @@ igraph_error_t igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_
 
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t) {
 
-    long int i, n = igraph_vector_ptr_size(&t->children);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&t->children);
     for (i = 0; i < n; i++) {
         int type = VECTOR(t->types)[i];
         switch (type) {
@@ -196,7 +196,7 @@ long int igraph_gml_tree_length(const igraph_gml_tree_t *t) {
 long int igraph_gml_tree_find(const igraph_gml_tree_t *t,
                               const char *name, long int from) {
 
-    long int size = igraph_vector_ptr_size(&t->names);
+    igraph_integer_t size = igraph_vector_ptr_size(&t->names);
     while ( from < size && (! VECTOR(t->names)[from] ||
                             strcmp(VECTOR(t->names)[from], name)) ) {
         from++;

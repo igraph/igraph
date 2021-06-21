@@ -141,7 +141,7 @@ igraph_error_t igraph_topological_sorting(
  *     sorting of a DAG.
  */
 igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t degrees, neis;
     igraph_dqueue_t sources;
     long int node, i, j, nei, vertices_left;
@@ -208,7 +208,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
                                   igraph_t *closure) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t deg;
     igraph_vector_t new_edges;
     igraph_vector_t ancestors;

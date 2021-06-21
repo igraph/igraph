@@ -182,7 +182,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         igraph_attribute_record_t *rec = VECTOR(eattrs)[i];
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-            long int origsize = igraph_vector_size(vec);
+            igraph_integer_t origsize = igraph_vector_size(vec);
             igraph_vector_resize(vec, context.actedge);
             for (j = origsize; j < context.actedge; j++) {
                 VECTOR(*vec)[j] = IGRAPH_NAN;
@@ -414,7 +414,7 @@ static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
  */
 
 igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i, j;
 
     igraph_attribute_type_t vtypes[V_LAST], etypes[E_LAST];
@@ -709,7 +709,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     }
 
     for (i = 0; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
-        long int edge = IGRAPH_EIT_GET(eit);
+        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
         igraph_integer_t from, to;
         igraph_edge(graph, (igraph_integer_t) edge, &from,  &to);
         if (bipartite) {

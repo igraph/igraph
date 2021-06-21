@@ -51,8 +51,8 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                     const igraph_attribute_combination_t *edge_comb) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     long int edge;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
     long int from, to, pfrom = -1, pto = -2;

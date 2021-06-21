@@ -29,7 +29,7 @@
 #include "igraph_qsort.h"
 
 void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
-    long int i, n = igraph_vector_ptr_size(v);
+    igraph_integer_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_destroy(VECTOR(*v)[i]);
@@ -40,7 +40,7 @@ void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
 }
 
 void igraph_i_union_intersection_destroy_vector_ints(igraph_vector_ptr_t *v) {
-    long int i, n = igraph_vector_ptr_size(v);
+    igraph_integer_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_int_destroy(VECTOR(*v)[i]);

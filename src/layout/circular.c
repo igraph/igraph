@@ -48,7 +48,7 @@
 igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_vs_t order) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t vs_size;
     long int i;
     igraph_vit_t vit;
@@ -90,7 +90,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
 igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
                        igraph_integer_t center, const igraph_vector_t *order) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int c = center;
     long int i;
     igraph_real_t step;
@@ -149,7 +149,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
  */
 igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     long int i;
     igraph_real_t h;
 

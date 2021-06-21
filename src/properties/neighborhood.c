@@ -72,7 +72,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *
                              igraph_neimode_t mode,
                              igraph_integer_t mindist) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_vit_t vit;
     long int i, j;
@@ -203,7 +203,7 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *r
                         igraph_vs_t vids, igraph_integer_t order,
                         igraph_neimode_t mode, igraph_integer_t mindist) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_vit_t vit;
     long int i, j;
@@ -350,7 +350,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
                                igraph_vs_t vids, igraph_integer_t order,
                                igraph_neimode_t mode,
                                igraph_integer_t mindist) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_vit_t vit;
     long int i, j;
