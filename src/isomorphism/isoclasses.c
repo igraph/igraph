@@ -738,7 +738,7 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
  */
 igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
                              igraph_integer_t *isoclass) {
-    int nodes = (int) igraph_vector_size(vids);
+    igraph_integer_t nodes = igraph_vector_size(vids);
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t neis;
 
@@ -836,7 +836,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             classedges = igraph_i_classedges_3;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_3) / sizeof(unsigned int))) {
+                number >= (igraph_integer_t)(sizeof(igraph_i_isographs_3) / sizeof(unsigned int))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
 
@@ -846,7 +846,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             classedges = igraph_i_classedges_4;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_4) / sizeof(unsigned int))) {
+                number >= (igraph_integer_t)(sizeof(igraph_i_isographs_4) / sizeof(unsigned int))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
 
@@ -858,7 +858,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             classedges = igraph_i_classedges_3u;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_3u) /
+                number >= (igraph_integer_t)(sizeof(igraph_i_isographs_3u) /
                                 sizeof(unsigned int))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
@@ -869,7 +869,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             classedges = igraph_i_classedges_4u;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_4u) /
+                number >= (igraph_integer_t)(sizeof(igraph_i_isographs_4u) /
                                 sizeof(unsigned int))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
