@@ -84,8 +84,8 @@ void debug(const char* fmt, ...) {
 
 /* Structure storing a pair of communities along with their dQ values */
 typedef struct s_igraph_i_fastgreedy_commpair {
-    long int first;       /* first member of the community pair */
-    long int second;      /* second member of the community pair */
+    igraph_integer_t first;  /* first member of the community pair */
+    igraph_integer_t second; /* second member of the community pair */
     igraph_real_t *dq;    /* pointer to a member of the dq vector storing the */
     /* increase in modularity achieved when joining */
     struct s_igraph_i_fastgreedy_commpair *opposite;
@@ -101,7 +101,7 @@ typedef struct {
 
 /* Global community list structure */
 typedef struct {
-    long int no_of_communities, n;  /* number of communities, number of vertices */
+    igraph_integer_t no_of_communities, n; /* number of communities, number of vertices */
     igraph_i_fastgreedy_community* e;     /* list of communities */
     igraph_i_fastgreedy_community** heap; /* heap of communities */
     igraph_integer_t *heapindex; /* heap index to speed up lookup by community idx */
@@ -112,7 +112,7 @@ typedef struct {
  * 0 otherwise. */
 static int igraph_i_fastgreedy_community_rescan_max(
         igraph_i_fastgreedy_community* comm) {
-    long int i, n;
+    igraph_integer_t i, n;
     igraph_i_fastgreedy_commpair *p, *best;
     igraph_real_t bestdq, currdq;
 
@@ -144,7 +144,7 @@ static int igraph_i_fastgreedy_community_rescan_max(
 /* Destroys the global community list object */
 static void igraph_i_fastgreedy_community_list_destroy(
         igraph_i_fastgreedy_community_list* list) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < list->n; i++) {
         igraph_vector_ptr_destroy(&list->e[i].neis);
     }
@@ -159,8 +159,8 @@ static void igraph_i_fastgreedy_community_list_destroy(
 
 /* Community list heap maintenance: sift down */
 static void igraph_i_fastgreedy_community_list_sift_down(
-        igraph_i_fastgreedy_community_list* list, long int idx) {
-    long int root, child, c1, c2;
+        igraph_i_fastgreedy_community_list* list, igraph_integer_t idx) {
+    igraph_integer_t root, child, c1, c2;
     igraph_i_fastgreedy_community* dummy;
     igraph_integer_t dummy2;
     igraph_i_fastgreedy_community** heap = list->heap;
@@ -194,8 +194,8 @@ static void igraph_i_fastgreedy_community_list_sift_down(
 
 /* Community list heap maintenance: sift up */
 static void igraph_i_fastgreedy_community_list_sift_up(
-        igraph_i_fastgreedy_community_list* list, long int idx) {
-    long int root, parent, c1, c2;
+        igraph_i_fastgreedy_community_list* list, igraph_integer_t idx) {
+    igraph_integer_t root, parent, c1, c2;
     igraph_i_fastgreedy_community* dummy;
     igraph_integer_t dummy2;
     igraph_i_fastgreedy_community** heap = list->heap;
@@ -226,7 +226,7 @@ static void igraph_i_fastgreedy_community_list_sift_up(
 /* Builds the community heap for the first time */
 static void igraph_i_fastgreedy_community_list_build_heap(
         igraph_i_fastgreedy_community_list* list) {
-    long int i;
+    igraph_integer_t i;
     for (i = list->no_of_communities / 2 - 1; i >= 0; i--) {
         igraph_i_fastgreedy_community_list_sift_down(list, i);
     }
@@ -240,20 +240,20 @@ static void igraph_i_fastgreedy_community_list_build_heap(
 /*
 static void igraph_i_fastgreedy_community_list_dump_heap(
         igraph_i_fastgreedy_community_list* list) {
-    long int i;
+    igraph_integer_t i;
     debug("Heap:\n");
     for (i = 0; i < list->no_of_communities; i++) {
         debug("(%ld, %p, %p)", i, list->heap[i],
               list->heap[i]->maxdq);
         if (list->heap[i]->maxdq) {
-            debug(" (%ld, %ld, %.7f)", list->heap[i]->maxdq->first,
+            debug(" (%" IGRAPH_PRId ", %" IGRAPH_PRId ", %.7f)", list->heap[i]->maxdq->first,
                   list->heap[i]->maxdq->second, *list->heap[i]->maxdq->dq);
         }
         debug("\n");
     }
     debug("Heap index:\n");
     for (i = 0; i < list->no_of_communities; i++) {
-        debug("%ld ", (long)list->heapindex[i]);
+        debug("%" IGRAPH_PRId " ", (igraph_integer_t)list->heapindex[i]);
     }
     debug("\nEND\n");
 }
@@ -264,12 +264,12 @@ static void igraph_i_fastgreedy_community_list_dump_heap(
 /*
 static void igraph_i_fastgreedy_community_list_check_heap(
         igraph_i_fastgreedy_community_list* list) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < list->no_of_communities / 2; i++) {
         if ((2 * i + 1 < list->no_of_communities && *list->heap[i]->maxdq->dq < *list->heap[2 * i + 1]->maxdq->dq) ||
             (2 * i + 2 < list->no_of_communities && *list->heap[i]->maxdq->dq < *list->heap[2 * i + 2]->maxdq->dq)) {
             IGRAPH_WARNING("Heap property violated");
-            debug("Position: %ld, %ld and %ld\n", i, 2 * i + 1, 2 * i + 2);
+            debug("Position: %" IGRAPH_PRId ", %" IGRAPH_PRId " and %" IGRAPH_PRId "\n", i, 2 * i + 1, 2 * i + 2);
             igraph_i_fastgreedy_community_list_dump_heap(list);
         }
     }
@@ -278,13 +278,13 @@ static void igraph_i_fastgreedy_community_list_check_heap(
 
 /* Removes a given element from the heap */
 static void igraph_i_fastgreedy_community_list_remove(
-        igraph_i_fastgreedy_community_list* list, long int idx) {
+        igraph_i_fastgreedy_community_list* list, igraph_integer_t idx) {
     igraph_real_t old;
-    long int commidx;
+    igraph_integer_t commidx;
 
     /* First adjust the index */
     commidx = list->heap[list->no_of_communities - 1]->maxdq->first;
-    list->heapindex[commidx] = (igraph_integer_t) idx;
+    list->heapindex[commidx] = idx;
     commidx = list->heap[idx]->maxdq->first;
     list->heapindex[commidx] = -1;
 
@@ -304,8 +304,8 @@ static void igraph_i_fastgreedy_community_list_remove(
 /* Removes a given element from the heap when there are no more neighbors
  * for it (comm->maxdq is NULL) */
 static void igraph_i_fastgreedy_community_list_remove2(
-        igraph_i_fastgreedy_community_list* list, long int idx, long int comm) {
-    long int i;
+        igraph_i_fastgreedy_community_list* list, igraph_integer_t idx, igraph_integer_t comm) {
+    igraph_integer_t i;
 
     if (idx == list->no_of_communities - 1) {
         /* We removed the rightmost element on the bottom level, no problem,
@@ -333,8 +333,8 @@ static void igraph_i_fastgreedy_community_list_remove2(
 /* Removes the pair belonging to community k from the neighborhood list
  * of community c (that is, clist[c]) and recalculates maxdq */
 static void igraph_i_fastgreedy_community_remove_nei(
-        igraph_i_fastgreedy_community_list* list, long int c, long int k) {
-    long int i, n;
+        igraph_i_fastgreedy_community_list* list, igraph_integer_t c, igraph_integer_t k) {
+    igraph_integer_t i, n;
     igraph_bool_t rescan = 0;
     igraph_i_fastgreedy_commpair *p;
     igraph_i_fastgreedy_community *comm;
@@ -367,7 +367,7 @@ static void igraph_i_fastgreedy_community_remove_nei(
             } else {
                 /* no more neighbors for this community. we should remove this
                  * community from the heap and restore the heap property */
-                debug("REMOVING (NO MORE NEIS): %ld\n", i);
+                debug("REMOVING (NO MORE NEIS): %" IGRAPH_PRId "\n", i);
                 igraph_i_fastgreedy_community_list_remove2(list, i, c);
             }
         }
@@ -378,19 +378,21 @@ static void igraph_i_fastgreedy_community_remove_nei(
  * `second` field */
 static int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
     igraph_i_fastgreedy_commpair *cp1, *cp2;
+    igraph_integer_t diff;
     cp1 = *(igraph_i_fastgreedy_commpair**)p1;
     cp2 = *(igraph_i_fastgreedy_commpair**)p2;
-    return (int) (cp1->second - cp2->second);
+    diff = cp1->second - cp2->second;
+    return (diff < 0) ? -1 : (diff > 0) ? 1 : 0;
 }
 
 /* Sorts the neighbor list of the community with the given index, optionally
  * optimizing the process if we know that the list is nearly sorted and only
  * a given pair is in the wrong place. */
 static void igraph_i_fastgreedy_community_sort_neighbors_of(
-        igraph_i_fastgreedy_community_list* list, long int index,
+        igraph_i_fastgreedy_community_list* list, igraph_integer_t index,
         igraph_i_fastgreedy_commpair* changed_pair) {
     igraph_vector_ptr_t* vec;
-    long int i, n;
+    igraph_integer_t i, n;
     igraph_bool_t can_skip_sort = 0;
     igraph_i_fastgreedy_commpair *other_pair;
 
@@ -461,7 +463,7 @@ static void igraph_i_fastgreedy_community_sort_neighbors_of(
 static int igraph_i_fastgreedy_community_update_dq(
         igraph_i_fastgreedy_community_list* list,
         igraph_i_fastgreedy_commpair* p, igraph_real_t newdq) {
-    long int i, j, to, from;
+    igraph_integer_t i, j, to, from;
     igraph_real_t olddq;
     igraph_i_fastgreedy_community *comm_to, *comm_from;
     to = p->first; from = p->second;
@@ -625,8 +627,8 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                 igraph_matrix_t *merges,
                                 igraph_vector_t *modularity,
                                 igraph_vector_t *membership) {
-    long int no_of_edges, no_of_nodes, no_of_joins, total_joins;
-    long int i, j, k, n, m, from, to, dummy, best_no_of_joins;
+    igraph_integer_t no_of_edges, no_of_nodes, no_of_joins, total_joins;
+    igraph_integer_t i, j, k, n, m, from, to, dummy, best_no_of_joins;
     igraph_integer_t ffrom, fto;
     igraph_eit_t edgeit;
     igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
@@ -723,13 +725,13 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_fastgreedy_community_list_destroy, &communities);
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_ptr_init(&communities.e[i].neis, 0);
-        communities.e[i].id = (igraph_integer_t) i;
+        communities.e[i].id = i;
         communities.e[i].size = 1;
     }
 
     /* Create list of community pairs from edges */
     debug("Allocating dq vector\n");
-    dq = (igraph_real_t*)calloc((size_t) no_of_edges, sizeof(igraph_real_t));
+    dq = IGRAPH_CALLOC(no_of_edges, igraph_real_t);
     if (dq == 0) {
         IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
@@ -737,7 +739,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     debug("Creating community pair list\n");
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
-    pairs = (igraph_i_fastgreedy_commpair*)calloc(2 * (size_t) no_of_edges, sizeof(igraph_i_fastgreedy_commpair));
+    pairs = IGRAPH_CALLOC(2 * no_of_edges, igraph_i_fastgreedy_commpair);
     if (pairs == 0) {
         IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
@@ -745,7 +747,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     loop_weight_sum = 0;
     for (i = 0, j = 0; !IGRAPH_EIT_END(edgeit); i += 2, j++, IGRAPH_EIT_NEXT(edgeit)) {
         igraph_integer_t eidx = IGRAPH_EIT_GET(edgeit);
-        igraph_edge(graph, (igraph_integer_t) eidx, &ffrom, &fto);
+        igraph_edge(graph, eidx, &ffrom, &fto);
 
         /* Create the pairs themselves */
         from = ffrom; to = fto;
@@ -897,13 +899,13 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         while (i < n && j < m) {
             p1 = (igraph_i_fastgreedy_commpair*)VECTOR(communities.e[to].neis)[i];
             p2 = (igraph_i_fastgreedy_commpair*)VECTOR(communities.e[from].neis)[j];
-            debug("Pairs: %ld-%ld and %ld-%ld\n", p1->first, p1->second,
+            debug("Pairs: %" IGRAPH_PRId "-%" IGRAPH_PRId " and %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p1->first, p1->second,
                   p2->first, p2->second);
             if (p1->second < p2->second) {
                 /* Considering p1 from now on */
-                debug("    Considering: %ld-%ld\n", p1->first, p1->second);
+                debug("    Considering: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p1->first, p1->second);
                 if (p1->second == from) {
-                    debug("    WILL REMOVE: %ld-%ld\n", to, from);
+                    debug("    WILL REMOVE: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", to, from);
                 } else {
                     /* chain, case 1 */
                     debug("    CHAIN(1): %ld-%ld %ld, now=%.7f, adding=%.7f, newdq(%ld,%ld)=%.7f\n",
@@ -913,7 +915,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                 i++;
             } else if (p1->second == p2->second) {
                 /* p1->first, p1->second and p2->first form a triangle */
-                debug("    Considering: %ld-%ld and %ld-%ld\n", p1->first, p1->second,
+                debug("    Considering: %" IGRAPH_PRId "-%" IGRAPH_PRId " and %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p1->first, p1->second,
                       p2->first, p2->second);
                 /* Update dq value */
                 debug("    TRIANGLE: %ld-%ld-%ld, now=%.7f, adding=%.7f, newdq(%ld,%ld)=%.7f\n",
@@ -923,9 +925,9 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                 i++;
                 j++;
             } else {
-                debug("    Considering: %ld-%ld\n", p2->first, p2->second);
+                debug("    Considering: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p2->first, p2->second);
                 if (p2->second == to) {
-                    debug("    WILL REMOVE: %ld-%ld\n", p2->second, p2->first);
+                    debug("    WILL REMOVE: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p2->second, p2->first);
                 } else {
                     /* chain, case 2 */
                     debug("    CHAIN(2): %ld %ld-%ld, newdq(%ld,%ld)=%.7f\n",
@@ -960,7 +962,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         while (i < n) {
             p1 = (igraph_i_fastgreedy_commpair*)VECTOR(communities.e[to].neis)[i];
             if (p1->second == from) {
-                debug("    WILL REMOVE: %ld-%ld\n", p1->first, from);
+                debug("    WILL REMOVE: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p1->first, from);
             } else {
                 /* chain, case 1 */
                 debug("    CHAIN(1): %ld-%ld %ld, now=%.7f, adding=%.7f, newdq(%ld,%ld)=%.7f\n",
@@ -996,7 +998,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
 
         /* Now, remove community `from` from the neighbors of community `to` */
         if (communities.no_of_communities > 2) {
-            debug("    REMOVING: %ld-%ld\n", to, from);
+            debug("    REMOVING: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", to, from);
             igraph_i_fastgreedy_community_remove_nei(&communities, to, from);
             i = igraph_i_fastgreedy_community_list_find_in_heap(&communities, from);
             igraph_i_fastgreedy_community_list_remove(&communities, i);

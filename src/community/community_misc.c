@@ -567,8 +567,10 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     IGRAPH_CHECK(igraph_sparsemat_init(&mu, k1, k2, n));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &mu);
     for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(igraph_sparsemat_entry(&mu,
-                                           (int)VECTOR(*v1)[i], (int)VECTOR(*v2)[i], 1));
+        IGRAPH_CHECK(igraph_sparsemat_entry(
+            &mu, (igraph_integer_t)VECTOR(*v1)[i],
+            (igraph_integer_t)VECTOR(*v2)[i], 1
+        ));
     }
 
     igraph_sparsemat_compress(&mu, &m);
