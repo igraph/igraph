@@ -672,7 +672,7 @@ const unsigned int igraph_i_classedges_4u[] = { 2, 3, 1, 3, 0, 3, 1, 2, 0, 2, 0,
  * Time complexity: O(|E|), the number of edges in the graph.
  */
 igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
-    long int e;
+    igraph_integer_t e;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t from, to;
@@ -746,7 +746,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
     const unsigned int *arr_idx, *arr_code;
     int code = 0;
 
-    long int i, j, s;
+    igraph_integer_t i, j, s;
 
     if (nodes < 3 || nodes > 4) {
         IGRAPH_ERROR("Only for three- or four-vertex subgraphs",
@@ -820,9 +820,9 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                            igraph_integer_t number, igraph_bool_t directed) {
     igraph_vector_t edges;
     const unsigned int *classedges;
-    long int power;
-    long int code;
-    long int pos;
+    igraph_integer_t power;
+    igraph_integer_t code;
+    igraph_integer_t pos;
 
     if (size < 3 || size > 4) {
         IGRAPH_ERROR("Only for graphs with three of four vertices",

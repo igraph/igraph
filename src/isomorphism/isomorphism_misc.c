@@ -60,8 +60,8 @@ igraph_error_t igraph_simplify_and_colorize(
     igraph_vector_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int pto = -1, pfrom = -1;
-    long int i;
+    igraph_integer_t pto = -1, pfrom = -1;
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_FROM));
     IGRAPH_FINALLY(igraph_es_destroy, &es);
