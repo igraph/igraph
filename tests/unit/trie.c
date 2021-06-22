@@ -123,7 +123,7 @@ int main() {
 
     for (i = 0; i < igraph_trie_size(&trie); i++) {
         igraph_trie_idx(&trie, i, &str);
-        printf("%d: %s\n", i, str);
+        printf("%" IGRAPH_PRId ": %s\n", i, str);
     }
     igraph_trie_destroy(&trie);
 
