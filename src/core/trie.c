@@ -75,7 +75,7 @@ igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
  */
 
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
-    long int i;
+    igraph_integer_t i;
     igraph_strvector_destroy(&t->strs);
     for (i = 0; i < igraph_vector_ptr_size(&t->children); i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
