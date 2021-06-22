@@ -44,16 +44,16 @@ typedef struct igraph_gml_tree_t {
 } igraph_gml_tree_t;
 
 igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
-                                 const char *name, int namelen,
+                                 const char *name, size_t namelen,
                                  igraph_integer_t value);
 igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
-                              const char *name, int namelen,
+                              const char *name, size_t namelen,
                               igraph_real_t value);
 igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
-                                const char *name, int namelen,
-                                const char *value, int valuelen);
+                                const char *name, size_t namelen,
+                                const char *value, size_t valuelen);
 igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
-                              const char *name, int namelen,
+                              const char *name, size_t namelen,
                               igraph_gml_tree_t *value);
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t);
 

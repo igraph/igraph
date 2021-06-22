@@ -76,7 +76,7 @@ igraph_real_t igraph_lgl_get_number(const char *str, yy_size_t len);
 %lex-param { void *scanner }
 
 %union {
-  long int edgenum;
+  igraph_integer_t edgenum;
   double weightnum;
 }
 

@@ -46,13 +46,13 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
     FlowGraph * cpy_fgraph = new FlowGraph(fgraph);
     IGRAPH_FINALLY(delete_FlowGraph, cpy_fgraph);
 
-    int Nnode = cpy_fgraph->Nnode;
+    igraph_integer_t Nnode = cpy_fgraph->Nnode;
     // "real" number of vertex, ie. number of vertex of the graph
 
-    int iteration = 0;
+    igraph_integer_t iteration = 0;
     double outer_oldCodeLength, newCodeLength;
 
-    int *initial_move = NULL;
+    igraph_integer_t *initial_move = NULL;
     bool initial_move_done = true;
 
     do { // Main loop
@@ -64,33 +64,33 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
             // ===========================================
 
             // intial_move indicate current clustering
-            initial_move = new int[Nnode];
+            initial_move = new igraph_integer_t[Nnode];
             // new_cluster_id --> old_cluster_id (save curent clustering state)
 
             IGRAPH_FINALLY(operator delete [], initial_move);
             initial_move_done = false;
 
-            int *subMoveTo = NULL; // enventual new partitionment of original graph
+            igraph_integer_t *subMoveTo = NULL; // enventual new partitionment of original graph
 
             if ((iteration % 2 == 0) && (fgraph->Nnode > 1)) {
                 // 0/ Submodule movements : partition each module of the
                 // current partition (rec. call)
 
-                subMoveTo = new int[Nnode];
+                subMoveTo = new igraph_integer_t[Nnode];
                 // vid_cpy_fgraph  --> new_cluster_id (new partition)
 
                 IGRAPH_FINALLY(operator delete [], subMoveTo);
 
-                int subModIndex = 0;
+                igraph_integer_t subModIndex = 0;
 
-                for (int i = 0 ; i < fgraph->Nnode ; i++) {
+                for (igraph_integer_t i = 0 ; i < fgraph->Nnode ; i++) {
                     // partition each non trivial module
                     size_t sub_Nnode = fgraph->node[i]->members.size();
                     if (sub_Nnode > 1) { // If the module is not trivial
-                        int *sub_members  = new int[sub_Nnode];      // id_sub --> id
+                        igraph_integer_t *sub_members  = new igraph_integer_t[sub_Nnode];      // id_sub --> id
                         IGRAPH_FINALLY(operator delete [], sub_members);
 
-                        for (int j = 0 ; j < sub_Nnode ; j++) {
+                        for (igraph_integer_t j = 0 ; j < sub_Nnode ; j++) {
                             sub_members[j] = fgraph->node[i]->members[j];
                         }
 
@@ -104,7 +104,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
                         infomap_partition(sub_fgraph, true);
 
                         // Record membership changes
-                        for (int j = 0; j < sub_fgraph->Nnode; j++) {
+                        for (igraph_integer_t j = 0; j < sub_fgraph->Nnode; j++) {
                             size_t Nmembers = sub_fgraph->node[j]->members.size();
                             for (size_t k = 0; k < Nmembers; k++) {
                                 subMoveTo[sub_members[sub_fgraph->node[j]->members[k]]] =
@@ -127,7 +127,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
             } else {
                 // 1/ Single-node movements : allows each node to move (again)
                 // save current modules
-                for (int i = 0; i < fgraph->Nnode; i++) { // for each module
+                for (igraph_integer_t i = 0; i < fgraph->Nnode; i++) { // for each module
                     size_t Nmembers = fgraph->node[i]->members.size(); // Module size
                     for (size_t j = 0; j < Nmembers; j++) { // for each vertex (of the module)
                         initial_move[fgraph->node[i]->members[j]] = i;
@@ -167,8 +167,8 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
             oldCodeLength = greedy->codeLength;
             bool moved = true;
-            int Nloops = 0;
-            //int count = 0;
+            igraph_integer_t Nloops = 0;
+            //igraph_integer_t count = 0;
             double inner_oldCodeLength = 1000;
 
             while (moved) { // main greedy optimizing loop
@@ -287,7 +287,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     double shortestCodeLength = 1000.0;
 
     // create membership vector
-    int Nnode = fgraph->Nnode;
+    igraph_integer_t Nnode = fgraph->Nnode;
     IGRAPH_CHECK(igraph_vector_resize(membership, Nnode));
 
     for (int trial = 0; trial < nb_trials; trial++) {
@@ -301,7 +301,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         if (cpy_fgraph->codeLength < shortestCodeLength) {
             shortestCodeLength = cpy_fgraph->codeLength;
             // ... store the partition
-            for (int i = 0 ; i < cpy_fgraph->Nnode ; i++) {
+            for (igraph_integer_t i = 0 ; i < cpy_fgraph->Nnode ; i++) {
                 size_t Nmembers = cpy_fgraph->node[i]->members.size();
                 for (size_t k = 0; k < Nmembers; k++) {
                     //cluster[ cpy_fgraph->node[i]->members[k] ] = i;

@@ -64,35 +64,35 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
                          igraph_i_pajek_parsedata_t *context,
                          const char *s);
 
-int igraph_i_pajek_add_string_vertex_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_string_vertex_attribute(const char *name,
                                                const char *value,
-                                               int len,
+                                               size_t len,
                                                igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_string_edge_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_string_edge_attribute(const char *name,
                                              const char *value,
-                                             int len,
+                                             size_t len,
                                              igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
                                                 igraph_real_t value,
                                                 igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_numeric_edge_attribute(const char *name,
                                               igraph_real_t value,
                                               igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
+igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
                                          igraph_vector_ptr_t *attrs,
-                                         long int count,
+                                         igraph_integer_t count,
                                          const char *attrname,
                                          igraph_integer_t vid,
                                          igraph_real_t number);
-int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
+igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                         igraph_vector_ptr_t *attrs,
-                                        long int count,
+                                        igraph_integer_t count,
                                         const char *attrname,
                                         igraph_integer_t vid,
                                         const char *str);
 
-int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
+igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
+igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
 
 extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 extern long int igraph_i_pajek_actvertex;
@@ -535,9 +535,9 @@ igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t length) {
 
 /* TODO: NA's */
 
-int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
+igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
                                          igraph_vector_ptr_t *attrs,
-                                         long int count,
+                                         igraph_integer_t count,
                                          const char *attrname,
                                          igraph_integer_t vid,
                                          igraph_real_t number) {
@@ -572,14 +572,14 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
     VECTOR(*na)[vid] = number;
   }
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 /* TODO: NA's */
 
-int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
+igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                         igraph_vector_ptr_t *attrs,
-                                        long int count,
+                                        igraph_integer_t count,
                                         const char *attrname,
                                         igraph_integer_t vid,
                                         const char *str) {
@@ -587,7 +587,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   igraph_integer_t id;
   igraph_strvector_t *na;
   igraph_attribute_record_t *rec;
-  long int i;
+  igraph_integer_t i;
 
   igraph_trie_get(names, attrname, &id);
   if (id == attrsize) {
@@ -614,15 +614,15 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   }
   igraph_strvector_set(na, vid, str);
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
-int igraph_i_pajek_add_string_vertex_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_string_vertex_attribute(const char *name,
                                                const char *value,
-                                               int len,
+                                               size_t len,
                                                igraph_i_pajek_parsedata_t *context) {
   char *tmp;
-  int ret;
+  igraph_error_t ret;
 
   tmp=IGRAPH_CALLOC(len+1, char);
   if (tmp==0) {
@@ -644,12 +644,12 @@ int igraph_i_pajek_add_string_vertex_attribute(const char *name,
   return ret;
 }
 
-int igraph_i_pajek_add_string_edge_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_string_edge_attribute(const char *name,
                                              const char *value,
-                                             int len,
+                                             size_t len,
                                              igraph_i_pajek_parsedata_t *context) {
   char *tmp;
-  int ret;
+  igraph_error_t ret;
 
   tmp=IGRAPH_CALLOC(len+1, char);
   if (tmp==0) {
@@ -671,7 +671,7 @@ int igraph_i_pajek_add_string_edge_attribute(const char *name,
   return ret;
 }
 
-int igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
                                                 igraph_real_t value,
                                                 igraph_i_pajek_parsedata_t *context) {
 
@@ -683,7 +683,7 @@ int igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
                                          value);
 }
 
-int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
+igraph_error_t igraph_i_pajek_add_numeric_edge_attribute(const char *name,
                                               igraph_real_t value,
                                               igraph_i_pajek_parsedata_t *context) {
 
@@ -695,7 +695,7 @@ int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
                                          value);
 }
 
-int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
+igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
 
   const char *attrname="type";
   igraph_trie_t *names=context->vertex_attribute_names;
@@ -732,21 +732,21 @@ int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
     VECTOR(*na)[i] = 1;
   }
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
-int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
+igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
   const igraph_vector_t *edges=context->vector;
-  int i, n1=context->vcount2;
-  int ne=igraph_vector_size(edges);
+  igraph_integer_t i, n1=context->vcount2;
+  igraph_integer_t ne=igraph_vector_size(edges);
 
   for (i=0; i<ne; i+=2) {
-    int v1=VECTOR(*edges)[i];
-    int v2=VECTOR(*edges)[i+1];
+    igraph_integer_t v1 = VECTOR(*edges)[i];
+    igraph_integer_t v2 = VECTOR(*edges)[i+1];
     if ( (v1 < n1 && v2 < n1) || (v1 > n1 && v2 > n1) ) {
       IGRAPH_WARNING("Invalid edge in bipartite graph");
     }
   }
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }

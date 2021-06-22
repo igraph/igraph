@@ -28,7 +28,7 @@
 #include <string.h>
 
 igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
-                                 const char *name, int namelen,
+                                 const char *name, size_t namelen,
                                  igraph_integer_t value) {
 
     igraph_integer_t *p;
@@ -59,7 +59,7 @@ igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
 }
 
 igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
-                              const char *name, int namelen,
+                              const char *name, size_t namelen,
                               igraph_real_t value) {
 
     igraph_real_t *p;
@@ -90,8 +90,8 @@ igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
 }
 
 igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
-                                const char *name, int namelen,
-                                const char *value, int valuelen) {
+                                const char *name, size_t namelen,
+                                const char *value, size_t valuelen) {
 
     IGRAPH_UNUSED(namelen);
     IGRAPH_UNUSED(valuelen);
@@ -115,7 +115,7 @@ igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
 }
 
 igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
-                              const char *name, int namelen,
+                              const char *name, size_t namelen,
                               igraph_gml_tree_t *value) {
 
     IGRAPH_UNUSED(namelen);
