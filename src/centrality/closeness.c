@@ -193,7 +193,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
 
-        long int source = IGRAPH_VIT_GET(vit);
+        igraph_integer_t source = IGRAPH_VIT_GET(vit);
         igraph_2wheap_clear(&Q);
         igraph_2wheap_push_with_index(&Q, source, -1.0);
         VECTOR(which)[source] = i + 1;
@@ -487,7 +487,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
          !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), i++)
     {
-        long int source = IGRAPH_VIT_GET(vit);
+        igraph_integer_t source = IGRAPH_VIT_GET(vit);
 
         igraph_dqueue_clear(&q);
         IGRAPH_CHECK(igraph_dqueue_push(&q, source));
@@ -599,7 +599,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
 
-        long int source = IGRAPH_VIT_GET(vit);
+        igraph_integer_t source = IGRAPH_VIT_GET(vit);
         igraph_2wheap_clear(&Q);
         igraph_2wheap_push_with_index(&Q, source, -1.0);
         VECTOR(which)[source] = i + 1;

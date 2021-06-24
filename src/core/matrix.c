@@ -57,8 +57,8 @@
 #ifndef USING_R
 igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
 
-    long int nr = igraph_matrix_complex_nrow(m);
-    long int nc = igraph_matrix_complex_ncol(m);
+    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
+    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
     long int i, j;
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
@@ -78,8 +78,8 @@ igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
 igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
                                  FILE *file) {
 
-    long int nr = igraph_matrix_complex_nrow(m);
-    long int nc = igraph_matrix_complex_ncol(m);
+    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
+    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
     long int i, j;
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
@@ -97,8 +97,8 @@ igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
 
 igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *real) {
-    long int nrow = igraph_matrix_complex_nrow(v);
-    long int ncol = igraph_matrix_complex_ncol(v);
+    igraph_integer_t nrow = igraph_matrix_complex_nrow(v);
+    igraph_integer_t ncol = igraph_matrix_complex_ncol(v);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_real(&v->data, &real->data));
     return IGRAPH_SUCCESS;
@@ -106,8 +106,8 @@ igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
 
 igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *imag) {
-    long int nrow = igraph_matrix_complex_nrow(v);
-    long int ncol = igraph_matrix_complex_ncol(v);
+    igraph_integer_t nrow = igraph_matrix_complex_nrow(v);
+    igraph_integer_t ncol = igraph_matrix_complex_ncol(v);
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_imag(&v->data, &imag->data));
     return IGRAPH_SUCCESS;
@@ -116,8 +116,8 @@ igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
 igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
                                    igraph_matrix_t *real,
                                    igraph_matrix_t *imag) {
-    long int nrow = igraph_matrix_complex_nrow(v);
-    long int ncol = igraph_matrix_complex_ncol(v);
+    igraph_integer_t nrow = igraph_matrix_complex_nrow(v);
+    igraph_integer_t ncol = igraph_matrix_complex_ncol(v);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_realimag(&v->data, &real->data,

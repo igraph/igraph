@@ -2391,7 +2391,7 @@ static igraph_error_t igraph_i_cattribute_get_numeric_vertex_attr(const igraph_t
         IGRAPH_FINALLY(igraph_vit_destroy, &it);
         IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
         for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
-            long int v = IGRAPH_VIT_GET(it);
+            igraph_integer_t v = IGRAPH_VIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*num)[v];
         }
         igraph_vit_destroy(&it);
@@ -2464,7 +2464,7 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
         IGRAPH_FINALLY(igraph_vit_destroy, &it);
         IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
         for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
-            long int v = IGRAPH_VIT_GET(it);
+            igraph_integer_t v = IGRAPH_VIT_GET(it);
             char *s;
             igraph_strvector_get(str, v, &s);
             IGRAPH_CHECK(igraph_strvector_set(value, i, s));

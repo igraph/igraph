@@ -177,7 +177,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
 
     for (i = 0; i < nr; i++, IGRAPH_VIT_NEXT(fromvit)) {
-        long int v1 = IGRAPH_VIT_GET(fromvit);
+        igraph_integer_t v1 = IGRAPH_VIT_GET(fromvit);
         if (igraph_vs_is_all(&to)) {
             long int v2;
             for (v2 = 0; v2 < nc; v2++) {
@@ -190,7 +190,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
             IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
             for (j = 0, IGRAPH_VIT_RESET(tovit); j < nc; j++, IGRAPH_VIT_NEXT(tovit)) {
-                long int v2 = IGRAPH_VIT_GET(tovit);
+                igraph_integer_t v2 = IGRAPH_VIT_GET(tovit);
                 igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
                 MATRIX(*res, i, j) -= sub;
             }

@@ -147,7 +147,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
         no_of_to = IGRAPH_VIT_SIZE(tovit);
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
-            long int v = IGRAPH_VIT_GET(tovit);
+            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
                 IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
                              IGRAPH_EINVAL);
@@ -164,7 +164,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
          IGRAPH_VIT_NEXT(fromvit), i++) {
 
         long int reached = 0;
-        long int source = IGRAPH_VIT_GET(fromvit);
+        igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
         igraph_2wheap_clear(&Q);
         igraph_2wheap_push_with_index(&Q, source, -1.0);
 
@@ -483,7 +483,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-            long int node = IGRAPH_VIT_GET(vit);
+            igraph_integer_t node = IGRAPH_VIT_GET(vit);
             long int size, act, edge;
             igraph_vector_t *vvec = 0, *evec = 0;
             if (vertices) {

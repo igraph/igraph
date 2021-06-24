@@ -134,7 +134,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
          IGRAPH_VIT_NEXT(fromvit), i++) {
-        long int source = IGRAPH_VIT_GET(fromvit);
+        igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
 
         igraph_vector_fill(&dist, my_infinity);
         VECTOR(dist)[source] = 0;
@@ -186,7 +186,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
         } else {
             for (IGRAPH_VIT_RESET(tovit), j = 0; !IGRAPH_VIT_END(tovit);
                  IGRAPH_VIT_NEXT(tovit), j++) {
-                long int v = IGRAPH_VIT_GET(tovit);
+                igraph_integer_t v = IGRAPH_VIT_GET(tovit);
                 MATRIX(*res, i, j) = VECTOR(dist)[v];
             }
         }
@@ -428,7 +428,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         for (IGRAPH_VIT_RESET(tovit), i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), i++) {
-            long int node = IGRAPH_VIT_GET(tovit);
+            igraph_integer_t node = IGRAPH_VIT_GET(tovit);
             long int size, act, edge;
             igraph_vector_t *vvec = 0, *evec = 0;
             if (vertices) {

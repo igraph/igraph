@@ -55,7 +55,7 @@ IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOO
 IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
 for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-    long int node = IGRAPH_VIT_GET(vit);
+    igraph_integer_t node = IGRAPH_VIT_GET(vit);
 
     IGRAPH_ALLOW_INTERRUPTION();
 

@@ -101,7 +101,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        long int node = IGRAPH_VIT_GET(vit);
+        igraph_integer_t node = IGRAPH_VIT_GET(vit);
         long int size = mindist == 0 ? 1 : 0;
         added[node] = i + 1;
         igraph_dqueue_clear(&q);
@@ -234,7 +234,7 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *r
     IGRAPH_CHECK(igraph_vector_ptr_resize(res, IGRAPH_VIT_SIZE(vit)));
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        long int node = IGRAPH_VIT_GET(vit);
+        igraph_integer_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_clear(&tmp);
         if (mindist == 0) {
@@ -381,7 +381,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
     IGRAPH_CHECK(igraph_vector_ptr_resize(res, IGRAPH_VIT_SIZE(vit)));
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        long int node = IGRAPH_VIT_GET(vit);
+        igraph_integer_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_clear(&tmp);
         if (mindist == 0) {

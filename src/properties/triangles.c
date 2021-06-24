@@ -151,7 +151,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&avids, nodes_to_calc));
     k = 0;
     for (i = 0; i < nodes_to_calc; IGRAPH_VIT_NEXT(vit), i++) {
-        long int v = IGRAPH_VIT_GET(vit);
+        igraph_integer_t v = IGRAPH_VIT_GET(vit);
         igraph_vector_int_t *neis2;
         long int neilen;
         if (VECTOR(indexv)[v] == 0) {
@@ -251,7 +251,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     IGRAPH_VIT_RESET(vit);
     for (i = 0; i < nodes_to_calc; i++, IGRAPH_VIT_NEXT(vit)) {
-        long int node = IGRAPH_VIT_GET(vit);
+        igraph_integer_t node = IGRAPH_VIT_GET(vit);
         long int idx = VECTOR(indexv)[node] - 1;
         igraph_vector_int_t *neis2 =
             igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);

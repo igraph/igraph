@@ -55,7 +55,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
         for (IGRAPH_VIT_RESET(*vit);
              !IGRAPH_VIT_END(*vit);
              IGRAPH_VIT_NEXT(*vit)) {
-            long int v = IGRAPH_VIT_GET(*vit);
+            igraph_integer_t v = IGRAPH_VIT_GET(*vit);
             if (!VECTOR(hit)[v]) {
                 nohit++;
                 VECTOR(hit)[v] = 1;
