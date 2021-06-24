@@ -363,7 +363,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
 
     igraph_vector_t fitness_out, fitness_in;
     igraph_real_t alpha_out = 0.0, alpha_in = 0.0;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t j;
 
     if (no_of_nodes < 0) {

@@ -62,7 +62,7 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
                               const igraph_matrix_t *pref_matrix,
                               igraph_bool_t directed,
                               igraph_vector_t *node_type_vec) {
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_vector_t edges;
     igraph_vector_t cumdist;
     igraph_vector_t potneis;
@@ -157,10 +157,10 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
     }
 
     for (i = k; i < nodes; i++) {
-        long int type1 = VECTOR(*nodetypes)[i];
+        igraph_integer_t type1 = VECTOR(*nodetypes)[i];
         igraph_random_sample(&potneis, 0, i - 1, k);
         for (j = 0; j < k; j++) {
-            long int type2 = VECTOR(*nodetypes)[(long int)VECTOR(potneis)[j]];
+            igraph_integer_t type2 = VECTOR(*nodetypes)[(igraph_integer_t)VECTOR(potneis)[j]];
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(potneis)[j]));

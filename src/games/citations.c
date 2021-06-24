@@ -437,7 +437,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
 
     /* First node */
     for (i = 0; i < no_of_types; i++) {
-        long int type = VECTOR(*types)[0];
+        igraph_integer_t type = VECTOR(*types)[0];
         if ( MATRIX(*pref, i, type) < 0) {
             IGRAPH_ERRORF("Preference matrix contains negative entry: %g.", IGRAPH_EINVAL, MATRIX(*pref, i, type));
         }
@@ -448,7 +448,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     RNG_BEGIN();
 
     for (i = 1; i < nodes; i++) {
-        long int type = VECTOR(*types)[i];
+        igraph_integer_t type = VECTOR(*types)[i];
         igraph_real_t sum = VECTOR(sums)[type];
         for (j = 0; j < edges_per_step; j++) {
             igraph_integer_t to;

@@ -66,7 +66,7 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                                igraph_bool_t multiple) {
 
     igraph_vector_t dimvector;
-    long int i;
+    igraph_integer_t i;
 
     if (dim < 1) {
         IGRAPH_ERROR("WS game: dimension should be at least one", IGRAPH_EINVAL);

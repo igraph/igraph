@@ -50,7 +50,7 @@ typedef struct s_vector_ptr {
     do { IGRAPH_CHECK(igraph_vector_ptr_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_ptr_destroy, v); } while (0)
 
-IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init      (igraph_vector_ptr_t* v, long int size);
+IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init      (igraph_vector_ptr_t* v, igraph_integer_t size);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_copy (igraph_vector_ptr_t* v, void** data, long int length);
 IGRAPH_EXPORT const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
                                                                  void *const *data, long int length);

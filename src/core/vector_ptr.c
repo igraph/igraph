@@ -87,8 +87,8 @@
  * time \endquote required to allocate \p size elements.
  */
 
-igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
-    long int alloc_size = size > 0 ? size : 1;
+igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_integer_t size) {
+    igraph_integer_t alloc_size = size > 0 ? size : 1;
     IGRAPH_ASSERT(v != NULL);
     if (size < 0) {
         size = 0;

@@ -383,11 +383,11 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
         for (b = 0; b < no_blocks; b++) {
             igraph_integer_t fromsize = m;
             igraph_integer_t tosize = n - tooff;
-            size_t maxedges = fromsize * tosize;
+            igraph_integer_t maxedges = fromsize * tosize;
             igraph_real_t last = RNG_GEOM(p);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
             while (last < maxedges) {
                 igraph_integer_t vto = last / fromsize;
-                igraph_integer_t vfrom = last - (size_t) vto * fromsize;
+                igraph_integer_t vfrom = last - vto * fromsize;
                 igraph_vector_push_back(&edges, fromoff + vfrom);
                 igraph_vector_push_back(&edges, tooff + vto);
                 last += RNG_GEOM(p);
