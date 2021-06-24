@@ -30,6 +30,7 @@
 #include "core/exceptions.h"
 
 #include <climits>
+#include <stdexcept>
 
 using namespace bliss;
 using namespace std;
