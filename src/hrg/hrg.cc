@@ -31,6 +31,8 @@
 #include "hrg/graph.h"
 #include "hrg/graph_simp.h"
 
+#include <climits>
+
 using namespace fitHRG;
 
 /**
@@ -191,13 +193,17 @@ static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
     igraph_integer_t no_of_edges = igraph_ecount(igraph);
     igraph_integer_t i;
 
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for the HRG module", IGRAPH_EOVERFLOW);
+    }
+
     // Create graph
-    d->g = new graph(no_of_nodes);
+    d->g = new graph((int) no_of_nodes);
 
     // Add edges
     for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(igraph, i);
-        igraph_integer_t to = IGRAPH_TO(igraph, i);
+        int from = (int) IGRAPH_FROM(igraph, i);
+        int to = (int) IGRAPH_TO(igraph, i);
         if (from == to) {
             continue;
         }
@@ -222,14 +228,18 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
     igraph_integer_t no_of_edges = igraph_ecount(igraph);
     igraph_integer_t i;
 
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for the HRG module", IGRAPH_EOVERFLOW);
+    }
+
     // Create graphs
-    d->g = new graph(no_of_nodes, true);
+    d->g = new graph((int) no_of_nodes, true);
     d->g->setAdjacencyHistograms(num_bins);
-    (*sg) = new simpleGraph(no_of_nodes);
+    (*sg) = new simpleGraph((int) no_of_nodes);
 
     for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(igraph, i);
-        igraph_integer_t to = IGRAPH_TO(igraph, i);
+        int from = (int) IGRAPH_FROM(igraph, i);
+        int to = (int) IGRAPH_TO(igraph, i);
         if (from == to) {
             continue;
         }

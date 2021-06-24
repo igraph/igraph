@@ -29,6 +29,8 @@
 
 #include "core/exceptions.h"
 
+#include <climits>
+
 using namespace bliss;
 using namespace std;
 
@@ -74,21 +76,28 @@ using namespace std;
 namespace { // unnamed namespace
 
 inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
-    unsigned int nof_vertices = (unsigned int)igraph_vcount(graph);
-    unsigned int nof_edges = (unsigned int)igraph_ecount(graph);
+    igraph_integer_t nof_vertices = igraph_vcount(graph);
+    igraph_integer_t nof_edges = igraph_ecount(graph);
+
+    if (nof_vertices > UINT_MAX || nof_edges > UINT_MAX) {
+        throw std::runtime_error("Graph too large for BLISS");
+    }
 
     AbstractGraph *g;
 
     if (igraph_is_directed(graph)) {
-        g = new Digraph(nof_vertices);
+        g = new Digraph(static_cast<int>(nof_vertices));
     } else {
-        g = new Graph(nof_vertices);
+        g = new Graph(static_cast<int>(nof_vertices));
     }
 
     /* g->set_verbose_level(0); */
 
-    for (unsigned int i = 0; i < nof_edges; i++) {
-        g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
+    for (unsigned int i = 0; i < static_cast<unsigned int>(nof_edges); i++) {
+        g->add_edge(
+            static_cast<unsigned int>(IGRAPH_FROM(graph, i)),
+            static_cast<unsigned int>(IGRAPH_TO(graph, i))
+        );
     }
 
     return g;
@@ -139,7 +148,11 @@ inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors)
         IGRAPH_ERROR("Invalid vertex color vector length.", IGRAPH_EINVAL);
     }
     for (int i = 0; i < n; ++i) {
-        g->change_color(i, VECTOR(*colors)[i]);
+        igraph_integer_t color = VECTOR(*colors)[i];
+        if (color < INT_MIN || color > INT_MAX) {
+            IGRAPH_ERRORF("Invalid vertex color index for vertex %d", IGRAPH_EOVERFLOW, color);
+        }
+        g->change_color(i, static_cast<int>(color));
     }
     return IGRAPH_SUCCESS;
 }
