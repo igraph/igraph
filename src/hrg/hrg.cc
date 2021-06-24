@@ -276,7 +276,7 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
  * Time complexity: O(n), the number of vertices in the graph.
  */
 
-igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, int n) {
+igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->left,      n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->right,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      n - 1);
@@ -333,7 +333,7 @@ igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
 
 igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     igraph_integer_t origsize = igraph_hrg_size(hrg);
-    int ret = 0;
+    igraph_error_t ret = IGRAPH_SUCCESS;
     igraph_error_handler_t *oldhandler =
         igraph_set_error_handler(igraph_error_handler_ignore);
 

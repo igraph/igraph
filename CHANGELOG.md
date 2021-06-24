@@ -46,6 +46,9 @@
    to return the predecessors and inbound edges instead of an
    `igraph_vector_long_t`.
 
+ - `igraph_hrg_init()` and `igraph_hrg_resize()` now takes an `igraph_integer_t`
+   as their size arguments instead of an `int`.
+
  - `igraph_hrg_size()` now returns an `igraph_integer_t` instead of an `int`.
 
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
@@ -80,6 +83,10 @@
    vectors whose size fits in an `int`). `igraph_blas_dgemv()` and
    `igraph_blas_dgemv_array()` thus now return an `igraph_error_t`, which may be
    set to `IGRAPH_EOVERFLOW` if the input vectors or matrices are too large.
+
+ - `igraph_sparsemat_transpose()` now takes an `igraph_bool_t` as its `values`
+   argument instead of an `int`. In practice, it has always been treated as a
+   boolean.
 
 ### Added
 

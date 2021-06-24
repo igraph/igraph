@@ -68,10 +68,10 @@ typedef struct igraph_hrg_t {
     igraph_vector_t left, right, prob, edges, vertices;
 } igraph_hrg_t;
 
-IGRAPH_EXPORT igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, int n);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n);
 IGRAPH_EXPORT void igraph_hrg_destroy(igraph_hrg_t *hrg);
 IGRAPH_EXPORT igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg);
-IGRAPH_EXPORT igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                                  igraph_hrg_t *hrg,

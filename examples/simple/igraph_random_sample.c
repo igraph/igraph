@@ -60,7 +60,7 @@ int error_test() {
         test = all_checks[i];
         ret = igraph_random_sample(&V, test->low, test->high, test->length);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (int)(i + 1));
+            printf("Error test no. %d failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
     }

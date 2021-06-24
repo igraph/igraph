@@ -612,11 +612,11 @@ igraph_error_t igraph_sparsemat_compress(const igraph_sparsemat_t *A,
 
 igraph_error_t igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
                                igraph_sparsemat_t *res,
-                               int values) {
+                               igraph_bool_t store_values) {
 
     if (A->cs->nz < 0) {
         /* column-compressed */
-        res->cs = cs_transpose(A->cs, values);
+        res->cs = cs_transpose(A->cs, store_values);
         if (!res->cs) {
             IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
         }

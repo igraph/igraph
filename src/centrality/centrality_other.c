@@ -84,14 +84,14 @@ static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const i
                                            int n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_int_t *neis;
-    long int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(adjlist, i);
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = VECTOR(*neis)[j];
+            igraph_integer_t nei = VECTOR(*neis)[j];
             to[i] += from[nei];
         }
     }
@@ -114,14 +114,14 @@ static igraph_error_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const 
     const igraph_inclist_t *inclist = data->inclist;
     const igraph_vector_t *weights = data->weights;
     igraph_vector_int_t *edges;
-    long int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         edges = igraph_inclist_get(inclist, i);
         nlen = igraph_vector_int_size(edges);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int edge = VECTOR(*edges)[j];
+            igraph_integer_t edge = VECTOR(*edges)[j];
             igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
@@ -139,7 +139,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     igraph_vector_t values;
     igraph_matrix_t vectors;
     igraph_vector_t degree;
-    int i;
+    igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     int no_of_nodes_int;
 
@@ -313,7 +313,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_vector_t indegree;
     igraph_bool_t dag;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    int i;
+    igraph_integer_t i;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -601,14 +601,14 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     igraph_adjlist_t *out = data->out;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
-    long int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(in, i);
         nlen = igraph_vector_int_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            long int nei = VECTOR(*neis)[j];
+            igraph_integer_t nei = VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += from[nei];
         }
     }
@@ -638,7 +638,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     const igraph_vector_t *weights = data->weights;
     const igraph_t *g = data->graph;
     igraph_vector_int_t *neis;
-    long int i, j, nlen;
+    igraph_integer_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(in, i);
@@ -680,7 +680,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
     igraph_matrix_t vectors;
     igraph_i_kleinberg_data_t extra;
     igraph_i_kleinberg_data2_t extra2;
-    long int i;
+    igraph_integer_t i;
 
     if (igraph_ecount(graph) == 0 || no_of_nodes == 1) {
         /* special case: empty graph or single vertex */
