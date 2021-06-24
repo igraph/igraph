@@ -75,7 +75,7 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, i
  *
  * Time complexity: O(1).
  */
-#define igraph_adjlist_get(al,no) (&(al)->adjs[(long int)(no)])
+#define igraph_adjlist_get(al,no) (&(al)->adjs[(igraph_integer_t)(no)])
 
 IGRAPH_EXPORT igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                                  igraph_neimode_t mode, igraph_bool_t duplicate);
@@ -106,7 +106,7 @@ IGRAPH_EXPORT igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, F
  *
  * Time complexity: O(1).
  */
-#define igraph_inclist_get(il,no) (&(il)->incs[(long int)(no)])
+#define igraph_inclist_get(il,no) (&(il)->incs[(igraph_integer_t)(no)])
 
 typedef struct igraph_lazy_adjlist_t {
     const igraph_t *graph;
@@ -144,7 +144,7 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlis
  * first time, O(1) for subsequent calls.
  */
 #define igraph_lazy_adjlist_get(al,no) \
-    ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
+    ((al)->adjs[(igraph_integer_t)(no)] != 0 ? ((al)->adjs[(igraph_integer_t)(no)]) : \
      (igraph_i_lazy_adjlist_get_real(al, no)))
 IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no);
 
@@ -182,7 +182,7 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  * time, O(1) for subsequent calls with the same \p no argument.
  */
 #define igraph_lazy_inclist_get(al,no) \
-    ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
+    ((al)->incs[(igraph_integer_t)(no)] != 0 ? ((al)->incs[(igraph_integer_t)(no)]) : \
      (igraph_i_lazy_inclist_get_real(al, no)))
 IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al, igraph_integer_t no);
 

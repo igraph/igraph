@@ -86,7 +86,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const 
  * \return The source vertex of the edge.
  * \sa \ref igraph_edge() if error checking is desired.
  */
-#define IGRAPH_FROM(graph,eid) ((igraph_integer_t)(VECTOR((graph)->from)[(long int)(eid)]))
+#define IGRAPH_FROM(graph,eid) ((igraph_integer_t)(VECTOR((graph)->from)[(igraph_integer_t)(eid)]))
 
 /**
  * \define IGRAPH_TO
@@ -99,7 +99,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const 
  * \return The target vertex of the edge.
  * \sa \ref igraph_edge() if error checking is desired.
  */
-#define IGRAPH_TO(graph,eid)   ((igraph_integer_t)(VECTOR((graph)->to)  [(long int)(eid)]))
+#define IGRAPH_TO(graph,eid)   ((igraph_integer_t)(VECTOR((graph)->to)  [(igraph_integer_t)(eid)]))
 
 /**
  * \define IGRAPH_OTHER
