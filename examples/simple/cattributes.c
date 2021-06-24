@@ -29,11 +29,11 @@ int print_attributes(const igraph_t *g) {
 
     igraph_vector_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    long int i;
+    igraph_integer_t i;
 
     igraph_vector_t vec;
     igraph_strvector_t svec;
-    long int j;
+    igraph_integer_t j;
 
     igraph_vector_init(&gtypes, 0);
     igraph_vector_init(&vtypes, 0);
@@ -58,8 +58,7 @@ int print_attributes(const igraph_t *g) {
     printf("\n");
 
     for (i = 0; i < igraph_vcount(g); i++) {
-        long int j;
-        printf("Vertex %li: ", i);
+        printf("Vertex %" IGRAPH_PRId ": ", i);
         for (j = 0; j < igraph_strvector_size(&vnames); j++) {
             printf("%s=", STR(vnames, j));
             if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -73,8 +72,7 @@ int print_attributes(const igraph_t *g) {
     }
 
     for (i = 0; i < igraph_ecount(g); i++) {
-        long int j;
-        printf("Edge %li (%i-%i): ", i, (int)IGRAPH_FROM(g, i), (int)IGRAPH_TO(g, i));
+        printf("Edge %" IGRAPH_PRId " (%" IGRAPH_PRId "-%" IGRAPH_PRId "): ", i, IGRAPH_FROM(g, i), IGRAPH_TO(g, i));
         for (j = 0; j < igraph_strvector_size(&enames); j++) {
             printf("%s=", STR(enames, j));
             if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -154,7 +152,7 @@ int main() {
     FILE *ifile;
     igraph_vector_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    long int i;
+    igraph_integer_t i;
     igraph_vector_t y;
     igraph_strvector_t id;
     igraph_vector_bool_t type;

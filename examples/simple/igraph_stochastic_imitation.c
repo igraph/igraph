@@ -81,7 +81,7 @@ int error_tests() {
                                           test->quantities, test->strategies,
                                           test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (int)(i + 1));
+            printf("Error test no. %d failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
         i++;
@@ -191,8 +191,7 @@ int petersen_game_test() {
                                           test->quantities, &stratcopy,
                                           test->mode);
         if (ret) {
-            printf("Stochastic imitation failed for vertex %d.\n",
-                   (int)test->vertex);
+            printf("Stochastic imitation failed for vertex %" IGRAPH_PRId ".\n", test->vertex);
             return IGRAPH_FAILURE;
         }
         /* If the updated strategy for the vertex matches one of the known */
@@ -206,8 +205,7 @@ int petersen_game_test() {
             }
         }
         if (!success) {
-            printf("Stochastic imitation failed for vertex %d.\n",
-                   (int)test->vertex);
+            printf("Stochastic imitation failed for vertex %" IGRAPH_PRId ".\n", test->vertex);
             return IGRAPH_FAILURE;
         }
         igraph_vector_destroy(&stratcopy);

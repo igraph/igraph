@@ -31,9 +31,9 @@ void custom_warning_handler (const char *reason, const char *file,
 
 void dump_graph(const char* header, const igraph_t* g) {
     fputs(header, stdout);
-    printf("Vertices: %li\n", (long int) igraph_vcount(g));
-    printf("Edges: %li\n", (long int) igraph_ecount(g));
-    printf("Directed: %i\n", (int) igraph_is_directed(g));
+    printf("Vertices: %" IGRAPH_PRId "\n", igraph_vcount(g));
+    printf("Edges: %" IGRAPH_PRId "\n", igraph_ecount(g));
+    printf("Directed: %i\n", igraph_is_directed(g) ? 1 : 0);
     igraph_write_graph_edgelist(g, stdout);
 }
 

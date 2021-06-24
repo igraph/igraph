@@ -94,7 +94,7 @@ int error_tests() {
                     test->strategies,
                     test->mode);
             if (ret != test->retval) {
-                printf("Error test no. %d failed.\n", (int)(i + 1));
+                printf("Error test no. %d failed.\n", i + 1);
                 return IGRAPH_FAILURE;
             }
             i++;
