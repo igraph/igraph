@@ -123,7 +123,9 @@ med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk)
 #endif
 {
     char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
-    int d, r, swaptype, swap_cnt;
+    int swaptype, swap_cnt;
+    size_t d;
+    ptrdiff_t r;
 
 loop:   SWAPINIT(a, es);
     swap_cnt = 0;
