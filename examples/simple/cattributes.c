@@ -337,7 +337,7 @@ int main() {
 
     igraph_strvector_init(&id, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
-        snprintf(str, sizeof(str) - 1, "%li", i);
+        snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
         igraph_strvector_set(&id, i, str);
     }
     SETVASV(&g, "foo", &id);
@@ -348,7 +348,7 @@ int main() {
     printf("\n");
     igraph_strvector_init(&id, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
-        snprintf(str, sizeof(str) - 1, "%li", i);
+        snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
         igraph_strvector_set(&id, i, str);
     }
     SETVASV(&g, "id", &id);
@@ -391,7 +391,7 @@ int main() {
 
     igraph_strvector_init(&id, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
-        snprintf(str, sizeof(str) - 1, "%li", i);
+        snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
         igraph_strvector_set(&id, i, str);
     }
     SETEASV(&g, "foo", &id);
@@ -402,7 +402,7 @@ int main() {
     printf("\n");
     igraph_strvector_init(&id, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
-        snprintf(str, sizeof(str) - 1, "%li", i);
+        snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
         igraph_strvector_set(&id, i, str);
     }
     SETEASV(&g, "color", &id);
