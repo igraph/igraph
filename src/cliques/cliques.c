@@ -624,7 +624,6 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
     igraph_integer_t v1, v2, v3, c, j, k;
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
-    igraph_integer_t j1;
     igraph_integer_t it_state;
 
     IGRAPH_ALLOW_INTERRUPTION();
