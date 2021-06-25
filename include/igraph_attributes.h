@@ -281,7 +281,7 @@ typedef struct igraph_attribute_table_t {
     void (*destroy)(igraph_t *graph);
     igraph_error_t (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
                            igraph_bool_t va, igraph_bool_t ea);
-    igraph_error_t (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
+    igraph_error_t (*add_vertices)(igraph_t *graph, igraph_integer_t nv, igraph_vector_ptr_t *attr);
     igraph_error_t (*permute_vertices)(const igraph_t *graph,
                             igraph_t *newgraph,
                             const igraph_vector_int_t *idx);

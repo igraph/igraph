@@ -71,11 +71,13 @@
    indexing, _not_ `long int`. Please refer to the headers for the exact details;
    the list of affected functions is too large to include here.
 
- - The `permute_vertices()` and `permute_edges()` functions in the attribute
+ - The `add_vertices()` function in the attribute handler now takes an
+   `igraph_integer_t` for the vertex count instead of a `long int`. The
+   `permute_vertices()` and `permute_edges()` functions in the attribute
    handler tables now take an `igraph_vector_int_t` instead of an
-   `igraph_vector_t` for the index vectors. This is relevant only to maintainers
-   of higher level interfaces to igraph; they should update their attribute
-   handlers accordingly.
+   `igraph_vector_t` for the index vectors. These are relevant only to
+   maintainers of higher level interfaces to igraph; they should update their
+   attribute handlers accordingly.
 
  - igraph functions that interface with external libraries such as BLAS or LAPACK
    may now fail if the underlying BLAS or LAPACK implementation cannot handle

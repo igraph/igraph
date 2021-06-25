@@ -59,7 +59,7 @@ igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igrap
     }
 }
 
-igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
+igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_vertices(graph, nv, attr);
     } else {

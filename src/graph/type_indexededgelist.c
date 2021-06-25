@@ -361,7 +361,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
  */
 igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     igraph_integer_t ec = igraph_ecount(graph);
-    long int i;
+    igraph_integer_t i;
 
     if (nv < 0) {
         IGRAPH_ERROR("cannot add negative number of vertices", IGRAPH_EINVAL);

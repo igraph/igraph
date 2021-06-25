@@ -42,7 +42,7 @@ igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr);
 void igraph_i_attribute_destroy(igraph_t *graph);
 igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from,
                             igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea);
-igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr);
+igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr);
 igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_t *idx);
