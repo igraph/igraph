@@ -30,7 +30,7 @@ int main() {
 
     igraph_t g;
     igraph_matrix_t merges;
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_vector_t x;
     igraph_arpack_options_t options;
     igraph_vector_t weights;
@@ -56,7 +56,7 @@ int main() {
                  -1);
 
     igraph_matrix_init(&merges, 0, 0);
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_vector_init(&x, 0);
     igraph_arpack_options_init(&options);
     igraph_vector_init(&weights, igraph_ecount(&g));
@@ -71,7 +71,7 @@ int main() {
                                          /*callback_extra=*/ 0);
 
     print_matrix_round(&merges);
-    print_vector_round(&membership);
+    print_vector_int(&membership);
 
     printf("\n");
 
@@ -85,11 +85,11 @@ int main() {
                                          /*callback_extra=*/ 0);
 
     print_matrix_round(&merges);
-    print_vector_round(&membership);
+    print_vector_int(&membership);
 
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&x);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_matrix_destroy(&merges);
     igraph_destroy(&g);
 

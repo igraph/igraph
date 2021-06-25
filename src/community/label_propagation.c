@@ -71,7 +71,7 @@
  * \example examples/simple/igraph_community_label_propagation.c
  */
 igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
-                                       igraph_vector_t *membership,
+                                       igraph_vector_int_t *membership,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,
                                        igraph_vector_bool_t *fixed,
@@ -114,7 +114,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_WARNING("Ignoring fixed vertices as no initial labeling given.");
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
 
     if (initial) {
         if (igraph_vector_size(initial) != no_of_nodes) {
@@ -141,7 +141,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             }
         }
 
-        i = igraph_vector_max(membership);
+        i = igraph_vector_int_max(membership);
         if (i > no_of_nodes) {
             IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1.", IGRAPH_EINVAL);
         }
@@ -279,7 +279,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_vector_fill(&label_counters, -1);
     j = 0;
     for (i = 0; i < no_of_nodes; i++) {
-        k = (long)VECTOR(*membership)[i] - 1;
+        k = VECTOR(*membership)[i] - 1;
         if (k >= 0) {
             if (VECTOR(label_counters)[k] == -1) {
                 /* We have seen this label for the first time */

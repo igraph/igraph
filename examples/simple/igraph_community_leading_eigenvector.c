@@ -23,18 +23,6 @@
 
 #include <igraph.h>
 
-int print_vector(const igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        printf("%.2g", (double)VECTOR(*v)[i]);
-        if (i != n - 1) {
-            printf(" ");
-        }
-    }
-    printf("\n");
-    return 0;
-}
-
 int print_matrix(const igraph_matrix_t *m) {
     long int i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
     for (i = 0; i < nrow; i++) {
@@ -53,7 +41,7 @@ int main() {
 
     igraph_t g;
     igraph_matrix_t merges;
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_vector_t x;
     igraph_arpack_options_t options;
 
@@ -78,7 +66,7 @@ int main() {
                  -1);
 
     igraph_matrix_init(&merges, 0, 0);
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_vector_init(&x, 0);
     igraph_arpack_options_init(&options);
 
@@ -91,7 +79,7 @@ int main() {
                                          /*callback_extra=*/ 0);
 
     print_matrix(&merges);
-    print_vector(&membership);
+    igraph_vector_int_print(&membership);
 
     printf("\n");
 
@@ -105,10 +93,10 @@ int main() {
                                          /*callback_extra=*/ 0);
 
     print_matrix(&merges);
-    print_vector(&membership);
+    igraph_vector_int_print(&membership);
 
     igraph_vector_destroy(&x);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_matrix_destroy(&merges);
     igraph_destroy(&g);
 

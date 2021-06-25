@@ -23,7 +23,7 @@
 
 int main() {
     igraph_t graph;
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_real_t modularity;
 
     igraph_famous(&graph, "Zachary"); /* We use Zachary's karate club network. */
@@ -33,18 +33,18 @@ int main() {
 
     /* All igraph functions that returns their result in an igraph_vector_t must be given
        an already initialized vector. */
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(
                 &graph, &membership,
                 /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
                 &modularity);
 
     printf("%ld communities found; modularity score is %g.\n",
-           (long int) (igraph_vector_max(&membership) + 1),
+           (long int) (igraph_vector_int_max(&membership) + 1),
            modularity);
 
     /* Destroy data structures at the end. */
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_destroy(&graph);
 
     return 0;

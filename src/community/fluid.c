@@ -64,7 +64,7 @@
  */
 igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_integer_t no_of_communities,
-                                       igraph_vector_t *membership,
+                                       igraph_vector_int_t *membership,
                                        igraph_real_t *modularity) {
     /* Declaration of variables */
     long int no_of_nodes, i, j, k, kv1;
@@ -80,8 +80,8 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     /* Checking input values */
     if (no_of_nodes < 2) {
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 0);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
@@ -111,7 +111,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     max_density = 1.0;
 
     /* Resize membership vector (number of nodes) */
-    IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
 
     /* Initialize density and com_to_numvertices vectors */
     IGRAPH_CHECK(igraph_vector_init(&density, no_of_communities));
@@ -124,7 +124,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
 
     /* Initialize the membership vector with 0 values */
-    igraph_vector_null(membership);
+    igraph_vector_int_null(membership);
     /* Initialize densities to max_density */
     igraph_vector_fill(&density, max_density);
 

@@ -100,15 +100,15 @@
 igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
                                    igraph_integer_t nodes,
                                    igraph_integer_t steps,
-                                   igraph_vector_t *membership,
-                                   igraph_vector_t *csize) {
+                                   igraph_vector_int_t *membership,
+                                   igraph_vector_int_t *csize) {
 
     igraph_integer_t no_of_nodes = nodes;
     igraph_integer_t components = no_of_nodes - steps;
     igraph_integer_t i, found = 0;
     igraph_vector_t tmp;
     igraph_vector_bool_t already_merged;
-    igraph_vector_t own_membership;
+    igraph_vector_int_t own_membership;
     igraph_bool_t using_own_membership = 0;
 
     if (steps > igraph_matrix_nrow(merges)) {
@@ -127,18 +127,18 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
     if (csize != 0 && membership == 0) {
         /* we need a membership vector to calculate 'csize' but the user did
          * not provide one; let's allocate one ourselves */
-        IGRAPH_VECTOR_INIT_FINALLY(&own_membership, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&own_membership, no_of_nodes);
         using_own_membership = 1;
         membership = &own_membership;
     }
 
     if (membership) {
-        IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-        igraph_vector_null(membership);
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+        igraph_vector_int_null(membership);
     }
     if (csize) {
-        IGRAPH_CHECK(igraph_vector_resize(csize, components));
-        igraph_vector_null(csize);
+        IGRAPH_CHECK(igraph_vector_int_resize(csize, components));
+        igraph_vector_int_null(csize);
     }
 
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&already_merged, steps + no_of_nodes);
@@ -217,7 +217,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
     IGRAPH_FINALLY_CLEAN(2);
 
     if (using_own_membership) {
-        igraph_vector_destroy(&own_membership);
+        igraph_vector_int_destroy(&own_membership);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -248,11 +248,11 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
  *
  * Time complexity: should be O(n) for n elements.
  */
-igraph_error_t igraph_reindex_membership(igraph_vector_t *membership,
+igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
                               igraph_vector_t *new_to_old,
                               igraph_integer_t *nb_clusters) {
 
-    igraph_integer_t i, n = igraph_vector_size(membership);
+    igraph_integer_t i, n = igraph_vector_int_size(membership);
     igraph_vector_t new_cluster;
     igraph_integer_t i_nb_clusters;
 
@@ -301,14 +301,14 @@ igraph_error_t igraph_reindex_membership(igraph_vector_t *membership,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_t *v1,
-                                           const igraph_vector_t *v2, igraph_real_t* result);
-static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
-                                            const igraph_vector_t *v2, igraph_real_t* result);
-static igraph_error_t igraph_i_compare_communities_rand(const igraph_vector_t *v1,
-                                             const igraph_vector_t *v2, igraph_real_t* result, igraph_bool_t adjust);
-static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1,
-                                        const igraph_vector_t *v2, igraph_integer_t* distance12,
+static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_int_t *v1,
+                                           const igraph_vector_int_t *v2, igraph_real_t* result);
+static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_int_t *v1,
+                                            const igraph_vector_int_t *v2, igraph_real_t* result);
+static igraph_error_t igraph_i_compare_communities_rand(const igraph_vector_int_t *v1,
+                                             const igraph_vector_int_t *v2, igraph_real_t* result, igraph_bool_t adjust);
+static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1,
+                                        const igraph_vector_int_t *v2, igraph_integer_t* distance12,
                                         igraph_integer_t* distance21);
 
 /**
@@ -366,21 +366,21 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1,
  *
  * Time complexity: O(n log(n)).
  */
-igraph_error_t igraph_compare_communities(const igraph_vector_t *comm1,
-                               const igraph_vector_t *comm2, igraph_real_t* result,
+igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
+                               const igraph_vector_int_t *comm2, igraph_real_t* result,
                                igraph_community_comparison_t method) {
-    igraph_vector_t c1, c2;
+    igraph_vector_int_t c1, c2;
 
-    if (igraph_vector_size(comm1) != igraph_vector_size(comm2)) {
+    if (igraph_vector_int_size(comm1) != igraph_vector_int_size(comm2)) {
         IGRAPH_ERROR("community membership vectors have different lengths", IGRAPH_EINVAL);
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_copy(&c1, comm1));
-    IGRAPH_FINALLY(igraph_vector_destroy, &c1);
+    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
-    IGRAPH_FINALLY(igraph_vector_destroy, &c2);
+    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
     IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
@@ -412,8 +412,8 @@ igraph_error_t igraph_compare_communities(const igraph_vector_t *comm1,
     }
 
     /* Clean up everything */
-    igraph_vector_destroy(&c1);
-    igraph_vector_destroy(&c2);
+    igraph_vector_int_destroy(&c1);
+    igraph_vector_int_destroy(&c2);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
@@ -469,22 +469,22 @@ igraph_error_t igraph_compare_communities(const igraph_vector_t *comm1,
  *
  * Time complexity: O(n log(n)).
  */
-igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
-                               const igraph_vector_t *comm2, igraph_integer_t *distance12,
+igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
+                               const igraph_vector_int_t *comm2, igraph_integer_t *distance12,
                                igraph_integer_t *distance21) {
-    igraph_vector_t c1, c2;
+    igraph_vector_int_t c1, c2;
 
-    if (igraph_vector_size(comm1) != igraph_vector_size(comm2)) {
+    if (igraph_vector_int_size(comm1) != igraph_vector_int_size(comm2)) {
         IGRAPH_ERRORF("Community membership vectors have different lengths: %ld and %ld.",
-                      IGRAPH_EINVAL, igraph_vector_size(comm1), igraph_vector_size(comm2));
+                      IGRAPH_EINVAL, igraph_vector_int_size(comm1), igraph_vector_int_size(comm2));
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_copy(&c1, comm1));
-    IGRAPH_FINALLY(igraph_vector_destroy, &c1);
+    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
-    IGRAPH_FINALLY(igraph_vector_destroy, &c2);
+    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
     IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
@@ -492,8 +492,8 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
     IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, distance12, distance21));
 
     /* Clean up everything */
-    igraph_vector_destroy(&c1);
-    igraph_vector_destroy(&c2);
+    igraph_vector_int_destroy(&c1);
+    igraph_vector_int_destroy(&c2);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
@@ -504,8 +504,8 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
  * membership vectors v1 and v2. This is needed by both Meila's and Danon's
  * community comparison measure.
  */
-static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
-        const igraph_vector_t* v2, double* h1, double* h2, double* mut_inf) {
+static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vector_int_t* v1,
+        const igraph_vector_int_t* v2, double* h1, double* h2, double* mut_inf) {
     igraph_integer_t i, n;
     igraph_integer_t k1;
     igraph_integer_t k2;
@@ -514,15 +514,15 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     igraph_sparsemat_t mu; /* uncompressed */
     igraph_sparsemat_iterator_t mit;
 
-    n = igraph_vector_size(v1);
+    n = igraph_vector_int_size(v1);
     if (n == 0) {
         *h1 = 0;
         *h2 = 0;
         *mut_inf = 0;
         return IGRAPH_SUCCESS;
     }
-    k1 = igraph_vector_max(v1) + 1;
-    k2 = igraph_vector_max(v2) + 1;
+    k1 = igraph_vector_int_max(v1) + 1;
+    k2 = igraph_vector_int_max(v2) + 1;
     p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
@@ -604,7 +604,7 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
  * </para><para>
  * Time complexity: O(n log(n))
  */
-static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
                                      igraph_real_t* result) {
     double h1, h2, mut_inf;
 
@@ -634,7 +634,7 @@ static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_t *v1
  * </para><para>
  * Time complexity: O(n log(n))
  */
-static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
                                     igraph_real_t* result) {
     double h1, h2, mut_inf;
 
@@ -655,18 +655,18 @@ static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_t *v1,
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
                               igraph_sparsemat_t *m) {
     igraph_integer_t k1, k2, i, n;
 
-    n = igraph_vector_size(v1);
+    n = igraph_vector_int_size(v1);
     if (n == 0) {
         IGRAPH_CHECK(igraph_sparsemat_resize(m, 0, 0, 0));
         return IGRAPH_SUCCESS;
     }
 
-    k1 = igraph_vector_max(v1) + 1;
-    k2 = igraph_vector_max(v2) + 1;
+    k1 = igraph_vector_int_max(v1) + 1;
+    k2 = igraph_vector_int_max(v2) + 1;
     IGRAPH_CHECK(igraph_sparsemat_resize(m, k1, k2, n));
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_sparsemat_entry(
@@ -693,9 +693,9 @@ static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_t *v1, const
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
                                  igraph_integer_t* distance12, igraph_integer_t* distance21) {
-    igraph_integer_t n = igraph_vector_size(v1);
+    igraph_integer_t n = igraph_vector_int_size(v1);
     igraph_vector_t rowmax, colmax;
     igraph_sparsemat_t m;
     igraph_sparsemat_t mu; /* uncompressed */
@@ -769,7 +769,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_t *v1, co
  * and k2 are the number of clusters in each of the clusterings.
  */
 static igraph_error_t igraph_i_compare_communities_rand(
-        const igraph_vector_t *v1, const igraph_vector_t *v2,
+        const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
         igraph_real_t *result, igraph_bool_t adjust) {
     igraph_sparsemat_t m;
     igraph_sparsemat_t mu; /* uncompressed */
@@ -779,9 +779,9 @@ static igraph_error_t igraph_i_compare_communities_rand(
     double rand, n;
     double frac_pairs_in_1, frac_pairs_in_2;
 
-    if (igraph_vector_size(v1) <= 1) {
+    if (igraph_vector_int_size(v1) <= 1) {
         IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
-        "Found membership vector of size %ld", IGRAPH_EINVAL, igraph_vector_size(v1));
+        "Found membership vector of size %ld", IGRAPH_EINVAL, igraph_vector_int_size(v1));
     }
 
     /* Calculate the confusion matrix */
@@ -821,7 +821,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
     /* Calculate row and column sums */
     nrow = igraph_sparsemat_nrow(&mu);
     ncol = igraph_sparsemat_ncol(&mu);
-    n = igraph_vector_size(v1) + 0.0;
+    n = igraph_vector_int_size(v1) + 0.0;
     IGRAPH_VECTOR_INIT_FINALLY(&rowsums, nrow);
     IGRAPH_VECTOR_INIT_FINALLY(&colsums, ncol);
     IGRAPH_CHECK(igraph_sparsemat_rowsums(&mu, &rowsums));

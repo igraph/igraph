@@ -106,14 +106,14 @@ public:
     double calculate_energy(double gamma);
     long   WriteClusters(igraph_real_t *modularity,
                          igraph_real_t *temperature,
-                         igraph_vector_t *csize, igraph_vector_t *membership,
+                         igraph_vector_int_t *csize, igraph_vector_int_t *membership,
                          double kT, double gamma);
     // long   WriteSoftClusters(char *filename, double threshold);
     double Get_Energy() const {
         return energy;
     }
     double FindCommunityFromStart(double gamma, double prob, char *nodename,
-                                  igraph_vector_t *result,
+                                  igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
                                   igraph_integer_t *inner_links,
@@ -164,8 +164,8 @@ public:
     // double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
     long WriteClusters(igraph_real_t *modularity,
                        igraph_real_t *temperature,
-                       igraph_vector_t *community_size,
-                       igraph_vector_t *membership,
+                       igraph_vector_int_t *community_size,
+                       igraph_vector_int_t *membership,
                        igraph_matrix_t *adhesion,
                        igraph_matrix_t *normalised_adhesion,
                        igraph_real_t *polarization,

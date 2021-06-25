@@ -36,12 +36,12 @@
 
 #include <string.h>
 
-static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
-    long int no = igraph_vector_max(membership) + 1;
+static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *membership) {
+    long int no = igraph_vector_int_max(membership) + 1;
     igraph_vector_t idx;
     long int realno = 0;
     long int i;
-    igraph_integer_t len = igraph_vector_size(membership);
+    igraph_integer_t len = igraph_vector_int_size(membership);
 
     IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
     for (i = 0; i < len; i++) {
@@ -66,9 +66,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              igraph_matrix_t *res,
                                              igraph_vector_t *bridges,
                                              igraph_vector_t *modularity,
-                                             igraph_vector_t *membership) {
+                                             igraph_vector_int_t *membership) {
 
-    igraph_vector_t mymembership;
+    igraph_vector_int_t mymembership;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
     igraph_real_t maxmod = -1;
@@ -76,10 +76,10 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     igraph_integer_t no_comps;
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&mymembership, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mymembership, no_of_nodes);
 
     if (membership) {
-        IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
     }
 
     if (modularity || res || bridges) {
@@ -104,7 +104,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         VECTOR(mymembership)[i] = i;
     }
     if (membership) {
-        igraph_vector_update(membership, &mymembership);
+        igraph_vector_int_update(membership, &mymembership);
     }
 
     IGRAPH_CHECK(igraph_modularity(graph, &mymembership, weights,
@@ -147,7 +147,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 if (actmod > maxmod) {
                     maxmod = actmod;
                     if (membership) {
-                        igraph_vector_update(membership, &mymembership);
+                        igraph_vector_int_update(membership, &mymembership);
                     }
                 }
             }
@@ -160,7 +160,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_rewrite_membership_vector(membership));
     }
 
-    igraph_vector_destroy(&mymembership);
+    igraph_vector_int_destroy(&mymembership);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -225,7 +225,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    igraph_vector_t *bridges,
                                    igraph_vector_t *modularity,
-                                   igraph_vector_t *membership) {
+                                   igraph_vector_int_t *membership) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t ptr;
@@ -244,7 +244,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
             igraph_vector_clear(modularity);
         }
         if (membership) {
-            igraph_vector_clear(membership);
+            igraph_vector_int_clear(membership);
         }
         return IGRAPH_SUCCESS;
     }
@@ -392,7 +392,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                                       igraph_matrix_t *merges,
                                       igraph_vector_t *bridges,
                                       igraph_vector_t *modularity,
-                                      igraph_vector_t *membership,
+                                      igraph_vector_int_t *membership,
                                       igraph_bool_t directed,
                                       const igraph_vector_t *weights) {
 

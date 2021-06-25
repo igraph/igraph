@@ -121,7 +121,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               int steps,
                               igraph_matrix_t *merges,
                               igraph_vector_t *modularity,
-                              igraph_vector_t *membership) {
+                              igraph_vector_int_t *membership) {
 
     long int no_of_nodes = igraph_vcount(graph);
     int length = steps;

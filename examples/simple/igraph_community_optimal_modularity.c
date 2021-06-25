@@ -48,7 +48,7 @@ int main() {
                               32, 33
                             };
 
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_vector_t weights;
     igraph_real_t modularity;
     igraph_bool_t simple;
@@ -64,7 +64,7 @@ int main() {
         return 1;
     }
 
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
 
     igraph_set_error_handler(&igraph_error_handler_printignore);
 
@@ -103,7 +103,7 @@ int main() {
     }
     igraph_destroy(&graph);
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&weights);
 
     return 0;

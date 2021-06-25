@@ -37,11 +37,11 @@
 
 #include <limits.h>
 
-static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
-                                  igraph_vector_t *csize, igraph_integer_t *no);
+static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_int_t *membership,
+                                  igraph_vector_int_t *csize, igraph_integer_t *no);
 
-static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
-                                    igraph_vector_t *csize, igraph_integer_t *no);
+static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_int_t *membership,
+                                    igraph_vector_int_t *csize, igraph_integer_t *no);
 
 /**
  * \ingroup structural
@@ -74,8 +74,8 @@ static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vec
  * edges in the graph.
  */
 
-igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
-                    igraph_vector_t *csize, igraph_integer_t *no,
+igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
+                    igraph_vector_int_t *csize, igraph_integer_t *no,
                     igraph_connectedness_t mode) {
     if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
         return igraph_i_clusters_weak(graph, membership, csize, no);
@@ -86,8 +86,8 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membershi
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
 }
 
-static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
-                                  igraph_vector_t *csize, igraph_integer_t *no) {
+static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_int_t *membership,
+                                  igraph_vector_int_t *csize, igraph_integer_t *no) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     char *already_added;
@@ -109,10 +109,10 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
 
     /* Memory for result, csize is dynamically allocated */
     if (membership) {
-        IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
     }
     if (csize) {
-        igraph_vector_clear(csize);
+        igraph_vector_int_clear(csize);
     }
 
     /* The algorithm */
@@ -149,7 +149,7 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
         }
         no_of_clusters++;
         if (csize) {
-            IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_cluster_size));
         }
     }
 
@@ -167,8 +167,8 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
-                                    igraph_vector_t *csize, igraph_integer_t *no) {
+static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_int_t *membership,
+                                    igraph_vector_int_t *csize, igraph_integer_t *no) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t next_nei = IGRAPH_VECTOR_NULL;
@@ -191,13 +191,13 @@ static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vec
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
     if (membership) {
-        IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
     }
     IGRAPH_CHECK(igraph_vector_reserve(&out, no_of_nodes));
 
     igraph_vector_null(&out);
     if (csize) {
-        igraph_vector_clear(csize);
+        igraph_vector_int_clear(csize);
     }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
@@ -306,7 +306,7 @@ static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vec
 
         no_of_clusters++;
         if (csize) {
-            IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_cluster_size));
         }
     }
 

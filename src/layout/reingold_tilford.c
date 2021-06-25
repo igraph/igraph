@@ -537,13 +537,13 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
     if (!roots || igraph_vector_size(roots) == 0) {
 
         igraph_vector_int_t order;
-        igraph_vector_t membership;
+        igraph_vector_int_t membership;
         igraph_integer_t no_comps;
         long int i, noseen = 0;
 
         IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-        IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, no_of_nodes);
 
         if (mode != IGRAPH_ALL) {
             /* look for roots by swimming against the stream */
@@ -578,7 +578,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
             VECTOR(myroots)[i] -= 1;
         }
 
-        igraph_vector_destroy(&membership);
+        igraph_vector_int_destroy(&membership);
         igraph_vector_int_destroy(&order);
         IGRAPH_FINALLY_CLEAN(2);
 

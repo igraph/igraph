@@ -63,8 +63,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
         igraph_real_t *temperature,
-        igraph_vector_t *membership,
-        igraph_vector_t *csize,
+        igraph_vector_int_t *membership,
+        igraph_vector_int_t *csize,
         igraph_integer_t spins,
         igraph_bool_t parupdate,
         igraph_real_t starttemp,
@@ -78,8 +78,8 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
         igraph_real_t *temperature,
-        igraph_vector_t *membership,
-        igraph_vector_t *csize,
+        igraph_vector_int_t *membership,
+        igraph_vector_int_t *csize,
         igraph_integer_t spins,
         igraph_bool_t parupdate,
         igraph_real_t starttemp,
@@ -189,8 +189,8 @@ igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                igraph_real_t *modularity,
                                igraph_real_t *temperature,
-                               igraph_vector_t *membership,
-                               igraph_vector_t *csize,
+                               igraph_vector_int_t *membership,
+                               igraph_vector_int_t *csize,
                                igraph_integer_t spins,
                                igraph_bool_t parupdate,
                                igraph_real_t starttemp,
@@ -236,8 +236,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
         igraph_real_t *temperature,
-        igraph_vector_t *membership,
-        igraph_vector_t *csize,
+        igraph_vector_int_t *membership,
+        igraph_vector_int_t *csize,
         igraph_integer_t spins,
         igraph_bool_t parupdate,
         igraph_real_t starttemp,
@@ -282,8 +282,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
        null and singleton graphs, so we catch them here. */
     if (no_of_nodes < 2) {
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 0);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
@@ -293,8 +293,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         }
         if (csize) {
             /* 0 clusters for 0 nodes, 1 cluster for 1 node */
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 1);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 1);
         }
         return IGRAPH_SUCCESS;
     }
@@ -437,7 +437,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
 igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       const igraph_vector_t *weights,
                                       igraph_integer_t vertex,
-                                      igraph_vector_t *community,
+                                      igraph_vector_int_t *community,
                                       igraph_real_t *cohesion,
                                       igraph_real_t *adhesion,
                                       igraph_integer_t *inner_links,
@@ -512,8 +512,8 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
         igraph_real_t *temperature,
-        igraph_vector_t *membership,
-        igraph_vector_t *csize,
+        igraph_vector_int_t *membership,
+        igraph_vector_int_t *csize,
         igraph_integer_t spins,
         igraph_bool_t parupdate,
         igraph_real_t starttemp,
@@ -569,8 +569,8 @@ static igraph_error_t igraph_i_community_spinglass_negative(
        null and singleton graphs, so we catch them here. */
     if (no_of_nodes < 2) {
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 0);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
@@ -580,8 +580,8 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         }
         if (csize) {
             /* 0 clusters for 0 nodes, 1 cluster for 1 node */
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 1);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 1);
         }
         return IGRAPH_SUCCESS;
     }

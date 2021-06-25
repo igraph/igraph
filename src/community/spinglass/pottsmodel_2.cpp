@@ -894,7 +894,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
 //###############################################################################################
 double PottsModel::FindCommunityFromStart(double gamma, double prob,
         char *nodename,
-        igraph_vector_t *result,
+        igraph_vector_int_t *result,
         igraph_real_t *cohesion,
         igraph_real_t *adhesion,
         igraph_integer_t *my_inner_links,
@@ -1126,11 +1126,11 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     }
     if (result) {
         node = iter.First(community);
-        igraph_vector_resize(result, 0);
+        igraph_vector_int_resize(result, 0);
         while (!iter.End()) {
             // printf("%s in community.\n",node->Get_Name());
             // fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
-            IGRAPH_CHECK(igraph_vector_push_back(result, node->Get_Index()));
+            IGRAPH_CHECK(igraph_vector_int_push_back(result, node->Get_Index()));
             node = iter.Next();
         }
     }
@@ -1147,8 +1147,8 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
 //################################################################################################
 long PottsModel::WriteClusters(igraph_real_t *modularity,
                                igraph_real_t *temperature,
-                               igraph_vector_t *csize,
-                               igraph_vector_t *membership,
+                               igraph_vector_int_t *csize,
+                               igraph_vector_int_t *membership,
                                double kT, double gamma) {
     NNode *n_cur, *n_cur2;
     /*
@@ -1211,7 +1211,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
         }
     }
     if (csize) {
-        igraph_vector_resize(csize, 0);
+        igraph_vector_int_resize(csize, 0);
         for (unsigned long spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 inner_links[spin] /= 2;
@@ -1240,7 +1240,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
                 p2=(0.5*n*(n-1)-lin + n*(N-n)-lout)*log((double)1.0-p);
                 */
                 //       fprintf(file,"%d\t%d\t%d\t%d\t%f\t%f\t%f\n",spin,nodes[spin], inner_links[spin], outer_links[spin], p_in, p_out,log_num_exp);
-                IGRAPH_CHECK(igraph_vector_push_back(csize, nodes[spin]));
+                IGRAPH_CHECK(igraph_vector_int_push_back(csize, nodes[spin]));
             }
         }
         //   fprintf(file,"\n");
@@ -1249,7 +1249,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
     //die Elemente der Cluster
     if (membership) {
         long int no = -1;
-        IGRAPH_CHECK(igraph_vector_resize(membership, num_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, num_of_nodes));
         for (unsigned long spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 no++;
@@ -1987,8 +1987,8 @@ double PottsModelN::FindStartTemp(double gamma, double lambda, double ts) {
 
 long PottsModelN::WriteClusters(igraph_real_t *modularity,
                                 igraph_real_t *temperature,
-                                igraph_vector_t *community_size,
-                                igraph_vector_t *membership,
+                                igraph_vector_int_t *community_size,
+                                igraph_vector_int_t *membership,
                                 igraph_matrix_t *adhesion,
                                 igraph_matrix_t *normalised_adhesion,
                                 igraph_real_t *polarization,
@@ -2051,7 +2051,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
     if (community_size) {
         //Initialize the vector
-        IGRAPH_CHECK(igraph_vector_resize(community_size, q));
+        IGRAPH_CHECK(igraph_vector_int_resize(community_size, q));
         for (unsigned long spin_opt = 1; spin_opt <= q; spin_opt++) {
             //Set the community size
             VECTOR(*community_size)[spin_opt - 1] = csize[spin_opt];
@@ -2060,7 +2060,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
     //Set the membership
     if (membership) {
-        IGRAPH_CHECK(igraph_vector_resize(membership, num_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, num_nodes));
         for (unsigned long i = 0; i < num_nodes; i++) {
             VECTOR(*membership)[ i ] = spin[i] - 1;
         }
