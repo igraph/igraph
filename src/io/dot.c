@@ -179,8 +179,8 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             IGRAPH_FINALLY(igraph_free, newname);
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
-                if (VECTOR(numv)[0] == (long)VECTOR(numv)[0]) {
-                    CHECK(fprintf(outstream, "    %s=%ld\n", newname, (long)VECTOR(numv)[0]));
+                if (VECTOR(numv)[0] == (igraph_integer_t)VECTOR(numv)[0]) {
+                    CHECK(fprintf(outstream, "    %s=%" IGRAPH_PRId "\n", newname, (igraph_integer_t)VECTOR(numv)[0]));
                 } else {
                     CHECK(fprintf(outstream, "    %s=", newname));
                     CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
@@ -217,8 +217,8 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name, igraph_vss_1(i), &numv));
-                    if (VECTOR(numv)[0] == (long)VECTOR(numv)[0]) {
-                        CHECK(fprintf(outstream, "    %s=%ld\n", newname, (long)VECTOR(numv)[0]));
+                    if (VECTOR(numv)[0] == (igraph_integer_t)VECTOR(numv)[0]) {
+                        CHECK(fprintf(outstream, "    %s=%" IGRAPH_PRId "\n", newname, (igraph_integer_t)VECTOR(numv)[0]));
                     } else {
                         CHECK(fprintf(outstream, "    %s=", newname));
                         CHECK(igraph_real_fprintf_precise(outstream,
@@ -265,8 +265,8 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph,
                                  name, igraph_ess_1((igraph_integer_t) i), &numv));
-                    if (VECTOR(numv)[0] == (long)VECTOR(numv)[0]) {
-                        CHECK(fprintf(outstream, "    %s=%ld\n", newname, (long)VECTOR(numv)[0]));
+                    if (VECTOR(numv)[0] == (igraph_integer_t)VECTOR(numv)[0]) {
+                        CHECK(fprintf(outstream, "    %s=%" IGRAPH_PRId "\n", newname, (igraph_integer_t)VECTOR(numv)[0]));
                     } else {
                         CHECK(fprintf(outstream, "    %s=", newname));
                         CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));

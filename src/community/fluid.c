@@ -186,7 +186,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
             neis = igraph_adjlist_get(&al, v1);
             size = igraph_vector_int_size(neis);
             for (j = 0; j < size; j++) {
-                k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+                k = VECTOR(*membership)[VECTOR(*neis)[j]];
                 /* skip if it has no label yet */
                 if (k == 0) {
                     continue;

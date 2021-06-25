@@ -211,13 +211,12 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                 ineis = igraph_inclist_get(&il, v1);
                 num_neis = igraph_vector_int_size(ineis);
                 for (j = 0; j < num_neis; j++) {
-                    k = VECTOR(*membership)[
-                    (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];
+                    k = VECTOR(*membership)[IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1)];
                     if (k == 0) {
                         continue;    /* skip if it has no label yet */
                     }
                     was_zero = (VECTOR(label_counters)[k] == 0);
-                    VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*ineis)[j]];
+                    VECTOR(label_counters)[k] += VECTOR(*weights)[VECTOR(*ineis)[j]];
                     if (was_zero && VECTOR(label_counters)[k] != 0) {
                         /* counter just became nonzero */
                         IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
@@ -234,7 +233,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                 neis = igraph_adjlist_get(&al, v1);
                 num_neis = igraph_vector_int_size(neis);
                 for (j = 0; j < num_neis; j++) {
-                    k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+                    k = VECTOR(*membership)[VECTOR(*neis)[j]];
                     if (k == 0) {
                         continue;    /* skip if it has no label yet */
                     }

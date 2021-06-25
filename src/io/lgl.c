@@ -319,10 +319,10 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_edge(graph, edge, &from, &to);
             igraph_strvector_get(&wvec, edge, &str1);
             if (from == actvertex) {
-                ret = fprintf(outstream, "%li %s\n", (long)to, str1);
+                ret = fprintf(outstream, "%" IGRAPH_PRId " %s\n", to, str1);
             } else {
                 actvertex = from;
-                ret = fprintf(outstream, "# %li\n%li %s\n", (long)from, (long)to, str1);
+                ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId " %s\n", from, to, str1);
             }
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);

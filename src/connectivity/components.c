@@ -1163,8 +1163,8 @@ static igraph_error_t igraph_i_bridges_rec(
         igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *incoming_edge)
 {
     igraph_vector_int_t *incedges;
-    long nc; /* neighbour count */
-    long i;
+    igraph_integer_t nc; /* neighbour count */
+    igraph_integer_t i;
 
     VECTOR(*visited)[u] = 1;
 
@@ -1176,7 +1176,7 @@ static igraph_error_t igraph_i_bridges_rec(
     incedges = igraph_inclist_get(il, u);
     nc = igraph_vector_int_size(incedges);
     for (i = 0; i < nc; ++i) {
-        long edge = (long) VECTOR(*incedges)[i];
+        igraph_integer_t edge = VECTOR(*incedges)[i];
         igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
 
         if (! VECTOR(*visited)[v]) {

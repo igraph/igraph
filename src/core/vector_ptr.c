@@ -688,7 +688,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
     uintptr_t *vind, first;
     igraph_integer_t n = igraph_vector_ptr_size(v);
 
-    IGRAPH_CHECK(igraph_vector_resize(inds, (long) n));
+    IGRAPH_CHECK(igraph_vector_resize(inds, n));
     if (n == 0) {
         return IGRAPH_SUCCESS;
     }

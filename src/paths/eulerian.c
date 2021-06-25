@@ -339,7 +339,7 @@ igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path
 
 
 static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
-    long int curr;
+    igraph_integer_t curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
     igraph_stack_t path, tracker, edge_tracker, edge_path;
@@ -389,8 +389,8 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
 
         if (VECTOR(degree)[curr] != 0) {
             igraph_vector_int_t *incedges;
-            long nc, edge = -1;
-            long int j, next;
+            igraph_integer_t nc, edge = -1;
+            igraph_integer_t j, next;
             IGRAPH_CHECK(igraph_stack_push(&tracker, curr));
 
             incedges = igraph_inclist_get(&il, curr);
@@ -398,7 +398,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
             IGRAPH_ASSERT(nc > 0);
 
             for (j = 0; j < nc; j++) {
-                edge = (long) VECTOR(*incedges)[j];
+                edge = VECTOR(*incedges)[j];
                 if (!VECTOR(visited_list)[edge]) {
                     break;
                 }
@@ -452,7 +452,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
 
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
 static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
-    long int curr;
+    igraph_integer_t curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
     igraph_stack_t path, tracker, edge_tracker, edge_path;
@@ -502,8 +502,8 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
 
         if (VECTOR(remaining_out_edges)[curr] != 0) {
             igraph_vector_int_t *incedges;
-            long nc, edge = -1;
-            long int j, next;
+            igraph_integer_t nc, edge = -1;
+            igraph_integer_t j, next;
             IGRAPH_CHECK(igraph_stack_push(&tracker, curr));
 
             incedges = igraph_inclist_get(&il, curr);
@@ -511,7 +511,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
             IGRAPH_ASSERT(nc > 0);
 
             for (j = 0; j < nc; j++) {
-                edge = (long) VECTOR(*incedges)[j];
+                edge = VECTOR(*incedges)[j];
                 if (!VECTOR(visited_list)[edge]) {
                     break;
                 }

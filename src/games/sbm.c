@@ -276,7 +276,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     if (m < 1) {
         IGRAPH_ERROR("`m' must be positive for HSBM", IGRAPH_EINVAL);
     }
-    if ((long) n  % (long) m) {
+    if (n % m) {
         IGRAPH_ERROR("`n' must be a multiple of `m' for HSBM", IGRAPH_EINVAL);
     }
     if (!igraph_vector_isininterval(rho, 0, 1)) {

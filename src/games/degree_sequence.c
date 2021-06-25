@@ -588,7 +588,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed_uniform
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
-        IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*out_deg)[i]));
+        IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));
     }
 
     RNG_BEGIN();
