@@ -146,7 +146,7 @@ igraph_error_t igraph_i_cutheap_update(
 
 /* Reset the value of all vertices to zero and make them active */
 
-igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
+igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_integer_t vertex) {
     igraph_integer_t i, j, n = igraph_vector_size(&ch->hptr);
     /* undefine */
     VECTOR(ch->hptr)[vertex] = UNDEFINED;

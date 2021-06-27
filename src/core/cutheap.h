@@ -56,7 +56,7 @@ IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_update(
     igraph_i_cutheap_t *ch, igraph_integer_t index, igraph_real_t add);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_integer_t vertex);
 
 __END_DECLS
 

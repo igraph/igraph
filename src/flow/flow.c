@@ -490,8 +490,8 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                    const igraph_vector_t *capacity,
                    igraph_maxflow_stats_t *stats) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_orig_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_orig_edges = igraph_ecount(graph);
     igraph_integer_t no_of_edges = 2 * no_of_orig_edges;
 
     igraph_vector_t rescap, excess;
@@ -1231,8 +1231,8 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                                       igraph_vector_t *cut,
                                       const igraph_vector_t *capacity) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     igraph_i_cutheap_t heap;
     igraph_real_t mincut = IGRAPH_INFINITY; /* infinity */
@@ -1326,8 +1326,8 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
             neis = igraph_adjlist_get(&adjlist, a);
             n = igraph_vector_int_size(edges);
             for (i = 0; i < n; i++) {
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
-                igraph_integer_t to = (igraph_integer_t) VECTOR(*neis)[i];
+                igraph_integer_t edge = VECTOR(*edges)[i];
+                igraph_integer_t to = VECTOR(*neis)[i];
                 igraph_real_t weight = capacity ? VECTOR(*capacity)[edge] : 1.0;
                 igraph_i_cutheap_update(&heap, to, weight);
             }
@@ -1391,7 +1391,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         neis = igraph_adjlist_get(&adjlist, last);
         n = igraph_vector_int_size(neis);
         for (i = 0; i < n; i++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[i];
+            igraph_integer_t nei = VECTOR(*neis)[i];
             igraph_integer_t n2, j;
             neis2 = igraph_adjlist_get(&adjlist, nei);
             n2 = igraph_vector_int_size(neis2);
@@ -1532,7 +1532,7 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
     for (i = 1; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
                                     pcut, ppartition, ppartition2, /*source=*/ 0,
-                                    /*target=*/ (igraph_integer_t) i, capacity, 0));
+                                    /*target=*/ i, capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
             if (cut) {
@@ -1551,7 +1551,7 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
         }
         IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
                                     pcut, ppartition, ppartition2,
-                                    /*source=*/ (igraph_integer_t) i,
+                                    /*source=*/ i,
                                     /*target=*/ 0, capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
@@ -1735,7 +1735,7 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
     }
 
     for (i = 1; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, 0, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, 0, i,
                                           capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
@@ -1743,7 +1743,7 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
                 break;
             }
         }
-        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, (igraph_integer_t) i, 0,
+        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, i, 0,
                                           capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
@@ -1766,8 +1766,8 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
                                                     igraph_integer_t target,
                                                     igraph_vconn_nei_t neighbors) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t edges;
     igraph_real_t real_res;
     igraph_t newgraph;
@@ -1850,7 +1850,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
                                                       igraph_integer_t target,
                                                       igraph_vconn_nei_t neighbors) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_t newgraph;
     igraph_bool_t conn;
 
@@ -1964,7 +1964,7 @@ igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
 static igraph_error_t igraph_i_vertex_connectivity_directed(const igraph_t *graph,
                                                  igraph_integer_t *res) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, j;
     igraph_integer_t minconn = no_of_nodes - 1, conn = 0;
 
@@ -1977,8 +1977,8 @@ static igraph_error_t igraph_i_vertex_connectivity_directed(const igraph_t *grap
             IGRAPH_ALLOW_INTERRUPTION();
 
             IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn,
-                         (igraph_integer_t) i,
-                         (igraph_integer_t) j,
+                         i,
+                         j,
                          IGRAPH_VCONN_NEI_NUMBER_OF_NODES));
             if (conn < minconn) {
                 minconn = conn;

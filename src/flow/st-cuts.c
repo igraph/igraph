@@ -128,8 +128,8 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
         }
     }
 
-    IGRAPH_CHECK(igraph_create(graphbar, &edges, (igraph_integer_t)
-                               new_no_of_nodes, IGRAPH_DIRECTED));
+    IGRAPH_CHECK(igraph_create(graphbar, &edges, new_no_of_nodes,
+                               IGRAPH_DIRECTED));
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -173,7 +173,7 @@ static igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_create(residual, tmp, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(residual, tmp, no_of_nodes,
                                IGRAPH_DIRECTED));
 
     return IGRAPH_SUCCESS;
@@ -243,7 +243,7 @@ static igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_create(residual, tmp, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(residual, tmp, no_of_nodes,
                                IGRAPH_DIRECTED));
 
     return IGRAPH_SUCCESS;
@@ -586,7 +586,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                 }
             }
         }
-        IGRAPH_CHECK(igraph_create(domtree, &edges, (igraph_integer_t) no_of_nodes,
+        IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes,
                                    IGRAPH_DIRECTED));
         igraph_vector_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
@@ -696,7 +696,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
        vertex after (=below) another GammaX vertex, we mark the higher
        one as non-minimal. */
 
-    IGRAPH_CHECK(igraph_dfs(domtree, (igraph_integer_t) root, IGRAPH_IN,
+    IGRAPH_CHECK(igraph_dfs(domtree, root, IGRAPH_IN,
                             /*unreachable=*/ 0, /*order=*/ 0,
                             /*order_out=*/ 0, /*father=*/ 0,
                             /*dist=*/ 0, /*in_callback=*/
@@ -770,7 +770,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     /* Construct the dominator tree of Sbar */
 
     IGRAPH_VECTOR_INIT_FINALLY(&leftout, 0);
-    IGRAPH_CHECK(igraph_dominator_tree(&Sbar, (igraph_integer_t) root,
+    IGRAPH_CHECK(igraph_dominator_tree(&Sbar, root,
                                        /*dom=*/ 0, &domtree,
                                        &leftout, IGRAPH_IN));
     IGRAPH_FINALLY(igraph_destroy, &domtree);
@@ -791,7 +791,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 igraph_vector_t neis;
                 igraph_integer_t j;
                 IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-                IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+                IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
                                               IGRAPH_OUT));
                 n = igraph_vector_size(&neis);
                 for (j = 0; j < n; j++) {
@@ -841,7 +841,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
            different subtrees are disjoint. */
         igraph_integer_t min = VECTOR(Sbar_map)[(igraph_integer_t) VECTOR(M)[i] ] - 1;
         igraph_integer_t nuvsize, isvlen, j;
-        IGRAPH_CHECK(igraph_dfs(&domtree, (igraph_integer_t) min, IGRAPH_IN,
+        IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
                                 /*unreachable=*/ 0, /*order=*/ &Nuv,
                                 /*order_out=*/ 0, /*father=*/ 0, /*dist=*/ 0,
                                 /*in_callback=*/ 0, /*out_callback=*/ 0,
@@ -889,7 +889,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
             *v = VECTOR(M)[i];
             /* Calculate real Isv */
             IGRAPH_CHECK(igraph_vector_append(&Nuv, &leftout));
-            IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ (igraph_integer_t) *v,
+            IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,
                                     /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                                     /*unreachable=*/ 0, /*restricted=*/ &Nuv,
                                     /*order=*/ &Isv_min, /*rank=*/ 0,
@@ -1169,7 +1169,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
     for (i = 0; i < no_of_nodes; i++) {
         if (!ACTIVE(i)) {
             igraph_integer_t j, n;
-            IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, i,
                                           IGRAPH_OUT));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
@@ -1279,7 +1279,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
         *v = VECTOR(Sbar_invmap)[ (igraph_integer_t) VECTOR(M)[i] ];
         /* TODO: restricted == keep ? */
-        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ (igraph_integer_t) *v,/*roots=*/ 0,
+        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ 0,
                                 /*mode=*/ IGRAPH_IN, /*unreachable=*/ 0,
                                 /*restricted=*/ &keep, /*order=*/ &Isv_min,
                                 /*rank=*/ 0, /*father=*/ 0, /*pred=*/ 0,
