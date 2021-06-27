@@ -88,6 +88,31 @@
    argument instead of an `int`. In practice, it has always been treated as a
    boolean.
 
+ - Functions that used an `igraph_vector_t` to represent cluster size
+   and cluster membership now use an `igraph_vector_int_t` instead. These are:
+   - `igraph_clusters()`
+   - `igraph_community_eb_get_merges()`
+   - `igraph_community_edge_betweenness()`
+   - `igraph_community_fastgreedy()`
+   - `igraph_community_fluid_communities()`
+   - `igraph_community_infomap()`
+   - `igraph_community_label_propagation()`
+   - `igraph_community_leading_eigenvector()`
+   - `igraph_community_leiden()`
+   - `igraph_community_multilevel()`
+   - `igraph_community_optimal_modularity()`
+   - `igraph_community_spinglass()`
+   - `igraph_community_spinglass_single()`
+   - `igraph_community_to_membership()`
+   - `igraph_community_walktrap()`
+   - `igraph_compare_communities()`
+   - `igraph_le_community_to_membership()`
+   - `igraph_modularity()`
+   - `igraph_reindex_membership()`
+   - `igraph_split_join_distance()`
+   `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
+   instead of `igraph_matrix_t()` for its memberships parameter.
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
