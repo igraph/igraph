@@ -52,15 +52,15 @@ IGRAPH_EXPORT igraph_error_t igraph_trussness(
 
 IGRAPH_EXPORT igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
                                                       igraph_real_t *modularity,
-                                                      igraph_vector_t *membership,
+                                                      igraph_vector_int_t *membership,
                                                       const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                              const igraph_vector_t *weights,
                                              igraph_real_t *modularity,
                                              igraph_real_t *temperature,
-                                             igraph_vector_t *membership,
-                                             igraph_vector_t *csize,
+                                             igraph_vector_int_t *membership,
+                                             igraph_vector_int_t *csize,
                                              igraph_integer_t spins,
                                              igraph_bool_t parupdate,
                                              igraph_real_t starttemp,
@@ -78,7 +78,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_spinglass(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                                     const igraph_vector_t *weights,
                                                     igraph_integer_t vertex,
-                                                    igraph_vector_t *community,
+                                                    igraph_vector_int_t *community,
                                                     igraph_real_t *cohesion,
                                                     igraph_real_t *adhesion,
                                                     igraph_integer_t *inner_links,
@@ -92,13 +92,13 @@ IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                                             int steps,
                                             igraph_matrix_t *merges,
                                             igraph_vector_t *modularity,
-                                            igraph_vector_t *membership);
+                                            igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            const igraph_vector_t *e_weights,
                                            const igraph_vector_t *v_weights,
                                            int nb_trials,
-                                           igraph_vector_t *membership,
+                                           igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
@@ -107,7 +107,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *g
                                                     igraph_matrix_t *merges,
                                                     igraph_vector_t *bridges,
                                                     igraph_vector_t *modularity,
-                                                    igraph_vector_t *membership,
+                                                    igraph_vector_int_t *membership,
                                                     igraph_bool_t directed,
                                                     const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
@@ -117,26 +117,26 @@ IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *grap
                                                  igraph_matrix_t *merges,
                                                  igraph_vector_t *bridges,
                                                  igraph_vector_t *modularity,
-                                                 igraph_vector_t *membership);
+                                                 igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                               const igraph_vector_t *weights,
                                               igraph_matrix_t *merges,
                                               igraph_vector_t *modularity,
-                                              igraph_vector_t *membership);
+                                              igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
                                                  igraph_integer_t nodes,
                                                  igraph_integer_t steps,
-                                                 igraph_vector_t *membership,
-                                                 igraph_vector_t *csize);
+                                                 igraph_vector_int_t *membership,
+                                                 igraph_vector_int_t *csize);
 IGRAPH_EXPORT igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
                                                     igraph_integer_t steps,
-                                                    igraph_vector_t *membership,
-                                                    igraph_vector_t *csize);
+                                                    igraph_vector_int_t *membership,
+                                                    igraph_vector_int_t *csize);
 
 IGRAPH_EXPORT igraph_error_t igraph_modularity(const igraph_t *graph,
-                                    const igraph_vector_t *membership,
+                                    const igraph_vector_int_t *membership,
                                     const igraph_vector_t *weights,
                                     const igraph_real_t resolution,
                                     const igraph_bool_t directed,
@@ -148,7 +148,7 @@ IGRAPH_EXPORT igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                                            igraph_matrix_t *modmat,
                                            igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_reindex_membership(igraph_vector_t *membership,
+IGRAPH_EXPORT igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
                                             igraph_vector_t *new_to_old,
                                             igraph_integer_t *nb_clusters);
 
@@ -187,7 +187,7 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
  */
 
 typedef igraph_error_t igraph_community_leading_eigenvector_callback_t(
-    const igraph_vector_t *membership,
+    const igraph_vector_int_t *membership,
     long int comm,
     igraph_real_t eigenvalue,
     const igraph_vector_t *eigenvector,
@@ -198,7 +198,7 @@ typedef igraph_error_t igraph_community_leading_eigenvector_callback_t(
 IGRAPH_EXPORT igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
                                                        const igraph_vector_t *weights,
                                                        igraph_matrix_t *merges,
-                                                       igraph_vector_t *membership,
+                                                       igraph_vector_int_t *membership,
                                                        igraph_integer_t steps,
                                                        igraph_arpack_options_t *options,
                                                        igraph_real_t *modularity,
@@ -211,11 +211,11 @@ IGRAPH_EXPORT igraph_error_t igraph_community_leading_eigenvector(const igraph_t
 
 IGRAPH_EXPORT igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                                      igraph_integer_t no_of_communities,
-                                                     igraph_vector_t *membership,
+                                                     igraph_vector_int_t *membership,
                                                      igraph_real_t *modularity);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
-                                                     igraph_vector_t *membership,
+                                                     igraph_vector_int_t *membership,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_t *initial,
                                                      igraph_vector_bool_t *fixed,
@@ -224,8 +224,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *
 IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               const igraph_vector_t *weights,
                                               const igraph_real_t resolution,
-                                              igraph_vector_t *membership,
-                                              igraph_matrix_t *memberships,
+                                              igraph_vector_int_t *membership,
+                                              igraph_matrix_int_t *memberships,
                                               igraph_vector_t *modularity);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
@@ -234,19 +234,19 @@ IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
                                           const igraph_real_t resolution_parameter,
                                           const igraph_real_t beta,
                                           const igraph_bool_t start,
-                                          igraph_vector_t *membership,
+                                          igraph_vector_int_t *membership,
                                           igraph_integer_t *nb_clusters,
                                           igraph_real_t *quality);
 /* -------------------------------------------------- */
 /* Community Structure Comparison                     */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_compare_communities(const igraph_vector_t *comm1,
-                                             const igraph_vector_t *comm2,
+IGRAPH_EXPORT igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
+                                             const igraph_vector_int_t *comm2,
                                              igraph_real_t* result,
                                              igraph_community_comparison_t method);
-IGRAPH_EXPORT igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
-                                             const igraph_vector_t *comm2,
+IGRAPH_EXPORT igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
+                                             const igraph_vector_int_t *comm2,
                                              igraph_integer_t* distance12,
                                              igraph_integer_t* distance21);
 

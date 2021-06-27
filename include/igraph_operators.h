@@ -60,7 +60,7 @@ IGRAPH_EXPORT igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *
 IGRAPH_EXPORT igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
                                  igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
 IGRAPH_EXPORT igraph_error_t igraph_contract_vertices(igraph_t *graph,
-                                           const igraph_vector_t *mapping,
+                                           const igraph_vector_int_t *mapping,
                                            const igraph_attribute_combination_t
                                      *vertex_comb);
 IGRAPH_EXPORT igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,

@@ -28,7 +28,8 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t membership, weights, initial;
+    igraph_vector_int_t membership;
+    igraph_vector_t weights, initial;
     igraph_vector_bool_t fixed;
     long int i;
 
@@ -55,7 +56,7 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(&g, &membership, 0, 0, 0,
                                        /*modularity=*/ 0);
 
@@ -95,7 +96,7 @@ int main() {
     igraph_vector_destroy(&initial);
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
 
     VERIFY_FINALLY_STACK();
 

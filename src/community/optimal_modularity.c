@@ -81,7 +81,7 @@
 
 igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
                                         igraph_real_t *modularity,
-                                        igraph_vector_t *membership,
+                                        igraph_vector_int_t *membership,
                                         const igraph_vector_t *weights) {
 
 #ifndef HAVE_GLPK
@@ -123,8 +123,8 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     /* Avoid problems with the null graph */
     if (no_of_nodes < 2) {
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 0);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
@@ -151,8 +151,8 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
             *modularity = IGRAPH_NAN;
         }
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_null(membership);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_null(membership);
         }
     }
 
@@ -256,7 +256,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
 
     if (membership) {
         long int comm = 0;   /* id of the last community that was found */
-        IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
 
             IGRAPH_ALLOW_INTERRUPTION();

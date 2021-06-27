@@ -468,12 +468,12 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
     igraph_vector_clear(res);
 
     if (vid < 0) { /* generate random spanning forest: consider each component separately */
-        igraph_vector_t membership, csize;
+        igraph_vector_int_t membership, csize;
         igraph_integer_t comp_count;
         igraph_integer_t i;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
 
         IGRAPH_CHECK(igraph_clusters(graph, &membership, &csize, &comp_count, IGRAPH_WEAK));
 
@@ -485,11 +485,11 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
                 ++j;
             }
 
-            IGRAPH_CHECK(igraph_i_lerw(graph, res, j, (igraph_integer_t) VECTOR(csize)[i], &visited, &il));
+            IGRAPH_CHECK(igraph_i_lerw(graph, res, j, VECTOR(csize)[i], &visited, &il));
         }
 
-        igraph_vector_destroy(&membership);
-        igraph_vector_destroy(&csize);
+        igraph_vector_int_destroy(&membership);
+        igraph_vector_int_destroy(&csize);
         IGRAPH_FINALLY_CLEAN(2);
     } else { /* consider the component containing vid */
         igraph_vector_t comp_vertices;

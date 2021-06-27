@@ -317,7 +317,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     long int next_extd_vertex_id = no_of_nodes;
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t no_of_components;  /* number of components of the original graph */
-    igraph_vector_t membership;         /* components of the original graph */
+    igraph_vector_int_t membership;         /* components of the original graph */
     igraph_vector_t extd_edgelist;   /* edge list of the extended graph */
     igraph_vector_t layers_own;  /* layer indices after having eliminated empty layers */
     igraph_real_t dx = 0, dx2 = 0; /* displacement of the current component on the X axis */
@@ -335,7 +335,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
-    IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&layer_to_y, 0);
 
     /* 1. Find a feedback arc set if we don't have a layering yet. If we do have
@@ -575,7 +575,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
     igraph_vector_destroy(&layers_own);
     igraph_vector_destroy(&layer_to_y);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     IGRAPH_FINALLY_CLEAN(3);
 
     if (extd_graph != 0) {

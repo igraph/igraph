@@ -31,10 +31,10 @@
 #include "test_utilities.inc"
 
 int test_all_st_cuts(const igraph_t *graph,
-                     long int source,
-                     long int target) {
+                     igraph_integer_t source,
+                     igraph_integer_t target) {
     igraph_vector_ptr_t cuts, partition1s;
-    long int n, i;
+    igraph_integer_t n, i;
 
     igraph_vector_ptr_init(&cuts, 0);
     igraph_vector_ptr_init(&partition1s, 0);
@@ -64,11 +64,11 @@ int test_all_st_cuts(const igraph_t *graph,
 int main() {
     igraph_t g;
     igraph_vector_ptr_t cuts, partition1s;
-    long int i, n;
+    igraph_integer_t i, n;
 
     igraph_marked_queue_t S;
     igraph_estack_t T;
-    long int v;
+    igraph_integer_t v;
     igraph_vector_t Isv;
 
     /* ----------------------------------------------------------- */
@@ -107,7 +107,7 @@ int main() {
                                &v, &Isv, NULL);
 
     /* Expected result: v=c, Isv={c,d,e,i} */
-    printf("%li; ", v);
+    printf("%" IGRAPH_PRId "; ", v);
     igraph_vector_print(&Isv);
 
     igraph_vector_destroy(&Isv);
@@ -129,7 +129,7 @@ int main() {
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
+    printf("%" IGRAPH_PRId "; ", v);
     igraph_vector_print(&Isv);
 
     igraph_vector_destroy(&Isv);
@@ -153,7 +153,7 @@ int main() {
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
+    printf("%" IGRAPH_PRId "; ", v);
     igraph_vector_print(&Isv);
 
     igraph_vector_destroy(&Isv);
@@ -177,7 +177,7 @@ int main() {
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
+    printf("%" IGRAPH_PRId "; ", v);
     igraph_vector_print(&Isv);
 
     igraph_vector_destroy(&Isv);
@@ -202,7 +202,7 @@ int main() {
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
+    printf("%" IGRAPH_PRId "; ", v);
     igraph_vector_print(&Isv);
 
     igraph_vector_destroy(&Isv);
@@ -227,7 +227,7 @@ int main() {
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
+    printf("%" IGRAPH_PRId "; ", v);
     igraph_vector_print(&Isv);
 
     igraph_vector_destroy(&Isv);

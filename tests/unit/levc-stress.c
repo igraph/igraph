@@ -35,7 +35,7 @@ int main() {
     for (k = 0; k < 20; k++) {
         igraph_t g;
         igraph_matrix_t merges;
-        igraph_vector_t membership;
+        igraph_vector_int_t membership;
         igraph_arpack_options_t options;
         double modularity;
         igraph_vector_t history;
@@ -45,7 +45,7 @@ int main() {
         fclose(DLFile);
 
         igraph_matrix_init(&merges, 0, 0);
-        igraph_vector_init(&membership, 0);
+        igraph_vector_int_init(&membership, 0);
         igraph_vector_init(&history, 0);
         igraph_arpack_options_init(&options);
 
@@ -58,7 +58,7 @@ int main() {
                                              /*callback_extra=*/ 0);
 
         igraph_vector_destroy(&history);
-        igraph_vector_destroy(&membership);
+        igraph_vector_int_destroy(&membership);
         igraph_matrix_destroy(&merges);
         igraph_destroy(&g);
     }

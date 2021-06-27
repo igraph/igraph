@@ -111,7 +111,7 @@
  * of edges.
  */
 igraph_error_t igraph_modularity(const igraph_t *graph,
-                      const igraph_vector_t *membership,
+                      const igraph_vector_int_t *membership,
                       const igraph_vector_t *weights,
                       const igraph_real_t resolution,
                       const igraph_bool_t directed,
@@ -127,7 +127,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_real_t directed_multiplier = (use_directed ? 1 : 2);
 
-    if (igraph_vector_size(membership) != igraph_vcount(graph)) {
+    if (igraph_vector_int_size(membership) != igraph_vcount(graph)) {
         IGRAPH_ERROR("Membership vector size differs from number of vertices.",
                      IGRAPH_EINVAL);
     }
@@ -147,9 +147,9 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     /* At this point, the 'membership' vector does not have length zero,
        thus it is safe to call igraph_vector_max() and min(). */
 
-    types = igraph_vector_max(membership) + 1;
+    types = igraph_vector_int_max(membership) + 1;
 
-    if (igraph_vector_min(membership) < 0) {
+    if (igraph_vector_int_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
     }
 

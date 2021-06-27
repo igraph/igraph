@@ -274,7 +274,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              const igraph_vector_t *e_weights,
                              const igraph_vector_t *v_weights,
                              int nb_trials,
-                             igraph_vector_t *membership,
+                             igraph_vector_int_t *membership,
                              igraph_real_t *codelength) {
 
     FlowGraph * fgraph = new FlowGraph(graph, e_weights, v_weights);
@@ -288,7 +288,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 
     // create membership vector
     igraph_integer_t Nnode = fgraph->Nnode;
-    IGRAPH_CHECK(igraph_vector_resize(membership, Nnode));
+    IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
 
     for (int trial = 0; trial < nb_trials; trial++) {
         cpy_fgraph = new FlowGraph(fgraph);

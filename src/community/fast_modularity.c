@@ -626,7 +626,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                 const igraph_vector_t *weights,
                                 igraph_matrix_t *merges,
                                 igraph_vector_t *modularity,
-                                igraph_vector_t *membership) {
+                                igraph_vector_int_t *membership) {
     igraph_integer_t no_of_edges, no_of_nodes, no_of_joins, total_joins;
     igraph_integer_t i, j, k, n, m, from, to, dummy, best_no_of_joins;
     igraph_integer_t ffrom, fto;

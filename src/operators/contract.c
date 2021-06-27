@@ -61,7 +61,7 @@ static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
  */
 
 igraph_error_t igraph_contract_vertices(igraph_t *graph,
-                             const igraph_vector_t *mapping,
+                             const igraph_vector_int_t *mapping,
                              const igraph_attribute_combination_t *vertex_comb) {
     igraph_vector_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -71,7 +71,7 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     long int e, last = -1;
     long int no_new_vertices;
 
-    if (igraph_vector_size(mapping) != no_of_nodes) {
+    if (igraph_vector_int_size(mapping) != no_of_nodes) {
         IGRAPH_ERROR("Invalid mapping vector length",
                      IGRAPH_EINVAL);
     }
@@ -80,7 +80,7 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
 
     if (no_of_nodes > 0) {
-        last = igraph_vector_max(mapping);
+        last = igraph_vector_int_max(mapping);
     }
 
     for (e = 0; e < no_of_edges; e++) {

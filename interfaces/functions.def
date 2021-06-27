@@ -1000,7 +1000,7 @@ igraph_laplacian:
 #######################################
 
 igraph_clusters:
-        PARAMS: GRAPH graph, OUT VECTOR membership, OUT VECTOR csize, \
+        PARAMS: GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR_INT csize, \
                 OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
         NAME-R: clusters
         IGNORE: RR
@@ -1293,20 +1293,20 @@ igraph_similarity_inverse_log_weighted:
 #######################################
 
 igraph_compare_communities:
-        PARAMS: VECTOR comm1, VECTOR comm2, OUT REALPTR res, \
+        PARAMS: VECTOR_INT comm1, VECTOR_INT comm2, OUT REALPTR res, \
                 COMMCMP method=VI
         IGNORE: RR, RNamespace
 
 igraph_community_spinglass:
         PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT REALPTR modularity,  \
-                OUT REALPTR temperature, OUT VECTOR membership, OUT VECTOR csize, \
+                OUT REALPTR temperature, OUT VECTOR_INT membership, OUT VECTOR_INT csize, \
                 INTEGER spins=25, BOOLEAN parupdate=False, REAL starttemp=1, REAL stoptemp=0.01, \
                 REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0, \
                 REAL gamma_minus=0, REAL d_p=0, REAL d_n=0
         IGNORE: RR, RC, RNamespace
 
 igraph_community_spinglass_single:
-        PARAMS: GRAPH graph, VECTOR_OR_0 weights, INTEGER vertex, OUT VECTOR community, \
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, INTEGER vertex, OUT VECTOR_INT community, \
                 OUT REALPTR cohesion, OUT REALPTR adhesion, \
                 OUT INTEGERPTR inner_links, OUT INTEGERPTR outer_links, \
                 INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
@@ -1314,13 +1314,13 @@ igraph_community_spinglass_single:
 
 igraph_community_walktrap:
         PARAMS: GRAPH graph, VECTOR weights, INT steps=4, OUT MATRIX merges, \
-                OUT VECTOR modularity, OUT VECTOR membership
+                OUT VECTOR modularity, OUT VECTOR_INT membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR edge_betweenness, \
                 OUT MATRIX merges, OUT VECTOR bridges, \
-                OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership, \
+                OUT VECTOR_OR_0 modularity, OUT VECTOR_INT_OR_0 membership, \
                 BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace
@@ -1328,27 +1328,27 @@ igraph_community_edge_betweenness:
 igraph_community_eb_get_merges:
         PARAMS: GRAPH graph, VECTOR edges, EDGEWEIGHTS weights=NULL, \
                 OUT MATRIX merges, OUT VECTOR bridges, \
-                OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership
+                OUT VECTOR_OR_0 modularity, OUT VECTOR_INT_OR_0 membership
         DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_community_fastgreedy:
-        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity, OUT VECTOR_OR_0 membership
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity, OUT VECTOR_INT_OR_0 membership
         IGNORE: RR, RC, RNamespace
 
 igraph_community_to_membership:
         PARAMS: GRAPH graph, MATRIX merges, INTEGER steps, \
-                OUT VECTOR membership, OUT VECTOR csize
+                OUT VECTOR_INT membership, OUT VECTOR_INT csize
         IGNORE: RR, RC, RNamespace
 
 igraph_le_community_to_membership:
-        PARAMS: MATRIX merges, INTEGER steps, INOUT VECTOR membership, \
-                OUT VECTOR_OR_0 csize
+        PARAMS: MATRIX merges, INTEGER steps, INOUT VECTOR_INT membership, \
+                OUT VECTOR_INT_OR_0 csize
         NAME-R: community.le.to.membership
         IGNORE: RR, RNamespace, RC
 
 igraph_modularity:
-        PARAMS: GRAPH graph, VECTOR membership, \
+        PARAMS: GRAPH graph, VECTOR_INT membership, \
                 IN VECTOR_OR_0 weights=NULL, \
                 REAL resolution=1.0, \
                 BOOLEAN directed=True,
@@ -1366,13 +1366,13 @@ igraph_modularity_matrix:
         IGNORE: RR
 
 igraph_reindex_membership:
-        PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
+        PARAMS: INOUT VECTOR_INT membership, OUT VECTOR_OR_0 new_to_old
         NAME-R: reindex.membership
         IGNORE: RNamespace, RR, RC
 
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
-                OUT MATRIX merges, OUT VECTOR membership, \
+                OUT MATRIX merges, OUT VECTOR_INT membership, \
                 INTEGER steps=-1, \
                 INOUT ARPACKOPT options=arpack_defaults, \
                 OUT REALPTR modularity, BOOLEAN start=False, \
@@ -1387,11 +1387,11 @@ igraph_community_leading_eigenvector:
 
 igraph_community_fluid_communities:
         PARAMS: GRAPH graph, INTEGER no_of_communities, \
-		            OUT VECTOR membership, OUT REALPTR modularity
+		            OUT VECTOR_INT membership, OUT REALPTR modularity
         NAME-R: cluster_fluid_communities
 
 igraph_community_label_propagation:
-        PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \
+        PARAMS: GRAPH graph, OUT VECTOR_INT membership, EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL, \
                 OUT REALPTR modularity
         DEPS: weights ON graph
@@ -1401,15 +1401,15 @@ igraph_community_label_propagation:
 igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 REAL resolution=1.0, \
-                OUT VECTOR membership, \
-		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
+                OUT VECTOR_INT membership, \
+		OUT MATRIX_INT_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
         NAME-R: cluster_louvain
         IGNORE: RR
 
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
-                OUT VECTOR_OR_0 membership, \
+                OUT VECTOR_INT_OR_0 membership, \
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
         NAME-R: cluster_optimal
@@ -1419,14 +1419,14 @@ igraph_community_leiden:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 VERTEXWEIGHTS vertex_weights=NULL, \
                 REAL resolution_parameter, REAL beta, \
-                BOOLEAN start, INOUT VECTOR_OR_0 membership, \
+                BOOLEAN start, INOUT VECTOR_INT_OR_0 membership, \
                 OUT INTEGERPTR nb_clusters, OUT REALPTR quality
         DEPS: weights ON graph, vertex_weights ON graph
         NAME-R: cluster_leiden
         IGNORE: RR
 
 igraph_split_join_distance:
-        PARAMS: VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12, \
+        PARAMS: VECTOR_INT comm1, VECTOR_INT comm2, OUT INTEGERPTR distance12, \
 		        OUT INTEGERPTR distance21
         NAME-R: split.join.distance
         IGNORE: RR, RNamespace
@@ -1470,7 +1470,7 @@ igraph_hrg_create:
 igraph_community_infomap:
         PARAMS: GRAPH graph, EDGEWEIGHTS e_weights=NULL, \
                 VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10, \
-                OUT VECTOR membership, OUT REALPTR codelength
+                OUT VECTOR_INT membership, OUT REALPTR codelength
         NAME-R: cluster_infomap
         DEPS: e_weights ON graph, v_weights ON graph
         IGNORE: RR

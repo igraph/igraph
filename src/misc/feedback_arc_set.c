@@ -451,14 +451,15 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_integer_t no_of_components;
     igraph_integer_t no_of_vertices = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_t membership, ordering, vertex_remapping;
+    igraph_vector_int_t membership;
+    igraph_vector_t ordering, vertex_remapping;
     igraph_vector_ptr_t vertices_by_components, edges_by_components;
     igraph_integer_t i, j, k, l, m, n, from, to, no_of_rows;
     igraph_real_t weight;
     glp_prob *ip;
     glp_iocp parm;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&ordering, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_remapping, no_of_vertices);
 
@@ -668,7 +669,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_vector_ptr_destroy_all(&edges_by_components);
     igraph_vector_destroy(&vertex_remapping);
     igraph_vector_destroy(&ordering);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;

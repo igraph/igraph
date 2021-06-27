@@ -24,11 +24,11 @@
 
 #include <igraph.h>
 
-void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *memberships, igraph_vector_t *modularity, FILE* f) {
+void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_int_t *memberships, igraph_vector_t *modularity, FILE* f) {
     igraph_integer_t i, j, no_of_nodes = igraph_vcount(g);
 
     j = igraph_vector_which_max(modularity);
-    for (i = 0; i < igraph_vector_size(membership); i++) {
+    for (i = 0; i < igraph_vector_int_size(membership); i++) {
         if (VECTOR(*membership)[i] != MATRIX(*memberships, j, i)) {
             fprintf(f, "WARNING: best membership vector element %" IGRAPH_PRId " does not match the best one in the membership matrix\n", i);
         }
@@ -37,7 +37,7 @@ void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *mem
     fprintf(f, "Modularities:\n");
     igraph_vector_print(modularity);
 
-    for (i = 0; i < igraph_matrix_nrow(memberships); i++) {
+    for (i = 0; i < igraph_matrix_int_nrow(memberships); i++) {
         for (j = 0; j < no_of_nodes; j++) {
             fprintf(f, "%ld ", (long int)MATRIX(*memberships, i, j));
         }
@@ -49,13 +49,14 @@ void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *mem
 
 int main() {
     igraph_t g;
-    igraph_vector_t modularity, membership, edges;
-    igraph_matrix_t memberships;
+    igraph_vector_t modularity, edges;
+    igraph_vector_int_t membership;
+    igraph_matrix_int_t memberships;
     int i, j, k;
 
     igraph_vector_init(&modularity, 0);
-    igraph_vector_init(&membership, 0);
-    igraph_matrix_init(&memberships, 0, 0);
+    igraph_vector_int_init(&membership, 0);
+    igraph_matrix_int_init(&memberships, 0, 0);
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -102,9 +103,9 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&modularity);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&edges);
-    igraph_matrix_destroy(&memberships);
+    igraph_matrix_int_destroy(&memberships);
 
     return 0;
 }

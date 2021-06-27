@@ -25,7 +25,8 @@
 
 int main() {
     igraph_t graph;
-    igraph_vector_t membership, degree;
+    igraph_vector_int_t membership;
+    igraph_vector_t degree;
     igraph_integer_t nb_clusters;
     igraph_real_t quality;
 
@@ -39,12 +40,12 @@ int main() {
                  0, 5, -1);
 
     /* Perform Leiden algorithm using CPM */
-    igraph_vector_init(&membership, igraph_vcount(&graph));
+    igraph_vector_int_init(&membership, igraph_vcount(&graph));
     igraph_community_leiden(&graph, NULL, NULL, 0.05, 0.01, 0, &membership, &nb_clusters, &quality);
 
     printf("Leiden found %" IGRAPH_PRId " clusters using CPM (resolution parameter 0.05), quality is %.4f.\n", nb_clusters, quality);
     printf("Membership: ");
-    igraph_vector_print(&membership);
+    igraph_vector_int_print(&membership);
     printf("\n");
 
     /* Start from existing membership to improve it further */
@@ -52,7 +53,7 @@ int main() {
 
     printf("Iterated Leiden, using CPM (resolution parameter 0.05), quality is %.4f.\n", quality);
     printf("Membership: ");
-    igraph_vector_print(&membership);
+    igraph_vector_int_print(&membership);
     printf("\n");
 
     /* Initialize degree vector to use for optimizing modularity */
@@ -64,11 +65,11 @@ int main() {
 
     printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
     printf("Membership: ");
-    igraph_vector_print(&membership);
+    igraph_vector_int_print(&membership);
     printf("\n");
 
     igraph_vector_destroy(&degree);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_destroy(&graph);
 
     return 0;
