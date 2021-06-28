@@ -33,8 +33,8 @@
 int vector_tail_cmp(const void *path1, const void *path2) {
     const igraph_vector_t *vec1 = *(const igraph_vector_t**)path1;
     const igraph_vector_t *vec2 = *(const igraph_vector_t**)path2;
-    size_t length1 = igraph_vector_size(vec1);
-    size_t length2 = igraph_vector_size(vec2);
+    igraph_integer_t length1 = igraph_vector_size(vec1);
+    igraph_integer_t length2 = igraph_vector_size(vec2);
     int diff;
 
     while (length1 > 0 && length2 > 0) {
@@ -85,9 +85,9 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
 
     igraph_vit_create(graph, vs, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        long int node = IGRAPH_VIT_GET(vit);
+        igraph_integer_t node = IGRAPH_VIT_GET(vit);
         if (VECTOR(*nrgeo)[node] - VECTOR(nrgeo2)[node]) {
-            printf("nrgeo[%ld] invalid, observed = %ld, expected = %ld\n",
+            printf("nrgeo[%" IGRAPH_PRId "] invalid, observed = %ld, expected = %ld\n",
                    node, (long int)VECTOR(*nrgeo)[node], (long int)VECTOR(nrgeo2)[node]);
         }
     }
@@ -112,7 +112,6 @@ int main() {
 
     igraph_t g;
     igraph_vector_ptr_t vertices, edges;
-    long int i;
 
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
@@ -194,7 +193,7 @@ int main() {
     igraph_destroy(&g);
 
     /* Regular lattice with some heavyweight edges */
-    igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(igraph_integer_t));
     igraph_lattice(&g, &dim_vec, 1, 0, 0, 0);
     igraph_vs_vector_small(&vs, 3, 12, 15, -1);
     igraph_vector_init(&weights_vec, 24);
