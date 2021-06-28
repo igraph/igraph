@@ -174,13 +174,13 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                                          igraph_vector_t *multiplicity) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_integer_t remaining_nodes = 0;
     igraph_vector_int_t vertex_perm, vertex_index;
     igraph_vector_t edges;
     igraph_adjlist_t adjlist;
     igraph_vector_int_t *neis1, *neis2;
-    long int neilen1, neilen2;
+    igraph_integer_t neilen1, neilen2;
     igraph_vector_int_t added;
     igraph_vector_t mult;
 
@@ -218,7 +218,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
             neis1 = igraph_adjlist_get(&adjlist, i);
             neilen1 = igraph_vector_int_size(neis1);
             for (j = 0; j < neilen1; j++) {
-                long int nei = VECTOR(*neis1)[j];
+                igraph_integer_t nei = VECTOR(*neis1)[j];
                 if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                     IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
                                  IGRAPH_EINVAL);
@@ -226,7 +226,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                 neis2 = igraph_adjlist_get(&adjlist, nei);
                 neilen2 = igraph_vector_int_size(neis2);
                 for (k = 0; k < neilen2; k++) {
-                    long int nei2 = VECTOR(*neis2)[k], new_nei2;
+                    igraph_integer_t nei2 = VECTOR(*neis2)[k], new_nei2;
                     if (nei2 <= i) {
                         continue;
                     }
@@ -257,11 +257,11 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                 /* OK, we need to go through all the edges added for vertex new_i
                    and check their multiplicity */
                 igraph_integer_t now = igraph_vector_size(&edges);
-                long int from = now - iedges * 2;
+                igraph_integer_t from = now - iedges * 2;
                 for (j = from; j < now; j += 2) {
-                    long int nei2 = VECTOR(edges)[j + 1];
+                    igraph_integer_t nei2 = VECTOR(edges)[j + 1];
                     igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2] - 1;
-                    long int m = VECTOR(mult)[nei2];
+                    igraph_integer_t m = VECTOR(mult)[nei2];
                     VECTOR(edges)[j + 1] = new_nei2;
                     IGRAPH_CHECK(igraph_vector_push_back(multiplicity, m));
                 }

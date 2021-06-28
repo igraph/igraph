@@ -39,7 +39,7 @@ void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
 
 igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_t *from,
-                                    long int size) {
+                                    igraph_integer_t size) {
 
     igraph_vector_t sizes;
     igraph_integer_t i, no = igraph_vector_size(from);

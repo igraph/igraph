@@ -258,7 +258,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Exclude the node from further searches */
             VECTOR(indegrees)[i] = VECTOR(outdegrees)[i] = -1;
             /* Get the neighbors and decrease their degrees */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_incident(graph, &neis, i,
                                          IGRAPH_OUT));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
@@ -290,7 +290,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Exclude the node from further searches */
             VECTOR(indegrees)[i] = VECTOR(outdegrees)[i] = -1;
             /* Get the neighbors and decrease their degrees */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_incident(graph, &neis, i,
                                          IGRAPH_IN));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
@@ -326,7 +326,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Remove vertex v */
             ordering[v] = order_next_pos++;
             /* Remove outgoing edges */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) v,
+            IGRAPH_CHECK(igraph_incident(graph, &neis, v,
                                          IGRAPH_OUT));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {
@@ -343,7 +343,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 }
             }
             /* Remove incoming edges */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) v,
+            IGRAPH_CHECK(igraph_incident(graph, &neis, v,
                                          IGRAPH_IN));
             j = igraph_vector_size(&neis);
             for (i = 0; i < j; i++) {

@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
-    long int i, j;
+    igraph_integer_t i, j;
 
     igraph_vector_clear(res);
 
@@ -241,13 +241,13 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
         already_added[i] = 1;
         IGRAPH_CHECK(igraph_dqueue_push(&q, i));
         while (! igraph_dqueue_empty(&q)) {
-            long int tmp_size;
-            long int act_node = igraph_dqueue_pop(&q);
-            IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act_node,
+            igraph_integer_t tmp_size;
+            igraph_integer_t act_node = igraph_dqueue_pop(&q);
+            IGRAPH_CHECK(igraph_incident(graph, &tmp, act_node,
                                          IGRAPH_ALL));
             tmp_size = igraph_vector_size(&tmp);
             for (j = 0; j < tmp_size; j++) {
-                long int edge = VECTOR(tmp)[j];
+                igraph_integer_t edge = VECTOR(tmp)[j];
                 if (added_edges[edge] == 0) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
                     if (already_added[to] == 0) {
@@ -283,7 +283,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
     igraph_vector_t adj;
 
-    long int i, j;
+    igraph_integer_t i, j;
 
     igraph_vector_clear(res);
 
@@ -310,7 +310,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
-        long int adj_size;
+        igraph_integer_t adj_size;
         if (already_added[i] > 0) {
             continue;
         }
@@ -318,7 +318,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
         already_added[i] = 1;
         /* add all edges of the first vertex */
-        igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
+        igraph_incident(graph, &adj, i, (igraph_neimode_t) mode);
         adj_size = igraph_vector_size(&adj);
         for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
@@ -350,7 +350,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
                     adj_size = igraph_vector_size(&adj);
                     for (j = 0; j < adj_size; j++) {
-                        long int edgeno = VECTOR(adj)[j];
+                        igraph_integer_t edgeno = VECTOR(adj)[j];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, to);
                         if (already_added[neighbor] == 0) {
                             IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
@@ -393,7 +393,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_t *res,
     visited_count = 1;
 
     while (visited_count < comp_size) {
-        long degree, edge;
+        igraph_integer_t degree, edge;
         igraph_vector_int_t *edges;
 
         edges = igraph_inclist_get(il, start);
@@ -498,7 +498,7 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
         /* we measure the size of the component */
         IGRAPH_VECTOR_INIT_FINALLY(&comp_vertices, 0);
         IGRAPH_CHECK(igraph_subcomponent(graph, &comp_vertices, vid, IGRAPH_ALL));
-        comp_size = (igraph_integer_t) igraph_vector_size(&comp_vertices);
+        comp_size = igraph_vector_size(&comp_vertices);
         igraph_vector_destroy(&comp_vertices);
         IGRAPH_FINALLY_CLEAN(1);
 

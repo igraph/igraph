@@ -163,7 +163,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
     igraph_neimode_t mode0;
-    long int i, no_of_nodes;
+    igraph_integer_t i, no_of_nodes;
 
     switch (mode) {
     case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
@@ -193,8 +193,8 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int no_of_vids;
-    long int from, i, j, k, l, u, v;
+    igraph_integer_t no_of_vids;
+    igraph_integer_t from, i, j, k, l, u, v;
     igraph_vector_t neis = IGRAPH_VECTOR_NULL;
     igraph_vector_t vid_reverse_index;
     igraph_vit_t vit;
@@ -634,7 +634,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  */
 igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
                            const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
-    long int i, j, nr, nc;
+    igraph_integer_t i, j, nr, nc;
 
     IGRAPH_CHECK(igraph_similarity_jaccard(graph, res, vids, mode, loops));
 
@@ -703,7 +703,7 @@ igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *re
  */
 igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
-    long int i, n;
+    igraph_integer_t i, n;
 
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, pairs, mode, loops));
     n = igraph_vector_size(res);
@@ -768,7 +768,7 @@ igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector
  */
 igraph_error_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
-    long int i, n;
+    igraph_integer_t i, n;
 
     IGRAPH_CHECK(igraph_similarity_jaccard_es(graph, res, es, mode, loops));
     n = igraph_vector_size(res);

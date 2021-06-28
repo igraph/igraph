@@ -56,7 +56,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
                         igraph_integer_t binwidth) {
 
     double sum = 0;
-    long int i;
+    igraph_integer_t i;
 
     /* Check */
     if (igraph_vector_size(data) < binwidth) {
@@ -224,11 +224,7 @@ igraph_error_t igraph_convex_hull(
                  (MATRIX(*data, next_idx, 0) - MATRIX(*data, before_last_idx, 0)) *
                  (MATRIX(*data, last_idx, 1) - MATRIX(*data, before_last_idx, 1));
         }
-        /*
-        printf("B L N cp: %ld, %ld, %ld, %f [", before_last_idx, last_idx, next_idx, (float)cp);
-        for (int k=0; k<j; k++) printf("%ld ", (long)VECTOR(stack)[k]);
-        printf("]\n");
-        */
+
         if (cp < 0) {
             /* We are turning into the right direction */
             igraph_vector_int_pop_back(&order);
@@ -358,7 +354,7 @@ igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_re
     if (discrete) {
         /* Does the vector contain discrete values only? */
         for (i = 0; i < n; i++) {
-            if ((long int)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
+            if ((igraph_integer_t)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
                 discrete = 0;
                 break;
             }

@@ -287,7 +287,7 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
  *
  * \deprecated-by igraph_sparsemat_entry 0.10.0
  */
-igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
+igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_integer_t row, igraph_integer_t col,
                           igraph_real_t value) {
     long int start, end;
 
@@ -417,7 +417,7 @@ igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to,
  * \deprecated-by igraph_sparsemat_resize 0.10.0
  */
 
-igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
+igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     long int i, j, ci, ei, mincol;
     IGRAPH_ASSERT(m != NULL);
     /* Iterating through the matrix data and deleting unnecessary data. */

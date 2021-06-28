@@ -84,8 +84,8 @@ igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
                                        const igraph_vector_int_t *rank) {
 
-    long int i;
-    long int n = il->length;
+    igraph_integer_t i;
+    igraph_integer_t n = il->length;
     igraph_vector_int_t mark;
     igraph_vector_int_init(&mark, n);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
@@ -96,7 +96,7 @@ static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_
         igraph_integer_t irank = VECTOR(*rank)[i];
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            long int edge = VECTOR(*v)[j];
+            igraph_integer_t edge = VECTOR(*v)[j];
             igraph_integer_t e = IGRAPH_OTHER(graph, edge, i);
             if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
@@ -256,12 +256,12 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
                                             const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int node, i, j, nn;
+    igraph_integer_t node, i, j, nn;
     igraph_inclist_t allinc;
     igraph_vector_int_t *neis1, *neis2;
-    long int neilen1, neilen2;
-    long int *neis;
-    long int maxdegree;
+    igraph_integer_t neilen1, neilen2;
+    igraph_integer_t *neis;
+    igraph_integer_t maxdegree;
 
     igraph_vector_int_t order;
     igraph_vector_int_t rank;
@@ -289,7 +289,7 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_inclist_destroy, &allinc);
     IGRAPH_CHECK(igraph_i_trans4_il_simplify(graph, &allinc, &rank));
 
-    neis = IGRAPH_CALLOC(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
         IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
     }
@@ -315,13 +315,13 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
         }
 
         for (i = 0; i < neilen1; i++) {
-            long int edge = VECTOR(*neis1)[i];
+            igraph_integer_t edge = VECTOR(*neis1)[i];
             igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
             igraph_real_t w = VECTOR(*weights)[edge];
             neis2 = igraph_inclist_get(&allinc, nei);
             neilen2 = igraph_vector_int_size(neis2);
             for (j = 0; j < neilen2; j++) {
-                long int edge2 = VECTOR(*neis2)[j];
+                igraph_integer_t edge2 = VECTOR(*neis2)[j];
                 igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge2, nei);
                 igraph_real_t w2 = VECTOR(*weights)[edge2];
                 if (neis[nei2] == node + 1) {

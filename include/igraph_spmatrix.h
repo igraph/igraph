@@ -61,12 +61,12 @@ typedef struct s_spmatrix {
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol);
 IGRAPH_EXPORT IGRAPH_DEPRECATED void igraph_spmatrix_destroy(igraph_spmatrix_t *m);
 /* igraph_spmatrix_resize not marked as deprecated yet because igraph_get_adjacency_sparse() uses it */
-IGRAPH_EXPORT igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol);
+IGRAPH_EXPORT igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_integer_t nrow, igraph_integer_t ncol);
 /* igraph_spmatrix_e not marked as deprecated yet because igraph_get_adjacency_sparse() uses it */
 IGRAPH_EXPORT igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m, long int row, long int col);
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
                                       igraph_real_t value);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_integer_t row, igraph_integer_t col,
                                         igraph_real_t value);
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from);
 IGRAPH_EXPORT IGRAPH_DEPRECATED long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m);

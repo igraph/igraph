@@ -66,9 +66,9 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int no_of_types;
+    igraph_integer_t no_of_types;
     igraph_vector_t ai, bi, eii;
-    long int e, i;
+    igraph_integer_t e, i;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
 
     if (igraph_vector_size(types) != no_of_nodes) {
@@ -89,8 +89,8 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     for (e = 0; e < no_of_edges; e++) {
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
-        long int from_type = VECTOR(*types)[from];
-        long int to_type = VECTOR(*types)[to];
+        igraph_integer_t from_type = VECTOR(*types)[from];
+        igraph_integer_t to_type = VECTOR(*types)[to];
 
         VECTOR(ai)[from_type] += 1;
         VECTOR(bi)[to_type] += 1;
@@ -177,7 +177,7 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int e;
+    igraph_integer_t e;
 
     directed = directed && igraph_is_directed(graph);
 

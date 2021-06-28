@@ -100,7 +100,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
 
         /* increment number of coloured neighbours for each neighbour of vertex */
         for (i = 0; i < neigh_count; ++i) {
-            long idx = VECTOR(*neighbors)[i];
+            igraph_integer_t idx = VECTOR(*neighbors)[i];
             if (igraph_2wheap_has_elem(&cn, idx)) {
                 igraph_2wheap_modify(&cn, idx, igraph_2wheap_get(&cn, idx) + 1);
             }
