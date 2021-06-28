@@ -33,7 +33,7 @@ void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn,
 
     printf("Diameter: ");
     print_real(stdout, result, "%g");
-    printf(", from %d to %d\n", from, to);
+    printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", from, to);
     printf("Edges:\n");
     print_vector_round(&path_edge);
     printf("Vertices:\n");

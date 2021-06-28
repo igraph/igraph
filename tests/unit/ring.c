@@ -98,8 +98,7 @@ ring_test_t *all_checks[] = { /*  1 */ &ring_uc_6,   /*  2 */ &ring_uc_0,
                                        0
                             };
 
-int check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
-                          igraph_bool_t mutual, igraph_bool_t circular) {
+int check_ring_properties(const igraph_t *ring, igraph_bool_t circular) {
 
     igraph_bool_t res;
 
@@ -140,8 +139,7 @@ int check_ring(const ring_test_t *test) {
     igraph_ring(&graph, test->n, test->directed, test->mutual, test->circular);
 
     /* Check its properties */
-    if ((ret = check_ring_properties(&graph, test->directed, test->mutual,
-                                     test->circular))) {
+    if ((ret = check_ring_properties(&graph, test->circular))) {
         return ret;
     }
 

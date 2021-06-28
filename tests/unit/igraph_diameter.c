@@ -50,7 +50,7 @@ int main() {
     igraph_vector_init(&path_edge, 0);
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
     igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %d to %d\n", result,
+    printf("diameter: %g, from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", result,
             from, to);
     print_vector_round(&path_vertex);
     print_vector_round(&path_edge);

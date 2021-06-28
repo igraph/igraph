@@ -65,8 +65,8 @@ void test_bug950_edge() {
 int main() {
     igraph_t g;
     igraph_es_t es;
-    igraph_vector_t eb, node_vec, source_vec, target_vec, bet, bet2, weights, edges;
-    igraph_vs_t vs, vs_source, vs_target;
+    igraph_vector_t eb, node_vec, source_vec, target_vec, bet, bet2, weights;
+    igraph_vs_t vs_source, vs_target;
     long int i, n;
 
     /* edge betweenness test */

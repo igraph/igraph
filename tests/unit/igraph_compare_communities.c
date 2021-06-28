@@ -28,7 +28,7 @@ char *names[] = {
 };
 
 
-void compare_and_print(igraph_vector_int_t *comm1, igraph_vector_int_t *comm2, igraph_community_comparison_t t, igraph_error_type_t e) {
+void compare_and_print(igraph_vector_int_t *comm1, igraph_vector_int_t *comm2, igraph_community_comparison_t t, igraph_error_t e) {
     igraph_real_t result;
     printf("%s result: ", names[t]);
     IGRAPH_ASSERT(igraph_compare_communities(comm1, comm2, &result, t) == e);

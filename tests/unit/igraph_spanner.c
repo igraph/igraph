@@ -24,8 +24,6 @@
 void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igraph_vector_t *weights) {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
-    long int i;
-    igraph_es_t edges;
     igraph_t spanner_graph;
     igraph_vector_t spanner_weights;
     igraph_matrix_t res_spanner, res_graph;
@@ -81,7 +79,7 @@ void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igr
 int main () {
     igraph_t graph;
     igraph_vector_t spanner, weights;
-    long int no_of_nodes, no_of_edges, no_of_edges_spanner;
+    long int no_of_edges;
 
     /* Initialize attribute handler; we will use edge attributes in test_spanner() */
     igraph_set_attribute_table(&igraph_cattribute_table);

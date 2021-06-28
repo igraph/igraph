@@ -152,7 +152,6 @@ int test_adjlist_from_inclist() {
     igraph_t g;
     igraph_inclist_t inclist;
     igraph_adjlist_t adjlist;
-    igraph_lazy_inclist_t lazy_inclist;
 
     igraph_small(
         &g, 5, /* directed = */ 1,

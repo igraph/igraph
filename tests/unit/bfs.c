@@ -31,7 +31,13 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
                            igraph_integer_t rank,
                            igraph_integer_t dist,
                            void *extra) {
-    printf(" %li", (long int) vid);
+    IGRAPH_UNUSED(graph);
+    IGRAPH_UNUSED(pred);
+    IGRAPH_UNUSED(succ);
+    IGRAPH_UNUSED(rank);
+    IGRAPH_UNUSED(dist);
+    IGRAPH_UNUSED(extra);
+    printf(" %" IGRAPH_PRId, vid);
     return 0;
 }
 

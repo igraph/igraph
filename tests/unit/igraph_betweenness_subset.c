@@ -22,10 +22,9 @@
 
 int main() {
     igraph_t g;
-    igraph_es_t es;
-    igraph_vector_t eb, node_vec, source_vec, target_vec, bet, bet2, weights, edges;
+    igraph_vector_t node_vec, source_vec, target_vec, bet, bet2, weights, edges;
     igraph_vs_t vs, vs_source, vs_target;
-    long int i, vid, n;
+    long int i, n;
 
     igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,

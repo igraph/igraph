@@ -103,11 +103,7 @@ lat_test_t *all_checks[] = { /*  1 */ &lat_u_0,   /*  2 */ &lat_u_01,
                                       0
                            };
 
-int check_lattice_properties(const igraph_t *lattice,
-                             const igraph_vector_int_t *dim,
-                             igraph_bool_t directed,
-                             igraph_bool_t mutual,
-                             igraph_bool_t circular) {
+int check_lattice_properties(const igraph_t *lattice) {
     igraph_bool_t res;
 
     /* Connected */
@@ -141,8 +137,7 @@ int check_lattice(const lat_test_t *test) {
                    test->mutual, test->circular);
 
     /* Check its properties */
-    if ((ret = check_lattice_properties(&graph, &dimvector, test->directed,
-                                        test->mutual, test->circular))) {
+    if ((ret = check_lattice_properties(&graph))) {
         igraph_destroy(&graph);
         printf("Lattice properties are not satisfied\n");
         return ret;

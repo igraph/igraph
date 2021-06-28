@@ -27,6 +27,10 @@
 
 void igraph_warnings_ignore(const char *reason, const char *file,
                             int line, int igraph_errno) {
+    IGRAPH_UNUSED(reason);
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
+    IGRAPH_UNUSED(igraph_errno);
     /* Do nothing */
 }
 

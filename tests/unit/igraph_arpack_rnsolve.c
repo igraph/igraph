@@ -30,6 +30,7 @@ typedef struct cb2_data_t {
 } cb2_data_t;
 
 int cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *extra) {
+    IGRAPH_UNUSED(n);
     cb2_data_t *data = (cb2_data_t*) extra;
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
                                            data->A, from, /*beta=*/ 0.0, to);
