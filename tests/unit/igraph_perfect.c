@@ -68,15 +68,15 @@ int main() {
 
     // 4X4 grid
     //==========================================================
-    igraph_vector_t dims;
-    igraph_vector_init(&dims, 2);
+    igraph_vector_int_t dims;
+    igraph_vector_int_init(&dims, 2);
     VECTOR(dims)[0] = 4;
     VECTOR(dims)[1] = 4;
     igraph_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
-    igraph_vector_destroy(&dims);
+    igraph_vector_int_destroy(&dims);
 
     // Paley graph of order 9
     //==========================================================

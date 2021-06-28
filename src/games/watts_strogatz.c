@@ -65,7 +65,7 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                                igraph_real_t p, igraph_bool_t loops,
                                igraph_bool_t multiple) {
 
-    igraph_vector_t dimvector;
+    igraph_vector_int_t dimvector;
     igraph_integer_t i;
 
     if (dim < 1) {
@@ -82,14 +82,14 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 
     /* Create the lattice first */
 
-    IGRAPH_VECTOR_INIT_FINALLY(&dimvector, dim);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dimvector, dim);
     for (i = 0; i < dim; i++) {
         VECTOR(dimvector)[i] = size;
     }
 
     IGRAPH_CHECK(igraph_lattice(graph, &dimvector, nei, IGRAPH_UNDIRECTED,
                                 0 /* mutual */, 1 /* circular */));
-    igraph_vector_destroy(&dimvector);
+    igraph_vector_int_destroy(&dimvector);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, graph);
 

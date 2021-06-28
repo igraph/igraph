@@ -116,9 +116,10 @@ int main() {
 
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
-    igraph_real_t dim[] = { 4, 4 };
+    igraph_integer_t dim[] = { 4, 4 };
 
-    igraph_vector_t weights_vec, dim_vec, nrgeo;
+    igraph_vector_t weights_vec, nrgeo;
+    igraph_vector_int_t dim_vec;
     igraph_vs_t vs;
 
     igraph_vector_init(&nrgeo, 0);
@@ -193,7 +194,7 @@ int main() {
     igraph_destroy(&g);
 
     /* Regular lattice with some heavyweight edges */
-    igraph_vector_view(&dim_vec, dim, sizeof(dim) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(igraph_real_t));
     igraph_lattice(&g, &dim_vec, 1, 0, 0, 0);
     igraph_vs_vector_small(&vs, 3, 12, 15, -1);
     igraph_vector_init(&weights_vec, 24);

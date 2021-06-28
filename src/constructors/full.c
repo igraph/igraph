@@ -64,7 +64,7 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
                 igraph_bool_t loops) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int i, j;
+    igraph_integer_t i, j;
 
     if (n < 0) {
         IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
@@ -137,7 +137,7 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                          igraph_bool_t directed) {
     igraph_vector_t edges;
-    long int i, j, ptr = 0;
+    igraph_integer_t i, j, ptr = 0;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, n * (n - 1));
     for (i = 1; i < n; i++) {

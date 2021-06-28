@@ -31,10 +31,10 @@
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
 static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_vector_t adjedges, adjedges2;
     igraph_vector_t edges;
-    long int prev = -1;
+    igraph_integer_t prev = -1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&adjedges, 0);
@@ -52,7 +52,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
         }
         n = igraph_vector_size(&adjedges);
         for (j = 0; j < n; j++) {
-            long int e = VECTOR(adjedges)[j];
+            igraph_integer_t e = VECTOR(adjedges)[j];
             if (e < i) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
@@ -63,7 +63,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
                                      IGRAPH_ALL));
         n = igraph_vector_size(&adjedges2);
         for (j = 0; j < n; j++) {
-            long int e = VECTOR(adjedges2)[j];
+            igraph_integer_t e = VECTOR(adjedges2)[j];
             if (e < i) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
@@ -87,10 +87,10 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
 
 static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_vector_t adjedges;
     igraph_vector_t edges;
-    long int prev = -1;
+    igraph_integer_t prev = -1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&adjedges, 0);
@@ -106,7 +106,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
         }
         n = igraph_vector_size(&adjedges);
         for (j = 0; j < n; j++) {
-            long int e = VECTOR(adjedges)[j];
+            igraph_integer_t e = VECTOR(adjedges)[j];
             IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
             IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
         }

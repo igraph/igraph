@@ -294,9 +294,9 @@ int main() {
     printf("==========================================================\n");
 
     {
-        igraph_vector_t dims;
+        igraph_vector_int_t dims;
 
-        igraph_vector_init(&dims, 2);
+        igraph_vector_int_init(&dims, 2);
         VECTOR(dims)[0] = 37;
         VECTOR(dims)[1] = 37;
 
@@ -308,7 +308,7 @@ int main() {
 
         igraph_vector_destroy(&bet);
         igraph_destroy(&g);
-        igraph_vector_destroy(&dims);
+        igraph_vector_int_destroy(&dims);
     }
 
     VERIFY_FINALLY_STACK();

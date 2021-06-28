@@ -90,6 +90,9 @@
    argument instead of an `int`. In practice, it has always been treated as a
    boolean.
 
+  - The dimension vector parameter for `igraph_lattice()` is now an
+    `igraph_vector_int_t` instead of `igraph_vector_t`.
+
  - Functions that used an `igraph_vector_t` to represent cluster size
    and cluster membership now use an `igraph_vector_int_t` instead. These are:
    - `igraph_clusters()`

@@ -58,10 +58,10 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     /* m - number of symbols */
     /* n - length of strings */
 
-    long int no_of_nodes, no_of_edges;
+    igraph_integer_t no_of_nodes, no_of_edges;
     igraph_vector_t edges;
-    long int i, j;
-    long int mm = m;
+    igraph_integer_t i, j;
+    igraph_integer_t mm = m;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph",
@@ -82,7 +82,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
 
     for (i = 0; i < no_of_nodes; i++) {
-        long int basis = (i * mm) % no_of_nodes;
+        igraph_integer_t basis = (i * mm) % no_of_nodes;
         for (j = 0; j < m; j++) {
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, basis + j);

@@ -53,10 +53,10 @@
 igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
     igraph_vector_int_t degree;
     igraph_vector_t edges;
-    long n;
-    long i, k;
-    long u, v; /* vertices */
-    long ec;
+    igraph_integer_t n;
+    igraph_integer_t i, k;
+    igraph_integer_t u, v; /* vertices */
+    igraph_integer_t ec;
 
     n = igraph_vector_int_size(prufer) + 2;
 
@@ -65,7 +65,7 @@ igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *pr
 
     /* build out-degree vector (i.e. number of child vertices) and verify Prufer sequence */
     for (i = 0; i < n - 2; ++i) {
-        long u = VECTOR(*prufer)[i];
+        igraph_integer_t u = VECTOR(*prufer)[i];
         if (u >= n || u < 0) {
             IGRAPH_ERROR("Invalid Prufer sequence", IGRAPH_EINVAL);
         }

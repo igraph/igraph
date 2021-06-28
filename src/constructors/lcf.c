@@ -49,9 +49,9 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 
     igraph_vector_t edges;
     igraph_integer_t no_of_shifts = igraph_vector_size(shifts);
-    long int ptr = 0, i, sptr = 0;
-    long int no_of_nodes = n;
-    long int no_of_edges = n + no_of_shifts * repeats;
+    igraph_integer_t ptr = 0, i, sptr = 0;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_edges = n + no_of_shifts * repeats;
 
     if (repeats < 0) {
         IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
@@ -69,9 +69,9 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 
     /* Then add the rest */
     while (ptr < 2 * no_of_edges) {
-        long int sh = VECTOR(*shifts)[sptr % no_of_shifts];
-        long int from = sptr % no_of_nodes;
-        long int to = (no_of_nodes + sptr + sh) % no_of_nodes;
+        igraph_integer_t sh = VECTOR(*shifts)[sptr % no_of_shifts];
+        igraph_integer_t from = sptr % no_of_nodes;
+        igraph_integer_t to = (no_of_nodes + sptr + sh) % no_of_nodes;
         VECTOR(edges)[ptr++] = from;
         VECTOR(edges)[ptr++] = to;
         sptr++;

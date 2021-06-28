@@ -253,8 +253,8 @@ const igraph_real_t igraph_i_famous_zachary[] = {
 };
 
 static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
-    long int no_of_nodes = data[0];
-    long int no_of_edges = data[1];
+    igraph_integer_t no_of_nodes = data[0];
+    igraph_integer_t no_of_edges = data[1];
     igraph_bool_t directed = (igraph_bool_t) data[2];
     igraph_vector_t edges;
 
