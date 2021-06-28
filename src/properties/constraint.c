@@ -80,8 +80,8 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
-    long int nodes_to_calc;
-    long int a, b, c, i, j, q, vsize, vsize2;
+    igraph_integer_t nodes_to_calc;
+    igraph_integer_t a, b, c, i, j, q, vsize, vsize2;
     igraph_integer_t edge, from, to, edge2;
 
     igraph_vector_t contrib;
@@ -108,7 +108,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                    IGRAPH_ALL, IGRAPH_NO_LOOPS));
     } else {
         for (a = 0; a < no_of_edges; a++) {
-            igraph_edge(graph, (igraph_integer_t) a, &from, &to);
+            igraph_edge(graph, a, &from, &to);
             if (from != to) {
                 VECTOR(degree)[from] += VECTOR(*weights)[a];
                 VECTOR(degree)[to  ] += VECTOR(*weights)[a];
@@ -123,9 +123,9 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         i = IGRAPH_VIT_GET(vit);
 
         /* get neighbors of i */
-        IGRAPH_CHECK(igraph_incident(graph, &ineis_in, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_incident(graph, &ineis_in, i,
                                      IGRAPH_IN));
-        IGRAPH_CHECK(igraph_incident(graph, &ineis_out, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_incident(graph, &ineis_out, i,
                                      IGRAPH_OUT));
 
         /* NaN for isolates */
@@ -186,9 +186,9 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             if (i == j) {
                 continue;
             }
-            IGRAPH_CHECK(igraph_incident(graph, &jneis_in, (igraph_integer_t) j,
+            IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j,
                                          IGRAPH_IN));
-            IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_integer_t) j,
+            IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j,
                                          IGRAPH_OUT));
             vsize2 = igraph_vector_size(&jneis_in);
             for (c = 0; c < vsize2; c++) {
@@ -231,9 +231,9 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                 if (i == j) {
                     continue;
                 }
-                IGRAPH_CHECK(igraph_incident(graph, &jneis_in, (igraph_integer_t) j,
+                IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j,
                                              IGRAPH_IN));
-                IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_integer_t) j,
+                IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j,
                                              IGRAPH_OUT));
                 vsize2 = igraph_vector_size(&jneis_in);
                 for (c = 0; c < vsize2; c++) {

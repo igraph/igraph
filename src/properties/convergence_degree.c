@@ -74,8 +74,8 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
                               igraph_vector_t *ins, igraph_vector_t *outs) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int i, j, k, n;
-    long int *geodist;
+    igraph_integer_t i, j, k, n;
+    igraph_integer_t *geodist;
     igraph_vector_int_t *eids;
     igraph_vector_t *ins_p, *outs_p, ins_v, outs_v;
     igraph_dqueue_t q;
@@ -106,7 +106,7 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
         igraph_vector_null(outs_p);
     }
 
-    geodist = IGRAPH_CALLOC(no_of_nodes, long int);
+    geodist = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (geodist == 0) {
         IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
     }
@@ -122,13 +122,13 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
         vec = (k == 0) ? VECTOR(*ins_p) : VECTOR(*outs_p);
         for (i = 0; i < no_of_nodes; i++) {
             igraph_dqueue_clear(&q);
-            memset(geodist, 0, sizeof(long int) * (size_t) no_of_nodes);
+            memset(geodist, 0, sizeof(igraph_integer_t) * (size_t) no_of_nodes);
             geodist[i] = 1;
             IGRAPH_CHECK(igraph_dqueue_push(&q, i));
             IGRAPH_CHECK(igraph_dqueue_push(&q, 0.0));
             while (!igraph_dqueue_empty(&q)) {
-                long int actnode = igraph_dqueue_pop(&q);
-                long int actdist = igraph_dqueue_pop(&q);
+                igraph_integer_t actnode = igraph_dqueue_pop(&q);
+                igraph_integer_t actdist = igraph_dqueue_pop(&q);
                 IGRAPH_ALLOW_INTERRUPTION();
                 eids = igraph_inclist_get(&inclist, actnode);
                 n = igraph_vector_int_size(eids);
@@ -141,12 +141,12 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
                              * increase either the size of the infield or the outfield */
                             if (!directed) {
                                 if (actnode < neighbor) {
-                                    VECTOR(*ins_p)[(long int)VECTOR(*eids)[j]] += 1;
+                                    VECTOR(*ins_p)[VECTOR(*eids)[j]] += 1;
                                 } else {
-                                    VECTOR(*outs_p)[(long int)VECTOR(*eids)[j]] += 1;
+                                    VECTOR(*outs_p)[VECTOR(*eids)[j]] += 1;
                                 }
                             } else {
-                                vec[(long int)VECTOR(*eids)[j]] += 1;
+                                vec[VECTOR(*eids)[j]] += 1;
                             }
                         } else if (geodist[neighbor] - 1 < actdist + 1) {
                             continue;
@@ -159,12 +159,12 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
                          * increase either the size of the infield or the outfield */
                         if (!directed) {
                             if (actnode < neighbor) {
-                                VECTOR(*ins_p)[(long int)VECTOR(*eids)[j]] += 1;
+                                VECTOR(*ins_p)[VECTOR(*eids)[j]] += 1;
                             } else {
-                                VECTOR(*outs_p)[(long int)VECTOR(*eids)[j]] += 1;
+                                VECTOR(*outs_p)[VECTOR(*eids)[j]] += 1;
                             }
                         } else {
-                            vec[(long int)VECTOR(*eids)[j]] += 1;
+                            vec[VECTOR(*eids)[j]] += 1;
                         }
                         geodist[neighbor] = actdist + 2;
                     }

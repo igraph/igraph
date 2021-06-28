@@ -132,12 +132,13 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
-    long int nodes_to_calc, affected_nodes;
-    long int maxdegree = 0;
-    long int i, j, k, nn;
+    igraph_integer_t nodes_to_calc, affected_nodes;
+    igraph_integer_t maxdegree = 0;
+    igraph_integer_t i, j, k, nn;
     igraph_lazy_adjlist_t adjlist;
-    igraph_vector_t indexv, avids, rank, order, triangles, degree;
-    long int *neis;
+    igraph_vector_t indexv, avids, rank, triangles, degree;
+    igraph_vector_int_t order;
+    igraph_integer_t *neis;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -153,16 +154,16 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     for (i = 0; i < nodes_to_calc; IGRAPH_VIT_NEXT(vit), i++) {
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
         igraph_vector_int_t *neis2;
-        long int neilen;
+        igraph_integer_t neilen;
         if (VECTOR(indexv)[v] == 0) {
             VECTOR(indexv)[v] = k + 1; k++;
             IGRAPH_CHECK(igraph_vector_push_back(&avids, v));
         }
 
-        neis2 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
+        neis2 = igraph_lazy_adjlist_get(&adjlist, v);
         neilen = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen; j++) {
-            long int nei = VECTOR(*neis2)[j];
+            igraph_integer_t nei = VECTOR(*neis2)[j];
             if (VECTOR(indexv)[nei] == 0) {
                 VECTOR(indexv)[nei] = k + 1; k++;
                 IGRAPH_CHECK(igraph_vector_push_back(&avids, nei));
@@ -172,27 +173,27 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     /* Degree, ordering, ranking */
     affected_nodes = igraph_vector_size(&avids);
-    IGRAPH_VECTOR_INIT_FINALLY(&order, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, affected_nodes);
     for (i = 0; i < affected_nodes; i++) {
-        long int v = VECTOR(avids)[i];
+        igraph_integer_t v = VECTOR(avids)[i];
         igraph_vector_int_t *neis2;
-        long int deg;
-        neis2 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
+        igraph_integer_t deg;
+        neis2 = igraph_lazy_adjlist_get(&adjlist, v);
         VECTOR(degree)[i] = deg = igraph_vector_int_size(neis2);
         if (deg > maxdegree) {
             maxdegree = deg;
         }
     }
-    igraph_vector_order1(&degree, &order, maxdegree + 1);
+    igraph_vector_order1_int(&degree, &order, maxdegree + 1);
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_VECTOR_INIT_FINALLY(&rank, affected_nodes);
     for (i = 0; i < affected_nodes; i++) {
-        VECTOR(rank)[ (long int) VECTOR(order)[i] ] = affected_nodes - i - 1;
+        VECTOR(rank)[ VECTOR(order)[i] ] = affected_nodes - i - 1;
     }
 
-    neis = IGRAPH_CALLOC(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
         IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM);
     }
@@ -200,37 +201,34 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&triangles, affected_nodes);
     for (nn = affected_nodes - 1; nn >= 0; nn--) {
-        long int node = VECTOR(avids) [ (long int) VECTOR(order)[nn] ];
+        igraph_integer_t node = VECTOR(avids) [ VECTOR(order)[nn] ];
         igraph_vector_int_t *neis1, *neis2;
-        long int neilen1, neilen2;
-        long int nodeindex = VECTOR(indexv)[node];
-        long int noderank = VECTOR(rank) [nodeindex - 1];
-
-        /*     fprintf(stderr, "node %li (indexv %li, rank %li)\n", node, */
-        /*      (long int)VECTOR(indexv)[node]-1, noderank); */
+        igraph_integer_t neilen1, neilen2;
+        igraph_integer_t nodeindex = VECTOR(indexv)[node];
+        igraph_integer_t noderank = VECTOR(rank) [nodeindex - 1];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        neis1 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);
+        neis1 = igraph_lazy_adjlist_get(&adjlist, node);
         neilen1 = igraph_vector_int_size(neis1);
         for (i = 0; i < neilen1; i++) {
-            long int nei = VECTOR(*neis1)[i];
+            igraph_integer_t nei = VECTOR(*neis1)[i];
             neis[nei] = node + 1;
         }
         for (i = 0; i < neilen1; i++) {
-            long int nei = VECTOR(*neis1)[i];
-            long int neiindex = VECTOR(indexv)[nei];
-            long int neirank = VECTOR(rank)[neiindex - 1];
+            igraph_integer_t nei = VECTOR(*neis1)[i];
+            igraph_integer_t neiindex = VECTOR(indexv)[nei];
+            igraph_integer_t neirank = VECTOR(rank)[neiindex - 1];
 
             /*       fprintf(stderr, "  nei %li (indexv %li, rank %li)\n", nei, */
             /*        neiindex, neirank); */
             if (neirank > noderank) {
-                neis2 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) nei);
+                neis2 = igraph_lazy_adjlist_get(&adjlist, nei);
                 neilen2 = igraph_vector_int_size(neis2);
                 for (j = 0; j < neilen2; j++) {
-                    long int nei2 = VECTOR(*neis2)[j];
-                    long int nei2index = VECTOR(indexv)[nei2];
-                    long int nei2rank = VECTOR(rank)[nei2index - 1];
+                    igraph_integer_t nei2 = VECTOR(*neis2)[j];
+                    igraph_integer_t nei2index = VECTOR(indexv)[nei2];
+                    igraph_integer_t nei2rank = VECTOR(rank)[nei2index - 1];
                     /*    fprintf(stderr, "    triple %li %li %li\n", node, nei, nei2); */
                     if (nei2rank < neirank) {
                         continue;
@@ -252,9 +250,9 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_VIT_RESET(vit);
     for (i = 0; i < nodes_to_calc; i++, IGRAPH_VIT_NEXT(vit)) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);
-        long int idx = VECTOR(indexv)[node] - 1;
+        igraph_integer_t idx = VECTOR(indexv)[node] - 1;
         igraph_vector_int_t *neis2 =
-            igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);
+            igraph_lazy_adjlist_get(&adjlist, node);
         igraph_integer_t deg = igraph_vector_int_size(neis2);
         if (mode == IGRAPH_TRANSITIVITY_ZERO && deg < 2) {
             VECTOR(*res)[i] = 0.0;
@@ -267,7 +265,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     igraph_vector_destroy(&triangles);
     igraph_free(neis);
     igraph_vector_destroy(&rank);
-    igraph_vector_destroy(&order);
+    igraph_vector_int_destroy(&order);
     igraph_vector_destroy(&avids);
     igraph_vector_destroy(&indexv);
     igraph_lazy_adjlist_destroy(&adjlist);
@@ -285,9 +283,9 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*                    const igraph_vs_t vids) { */
 
 /*   igraph_vit_t vit; */
-/*   long int nodes_to_calc; */
+/*   igraph_integer_t nodes_to_calc; */
 /*   igraph_lazy_adjlist_t adjlist; */
-/*   long int i, j; */
+/*   igraph_integer_t i, j; */
 
 /*   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit)); */
 /*   IGRAPH_FINALLY(igraph_vit_destroy, &vit); */
@@ -300,20 +298,20 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc)); */
 /*   for (i=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);  */
 /*        i++, IGRAPH_VIT_NEXT(vit)) { */
-/*     long int node=IGRAPH_VIT_GET(vit); */
+/*     igraph_integer_t node=IGRAPH_VIT_GET(vit); */
 /*     igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, node); */
-/*     long int n1=igraph_vector_size(neis); */
+/*     igraph_integer_t n1=igraph_vector_size(neis); */
 /*     igraph_real_t triangles=0; */
 /*     igraph_real_t triples=(double)n1*(n1-1); */
 /*     IGRAPH_ALLOW_INTERRUPTION(); */
 /*     for (j=0; j<n1; j++) { */
-/*       long int node2=VECTOR(*neis)[j]; */
+/*       igraph_integer_t node2=VECTOR(*neis)[j]; */
 /*       igraph_vector_t *neis2=igraph_lazy_adjlist_get(&adjlist, node2); */
-/*       long int n2=igraph_vector_size(neis2); */
-/*       long int l1=0, l2=0; */
+/*       igraph_integer_t n2=igraph_vector_size(neis2); */
+/*       igraph_integer_t l1=0, l2=0; */
 /*       while (l1 < n1 && l2 < n2) { */
-/*  long int nei1=VECTOR(*neis)[l1]; */
-/*  long int nei2=VECTOR(*neis2)[l2]; */
+/*  igraph_integer_t nei1=VECTOR(*neis)[l1]; */
+/*  igraph_integer_t nei2=VECTOR(*neis2)[l2]; */
 /*  if (nei1 < nei2) {  */
 /*    l1++; */
 /*  } else if (nei1 > nei2) { */
@@ -566,7 +564,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     igraph_integer_t node, nn;
     igraph_integer_t maxdegree;
     igraph_integer_t *neis;
-    igraph_vector_t order;
+    igraph_vector_int_t order;
     igraph_vector_t rank;
     igraph_vector_t degree;
 
@@ -579,20 +577,20 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
     maxdegree = igraph_vector_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
+    IGRAPH_CHECK(igraph_vector_order1_int(&degree, &order, maxdegree));
 
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(rank)[ (igraph_integer_t) VECTOR(order)[i] ] = no_of_nodes - i - 1;
+        VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -636,7 +634,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_FREE(neis);
     igraph_adjlist_destroy(&allneis);
     igraph_vector_destroy(&rank);
-    igraph_vector_destroy(&order);
+    igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(4);
 
     if (triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO) {
@@ -694,7 +692,7 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        adj1 = igraph_lazy_inclist_get(&incident, (igraph_integer_t) node);
+        adj1 = igraph_lazy_inclist_get(&incident, node);
         adjlen1 = igraph_vector_int_size(adj1);
         /* Mark the neighbors of the node */
         for (j = 0; j < adjlen1; j++) {
@@ -710,7 +708,7 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
             igraph_integer_t edge1 = VECTOR(*adj1)[j];
             igraph_real_t weight1 = VECTOR(*weights)[edge1];
             igraph_integer_t v = IGRAPH_OTHER(graph, edge1, node);
-            adj2 = igraph_lazy_inclist_get(&incident, (igraph_integer_t) v);
+            adj2 = igraph_lazy_inclist_get(&incident, v);
             adjlen2 = igraph_vector_int_size(adj2);
             for (k = 0; k < adjlen2; k++) {
                 igraph_integer_t edge2 = VECTOR(*adj2)[k];
@@ -743,7 +741,8 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
                                          igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t order, degree, rank;
+    igraph_vector_int_t order;
+    igraph_vector_t degree, rank;
     igraph_integer_t maxdegree;
     igraph_inclist_t incident;
     igraph_vector_int_t neis;
@@ -756,20 +755,20 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
      * multi-edges. These must be ensured by the caller.
      */
 
-    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
     maxdegree = igraph_vector_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
+    IGRAPH_CHECK(igraph_vector_order1_int(&degree, &order, maxdegree));
 
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                  IGRAPH_LOOPS, weights));
 
     IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(rank)[ (long int)VECTOR(order)[i] ] = no_of_nodes - i - 1;
+        VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &incident, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
@@ -837,7 +836,7 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
     igraph_inclist_destroy(&incident);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&degree);
-    igraph_vector_destroy(&order);
+    igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(6);
 
     return IGRAPH_SUCCESS;

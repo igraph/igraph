@@ -76,7 +76,7 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
 igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                    igraph_es_t es) {
     igraph_eit_t eit;
-    long int i;
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);

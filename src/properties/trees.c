@@ -61,7 +61,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_roots = igraph_vector_size(roots);
-    long int tree_vertex_count = no_of_nodes;
+    igraph_integer_t tree_vertex_count = no_of_nodes;
 
     igraph_vector_t edges;
     igraph_vector_bool_t seen_vertices;
@@ -70,7 +70,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_dqueue_t Q;
     igraph_vector_t neis;
 
-    long int i, n, r, v_ptr = no_of_nodes;
+    igraph_integer_t i, n, r, v_ptr = no_of_nodes;
 
     /* TODO: handle not-connected graphs, multiple root vertices */
 
@@ -90,18 +90,18 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     for (r = 0; r < no_of_roots; r++) {
 
-        long int root = VECTOR(*roots)[r];
+        igraph_integer_t root = VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
         igraph_dqueue_push(&Q, root);
 
         while (!igraph_dqueue_empty(&Q)) {
-            long int actnode = igraph_dqueue_pop(&Q);
+            igraph_integer_t actnode = igraph_dqueue_pop(&Q);
 
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
             n = igraph_vector_size(&neis);
             for (i = 0; i < n; i++) {
 
-                long int edge = VECTOR(neis)[i];
+                igraph_integer_t edge = VECTOR(neis)[i];
                 igraph_integer_t from = IGRAPH_FROM(graph, edge);
                 igraph_integer_t to = IGRAPH_TO(graph, edge);
                 igraph_integer_t nei = IGRAPH_OTHER(graph, edge, actnode);
@@ -160,7 +160,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 static igraph_error_t igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
     igraph_stack_int_t stack;
     igraph_vector_bool_t visited;
-    long i;
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, igraph_adjlist_size(al)));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
@@ -176,7 +176,7 @@ static igraph_error_t igraph_i_is_tree_visitor(igraph_integer_t root, const igra
     while (! igraph_stack_int_empty(&stack)) {
         igraph_integer_t u;
         igraph_vector_int_t *neighbors;
-        long ncount;
+        igraph_integer_t ncount;
 
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);

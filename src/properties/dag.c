@@ -103,8 +103,8 @@ igraph_error_t igraph_topological_sorting(
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, mode));
         j = igraph_vector_size(&neis);
         for (i = 0; i < j; i++) {
-            VECTOR(degrees)[(long)VECTOR(neis)[i]]--;
-            if (VECTOR(degrees)[(long)VECTOR(neis)[i]] == 0) {
+            VECTOR(degrees)[(igraph_integer_t)VECTOR(neis)[i]]--;
+            if (VECTOR(degrees)[(igraph_integer_t)VECTOR(neis)[i]] == 0) {
                 IGRAPH_CHECK(igraph_dqueue_int_push(&sources, VECTOR(neis)[i]));
             }
         }
@@ -176,7 +176,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_IN));
         j = igraph_vector_size(&neis);
         for (i = 0; i < j; i++) {
-            nei = (long)VECTOR(neis)[i];
+            nei = (igraph_integer_t)VECTOR(neis)[i];
             if (nei == node) {
                 continue;
             }
@@ -264,7 +264,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
                     IGRAPH_CHECK(igraph_vector_push_back(&ancestors, node));
                 }
                 IGRAPH_CHECK(igraph_neighbors(graph, &neighbors,
-                                              (igraph_integer_t) node, IGRAPH_IN));
+                                              node, IGRAPH_IN));
                 n = igraph_vector_size(&neighbors);
                 IGRAPH_CHECK(igraph_stack_int_push(&path, STAR));
                 for (j = 0; j < n; j++) {
@@ -284,7 +284,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
     igraph_vector_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(5);
 
-    IGRAPH_CHECK(igraph_create(closure, &new_edges, (igraph_integer_t)no_of_nodes,
+    IGRAPH_CHECK(igraph_create(closure, &new_edges, no_of_nodes,
                                IGRAPH_DIRECTED));
 
     igraph_vector_destroy(&new_edges);

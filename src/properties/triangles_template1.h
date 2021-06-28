@@ -24,12 +24,12 @@
 
 igraph_integer_t no_of_nodes = igraph_vcount(graph);
 igraph_vit_t vit;
-long int nodes_to_calc;
+igraph_integer_t nodes_to_calc;
 igraph_vector_int_t *neis1, *neis2;
 igraph_real_t triangles;
-long int i, j, k;
-long int neilen1, neilen2;
-long int *neis;
+igraph_integer_t i, j, k;
+igraph_integer_t neilen1, neilen2;
+igraph_integer_t *neis;
 igraph_lazy_adjlist_t adjlist;
 
 IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -43,7 +43,7 @@ if (nodes_to_calc == 0) {
     return IGRAPH_SUCCESS;
 }
 
-neis = IGRAPH_CALLOC(no_of_nodes, long int);
+neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
 if (neis == 0) {
     IGRAPH_ERROR("local undirected transitivity failed", IGRAPH_ENOMEM);
 }
@@ -59,19 +59,19 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
 
-    neis1 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) node);
+    neis1 = igraph_lazy_adjlist_get(&adjlist, node);
     neilen1 = igraph_vector_int_size(neis1);
     for (j = 0; j < neilen1; j++) {
-        neis[ (long int)VECTOR(*neis1)[j] ] = i + 1;
+        neis[ (igraph_integer_t)VECTOR(*neis1)[j] ] = i + 1;
     }
     triangles = 0;
 
     for (j = 0; j < neilen1; j++) {
-        long int v = VECTOR(*neis1)[j];
-        neis2 = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
+        igraph_integer_t v = VECTOR(*neis1)[j];
+        neis2 = igraph_lazy_adjlist_get(&adjlist, v);
         neilen2 = igraph_vector_int_size(neis2);
         for (k = 0; k < neilen2; k++) {
-            long int v2 = VECTOR(*neis2)[k];
+            igraph_integer_t v2 = VECTOR(*neis2)[k];
             if (neis[v2] == i + 1) {
                 triangles += 1.0;
             }

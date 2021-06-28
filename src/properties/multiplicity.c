@@ -55,11 +55,11 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
         *res = 1;
     } else {
         igraph_vector_t neis;
-        long int i, j, n;
+        igraph_integer_t i, j, n;
         igraph_bool_t found = 0;
         IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc; i++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
@@ -108,11 +108,11 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         *res = 0;
     } else {
         igraph_vector_t neis;
-        long int i, j, n;
+        igraph_integer_t i, j, n;
         igraph_bool_t found = 0;
         IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc && !found; i++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
                                           IGRAPH_OUT));
             n = igraph_vector_size(&neis);
             for (j = 1; j < n; j++) {
@@ -169,7 +169,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
 igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                        igraph_es_t es) {
     igraph_eit_t eit;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -185,7 +185,7 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
         igraph_vector_int_t *neis =
-            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+            igraph_lazy_inclist_get(&inclist, from);
 
         if (neis == 0) {
             /* Most likely out of memory */
@@ -196,7 +196,7 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            long int e2 = VECTOR(*neis)[j];
+            igraph_integer_t e2 = VECTOR(*neis)[j];
             igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to && e2 < e) {
                 VECTOR(*res)[i] = 1;
@@ -237,7 +237,7 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
  */
 igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
     igraph_eit_t eit;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -252,7 +252,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
         igraph_vector_int_t *neis =
-            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+            igraph_lazy_inclist_get(&inclist, from);
 
         if (neis == 0) {
             /* Most likely out of memory */
@@ -263,7 +263,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            long int e2 = VECTOR(*neis)[j];
+            igraph_integer_t e2 = VECTOR(*neis)[j];
             igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to) {
                 VECTOR(*res)[i] += 1;
@@ -312,7 +312,7 @@ igraph_error_t igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igra
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;
-    long int i;
+    igraph_integer_t i;
 
     /* How many edges do we have? */
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -340,7 +340,7 @@ igraph_error_t igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igra
            out-list of to. We don't search an empty vector, because
            vector_binsearch seems to have a bug with this. */
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                (igraph_integer_t) to);
+                                to);
         if (igraph_vector_int_empty(neis)) {
             VECTOR(*res)[i] = 0;
         } else {
