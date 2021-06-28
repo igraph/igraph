@@ -296,10 +296,10 @@ target_compile_definitions(
   PRIVATE
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
-target_compile_options(
+# target_compile_options(
 #   # -Wconversion could be useful?
-  igraph PRIVATE -Wshorten-64-to-32
-)
+#   igraph PRIVATE -Wshorten-64-to-32
+# )
 
 # Make sure that a macro named IGRAPH_FILE_BASENAME is provided in every
 # compiler call so we can use these in debug messages without revealing the
