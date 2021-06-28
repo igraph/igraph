@@ -28,8 +28,8 @@ int main() {
     igraph_t g;
     igraph_vector_t v = IGRAPH_VECTOR_NULL;
     igraph_real_t edges[] = { 0, 1, 1, 2, 2, 2, 2, 3, 2, 4, 3, 4 };
-    igraph_vector_t v2;
-    long int i;
+    igraph_vector_int_t v2;
+    igraph_integer_t i;
     igraph_vit_t vit;
     igraph_vs_t vs;
     igraph_integer_t size;
@@ -38,7 +38,7 @@ int main() {
     igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
 
     /* Create iterator based on a vector (view) */
-    igraph_vector_init(&v2, 6);
+    igraph_vector_int_init(&v2, 6);
     VECTOR(v2)[0] = 0;
     VECTOR(v2)[1] = 2;
     VECTOR(v2)[2] = 4;
@@ -56,12 +56,12 @@ int main() {
         IGRAPH_VIT_NEXT(vit);
         i++;
     }
-    if (i != igraph_vector_size(&v2)) {
+    if (i != igraph_vector_int_size(&v2)) {
         return 2;
     }
 
     igraph_vit_destroy(&vit);
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_destroy(&v2);
 
     /* Create small vector iterator */
 

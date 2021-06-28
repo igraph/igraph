@@ -229,7 +229,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_t *graph_copy;
 
     igraph_vector_ptr_t separators;
-    igraph_vector_t compvertices;
+    igraph_vector_int_t compvertices;
     igraph_vector_int_t components;
     igraph_vector_bool_t marked;
 
@@ -280,7 +280,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_ptr_init(&separators, 0));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &separators);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&compvertices, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&compvertices, 0);
     IGRAPH_CHECK(igraph_vector_bool_init(&marked, 0));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &marked);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -369,14 +369,14 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             igraph_t *newgraph;
             igraph_integer_t maxdeg;
 
-            igraph_vector_clear(&compvertices);
+            igraph_vector_int_clear(&compvertices);
 
             while (1) {
-                long int v = VECTOR(components)[cptr++];
+                igraph_integer_t v = VECTOR(components)[cptr++];
                 if (v < 0) {
                     break;
                 }
-                IGRAPH_CHECK(igraph_vector_push_back(&compvertices, v));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&compvertices, v));
             }
 
             newmapping = IGRAPH_CALLOC(1, igraph_vector_t);
@@ -437,7 +437,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_dqueue_destroy(&bfsQ);
     igraph_vector_destroy(&neis);
     igraph_vector_bool_destroy(&marked);
-    igraph_vector_destroy(&compvertices);
+    igraph_vector_int_destroy(&compvertices);
     igraph_vector_ptr_destroy(&separators);
     IGRAPH_FINALLY_CLEAN(7);
 

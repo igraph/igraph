@@ -156,12 +156,12 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  * Time complexity: The algorithm is a randomized Las Vegas algorithm. The expected
  *                  running time is O(km) where k is the value mentioned above.
  */
-int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
+igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanner,
         igraph_real_t stretch, igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int i, j, v, nlen, neighbor, cluster;
+    igraph_integer_t i, j, v, nlen, neighbor, cluster;
     double sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
     igraph_vector_t clustering, lightest_eid, lightest_weight;
     igraph_vector_bool_t is_cluster_sampled;
@@ -201,7 +201,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
     }
 
     // Clear the vector that will contain the IDs of the edges in the spanner
-    igraph_vector_clear(spanner);
+    igraph_vector_int_clear(spanner);
 
     // Create an incidence list reprsentation of the graph and also create the
     // corresponding adjacency list. The residual graph will not be constructed
@@ -249,7 +249,7 @@ int igraph_spanner (const igraph_t *graph, igraph_vector_t *spanner,
 #define ADD_EDGE_TO_SPANNER {                                   \
     if (!VECTOR(is_edge_in_spanner)[edge]) {         \
         VECTOR(is_edge_in_spanner)[edge] = 1;        \
-        IGRAPH_CHECK(igraph_vector_push_back(spanner, edge));   \
+        IGRAPH_CHECK(igraph_vector_int_push_back(spanner, edge));   \
     }                                                           \
 }
 

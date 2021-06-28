@@ -1264,36 +1264,38 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
-                                     const igraph_vector_t *pairs,
+static igraph_error_t igraph_i_get_eids_pairs(const igraph_t *graph, igraph_vector_int_t *eids,
+                                     const igraph_vector_int_t *pairs,
                                      igraph_bool_t directed, igraph_bool_t error);
 
-igraph_error_t igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
-                                    const igraph_vector_t *path,
+static igraph_error_t igraph_i_get_eids_path(const igraph_t *graph, igraph_vector_int_t *eids,
+                                    const igraph_vector_int_t *path,
                                     igraph_bool_t directed, igraph_bool_t error);
 
-igraph_error_t igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
-                          const igraph_vector_t *pairs,
-                          igraph_bool_t directed, igraph_bool_t error) {
-    igraph_integer_t n = igraph_vector_size(pairs);
+static igraph_error_t igraph_i_get_eids_pairs(
+    const igraph_t *graph, igraph_vector_int_t *eids,
+    const igraph_vector_int_t *pairs, igraph_bool_t directed,
+    igraph_bool_t error
+) {
+    igraph_integer_t n = igraph_vector_int_size(pairs);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t i;
     igraph_integer_t eid = -1;
 
     if (n % 2 != 0) {
         IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
                      IGRAPH_EINVAL);
     }
-    if (!igraph_vector_isininterval(pairs, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(eids, n / 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, n / 2));
 
     if (igraph_is_directed(graph)) {
         for (i = 0; i < n / 2; i++) {
-            long int from = VECTOR(*pairs)[2 * i];
-            long int to = VECTOR(*pairs)[2 * i + 1];
+            igraph_integer_t from = VECTOR(*pairs)[2 * i];
+            igraph_integer_t to = VECTOR(*pairs)[2 * i + 1];
 
             eid = -1;
             FIND_DIRECTED_EDGE(graph, from, to, &eid);
@@ -1308,8 +1310,8 @@ igraph_error_t igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eid
         }
     } else {
         for (i = 0; i < n / 2; i++) {
-            long int from = VECTOR(*pairs)[2 * i];
-            long int to = VECTOR(*pairs)[2 * i + 1];
+            igraph_integer_t from = VECTOR(*pairs)[2 * i];
+            igraph_integer_t to = VECTOR(*pairs)[2 * i + 1];
 
             eid = -1;
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
@@ -1323,25 +1325,27 @@ igraph_error_t igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eid
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
-                                    const igraph_vector_t *path,
-                                    igraph_bool_t directed, igraph_bool_t error) {
+static igraph_error_t igraph_i_get_eids_path(
+    const igraph_t *graph, igraph_vector_int_t *eids,
+    const igraph_vector_int_t *path, igraph_bool_t directed,
+    igraph_bool_t error
+) {
 
-    igraph_integer_t n = igraph_vector_size(path);
+    igraph_integer_t n = igraph_vector_int_size(path);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t i;
     igraph_integer_t eid = -1;
 
-    if (!igraph_vector_isininterval(path, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(path, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(eids, n == 0 ? 0 : n - 1));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, n == 0 ? 0 : n - 1));
 
     if (igraph_is_directed(graph)) {
         for (i = 0; i < n - 1; i++) {
-            long int from = VECTOR(*path)[i];
-            long int to = VECTOR(*path)[i + 1];
+            igraph_integer_t from = VECTOR(*path)[i];
+            igraph_integer_t to = VECTOR(*path)[i + 1];
 
             eid = -1;
             FIND_DIRECTED_EDGE(graph, from, to, &eid);
@@ -1356,8 +1360,8 @@ igraph_error_t igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids
         }
     } else {
         for (i = 0; i < n - 1; i++) {
-            long int from = VECTOR(*path)[i];
-            long int to = VECTOR(*path)[i + 1];
+            igraph_integer_t from = VECTOR(*path)[i];
+            igraph_integer_t to = VECTOR(*path)[i + 1];
 
             eid = -1;
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
@@ -1429,26 +1433,26 @@ igraph_error_t igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids
  * \example examples/simple/igraph_get_eids.c
  */
 
-igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
-                    const igraph_vector_t *pairs,
-                    const igraph_vector_t *path,
+igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
+                    const igraph_vector_int_t *pairs,
+                    const igraph_vector_int_t *path,
                     igraph_bool_t directed, igraph_bool_t error) {
 
     if (!pairs && !path) {
-        igraph_vector_clear(eids);
+        igraph_vector_int_clear(eids);
         return IGRAPH_SUCCESS;
     } else if (pairs && !path) {
-        return igraph_get_eids_pairs(graph, eids, pairs, directed, error);
+        return igraph_i_get_eids_pairs(graph, eids, pairs, directed, error);
     } else if (!pairs && path) {
-        return igraph_get_eids_path(graph, eids, path, directed, error);
+        return igraph_i_get_eids_path(graph, eids, path, directed, error);
     } else {
         /* both */
-        igraph_vector_t tmp;
-        IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
-        IGRAPH_CHECK(igraph_get_eids_pairs(graph, eids, pairs, directed, error));
-        IGRAPH_CHECK(igraph_get_eids_path(graph, &tmp, path, directed, error));
-        IGRAPH_CHECK(igraph_vector_append(eids, &tmp));
-        igraph_vector_destroy(&tmp);
+        igraph_vector_int_t tmp;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
+        IGRAPH_CHECK(igraph_i_get_eids_pairs(graph, eids, pairs, directed, error));
+        IGRAPH_CHECK(igraph_i_get_eids_path(graph, &tmp, path, directed, error));
+        IGRAPH_CHECK(igraph_vector_int_append(eids, &tmp));
+        igraph_vector_int_destroy(&tmp);
         IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
@@ -1461,8 +1465,8 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 #define BINSEARCH(start,end,value,iindex,edgelist,N,pos,seen)    \
     do {                                                      \
         while ((start) < (end)) {                                 \
-            long int mid=(start)+((end)-(start))/2;                 \
-            long int e= VECTOR((iindex))[mid];        \
+            igraph_integer_t mid=(start)+((end)-(start))/2;                 \
+            igraph_integer_t e= VECTOR((iindex))[mid];        \
             if (VECTOR((edgelist))[e] < (value)) {                  \
                 (start)=mid+1;                                        \
             } else {                                                \
@@ -1470,7 +1474,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
             }                                                       \
         }                                                         \
         if ((start)<(N)) {                                        \
-            long int e= VECTOR((iindex))[(start)];        \
+            igraph_integer_t e = VECTOR((iindex))[(start)];       \
             while ((start)<(N) && seen[e] && VECTOR(edgelist)[e] == (value)) {  \
                 (start)++;                        \
                 e= VECTOR(iindex)[(start)];         \
@@ -1482,12 +1486,12 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 
 #define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid,seen)            \
     do {                                                              \
-        long int start= VECTOR(graph->os)[xfrom];         \
-        long int end= VECTOR(graph->os)[xfrom+1];         \
-        long int N=end;                                                 \
-        long int start2= VECTOR(graph->is)[xto];          \
-        long int end2= VECTOR(graph->is)[xto+1];          \
-        long int N2=end2;                                               \
+        igraph_integer_t start = VECTOR(graph->os)[xfrom];         \
+        igraph_integer_t end= VECTOR(graph->os)[xfrom+1];         \
+        igraph_integer_t N=end;                                                 \
+        igraph_integer_t start2= VECTOR(graph->is)[xto];          \
+        igraph_integer_t end2= VECTOR(graph->is)[xto+1];          \
+        igraph_integer_t N2=end2;                                               \
         if (end-start<end2-start2) {                                    \
             BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid,seen);      \
         } else {                                                        \
@@ -1497,36 +1501,35 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 
 #define FIND_UNDIRECTED_EDGE(graph,from,to,eid,seen)            \
     do {                                                              \
-        long int xfrom1= from > to ? from : to;                         \
-        long int xto1= from > to ? to : from;                           \
+        igraph_integer_t xfrom1= from > to ? from : to;                         \
+        igraph_integer_t xto1= from > to ? to : from;                           \
         FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid,seen);         \
     } while (0)
 
 
-igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
-                                          const igraph_vector_t *pairs,
+igraph_error_t igraph_i_get_eids_multipairs(const igraph_t *graph, igraph_vector_int_t *eids,
+                                          const igraph_vector_int_t *pairs,
                                           igraph_bool_t directed, igraph_bool_t error);
 
-igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
-                              const igraph_vector_t *path,
+igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_int_t *eids,
+                              const igraph_vector_int_t *path,
                               igraph_bool_t directed, igraph_bool_t error);
 
-igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t *eids,
-                                          const igraph_vector_t *pairs,
+igraph_error_t igraph_i_get_eids_multipairs(const igraph_t *graph, igraph_vector_int_t *eids,
+                                          const igraph_vector_int_t *pairs,
                                           igraph_bool_t directed, igraph_bool_t error) {
 
-    igraph_integer_t n = igraph_vector_size(pairs);
+    igraph_integer_t i, n = igraph_vector_int_size(pairs);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t *seen;
-    long int i;
     igraph_integer_t eid = -1;
 
     if (n % 2 != 0) {
         IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
                      IGRAPH_EINVAL);
     }
-    if (!igraph_vector_isininterval(pairs, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
     }
 
@@ -1535,12 +1538,12 @@ igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t
         IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, seen);
-    IGRAPH_CHECK(igraph_vector_resize(eids, n / 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, n / 2));
 
     if (igraph_is_directed(graph)) {
         for (i = 0; i < n / 2; i++) {
-            long int from = VECTOR(*pairs)[2 * i];
-            long int to = VECTOR(*pairs)[2 * i + 1];
+            igraph_integer_t from = VECTOR(*pairs)[2 * i];
+            igraph_integer_t to = VECTOR(*pairs)[2 * i + 1];
 
             eid = -1;
             FIND_DIRECTED_EDGE(graph, from, to, &eid, seen);
@@ -1557,8 +1560,8 @@ igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t
         }
     } else {
         for (i = 0; i < n / 2; i++) {
-            long int from = VECTOR(*pairs)[2 * i];
-            long int to = VECTOR(*pairs)[2 * i + 1];
+            igraph_integer_t from = VECTOR(*pairs)[2 * i];
+            igraph_integer_t to = VECTOR(*pairs)[2 * i + 1];
 
             eid = -1;
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid, seen);
@@ -1576,18 +1579,18 @@ igraph_error_t igraph_get_eids_multipairs(const igraph_t *graph, igraph_vector_t
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t *eids,
-                                         const igraph_vector_t *path,
-                                         igraph_bool_t directed, igraph_bool_t error) {
+igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_int_t *eids,
+                                           const igraph_vector_int_t *path,
+                                           igraph_bool_t directed, igraph_bool_t error) {
 
-    igraph_integer_t n = igraph_vector_size(path);
+    igraph_integer_t n = igraph_vector_int_size(path);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t *seen;
-    long int i;
+    igraph_integer_t i;
     igraph_integer_t eid = -1;
 
-    if (!igraph_vector_isininterval(path, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(path, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
     }
 
@@ -1596,12 +1599,12 @@ igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t 
         IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, seen);
-    IGRAPH_CHECK(igraph_vector_resize(eids, n == 0 ? 0 : n - 1));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, n == 0 ? 0 : n - 1));
 
     if (igraph_is_directed(graph)) {
         for (i = 0; i < n - 1; i++) {
-            long int from = VECTOR(*path)[i];
-            long int to = VECTOR(*path)[i + 1];
+            igraph_integer_t from = VECTOR(*path)[i];
+            igraph_integer_t to = VECTOR(*path)[i + 1];
 
             eid = -1;
             FIND_DIRECTED_EDGE(graph, from, to, &eid, seen);
@@ -1618,8 +1621,8 @@ igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t 
         }
     } else {
         for (i = 0; i < n - 1; i++) {
-            long int from = VECTOR(*path)[i];
-            long int to = VECTOR(*path)[i + 1];
+            igraph_integer_t from = VECTOR(*path)[i];
+            igraph_integer_t to = VECTOR(*path)[i + 1];
 
             eid = -1;
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid, seen);
@@ -1695,18 +1698,18 @@ igraph_error_t igraph_get_eids_multipath(const igraph_t *graph, igraph_vector_t 
  * multiple edges.
  */
 
-igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
-                          const igraph_vector_t *pairs,
-                          const igraph_vector_t *path,
+igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_int_t *eids,
+                          const igraph_vector_int_t *pairs,
+                          const igraph_vector_int_t *path,
                           igraph_bool_t directed, igraph_bool_t error) {
 
     if (!pairs && !path) {
-        igraph_vector_clear(eids);
+        igraph_vector_int_clear(eids);
         return IGRAPH_SUCCESS;
     } else if (pairs && !path) {
-        return igraph_get_eids_multipairs(graph, eids, pairs, directed, error);
+        return igraph_i_get_eids_multipairs(graph, eids, pairs, directed, error);
     } else if (!pairs && path) {
-        return igraph_get_eids_multipath(graph, eids, path, directed, error);
+        return igraph_i_get_eids_multipath(graph, eids, path, directed, error);
     } else { /* both */
         IGRAPH_ERROR("Give `pairs' or `path' but not both", IGRAPH_EINVAL);
     }

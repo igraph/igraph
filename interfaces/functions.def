@@ -1011,7 +1011,7 @@ igraph_is_connected:
 
 igraph_decompose:
         PARAMS: GRAPH graph, OUT GRAPHLIST components, CONNECTEDNESS mode=WEAK, \
-                LONGINT maxcompno=-1, LONGINT minelements=1
+                INTEGER maxcompno=-1, INTEGER minelements=1
         IGNORE: RR, RC, RNamespace
 
 igraph_articulation_points:

@@ -50,17 +50,17 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                     igraph_bool_t loops,
                     const igraph_attribute_combination_t *edge_comb) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int edge;
+    igraph_integer_t edge;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
-    long int from, to, pfrom = -1, pto = -2;
+    igraph_integer_t from, to, pfrom = -1, pto = -2;
     igraph_t res;
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_t mergeinto;
-    long int actedge;
+    igraph_integer_t actedge;
 
     if (!multiple && !loops)
         /* nothing to do */
@@ -69,9 +69,11 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     }
 
     if (!multiple) {
+        igraph_vector_int_t edges_to_delete;
+
         /* removing loop edges only, this is simple. No need to combine anything
          * and the whole process can be done in-place */
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_to_delete, 0);
         IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
         IGRAPH_FINALLY(igraph_es_destroy, &es);
         IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -82,7 +84,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
             from = IGRAPH_FROM(graph, edge);
             to = IGRAPH_TO(graph, edge);
             if (from == to) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, edge));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges_to_delete, edge));
             }
             IGRAPH_EIT_NEXT(eit);
         }
@@ -91,11 +93,11 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
         igraph_es_destroy(&es);
         IGRAPH_FINALLY_CLEAN(2);
 
-        if (igraph_vector_size(&edges) > 0) {
-            IGRAPH_CHECK(igraph_delete_edges(graph, igraph_ess_vector(&edges)));
+        if (igraph_vector_int_size(&edges_to_delete) > 0) {
+            IGRAPH_CHECK(igraph_delete_edges(graph, igraph_ess_vector(&edges_to_delete)));
         }
 
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges_to_delete);
         IGRAPH_FINALLY_CLEAN(1);
 
         return IGRAPH_SUCCESS;

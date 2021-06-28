@@ -44,7 +44,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     char message[256];
     igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
-    igraph_vector_t eids, edgevec, alledges;
+    igraph_vector_int_t eids;
+    igraph_vector_t edgevec, alledges;
     igraph_bool_t directed, loops, ok;
     igraph_es_t es;
     igraph_adjlist_t al;
@@ -58,7 +59,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
 
     RNG_BEGIN();
 
-    IGRAPH_VECTOR_INIT_FINALLY(&eids, 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 2);
 
     if (use_adjlist) {
         /* As well as the sorted adjacency list, we maintain an unordered
@@ -104,15 +105,13 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
 
             /* Get the endpoints */
             if (use_adjlist) {
-                a = VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[0]) * 2];
-                b = VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1];
-                c = VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[1]) * 2];
-                d = VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1];
+                a = VECTOR(alledges)[VECTOR(eids)[0] * 2];
+                b = VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1];
+                c = VECTOR(alledges)[VECTOR(eids)[1] * 2];
+                d = VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1];
             } else {
-                IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[0],
-                                         &a, &b));
-                IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[1],
-                                         &c, &d));
+                IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[0], &a, &b));
+                IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[1], &c, &d));
             }
 
             /* For an undirected graph, we have two "variants" of each edge, i.e.
@@ -123,8 +122,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                 if (use_adjlist) {
                     /* Flip the edge in the unordered edge-list, so the update later on
                      * hits the correct end. */
-                    VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[1]) * 2] = c;
-                    VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = d;
+                    VECTOR(alledges)[VECTOR(eids)[1] * 2] = c;
+                    VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = d;
                 }
             }
 
@@ -180,8 +179,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, c, d, b, directed));
                     /* Also replace in unsorted edgelist: */
-                    VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1] = d;
-                    VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = b;
+                    VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1] = d;
+                    VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = b;
                 } else {
                     IGRAPH_CHECK(igraph_delete_edges(graph, es));
                     VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
@@ -215,7 +214,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
         igraph_vector_destroy(&edgevec);
     }
 
-    igraph_vector_destroy(&eids);
+    igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(use_adjlist ? 3 : 2);
 
     RNG_END();

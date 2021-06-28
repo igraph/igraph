@@ -33,28 +33,28 @@ void check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
     IGRAPH_ASSERT(igraph_vector_ptr_size(evecs) == n);
 
     for (i = 0; i < n; i++) {
-        igraph_vector_t *vvec = VECTOR(*vecs)[i];
-        igraph_vector_t *evec = VECTOR(*evecs)[i];
-        long int j, n2 = igraph_vector_size(evec);
-        if (igraph_vector_size(vvec) == 0 && n2 == 0) {
+        igraph_vector_int_t *vvec = VECTOR(*vecs)[i];
+        igraph_vector_int_t *evec = VECTOR(*evecs)[i];
+        igraph_integer_t j, n2 = igraph_vector_int_size(evec);
+        if (igraph_vector_int_size(vvec) == 0 && n2 == 0) {
             continue;
         }
-        IGRAPH_ASSERT(igraph_vector_size(vvec) == n2 + 1);
+        IGRAPH_ASSERT(igraph_vector_int_size(vvec) == n2 + 1);
 
         for (j = 0; j < n2; j++) {
-            long int edge = VECTOR(*evec)[j];
-            long int from = VECTOR(*vvec)[j];
-            long int to = VECTOR(*vvec)[j + 1];
+            igraph_integer_t edge = VECTOR(*evec)[j];
+            igraph_integer_t from = VECTOR(*vvec)[j];
+            igraph_integer_t to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 IGRAPH_ASSERT(from == IGRAPH_FROM(graph, edge) &&
                               to == IGRAPH_TO(graph, edge));
             } else {
-                long int from2 = IGRAPH_FROM(graph, edge);
-                long int to2 = IGRAPH_TO(graph, edge);
-                long int min1 = from < to ? from : to;
-                long int max1 = from < to ? to : from;
-                long int min2 = from2 < to2 ? from2 : to2;
-                long int max2 = from2 < to2 ? to2 : from2;
+                igraph_integer_t from2 = IGRAPH_FROM(graph, edge);
+                igraph_integer_t to2 = IGRAPH_TO(graph, edge);
+                igraph_integer_t min1 = from < to ? from : to;
+                igraph_integer_t max1 = from < to ? to : from;
+                igraph_integer_t min2 = from2 < to2 ? from2 : to2;
+                igraph_integer_t max2 = from2 < to2 ? to2 : from2;
                 IGRAPH_ASSERT(min1 == min2 && max1 == max2);
             }
         }
@@ -98,7 +98,7 @@ int main() {
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;
     igraph_vector_int_t pred, inbound;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t weights_data_0[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_real_t weights_data_1[] = { 6, 7, 8, -4, -2, -3, 9, 2, 7 };
     igraph_real_t weights_data_2[] = { 6, 7, 2, -4, -2, -3, 9, 2, 7 };
@@ -127,10 +127,10 @@ int main() {
     igraph_vector_ptr_init(&evecs, vs_size);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(evecs)[i], 0);
+        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_int_init(VECTOR(vecs)[i], 0);
+        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_int_init(VECTOR(evecs)[i], 0);
     }
 
     igraph_vector_view(&weights_vec, weights_data_0, sizeof(weights_data_0) / sizeof(igraph_real_t));
@@ -144,10 +144,10 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_round(VECTOR(vecs)[i]);
-        igraph_vector_destroy(VECTOR(vecs)[i]);
+        print_vector_int(VECTOR(vecs)[i]);
+        igraph_vector_int_destroy(VECTOR(vecs)[i]);
         free(VECTOR(vecs)[i]);
-        igraph_vector_destroy(VECTOR(evecs)[i]);
+        igraph_vector_int_destroy(VECTOR(evecs)[i]);
         free(VECTOR(evecs)[i]);
     }
 
@@ -159,10 +159,10 @@ int main() {
     igraph_vector_ptr_resize(&evecs, vs_size);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(evecs)[i], 0);
+        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_int_init(VECTOR(vecs)[i], 0);
+        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_int_init(VECTOR(evecs)[i], 0);
     }
 
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
@@ -175,10 +175,10 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_round(VECTOR(vecs)[i]);
-        igraph_vector_destroy(VECTOR(vecs)[i]);
+        print_vector_int(VECTOR(vecs)[i]);
+        igraph_vector_int_destroy(VECTOR(vecs)[i]);
         free(VECTOR(vecs)[i]);
-        igraph_vector_destroy(VECTOR(evecs)[i]);
+        igraph_vector_int_destroy(VECTOR(evecs)[i]);
         free(VECTOR(evecs)[i]);
     }
 
@@ -204,10 +204,10 @@ int main() {
     igraph_vector_int_init(&inbound, 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init(VECTOR(evecs)[i], 0);
+        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_int_init(VECTOR(vecs)[i], 0);
+        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_int_init(VECTOR(evecs)[i], 0);
     }
     igraph_vs_vector_small(&vs, 0, 1, 3, 2, 1,  -1);
     igraph_small(&g, 5, IGRAPH_DIRECTED,
@@ -225,10 +225,10 @@ int main() {
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
     for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_round(VECTOR(vecs)[i]);
-        igraph_vector_destroy(VECTOR(vecs)[i]);
+        print_vector_int(VECTOR(vecs)[i]);
+        igraph_vector_int_destroy(VECTOR(vecs)[i]);
         free(VECTOR(vecs)[i]);
-        igraph_vector_destroy(VECTOR(evecs)[i]);
+        igraph_vector_int_destroy(VECTOR(evecs)[i]);
         free(VECTOR(evecs)[i]);
     }
 

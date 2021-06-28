@@ -28,7 +28,7 @@
 int validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
     igraph_integer_t n = igraph_vcount(graph);
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_real_t min_weight, flow_value;
     long int i, j, k, m;
 
@@ -51,20 +51,20 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     for (i = 0; i < n; i++) {
         for (j = i + 1; j < n; j++) {
             IGRAPH_CHECK(igraph_get_shortest_path(tree, 0, &edges, i, j, IGRAPH_ALL));
-            m = igraph_vector_size(&edges);
+            m = igraph_vector_int_size(&edges);
             if (m == 0) {
                 continue;
             }
 
-            min_weight = VECTOR(*flow)[(long int)VECTOR(edges)[0]];
+            min_weight = VECTOR(*flow)[VECTOR(edges)[0]];
             for (k = 1; k < m; k++) {
-                if (VECTOR(*flow)[(long int)VECTOR(edges)[k]] < min_weight) {
-                    min_weight = VECTOR(*flow)[(long int)VECTOR(edges)[k]];
+                if (VECTOR(*flow)[VECTOR(edges)[k]] < min_weight) {
+                    min_weight = VECTOR(*flow)[VECTOR(edges)[k]];
                 }
             }
 
@@ -77,7 +77,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
         }
     }
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

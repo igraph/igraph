@@ -31,10 +31,10 @@
  * first.
  */
 int vector_tail_cmp(const void *path1, const void *path2) {
-    const igraph_vector_t *vec1 = *(const igraph_vector_t**)path1;
-    const igraph_vector_t *vec2 = *(const igraph_vector_t**)path2;
-    igraph_integer_t length1 = igraph_vector_size(vec1);
-    igraph_integer_t length2 = igraph_vector_size(vec2);
+    const igraph_vector_int_t *vec1 = *(const igraph_vector_int_t**)path1;
+    const igraph_vector_int_t *vec2 = *(const igraph_vector_int_t**)path2;
+    igraph_integer_t length1 = igraph_vector_int_size(vec1);
+    igraph_integer_t length2 = igraph_vector_int_size(vec2);
     int diff;
 
     while (length1 > 0 && length2 > 0) {
@@ -57,15 +57,15 @@ int vector_tail_cmp(const void *path1, const void *path2) {
 
 void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
                  const igraph_vector_ptr_t *paths,
-                 const igraph_vector_t *nrgeo) {
+                 const igraph_vector_int_t *nrgeo) {
     igraph_integer_t i, n;
-    igraph_vector_t nrgeo2, *path;
+    igraph_vector_int_t nrgeo2, *path;
     igraph_vit_t vit;
 
     n = igraph_vcount(graph);
-    igraph_vector_init(&nrgeo2, n);
-    if (igraph_vector_size(nrgeo) != n) {
-        printf("nrgeo vector length must be %" IGRAPH_PRId ", was %" IGRAPH_PRId, n, igraph_vector_size(nrgeo));
+    igraph_vector_int_init(&nrgeo2, n);
+    if (igraph_vector_int_size(nrgeo) != n) {
+        printf("nrgeo vector length must be %" IGRAPH_PRId ", was %" IGRAPH_PRId, n, igraph_vector_int_size(nrgeo));
         return;
     }
 
@@ -76,32 +76,32 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
             printf("Null path found in result vector at index %" IGRAPH_PRId "\n", i);
             return;
         }
-        if (igraph_vector_size(path) == 0) {
+        if (igraph_vector_int_size(path) == 0) {
             printf("Empty path found in result vector at index %" IGRAPH_PRId "\n", i);
             return;
         }
-        VECTOR(nrgeo2)[(long int)igraph_vector_tail(path)] += 1;
+        VECTOR(nrgeo2)[igraph_vector_int_tail(path)] += 1;
     }
 
     igraph_vit_create(graph, vs, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);
         if (VECTOR(*nrgeo)[node] - VECTOR(nrgeo2)[node]) {
-            printf("nrgeo[%" IGRAPH_PRId "] invalid, observed = %ld, expected = %ld\n",
-                   node, (long int)VECTOR(*nrgeo)[node], (long int)VECTOR(nrgeo2)[node]);
+            printf("nrgeo[%" IGRAPH_PRId "] invalid, observed = %" IGRAPH_PRId ", expected = %" IGRAPH_PRId "\n",
+                   node, VECTOR(*nrgeo)[node], VECTOR(nrgeo2)[node]);
         }
     }
     igraph_vit_destroy(&vit);
 
-    igraph_vector_destroy(&nrgeo2);
+    igraph_vector_int_destroy(&nrgeo2);
 }
 
 void print_and_destroy_items(igraph_vector_ptr_t* vec) {
-    long int i;
+    igraph_integer_t i;
 
     for (i = 0; i < igraph_vector_ptr_size(vec); i++) {
-        igraph_vector_print(VECTOR(*vec)[i]);
-        igraph_vector_destroy(VECTOR(*vec)[i]);
+        igraph_vector_int_print(VECTOR(*vec)[i]);
+        igraph_vector_int_destroy(VECTOR(*vec)[i]);
         igraph_free(VECTOR(*vec)[i]);
     }
 
@@ -117,11 +117,12 @@ int main() {
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_integer_t dim[] = { 4, 4 };
 
-    igraph_vector_t weights_vec, nrgeo;
+    igraph_vector_t weights_vec;
+    igraph_vector_int_t nrgeo;
     igraph_vector_int_t dim_vec;
     igraph_vs_t vs;
 
-    igraph_vector_init(&nrgeo, 0);
+    igraph_vector_int_init(&nrgeo, 0);
 
     /* Simple ring graph without weights */
 
@@ -215,7 +216,7 @@ int main() {
 
     igraph_vector_ptr_destroy(&vertices);
     igraph_vector_ptr_destroy(&edges);
-    igraph_vector_destroy(&nrgeo);
+    igraph_vector_int_destroy(&nrgeo);
 
     if (!IGRAPH_FINALLY_STACK_EMPTY) {
         return 1;

@@ -356,7 +356,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
     igraph_integer_t i, j;
     igraph_integer_t *added;
     igraph_vector_t neis;
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
     igraph_t *newg;
 
     if (order < 0) {
@@ -377,15 +377,15 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
     IGRAPH_CHECK(igraph_vector_ptr_resize(res, IGRAPH_VIT_SIZE(vit)));
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
-        igraph_vector_clear(&tmp);
+        igraph_vector_int_clear(&tmp);
         if (mindist == 0) {
-            IGRAPH_CHECK(igraph_vector_push_back(&tmp, node));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&tmp, node));
         }
         if (order > 0) {
             igraph_dqueue_push(&q, node);
@@ -408,7 +408,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
                         IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
                         IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
                         if (actdist + 1 >= mindist) {
-                            IGRAPH_CHECK(igraph_vector_push_back(&tmp, nei));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&tmp, nei));
                         }
                     }
                 }
@@ -419,7 +419,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
-                            IGRAPH_CHECK(igraph_vector_push_back(&tmp, nei));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&tmp, nei));
                         }
                     }
                 }
@@ -432,7 +432,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
             IGRAPH_ERROR("Cannot create neighborhood graph", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, newg);
-        if (igraph_vector_size(&tmp) < no_of_nodes) {
+        if (igraph_vector_int_size(&tmp) < no_of_nodes) {
             IGRAPH_CHECK(igraph_induced_subgraph(graph, newg,
                                                  igraph_vss_vector(&tmp),
                                                  IGRAPH_SUBGRAPH_AUTO));
@@ -443,7 +443,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_p
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     igraph_vector_destroy(&neis);
     igraph_vit_destroy(&vit);
     igraph_dqueue_destroy(&q);

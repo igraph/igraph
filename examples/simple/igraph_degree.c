@@ -34,11 +34,10 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
 
     igraph_t g;
-    igraph_vector_t v, seq;
-    int ret;
-    igraph_integer_t mdeg, nedges;
-    long int i;
-    long int ndeg;
+    igraph_vector_t v;
+    igraph_vector_int_t seq;
+    igraph_error_t ret;
+    igraph_integer_t i, mdeg, ndeg, nedges;
 
     /* Create graph */
     igraph_vector_init(&v, 8);
@@ -127,7 +126,7 @@ int main() {
 
     /* Degree of the same vertex multiple times */
 
-    igraph_vector_init(&seq, 3);
+    igraph_vector_int_init(&seq, 3);
     VECTOR(seq)[0] = 2;
     VECTOR(seq)[1] = 0;
     VECTOR(seq)[2] = 2;
@@ -148,7 +147,7 @@ int main() {
     }
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&seq);
+    igraph_vector_int_destroy(&seq);
 
     /* Maximum degree */
 

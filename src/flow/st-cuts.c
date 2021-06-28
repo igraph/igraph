@@ -395,7 +395,7 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
  * \param dom Pointer to an initialized vector or a null pointer. If
  *        not a null pointer, then the immediate dominator of each
  *        vertex will be stored here. For vertices that are not
- *        reachable from the root, NaN is stored here. For
+ *        reachable from the root, -2 is stored here. For
  *        the root vertex itself, -1 is added.
  * \param domtree Pointer to an uninitialized igraph_t, or NULL. If
  *        not a null pointer, then the dominator tree is returned
@@ -420,17 +420,17 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
 
 igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                           igraph_integer_t root,
-                          igraph_vector_t *dom,
+                          igraph_vector_int_t *dom,
                           igraph_t *domtree,
-                          igraph_vector_t *leftout,
+                          igraph_vector_int_t *leftout,
                           igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     igraph_adjlist_t succ, pred;
-    igraph_vector_t parent;
+    igraph_vector_int_t parent;
     igraph_vector_int_t semi;    /* +1 always */
-    igraph_vector_t vertex;   /* +1 always */
+    igraph_vector_int_t vertex;   /* +1 always */
     igraph_i_dbucket_t bucket;
     igraph_vector_int_t ancestor;
     igraph_vector_int_t label;
@@ -439,7 +439,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     igraph_integer_t i;
 
-    igraph_vector_t vdom, *mydom = dom;
+    igraph_vector_int_t vdom, *mydom = dom;
 
     igraph_integer_t component_size = 0;
 
@@ -459,21 +459,17 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     }
 
     if (dom) {
-        IGRAPH_CHECK(igraph_vector_resize(dom, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(dom, no_of_nodes));
     } else {
         mydom = &vdom;
-        IGRAPH_VECTOR_INIT_FINALLY(mydom, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(mydom, no_of_nodes);
     }
-    igraph_vector_fill(mydom, IGRAPH_NAN);
+    igraph_vector_int_fill(mydom, -2);
 
-    IGRAPH_CHECK(igraph_vector_init(&parent, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_destroy, &parent);
-    IGRAPH_CHECK(igraph_vector_int_init(&semi, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &semi);
-    IGRAPH_CHECK(igraph_vector_init(&vertex, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_destroy, &vertex);
-    IGRAPH_CHECK(igraph_vector_int_init(&ancestor, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &ancestor);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&parent, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&semi, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ancestor, no_of_nodes);
     IGRAPH_CHECK(igraph_vector_int_init_seq(&label, 0, no_of_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &label);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
@@ -492,7 +488,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                             /*out_callback=*/ 0, /*extra=*/ 0));
 
     for (i = 0; i < no_of_nodes; i++) {
-        if (IGRAPH_FINITE(VECTOR(vertex)[i])) {
+        if (VECTOR(vertex)[i] >= 0) {
             igraph_integer_t t = VECTOR(vertex)[i];
             VECTOR(semi)[t] = component_size + 1;
             VECTOR(vertex)[component_size] = t + 1;
@@ -502,9 +498,9 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     if (leftout) {
         igraph_integer_t n = no_of_nodes - component_size;
         igraph_integer_t p = 0, j;
-        IGRAPH_CHECK(igraph_vector_resize(leftout, n));
+        IGRAPH_CHECK(igraph_vector_int_resize(leftout, n));
         for (j = 0; j < no_of_nodes && p < n; j++) {
-            if (!IGRAPH_FINITE(VECTOR(parent)[j])) {
+            if (VECTOR(parent)[j] < -1) {
                 VECTOR(*leftout)[p++] = j;
             }
         }
@@ -517,7 +513,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         igraph_integer_t j, n = igraph_vector_int_size(v);
         for (j = 0; j < n; ) {
             igraph_integer_t v2 = VECTOR(*v)[j];
-            if (IGRAPH_FINITE(VECTOR(parent)[v2])) {
+            if (VECTOR(parent)[v2] >= -1) {
                 j++;
             } else {
                 VECTOR(*v)[j] = VECTOR(*v)[n - 1];
@@ -540,11 +536,10 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                 VECTOR(semi)[w] = VECTOR(semi)[u];
             }
         }
-        igraph_i_dbucket_insert(&bucket, (igraph_integer_t)
-                                VECTOR(vertex)[ VECTOR(semi)[w] - 1 ] - 1, w);
-        igraph_i_dominator_LINK((igraph_integer_t) VECTOR(parent)[w], w, &ancestor);
-        while (!igraph_i_dbucket_empty(&bucket, (igraph_integer_t) VECTOR(parent)[w])) {
-            igraph_integer_t v = igraph_i_dbucket_delete(&bucket, (igraph_integer_t) VECTOR(parent)[w]);
+        igraph_i_dbucket_insert(&bucket, VECTOR(vertex)[ VECTOR(semi)[w] - 1 ] - 1, w);
+        igraph_i_dominator_LINK(VECTOR(parent)[w], w, &ancestor);
+        while (!igraph_i_dbucket_empty(&bucket, VECTOR(parent)[w])) {
+            igraph_integer_t v = igraph_i_dbucket_delete(&bucket, VECTOR(parent)[w]);
             igraph_integer_t u = igraph_i_dominator_EVAL(v, &ancestor, &label, &semi);
             VECTOR(*mydom)[v] = VECTOR(semi)[u] < VECTOR(semi)[v] ? u :
                                 VECTOR(parent)[w];
@@ -556,7 +551,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     for (i = 1; i < component_size; i++) {
         igraph_integer_t w = VECTOR(vertex)[i] - 1;
         if (VECTOR(*mydom)[w] != VECTOR(vertex)[VECTOR(semi)[w] - 1] - 1) {
-            VECTOR(*mydom)[w] = VECTOR(*mydom)[(igraph_integer_t)VECTOR(*mydom)[w]];
+            VECTOR(*mydom)[w] = VECTOR(*mydom)[VECTOR(*mydom)[w]];
         }
     }
     VECTOR(*mydom)[root] = -1;
@@ -566,9 +561,9 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     igraph_adjlist_destroy(&succ);
     igraph_vector_int_destroy(&label);
     igraph_vector_int_destroy(&ancestor);
-    igraph_vector_destroy(&vertex);
+    igraph_vector_int_destroy(&vertex);
     igraph_vector_int_destroy(&semi);
-    igraph_vector_destroy(&parent);
+    igraph_vector_int_destroy(&parent);
     IGRAPH_FINALLY_CLEAN(8);
 
     if (domtree) {
@@ -576,7 +571,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         igraph_integer_t ptr = 0;
         IGRAPH_VECTOR_INIT_FINALLY(&edges, component_size * 2 - 2);
         for (i = 0; i < no_of_nodes; i++) {
-            if (i != root && IGRAPH_FINITE(VECTOR(*mydom)[i])) {
+            if (i != root && VECTOR(*mydom)[i] >= 0) {
                 if (mode == IGRAPH_OUT) {
                     VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
                     VECTOR(edges)[ptr++] = i;
@@ -597,7 +592,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     }
 
     if (!dom) {
-        igraph_vector_destroy(&vdom);
+        igraph_vector_int_destroy(&vdom);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -729,14 +724,14 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_t Sbar;
     igraph_vector_t Sbar_map, Sbar_invmap;
-    igraph_vector_t keep;
+    igraph_vector_int_t keep;
     igraph_t domtree;
-    igraph_vector_t leftout;
+    igraph_vector_int_t leftout;
     igraph_integer_t i, nomin, n;
     igraph_integer_t root;
     igraph_vector_t M;
     igraph_vector_bool_t GammaS;
-    igraph_vector_t Nuv;
+    igraph_vector_int_t Nuv;
     igraph_vector_t Isv_min;
     igraph_vector_t GammaS_vec;
     igraph_integer_t Sbar_size;
@@ -747,20 +742,20 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&Sbar_invmap, 0);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&keep, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&keep, 0);
     for (i = 0; i < no_of_nodes; i++) {
         if (!igraph_marked_queue_iselement(S, i)) {
-            IGRAPH_CHECK(igraph_vector_push_back(&keep, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&keep, i));
         }
     }
-    Sbar_size = igraph_vector_size(&keep);
+    Sbar_size = igraph_vector_int_size(&keep);
 
     IGRAPH_CHECK(igraph_induced_subgraph_map(graph, &Sbar,
                  igraph_vss_vector(&keep),
                  IGRAPH_SUBGRAPH_AUTO,
                  /* map= */ &Sbar_map,
                  /* invmap= */ &Sbar_invmap));
-    igraph_vector_destroy(&keep);
+    igraph_vector_int_destroy(&keep);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, &Sbar);
 
@@ -769,7 +764,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     /* -------------------------------------------------------------*/
     /* Construct the dominator tree of Sbar */
 
-    IGRAPH_VECTOR_INIT_FINALLY(&leftout, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&leftout, 0);
     IGRAPH_CHECK(igraph_dominator_tree(&Sbar, root,
                                        /*dom=*/ 0, &domtree,
                                        &leftout, IGRAPH_IN));
@@ -810,10 +805,10 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
        correspond to node labelling of graph instead of SBar.
        At the same time ensure that GammaS is a proper subset of
        L, where L are the nodes in the dominator tree. */
-    n = igraph_vector_size(&leftout);
+    n = igraph_vector_int_size(&leftout);
     for (i = 0; i < n; i++) {
-        VECTOR(leftout)[i] = VECTOR(Sbar_invmap)[(igraph_integer_t)VECTOR(leftout)[i]];
-        VECTOR(GammaS)[(igraph_integer_t)VECTOR(leftout)[i]] = 0;
+        VECTOR(leftout)[i] = VECTOR(Sbar_invmap)[VECTOR(leftout)[i]];
+        VECTOR(GammaS)[VECTOR(leftout)[i]] = 0;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&M, 0);
@@ -823,7 +818,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     }
 
     igraph_vector_clear(Isv);
-    IGRAPH_VECTOR_INIT_FINALLY(&Nuv, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Nuv, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&GammaS_vec, 0);
     for (i = 0; i < no_of_nodes; i++) {
@@ -846,16 +841,16 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                                 /*order_out=*/ 0, /*father=*/ 0, /*dist=*/ 0,
                                 /*in_callback=*/ 0, /*out_callback=*/ 0,
                                 /*extra=*/ 0));
-        /* Remove the NAN values from the end of the vector */
+        /* Remove the negative values from the end of the vector */
         for (nuvsize = 0; nuvsize < Sbar_size; nuvsize++) {
-            igraph_real_t t = VECTOR(Nuv)[nuvsize];
-            if (IGRAPH_FINITE(t)) {
-                VECTOR(Nuv)[nuvsize] = VECTOR(Sbar_invmap)[(igraph_integer_t) t];
+            igraph_integer_t t = VECTOR(Nuv)[nuvsize];
+            if (t >= 0) {
+                VECTOR(Nuv)[nuvsize] = VECTOR(Sbar_invmap)[t];
             } else {
                 break;
             }
         }
-        igraph_vector_resize(&Nuv, nuvsize);
+        igraph_vector_int_resize(&Nuv, nuvsize);
 
         /* -------------------------------------------------------------*/
         /* By a BFS search of <Nu(v)> determine I(S,v)-K.
@@ -888,7 +883,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         if (j == isvlen) {
             *v = VECTOR(M)[i];
             /* Calculate real Isv */
-            IGRAPH_CHECK(igraph_vector_append(&Nuv, &leftout));
+            IGRAPH_CHECK(igraph_vector_int_append(&Nuv, &leftout));
             IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,
                                     /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                                     /*unreachable=*/ 0, /*restricted=*/ &Nuv,
@@ -909,13 +904,13 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
     igraph_vector_destroy(&GammaS_vec);
     igraph_vector_destroy(&Isv_min);
-    igraph_vector_destroy(&Nuv);
+    igraph_vector_int_destroy(&Nuv);
     IGRAPH_FINALLY_CLEAN(3);
 
     igraph_vector_destroy(&M);
     igraph_vector_bool_destroy(&GammaS);
     igraph_destroy(&domtree);
-    igraph_vector_destroy(&leftout);
+    igraph_vector_int_destroy(&leftout);
     igraph_destroy(&Sbar);
     igraph_vector_destroy(&Sbar_map);
     igraph_vector_destroy(&Sbar_invmap);
@@ -1222,7 +1217,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, j;
     igraph_vector_t Sbar_map, Sbar_invmap;
-    igraph_vector_t keep;
+    igraph_vector_int_t keep;
     igraph_t Sbar;
     igraph_vector_t M;
     igraph_integer_t nomin;
@@ -1238,10 +1233,10 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&Sbar_invmap, 0);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&keep, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&keep, 0);
     for (i = 0; i < no_of_nodes; i++) {
         if (!igraph_marked_queue_iselement(S, i)) {
-            IGRAPH_CHECK(igraph_vector_push_back(&keep, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&keep, i));
         }
     }
 
@@ -1300,7 +1295,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     igraph_vector_destroy(&M);
     igraph_destroy(&Sbar);
-    igraph_vector_destroy(&keep);
+    igraph_vector_int_destroy(&keep);
     igraph_vector_destroy(&Sbar_invmap);
     igraph_vector_destroy(&Sbar_map);
     IGRAPH_FINALLY_CLEAN(5);

@@ -79,16 +79,16 @@ IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_boo
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                                const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
                                                           igraph_t *mst);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
                                                     const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                               igraph_integer_t vid);
 
-IGRAPH_EXPORT igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid,
+IGRAPH_EXPORT igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vid,
                                       igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
@@ -112,7 +112,7 @@ IGRAPH_EXPORT igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *
                                                      igraph_vector_t *knnk,
                                                      const igraph_vector_t *weights);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
                                           const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
 
 /* -------------------------------------------------- */

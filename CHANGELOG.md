@@ -27,10 +27,24 @@
    generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
    variant of the same data type.
 
+ - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
+   the list of articulation points, not an `igraph_vector_t`.
+
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
    `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
    an `igraph_vector_int_t` for the out-degree sequence of the nodes being
    generated instead of an `igraph_vector_t`.
+
+ - `igraph_bfs()` now takes an `igraph_vector_int_t` for its `restricted`
+   argument instead of an `igraph_vector_t`.
+
+ - `igraph_biconnected_components()` now uses an `igraph_vector_int_t` to return
+   the list of articulation points, not an `igraph_vector_t`. Also, the members
+   of the pointer vectors containing the edges and vertices of the components
+   are now of type `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - `igraph_bridges()` now uses an `igraph_vector_int_t` to return the list of
+   bridges, not an `igraph_vector_t`.
 
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
@@ -38,13 +52,44 @@
  - `igraph_convex_hull()` now uses an `igraph_vector_int_t` to return the
    indices of the input vertices that were chosen to be in the convex hull.
 
+ - `igraph_decompose()` now uses an `igraph_integer_t` for its `maxcompno` and
+   `minelements` arguments instead of a `long int`.
+
  - `igraph_degree_sequnce_game()` now takes degree sequences represented as
    `igraph_vector_int_t` instead of `igraph_vector_t`.
+
+ - `igraph_dfs()` now takes an `igraph_vector_int_t` for its `order`, `order_out`,
+   `father` and `dist` arguments instead of an `igraph_vector_t`. Furthermore,
+   these vectors will contain -2 for vertices that have not been visited; in
+   earlier versions, they used to contain NaN instead. Note that -1 is still
+   used in the `father` vector to indicate the root of a DFS tree.
+
+ - `igraph_diameter()` and `igraph_diameter_dijkstra()` now use `igraph_vector_int_t`
+   vectors to return the list of vertex and edge IDs in the diameter.
+
+ - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
+   `dom` and `leftout` arguments instead of an `igraph_vector_t`.
+
+ - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
+   IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
+
+ - `igraph_get_eids()` and `igraph_get_eids_multi()` now use `igraph_vector_int_t`
+   to return lists of edge IDs and to receive lists of vertex IDs.
+
+ - `igraph_get_shortest_path()`, `igraph_get_shortest_path_bellman_ford()` and
+   `igraph_get_shortest_path_dijkstra()` now use `igraph_vector_int_t` vectors
+   to return the list of vertex and edge IDs in the shortest path.
 
  - `igraph_get_shortest_paths()`, `igraph_get_shortest_paths_dijkstra()` and
    `igraph_get_shortest_paths_bellman_ford()` now use an `igraph_vector_int_t`
    to return the predecessors and inbound edges instead of an
    `igraph_vector_long_t`.
+
+ - The pointer vectors in the argument lists of `igraph_get_all_shortest_paths()`,
+   `igraph_get_all_shortest_paths_dijkstra()`, `igraph_get_shortest_paths()`,
+   `igraph_get_shortesT_paths_bellman_ford()` and
+   `igraph_get_shortest_paths_dijkstra()` now contain `igraph_vector_int_t` vectors
+   instead of `igraph_vector_t`.
 
  - `igraph_hrg_init()` and `igraph_hrg_resize()` now takes an `igraph_integer_t`
    as their size arguments instead of an `int`.
@@ -59,9 +104,27 @@
    use an `igraph_vector_int_t` to return the matching instead of an
    `igraph_vector_long_t`.
 
+ - `igraph_spanner()` now uses an `igraph_vector_int_t` to return the vector
+   of edge IDs in the spanner instead of an `igraph_vector_t`.
+
+ - `igraph_spanning_tree()`, `igraph_minimum_spanning_tree()` and
+   `igraph_random_spanning_tree()` now all use an `igraph_vector_int_t` to
+   return the vector of edge IDs in the spanning tree instead of an
+   `igraph_vector_t`.
+
  - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
    `igraph_vector_t`.
+
+ - `igraph_subcomponent()` now uses an `igraph_integer_t` for the seed vertex
+   instead of an `igraph_real_t`. It also uses an `igraph_vector_int_t` to
+   return the list of vertices in the same component as the seed vertex instead
+   of an `igraph_vector_t`.
+
+ - `igraph_vs_vector()`, `igraph_vss_vector()` and `igraph_vs_vector_copy()` now
+   all take an `igraph_vector_int_t` as the vector of vertex IDs, not an
+   `igraph_vector_t`. Similarly, `igraph_vs_as_vector()` now returns the vector
+   of matched vertex IDs in an `igraph_vector_int_t`, not an `igraph_vector_t`.
 
  - `igraph_write_graph_dimacs()` now uses `igraph_integer_t` for the source and
    target vertex index instead of a `long int`.

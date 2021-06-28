@@ -930,17 +930,17 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
 
 igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
                     igraph_integer_t *pfrom, igraph_integer_t *pto,
-                    igraph_vector_t *vertex_path, igraph_vector_t *edge_path,
+                    igraph_vector_int_t *vertex_path, igraph_vector_int_t *edge_path,
                     igraph_bool_t directed, igraph_bool_t unconn) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int i, j, n;
-    long int *already_added;
-    long int nodes_reached;
-    long int from = 0, to = 0;
+    igraph_integer_t i, j, n;
+    igraph_integer_t *already_added;
+    igraph_integer_t nodes_reached;
+    igraph_integer_t from = 0, to = 0;
     igraph_real_t res = 0;
 
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     igraph_neimode_t dirmode;
     igraph_adjlist_t allneis;
@@ -952,10 +952,10 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
             *pres = IGRAPH_NAN;
         }
         if (vertex_path) {
-            igraph_vector_clear(vertex_path);
+            igraph_vector_int_clear(vertex_path);
         }
         if (edge_path) {
-            igraph_vector_clear(edge_path);
+            igraph_vector_int_clear(edge_path);
         }
         if (pfrom) {
             *pfrom = -1;
@@ -971,29 +971,29 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     } else {
         dirmode = IGRAPH_ALL;
     }
-    already_added = IGRAPH_CALLOC(no_of_nodes, long int);
+    already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_added == 0) {
         IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, already_added);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     for (i = 0; i < no_of_nodes; i++) {
         nodes_reached = 1;
-        IGRAPH_CHECK(igraph_dqueue_push(&q, i));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         already_added[i] = i + 1;
 
         IGRAPH_PROGRESS("Diameter: ", 100.0 * i / no_of_nodes, NULL);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            long int actnode = igraph_dqueue_pop(&q);
-            long int actdist = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             if (actdist > res) {
                 res = actdist;
                 from = i;
@@ -1003,14 +1003,14 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int neighbor = VECTOR(*neis)[j];
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (already_added[neighbor] == i + 1) {
                     continue;
                 }
                 already_added[neighbor] = i + 1;
                 nodes_reached++;
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
         } /* while !igraph_dqueue_empty */
 
@@ -1030,30 +1030,28 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
         *pres = res;
     }
     if (pfrom != 0) {
-        *pfrom = (igraph_integer_t) from;
+        *pfrom = from;
     }
     if (pto != 0) {
-        *pto = (igraph_integer_t) to;
+        *pto = to;
     }
     if ((vertex_path) || (edge_path)) {
         if (! igraph_finite(res)) {
             if (vertex_path) {
-                igraph_vector_clear(vertex_path);
+                igraph_vector_int_clear(vertex_path);
             }
             if (edge_path){
-                igraph_vector_clear(edge_path);
+                igraph_vector_int_clear(edge_path);
             }
         } else {
             IGRAPH_CHECK(igraph_get_shortest_path(graph, vertex_path, edge_path,
-                                                    (igraph_integer_t) from,
-                                                    (igraph_integer_t)to,
-                                                    dirmode));
+                                                  from, to, dirmode));
         }
     }
 
     /* clean */
     IGRAPH_FREE(already_added);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -1105,8 +1103,8 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                              igraph_real_t *pres,
                              igraph_integer_t *pfrom,
                              igraph_integer_t *pto,
-                             igraph_vector_t *vertex_path,
-                             igraph_vector_t *edge_path,
+                             igraph_vector_int_t *vertex_path,
+                             igraph_vector_int_t *edge_path,
                              igraph_bool_t directed,
                              igraph_bool_t unconn) {
 
@@ -1130,12 +1128,12 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
 
     igraph_2wheap_t Q;
     igraph_inclist_t inclist;
-    long int source, j;
+    igraph_integer_t source, j;
     igraph_neimode_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
-    long int from = -1, to = -1;
+    igraph_integer_t from = -1, to = -1;
     igraph_real_t res = 0;
-    long int nodes_reached = 0;
+    igraph_integer_t nodes_reached = 0;
 
     /* See https://github.com/igraph/igraph/issues/1538#issuecomment-724071857
      * for why we return NaN for the null graph. */
@@ -1144,10 +1142,10 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
             *pres = IGRAPH_NAN;
         }
         if (vertex_path) {
-            igraph_vector_clear(vertex_path);
+            igraph_vector_int_clear(vertex_path);
         }
         if (edge_path) {
-            igraph_vector_clear(edge_path);
+            igraph_vector_int_clear(edge_path);
         }
         if (pfrom) {
             *pfrom = -1;
@@ -1168,7 +1166,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) not equal to number of edges (%ld).",
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") not equal to number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
 
@@ -1198,10 +1196,10 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
         nodes_reached = 0.0;
 
         while (!igraph_2wheap_empty(&Q)) {
-            long int minnei = igraph_2wheap_max_index(&Q);
+            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
             igraph_vector_int_t *neis;
-            long int nlen;
+            igraph_integer_t nlen;
 
             if (mindist > res) {
                 res = mindist; from = source; to = minnei;
@@ -1212,7 +1210,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = VECTOR(*neis)[j];
+                igraph_integer_t edge = VECTOR(*neis)[j];
                 igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
@@ -1252,24 +1250,23 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
         *pres = res;
     }
     if (pfrom) {
-        *pfrom = (igraph_integer_t) from;
+        *pfrom = from;
     }
     if (pto) {
-        *pto = (igraph_integer_t) to;
+        *pto = to;
     }
     if ((vertex_path) || (edge_path)) {
         if (!igraph_finite(res)) {
             if (vertex_path){
-                igraph_vector_clear(vertex_path);
+                igraph_vector_int_clear(vertex_path);
             }
             if (edge_path) {
-                igraph_vector_clear(edge_path);
+                igraph_vector_int_clear(edge_path);
             }
         } else {
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
                             /*vertices=*/ vertex_path, /*edges=*/ edge_path,
-                            (igraph_integer_t) from,
-                            (igraph_integer_t) to,
+                            from, to,
                             weights, dirmode));
         }
     }

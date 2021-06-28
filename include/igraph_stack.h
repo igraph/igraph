@@ -64,6 +64,12 @@ __BEGIN_DECLS
 #undef BASE_PTR
 
 #define IGRAPH_STACK_NULL { 0,0,0 }
+#define IGRAPH_STACK_INIT_FINALLY(v, size) \
+    do { IGRAPH_CHECK(igraph_stack_init(v, size)); \
+        IGRAPH_FINALLY(igraph_stack_destroy, v); } while (0)
+#define IGRAPH_STACK_INT_INIT_FINALLY(v, size) \
+    do { IGRAPH_CHECK(igraph_stack_int_init(v, size)); \
+        IGRAPH_FINALLY(igraph_stack_int_destroy, v); } while (0)
 
 IGRAPH_EXPORT void igraph_stack_ptr_free_all(igraph_stack_ptr_t* s);
 IGRAPH_EXPORT void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* s);

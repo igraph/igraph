@@ -604,7 +604,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
         /* Network simplex algorithm of Gansner et al, using the original linear
          * programming formulation */
         igraph_integer_t i, j;
-        igraph_vector_t outdegs, indegs, feedback_edges;
+        igraph_vector_t outdegs, indegs;
+        igraph_vector_int_t feedback_edges;
         glp_prob *ip;
         glp_smcp parm;
 
@@ -615,20 +616,20 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
         /* Allocate storage and create the problem */
         ip = glp_create_prob();
         IGRAPH_FINALLY(glp_delete_prob, ip);
-        IGRAPH_VECTOR_INIT_FINALLY(&feedback_edges, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&feedback_edges, 0);
         IGRAPH_VECTOR_INIT_FINALLY(&outdegs, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&indegs, no_of_nodes);
 
         /* Find an approximate feedback edge set */
         IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, &feedback_edges, weights, 0));
-        igraph_vector_sort(&feedback_edges);
+        igraph_vector_int_sort(&feedback_edges);
 
         /* Calculate in- and out-strengths for the remaining edges */
         IGRAPH_CHECK(igraph_strength(graph, &indegs, igraph_vss_all(),
                                      IGRAPH_IN, 1, weights));
         IGRAPH_CHECK(igraph_strength(graph, &outdegs, igraph_vss_all(),
                                      IGRAPH_IN, 1, weights));
-        j = igraph_vector_size(&feedback_edges);
+        j = igraph_vector_int_size(&feedback_edges);
         for (i = 0; i < j; i++) {
             igraph_integer_t eid = VECTOR(feedback_edges)[i];
             igraph_integer_t from = IGRAPH_FROM(graph, eid);
@@ -658,7 +659,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
 
         /* Add constraints */
         glp_add_rows(ip, (int) no_of_edges);
-        IGRAPH_CHECK(igraph_vector_push_back(&feedback_edges, -1));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&feedback_edges, -1));
         j = 0;
         for (i = 0; i < no_of_edges; i++) {
             int ind[3];
@@ -694,7 +695,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
         }
 
         glp_delete_prob(ip);
-        igraph_vector_destroy(&feedback_edges);
+        igraph_vector_int_destroy(&feedback_edges);
         IGRAPH_FINALLY_CLEAN(2);
     } else if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_feedback_arc_set_eades(graph, 0, weights, membership));

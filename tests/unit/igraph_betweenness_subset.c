@@ -22,9 +22,11 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t node_vec, source_vec, target_vec, bet, bet2, weights, edges;
+    igraph_es_t es;
+    igraph_vector_t eb, bet, bet2, weights, edges;
+    igraph_vector_int_t node_vec, source_vec, target_vec;
     igraph_vs_t vs, vs_source, vs_target;
-    long int i, n;
+    igraph_integer_t i, vid, n;
 
     igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
@@ -55,7 +57,7 @@ int main() {
                                          /* start_from= */ 0);
 
     igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
-    
+
     igraph_vector_init(&bet, 0);
     igraph_vs_seq(&vs_source, 0, 500);
     igraph_vs_seq(&vs_target, 500, 999);
@@ -84,7 +86,7 @@ int main() {
      * first 9 vertices of layer 2, the first 98 vertices of layer 3 or the
      * first 980 vertices of layer 4; the betweenness of these vertices should
      * all be zeros.
-     * 
+     *
      * Also, the betweenness of the common grand-grandparent in layer 2 is easy
      * to calculate as any shortest path going between grand-grandchildren
      * reachable via its left child and via its right child should pass through
@@ -96,8 +98,8 @@ int main() {
      * are 1945 and 199 if the vertex being considered is a descendant of the
      * common grand-grandparent in layer 2, and zero otherwise. */
 
-    igraph_vs_seq(&vs_source, 10911, 11110); 
-    igraph_vs_seq(&vs_target, 10911, 11110);    
+    igraph_vs_seq(&vs_source, 10911, 11110);
+    igraph_vs_seq(&vs_target, 10911, 11110);
     igraph_vector_init(&bet, 0);
 
     igraph_betweenness_subset(
@@ -145,7 +147,7 @@ int main() {
 
         if (VECTOR(bet)[i] != expected) {
             printf(
-                "Invalid betweenness for vertex %ld, expected %ld, got %ld\n",
+                "Invalid betweenness for vertex %" IGRAPH_PRId ", expected %ld, got %ld\n",
                 i, expected, (long int) VECTOR(bet)[i]
             );
             break;
@@ -206,15 +208,15 @@ int main() {
     igraph_vector_init(&weights, igraph_ecount(&g));
     igraph_vector_fill(&weights, 1);
 
-    for (int i = 0; i<5; i++)
+    for (i = 0; i < 5; i++)
     {
-        igraph_vector_init_seq(&node_vec, 0, 4);
-        igraph_vector_remove(&node_vec, (long int) i);
+        igraph_vector_int_init_seq(&node_vec, 0, 4);
+        igraph_vector_int_remove(&node_vec, i);
         igraph_vs_vector(&vs, &node_vec);
-        igraph_vector_init_seq(&source_vec, 0, 4);
-        igraph_vector_remove(&source_vec, (long int) i);
+        igraph_vector_int_init_seq(&source_vec, 0, 4);
+        igraph_vector_int_remove(&source_vec, i);
         igraph_vs_vector(&vs_source, &source_vec);
-        printf("subset without %d\n", i);
+        printf("subset without %" IGRAPH_PRId "\n", i);
         printf("Unweighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
             /* res=       */ &bet,
@@ -238,9 +240,9 @@ int main() {
 
         IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
         igraph_vs_destroy(&vs);
-        igraph_vector_destroy(&node_vec);
+        igraph_vector_int_destroy(&node_vec);
         igraph_vs_destroy(&vs_source);
-        igraph_vector_destroy(&source_vec);
+        igraph_vector_int_destroy(&source_vec);
     }
 
     igraph_vector_destroy(&bet);
@@ -263,12 +265,12 @@ int main() {
     VECTOR(weights)[2] = 0.99;
     VECTOR(weights)[3] = 2;
 
-    for (int i = 0; i<3; i++)
+    for (i = 0; i < 3; i++)
     {
-        igraph_vector_init_seq(&target_vec, 0, 3);
-        igraph_vector_remove(&target_vec, (long int) i);
+        igraph_vector_int_init_seq(&target_vec, 0, 3);
+        igraph_vector_int_remove(&target_vec, i);
         igraph_vs_vector(&vs_target, &target_vec);
-        printf("subset without %d\n", i);
+        printf("subset without %" IGRAPH_PRId "\n", i);
         printf("Unweighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
             /* res=       */ &bet,
@@ -291,7 +293,7 @@ int main() {
         printf("\n");
 
         igraph_vs_destroy(&vs_target);
-        igraph_vector_destroy(&target_vec);
+        igraph_vector_int_destroy(&target_vec);
     }
 
     igraph_vector_destroy(&bet);
@@ -310,7 +312,7 @@ int main() {
         /* sources = */ igraph_vss_all(),
         /* target = */ igraph_vss_all(),
         /* weights=   */ NULL);
-    
+
     print_vector(&bet);
 
     igraph_vector_destroy(&bet);
@@ -329,13 +331,13 @@ int main() {
         igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
 
         igraph_vector_init(&bet, 0);
-        igraph_vector_init_seq(&target_vec, 0, (int) igraph_vcount(&g) - 1);
-        igraph_vector_remove(&target_vec, (long int)0);
+        igraph_vector_int_init_seq(&target_vec, 0, igraph_vcount(&g) - 1);
+        igraph_vector_int_remove(&target_vec, 0);
         igraph_vs_vector(&vs_target, &target_vec);
-        igraph_vector_init_seq(&source_vec, 0, (int) igraph_vcount(&g) - 1);
-        igraph_vector_remove(&source_vec, (long int) 0);
+        igraph_vector_int_init_seq(&source_vec, 0, igraph_vcount(&g) - 1);
+        igraph_vector_int_remove(&source_vec, 0);
         igraph_vs_vector(&vs_source, &source_vec);
-        
+
         igraph_betweenness_subset (/* graph=     */ &g,
         /* res=       */ &bet,
         /* vids=      */ igraph_vss_all(),
@@ -344,14 +346,14 @@ int main() {
         /* target = */ vs_target,
         /* weights=   */ NULL);;
         printf("Max betweenness: %f\n", igraph_vector_max(&bet));
-        
+
         igraph_vector_destroy(&bet);
         igraph_destroy(&g);
         igraph_vector_int_destroy(&dims);
         igraph_vs_destroy(&vs_target);
-        igraph_vector_destroy(&target_vec);
+        igraph_vector_int_destroy(&target_vec);
         igraph_vs_destroy(&vs_source);
-        igraph_vector_destroy(&source_vec);
+        igraph_vector_int_destroy(&source_vec);
     }
 
     VERIFY_FINALLY_STACK();

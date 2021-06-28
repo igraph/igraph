@@ -2296,9 +2296,9 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
            and target and calculate the disjoint paths on the new
            graph. Finally we add 1 for the removed connection(s).  */
         igraph_es_t es;
-        igraph_vector_t v;
+        igraph_vector_int_t v;
         igraph_t newgraph;
-        IGRAPH_VECTOR_INIT_FINALLY(&v, 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 2);
         VECTOR(v)[0] = source;
         VECTOR(v)[1] = target;
         IGRAPH_CHECK(igraph_es_multipairs(&es, &v, IGRAPH_DIRECTED));
@@ -2325,7 +2325,7 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
         IGRAPH_FINALLY_CLEAN(3);
         igraph_destroy(&newgraph);
         igraph_es_destroy(&es);
-        igraph_vector_destroy(&v);
+        igraph_vector_int_destroy(&v);
     }
 
     /* These do nothing if the two vertices are connected,

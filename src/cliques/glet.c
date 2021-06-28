@@ -321,7 +321,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
 
     igraph_vector_ptr_t mycliques;
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_t subv;
+    igraph_vector_int_t subv;
     igraph_t subg;
     igraph_integer_t i, nographs, nocliques;
     igraph_t *newgraphs = 0;
@@ -332,12 +332,12 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&mycliques, 0));
     IGRAPH_FINALLY(igraph_i_graphlets_destroy_vectorlist, &mycliques);
-    IGRAPH_VECTOR_INIT_FINALLY(&subv, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&subv, 0);
 
     /* We start by finding cliques at the lowest threshold */
     for (i = 0; i < no_of_edges; i++) {
         if (VECTOR(*weights)[i] >= startthr) {
-            IGRAPH_CHECK(igraph_vector_push_back(&subv, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&subv, i));
         }
     }
     igraph_subgraph_edges(graph, &subg, igraph_ess_vector(&subv),
@@ -348,7 +348,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
     nocliques = igraph_vector_ptr_size(&mycliques);
 
-    igraph_vector_destroy(&subv);
+    igraph_vector_int_destroy(&subv);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Get the next cliques and thresholds */

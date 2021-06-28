@@ -142,7 +142,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
             int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
                                     28, 33, 34, 39, 62, 120
                                   };
-            int i, n = sizeof(not_connected) / sizeof(int);
+            int i, n = sizeof(not_connected) / sizeof(not_connected[0]);
             for (i = 0; i < n; i++) {
                 VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
             }

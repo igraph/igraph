@@ -21,10 +21,10 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
-        VECTOR(vpath)[i] = igraph_Calloc(1, igraph_vector_t);
-        VECTOR(epath)[i] = igraph_Calloc(1, igraph_vector_t);
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(vpath)[i], 0));
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(epath)[i], 0));
+        VECTOR(vpath)[i] = igraph_Calloc(1, igraph_vector_int_t);
+        VECTOR(epath)[i] = igraph_Calloc(1, igraph_vector_int_t);
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(vpath)[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(epath)[i], 0));
     }
 
     IGRAPH_CHECK(igraph_get_shortest_paths(
@@ -34,15 +34,15 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
 
     printf("Vertices:\n");
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
-        print_vector(VECTOR(vpath)[i]);
-        igraph_vector_destroy(VECTOR(vpath)[i]);
+        print_vector_int(VECTOR(vpath)[i]);
+        igraph_vector_int_destroy(VECTOR(vpath)[i]);
     }
     printf("\n");
 
     printf("Edges:\n");
     for (i = 0; i < igraph_vector_ptr_size(&epath); i++) {
-        print_vector(VECTOR(epath)[i]);
-        igraph_vector_destroy(VECTOR(epath)[i]);
+        print_vector_int(VECTOR(epath)[i]);
+        igraph_vector_int_destroy(VECTOR(epath)[i]);
     }
     printf("\n");
 
@@ -84,10 +84,10 @@ int test_weighted(
     IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
-        VECTOR(vpath)[i] = igraph_Calloc(1, igraph_vector_t);
-        VECTOR(epath)[i] = igraph_Calloc(1, igraph_vector_t);
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(vpath)[i], 0));
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(epath)[i], 0));
+        VECTOR(vpath)[i] = igraph_Calloc(1, igraph_vector_int_t);
+        VECTOR(epath)[i] = igraph_Calloc(1, igraph_vector_int_t);
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(vpath)[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(epath)[i], 0));
     }
 
     if (use_bellman_ford) {
@@ -104,15 +104,15 @@ int test_weighted(
 
     printf("Vertices:\n");
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
-        print_vector(VECTOR(vpath)[i]);
-        igraph_vector_destroy(VECTOR(vpath)[i]);
+        print_vector_int(VECTOR(vpath)[i]);
+        igraph_vector_int_destroy(VECTOR(vpath)[i]);
     }
     printf("\n");
 
     printf("Edges:\n");
     for (i = 0; i < igraph_vector_ptr_size(&epath); i++) {
-        print_vector(VECTOR(epath)[i]);
-        igraph_vector_destroy(VECTOR(epath)[i]);
+        print_vector_int(VECTOR(epath)[i]);
+        igraph_vector_int_destroy(VECTOR(epath)[i]);
     }
     printf("\n");
 

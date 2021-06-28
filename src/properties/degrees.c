@@ -478,7 +478,8 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
                                      igraph_order_t order,
                                      igraph_bool_t only_indices) {
     igraph_integer_t i, n;
-    igraph_vector_t degrees, vs_vec;
+    igraph_vector_t degrees;
+    igraph_vector_int_t vs_vec;
     IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
     IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, outvids, order == IGRAPH_DESCENDING));
@@ -486,13 +487,13 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
         igraph_vector_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&vs_vec, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vs_vec, 0);
         IGRAPH_CHECK(igraph_vs_as_vector(graph, vids, &vs_vec));
         n = igraph_vector_int_size(outvids);
         for (i = 0; i < n; i++) {
             VECTOR(*outvids)[i] = VECTOR(vs_vec)[VECTOR(*outvids)[i]];
         }
-        igraph_vector_destroy(&vs_vec);
+        igraph_vector_int_destroy(&vs_vec);
         igraph_vector_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(2);
     }

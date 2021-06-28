@@ -405,7 +405,7 @@ static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igr
     /* Rewrite the map as edge weights */
     m = igraph_vector_size(&map2);
     for (i = 0; i < m; i++) {
-        VECTOR(map2)[i] = VECTOR(*weights_them)[ (int) VECTOR(map2)[i] ];
+        VECTOR(map2)[i] = VECTOR(*weights_them)[ (igraph_integer_t) VECTOR(map2)[i] ];
     }
 
     igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS,

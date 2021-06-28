@@ -45,9 +45,9 @@ int main() {
 
     igraph_t graph, ring;
     igraph_vector_t order, rank, father, pred, succ, dist;
-    igraph_vector_t restricted;
+    igraph_vector_int_t restricted;
     igraph_vector_t roots;
-    long int i;
+    igraph_integer_t i;
 
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);
@@ -97,9 +97,9 @@ int main() {
 
     /* Test restricted */
 
-    igraph_vector_init(&restricted, 0);
+    igraph_vector_int_init(&restricted, 0);
     for (i = 5; i < igraph_vcount(&graph); i++) {
-        igraph_vector_push_back(&restricted, i);
+        igraph_vector_int_push_back(&restricted, i);
     }
     printf("(");
     igraph_bfs(&graph, /*root=*/ 5, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
@@ -134,7 +134,7 @@ int main() {
     printf(" )\n");
 
     igraph_vector_destroy(&roots);
-    igraph_vector_destroy(&restricted);
+    igraph_vector_int_destroy(&restricted);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

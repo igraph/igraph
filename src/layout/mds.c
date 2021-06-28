@@ -233,16 +233,15 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
     } else {
         /* The graph is not connected, lay out the components one by one */
         igraph_vector_ptr_t layouts;
-        igraph_vector_int_t comp_tmp, vertex_order;
-        igraph_vector_t comp;
+        igraph_vector_int_t vertex_order;
+        igraph_vector_int_t comp;
         igraph_t subgraph;
         igraph_matrix_t *layout;
         igraph_matrix_t dist_submatrix;
         igraph_bool_t *seen_vertices;
         igraph_integer_t j, n, processed_vertex_count = 0;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&comp, 0);
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&comp_tmp, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&comp, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_order, no_of_nodes);
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&layouts, 0));
@@ -269,16 +268,8 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_induced_subgraph(graph, &subgraph, igraph_vss_vector(&comp),
                                                  IGRAPH_SUBGRAPH_AUTO));
             IGRAPH_FINALLY(igraph_destroy, &subgraph);
-            /* Temporary copt of comp into comp_tmp until we change the interface
-             * of igraph_subcomponent() to produce an igraph_vector_int_t */
-            n = igraph_vector_size(&comp);
-            IGRAPH_CHECK(igraph_vector_int_resize(&comp_tmp, n));
-            for (j = 0; j < n; j++) {
-                VECTOR(comp_tmp)[j] = VECTOR(comp)[j];
-            }
             /* Calculate the submatrix of the distances */
-            IGRAPH_CHECK(igraph_matrix_select_rows_cols(&m, &dist_submatrix,
-                         &comp_tmp, &comp_tmp));
+            IGRAPH_CHECK(igraph_matrix_select_rows_cols(&m, &dist_submatrix, &comp, &comp));
             /* Allocate a new matrix for storing the layout */
             layout = IGRAPH_CALLOC(1, igraph_matrix_t);
             if (layout == 0) {
@@ -296,10 +287,10 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
             igraph_destroy(&subgraph);
             IGRAPH_FINALLY_CLEAN(1);
             /* Mark all the vertices in the component as visited */
-            n = igraph_vector_size(&comp);
+            n = igraph_vector_int_size(&comp);
             for (j = 0; j < n; j++) {
-                seen_vertices[(long int)VECTOR(comp)[j]] = 1;
-                VECTOR(vertex_order)[(long int)VECTOR(comp)[j]] = processed_vertex_count++;
+                seen_vertices[VECTOR(comp)[j]] = 1;
+                VECTOR(vertex_order)[VECTOR(comp)[j]] = processed_vertex_count++;
             }
         }
         /* Merge the layouts - reusing dist_submatrix here */
@@ -311,9 +302,8 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
         igraph_matrix_destroy(&dist_submatrix);
         igraph_vector_ptr_destroy_all(&layouts);
         igraph_vector_int_destroy(&vertex_order);
-        igraph_vector_int_destroy(&comp_tmp);
-        igraph_vector_destroy(&comp);
-        IGRAPH_FINALLY_CLEAN(6);
+        igraph_vector_int_destroy(&comp);
+        IGRAPH_FINALLY_CLEAN(5);
     }
 
     RNG_END();

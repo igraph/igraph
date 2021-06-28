@@ -39,6 +39,9 @@ int check_flow(int errorinc,
     igraph_real_t cutsize;
     igraph_t graph_copy;
     igraph_matrix_t sp;
+    igraph_vector_int_t cut_int;
+
+    igraph_vector_int_init(&cut_int, 0);
 
     if (print) {
         printf("flow value: %g\n", (double) flow_value);
@@ -79,18 +82,18 @@ int check_flow(int errorinc,
         igraph_vector_init(&outedges, 0);
 
         for (i = 0; i < n; i++) {
-            long int n1, n2, j;
+            igraph_integer_t n1, n2, j;
             igraph_real_t in_flow = 0.0, out_flow = 0.0;
             igraph_incident(graph, &inedges,  i, IGRAPH_IN);
             igraph_incident(graph, &outedges, i, IGRAPH_OUT);
             n1 = igraph_vector_size(&inedges);
             n2 = igraph_vector_size(&outedges);
             for (j = 0; j < n1; j++) {
-                long int e = VECTOR(inedges)[j];
+                igraph_integer_t e = VECTOR(inedges)[j];
                 in_flow += VECTOR(*flow)[e];
             }
             for (j = 0; j < n2; j++) {
-                long int e = VECTOR(outedges)[j];
+                igraph_integer_t e = VECTOR(outedges)[j];
                 out_flow += VECTOR(*flow)[e];
             }
             if (i == source) {
@@ -121,7 +124,7 @@ int check_flow(int errorinc,
 
     /* Check the minimum cut size*/
     for (i = 0, cutsize = 0.0; i < nc; i++) {
-        long int edge = VECTOR(*cut)[i];
+        igraph_integer_t edge = VECTOR(*cut)[i];
         cutsize += VECTOR(*capacity)[edge];
     }
     if (fabs(cutsize - flow_value) > 1e-14) {
@@ -130,7 +133,13 @@ int check_flow(int errorinc,
 
     /* Check that the cut indeed cuts */
     igraph_copy(&graph_copy, graph);
-    igraph_delete_edges(&graph_copy, igraph_ess_vector(cut));
+
+    n = igraph_vector_size(cut);
+    igraph_vector_int_resize(&cut_int, n);
+    for (i = 0; i < n; i++) {
+        VECTOR(cut_int)[i] = VECTOR(*cut)[i];
+    }
+    igraph_delete_edges(&graph_copy, igraph_ess_vector(&cut_int));
     igraph_matrix_init(&sp, 1, 1);
     igraph_shortest_paths(&graph_copy, &sp, /*from=*/ igraph_vss_1(source),
                           /*to=*/ igraph_vss_1(target), IGRAPH_OUT);
@@ -139,6 +148,8 @@ int check_flow(int errorinc,
     }
     igraph_matrix_destroy(&sp);
     igraph_destroy(&graph_copy);
+
+    igraph_vector_int_destroy(&cut_int);
 
     return 0;
 }

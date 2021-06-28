@@ -23,15 +23,16 @@
 int main() {
     igraph_t graph;
     igraph_vector_ptr_t paths, paths_edge;
-    igraph_vector_t nrgeo, weights;
+    igraph_vector_int_t nrgeo;
+    igraph_vector_t weights;
     igraph_integer_t from, to;
-    long int i;
+    igraph_integer_t i;
 
     igraph_vector_ptr_init(&paths, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_int_destroy);
     igraph_vector_ptr_init(&paths_edge, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_edge, igraph_vector_destroy);
-    igraph_vector_init(&nrgeo, 0);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_edge, igraph_vector_int_destroy);
+    igraph_vector_int_init(&nrgeo, 0);
 
     igraph_vector_init(&weights, 0);
 
@@ -51,7 +52,7 @@ int main() {
     igraph_get_all_shortest_paths(&graph, &paths, NULL, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
+        print_vector_int(VECTOR(paths)[i]);
     }
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
     igraph_vector_ptr_free_all(&paths);
@@ -62,7 +63,7 @@ int main() {
     igraph_get_all_shortest_paths_dijkstra(&graph, &paths, NULL, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
+        print_vector_int(VECTOR(paths)[i]);
     }
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
     igraph_vector_ptr_free_all(&paths);
@@ -78,11 +79,11 @@ int main() {
 
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
+        print_vector_int(VECTOR(paths)[i]);
     }
 
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
-        print_vector(VECTOR(paths_edge)[i]);
+        print_vector_int(VECTOR(paths_edge)[i]);
     }
 
     igraph_vector_ptr_free_all(&paths);
@@ -104,10 +105,10 @@ int main() {
 
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
+        print_vector_int(VECTOR(paths)[i]);
     }
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
-        print_vector(VECTOR(paths_edge)[i]);
+        print_vector_int(VECTOR(paths_edge)[i]);
     }
 
     igraph_vector_ptr_free_all(&paths);
@@ -121,10 +122,10 @@ int main() {
 
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
+        print_vector_int(VECTOR(paths)[i]);
     }
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
-        print_vector(VECTOR(paths_edge)[i]);
+        print_vector_int(VECTOR(paths_edge)[i]);
     }
 
     igraph_vector_ptr_free_all(&paths);
@@ -138,10 +139,10 @@ int main() {
 
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
+        print_vector_int(VECTOR(paths)[i]);
     }
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
-        print_vector(VECTOR(paths_edge)[i]);
+        print_vector_int(VECTOR(paths_edge)[i]);
     }
 
     igraph_vector_ptr_free_all(&paths);
@@ -149,7 +150,7 @@ int main() {
 
     igraph_vector_ptr_destroy(&paths);
     igraph_vector_ptr_destroy(&paths_edge);
-    igraph_vector_destroy(&nrgeo);
+    igraph_vector_int_destroy(&nrgeo);
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 

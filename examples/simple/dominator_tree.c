@@ -27,9 +27,10 @@
 int main() {
 
     igraph_t g, domtree;
-    igraph_vector_t dom, leftout;
+    igraph_vector_int_t dom;
+    igraph_vector_int_t leftout;
 
-    igraph_vector_init(&dom, 0);
+    igraph_vector_int_init(&dom, 0);
     igraph_small(&g, 13, IGRAPH_DIRECTED,
                  0, 1, 0, 7, 0, 10,
                  1, 2, 1, 5,
@@ -53,20 +54,20 @@ int main() {
     /* Proper calculation */
     igraph_dominator_tree(&g, /*root=*/ 0, &dom, /*domtree=*/ 0,
                           /*leftout=*/ 0, /*mode=*/ IGRAPH_OUT);
-    igraph_vector_print(&dom);
+    igraph_vector_int_print(&dom);
 
     /* Tree calculation */
     igraph_dominator_tree(&g, /*root=*/ 0, /*dom=*/ 0, /*domtree=*/ &domtree,
                           /*leftout=*/ 0, /*mode=*/ IGRAPH_OUT);
     igraph_write_graph_edgelist(&domtree, stdout);
 
-    igraph_vector_destroy(&dom);
+    igraph_vector_int_destroy(&dom);
     igraph_destroy(&domtree);
     igraph_destroy(&g);
 
     /* -------------------------------------------------------------------*/
 
-    igraph_vector_init(&dom, 0);
+    igraph_vector_int_init(&dom, 0);
     igraph_small(&g, 13, IGRAPH_DIRECTED,
                  1, 0, 2, 0, 3, 0,
                  4, 1,
@@ -90,21 +91,21 @@ int main() {
     /* Proper calculation */
     igraph_dominator_tree(&g, /*root=*/ 0, &dom, /*domtree=*/ 0,
                           /*leftout=*/ 0, /*mode=*/ IGRAPH_IN);
-    igraph_vector_print(&dom);
+    igraph_vector_int_print(&dom);
 
     /* Tree calculation */
     igraph_dominator_tree(&g, /*root=*/ 0, /*dom=*/ 0, /*domtree=*/ &domtree,
                           /*leftout=*/ 0, /*mode=*/ IGRAPH_IN);
     igraph_write_graph_edgelist(&domtree, stdout);
 
-    igraph_vector_destroy(&dom);
+    igraph_vector_int_destroy(&dom);
     igraph_destroy(&domtree);
     igraph_destroy(&g);
 
     /* -------------------------------------------------------------------*/
 
-    igraph_vector_init(&dom, 0);
-    igraph_vector_init(&leftout, 0);
+    igraph_vector_int_init(&dom, 0);
+    igraph_vector_int_init(&leftout, 0);
 
     /* Check a graph with more components */
     igraph_small(&g, 20, IGRAPH_DIRECTED,
@@ -125,19 +126,19 @@ int main() {
 
     igraph_dominator_tree(&g, /*root=*/ 0, &dom, &domtree,
                           &leftout, /*mode=*/ IGRAPH_OUT);
-    igraph_vector_print(&dom);
-    igraph_vector_print(&leftout);
+    igraph_vector_int_print(&dom);
+    igraph_vector_int_print(&leftout);
     igraph_write_graph_edgelist(&domtree, stdout);
 
-    igraph_vector_destroy(&dom);
-    igraph_vector_destroy(&leftout);
+    igraph_vector_int_destroy(&dom);
+    igraph_vector_int_destroy(&leftout);
     igraph_destroy(&domtree);
     igraph_destroy(&g);
 
     /* -------------------------------------------------------------------*/
 
-    igraph_vector_init(&dom, 0);
-    igraph_vector_init(&leftout, 0);
+    igraph_vector_int_init(&dom, 0);
+    igraph_vector_int_init(&leftout, 0);
 
     igraph_small(&g, 10, IGRAPH_DIRECTED,
                  0, 9,
@@ -152,12 +153,12 @@ int main() {
 
     igraph_dominator_tree(&g, /*root=*/ 9, &dom, &domtree,
                           &leftout, /*mode=*/ IGRAPH_IN);
-    igraph_vector_print(&dom);
-    igraph_vector_print(&leftout);
+    igraph_vector_int_print(&dom);
+    igraph_vector_int_print(&leftout);
     igraph_write_graph_edgelist(&domtree, stdout);
 
-    igraph_vector_destroy(&dom);
-    igraph_vector_destroy(&leftout);
+    igraph_vector_int_destroy(&dom);
+    igraph_vector_int_destroy(&leftout);
     igraph_destroy(&domtree);
     igraph_destroy(&g);
 

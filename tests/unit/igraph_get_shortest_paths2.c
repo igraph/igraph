@@ -45,13 +45,13 @@ int main() {
     igraph_vector_int_init(&inbound_edges, 0);
 
     for (i = 0; i < vcount; i++) {
-        igraph_vector_t *v1 = malloc(sizeof(igraph_vector_t));
-        igraph_vector_t *v2 = malloc(sizeof(igraph_vector_t));
+        igraph_vector_int_t *v1 = malloc(sizeof(igraph_vector_int_t));
+        igraph_vector_int_t *v2 = malloc(sizeof(igraph_vector_int_t));
         if (!v1 || !v2) {
             exit(2);
         }
-        igraph_vector_init(v1, 0);
-        igraph_vector_init(v2, 0);
+        igraph_vector_int_init(v1, 0);
+        igraph_vector_int_init(v2, 0);
         VECTOR(resvertices)[i] = v1;
         VECTOR(resedges)[i] = v2;
     }
@@ -61,12 +61,12 @@ int main() {
                               &predecessors, &inbound_edges);
 
     for (i = 0; i < vcount; i++) {
-        igraph_vector_t *v1 = VECTOR(resvertices)[i];
-        igraph_vector_t *v2 = VECTOR(resedges)[i];
+        igraph_vector_int_t *v1 = VECTOR(resvertices)[i];
+        igraph_vector_int_t *v2 = VECTOR(resedges)[i];
         printf("%i V: ", i);
-        igraph_vector_print(v1);
+        igraph_vector_int_print(v1);
         printf("%i E: ", i);
-        igraph_vector_print(v2);
+        igraph_vector_int_print(v2);
     }
     printf("pred: ");
     igraph_vector_int_print(&predecessors);
@@ -76,10 +76,10 @@ int main() {
     igraph_vector_int_destroy(&inbound_edges);
     igraph_vector_int_destroy(&predecessors);
     for (i = 0; i < vcount; i++) {
-        igraph_vector_t *v1 = VECTOR(resvertices)[i];
-        igraph_vector_t *v2 = VECTOR(resedges)[i];
-        igraph_vector_destroy(v1);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_t *v1 = VECTOR(resvertices)[i];
+        igraph_vector_int_t *v2 = VECTOR(resedges)[i];
+        igraph_vector_int_destroy(v1);
+        igraph_vector_int_destroy(v2);
         igraph_free(v1);
         igraph_free(v2);
     }

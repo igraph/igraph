@@ -98,7 +98,7 @@
 igraph_error_t igraph_bfs(const igraph_t *graph,
                igraph_integer_t root, const igraph_vector_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
-               const igraph_vector_t *restricted,
+               const igraph_vector_int_t *restricted,
                igraph_vector_t *order, igraph_vector_t *rank,
                igraph_vector_t *father,
                igraph_vector_t *pred, igraph_vector_t *succ,
@@ -133,8 +133,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
     }
 
     if (restricted) {
-        igraph_real_t min, max;
-        igraph_vector_minmax(restricted, &min, &max);
+        igraph_integer_t min, max;
+        igraph_vector_int_minmax(restricted, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
             IGRAPH_ERROR("Invalid vertex id in restricted set", IGRAPH_EINVAL);
         }
@@ -161,10 +161,10 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
        found. Special care must be taken for vertices that are not in
        the restricted set, but are to be used as 'root' vertices. */
     if (restricted) {
-        igraph_integer_t i, n = igraph_vector_size(restricted);
+        igraph_integer_t i, n = igraph_vector_int_size(restricted);
         igraph_vector_char_fill(&added, 1);
         for (i = 0; i < n; i++) {
-            long int v = VECTOR(*restricted)[i];
+            igraph_integer_t v = VECTOR(*restricted)[i];
             VECTOR(added)[v] = 0;
         }
     }
@@ -454,7 +454,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
  *        graphs are stored here, in the order of the completion of
  *        their subtree.
  * \param father If not a null pointer, then the id of the father of
- *        each vertex is stored here.
+ *        each vertex is stored here. -1 will be stored for the root of the
+ *        search tree; -2 will be stored for vertices that were not visited.
  * \param dist If not a null pointer, then the distance from the root of
  *        the current search tree is stored here.
  * \param in_callback If not null, then it should be a pointer to a
@@ -472,9 +473,9 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
 
 igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_neimode_t mode, igraph_bool_t unreachable,
-               igraph_vector_t *order,
-               igraph_vector_t *order_out, igraph_vector_t *father,
-               igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
+               igraph_vector_int_t *order,
+               igraph_vector_int_t *order_out, igraph_vector_int_t *father,
+               igraph_vector_int_t *dist, igraph_dfshandler_t *in_callback,
                igraph_dfshandler_t *out_callback,
                void *extra) {
 
@@ -484,10 +485,10 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     igraph_vector_char_t added;
     igraph_vector_int_t nptr;
     igraph_error_t ret;
-    long int actroot;
-    long int act_rank = 0;
-    long int rank_out = 0;
-    long int act_dist = 0;
+    igraph_integer_t actroot;
+    igraph_integer_t act_rank = 0;
+    igraph_integer_t rank_out = 0;
+    igraph_integer_t act_dist = 0;
 
     if (root < 0 || root >= no_of_nodes) {
         IGRAPH_ERROR("Invalid root vertex for DFS", IGRAPH_EINVAL);
@@ -521,8 +522,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     /* Resize result vectors and fill them with IGRAPH_NAN */
 
 # define VINIT(v) if (v) {                      \
-        igraph_vector_resize(v, no_of_nodes);       \
-        igraph_vector_fill(v, IGRAPH_NAN); }
+        IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes));       \
+        igraph_vector_int_fill(v, -2); }
 
     VINIT(order);
     VINIT(order_out);
@@ -574,7 +575,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             }
 
             if (in_callback) {
-                IGRAPH_CHECK_CALLBACK(in_callback(graph, (igraph_integer_t) actroot, 0, extra), &ret);
+                IGRAPH_CHECK_CALLBACK(in_callback(graph, actroot, 0, extra), &ret);
                 if (ret == IGRAPH_STOP) {
                     FREE_ALL();
                     return IGRAPH_SUCCESS;
@@ -586,8 +587,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
         while (!igraph_stack_empty(&stack)) {
             igraph_integer_t actvect = igraph_stack_top(&stack);
-            igraph_vector_int_t *neis =
-                igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actvect);
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             igraph_integer_t n = igraph_vector_int_size(neis);
             igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, actvect);
 
@@ -616,12 +616,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
                 if (in_callback) {
                     IGRAPH_CHECK_CALLBACK(
-                        in_callback(
-                            graph,
-                            (igraph_integer_t) nei,
-                            (igraph_integer_t) act_dist,
-                            extra
-                        ),
+                        in_callback(graph, nei, act_dist, extra),
                         &ret
                     );
                     if (ret == IGRAPH_STOP) {
@@ -640,12 +635,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
                 if (out_callback) {
                     IGRAPH_CHECK_CALLBACK(
-                        out_callback(
-                            graph,
-                            (igraph_integer_t) actvect,
-                            (igraph_integer_t) act_dist,
-                            extra
-                        ),
+                        out_callback(graph, actvect, act_dist, extra),
                         &ret
                     );
 

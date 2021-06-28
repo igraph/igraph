@@ -79,7 +79,7 @@
  *
  * Time complexity: depends on \p algo, see the time complexities there.
  */
-igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
                             const igraph_vector_t *weights, igraph_fas_algorithm_t algo) {
 
     if (weights && igraph_vector_size(weights) < igraph_ecount(graph))
@@ -105,12 +105,12 @@ igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *r
 /**
  * Solves the feedback arc set problem for undirected graphs.
  */
-igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights, igraph_vector_t *layering) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes - 1);
     if (weights) {
         /* Find a maximum weight spanning tree. igraph has a routine for minimum
          * spanning trees, so we negate the weights */
@@ -129,18 +129,18 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
     /* Now we have a bunch of edges that constitute a spanning forest. We have
      * to come up with a layering, and return those edges that are not in the
      * spanning forest */
-    igraph_vector_sort(&edges);
-    IGRAPH_CHECK(igraph_vector_push_back(&edges, -1));  /* guard element */
+    igraph_vector_int_sort(&edges);
+    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, -1));  /* guard element */
 
     if (result != 0) {
-        igraph_vector_clear(result);
+        igraph_vector_int_clear(result);
         n = igraph_ecount(graph);
         for (i = 0, j = 0; i < n; i++) {
             if (i == VECTOR(edges)[j]) {
                 j++;
                 continue;
             }
-            IGRAPH_CHECK(igraph_vector_push_back(result, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
         }
     }
 
@@ -185,7 +185,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -194,7 +194,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
 /**
  * Solves the feedback arc set problem using the heuristics of Eades et al.
  */
-igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_int_t *result,
                                     const igraph_vector_t *weights, igraph_vector_t *layers) {
     igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
     igraph_dqueue_t sources, sinks;
@@ -384,12 +384,12 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
     /* Find the feedback edges based on the ordering */
     if (result != 0) {
-        igraph_vector_clear(result);
+        igraph_vector_int_clear(result);
         j = igraph_ecount(graph);
         for (i = 0; i < j; i++) {
             igraph_integer_t from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
             if (from == to || ordering[from] > ordering[to]) {
-                IGRAPH_CHECK(igraph_vector_push_back(result, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
             }
         }
     }
@@ -442,7 +442,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 /**
  * Solves the feedback arc set problem using integer programming.
  */
-igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_int_t *result,
                                  const igraph_vector_t *weights) {
 #ifndef HAVE_GLPK
     IGRAPH_ERROR("GLPK is not available", IGRAPH_UNIMPLEMENTED);
@@ -463,7 +463,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     IGRAPH_VECTOR_INIT_FINALLY(&ordering, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_remapping, no_of_vertices);
 
-    igraph_vector_clear(result);
+    igraph_vector_int_clear(result);
 
     /* Decompose the graph into connected components */
     IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
@@ -656,7 +656,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
             from = VECTOR(vertex_remapping)[IGRAPH_FROM(graph, l)];
             to = VECTOR(vertex_remapping)[IGRAPH_TO(graph, l)];
             if (from == to || VECTOR(ordering)[from] < VECTOR(ordering)[to]) {
-                IGRAPH_CHECK(igraph_vector_push_back(result, l));
+                IGRAPH_CHECK(igraph_vector_int_push_back(result, l));
             }
         }
 
