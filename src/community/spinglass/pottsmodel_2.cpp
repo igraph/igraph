@@ -113,8 +113,8 @@ PottsModel::~PottsModel() {
 //when called with positve one.
 //This may be handy, if you want to warm up the network.
 //####################################################
-unsigned long PottsModel::assign_initial_conf(long int spin) {
-    long int s;
+unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
+    igraph_integer_t s;
     DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
     NNode *n_cur;
@@ -755,7 +755,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     //HugeArray<int> neighbours;
     double norm, r, beta, minweight, prefac = 0;
     bool found;
-    long int number_of_nodes;
+    igraph_integer_t number_of_nodes;
     sweep = 0;
     changes = 0;
     number_of_nodes = net->node_list->Size();
@@ -1248,7 +1248,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 
     //die Elemente der Cluster
     if (membership) {
-        long int no = -1;
+        igraph_integer_t no = -1;
         IGRAPH_CHECK(igraph_vector_int_resize(membership, num_of_nodes));
         for (unsigned long spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {

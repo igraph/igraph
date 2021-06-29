@@ -246,7 +246,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     unsigned long changes, runs;
     igraph_bool_t use_weights = 0;
     bool zeroT;
@@ -497,7 +497,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         /* the initial conf is needed, because otherwise,
            the degree of the nodes is not in the weight property, stupid!!! */
         pm.assign_initial_conf(-1);
-        snprintf(startnode, 255, "%li", (long int)vertex + 1);
+        snprintf(startnode, 255, "%" IGRAPH_PRId "", vertex + 1);
         pm.FindCommunityFromStart(gamma, prob, startnode, community,
                                    cohesion, adhesion, inner_links, outer_links);
 
@@ -526,7 +526,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     unsigned long changes, runs;
     igraph_bool_t use_weights = 0;
     bool zeroT;

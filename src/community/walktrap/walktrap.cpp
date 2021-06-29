@@ -123,7 +123,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               igraph_vector_t *modularity,
                               igraph_vector_int_t *membership) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     int length = steps;
     long max_memory = -1;
 
@@ -155,7 +155,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
     }
 
     if (membership) {
-        long int m;
+        igraph_integer_t m;
         m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
         IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
                      /*steps=*/ m,

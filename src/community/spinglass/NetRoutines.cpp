@@ -59,9 +59,9 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
     NNode *node1, *node2;
     DLList_Iter<NNode*> iter;
     igraph_vector_t edgelist;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int ii;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t ii;
     const char *empty = "";
 
     IGRAPH_VECTOR_INIT_FINALLY(&edgelist, no_of_edges * 2);
@@ -72,8 +72,8 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
     }
 
     for (ii = 0; ii < no_of_edges; ii++) {
-        long int i1 = VECTOR(edgelist)[2 * ii];
-        long int i2 = VECTOR(edgelist)[2 * ii + 1];
+        igraph_integer_t i1 = VECTOR(edgelist)[2 * ii];
+        igraph_integer_t i2 = VECTOR(edgelist)[2 * ii + 1];
         igraph_real_t Links;
         if (use_weights) {
             Links = VECTOR(*weights)[ii];
@@ -82,11 +82,11 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
         }
 
         node1 = net->node_list->Get(i1);
-        sprintf(name, "%li", i1+1);
+        sprintf(name, "%" IGRAPH_PRId "", i1+1);
         node1->Set_Name(name);
 
         node2 = net->node_list->Get(i2);
-        sprintf(name, "%li", i2+1);
+        sprintf(name, "%" IGRAPH_PRId "", i2+1);
         node2->Set_Name(name);
 
         node1->Connect_To(node2, Links);

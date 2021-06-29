@@ -154,9 +154,9 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     Graph &G = *this;
 
     int max_vertex = (int)igraph_vcount(graph) - 1;
-    long int no_of_edges = igraph_ecount(graph);
-    long int i;
-    long int deg;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i;
+    igraph_integer_t deg;
     double w;
 
     Edge_list EL;
