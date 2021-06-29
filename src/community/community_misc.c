@@ -268,7 +268,7 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
      * indicates that no cluster was assigned yet. */
     i_nb_clusters = 1;
     for (i = 0; i < n; i++) {
-        long int c = VECTOR(*membership)[i];
+        igraph_integer_t c = VECTOR(*membership)[i];
 
         if (c >= n) {
             IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
@@ -537,7 +537,7 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     /* Calculate the entropy of v1 */
     *h1 = 0.0;
     for (i = 0; i < n; i++) {
-        p1[(long int)VECTOR(*v1)[i]]++;
+        p1[VECTOR(*v1)[i]]++;
     }
     for (i = 0; i < k1; i++) {
         p1[i] /= n;
@@ -547,7 +547,7 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     /* Calculate the entropy of v2 */
     *h2 = 0.0;
     for (i = 0; i < n; i++) {
-        p2[(long int)VECTOR(*v2)[i]]++;
+        p2[VECTOR(*v2)[i]]++;
     }
     for (i = 0; i < k2; i++) {
         p2[i] /= n;
@@ -568,8 +568,8 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &mu);
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_sparsemat_entry(
-            &mu, (igraph_integer_t)VECTOR(*v1)[i],
-            (igraph_integer_t)VECTOR(*v2)[i], 1
+            &mu, VECTOR(*v1)[i],
+            VECTOR(*v2)[i], 1
         ));
     }
 
@@ -670,7 +670,7 @@ static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_int_t *v1, c
     IGRAPH_CHECK(igraph_sparsemat_resize(m, k1, k2, n));
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_sparsemat_entry(
-            m, (igraph_integer_t)VECTOR(*v1)[i], (igraph_integer_t)VECTOR(*v2)[i], 1
+            m, VECTOR(*v1)[i], VECTOR(*v2)[i], 1
         ));
     }
 

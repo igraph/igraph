@@ -67,7 +67,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_vector_int_t *membership,
                                        igraph_real_t *modularity) {
     /* Declaration of variables */
-    long int no_of_nodes, i, j, k, kv1;
+    igraph_integer_t no_of_nodes, i, j, k, kv1;
     igraph_adjlist_t al;
     double max_density;
     igraph_bool_t res, running;
@@ -133,7 +133,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     for (i = 0; i < no_of_communities; i++) {
         /* Initialize membership at initial nodes for each community
          * where 0 refers to have no label*/
-        VECTOR(*membership)[(long int)VECTOR(node_order)[i]] = i + 1.0;
+        VECTOR(*membership)[(igraph_integer_t)VECTOR(node_order)[i]] = i + 1.0;
         /* Initialize com_to_numvertices list: Number of vertices for each community */
         VECTOR(com_to_numvertices)[i] = 1;
     }
@@ -153,7 +153,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     running = 1;
     while (running) {
         /* Declarations of varibales used inside main loop */
-        long int v1, size, rand_idx;
+        igraph_integer_t v1, size, rand_idx;
         igraph_real_t max_count, label_counter_diff;
         igraph_vector_int_t *neis;
         igraph_bool_t same_label_in_dominant;

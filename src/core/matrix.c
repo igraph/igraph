@@ -59,7 +59,7 @@ igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
 
     igraph_integer_t nr = igraph_matrix_complex_nrow(m);
     igraph_integer_t nc = igraph_matrix_complex_ncol(m);
-    long int i, j;
+    igraph_integer_t i, j;
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
             igraph_complex_t z = MATRIX(*m, i, j);
@@ -80,7 +80,7 @@ igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
 
     igraph_integer_t nr = igraph_matrix_complex_nrow(m);
     igraph_integer_t nc = igraph_matrix_complex_ncol(m);
-    long int i, j;
+    igraph_integer_t i, j;
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
             igraph_complex_t z = MATRIX(*m, i, j);

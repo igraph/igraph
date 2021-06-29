@@ -7,7 +7,7 @@
 
 int random_permutation(igraph_vector_t *vec) {
     /* We just do size(vec) * 2 swaps */
-    long int one, two, tmp, i, n = igraph_vector_size(vec);
+    igraph_integer_t one, two, tmp, i, n = igraph_vector_size(vec);
     for (i = 0; i < 2 * n; i++) {
         one = (double)rand() / RAND_MAX * n;
         two = (double)rand() / RAND_MAX * n;

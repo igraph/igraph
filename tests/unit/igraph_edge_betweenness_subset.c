@@ -29,7 +29,7 @@ void test_bug950_edge() {
     igraph_vector_t eb;
     igraph_vector_t weights;
     igraph_integer_t from, to;
-    long int no_of_edges, i;
+    igraph_integer_t no_of_edges, i;
 
     igraph_full(&g, 6, 0, 0);
     no_of_edges = igraph_ecount(&g);
@@ -65,9 +65,9 @@ void test_bug950_edge() {
 int main() {
     igraph_t g;
     igraph_es_t es;
-    igraph_vector_t eb, bet, bet2, weights, edges;
+    igraph_vector_t eb, bet, bet2, weights;
     igraph_vector_int_t node_vec, source_vec, target_vec;
-    igraph_vs_t vs, vs_source, vs_target;
+    igraph_vs_t vs_source, vs_target;
     igraph_integer_t i, n;
 
     /* edge betweenness test */
@@ -116,8 +116,8 @@ int main() {
 
     n = igraph_ecount(&g);
     for (i = 0; i < n; i++) {
-        long int expected;
-        long int vid = i + 1;
+        igraph_integer_t expected;
+        igraph_integer_t vid = i + 1;
 
         if (vid >= 10911) {
             /* edge leading to layer 5, in the subset. There are 199 shortest
@@ -148,9 +148,9 @@ int main() {
 
         if (VECTOR(bet)[i] != expected) {
             printf(
-                "Invalid betweenness for edge %" IGRAPH_PRId " (from vertex %ld towards the "
-                "root), expected %ld, got %ld\n",
-                i, vid, expected, (long int) VECTOR(bet)[i]
+                "Invalid betweenness for edge %" IGRAPH_PRId " (from vertex %" IGRAPH_PRId " towards the "
+                "root), expected %" IGRAPH_PRId ", got %" IGRAPH_PRId "\n",
+                i, vid, expected, (igraph_integer_t) VECTOR(bet)[i]
             );
             break;
         }

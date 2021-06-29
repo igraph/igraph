@@ -142,14 +142,14 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
     igraph_2wheap_t Q;
     igraph_vit_t vit;
-    long int nodes_to_calc;
+    igraph_integer_t nodes_to_calc;
 
     igraph_lazy_inclist_t inclist;
-    long int i, j;
+    igraph_integer_t i, j;
 
     igraph_vector_t dist;
     igraph_vector_int_t which;
-    long int nodes_reached;
+    igraph_integer_t nodes_reached;
 
     igraph_real_t mindist = 0;
 
@@ -216,7 +216,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
             nodes_reached++;
 
             for (j = 0; j < nlen; j++) {
-                long int edge = VECTOR(*neis)[j];
+                igraph_integer_t edge = VECTOR(*neis)[j];
                 igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
@@ -389,7 +389,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int act = igraph_dqueue_pop(&q);
+            igraph_integer_t act = igraph_dqueue_pop(&q);
             actdist = igraph_dqueue_pop(&q);
 
             if (cutoff >= 0 && actdist > cutoff) {
@@ -402,7 +402,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
             for (j = 0; j < igraph_vector_int_size(neis); j++) {
-                long int neighbor = VECTOR(*neis)[j];
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;
                 }
@@ -498,7 +498,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int act = igraph_dqueue_pop(&q);
+            igraph_integer_t act = igraph_dqueue_pop(&q);
             actdist = igraph_dqueue_pop(&q);
 
             if (cutoff >= 0 && actdist > cutoff) {
@@ -513,7 +513,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
             for (j = 0; j < igraph_vector_int_size(neis); j++) {
-                long int neighbor = VECTOR(*neis)[j];
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;
                 }

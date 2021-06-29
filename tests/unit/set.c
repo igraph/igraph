@@ -32,7 +32,7 @@ void print_set(igraph_set_t *set, FILE *f) {
     igraph_integer_t state = 0;
     igraph_integer_t element;
     while (igraph_set_iterate(set, &state, &element)) {
-        fprintf(f, " %li", (long int) element);
+        fprintf(f, " %" IGRAPH_PRId , element);
     }
     fprintf(f, "\n");
 }

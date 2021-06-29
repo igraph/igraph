@@ -66,7 +66,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
-    long int i = 0;
+    igraph_integer_t i = 0;
     int ret;
     igraph_attribute_type_t vertex_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
     igraph_attribute_type_t edge_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
@@ -199,9 +199,9 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }
-            CHECK(fprintf(outstream, "%ld %ld %ld |{",
-                          (long int) from + 1, (long int) to + 1,
-                          (long int) rev + 1));
+            CHECK(fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " %" IGRAPH_PRId " |{",
+                          from + 1, to + 1,
+                          rev + 1));
             CHECK(igraph_real_fprintf_precise(outstream, VECTOR(values)[eid]));
             CHECK(fprintf(outstream, "}|\n"));
             IGRAPH_EIT_NEXT(it);
@@ -227,9 +227,9 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                 IGRAPH_ERROR("edge attribute values cannot contain newline characters",
                              IGRAPH_EINVAL);
             }
-            CHECK(fprintf(outstream, "%ld %ld %ld |{%s}|\n",
-                          (long int) from + 1, (long int) to + 1,
-                          (long int) rev + 1, str));
+            CHECK(fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " %" IGRAPH_PRId " |{%s}|\n",
+                          from + 1, to + 1,
+                          rev + 1, str));
             IGRAPH_EIT_NEXT(it);
         }
         igraph_strvector_destroy(&values);
@@ -242,9 +242,9 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }
-            CHECK(fprintf(outstream, "%ld %ld %ld |{}|\n",
-                          (long int) from + 1, (long int) to + 1,
-                          (long int) rev + 1));
+            CHECK(fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " %" IGRAPH_PRId " |{}|\n",
+                          from + 1, to + 1,
+                          rev + 1));
             IGRAPH_EIT_NEXT(it);
         }
     }

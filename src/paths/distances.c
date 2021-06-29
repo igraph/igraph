@@ -46,7 +46,7 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
     igraph_vector_int_t counted;
-    long int i, mark = 1;
+    igraph_integer_t i, mark = 1;
     igraph_integer_t min_degree = 0;
 
     IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
@@ -78,11 +78,11 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
             igraph_integer_t act = igraph_dqueue_int_pop(&q);
             igraph_integer_t dist = igraph_dqueue_int_pop(&q);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(adjlist, act);
-            long int j, n;
+            igraph_integer_t j, n;
 
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int nei = VECTOR(*neis)[j];
+                igraph_integer_t nei = VECTOR(*neis)[j];
                 if (VECTOR(counted)[nei] != mark) {
                     VECTOR(counted)[nei] = mark;
                     nodes_reached++;
@@ -465,18 +465,18 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
     igraph_2wheap_push_with_index(&Q, vid_start, -1.0);
 
     while (!igraph_2wheap_empty(&Q)) {
-        long int minnei = igraph_2wheap_max_index(&Q);
+        igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
         igraph_vector_int_t *neis;
-        long int nlen;
+        igraph_integer_t nlen;
 
         VECTOR(vec_dist)[minnei] = mindist - 1.0;
 
         /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
+        neis = igraph_lazy_inclist_get(inclist, minnei);
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            long int edge = VECTOR(*neis)[i];
+            igraph_integer_t edge = VECTOR(*neis)[i];
             igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
@@ -495,7 +495,7 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
     *ecc = 0;
     *vid_ecc = vid_start;
     double degree_ecc = 0;
-    long int degree_i;
+    igraph_integer_t degree_i;
     for (i = 0; i < no_of_nodes; i++) {
         if (i == vid_start) {
             continue;

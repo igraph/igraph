@@ -38,7 +38,7 @@
 
 static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
-    long int i, j, len = strlen(orig), newlen = 0;
+    igraph_integer_t i, j, len = strlen(orig), newlen = 0;
     igraph_bool_t need_quote = 0, is_number = 1;
 
     /* first, check whether the string is equal to some reserved word */

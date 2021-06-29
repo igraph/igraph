@@ -11,7 +11,7 @@ struct userdata {
 
 int compare_vectors(const void *p1, const void *p2) {
     igraph_vector_t *v1, *v2;
-    long s1, s2, i;
+    igraph_integer_t s1, s2, i;
 
     v1 = *((igraph_vector_t **) p1);
     v2 = *((igraph_vector_t **) p2);

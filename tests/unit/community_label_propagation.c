@@ -31,7 +31,7 @@ int main() {
     igraph_vector_int_t membership;
     igraph_vector_t weights, initial;
     igraph_vector_bool_t fixed;
-    long int i;
+    igraph_integer_t i;
 
     /* label propagation is a stochastic method */
     igraph_rng_seed(igraph_rng_default(), 765);

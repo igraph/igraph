@@ -61,15 +61,15 @@ igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     igraph_vector_t sizes;
     igraph_vector_t x, y, r;
     igraph_vector_t nx, ny, nr;
-    long int allnodes = 0;
-    long int i, j;
-    long int actg;
+    igraph_integer_t allnodes = 0;
+    igraph_integer_t i, j;
+    igraph_integer_t actg;
     igraph_i_layout_mergegrid_t grid;
-    long int jpos = 0;
+    igraph_integer_t jpos = 0;
     igraph_real_t minx, maxx, miny, maxy;
     igraph_real_t area = 0;
     igraph_real_t maxr = 0;
-    long int respos;
+    igraph_integer_t respos;
 
     /* Graphs are currently not used, only the coordinates */
     IGRAPH_UNUSED(thegraphs);
@@ -183,7 +183,7 @@ igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r) {
     igraph_integer_t nodes = igraph_matrix_nrow(coords);
-    long int i;
+    igraph_integer_t i;
     igraph_real_t xmin, xmax, ymin, ymax;
 
     xmin = xmax = MATRIX(*coords, 0, 0);
@@ -215,7 +215,7 @@ igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *z, igraph_real_t *r) {
     igraph_integer_t nodes = igraph_matrix_nrow(coords);
-    long int i;
+    igraph_integer_t i;
     igraph_real_t xmin, xmax, ymin, ymax, zmin, zmax;
 
     xmin = xmax = MATRIX(*coords, 0, 0);
@@ -255,12 +255,12 @@ igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
 
 igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                              long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+                              igraph_integer_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                               igraph_real_t killr) {
-    long int sp = -1;
+    igraph_integer_t sp = -1;
     igraph_real_t angle, len;
-    long int steps = 0;
+    igraph_integer_t steps = 0;
 
     /* The graph is not used, only its coordinates */
     IGRAPH_UNUSED(actg);

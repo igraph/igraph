@@ -53,7 +53,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t edges;
-    long int i, p = 0;
+    igraph_integer_t i, p = 0;
 
     if (igraph_vector_size(permutation) != no_of_nodes) {
         IGRAPH_ERROR("Permute vertices: invalid permutation vector size", IGRAPH_EINVAL);
@@ -80,7 +80,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
         if (igraph_vector_size(&vtypes) != 0) {
             IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_nodes);
             for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(index)[(long int) VECTOR(*permutation)[i]] = i;
+                VECTOR(index)[(igraph_integer_t) VECTOR(*permutation)[i]] = i;
             }
             IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &index));
             igraph_vector_int_destroy(&index);

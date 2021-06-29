@@ -30,7 +30,7 @@
 #include "test_utilities.inc"
 
 int main () {
-    long int i;
+    igraph_integer_t i;
     igraph_matrix_t m;
     igraph_real_t x, y, z, r;
 
@@ -48,7 +48,7 @@ int main () {
         igraph_real_t dist = hypot(MATRIX(m, i, 0) - x, MATRIX(m, i, 1) - y);
         if (dist > r) {
             printf("x: %f y: %f r: %f\n", x, y, r);
-            printf("x: %f y: %f dist: %f (%li)\n",
+            printf("x: %f y: %f dist: %f (%" IGRAPH_PRId ")\n",
                    MATRIX(m, i, 0), MATRIX(m, i, 1), dist, i);
             return 1;
         }
@@ -70,7 +70,7 @@ int main () {
                                   (MATRIX(m, i, 2) - z) * (MATRIX(m, i, 2) - z));
         if (dist > r) {
             printf("x: %f y: %f z: %f r: %f\n", x, y, z, r);
-            printf("x: %f y: %f z: %f dist: %f (%li)\n",
+            printf("x: %f y: %f z: %f dist: %f (%" IGRAPH_PRId ")\n",
                    MATRIX(m, i, 0), MATRIX(m, i, 1), MATRIX(m, i, 2), dist, i);
             return 1;
         }

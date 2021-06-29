@@ -37,19 +37,19 @@
 
 static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
                                  igraph_vit_t *vit,
-                                 long int except,
+                                 igraph_integer_t except,
                                  igraph_bool_t *res,
                                  igraph_vector_bool_t *removed,
                                  igraph_dqueue_t *Q,
                                  igraph_vector_t *neis,
-                                 long int no_of_nodes) {
+                                 igraph_integer_t no_of_nodes) {
 
-    long int start = 0;
+    igraph_integer_t start = 0;
 
     if (IGRAPH_VIT_SIZE(*vit) >= no_of_nodes - 1) {
         /* Just need to check that we really have at least n-1 vertices in it */
         igraph_vector_bool_t hit;
-        long int nohit = 0;
+        igraph_integer_t nohit = 0;
         IGRAPH_CHECK(igraph_vector_bool_init(&hit, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, &hit);
         for (IGRAPH_VIT_RESET(*vit);
@@ -80,7 +80,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
         }
     } else {
         /* There is an exception */
-        long int i;
+        igraph_integer_t i;
         for (i = 0, IGRAPH_VIT_RESET(*vit);
              i < except;
              i++, IGRAPH_VIT_NEXT(*vit)) {
@@ -106,12 +106,12 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_push(Q, start));
     VECTOR(*removed)[start] = 1;
     while (!igraph_dqueue_empty(Q)) {
-        long int node = igraph_dqueue_pop(Q);
-        long int j, n;
-        IGRAPH_CHECK(igraph_neighbors(graph, neis, (igraph_integer_t) node, IGRAPH_ALL));
+        igraph_integer_t node = igraph_dqueue_pop(Q);
+        igraph_integer_t j, n;
+        IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
         n = igraph_vector_size(neis);
         for (j = 0; j < n; j++) {
-            long int nei = VECTOR(*neis)[j];
+            igraph_integer_t nei = VECTOR(*neis)[j];
             if (!VECTOR(*removed)[nei]) {
                 IGRAPH_CHECK(igraph_dqueue_push(Q, nei));
                 VECTOR(*removed)[nei] = 1;
@@ -192,7 +192,7 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
  *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
- * \param candidate Pointer to a vector of long integers, the
+ * \param candidate Pointer to a vector of igraph_integer_tegers, the
  *        candidate minimal separator.
  * \param res Pointer to a boolean variable, the result is stored
  *        here.
@@ -213,7 +213,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
     igraph_vector_bool_t removed;
     igraph_dqueue_t Q;
     igraph_vector_t neis;
-    long int candsize;
+    igraph_integer_t candsize;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, candidate, &vit));
@@ -239,7 +239,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
          * false for all vertices, then 'candidate' is a minimal
          * separator.
          */
-        long int i;
+        igraph_integer_t i;
         for (i = 0, *res = 0; i < candsize && (!*res); i++) {
             igraph_vector_bool_null(&removed);
             IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, i, res, &removed,
@@ -277,7 +277,7 @@ static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist
      * vertices that were already found in the BFS
      */
 
-    long int i, no_of_nodes = igraph_adjlist_size(adjlist);
+    igraph_integer_t i, no_of_nodes = igraph_adjlist_size(adjlist);
 
     igraph_dqueue_clear(Q);
     igraph_vector_clear(components);
@@ -293,11 +293,11 @@ static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist
         igraph_vector_push_back(components, i);
 
         while (!igraph_dqueue_empty(Q)) {
-            long int act_node = igraph_dqueue_pop(Q);
+            igraph_integer_t act_node = igraph_dqueue_pop(Q);
             igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, act_node);
             igraph_integer_t j, n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int nei = VECTOR(*neis)[j];
+                igraph_integer_t nei = VECTOR(*neis)[j];
                 if (VECTOR(*leaveout)[nei] == *mark) {
                     continue;
                 }
@@ -345,7 +345,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
     igraph_integer_t cptr = 0, next, complen = igraph_vector_size(components);
 
     while (cptr < complen) {
-        long int saved = cptr;
+        igraph_integer_t saved = cptr;
         igraph_vector_clear(sorter);
 
         /* Calculate N(C) for the next C */
@@ -359,7 +359,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
             igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, next);
             igraph_integer_t j, nn = igraph_vector_int_size(neis);
             for (j = 0; j < nn; j++) {
-                long int nei = VECTOR(*neis)[j];
+                igraph_integer_t nei = VECTOR(*neis)[j];
                 if (VECTOR(*leaveout)[nei] != *mark) {
                     igraph_vector_push_back(sorter, nei);
                     VECTOR(*leaveout)[nei] = *mark;
@@ -454,9 +454,9 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t leaveout;
     igraph_vector_bool_t already_tried;
-    long int try_next = 0;
+    igraph_integer_t try_next = 0;
     unsigned long int mark = 1;
-    long int v;
+    igraph_integer_t v;
 
     igraph_adjlist_t adjlist;
     igraph_vector_t components;
@@ -494,7 +494,7 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
         igraph_integer_t i, n = igraph_vector_int_size(neis);
         VECTOR(leaveout)[v] = mark;
         for (i = 0; i < n; i++) {
-            long int nei = VECTOR(*neis)[i];
+            igraph_integer_t nei = VECTOR(*neis)[i];
             VECTOR(leaveout)[nei] = mark;
         }
 
@@ -519,15 +519,15 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
         for (b = 0; b < basislen; b++) {
 
             /* Remove N(x) U basis */
-            long int x = VECTOR(*basis)[b];
+            igraph_integer_t x = VECTOR(*basis)[b];
             igraph_vector_int_t *neis = igraph_adjlist_get(&adjlist, x);
             igraph_integer_t i, n = igraph_vector_int_size(neis);
             for (i = 0; i < basislen; i++) {
-                long int sn = VECTOR(*basis)[i];
+                igraph_integer_t sn = VECTOR(*basis)[i];
                 VECTOR(leaveout)[sn] = mark;
             }
             for (i = 0; i < n; i++) {
-                long int nei = VECTOR(*neis)[i];
+                igraph_integer_t nei = VECTOR(*neis)[i];
                 VECTOR(leaveout)[nei] = mark;
             }
 
@@ -564,11 +564,11 @@ static igraph_error_t igraph_i_minimum_size_separators_append(igraph_vector_ptr_
 
     igraph_integer_t olen = igraph_vector_ptr_size(old);
     igraph_integer_t nlen = igraph_vector_ptr_size(new);
-    long int i;
+    igraph_integer_t i;
 
     for (i = 0; i < nlen; i++) {
         igraph_vector_t *newvec = VECTOR(*new)[i];
-        long int j;
+        igraph_integer_t j;
         for (j = 0; j < olen; j++) {
             igraph_vector_t *oldvec = VECTOR(*old)[j];
             if (igraph_vector_all_e(oldvec, newvec)) {

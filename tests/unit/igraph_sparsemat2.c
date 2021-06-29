@@ -39,11 +39,11 @@ int igraph_matrix_dgemv(const igraph_matrix_t *m,
 
     int nrow = igraph_matrix_nrow(m);
     int ncol = igraph_matrix_ncol(m);
-    long int vlen = igraph_vector_size(v);
+    igraph_integer_t vlen = igraph_vector_size(v);
     int one = 1;
     char t = transpose_m ? 't' : 'n';
-    long int input_len  = transpose_m ? nrow : ncol;
-    long int output_len = transpose_m ? ncol : nrow;
+    igraph_integer_t input_len  = transpose_m ? nrow : ncol;
+    igraph_integer_t output_len = transpose_m ? ncol : nrow;
 
     if (vlen != input_len) {
         IGRAPH_ERROR("Matrix and vector sizes are incompatible", IGRAPH_EINVAL);
@@ -77,11 +77,11 @@ int my_dgemv(const igraph_matrix_t *m,
 
     int nrow = igraph_matrix_nrow(m);
     int ncol = igraph_matrix_ncol(m);
-    long int vlen = igraph_vector_size(v);
+    igraph_integer_t vlen = igraph_vector_size(v);
     int one = 1;
     char t = transpose_m ? 't' : 'n';
-    long int input_len  = transpose_m ? nrow : ncol;
-    long int output_len = transpose_m ? ncol : nrow;
+    igraph_integer_t input_len  = transpose_m ? nrow : ncol;
+    igraph_integer_t output_len = transpose_m ? ncol : nrow;
 
     if (vlen != input_len) {
         IGRAPH_ERROR("Matrix and vector sizes are incompatible", IGRAPH_EINVAL);
@@ -110,11 +110,11 @@ int my_dgemm(const igraph_matrix_t *m1,
              const igraph_matrix_t *m2,
              igraph_matrix_t *res) {
 
-    long int m1_r = igraph_matrix_nrow(m1);
-    long int m1_c = igraph_matrix_ncol(m1);
-    long int m2_r = igraph_matrix_nrow(m2);
-    long int m2_c = igraph_matrix_ncol(m2);
-    long int i, j, k;
+    igraph_integer_t m1_r = igraph_matrix_nrow(m1);
+    igraph_integer_t m1_c = igraph_matrix_ncol(m1);
+    igraph_integer_t m2_r = igraph_matrix_nrow(m2);
+    igraph_integer_t m2_c = igraph_matrix_ncol(m2);
+    igraph_integer_t i, j, k;
 
     if (m1_c != m2_r) {
         IGRAPH_ERROR("Cannot multiply matrices, invalid dimensions", IGRAPH_EINVAL);
@@ -137,9 +137,9 @@ int my_dgemm(const igraph_matrix_t *m1,
 igraph_bool_t check_same(const igraph_sparsemat_t *A,
                          const igraph_matrix_t *M) {
 
-    long int nrow = igraph_sparsemat_nrow(A);
-    long int ncol = igraph_sparsemat_ncol(A);
-    long int j, p, nzero = 0;
+    igraph_integer_t nrow = igraph_sparsemat_nrow(A);
+    igraph_integer_t ncol = igraph_sparsemat_ncol(A);
+    igraph_integer_t j, p, nzero = 0;
 
     if (nrow != igraph_matrix_nrow(M) ||
         ncol != igraph_matrix_ncol(M)) {
@@ -148,7 +148,7 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
 
     for (j = 0; j < A->cs->n; j++) {
         for (p = A->cs->p[j]; p < A->cs->p[j + 1]; p++) {
-            long int to = A->cs->i[p];
+            igraph_integer_t to = A->cs->i[p];
             igraph_real_t value = A->cs->x[p];
             if (value != MATRIX(*M, to, j)) {
                 return 0;
@@ -173,7 +173,7 @@ int main() {
     igraph_sparsemat_t A, B, C, D;
     igraph_vector_t v, w, x, y;
     igraph_matrix_t M, N, O;
-    long int i;
+    igraph_integer_t i;
 
     srand(1);
 
@@ -184,8 +184,8 @@ int main() {
     igraph_matrix_init(&M, NROW, NCOL);
     igraph_sparsemat_init(&A, NROW, NCOL, EDGES);
     for (i = 0; i < EDGES; i++) {
-        long int r = RNG_INTEGER(0, NROW - 1);
-        long int c = RNG_INTEGER(0, NCOL - 1);
+        igraph_integer_t r = RNG_INTEGER(0, NROW - 1);
+        igraph_integer_t c = RNG_INTEGER(0, NCOL - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         MATRIX(M, r, c) = MATRIX(M, r, c) + value;
         igraph_sparsemat_entry(&A, r, c, value);
@@ -230,8 +230,8 @@ int main() {
     igraph_matrix_init(&M, NROW_A, NCOL_A);
     igraph_sparsemat_init(&A, NROW_A, NCOL_A, EDGES_A);
     for (i = 0; i < EDGES_A; i++) {
-        long int r = RNG_INTEGER(0, NROW_A - 1);
-        long int c = RNG_INTEGER(0, NCOL_A - 1);
+        igraph_integer_t r = RNG_INTEGER(0, NROW_A - 1);
+        igraph_integer_t c = RNG_INTEGER(0, NCOL_A - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         MATRIX(M, r, c) = MATRIX(M, r, c) + value;
         igraph_sparsemat_entry(&A, r, c, value);
@@ -242,8 +242,8 @@ int main() {
     igraph_matrix_init(&N, NROW_B, NCOL_B);
     igraph_sparsemat_init(&B, NROW_B, NCOL_B, EDGES_B);
     for (i = 0; i < EDGES_B; i++) {
-        long int r = RNG_INTEGER(0, NROW_B - 1);
-        long int c = RNG_INTEGER(0, NCOL_B - 1);
+        igraph_integer_t r = RNG_INTEGER(0, NROW_B - 1);
+        igraph_integer_t c = RNG_INTEGER(0, NCOL_B - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         MATRIX(N, r, c) = MATRIX(N, r, c) + value;
         igraph_sparsemat_entry(&B, r, c, value);

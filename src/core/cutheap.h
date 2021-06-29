@@ -42,9 +42,9 @@ __BEGIN_DECLS
 
 typedef struct igraph_i_cutheap_t {
     igraph_vector_t heap;
-    igraph_vector_t index;
+    igraph_vector_int_t index;
     igraph_vector_t hptr;
-    long int dnodes;
+    igraph_integer_t dnodes;
 } igraph_i_cutheap_t;
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes);

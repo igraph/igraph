@@ -129,7 +129,7 @@ class Communities {
 private:
     long max_memory;  // size in Byte of maximal memory usage, -1 for no limit
     igraph_matrix_t *merges;
-    long int mergeidx;
+    igraph_integer_t mergeidx;
     igraph_vector_t *modularity;
 
 public:

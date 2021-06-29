@@ -33,7 +33,7 @@
 
 static igraph_real_t igraph_i_distance_between(
         const igraph_matrix_t *c,
-        long int a, long int b);
+        igraph_integer_t a, igraph_integer_t b);
 
 static igraph_error_t igraph_i_determine_electric_axal_forces(
         const igraph_matrix_t *pos,
@@ -41,14 +41,14 @@ static igraph_error_t igraph_i_determine_electric_axal_forces(
         igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
-        long int other_node,
-        long int this_node);
+        igraph_integer_t other_node,
+        igraph_integer_t this_node);
 
 static igraph_error_t igraph_i_apply_electrical_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
-        long int other_node, long int this_node,
+        igraph_integer_t other_node, igraph_integer_t this_node,
         igraph_real_t node_charge,
         igraph_real_t distance);
 
@@ -58,15 +58,15 @@ static igraph_error_t igraph_i_determine_spring_axal_forces(
         igraph_real_t directed_force,
         igraph_real_t distance,
         igraph_real_t spring_length,
-        long int other_node,
-        long int this_node);
+        igraph_integer_t other_node,
+        igraph_integer_t this_node);
 
 static igraph_error_t igraph_i_apply_spring_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
-        long int other_node,
-        long int this_node, igraph_real_t spring_length,
+        igraph_integer_t other_node,
+        igraph_integer_t this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant);
 
 static igraph_error_t igraph_i_move_nodes(
@@ -78,7 +78,7 @@ static igraph_error_t igraph_i_move_nodes(
 
 static igraph_real_t igraph_i_distance_between(
         const igraph_matrix_t *c,
-        long int a, long int b) {
+        igraph_integer_t a, igraph_integer_t b) {
     igraph_real_t diffx = MATRIX(*c, a, 0) - MATRIX(*c, b, 0);
     igraph_real_t diffy = MATRIX(*c, a, 1) - MATRIX(*c, b, 1);
     return hypot(diffx, diffy);
@@ -89,8 +89,8 @@ static igraph_error_t igraph_i_determine_electric_axal_forces(const igraph_matri
         igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
-        long int other_node,
-        long int this_node) {
+        igraph_integer_t other_node,
+        igraph_integer_t this_node) {
 
     // We know what the directed force is.  We now need to translate it
     // into the appropriate x and y components.
@@ -141,7 +141,7 @@ static igraph_error_t igraph_i_apply_electrical_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
-        long int other_node, long int this_node,
+        igraph_integer_t other_node, igraph_integer_t this_node,
         igraph_real_t node_charge,
         igraph_real_t distance) {
 
@@ -167,7 +167,7 @@ static igraph_error_t igraph_i_determine_spring_axal_forces(
         igraph_real_t directed_force,
         igraph_real_t distance,
         igraph_real_t spring_length,
-        long int other_node, long int this_node) {
+        igraph_integer_t other_node, igraph_integer_t this_node) {
 
     // if the spring is just the right size, the forces will be 0, so we can
     // skip the computation.
@@ -204,8 +204,8 @@ static igraph_error_t igraph_i_apply_spring_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
-        long int other_node,
-        long int this_node, igraph_real_t spring_length,
+        igraph_integer_t other_node,
+        igraph_integer_t this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant) {
 
     // determined using Hooke's Law:
@@ -361,9 +361,9 @@ igraph_error_t igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *re
     /* apply on each other based on if both node types' charges are zero. */
     igraph_bool_t apply_electric_charges = (node_charge != 0);
 
-    long int this_node, other_node, edge;
+    igraph_integer_t this_node, other_node, edge;
     igraph_real_t distance;
-    long int i;
+    igraph_integer_t i;
 
     IGRAPH_VECTOR_INIT_FINALLY(&pending_forces_x, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&pending_forces_y, no_of_nodes);

@@ -22,12 +22,12 @@
 #include "test_utilities.inc"
 
 void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn, igraph_bool_t directed) {
-    igraph_vector_t path_vertex, path_edge;
+    igraph_vector_int_t path_vertex, path_edge;
     igraph_real_t result;
     igraph_integer_t from, to;
 
-    igraph_vector_init(&path_edge, 0);
-    igraph_vector_init(&path_vertex, 0);
+    igraph_vector_int_init(&path_edge, 0);
+    igraph_vector_int_init(&path_vertex, 0);
 
     igraph_diameter_dijkstra(g, weights, &result, &from, &to, &path_vertex, &path_edge, directed, unconn);
 
@@ -35,12 +35,12 @@ void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn,
     print_real(stdout, result, "%g");
     printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", from, to);
     printf("Edges:\n");
-    print_vector_round(&path_edge);
+    print_vector_int(&path_edge);
     printf("Vertices:\n");
-    print_vector_round(&path_vertex);
+    print_vector_int(&path_vertex);
 
-    igraph_vector_destroy(&path_edge);
-    igraph_vector_destroy(&path_vertex);
+    igraph_vector_int_destroy(&path_edge);
+    igraph_vector_int_destroy(&path_vertex);
     printf("\n");
 }
 

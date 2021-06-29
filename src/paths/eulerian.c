@@ -46,12 +46,12 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
     igraph_vector_int_t csize;
     /* boolean vector to mark singletons: */
     igraph_vector_t nonsingleton;
-    long int i, n, vsize;
-    long int cluster_count;
+    igraph_integer_t i, n, vsize;
+    igraph_integer_t cluster_count;
     /* number of self-looping singletons: */
-    long int es;
+    igraph_integer_t es;
     /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
-    long int ens;
+    igraph_integer_t ens;
 
     n = igraph_vcount(graph);
 
@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
     es = 0;
     ens = 0;
     for (i = 0; i < n; i++) {
-        long int deg = VECTOR(degree)[i];
+        igraph_integer_t deg = VECTOR(degree)[i];
         /* Eulerian is about edges, so skip free vertices */
         if (deg == 0) continue;
 
@@ -149,7 +149,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
     /* note: we cannot do this in the previous loop because at that time we are
      * not sure yet if a path exists */
     for (i = 0; i < n; i++) {
-        if ((*has_cycle && ((long int) VECTOR(degree)[i]) > 0) || (!*has_cycle && ((long int) VECTOR(degree)[i]) %2 == 1)) {
+        if ((*has_cycle && ((igraph_integer_t) VECTOR(degree)[i]) > 0) || (!*has_cycle && ((igraph_integer_t) VECTOR(degree)[i]) %2 == 1)) {
             *start_of_path = i;
             break;
         }
@@ -164,16 +164,16 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
 
 static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle,                                         igraph_integer_t *start_of_path) {
     igraph_integer_t incoming_excess, outgoing_excess, n;
-    long int i, vsize;
-    long int cluster_count;
+    igraph_integer_t i, vsize;
+    igraph_integer_t cluster_count;
     igraph_vector_t out_degree, in_degree;
     igraph_vector_int_t csize;
     /* boolean vector to mark singletons: */
     igraph_vector_t nonsingleton;
     /* number of self-looping singletons: */
-    long int es;
+    igraph_integer_t es;
     /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
-    long int ens;
+    igraph_integer_t ens;
 
     n = igraph_vcount(graph);
 
@@ -230,8 +230,8 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
     ens = 0;
     *start_of_path = -1;
     for (i = 0; i < n; i++) {
-        long int degin = VECTOR(in_degree)[i];
-        long int degout = VECTOR(out_degree)[i];
+        igraph_integer_t degin = VECTOR(in_degree)[i];
+        igraph_integer_t degout = VECTOR(out_degree)[i];
 
         /* Eulerian is about edges, so skip free vertices */
         if (degin + degout == 0) continue;

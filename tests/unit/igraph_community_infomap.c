@@ -36,7 +36,7 @@ void show_results(igraph_vector_int_t * membership, igraph_real_t codelength) {
     printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n", codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership: ");
     for (i = 0; i < igraph_vector_int_size(membership); i++) {
-        printf("%li ", (long)VECTOR(*membership)[i] );
+        printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
     }
     printf("\n");
 }
@@ -46,7 +46,7 @@ void show_results_lite(igraph_vector_int_t * membership, igraph_real_t codelengt
     printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n", codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership (1/100 of vertices): ");
     for (i = 0; i < igraph_vector_int_size(membership); i += 100) {
-        printf("%li ", (long)VECTOR(*membership)[i] );
+        printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
     }
     printf("\n");
 }

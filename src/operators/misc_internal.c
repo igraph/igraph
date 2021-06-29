@@ -137,14 +137,14 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
     if (!directed) {
         for (i = 0, j = 0; i < no_edges_left; i++, j += 2) {
             if (VECTOR(edges1)[j] > VECTOR(edges1)[j + 1]) {
-                long int tmp = VECTOR(edges1)[j];
+                igraph_integer_t tmp = VECTOR(edges1)[j];
                 VECTOR(edges1)[j] = VECTOR(edges1)[j + 1];
                 VECTOR(edges1)[j + 1] = tmp;
             }
         }
         for (i = 0, j = 0; i < no_edges_right; i++, j += 2) {
             if (VECTOR(edges2)[j] > VECTOR(edges2)[j + 1]) {
-                long int tmp = VECTOR(edges2)[j];
+                igraph_integer_t tmp = VECTOR(edges2)[j];
                 VECTOR(edges2)[j] = VECTOR(edges2)[j + 1];
                 VECTOR(edges2)[j + 1] = tmp;
             }

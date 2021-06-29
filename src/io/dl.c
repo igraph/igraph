@@ -62,7 +62,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
     int i;
-    long int n, n2;
+    igraph_integer_t n, n2;
     const igraph_strvector_t *namevec = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;

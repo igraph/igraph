@@ -122,7 +122,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     /* start pointers */
     j = 0;
     for (i = 0; i <= maxdeg; i++) {
-        long int k = bin[i];
+        igraph_integer_t k = bin[i];
         bin[i] = j;
         j += k;
     }
@@ -146,7 +146,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
         igraph_integer_t v = vert[i];
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, omode));
         for (j = 0; j < igraph_vector_size(&neis); j++) {
-            long int u = VECTOR(neis)[j];
+            igraph_integer_t u = VECTOR(neis)[j];
             if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
                 igraph_integer_t du = VECTOR(*cores)[u];
                 igraph_integer_t pu = pos[u];

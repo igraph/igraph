@@ -142,7 +142,7 @@ int moran_one_test() {
     igraph_vector_t quant, quantcp;
     igraph_vector_t strat, stratcp;
     igraph_vector_t wgt;
-    long int i;
+    igraph_integer_t i;
 
     /* graph representing the game network; quantities and strategies vectors */
     igraph_small(&g, /*nvert*/ 0, IGRAPH_DIRECTED,

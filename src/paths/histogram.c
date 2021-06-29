@@ -60,16 +60,16 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
                             igraph_real_t *unconnected, igraph_bool_t directed) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_vector_int_t already_added;
-    long int nodes_reached;
+    igraph_integer_t nodes_reached;
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     igraph_neimode_t dirmode;
     igraph_adjlist_t allneis;
     igraph_real_t unconn = 0;
-    long int ressize;
+    igraph_integer_t ressize;
 
     if (directed) {
         dirmode = IGRAPH_OUT;
@@ -97,13 +97,13 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = igraph_dqueue_pop(&q);
-            long int actdist = igraph_dqueue_pop(&q);
+            igraph_integer_t actnode = igraph_dqueue_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int neighbor = VECTOR(*neis)[j];
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_added)[neighbor] == i + 1) {
                     continue;
                 }

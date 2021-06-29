@@ -28,7 +28,7 @@
 
 int main() {
     igraph_marked_queue_t Q;
-    long int i;
+    igraph_integer_t i;
 
     igraph_marked_queue_init(&Q, 100);
     for (i = 0; i < 50; i++) {
@@ -43,7 +43,7 @@ int main() {
 
     for (i = 1; i < 50; i++) {
         if (!igraph_marked_queue_iselement(&Q, i)) {
-            printf("Problem with %li.\n", i);
+            printf("Problem with %" IGRAPH_PRId ".\n", i);
             return 3;
         }
     }

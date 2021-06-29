@@ -108,7 +108,7 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_integer_t s
  */
 
 const igraph_vector_ptr_t *igraph_vector_ptr_view(const igraph_vector_ptr_t *v, void *const *data,
-        long int length) {
+        igraph_integer_t length) {
     igraph_vector_ptr_t *v2 = (igraph_vector_ptr_t*) v;
     v2->stor_begin = (void **)data;
     v2->stor_end = (void**)data + length;
@@ -351,7 +351,7 @@ void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
  * \param pos The position where the new element is inserted.
  * \param e The inserted element
  */
-igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
+igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_integer_t pos, void* e) {
     igraph_integer_t size = igraph_vector_ptr_size(v);
     IGRAPH_CHECK(igraph_vector_ptr_resize(v, size + 1));
     if (pos < size) {
@@ -374,7 +374,7 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, vo
  * Time complexity: O(1).
  */
 
-void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, long int pos) {
+void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return *(v->stor_begin + pos);
@@ -392,7 +392,7 @@ void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, long int pos) {
  * Time complexity: O(1).
  */
 
-void igraph_vector_ptr_set(igraph_vector_ptr_t* v, long int pos, void* value) {
+void igraph_vector_ptr_set(igraph_vector_ptr_t* v, igraph_integer_t pos, void* value) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     *(v->stor_begin + pos) = value;
@@ -445,7 +445,7 @@ igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t
  *         \c IGRAPH_ENOMEM if out of memory
  */
 
-igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int length) {
+igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, igraph_integer_t length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
@@ -499,7 +499,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  */
 
 igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    long int from_size;
+    igraph_integer_t from_size;
 
     IGRAPH_ASSERT(from != NULL);
     /*   IGRAPH_ASSERT(from->stor_begin != NULL); */ /* TODO */
@@ -524,7 +524,7 @@ igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vect
  * \brief Remove an element from a pointer vector.
  */
 
-void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
+void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     if (pos + 1 < igraph_vector_ptr_size(v)) { /* No need to move data when removing the last element. */
@@ -772,7 +772,7 @@ igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_ve
         ind_ptr < index->end;
         v_ptr++, ind_ptr++
     ) {
-        *v_ptr = VECTOR(*v)[(long int) *ind_ptr];
+        *v_ptr = VECTOR(*v)[(igraph_integer_t) *ind_ptr];
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_resize(v, igraph_vector_size(index)));

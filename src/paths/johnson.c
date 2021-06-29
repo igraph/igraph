@@ -76,8 +76,8 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     igraph_t newgraph;
     igraph_vector_t edges, newweights;
     igraph_matrix_t bfres;
-    long int i, ptr;
-    long int nr, nc;
+    igraph_integer_t i, ptr;
+    igraph_integer_t nr, nc;
     igraph_vit_t fromvit;
 
     /* If no weights, then we can just run the unweighted version */
@@ -179,13 +179,13 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     for (i = 0; i < nr; i++, IGRAPH_VIT_NEXT(fromvit)) {
         igraph_integer_t v1 = IGRAPH_VIT_GET(fromvit);
         if (igraph_vs_is_all(&to)) {
-            long int v2;
+            igraph_integer_t v2;
             for (v2 = 0; v2 < nc; v2++) {
                 igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
                 MATRIX(*res, i, v2) -= sub;
             }
         } else {
-            long int j;
+            igraph_integer_t j;
             igraph_vit_t tovit;
             IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
             IGRAPH_FINALLY(igraph_vit_destroy, &tovit);

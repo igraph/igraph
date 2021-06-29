@@ -118,11 +118,11 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
                       igraph_real_t *modularity) {
 
     igraph_vector_t e, k_out, k_in;
-    long int types;
+    igraph_integer_t types;
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    long int i;
+    igraph_integer_t i;
     igraph_real_t m;
-    long int c1, c2;
+    igraph_integer_t c1, c2;
     /* Only consider the graph as directed if it actually is directed */
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_real_t directed_multiplier = (use_directed ? 1 : 2);
@@ -306,7 +306,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
     igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_real_t scaling_factor;
     if (weights && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);

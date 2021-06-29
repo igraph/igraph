@@ -185,7 +185,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * Time complexity: O(|V|), linear in the number of vertices.
  */
 igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
-    long int i;
+    igraph_integer_t i;
 
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
@@ -265,9 +265,9 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
             n--;
         }
         for (j = 0; j < igraph_vector_size(&vec); j++) {
-            if (! seen [ (long int) VECTOR(vec)[j] ] ) {
+            if (! seen [ (igraph_integer_t) VECTOR(vec)[j] ] ) {
                 n--;
-                seen[ (long int) VECTOR(vec)[j] ] = 1;
+                seen[ (igraph_integer_t) VECTOR(vec)[j] ] = 1;
             }
         }
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
@@ -356,7 +356,7 @@ igraph_error_t igraph_adjlist_init_from_inclist(
  * Time complexity: depends on memory management.
  */
 void igraph_adjlist_destroy(igraph_adjlist_t *al) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < al->length; i++) {
         if (&al->adjs[i]) {
             igraph_vector_int_destroy(&al->adjs[i]);
@@ -374,7 +374,7 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
  * the total number of elements in the adjacency list.
  */
 void igraph_adjlist_clear(igraph_adjlist_t *al) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < al->length; i++) {
         igraph_vector_int_clear(&al->adjs[i]);
     }
@@ -404,7 +404,7 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
  * the adjacency list.
  */
 void igraph_adjlist_sort(igraph_adjlist_t *al) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < al->length; i++) {
         igraph_vector_int_sort(&al->adjs[i]);
     }
@@ -423,8 +423,8 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
  * vertices.
  */
 igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
-    long int i;
-    long int n = al->length;
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     igraph_vector_int_t mark;
     igraph_vector_int_init(&mark, n);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
@@ -433,7 +433,7 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
         igraph_integer_t j, l = igraph_vector_int_size(v);
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            long int e = VECTOR(*v)[j];
+            igraph_integer_t e = VECTOR(*v)[j];
             if (VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
                 j++;
@@ -452,7 +452,7 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
 
 igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
                                     igraph_adjlist_t *al) {
-    long int i, j, l, n, p;
+    igraph_integer_t i, j, l, n, p;
     igraph_vector_int_t *v;
 
     IGRAPH_WARNING(
@@ -470,7 +470,7 @@ igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
         if (l > 0) {
             p = 1;
             for (j = 1; j < l; j++) {
-                long int e = VECTOR(*v)[j];
+                igraph_integer_t e = VECTOR(*v)[j];
                 /* Non-loop edges, and one end of loop edges are fine. */
                 /* We assume that the vector is sorted and we also keep it sorted */
                 if (e != i || VECTOR(*v)[j - 1] != e) {
@@ -486,8 +486,8 @@ igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
 
 #ifndef USING_R
 igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
-    long int i;
-    long int n = al->length;
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_vector_int_print(v);
@@ -497,8 +497,8 @@ igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
 #endif
 
 igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
-    long int i;
-    long int n = al->length;
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_vector_int_fprint(v, outfile);
@@ -557,7 +557,7 @@ igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_
 static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
     igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
 ) {
-    long int i, length, eid, write_ptr;
+    igraph_integer_t i, length, eid, write_ptr;
     igraph_vector_int_t *seen_loops = 0;
 
     /* In this function we make use of the fact that we are dealing with
@@ -625,7 +625,7 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
 }
 
 igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il) {
-    long int i, n;
+    igraph_integer_t i, n;
 
     IGRAPH_WARNING(
         "igraph_inclist_remove_duplicate() is deprecated; use the constructor "
@@ -649,8 +649,8 @@ igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inc
 
 #ifndef USING_R
 igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
-    long int i;
-    long int n = al->length;
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->incs[i];
         igraph_vector_int_print(v);
@@ -660,8 +660,8 @@ igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
 #endif
 
 igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
-    long int i;
-    long int n = al->length;
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->incs[i];
         igraph_vector_int_fprint(v, outfile);
@@ -771,7 +771,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
  */
 
 igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
-    long int i;
+    igraph_integer_t i;
 
     il->length = n;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
@@ -798,7 +798,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
  */
 
 void igraph_inclist_destroy(igraph_inclist_t *il) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < il->length; i++) {
         /* This works if some igraph_vector_int_t's are 0,
            because igraph_vector_destroy can handle this. */
@@ -817,7 +817,7 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
  * the total number of elements in the incidence list.
  */
 void igraph_inclist_clear(igraph_inclist_t *il) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < il->length; i++) {
         igraph_vector_int_clear(&il->incs[i]);
     }
@@ -840,7 +840,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_multiple_t multiple
 ) {
-    long int i, p = 0;
+    igraph_integer_t i, p = 0;
     igraph_integer_t n = igraph_vector_int_size(v);
 
     if (
@@ -1023,7 +1023,7 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
  * the total number of elements in the adjacency list.
  */
 void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al) {
-    long int i, n = al->length;
+    igraph_integer_t i, n = al->length;
     for (i = 0; i < n; i++) {
         if (al->adjs[i] != 0) {
             igraph_vector_int_destroy(al->adjs[i]);
@@ -1048,7 +1048,7 @@ igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al) {
 igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
         igraph_integer_t pno) {
     igraph_integer_t no = pno;
-    long int i, n;
+    igraph_integer_t i, n;
     int ret;
 
     if (al->adjs[no] == 0) {
@@ -1185,7 +1185,7 @@ void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
  * the total number of elements in the incidence list.
  */
 void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il) {
-    long int i, n = il->length;
+    igraph_integer_t i, n = il->length;
     for (i = 0; i < n; i++) {
         if (il->incs[i] != 0) {
             igraph_vector_int_destroy(il->incs[i]);
@@ -1211,7 +1211,7 @@ igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
         igraph_integer_t pno) {
     igraph_integer_t no = pno;
     int ret;
-    long int i, n;
+    igraph_integer_t i, n;
 
     if (il->incs[no] == 0) {
         ret = igraph_incident(il->graph, &il->dummy, no, il->mode);

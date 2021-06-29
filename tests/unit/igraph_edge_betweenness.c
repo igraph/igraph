@@ -30,7 +30,7 @@ void test_bug950() {
     igraph_vector_t eb;
     igraph_vector_t weights;
     igraph_integer_t from, to;
-    long int no_of_edges, i;
+    igraph_integer_t no_of_edges, i;
 
     igraph_full(&g, 6, 0, 0);
     no_of_edges = igraph_ecount(&g);

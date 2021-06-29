@@ -53,7 +53,7 @@
  * Time complexity: operating system dependent.
  */
 
-igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol) {
+igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&m->ridx, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&m->cidx, ncol + 1);
@@ -136,8 +136,8 @@ igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix
  * \deprecated-by igraph_sparsemat_index 0.10.0
  */
 igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
-                                long int row, long int col) {
-    long int start, end;
+                                igraph_integer_t row, igraph_integer_t col) {
+    igraph_integer_t start, end;
 
     IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
@@ -149,7 +149,7 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
     /* Elements residing in column col are between m->data[start] and
      * m->data[end], inclusive, ordered by row index */
     while (start < end - 1) {
-        long int mid = (start + end) / 2;
+        igraph_integer_t mid = (start + end) / 2;
         if (VECTOR(m->ridx)[mid] > row) {
             end = mid;
         } else if (VECTOR(m->ridx)[mid] < row) {
@@ -186,9 +186,9 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
  *
  * \deprecated-by igraph_sparsemat_entry 0.10.0
  */
-igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
+igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, igraph_integer_t row, igraph_integer_t col,
                         igraph_real_t value) {
-    long int start, end;
+    igraph_integer_t start, end;
 
     IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
@@ -210,7 +210,7 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
     /* Elements residing in column col are between m->data[start] and
      * m->data[end], inclusive, ordered by row index */
     while (start < end - 1) {
-        long int mid = (start + end) / 2;
+        igraph_integer_t mid = (start + end) / 2;
         if (VECTOR(m->ridx)[mid] > row) {
             end = mid;
         } else if (VECTOR(m->ridx)[mid] < row) {
@@ -289,7 +289,7 @@ igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int 
  */
 igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_integer_t row, igraph_integer_t col,
                           igraph_real_t value) {
-    long int start, end;
+    igraph_integer_t start, end;
 
     IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
@@ -311,7 +311,7 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_integer_t row,
     /* Elements residing in column col are between m->data[start] and
      * m->data[end], inclusive, ordered by row index */
     while (start < end - 1) {
-        long int mid = (start + end) / 2;
+        igraph_integer_t mid = (start + end) / 2;
         if (VECTOR(m->ridx)[mid] > row) {
             end = mid;
         } else if (VECTOR(m->ridx)[mid] < row) {
@@ -378,8 +378,8 @@ igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_integer_t row,
  *
  * \deprecated 0.10.0
  */
-igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from) {
-    long int i;
+igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, igraph_integer_t to, igraph_integer_t from) {
+    igraph_integer_t i;
     if (to < 0 || to >= m->ncol) {
        IGRAPH_ERROR("The 'to' column does not exist.", IGRAPH_EINVAL);
     }
@@ -389,7 +389,7 @@ igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to,
     /* TODO: I think this implementation could be speeded up if I don't use
      * igraph_spmatrix_add_e directly -- but maybe it's not worth the fuss */
     for (i = VECTOR(m->cidx)[from]; i < VECTOR(m->cidx)[from + 1]; i++) {
-        IGRAPH_CHECK(igraph_spmatrix_add_e(m, (long int) VECTOR(m->ridx)[i],
+        IGRAPH_CHECK(igraph_spmatrix_add_e(m, (igraph_integer_t) VECTOR(m->ridx)[i],
                                            to, VECTOR(m->data)[i]));
     }
 
@@ -418,7 +418,7 @@ igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to,
  */
 
 igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_integer_t nrow, igraph_integer_t ncol) {
-    long int i, j, ci, ei, mincol;
+    igraph_integer_t i, j, ci, ei, mincol;
     IGRAPH_ASSERT(m != NULL);
     /* Iterating through the matrix data and deleting unnecessary data. */
     /* At the same time, we create the new indices as well */
@@ -462,7 +462,7 @@ igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_integer_t nro
  * \deprecated-by igraph_sparsemat_count_nonzero 0.10.0
  */
 
-long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return igraph_vector_size(&m->data);
 }
@@ -479,7 +479,7 @@ long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
  * Time complexity: O(1).
  */
 
-long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_size(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return (m->nrow) * (m->ncol);
 }
@@ -497,7 +497,7 @@ long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
  * \deprecated-by igraph_sparsemat_nrow 0.10.0
  */
 
-long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return m->nrow;
 }
@@ -515,7 +515,7 @@ long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
  * \deprecated-by igraph_sparsemat_ncol 0.10.0
  */
 
-long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return m->ncol;
 }
@@ -539,7 +539,7 @@ long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
  */
 
 igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
-    long int c, dest_idx, idx;
+    igraph_integer_t c, dest_idx, idx;
 
     memset(to, 0, sizeof(igraph_real_t) * (size_t) igraph_spmatrix_size(m));
     for (c = 0, dest_idx = 0; c < m->ncol; c++, dest_idx += m->nrow) {
@@ -584,7 +584,7 @@ igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
  * \deprecated-by igraph_sparsemat_add_cols 0.10.0
  */
 
-igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
+igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, igraph_integer_t n) {
     igraph_spmatrix_resize(m, m->nrow, m->ncol + n);
     return IGRAPH_SUCCESS;
 }
@@ -602,7 +602,7 @@ igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
  * \deprecated-by igraph_sparsemat_add_rows 0.10.0
  */
 
-igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
+igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, igraph_integer_t n) {
     igraph_spmatrix_resize(m, m->nrow + n, m->ncol);
     return IGRAPH_SUCCESS;
 }
@@ -619,11 +619,11 @@ igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
  * \deprecated-by igraph_sparsemat_scale_rows 0.10.0
  */
 
-igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
+igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, igraph_integer_t row) {
     if (row < 0 || row >= m->nrow) {
        IGRAPH_ERROR("The row does not exist.", IGRAPH_EINVAL);
     }
-    long int ci, ei, i, j, nremove = 0, nremove_old = 0;
+    igraph_integer_t ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_int_t permvec;
 
     IGRAPH_ASSERT(m != NULL);
@@ -656,8 +656,8 @@ igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
 
 /* Unused local functions---temporarily disabled */
 #if 0
-static igraph_error_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
-    long int ei, n;
+static igraph_error_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, igraph_integer_t row) {
+    igraph_integer_t ei, n;
 
     IGRAPH_ASSERT(m != NULL);
     n = igraph_vector_size(&m->data);
@@ -670,7 +670,7 @@ static igraph_error_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, lon
 }
 
 static igraph_error_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
-    long int ci, ei, i, j, nremove = 0, nremove_old = 0;
+    igraph_integer_t ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
     IGRAPH_ASSERT(m != NULL);
@@ -714,20 +714,20 @@ static igraph_error_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
  * \deprecated-by igraph_sparsemat_scale_cols 0.10.0
  */
 
-igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
+igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, igraph_integer_t col) {
     if (col < 0 || col >= m->ncol) {
        IGRAPH_ERROR("The column does not exist.", IGRAPH_EINVAL);
     }
-    long int i, n;
+    igraph_integer_t i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (long)VECTOR(m->cidx)[col + 1] - (long)VECTOR(m->cidx)[col];
     if (n == 0) {
         return IGRAPH_SUCCESS;
     }
-    igraph_vector_remove_section(&m->ridx, (long int) VECTOR(m->cidx)[col],
-                                 (long int) VECTOR(m->cidx)[col + 1]);
-    igraph_vector_remove_section(&m->data, (long int) VECTOR(m->cidx)[col],
-                                 (long int) VECTOR(m->cidx)[col + 1]);
+    igraph_vector_remove_section(&m->ridx, (igraph_integer_t) VECTOR(m->cidx)[col],
+                                 (igraph_integer_t) VECTOR(m->cidx)[col + 1]);
+    igraph_vector_remove_section(&m->data, (igraph_integer_t) VECTOR(m->cidx)[col],
+                                 (igraph_integer_t) VECTOR(m->cidx)[col + 1]);
     for (i = col + 1; i <= m->ncol; i++) {
         VECTOR(m->cidx)[i] -= n;
     }
@@ -763,7 +763,7 @@ void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
  */
 
 igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
-    long int i, c;
+    igraph_integer_t i, c;
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_CHECK(igraph_vector_resize(res, m->ncol));
     igraph_vector_null(res);
@@ -788,14 +788,14 @@ igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector
  */
 
 igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
-    long int i, n;
+    igraph_integer_t i, n;
     IGRAPH_ASSERT(m != NULL);
 
     IGRAPH_CHECK(igraph_vector_resize(res, m->nrow));
     n = igraph_vector_size(&m->data);
     igraph_vector_null(res);
     for (i = 0; i < n; i++) {
-        VECTOR(*res)[(long int)VECTOR(m->ridx)[i]] += VECTOR(m->data)[i];
+        VECTOR(*res)[(igraph_integer_t)VECTOR(m->ridx)[i]] += VECTOR(m->data)[i];
     }
     return IGRAPH_SUCCESS;
 }
@@ -920,8 +920,8 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
 /* Unused function, temporarily disabled */
 /*
 static igraph_error_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
-                                                     igraph_vector_t *res, long int col) {
-    long int i, n;
+                                                     igraph_vector_t *res, igraph_integer_t col) {
+    igraph_integer_t i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
     IGRAPH_CHECK(igraph_vector_resize(res, n));
@@ -1111,8 +1111,8 @@ igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *fil
     IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, matrix));
     IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
     while (!igraph_spmatrix_iter_end(&mit)) {
-        fprintf(file, "[%ld, %ld] = %.4f\n", (long int)mit.ri,
-                (long int)mit.ci, mit.value);
+        fprintf(file, "[%" IGRAPH_PRId ", %" IGRAPH_PRId "] = %.4f\n", mit.ri,
+                mit.ci, mit.value);
         igraph_spmatrix_iter_next(&mit);
     }
     igraph_spmatrix_iter_destroy(&mit);

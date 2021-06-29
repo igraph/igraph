@@ -22,11 +22,10 @@
 
 int main() {
     igraph_t g;
-    igraph_es_t es;
-    igraph_vector_t eb, bet, bet2, weights, edges;
+    igraph_vector_t bet, bet2, weights, edges;
     igraph_vector_int_t node_vec, source_vec, target_vec;
     igraph_vs_t vs, vs_source, vs_target;
-    igraph_integer_t i, vid, n;
+    igraph_integer_t i, n;
 
     igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
@@ -116,7 +115,7 @@ int main() {
 
     n = igraph_vcount(&g);
     for (i = 0; i < n; i++) {
-        long int expected;
+        igraph_integer_t expected;
 
         if (i >= 10911) {
             /* layer 5, in the subset. There are 199 shortest paths that
@@ -147,8 +146,8 @@ int main() {
 
         if (VECTOR(bet)[i] != expected) {
             printf(
-                "Invalid betweenness for vertex %" IGRAPH_PRId ", expected %ld, got %ld\n",
-                i, expected, (long int) VECTOR(bet)[i]
+                "Invalid betweenness for vertex %" IGRAPH_PRId ", expected %" IGRAPH_PRId ", got %" IGRAPH_PRId "\n",
+                i, expected, (igraph_integer_t) VECTOR(bet)[i]
             );
             break;
         }

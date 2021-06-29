@@ -58,11 +58,11 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     const igraph_vector_t *weights,
     const igraph_vector_t *clustering,
     const igraph_vector_bool_t *is_cluster_sampled,
-    long int v,
+    igraph_integer_t v,
     igraph_vector_t *lightest_eid,
     igraph_vector_t *lightest_weight,
     igraph_vector_int_t *dirty_vids,
-    long int *nearest_neighboring_sampled_cluster
+    igraph_integer_t *nearest_neighboring_sampled_cluster
 ) {
     // This internal function gets the residual graph, the clustering, the sampled clustering and
     // the vector and return the lightest edge to each neighboring cluster and the index of the lightest
@@ -74,9 +74,9 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     igraph_integer_t i, nlen = igraph_vector_int_size(incident_edges);
 
     for (i = 0; i < nlen; i++) {
-        long int neighbor_node = VECTOR(*adjacent_nodes)[i];
-        long int edge = VECTOR(*incident_edges)[i];
-        long int neighbor_cluster = VECTOR(*clustering)[neighbor_node];
+        igraph_integer_t neighbor_node = VECTOR(*adjacent_nodes)[i];
+        igraph_integer_t edge = VECTOR(*incident_edges)[i];
+        igraph_integer_t neighbor_cluster = VECTOR(*clustering)[neighbor_node];
         igraph_real_t weight = weights ? VECTOR(*weights)[edge] : 1;
 
         // If the weight of the edge being considered is smaller than the weight
@@ -110,7 +110,7 @@ static void igraph_i_clear_lightest_edges_to_clusters(
 ) {
     igraph_integer_t i, n = igraph_vector_int_size(dirty_vids);
     for (i = 0; i < n; i++) {
-        long int vid = VECTOR(*dirty_vids)[i];
+        igraph_integer_t vid = VECTOR(*dirty_vids)[i];
         VECTOR(*lightest_weight)[vid] = INFINITY;
         VECTOR(*lightest_eid)[vid] = -1;
     }
@@ -279,7 +279,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
 
             // Step 2: find the lightest edge that connects vertex v to its
             // neighboring sampled clusters
-            long int nearest_neighboring_sampled_cluster = -1;
+            igraph_integer_t nearest_neighboring_sampled_cluster = -1;
             IGRAPH_CHECK(igraph_i_collect_lightest_edges_to_clusters(
                 &adjlist,
                 &inclist,

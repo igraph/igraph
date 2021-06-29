@@ -72,7 +72,7 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
                                igraph_integer_t n, igraph_bool_t directed) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int from, to;
+    igraph_integer_t from, to;
     int c;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -89,11 +89,11 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        read = fscanf(instream, "%li", &from);
+        read = fscanf(instream, "%" IGRAPH_PRId "", &from);
         if (read != 1) {
             IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR);
         }
-        read = fscanf(instream, "%li", &to);
+        read = fscanf(instream, "%" IGRAPH_PRId "", &to);
         if (read != 1) {
             IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR);
         }
@@ -144,9 +144,9 @@ igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstrea
         igraph_integer_t from, to;
         int ret;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-        ret = fprintf(outstream, "%li %li\n",
-                      (long int) from,
-                      (long int) to);
+        ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",
+                      from,
+                      to);
         if (ret < 0) {
             IGRAPH_ERROR("Write error", IGRAPH_EFILE);
         }

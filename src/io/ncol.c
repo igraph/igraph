@@ -322,7 +322,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
             ret1 = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " ", from, to);
-            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret3 = fputc('\n', outstream);
             if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -356,7 +356,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
-            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret2 = fputc('\n', outstream);
             if (ret < 0 || ret2 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);

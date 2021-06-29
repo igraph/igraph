@@ -90,7 +90,7 @@ public:
     PottsModel(network *net, unsigned long q, int norm_by_degree);
     ~PottsModel();
     double* color_field;
-    unsigned long assign_initial_conf(long int spin);
+    unsigned long assign_initial_conf(igraph_integer_t spin);
     unsigned long initialize_lookup(double kT, double gamma);
     double initialize_Qmatrix();
     double calculate_Q();

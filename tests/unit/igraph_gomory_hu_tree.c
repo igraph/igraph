@@ -30,15 +30,15 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
     igraph_integer_t n = igraph_vcount(graph);
     igraph_vector_int_t edges;
     igraph_real_t min_weight, flow_value;
-    long int i, j, k, m;
+    igraph_integer_t i, j, k, m;
 
     if (igraph_vcount(tree) != n) {
-        printf("Gomory-Hu tree should have %ld vertices\n", (long int)n);
+        printf("Gomory-Hu tree should have %" IGRAPH_PRId " vertices\n", n);
         return IGRAPH_EINVAL;
     }
 
     if (igraph_ecount(tree) != n - 1) {
-        printf("Gomory-Hu tree should have %ld edges\n", (long int)n - 1);
+        printf("Gomory-Hu tree should have %" IGRAPH_PRId " edges\n", n - 1);
         return IGRAPH_EINVAL;
     }
 
@@ -70,7 +70,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
 
             IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, 0, 0, i, j, capacity, 0));
             if (flow_value != min_weight) {
-                printf("Min weight of path %ld --> %ld in Gomory-Hu tree is %.4f, "
+                printf("Min weight of path %" IGRAPH_PRId " --> %" IGRAPH_PRId " in Gomory-Hu tree is %.4f, "
                        "expected %.4f from flow calculation\n", i, j, min_weight, flow_value);
                 return IGRAPH_EINVAL;
             }

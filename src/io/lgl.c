@@ -220,7 +220,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                            const char *names, const char *weights,
                            igraph_bool_t isolates) {
     igraph_eit_t it;
-    long int actvertex = -1;
+    igraph_integer_t actvertex = -1;
     igraph_attribute_type_t nametype, weighttype;
 
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
@@ -264,10 +264,10 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             int ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
             if (from == actvertex) {
-                ret = fprintf(outstream, "%li\n", (long int)to);
+                ret = fprintf(outstream, "%" IGRAPH_PRId "\n", to);
             } else {
                 actvertex = from;
-                ret = fprintf(outstream, "# %li\n%li\n", (long int)from, (long int)to);
+                ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId "\n", from, to);
             }
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -375,7 +375,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 
     if (isolates) {
         igraph_integer_t nov = igraph_vcount(graph);
-        long int i;
+        igraph_integer_t i;
         int ret = 0;
         igraph_vector_t deg;
         igraph_strvector_t nvec;
@@ -389,7 +389,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                           IGRAPH_ALL, IGRAPH_LOOPS);
             if (VECTOR(deg)[0] == 0) {
                 if (names == 0) {
-                    ret = fprintf(outstream, "# %li\n", i);
+                    ret = fprintf(outstream, "# %" IGRAPH_PRId "\n", i);
                 } else {
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
                                  igraph_vss_1((igraph_integer_t) i), &nvec));

@@ -39,7 +39,7 @@ static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_r
                                     int n, void *extra);
 
 static igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                                      igraph_matrix_t *dist, long int dim);
+                                      igraph_matrix_t *dist, igraph_integer_t dim);
 
 static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
                                     int n, void *extra) {
@@ -52,14 +52,14 @@ static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_r
 /* MDS layout for a connected graph, with no error checking on the
  * input parameters. The distance matrix will be modified in-place. */
 igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                               igraph_matrix_t *dist, long int dim) {
+                               igraph_matrix_t *dist, igraph_integer_t dim) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int nev = dim;
+    igraph_integer_t nev = dim;
     igraph_matrix_t vectors;
     igraph_vector_t values, row_means;
     igraph_real_t grand_mean;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_eigen_which_t which;
 
     if (no_of_nodes > INT_MAX) {
@@ -189,7 +189,7 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
  */
 
 igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
-                      const igraph_matrix_t *dist, long int dim) {
+                      const igraph_matrix_t *dist, igraph_integer_t dim) {
     igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;
     igraph_bool_t conn;

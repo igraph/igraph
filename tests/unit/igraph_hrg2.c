@@ -29,7 +29,7 @@
 int main() {
     igraph_t karate;
     igraph_vector_t parents, weights;
-    long int i, n;
+    igraph_integer_t i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -71,9 +71,9 @@ int main() {
     /* We do some simple validity tests on the results only; the exact results
      * are different on i386 vs other platforms due to numerical inaccuracies */
     if (igraph_vector_size(&weights) + igraph_vcount(&karate) != igraph_vector_size(&parents)) {
-        printf("Vector length mismatch: %ld + %ld != %ld\n",
-            (long int) igraph_vector_size(&weights), (long int) igraph_vcount(&karate),
-            (long int) igraph_vector_size(&parents)
+        printf("Vector length mismatch: %" IGRAPH_PRId " + %" IGRAPH_PRId " != %" IGRAPH_PRId "\n",
+            igraph_vector_size(&weights), igraph_vcount(&karate),
+            igraph_vector_size(&parents)
         );
         abort();
     }

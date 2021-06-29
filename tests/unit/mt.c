@@ -26,7 +26,7 @@
 
 int main() {
 
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < 1000; i++) {
         igraph_real_t r = igraph_rng_get_unif01(igraph_rng_default());
         if (r < 0 || r > 1) {

@@ -38,7 +38,7 @@
 #include <string.h>    /* memset */
 
 static void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
-    long i, n;
+    igraph_integer_t i, n;
 
     n = igraph_vector_ptr_size(res);
     for (i = 0; i < n; i++) {
@@ -52,15 +52,15 @@ static void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
 
 static igraph_error_t igraph_i_find_k_cliques(
         const igraph_t *graph,
-        long int size,
+        igraph_integer_t size,
         const igraph_real_t *member_storage,
         igraph_real_t **new_member_storage,
-        long int old_clique_count,
-        long int *clique_count,
+        igraph_integer_t old_clique_count,
+        igraph_integer_t *clique_count,
         igraph_vector_t *neis,
         igraph_bool_t independent_vertices) {
 
-    long int j, k, l, m, n, new_member_storage_size;
+    igraph_integer_t j, k, l, m, n, new_member_storage_size;
     const igraph_real_t *c1, *c2;
     igraph_real_t v1, v2;
     igraph_bool_t ok;
@@ -195,7 +195,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
     igraph_integer_t no_of_nodes;
     igraph_vector_t neis;
     igraph_real_t *member_storage = 0, *new_member_storage, *c1;
-    long int i, j, k, clique_count, old_clique_count;
+    igraph_integer_t i, j, k, clique_count, old_clique_count;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
@@ -759,7 +759,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
 }
 
 static void igraph_i_free_set_array(igraph_set_t* array) {
-    long int i = 0;
+    igraph_integer_t i = 0;
     while (igraph_set_inited(array + i)) {
         igraph_set_destroy(array + i);
         i++;
@@ -994,7 +994,7 @@ static igraph_error_t igraph_i_maximal_cliques_store_size_check(const igraph_vec
 static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
     igraph_vector_t* vec;
-    long int i, n;
+    igraph_integer_t i, n;
 
     IGRAPH_UNUSED(cont);
     /* Is the current clique at least as large as the others that we have found? */

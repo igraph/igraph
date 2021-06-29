@@ -50,7 +50,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t vs_size;
-    long int i;
+    igraph_integer_t i;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vs_size(graph, &order, &vs_size));
@@ -91,8 +91,8 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
                        igraph_integer_t center, const igraph_vector_t *order) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int c = center;
-    long int i;
+    igraph_integer_t c = center;
+    igraph_integer_t i;
     igraph_real_t step;
     igraph_real_t phi;
 
@@ -110,7 +110,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     } else {
         for (i = 0, step = 2 * M_PI / (no_of_nodes - 1), phi = 0;
              i < no_of_nodes; i++) {
-            long int node = order ? (long int) VECTOR(*order)[i] : i;
+            igraph_integer_t node = order ? (igraph_integer_t) VECTOR(*order)[i] : i;
             if (order && (node < 0 || node >= no_of_nodes)) {
                 IGRAPH_ERROR("Elements in the order vector are not all vertices of the graph.", IGRAPH_EINVAL);
             }
@@ -150,7 +150,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
 igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t i;
     igraph_real_t h;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));

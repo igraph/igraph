@@ -25,7 +25,7 @@ void print_real(FILE *f, igraph_real_t x, const char *format) {
 }
 
 void print_vector_format(const igraph_vector_t *v, FILE *f, const char *format) {
-    long i, n = igraph_vector_size(v);
+    igraph_integer_t i, n = igraph_vector_size(v);
     fprintf(f, "(");
     for (i=0; i < n; i++) {
         fprintf(f, " ");
@@ -48,7 +48,7 @@ void print_vector_round(const igraph_vector_t *v) {
 
 /* Print elements of an integer vector */
 void print_vector_int(const igraph_vector_int_t *v) {
-    long i, n = igraph_vector_int_size(v);
+    igraph_integer_t i, n = igraph_vector_int_size(v);
     printf("(");
     for (i=0; i < n; i++) {
         printf(" %" IGRAPH_PRId, VECTOR(*v)[i]);
@@ -59,7 +59,7 @@ void print_vector_int(const igraph_vector_int_t *v) {
 
 /* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
 void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
-    long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+    igraph_integer_t i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
     for (i = 0; i < nrow; i++) {
         fprintf(f, i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {
@@ -86,12 +86,12 @@ void print_matrix_round(const igraph_matrix_t *m) {
  * is empty.
  */
 void print_adjlist(const igraph_adjlist_t *adjlist) {
-    long vcount = igraph_adjlist_size(adjlist);
-    long i;
+    igraph_integer_t vcount = igraph_adjlist_size(adjlist);
+    igraph_integer_t i;
 
     printf("{\n");
     for (i = 0; i < vcount; ++i) {
-        printf("  %ld: ", i);
+        printf("  %" IGRAPH_PRId ": ", i);
         print_vector_int(igraph_adjlist_get(adjlist, i));
     }
     printf("}\n");
@@ -99,12 +99,12 @@ void print_adjlist(const igraph_adjlist_t *adjlist) {
 
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph) {
-    long ecount = igraph_ecount(graph);
-    long vcount = igraph_vcount(graph);
-    long i;
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t i;
 
     printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
-    printf("vcount: %ld\n", vcount);
+    printf("vcount: %" IGRAPH_PRId "\n", vcount);
     printf("edges: {\n");
     for (i=0; i < ecount; ++i)
         printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
@@ -116,12 +116,12 @@ void print_graph(const igraph_t *graph) {
  * is empty.
  */
 void print_inclist(const igraph_inclist_t *inclist) {
-    long vcount = igraph_inclist_size(inclist);
-    long i;
+    igraph_integer_t vcount = igraph_inclist_size(inclist);
+    igraph_integer_t i;
 
     printf("{\n");
     for (i = 0; i < vcount; ++i) {
-        printf("  %ld: ", i);
+        printf("  %" IGRAPH_PRId ": ", i);
         print_vector_int(igraph_inclist_get(inclist, i));
     }
     printf("}\n");
@@ -132,12 +132,12 @@ void print_inclist(const igraph_inclist_t *inclist) {
  * is empty.
  */
 void print_lazy_adjlist(igraph_lazy_adjlist_t *adjlist) {
-    long vcount = igraph_lazy_adjlist_size(adjlist);
-    long i;
+    igraph_integer_t vcount = igraph_lazy_adjlist_size(adjlist);
+    igraph_integer_t i;
 
     printf("{\n");
     for (i = 0; i < vcount; ++i) {
-        printf("  %ld: ", i);
+        printf("  %" IGRAPH_PRId ": ", i);
         print_vector_int(igraph_lazy_adjlist_get(adjlist, i));
     }
     printf("}\n");
@@ -148,12 +148,12 @@ void print_lazy_adjlist(igraph_lazy_adjlist_t *adjlist) {
  * is empty.
  */
 void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
-    long vcount = igraph_lazy_inclist_size(inclist);
-    long i;
+    igraph_integer_t vcount = igraph_lazy_inclist_size(inclist);
+    igraph_integer_t i;
 
     printf("{\n");
     for (i = 0; i < vcount; ++i) {
-        printf("  %ld: ", i);
+        printf("  %" IGRAPH_PRId ": ", i);
         print_vector_int(igraph_lazy_inclist_get(inclist, i));
     }
     printf("}\n");
@@ -178,13 +178,13 @@ int edge_compare(const void *e1, const void *e2) {
 /* Print a graph using a sorted edge list. Other than sorting (i.e. canonicalizing) the edge list,
  * this function is identical to print_graph(). */
 void print_graph_canon(const igraph_t *graph) {
-    long ecount = igraph_ecount(graph);
-    long vcount = igraph_vcount(graph);
-    long i;
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t i;
     igraph_vector_t edges;
 
     printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
-    printf("vcount: %ld\n", vcount);
+    printf("vcount: %" IGRAPH_PRId "\n", vcount);
     printf("edges: {\n");
 
     igraph_vector_init(&edges, 0);
@@ -206,7 +206,7 @@ void print_graph_canon(const igraph_t *graph) {
     igraph_qsort(&VECTOR(edges)[0], ecount, 2*sizeof(igraph_real_t), &edge_compare);
 
     for (i=0; i < ecount; ++i) {
-        printf("%ld %ld\n", (long) VECTOR(edges)[2*i], (long) VECTOR(edges)[2*i+1]);
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", (igraph_integer_t) VECTOR(edges)[2*i], (igraph_integer_t) VECTOR(edges)[2*i+1]);
     }
 
     igraph_vector_destroy(&edges);
@@ -217,7 +217,7 @@ void print_graph_canon(const igraph_t *graph) {
 /* Print a vector, ensuring that the first nonzero element is positive. */
 void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, const char* format) {
     igraph_vector_t copy;
-    long i, n;
+    igraph_integer_t i, n;
 
     igraph_vector_copy(&copy, vector);
 
@@ -244,7 +244,7 @@ void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, 
  * part has a positive real part. */
 void print_vector_complex_first_nonzero_real_part_positive(const igraph_vector_complex_t *vector) {
     igraph_vector_complex_t copy;
-    long i, n;
+    igraph_integer_t i, n;
 
     igraph_vector_complex_copy(&copy, vector);
 
@@ -274,7 +274,7 @@ void print_vector_complex_first_nonzero_real_part_positive(const igraph_vector_c
  * positive. */
 void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* format) {
     igraph_matrix_t copy;
-    long i, j, nrow, ncol;
+    igraph_integer_t i, j, nrow, ncol;
 
     igraph_matrix_copy(&copy, matrix);
 
@@ -304,7 +304,7 @@ void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* 
  * part in each column has a positive real part. */
 void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matrix) {
     igraph_matrix_complex_t copy;
-    long i, j, nrow, ncol;
+    igraph_integer_t i, j, nrow, ncol;
     igraph_complex_t z;
     char buf[256];
     size_t len;

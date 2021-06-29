@@ -27,7 +27,7 @@
 
 /* How many "true" elements in the Boolean vector? */
 long vector_bool_count(const igraph_vector_bool_t *vec) {
-    long i, n = igraph_vector_bool_size(vec), cnt = 0;
+    igraph_integer_t i, n = igraph_vector_bool_size(vec), cnt = 0;
 
     for (i=0; i < n; ++i) {
         if (VECTOR(*vec)[i]) {
@@ -44,7 +44,7 @@ int main() {
     igraph_vector_t types, in_types, out_types;
     igraph_bool_t connected, has_loop, has_multi;
     igraph_vector_bool_t is_loop;
-    long i;
+    igraph_integer_t i;
 
     igraph_vector_init(&types, 0);
 

@@ -188,7 +188,7 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
 
 typedef igraph_error_t igraph_community_leading_eigenvector_callback_t(
     const igraph_vector_int_t *membership,
-    long int comm,
+    igraph_integer_t comm,
     igraph_real_t eigenvalue,
     const igraph_vector_t *eigenvector,
     igraph_arpack_function_t *arpack_multiplier,

@@ -28,8 +28,8 @@
 
 /* Compare the elements of two vectors for equality, handling NaN values. */
 igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
-    long int n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
-    long int i;
+    igraph_integer_t n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
+    igraph_integer_t i;
 
     if (n1 != n2) {
         return 0;
@@ -50,8 +50,8 @@ igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2)
 
 /* Compute the average of a vector, ignoring NaN values. */
 igraph_real_t vector_avg(const igraph_vector_t *v) {
-    long int n = igraph_vector_size(v);
-    long int i;
+    igraph_integer_t n = igraph_vector_size(v);
+    igraph_integer_t i;
     igraph_real_t sum = 0.0, count;
 
     count = 0;

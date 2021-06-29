@@ -440,7 +440,7 @@
     #if (defined(__STDC__) && defined(__STDC_VERSION__)) || defined (S_SPLINT_S)
         #if (__STDC__ && __STDC_VERSION >= 199901L) || defined (S_SPLINT_S)
             #define stdint_int64_defined
-            typedef long long int64_t;
+            typedef long igraph_integer_t64_t;
             typedef unsigned long long uint64_t;
             #define UINT64_C(v) v ## ULL
             #define  INT64_C(v) v ## LL
@@ -453,7 +453,7 @@
     #if !defined (stdint_int64_defined)
         #if defined(__GNUC__)
             #define stdint_int64_defined
-            __extension__ typedef long long int64_t;
+            __extension__ typedef long igraph_integer_t64_t;
             __extension__ typedef unsigned long long uint64_t;
             #define UINT64_C(v) v ## ULL
             #define  INT64_C(v) v ## LL
@@ -462,7 +462,7 @@
             #endif
         #elif defined(__MWERKS__) || defined (__SUNPRO_C) || defined (__SUNPRO_CC) || defined (__APPLE_CC__) || defined (_LONG_LONG) || defined (_CRAYC) || defined (S_SPLINT_S)
             #define stdint_int64_defined
-            typedef long long int64_t;
+            typedef long igraph_integer_t64_t;
             typedef unsigned long long uint64_t;
             #define UINT64_C(v) v ## ULL
             #define  INT64_C(v) v ## LL

@@ -255,7 +255,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     }
 
     if (membership) {
-        long int comm = 0;   /* id of the last community that was found */
+        igraph_integer_t comm = 0;   /* id of the last community that was found */
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
 

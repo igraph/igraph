@@ -28,7 +28,7 @@ void check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
                  const igraph_vector_ptr_t *evecs) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    long int i, n = igraph_vector_ptr_size(vecs);
+    igraph_integer_t i, n = igraph_vector_ptr_size(vecs);
 
     IGRAPH_ASSERT(igraph_vector_ptr_size(evecs) == n);
 
@@ -64,7 +64,7 @@ void check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
 void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
                         const igraph_vector_int_t* inbound, int start) {
 
-    long int i, n = igraph_vcount(graph);
+    igraph_integer_t i, n = igraph_vcount(graph);
 
     IGRAPH_ASSERT(igraph_vector_int_size(pred) == n);
     IGRAPH_ASSERT(igraph_vector_int_size(inbound) == n);
@@ -81,10 +81,10 @@ void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
             IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
 
         } else {
-            long int eid = VECTOR(*inbound)[i];
-            long int u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
+            igraph_integer_t eid = VECTOR(*inbound)[i];
+            igraph_integer_t u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
             if (v != i && !igraph_is_directed(graph)) {
-                long int dummy = u;
+                igraph_integer_t dummy = u;
                 u = v;
                 v = dummy;
             }

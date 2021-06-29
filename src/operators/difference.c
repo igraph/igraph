@@ -62,14 +62,14 @@ igraph_error_t igraph_difference(igraph_t *res,
 
     igraph_integer_t no_of_nodes_orig = igraph_vcount(orig);
     igraph_integer_t no_of_nodes_sub = igraph_vcount(sub);
-    long int no_of_nodes = no_of_nodes_orig;
-    long int smaller_nodes;
+    igraph_integer_t no_of_nodes = no_of_nodes_orig;
+    igraph_integer_t smaller_nodes;
     igraph_bool_t directed = igraph_is_directed(orig);
     igraph_vector_t edges;
     igraph_vector_int_t edge_ids;
     igraph_vector_int_t *nei1, *nei2;
     igraph_inclist_t inc_orig, inc_sub;
-    long int i;
+    igraph_integer_t i;
     igraph_integer_t v1, v2;
 
     if (directed != igraph_is_directed(sub)) {
@@ -141,7 +141,7 @@ igraph_error_t igraph_difference(igraph_t *res,
 
     /* copy remaining edges, use the previous value of 'i' */
     for (; i < no_of_nodes_orig; i++) {
-        long int n1, e1;
+        igraph_integer_t n1, e1;
         nei1 = igraph_inclist_get(&inc_orig, i);
         n1 = igraph_vector_int_size(nei1) - 1;
         while (n1 >= 0) {

@@ -51,9 +51,9 @@ typedef struct s_vector_ptr {
         IGRAPH_FINALLY(igraph_vector_ptr_destroy, v); } while (0)
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init      (igraph_vector_ptr_t* v, igraph_integer_t size);
-IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_copy (igraph_vector_ptr_t* v, void** data, long int length);
+IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_copy (igraph_vector_ptr_t* v, void** data, igraph_integer_t length);
 IGRAPH_EXPORT const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
-                                                                 void *const *data, long int length);
+                                                                 void *const *data, igraph_integer_t length);
 IGRAPH_EXPORT void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v);
@@ -66,14 +66,14 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_push_back (igraph_vector_ptr_t* v
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_append    (igraph_vector_ptr_t *to,
                                                const igraph_vector_ptr_t *from);
 IGRAPH_EXPORT void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v);
-IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t *v, long int pos, void* e);
-IGRAPH_EXPORT void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos);
-IGRAPH_EXPORT void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value);
+IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t *v, igraph_integer_t pos, void* e);
+IGRAPH_EXPORT void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, igraph_integer_t pos);
+IGRAPH_EXPORT void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, igraph_integer_t pos, void* value);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t newsize);
 IGRAPH_EXPORT void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_vector_t* index);
-IGRAPH_EXPORT void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
+IGRAPH_EXPORT void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_integer_t pos);
 IGRAPH_EXPORT void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_sort_ind(
     igraph_vector_ptr_t *v, igraph_vector_t *inds, int(*compar)(const void*, const void*));

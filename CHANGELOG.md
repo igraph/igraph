@@ -181,6 +181,34 @@
    `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
    instead of `igraph_matrix_t()` for its memberships parameter.
 
+ - Every `igraph_spmatrix_*()` function and struct now uses `igraph_integer_t`
+   instead of `long int` for the numbers of rows and columns, and row and column
+   indexes.
+
+ - The position parameters in `igraph_vector_ptr_insert()`,
+   `igraph_vector_ptr_e()`, `igraph_vector_ptr_set()`,
+   `igraph_vector_ptr_remove()` now all are of type `igraph_integer_t` instead
+   of `long int`. The length parameters in `igraph_vector_ptr_init_copy()` and
+   `igraph_vector_ptr_view()` are also change to `igraph_integer_t`.
+
+ - The width parameter of `igraph_layout_grid()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - The width and height parameters of `igraph_layout_grid_3d()` are now
+   `igraph_integer_t` instead of `long int`.
+
+ - The dimension parameter of `igraph_layout_mds()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - The maxiter parameter of `igraph_layout_sugiyama()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - The community parameter `igraph_community_leading_eigenvector_callback_t` is
+   now an `igraph_integer_t` instead of `long int`.
+   
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

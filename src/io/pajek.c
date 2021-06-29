@@ -137,7 +137,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_t vattrs;
     igraph_trie_t eattrnames;
     igraph_vector_ptr_t eattrs;
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_i_pajek_parsedata_t context;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -189,7 +189,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
             }
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            long int origsize = igraph_strvector_size(strvec);
+            igraph_integer_t origsize = igraph_strvector_size(strvec);
             igraph_strvector_resize(strvec, context.actedge);
             for (j = origsize; j < context.actedge; j++) {
                 igraph_strvector_set(strvec, j, "");
@@ -302,7 +302,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 #define E_LAST             23
 
 static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
-    long int destlen = 0;
+    igraph_integer_t destlen = 0;
     igraph_bool_t need_escape = 0;
 
     /* Determine whether the string contains characters to be escaped */
@@ -716,7 +716,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             from = VECTOR(bip_index2)[from];
             to  = VECTOR(bip_index2)[to];
         }
-        fprintf(outstream, "%li %li", (long int) from + 1, (long int) to + 1);
+        fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId , from + 1, to + 1);
 
         /* Weights */
         if (etypes[E_WEIGHT] == IGRAPH_ATTRIBUTE_NUMERIC) {

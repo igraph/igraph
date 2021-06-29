@@ -42,10 +42,10 @@ int igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
 void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
 
 static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
-    long int i;
+    igraph_integer_t i;
     igraph_vector_ptr_t *vec;
     for (i = 0; i < 3; i++) {
-        long int j;
+        igraph_integer_t j;
         vec = ptr[i];
         for (j = 0; j < igraph_vector_ptr_size(vec); j++) {
             igraph_attribute_record_t *atrec = VECTOR(*vec)[j];
@@ -69,7 +69,7 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     }
 }
 
-static igraph_error_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_real_t *result) {
+static igraph_error_t igraph_i_gml_toreal(igraph_gml_tree_t *node, igraph_integer_t pos, igraph_real_t *result) {
 
     igraph_real_t value = 0.0;
     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
@@ -90,7 +90,7 @@ static igraph_error_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos,
     return IGRAPH_SUCCESS;
 }
 
-static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
+static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer_t pos) {
 
     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
     static char tmp[256];

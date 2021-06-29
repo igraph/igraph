@@ -70,7 +70,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
     igraph_vector_t edges;
     igraph_bool_t directed_left = igraph_is_directed(left);
     igraph_integer_t from, to;
-    long int i;
+    igraph_integer_t i;
 
     if (directed_left != igraph_is_directed(right)) {
         IGRAPH_ERROR("Cannot union directed and undirected graphs",
@@ -135,10 +135,10 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = 1;
     igraph_vector_t edges;
-    long int no_of_edges = 0;
-    long int shift = 0;
+    igraph_integer_t no_of_edges = 0;
+    igraph_integer_t shift = 0;
     igraph_t *graph;
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_integer_t from, to;
 
     if (no_of_graphs != 0) {
@@ -158,7 +158,7 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
 
     for (i = 0; i < no_of_graphs; i++) {
-        long int ec;
+        igraph_integer_t ec;
         graph = VECTOR(*graphs)[i];
         ec = igraph_ecount(graph);
         for (j = 0; j < ec; j++) {
