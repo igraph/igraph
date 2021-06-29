@@ -35,11 +35,11 @@ void print_vector_int(igraph_vector_int_t *v, FILE *f) {
 int check_simple() {
 
     igraph_t g;
-    long int nodes = 100;
-    long int edges = 1000;
+    igraph_integer_t nodes = 100;
+    igraph_integer_t edges = 1000;
     igraph_real_t p = 3.0 / nodes;
-    long int runs = 10;
-    long int r, e, ecount;
+    igraph_integer_t runs = 10;
+    igraph_integer_t r, e, ecount;
     igraph_vector_int_t eids, pairs, path;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
@@ -53,21 +53,21 @@ int check_simple() {
                                 /*directed=*/ 0, /*loops=*/ 0);
         ecount = igraph_ecount(&g);
         for (e = 0; e < edges; e++) {
-            long int edge = RNG_INTEGER(0, ecount - 1);
+            igraph_integer_t edge = RNG_INTEGER(0, ecount - 1);
             VECTOR(pairs)[2 * e] = IGRAPH_FROM(&g, edge);
             VECTOR(pairs)[2 * e + 1] = IGRAPH_TO(&g, edge);
         }
         igraph_get_eids(&g, &eids, &pairs, /*path=*/ 0, 0, /*error=*/ 1);
         for (e = 0; e < edges; e++) {
-            long int edge = VECTOR(eids)[e];
-            long int from1 = VECTOR(pairs)[2 * e];
-            long int to1 = VECTOR(pairs)[2 * e + 1];
-            long int from2 = IGRAPH_FROM(&g, edge);
-            long int to2 = IGRAPH_TO(&g, edge);
-            long int min1 = from1 < to1 ? from1 : to1;
-            long int max1 = from1 < to1 ? to1 : from1;
-            long int min2 = from2 < to2 ? from2 : to2;
-            long int max2 = from2 < to2 ? to2 : from2;
+            igraph_integer_t edge = VECTOR(eids)[e];
+            igraph_integer_t from1 = VECTOR(pairs)[2 * e];
+            igraph_integer_t to1 = VECTOR(pairs)[2 * e + 1];
+            igraph_integer_t from2 = IGRAPH_FROM(&g, edge);
+            igraph_integer_t to2 = IGRAPH_TO(&g, edge);
+            igraph_integer_t min1 = from1 < to1 ? from1 : to1;
+            igraph_integer_t max1 = from1 < to1 ? to1 : from1;
+            igraph_integer_t min2 = from2 < to2 ? from2 : to2;
+            igraph_integer_t max2 = from2 < to2 ? to2 : from2;
             if (min1 != min2 || max1 != max2) {
                 return 11;
             }
@@ -77,15 +77,15 @@ int check_simple() {
                         IGRAPH_UNDIRECTED, /*unconn=*/ 1);
         igraph_get_eids(&g, &eids, /*pairs=*/ 0, &path, 0, /*error=*/ 1);
         for (e = 0; e < igraph_vector_int_size(&path) - 1; e++) {
-            long int edge = VECTOR(eids)[e];
-            long int from1 = VECTOR(path)[e];
-            long int to1 = VECTOR(path)[e + 1];
-            long int from2 = IGRAPH_FROM(&g, edge);
-            long int to2 = IGRAPH_TO(&g, edge);
-            long int min1 = from1 < to1 ? from1 : to1;
-            long int max1 = from1 < to1 ? to1 : from1;
-            long int min2 = from2 < to2 ? from2 : to2;
-            long int max2 = from2 < to2 ? to2 : from2;
+            igraph_integer_t edge = VECTOR(eids)[e];
+            igraph_integer_t from1 = VECTOR(path)[e];
+            igraph_integer_t to1 = VECTOR(path)[e + 1];
+            igraph_integer_t from2 = IGRAPH_FROM(&g, edge);
+            igraph_integer_t to2 = IGRAPH_TO(&g, edge);
+            igraph_integer_t min1 = from1 < to1 ? from1 : to1;
+            igraph_integer_t max1 = from1 < to1 ? to1 : from1;
+            igraph_integer_t min2 = from2 < to2 ? from2 : to2;
+            igraph_integer_t max2 = from2 < to2 ? to2 : from2;
             if (min1 != min2 || max1 != max2) {
                 return 12;
             }

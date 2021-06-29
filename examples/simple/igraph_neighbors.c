@@ -24,9 +24,9 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+        fprintf(f, " %" IGRAPH_PRId "", (igraph_integer_t) VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }

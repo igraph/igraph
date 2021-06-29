@@ -33,9 +33,6 @@ void sort_and_print_vector(igraph_vector_int_t *v) {
     printf("\n");
 }
 
-void warning_handler_ignore(const char* reason, const char* file, int line, int e) {
-}
-
 int main() {
 
     igraph_t g;
@@ -43,7 +40,7 @@ int main() {
     igraph_integer_t no;
     igraph_integer_t i;
 
-    igraph_set_warning_handler(warning_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     igraph_vector_ptr_init(&result, 0);
     igraph_small(&g, 7, 0, 0, 1, 1, 2, 2, 3, 3, 0, 2, 4, 4, 5, 2, 5, -1);

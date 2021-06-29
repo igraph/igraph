@@ -26,7 +26,7 @@
 
 int compare_vectors(const void *p1, const void *p2) {
     igraph_vector_t *v1, *v2;
-    long s1, s2, i;
+    igraph_integer_t s1, s2, i;
 
     v1 = *((igraph_vector_t **) p1);
     v2 = *((igraph_vector_t **) p2);
@@ -51,7 +51,7 @@ int compare_vectors(const void *p1, const void *p2) {
 
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_ptr_t *list) {
-    long i, len;
+    igraph_integer_t i, len;
     len = igraph_vector_ptr_size(list);
     for (i = 0; i < len; ++i) {
         igraph_vector_sort((igraph_vector_t *) VECTOR(*list)[i]);
@@ -60,16 +60,12 @@ void canonicalize_list(igraph_vector_ptr_t *list) {
 }
 
 void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
+    igraph_integer_t i, n = igraph_vector_size(v);
     for (i = 0; i < n; i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
+        printf(" %" IGRAPH_PRId "", (igraph_integer_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
-
-void warning_handler_ignore(const char* reason, const char* file, int line, int e) {
-}
-
 
 struct userdata {
     int i;
@@ -119,10 +115,10 @@ int main() {
     igraph_vector_ptr_t result;
     igraph_es_t es;
     igraph_integer_t omega;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
-    igraph_set_warning_handler(warning_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     igraph_vector_ptr_init(&result, 0);
     igraph_full(&g, 6, 0, 0);
@@ -137,7 +133,7 @@ int main() {
             igraph_largest_cliques(&g, &result);
         }
         n = igraph_vector_ptr_size(&result);
-        printf("%ld cliques found\n", (long)n);
+        printf("%" IGRAPH_PRId " cliques found\n", (igraph_integer_t)n);
         canonicalize_list(&result);
         for (i = 0; i < n; i++) {
             igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
@@ -148,7 +144,7 @@ int main() {
     }
 
     igraph_clique_number(&g, &omega);
-    printf("omega=%ld\n", (long)omega);
+    printf("omega=%" IGRAPH_PRId "\n", (igraph_integer_t)omega);
 
     test_callback(&g);
 

@@ -30,7 +30,7 @@ void test_motifs() {
     igraph_t graph;
     igraph_vector_t randesu_counts, lad_counts;
     igraph_vector_t cut_prob;
-    int i, n;
+    igraph_integer_t i, n;
     igraph_bool_t equal;
     igraph_integer_t vcount;
 
@@ -153,7 +153,7 @@ void test_motifs_undirected() {
     igraph_t graph;
     igraph_vector_t randesu_counts, lad_counts;
     igraph_vector_t cut_prob;
-    int i, n;
+    igraph_integer_t i, n;
     igraph_bool_t equal;
     igraph_integer_t vcount;
 
@@ -277,7 +277,8 @@ int main() {
     igraph_bool_t iso;
     igraph_vector_t map;
     igraph_vector_ptr_t maps;
-    int i, n, result;
+    igraph_integer_t i, n;
+    igraph_error_t result;
     int domainsvec[] = { 0, 2, 8, -1,
                          4, 5, 6, 7, -1,
                          1, 3, 5, 6, 7, 8, -1,

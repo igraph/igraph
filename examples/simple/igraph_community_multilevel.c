@@ -39,7 +39,7 @@ void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_in
 
     for (i = 0; i < igraph_matrix_int_nrow(memberships); i++) {
         for (j = 0; j < no_of_nodes; j++) {
-            fprintf(f, "%ld ", (long int)MATRIX(*memberships, i, j));
+            fprintf(f, "%" IGRAPH_PRId " ", MATRIX(*memberships, i, j));
         }
         fprintf(f, "\n");
     }

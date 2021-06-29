@@ -31,15 +31,15 @@ typedef struct {
     igraph_vector_t *strategies;
     igraph_vector_t *known_strats;
     igraph_neimode_t mode;
-    int retval;
+    igraph_integer_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-int error_tests() {
+igraph_error_t error_tests() {
     igraph_t g, h;
     igraph_vector_t quant, strat;
-    int i, n, ret;
+    igraph_integer_t i, n, ret;
     strategy_test_t *test;
 
     /* nonempty graph */
@@ -81,7 +81,7 @@ int error_tests() {
                                           test->quantities, test->strategies,
                                           test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", i + 1);
+            printf("Error test no. %" IGRAPH_PRId " failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
         i++;
@@ -98,10 +98,11 @@ int error_tests() {
 /* Updating the strategy of an isolated vertex. In this case, the strategies
  * vector should not change at all.
  */
-int isolated_vertex_test() {
+igraph_error_t isolated_vertex_test() {
     igraph_t g;
     igraph_vector_t quant, strat, v;
-    int i, ret;
+    igraph_integer_t i;
+    igraph_error_t ret;
 
     /* graph with one isolated vertex */
     igraph_small(&g, /*n vertices*/ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
@@ -145,12 +146,13 @@ int isolated_vertex_test() {
  * default strategies vector. Some vertices are chosen for strategy revision,
  * each one via a different stochastic imitation rule.
  */
-int petersen_game_test() {
+igraph_error_t petersen_game_test() {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t quant, strat, stratcopy, *knownstrats;
     igraph_vector_t known0, known2, known4;
-    int i, k, n, nvert, ret;
+    igraph_integer_t i, k, n, ret;
+    int nvert;
     strategy_test_t *test;
 
     /* the Petersen graph */
@@ -223,7 +225,7 @@ int petersen_game_test() {
 }
 
 int main() {
-    int ret;
+    igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 547612);
 

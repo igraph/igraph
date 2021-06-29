@@ -4,7 +4,7 @@ int main(void)
 {
    igraph_t graph;
    igraph_vector_ptr_t seps;
-   long int i;
+   igraph_integer_t i;
 
    igraph_famous(&graph, "tutte");
    igraph_vector_ptr_init(&seps, 0);

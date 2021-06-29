@@ -104,10 +104,10 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
                 exit(error_code + 4);
             }
         } else {
-            long int eid = VECTOR(*inbound)[i];
-            long int u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
+            igraph_integer_t eid = VECTOR(*inbound)[i];
+            igraph_integer_t u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
             if (v != i && !igraph_is_directed(graph)) {
-                long int dummy = u;
+                igraph_integer_t dummy = u;
                 u = v;
                 v = dummy;
             }

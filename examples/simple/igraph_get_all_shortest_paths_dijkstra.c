@@ -35,7 +35,7 @@ int vector_tail_cmp(const void *path1, const void *path2) {
     const igraph_vector_int_t *vec2 = *(const igraph_vector_int_t**)path2;
     igraph_integer_t length1 = igraph_vector_int_size(vec1);
     igraph_integer_t length2 = igraph_vector_int_size(vec2);
-    int diff;
+    igraph_integer_t diff;
 
     while (length1 > 0 && length2 > 0) {
         length1--;
@@ -210,9 +210,9 @@ int main() {
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
 
-    printf("%ld ", (long int)VECTOR(nrgeo)[3]);
-    printf("%ld ", (long int)VECTOR(nrgeo)[12]);
-    printf("%ld\n", (long int)VECTOR(nrgeo)[15]);
+    printf("%" IGRAPH_PRId " ", VECTOR(nrgeo)[3]);
+    printf("%" IGRAPH_PRId " ", VECTOR(nrgeo)[12]);
+    printf("%" IGRAPH_PRId "\n", VECTOR(nrgeo)[15]);
 
     igraph_vector_ptr_destroy(&vertices);
     igraph_vector_ptr_destroy(&edges);

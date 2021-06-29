@@ -33,15 +33,16 @@ typedef struct {
     igraph_vector_t *strategies;
     igraph_vector_t *known_strats;
     igraph_neimode_t mode;
-    int retval;
+    igraph_error_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-int error_tests() {
+igraph_error_t error_tests() {
     igraph_t g, gzero, h;
     igraph_vector_t quant, quantzero, strat, stratzero;
-    int i, n, nvert, ret;
+    igraph_integer_t i, n, nvert;
+    igraph_error_t ret;
     strategy_test_t *test;
 
     /* nonempty graph */
@@ -90,7 +91,7 @@ int error_tests() {
                                               test->islocal, test->quantities,
                                               test->strategies, test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", i + 1);
+            printf("Error test no. %" IGRAPH_PRId " failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
         i++;
@@ -112,12 +113,13 @@ int error_tests() {
  * perspective (whether local or global) could affect the range of
  * possible strategies a vertex could adopt.
  */
-int roulette_test() {
+igraph_error_t roulette_test() {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t *known, quant, strat, stratcopy;
     igraph_vector_t known0, known1, known2, known3, known4, known5;
-    int i, k, n, nvert, ret;;
+    igraph_integer_t i, k, n, nvert;
+    igraph_error_t ret;
     strategy_test_t *test;
 
     /* the game network */
@@ -163,7 +165,7 @@ int roulette_test() {
                                               test->islocal, test->quantities,
                                               &stratcopy, test->mode);
         if (ret != test->retval) {
-            printf("Test no. %d failed.\n", i + 1);
+            printf("Test no. %" IGRAPH_PRId " failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
         /* If the revised strategy s matches one of the candidate strategies, */
@@ -201,11 +203,11 @@ int roulette_test() {
 /* It is possible for a vertex to retain its current strategy. This can
  * happen both in the local and global perspectives.
  */
-int retain_strategy_test() {
+igraph_error_t retain_strategy_test() {
     igraph_t g;
     igraph_integer_t max, min, v;
     igraph_vector_t quant, strat, stratcp;
-    int i, ntry, nvert;
+    igraph_integer_t i, ntry, nvert;
 
     /* the game network */
     igraph_small(&g, /*nvert=*/ 0, IGRAPH_UNDIRECTED,

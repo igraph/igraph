@@ -25,7 +25,7 @@
 
 igraph_bool_t check_laplacian(igraph_t* graph, const igraph_matrix_t* matrix, const igraph_vector_t* w) {
     igraph_vector_t vec, res;
-    long int i, j;
+    igraph_integer_t i, j;
 
     igraph_vector_init(&vec, 0);
     igraph_vector_init(&res, igraph_vcount(graph));

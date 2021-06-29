@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 int print_matrix(const igraph_matrix_t *m) {
-    long int i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+    igraph_integer_t i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
             printf("%.2g", (double)MATRIX(*m, i, j));

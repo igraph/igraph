@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
+    igraph_integer_t i, n = igraph_vector_size(v);
     igraph_real_t sum = 0.0;
     for (i = 0; i < n; i++) {
         if (!igraph_is_nan(VECTOR(*v)[i])) {

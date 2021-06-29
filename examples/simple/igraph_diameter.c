@@ -22,7 +22,7 @@ int main() {
                          /*start_from=*/ 0);
     igraph_diameter(&g, &result, 0, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
 
-    /*   printf("Diameter: %li\n", (long int) result); */
+    /*   printf("Diameter: %" IGRAPH_PRId "\n", (igraph_integer_t) result); */
 
     igraph_destroy(&g);
 
@@ -30,8 +30,8 @@ int main() {
     igraph_vector_int_init(&path, 0);
     igraph_vector_int_init(&path_edge, 0);
     igraph_diameter(&g, &result, &from, &to, &path, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %li, from %li to %li\n", (long int) result,
-           (long int) from, (long int) to);
+    printf("diameter: %" IGRAPH_PRId ", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", (igraph_integer_t) result,
+           (igraph_integer_t) from, (igraph_integer_t) to);
     print_vector_int(&path);
     print_vector_int(&path_edge);
 

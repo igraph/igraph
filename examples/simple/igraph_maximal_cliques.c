@@ -42,7 +42,7 @@ int permutation(igraph_vector_t *vec) {
 int sort_cmp(const void *a, const void *b) {
     const igraph_vector_t **da = (const igraph_vector_t **) a;
     const igraph_vector_t **db = (const igraph_vector_t **) b;
-    int i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
+    igraph_integer_t i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
     if (alen != blen) {
         return (alen < blen) - (alen > blen);
     }
@@ -56,7 +56,7 @@ int sort_cmp(const void *a, const void *b) {
 }
 
 void sort_cliques(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+    igraph_integer_t i, n = igraph_vector_ptr_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
         igraph_vector_sort(v);

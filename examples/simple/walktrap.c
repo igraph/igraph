@@ -27,8 +27,8 @@ int main() {
     igraph_t g;
     igraph_matrix_t merges;
     igraph_vector_t modularity;
-    long int no_of_nodes;
-    long int i;
+    igraph_integer_t no_of_nodes;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -46,9 +46,9 @@ int main() {
     no_of_nodes = igraph_vcount(&g);
     printf("Merges:\n");
     for (i = 0; i < igraph_matrix_nrow(&merges); i++) {
-        printf("%2.1li + %2.li -> %2.li (modularity %4.2f)\n",
-               (long int)MATRIX(merges, i, 0),
-               (long int)MATRIX(merges, i, 1),
+        printf("%2.1" IGRAPH_PRId " + %2." IGRAPH_PRId " -> %2." IGRAPH_PRId " (modularity %4.2f)\n",
+               (igraph_integer_t)MATRIX(merges, i, 0),
+               (igraph_integer_t)MATRIX(merges, i, 1),
                no_of_nodes + i,
                VECTOR(modularity)[i]);
     }

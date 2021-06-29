@@ -28,7 +28,7 @@ int main() {
     igraph_real_t d;
     igraph_vector_t u, v;
     int ret;
-    long int i, k, n;
+    igraph_integer_t i, k, n;
 
     /********************************
      * Example usage

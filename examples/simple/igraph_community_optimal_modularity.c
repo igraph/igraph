@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void prepare_weights_vector(igraph_vector_t* weights, const igraph_t* graph) {
-    int i, n = igraph_ecount(graph);
+    igraph_integer_t i, n = igraph_ecount(graph);
     igraph_vector_resize(weights, n);
     for (i = 0; i < n; i++) {
         VECTOR(*weights)[i] = i % 5;

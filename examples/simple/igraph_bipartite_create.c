@@ -30,7 +30,7 @@ int main() {
     igraph_t g;
     igraph_vector_bool_t types;
     igraph_vector_t edges;
-    long int i;
+    igraph_integer_t i;
     int ret;
 
     igraph_vector_view(&edges, edges2, sizeof(edges2) / sizeof(igraph_real_t));

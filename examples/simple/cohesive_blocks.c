@@ -29,7 +29,7 @@ int doit(igraph_t *g) {
     igraph_vector_t cohesion;
     igraph_vector_t parent;
     igraph_t block_tree;
-    long int i;
+    igraph_integer_t i;
 
     igraph_vector_ptr_init(&blocks, 0);
     igraph_vector_init(&cohesion, 0);

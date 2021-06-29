@@ -31,8 +31,8 @@ int igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
 void test_unweighted() {
     igraph_t g;
     igraph_vector_t edges, eb;
-    long int i;
-    long int no_of_edges;
+    igraph_integer_t i;
+    igraph_integer_t no_of_edges;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -64,7 +64,7 @@ void test_unweighted() {
 
     no_of_edges = igraph_ecount(&g);
     for (i = 0; i < no_of_edges; i++) {
-        printf("%li ", (long int)VECTOR(edges)[i]);
+        printf("%" IGRAPH_PRId " ", (igraph_integer_t)VECTOR(edges)[i]);
     }
     printf("\n");
 

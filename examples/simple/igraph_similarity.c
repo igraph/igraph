@@ -25,7 +25,7 @@
 #include <igraph.h>
 
 void print_matrix(igraph_matrix_t *m, FILE *f) {
-    long int i, j;
+    igraph_integer_t i, j;
     for (i = 0; i < igraph_matrix_nrow(m); i++) {
         for (j = 0; j < igraph_matrix_ncol(m); j++) {
             fprintf(f, " %.2f", MATRIX(*m, i, j));
@@ -38,7 +38,7 @@ void print_matrix(igraph_matrix_t *m, FILE *f) {
 int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
                       igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_t pairs, res;
-    long int i, j, k, n;
+    igraph_integer_t i, j, k, n;
     igraph_eit_t eit;
 
     igraph_vector_init(&res, 0);
@@ -59,7 +59,7 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
     for (i = 0, k = 0; i < n; i++) {
         for (j = n - 1; j >= 0; j--, k++) {
             if (fabs(VECTOR(res)[k] - MATRIX(*m, i, j)) > 1e-6) {
-                fprintf(stderr, "Jaccard similarity calculation for vertex pair %ld-%ld "
+                fprintf(stderr, "Jaccard similarity calculation for vertex pair %" IGRAPH_PRId "-%" IGRAPH_PRId " "
                         "does not match the value in the full matrix (%.6f vs %.6f)\n",
                         i, j, VECTOR(res)[k], MATRIX(*m, i, j));
                 return 1;
@@ -73,11 +73,11 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
     igraph_eit_create(g, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &eit);
     k = 0;
     while (!IGRAPH_EIT_END(eit)) {
-        long int eid = IGRAPH_EIT_GET(eit);
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         i = IGRAPH_FROM(g, eid);
         j = IGRAPH_TO(g, eid);
         if (fabs(VECTOR(res)[k] - MATRIX(*m, i, j)) > 1e-6) {
-            fprintf(stderr, "Jaccard similarity calculation for edge %ld-%ld (ID=%ld) "
+            fprintf(stderr, "Jaccard similarity calculation for edge %" IGRAPH_PRId "-%" IGRAPH_PRId " (ID=%" IGRAPH_PRId ") "
                     "does not match the value in the full matrix (%.6f vs %.6f)\n",
                     i, j, eid, VECTOR(res)[k], MATRIX(*m, i, j));
             return 1;
@@ -96,7 +96,7 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
 int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
                    igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_t pairs, res;
-    long int i, j, k, n;
+    igraph_integer_t i, j, k, n;
     igraph_eit_t eit;
 
     igraph_vector_init(&res, 0);
@@ -117,7 +117,7 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
     for (i = 0, k = 0; i < n; i++) {
         for (j = n - 1; j >= 0; j--, k++) {
             if (fabs(VECTOR(res)[k] - MATRIX(*m, i, j)) > 1e-6) {
-                fprintf(stderr, "Dice similarity calculation for vertex pair %ld-%ld "
+                fprintf(stderr, "Dice similarity calculation for vertex pair %" IGRAPH_PRId "-%" IGRAPH_PRId " "
                         "does not match the value in the full matrix (%.6f vs %.6f)\n",
                         i, j, VECTOR(res)[k], MATRIX(*m, i, j));
                 return 1;
@@ -131,11 +131,11 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
     igraph_eit_create(g, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &eit);
     k = 0;
     while (!IGRAPH_EIT_END(eit)) {
-        long int eid = IGRAPH_EIT_GET(eit);
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         i = IGRAPH_FROM(g, eid);
         j = IGRAPH_TO(g, eid);
         if (fabs(VECTOR(res)[k] - MATRIX(*m, i, j)) > 1e-6) {
-            fprintf(stderr, "Dice similarity calculation for edge %ld-%ld (ID=%ld) "
+            fprintf(stderr, "Dice similarity calculation for edge %" IGRAPH_PRId "-%" IGRAPH_PRId " (ID=%" IGRAPH_PRId ") "
                     "does not match the value in the full matrix (%.6f vs %.6f)\n",
                     i, j, eid, VECTOR(res)[k], MATRIX(*m, i, j));
             return 1;

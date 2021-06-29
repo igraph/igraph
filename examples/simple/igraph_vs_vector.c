@@ -68,9 +68,9 @@ int main() {
     igraph_vs_vector_small(&vs, 0, 2, 4, 0, 2, 4, 2, -1);
     igraph_vit_create(&g, vs, &vit);
     igraph_vs_size(&g, &vs, &size);
-    printf("%li ", (long int) size);
+    printf("%" IGRAPH_PRId " ", (igraph_integer_t) size);
     for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        printf("%li ", (long int) IGRAPH_VIT_GET(vit));
+        printf("%" IGRAPH_PRId " ", (igraph_integer_t) IGRAPH_VIT_GET(vit));
     }
     printf("\n");
 

@@ -31,7 +31,7 @@
 int main() {
     igraph_matrix_t mat, mat2;
     igraph_sparsemat_t spmat, spmat2;
-    int i, j, nz1, nz2;
+    igraph_integer_t i, j, nz1, nz2;
     igraph_vector_t sums1, sums2;
 
 
@@ -132,7 +132,7 @@ int main() {
         }
     }
     if (nz1 != nz2) {
-        printf("%i %i\n", nz1, nz2);
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", nz1, nz2);
         return 7;
     }
 
@@ -145,7 +145,7 @@ int main() {
         }
     }
     if (nz1 != nz2) {
-        printf("%i %i\n", nz1, nz2);
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", nz1, nz2);
         return 8;
     }
 

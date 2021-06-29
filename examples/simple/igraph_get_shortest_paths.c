@@ -37,7 +37,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
                 const igraph_vector_ptr_t *evecs, int error_code) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    long int i, n = igraph_vector_ptr_size(vecs);
+    igraph_integer_t i, n = igraph_vector_ptr_size(vecs);
     if (igraph_vector_ptr_size(evecs) != n) {
         exit(error_code + 1);
     }
