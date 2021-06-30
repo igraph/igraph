@@ -197,7 +197,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
 igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_int_t *result,
                                     const igraph_vector_t *weights, igraph_vector_t *layers) {
     igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
-    igraph_dqueue_t sources, sinks;
+    igraph_dqueue_int_t sources, sinks;
     igraph_vector_t neis;
     igraph_vector_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
@@ -213,10 +213,10 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     IGRAPH_VECTOR_INIT_FINALLY(&instrengths, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&outstrengths, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_CHECK(igraph_dqueue_init(&sources, 0));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &sources);
-    IGRAPH_CHECK(igraph_dqueue_init(&sinks, 0));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &sinks);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&sources, 0));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &sources);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&sinks, 0));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &sinks);
 
     IGRAPH_CHECK(igraph_degree(graph, &indegrees, igraph_vss_all(), IGRAPH_IN, 0));
     IGRAPH_CHECK(igraph_degree(graph, &outdegrees, igraph_vss_all(), IGRAPH_OUT, 0));
@@ -240,19 +240,19 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(indegrees)[i] = VECTOR(outdegrees)[i] = -1;
             } else {
                 /* This is a source */
-                igraph_dqueue_push(&sources, i);
+                igraph_dqueue_int_push(&sources, i);
             }
         } else if (VECTOR(outdegrees)[i] == 0) {
             /* This is a sink */
-            igraph_dqueue_push(&sinks, i);
+            igraph_dqueue_int_push(&sinks, i);
         }
     }
 
     /* While we have any nodes left... */
     while (nodes_left > 0) {
         /* (1) Remove the sources one by one */
-        while (!igraph_dqueue_empty(&sources)) {
-            i = igraph_dqueue_pop(&sources);
+        while (!igraph_dqueue_int_empty(&sources)) {
+            i = igraph_dqueue_int_pop(&sources);
             /* Add the node to the ordering */
             ordering[i] = order_next_pos++;
             /* Exclude the node from further searches */
@@ -271,15 +271,15 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(indegrees)[k]--;
                 VECTOR(instrengths)[k] -= (weights ? VECTOR(*weights)[eid] : 1.0);
                 if (VECTOR(indegrees)[k] == 0) {
-                    IGRAPH_CHECK(igraph_dqueue_push(&sources, k));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&sources, k));
                 }
             }
             nodes_left--;
         }
 
         /* (2) Remove the sinks one by one */
-        while (!igraph_dqueue_empty(&sinks)) {
-            i = igraph_dqueue_pop(&sinks);
+        while (!igraph_dqueue_int_empty(&sinks)) {
+            i = igraph_dqueue_int_pop(&sinks);
             /* Maybe the vertex became sink and source at the same time, hence it
              * was already removed in the previous iteration. Check it. */
             if (VECTOR(indegrees)[i] < 0) {
@@ -303,7 +303,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(outdegrees)[k]--;
                 VECTOR(outstrengths)[k] -= (weights ? VECTOR(*weights)[eid] : 1.0);
                 if (VECTOR(outdegrees)[k] == 0) {
-                    IGRAPH_CHECK(igraph_dqueue_push(&sinks, k));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&sinks, k));
                 }
             }
             nodes_left--;
@@ -339,7 +339,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(indegrees)[k]--;
                 VECTOR(instrengths)[k] -= (weights ? VECTOR(*weights)[eid] : 1.0);
                 if (VECTOR(indegrees)[k] == 0) {
-                    IGRAPH_CHECK(igraph_dqueue_push(&sources, k));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&sources, k));
                 }
             }
             /* Remove incoming edges */
@@ -356,7 +356,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(outdegrees)[k]--;
                 VECTOR(outstrengths)[k] -= (weights ? VECTOR(*weights)[eid] : 1.0);
                 if (VECTOR(outdegrees)[k] == 0 && VECTOR(indegrees)[k] > 0) {
-                    IGRAPH_CHECK(igraph_dqueue_push(&sinks, k));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&sinks, k));
                 }
             }
 
@@ -366,8 +366,8 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         }
     }
 
-    igraph_dqueue_destroy(&sinks);
-    igraph_dqueue_destroy(&sources);
+    igraph_dqueue_int_destroy(&sinks);
+    igraph_dqueue_int_destroy(&sources);
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&outstrengths);
     igraph_vector_destroy(&instrengths);

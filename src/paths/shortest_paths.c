@@ -51,7 +51,7 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
     igraph_real_t no_of_pairs = no_of_nodes > 0 ? no_of_nodes * (no_of_nodes - 1.0) : 0.0; /* no. of ordered vertex pairs */
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     igraph_adjlist_t allneis;
 
@@ -61,7 +61,7 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
         IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, already_added);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &allneis,
@@ -71,15 +71,15 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     for (source = 0; source < no_of_nodes; source++) {
-        IGRAPH_CHECK(igraph_dqueue_push(&q, source));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         already_added[source] = source + 1;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
@@ -95,10 +95,10 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
                     *res += actdist + 1.0;
                 }
                 no_of_conn_pairs += 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
-        } /* while !igraph_dqueue_empty */
+        } /* while !igraph_dqueue_int_empty */
     } /* for source < no_of_nodes */
 
 
@@ -129,7 +129,7 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
 
     /* clean */
     IGRAPH_FREE(already_added);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -431,7 +431,7 @@ igraph_error_t igraph_global_efficiency(const igraph_t *graph, igraph_real_t *re
 static igraph_error_t igraph_i_local_efficiency_unweighted(
         const igraph_t *graph,
         const igraph_adjlist_t *adjlist,
-        igraph_dqueue_t *q,
+        igraph_dqueue_int_t *q,
         igraph_integer_t *already_counted,
         igraph_vector_t *vertex_neis,
         igraph_vector_char_t *nei_mask,
@@ -445,7 +445,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
     igraph_integer_t neighbor_count; /* unlike 'vertex_neis_size', 'neighbor_count' does not count self-loops and multi-edges */
     igraph_integer_t i, j;
 
-    igraph_dqueue_clear(q);
+    igraph_dqueue_int_clear(q);
     memset(already_counted, 0, no_of_nodes * sizeof(igraph_integer_t));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
@@ -481,21 +481,21 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
             continue;
         VECTOR(*nei_mask)[source] = 2; /* mark neighbour as already processed */
 
-        IGRAPH_CHECK(igraph_dqueue_push(q, source));
-        IGRAPH_CHECK(igraph_dqueue_push(q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(q, source));
+        IGRAPH_CHECK(igraph_dqueue_int_push(q, 0));
         already_counted[source] = source + 1;
 
-        while (!igraph_dqueue_empty(q)) {
+        while (!igraph_dqueue_int_empty(q)) {
             igraph_vector_int_t *act_neis;
             igraph_integer_t act_neis_size;
-            igraph_integer_t act = igraph_dqueue_pop(q);
-            igraph_integer_t actdist = igraph_dqueue_pop(q);
+            igraph_integer_t act = igraph_dqueue_int_pop(q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(q);
 
             if (act != source && VECTOR(*nei_mask)[act]) {
                 *res += 1.0 / actdist;
                 reached++;
                 if (reached == neighbor_count) {
-                    igraph_dqueue_clear(q);
+                    igraph_dqueue_int_clear(q);
                     break;
                 }
             }
@@ -509,8 +509,8 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
                     continue;
 
                 already_counted[neighbor] = i + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(q, actdist + 1));
             }
         }
     }
@@ -733,7 +733,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
     {
         igraph_integer_t *already_counted;
         igraph_adjlist_t adjlist;
-        igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+        igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
         already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
         if (already_counted == 0) {
@@ -748,7 +748,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
         ));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+        IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
         for (IGRAPH_VIT_RESET(vit), i=0;
              ! IGRAPH_VIT_END(vit);
@@ -760,7 +760,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
                              &(VECTOR(*res)[i]), IGRAPH_VIT_GET(vit), mode));
         }
 
-        igraph_dqueue_destroy(&q);
+        igraph_dqueue_int_destroy(&q);
         igraph_adjlist_destroy(&adjlist);
         IGRAPH_FREE(already_counted);
         IGRAPH_FINALLY_CLEAN(3);
@@ -1012,7 +1012,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
-        } /* while !igraph_dqueue_empty */
+        } /* while !igraph_dqueue_int_empty */
 
         /* not connected, return IGRAPH_INFINITY */
         if (nodes_reached != no_of_nodes && !unconn) {

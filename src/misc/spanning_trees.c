@@ -213,7 +213,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
     char *already_added;
     char *added_edges;
 
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
     igraph_integer_t i, j;
 
@@ -230,7 +230,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     for (i = 0; i < no_of_nodes; i++) {
         if (already_added[i] > 0) {
@@ -240,10 +240,10 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
         IGRAPH_ALLOW_INTERRUPTION();
 
         already_added[i] = 1;
-        IGRAPH_CHECK(igraph_dqueue_push(&q, i));
-        while (! igraph_dqueue_empty(&q)) {
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
+        while (! igraph_dqueue_int_empty(&q)) {
             igraph_integer_t tmp_size;
-            igraph_integer_t act_node = igraph_dqueue_pop(&q);
+            igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
             IGRAPH_CHECK(igraph_incident(graph, &tmp, act_node,
                                          IGRAPH_ALL));
             tmp_size = igraph_vector_size(&tmp);
@@ -255,14 +255,14 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
                         already_added[to] = 1;
                         added_edges[edge] = 1;
                         IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
-                        IGRAPH_CHECK(igraph_dqueue_push(&q, to));
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, to));
                     }
                 }
             }
         }
     }
 
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     IGRAPH_FREE(already_added);
     igraph_vector_destroy(&tmp);
     IGRAPH_FREE(added_edges);

@@ -67,7 +67,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_vector_bool_t seen_vertices;
     igraph_vector_bool_t seen_edges;
 
-    igraph_dqueue_t Q;
+    igraph_dqueue_int_t Q;
     igraph_vector_t neis;
 
     igraph_integer_t i, n, r, v_ptr = no_of_nodes;
@@ -76,7 +76,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     igraph_vector_reserve(&edges, no_of_edges * 2);
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_vertices, no_of_nodes);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_edges, no_of_edges);
@@ -92,10 +92,10 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
         igraph_integer_t root = VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
-        igraph_dqueue_push(&Q, root);
+        igraph_dqueue_int_push(&Q, root);
 
-        while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&Q);
+        while (!igraph_dqueue_int_empty(&Q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
 
             IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
             n = igraph_vector_size(&neis);
@@ -116,7 +116,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                         igraph_vector_push_back(&edges, to);
 
                         VECTOR(seen_vertices)[nei] = 1;
-                        IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
 
                     } else {
 
@@ -137,14 +137,14 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
             } /* for i<n */
 
-        } /* ! igraph_dqueue_empty(&Q) */
+        } /* ! igraph_dqueue_int_empty(&Q) */
 
     } /* r < igraph_vector_size(roots) */
 
     igraph_vector_bool_destroy(&seen_edges);
     igraph_vector_bool_destroy(&seen_vertices);
     igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_create(tree, &edges, tree_vertex_count, igraph_is_directed(graph)));

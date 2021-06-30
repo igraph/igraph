@@ -843,14 +843,14 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_char_t seen;
-    igraph_dqueue_t Q;
+    igraph_dqueue_int_t Q;
     igraph_vector_t neis;
     igraph_bool_t bi = 1;
     igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &seen);
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
     for (i = 0; bi && i < no_of_nodes; i++) {
@@ -859,12 +859,12 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
             continue;
         }
 
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, i));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, i));
         VECTOR(seen)[i] = 1;
 
-        while (bi && !igraph_dqueue_empty(&Q)) {
+        while (bi && !igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t n, j;
-            igraph_integer_t actnode = igraph_dqueue_pop(&Q);
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             char acttype = VECTOR(seen)[actnode];
 
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
@@ -879,14 +879,14 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                     }
                 } else {
                     VECTOR(seen)[nei] = 3 - acttype;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                 }
             }
         }
     }
 
     igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(2);
 
     if (res) {

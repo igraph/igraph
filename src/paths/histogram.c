@@ -64,7 +64,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
     igraph_vector_int_t already_added;
     igraph_integer_t nodes_reached;
 
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     igraph_neimode_t dirmode;
     igraph_adjlist_t allneis;
@@ -79,7 +79,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
 
     IGRAPH_CHECK(igraph_vector_int_init(&already_added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &already_added);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
@@ -88,17 +88,17 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
 
     for (i = 0; i < no_of_nodes; i++) {
         nodes_reached = 1;      /* itself */
-        IGRAPH_CHECK(igraph_dqueue_push(&q, i));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         VECTOR(already_added)[i] = i + 1;
 
         IGRAPH_PROGRESS("Path length histogram: ", 100.0 * i / no_of_nodes, NULL);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
             n = igraph_vector_int_size(neis);
@@ -117,10 +117,10 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
                 }
                 VECTOR(*res)[actdist] += 1;
 
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
-        } /* while !igraph_dqueue_empty */
+        } /* while !igraph_dqueue_int_empty */
 
         unconn += (no_of_nodes - nodes_reached);
 
@@ -137,7 +137,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
     }
 
     igraph_vector_int_destroy(&already_added);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(3);
 

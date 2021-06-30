@@ -78,7 +78,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    igraph_dqueue_t history;
+    igraph_dqueue_int_t history;
     igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
     if (no_of_nodes < 0) {
@@ -119,15 +119,15 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_dqueue_init(&history,
+    IGRAPH_CHECK(igraph_dqueue_int_init(&history,
                                     1.5 * time_window * no_of_edges / no_of_nodes + 10));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &history);
 
     RNG_BEGIN();
 
     /* first node */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
-    igraph_dqueue_push(&history, -1);
+    igraph_dqueue_int_push(&history, -1);
 
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
@@ -138,7 +138,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         }
 
         if (i >= time_window) {
-            while ((j = igraph_dqueue_pop(&history)) != -1) {
+            while ((j = igraph_dqueue_int_pop(&history)) != -1) {
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(&sumtree, j, pow(VECTOR(degree)[j], power) + zero_appeal));
             }
@@ -150,9 +150,9 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
-            igraph_dqueue_push(&history, to);
+            igraph_dqueue_int_push(&history, to);
         }
-        igraph_dqueue_push(&history, -1);
+        igraph_dqueue_int_push(&history, -1);
 
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
@@ -169,7 +169,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
 
     RNG_END();
 
-    igraph_dqueue_destroy(&history);
+    igraph_dqueue_int_destroy(&history);
     igraph_psumtree_destroy(&sumtree);
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(3);
@@ -242,7 +242,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    igraph_dqueue_t history;
+    igraph_dqueue_int_t history;
     igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
     if (no_of_nodes == 0) {
@@ -286,15 +286,15 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_dqueue_init(&history,
-                                    1.5 * time_window * no_of_edges / no_of_nodes + 10));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&history,
+                                        1.5 * time_window * no_of_edges / no_of_nodes + 10));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &history);
 
     RNG_BEGIN();
 
     /* first node */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
-    igraph_dqueue_push(&history, -1);
+    igraph_dqueue_int_push(&history, -1);
 
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
@@ -306,7 +306,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         }
 
         if (i >= time_window) {
-            while ((j = igraph_dqueue_pop(&history)) != -1) {
+            while ((j = igraph_dqueue_int_pop(&history)) != -1) {
                 igraph_integer_t age = (i - j) / binwidth;
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(
@@ -322,9 +322,9 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
-            igraph_dqueue_push(&history, to);
+            igraph_dqueue_int_push(&history, to);
         }
-        igraph_dqueue_push(&history, -1);
+        igraph_dqueue_int_push(&history, -1);
 
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
@@ -359,7 +359,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
 
     RNG_END();
 
-    igraph_dqueue_destroy(&history);
+    igraph_dqueue_int_destroy(&history);
     igraph_vector_destroy(&degree);
     igraph_psumtree_destroy(&sumtree);
     IGRAPH_FINALLY_CLEAN(3);

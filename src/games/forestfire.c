@@ -112,7 +112,7 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_t edges;
     igraph_vector_t *inneis, *outneis;
     igraph_i_forest_fire_data_t data;
-    igraph_dqueue_t neiq;
+    igraph_dqueue_int_t neiq;
     igraph_integer_t ambs = pambs;
     igraph_real_t param_geom_out = 1 - fw_prob;
     igraph_real_t param_geom_in = 1 - fw_prob * bw_factor;
@@ -158,14 +158,14 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     IGRAPH_CHECK(igraph_vector_int_init(&visited, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &visited);
-    IGRAPH_DQUEUE_INIT_FINALLY(&neiq, 10);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&neiq, 10);
 
     RNG_BEGIN();
 
 #define ADD_EDGE_TO(nei) \
     if (VECTOR(visited)[(nei)] != actnode+1) {                     \
         VECTOR(visited)[(nei)] = actnode+1;                          \
-        IGRAPH_CHECK(igraph_dqueue_push(&neiq, nei));                \
+        IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, nei));                \
         IGRAPH_CHECK(igraph_vector_push_back(&edges, actnode));      \
         IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));          \
         IGRAPH_CHECK(igraph_vector_push_back(outneis+actnode, nei)); \
@@ -189,8 +189,8 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
             ADD_EDGE_TO(a);
         }
 
-        while (!igraph_dqueue_empty(&neiq)) {
-            igraph_integer_t actamb = igraph_dqueue_pop(&neiq);
+        while (!igraph_dqueue_int_empty(&neiq)) {
+            igraph_integer_t actamb = igraph_dqueue_int_pop(&neiq);
             igraph_vector_t *outv = outneis + actamb;
             igraph_vector_t *inv = inneis + actamb;
             igraph_integer_t no_in = igraph_vector_size(inv);
@@ -248,7 +248,7 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     IGRAPH_PROGRESS("Forest fire: ", 100.0, NULL);
 
-    igraph_dqueue_destroy(&neiq);
+    igraph_dqueue_int_destroy(&neiq);
     igraph_vector_int_destroy(&visited);
     igraph_i_forest_fire_free(&data);
     igraph_free(outneis);

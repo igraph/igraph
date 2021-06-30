@@ -57,14 +57,14 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         igraph_integer_t *nb_clusters,
         igraph_vector_int_t *membership) {
 
-    igraph_dqueue_t unstable_nodes;
+    igraph_dqueue_int_t unstable_nodes;
     igraph_real_t max_diff = 0.0, diff = 0.0;
     igraph_integer_t n = igraph_vcount(graph);
     igraph_vector_bool_t neighbor_cluster_added, node_is_stable;
     igraph_vector_t cluster_weights, edge_weights_per_cluster, neighbor_clusters;
     igraph_vector_int_t node_order;
     igraph_vector_int_t nb_nodes_per_cluster;
-    igraph_stack_t empty_clusters;
+    igraph_stack_int_t empty_clusters;
     igraph_integer_t i, j, c, nb_neigh_clusters;
 
     /* Initialize queue of unstable nodes and whether node is stable. Only
@@ -72,8 +72,8 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     IGRAPH_CHECK(igraph_vector_bool_init(&node_is_stable, n));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &node_is_stable);
 
-    IGRAPH_CHECK(igraph_dqueue_init(&unstable_nodes, n));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &unstable_nodes);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&unstable_nodes, n));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &unstable_nodes);
 
     /* Shuffle nodes */
     IGRAPH_CHECK(igraph_vector_int_init_seq(&node_order, 0, n - 1));
@@ -82,7 +82,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
 
     /* Add to the queue */
     for (i = 0; i < n; i++) {
-        igraph_dqueue_push(&unstable_nodes, VECTOR(node_order)[i]);
+        igraph_dqueue_int_push(&unstable_nodes, VECTOR(node_order)[i]);
     }
 
     /* Initialize cluster weights and nb nodes */
@@ -97,11 +97,11 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     }
 
     /* Initialize empty clusters */
-    IGRAPH_CHECK(igraph_stack_init(&empty_clusters, n));
-    IGRAPH_FINALLY(igraph_stack_destroy, &empty_clusters);
+    IGRAPH_CHECK(igraph_stack_int_init(&empty_clusters, n));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &empty_clusters);
     for (c = 0; c < n; c++)
         if (VECTOR(nb_nodes_per_cluster)[c] == 0) {
-            igraph_stack_push(&empty_clusters, c);
+            igraph_stack_int_push(&empty_clusters, c);
         }
 
     /* Initialize vectors to be used in calculating differences */
@@ -116,8 +116,8 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
 
     /* Iterate while the queue is not empty */
     j = 0;
-    while (!igraph_dqueue_empty(&unstable_nodes)) {
-        igraph_integer_t v = igraph_dqueue_pop(&unstable_nodes);
+    while (!igraph_dqueue_int_empty(&unstable_nodes)) {
+        igraph_integer_t v = igraph_dqueue_int_pop(&unstable_nodes);
         igraph_integer_t best_cluster, current_cluster = VECTOR(*membership)[v];
         igraph_integer_t degree, i;
         igraph_vector_int_t *edges;
@@ -126,11 +126,11 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         VECTOR(cluster_weights)[current_cluster] -= VECTOR(*node_weights)[v];
         VECTOR(nb_nodes_per_cluster)[current_cluster]--;
         if (VECTOR(nb_nodes_per_cluster)[current_cluster] == 0) {
-            IGRAPH_CHECK(igraph_stack_push(&empty_clusters, current_cluster));
+            IGRAPH_CHECK(igraph_stack_int_push(&empty_clusters, current_cluster));
         }
 
         /* Find out neighboring clusters */
-        c = igraph_stack_top(&empty_clusters);
+        c = igraph_stack_int_top(&empty_clusters);
         VECTOR(neighbor_clusters)[0] = c;
         VECTOR(neighbor_cluster_added)[c] = 1;
         nb_neigh_clusters = 1;
@@ -168,8 +168,8 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         /* Move node to best cluster */
         VECTOR(cluster_weights)[best_cluster] += VECTOR(*node_weights)[v];
         VECTOR(nb_nodes_per_cluster)[best_cluster]++;
-        if (best_cluster == igraph_stack_top(&empty_clusters)) {
-            igraph_stack_pop(&empty_clusters);
+        if (best_cluster == igraph_stack_int_top(&empty_clusters)) {
+            igraph_stack_int_pop(&empty_clusters);
         }
 
         /* Mark node as stable */
@@ -183,7 +183,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
                 igraph_integer_t e = VECTOR(*edges)[i];
                 igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
                 if (VECTOR(node_is_stable)[u] && VECTOR(*membership)[u] != best_cluster) {
-                    IGRAPH_CHECK(igraph_dqueue_push(&unstable_nodes, u));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&unstable_nodes, u));
                     VECTOR(node_is_stable)[u] = 0;
                 }
             }
@@ -201,11 +201,11 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     igraph_vector_destroy(&neighbor_clusters);
     igraph_vector_bool_destroy(&neighbor_cluster_added);
     igraph_vector_destroy(&edge_weights_per_cluster);
-    igraph_stack_destroy(&empty_clusters);
+    igraph_stack_int_destroy(&empty_clusters);
     igraph_vector_int_destroy(&nb_nodes_per_cluster);
     igraph_vector_destroy(&cluster_weights);
     igraph_vector_int_destroy(&node_order);
-    igraph_dqueue_destroy(&unstable_nodes);
+    igraph_dqueue_int_destroy(&unstable_nodes);
     igraph_vector_bool_destroy(&node_is_stable);
 
     IGRAPH_FINALLY_CLEAN(9);

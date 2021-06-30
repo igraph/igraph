@@ -73,7 +73,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
                  igraph_vector_t *circle) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_t q;
+    igraph_dqueue_int_t q;
     igraph_lazy_adjlist_t adjlist;
     igraph_integer_t mincirc = LONG_MAX, minvertex = 0;
     igraph_integer_t node;
@@ -86,7 +86,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&level, no_of_nodes);
 
     for (node = 0; !triangle && node < no_of_nodes; node++) {
@@ -102,15 +102,15 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         }
 
         anycircle = 0;
-        igraph_dqueue_clear(&q);
+        igraph_dqueue_int_clear(&q);
         igraph_vector_int_null(&level);
-        IGRAPH_CHECK(igraph_dqueue_push(&q, node));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, node));
         VECTOR(level)[node] = 1;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actlevel = VECTOR(level)[actnode];
             igraph_integer_t i, n;
 
@@ -145,7 +145,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
                         }
                     }
                 } else {
-                    igraph_dqueue_push(&q, nei);
+                    igraph_dqueue_int_push(&q, nei);
                     VECTOR(level)[nei] = actlevel + 1;
                 }
             }
@@ -166,20 +166,20 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         IGRAPH_CHECK(igraph_vector_resize(circle, mincirc));
         if (mincirc != 0) {
             igraph_integer_t i, n, idx = 0;
-            igraph_dqueue_clear(&q);
+            igraph_dqueue_int_clear(&q);
             igraph_vector_int_null(&level); /* used for father pointers */
 #define FATHER(x) (VECTOR(level)[(x)])
-            IGRAPH_CHECK(igraph_dqueue_push(&q, minvertex));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, minvertex));
             FATHER(minvertex) = minvertex;
             while (FATHER(t1) == 0 || FATHER(t2) == 0) {
-                igraph_integer_t actnode = igraph_dqueue_pop(&q);
+                igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
                 neis = igraph_lazy_adjlist_get(&adjlist, actnode);
                 n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {
                     igraph_integer_t nei = VECTOR(*neis)[i];
                     if (FATHER(nei) == 0) {
                         FATHER(nei) = actnode + 1;
-                        igraph_dqueue_push(&q, nei);
+                        igraph_dqueue_int_push(&q, nei);
                     }
                 }
             }  /* while q !empty */
@@ -199,7 +199,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 #undef FATHER
 
     igraph_vector_int_destroy(&level);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_lazy_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(3);
 

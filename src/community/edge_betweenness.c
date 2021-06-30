@@ -410,13 +410,13 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_integer_t maxedge, pos;
     igraph_integer_t from, to;
     igraph_bool_t result_owned = 0;
-    igraph_stack_t stack = IGRAPH_STACK_NULL;
+    igraph_stack_int_t stack = IGRAPH_STACK_NULL;
     igraph_real_t steps, steps_done;
 
     char *passive;
 
     /* Needed only for the unweighted case */
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
     /* Needed only for the weighted case */
     igraph_2wheap_t heap;
@@ -462,7 +462,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     if (weights == 0) {
-        IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+        IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     } else {
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
@@ -499,8 +499,8 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
     }
 
-    IGRAPH_CHECK(igraph_stack_init(&stack, no_of_nodes));
-    IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, no_of_nodes));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
 
     IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
     if (edge_betweenness) {
@@ -545,15 +545,15 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 memset(distance, 0, (size_t) no_of_nodes * sizeof(double));
                 memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(double));
                 memset(tmpscore, 0, (size_t) no_of_nodes * sizeof(double));
-                igraph_stack_clear(&stack); /* it should be empty anyway... */
+                igraph_stack_int_clear(&stack); /* it should be empty anyway... */
 
-                IGRAPH_CHECK(igraph_dqueue_push(&q, source));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
 
                 nrgeo[source] = 1;
                 distance[source] = 0;
 
-                while (!igraph_dqueue_empty(&q)) {
-                    igraph_integer_t actnode = igraph_dqueue_pop(&q);
+                while (!igraph_dqueue_int_empty(&q)) {
+                    igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
                     neip = igraph_inclist_get(elist_out_p, actnode);
                     neino = igraph_vector_int_size(neip);
@@ -569,17 +569,17 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             /* we haven't seen this node yet */
                             nrgeo[neighbor] += nrgeo[actnode];
                             distance[neighbor] = distance[actnode] + 1;
-                            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                            IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+                            IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                            IGRAPH_CHECK(igraph_stack_int_push(&stack, neighbor));
                         }
                     }
-                } /* while !igraph_dqueue_empty */
+                } /* while !igraph_dqueue_int_empty */
 
                 /* Ok, we've the distance of each node and also the number of
                    shortest paths to them. Now we do an inverse search, starting
                    with the farthest nodes. */
-                while (!igraph_stack_empty(&stack)) {
-                    igraph_integer_t actnode = igraph_stack_pop(&stack);
+                while (!igraph_stack_int_empty(&stack)) {
+                    igraph_integer_t actnode = igraph_stack_int_pop(&stack);
                     if (distance[actnode] < 1) {
                         continue;    /* skip source node */
                     }
@@ -622,7 +622,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     igraph_integer_t minnei = igraph_2wheap_max_index(&heap);
                     igraph_real_t mindist = -igraph_2wheap_delete_max(&heap);
 
-                    igraph_stack_push(&stack, minnei);
+                    igraph_stack_int_push(&stack, minnei);
 
                     neip = igraph_inclist_get(elist_out_p, minnei);
                     neino = igraph_vector_int_size(neip);
@@ -659,8 +659,8 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     }
                 } /* igraph_2wheap_empty(&Q) */
 
-                while (!igraph_stack_empty(&stack)) {
-                    igraph_integer_t w = igraph_stack_pop(&stack);
+                while (!igraph_stack_int_empty(&stack)) {
+                    igraph_integer_t w = igraph_stack_int_pop(&stack);
                     igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
                     igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
 
@@ -709,11 +709,11 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     igraph_free(passive);
     igraph_vector_destroy(&eb);
-    igraph_stack_destroy(&stack);
+    igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(3);
 
     if (weights == 0) {
-        igraph_dqueue_destroy(&q);
+        igraph_dqueue_int_destroy(&q);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         igraph_2wheap_destroy(&heap);

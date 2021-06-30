@@ -491,7 +491,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_dqueue_t tosplit;
+    igraph_dqueue_int_t tosplit;
     igraph_vector_int_t idx;
     igraph_vector_t idx2, mymerges;
     igraph_vector_t strength, tmp;
@@ -589,10 +589,10 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         }
     }
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&tosplit, 100);
     for (i = 0; i < communities; i++) {
         if (VECTOR(idx)[i] > 2) {
-            igraph_dqueue_push(&tosplit, i);
+            igraph_dqueue_int_push(&tosplit, i);
         }
     }
     for (i = 1; i < communities; i++) {
@@ -658,8 +658,8 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     extra.no_of_edges = no_of_edges;
     extra.mymembership = mymembership;
 
-    while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
-        igraph_integer_t comm = igraph_dqueue_pop_back(&tosplit);
+    while (!igraph_dqueue_int_empty(&tosplit) && staken < steps) {
+        igraph_integer_t comm = igraph_dqueue_int_pop_back(&tosplit);
         /* depth first search */
         igraph_integer_t size = 0;
         igraph_real_t tmpev;
@@ -920,10 +920,10 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
 
         /* Store the resulting communities in the queue if needed */
         if (l > 1) {
-            IGRAPH_CHECK(igraph_dqueue_push(&tosplit, communities - 1));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&tosplit, communities - 1));
         }
         if (size - l > 1) {
-            IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&tosplit, comm));
         }
 
     }
@@ -938,7 +938,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         igraph_vector_destroy(&strength);
         IGRAPH_FINALLY_CLEAN(2);
     }
-    igraph_dqueue_destroy(&tosplit);
+    igraph_dqueue_int_destroy(&tosplit);
     igraph_vector_destroy(&tmp);
     igraph_vector_destroy(&idx2);
     IGRAPH_FINALLY_CLEAN(3);
