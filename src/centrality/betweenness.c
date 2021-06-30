@@ -64,7 +64,7 @@ static int igraph_i_sspf(
     igraph_integer_t source,
     igraph_vector_t *dist,
     igraph_real_t *nrgeo,
-    igraph_stack_t *stack,
+    igraph_stack_int_t *stack,
     igraph_adjlist_t *fathers,
     igraph_adjlist_t *adjlist,
     igraph_real_t cutoff
@@ -93,7 +93,7 @@ static int igraph_i_sspf(
         }
 
         /* Record that we have visited this node */
-        IGRAPH_CHECK(igraph_stack_push(stack, actnode));
+        IGRAPH_CHECK(igraph_stack_int_push(stack, actnode));
 
         /* Examine the neighbors of this node */
         neis = igraph_adjlist_get(adjlist, actnode);
@@ -145,7 +145,7 @@ static int igraph_i_sspf_edge(
     igraph_integer_t source,
     igraph_vector_t *dist,
     igraph_real_t *nrgeo,
-    igraph_stack_t *stack,
+    igraph_stack_int_t *stack,
     igraph_inclist_t *fathers,
     const igraph_inclist_t *inclist,
     igraph_real_t cutoff
@@ -174,7 +174,7 @@ static int igraph_i_sspf_edge(
         }
 
         /* Record that we have visited this node */
-        IGRAPH_CHECK(igraph_stack_push(stack, actnode));
+        IGRAPH_CHECK(igraph_stack_int_push(stack, actnode));
 
         /* Examine the neighbors of this node */
         neis = igraph_inclist_get(inclist, actnode);
@@ -229,7 +229,7 @@ static int igraph_i_sspf_weighted(
     igraph_vector_t *dist,
     igraph_real_t *nrgeo,
     const igraph_vector_t *weights,
-    igraph_stack_t *stack,
+    igraph_stack_int_t *stack,
     igraph_adjlist_t *fathers,
     igraph_inclist_t *inclist,
     igraph_real_t cutoff
@@ -265,7 +265,7 @@ static int igraph_i_sspf_weighted(
         }
 
         /* Record that we have visited this node */
-        IGRAPH_CHECK(igraph_stack_push(stack, minnei));
+        IGRAPH_CHECK(igraph_stack_int_push(stack, minnei));
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_inclist_get(inclist, minnei);
@@ -338,7 +338,7 @@ static int igraph_i_sspf_weighted_edge(
     igraph_vector_t *dist,
     igraph_real_t *nrgeo,
     const igraph_vector_t *weights,
-    igraph_stack_t *stack,
+    igraph_stack_int_t *stack,
     igraph_inclist_t *fathers,
     const igraph_inclist_t *inclist,
     igraph_real_t cutoff
@@ -374,7 +374,7 @@ static int igraph_i_sspf_weighted_edge(
         }
 
         /* Record that we have visited this node */
-        IGRAPH_CHECK(igraph_stack_push(stack, minnei));
+        IGRAPH_CHECK(igraph_stack_int_push(stack, minnei));
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_inclist_get(inclist, minnei);
@@ -543,7 +543,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     igraph_adjlist_t adjlist, fathers;
     igraph_inclist_t inclist;
     igraph_integer_t source, j, neighbor;
-    igraph_stack_t S;
+    igraph_stack_int_t S;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t dist;
     /* Note: nrgeo holds the number of shortest paths, which may be very large in some cases,
@@ -572,8 +572,8 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
 
-    IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
-    IGRAPH_FINALLY(igraph_stack_destroy, &S);
+    IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
@@ -622,8 +622,8 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
 
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
-        while (!igraph_stack_empty(&S)) {
-            igraph_integer_t actnode = igraph_stack_pop(&S);
+        while (!igraph_stack_int_empty(&S)) {
+            igraph_integer_t actnode = igraph_stack_int_pop(&S);
             igraph_vector_int_t *neis = igraph_adjlist_get(&fathers, actnode);
             igraph_integer_t nneis = igraph_vector_int_size(neis);
             igraph_real_t coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
@@ -674,7 +674,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     igraph_Free(nrgeo);
     igraph_Free(tmpscore);
     igraph_vector_destroy(&dist);
-    igraph_stack_destroy(&S);
+    igraph_stack_int_destroy(&S);
     igraph_adjlist_destroy(&fathers);
     if (weights) {
         igraph_inclist_destroy(&inclist);
@@ -773,7 +773,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
-    igraph_stack_t S;
+    igraph_stack_int_t S;
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
@@ -797,8 +797,8 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
-    IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
-    IGRAPH_FINALLY(igraph_stack_destroy, &S);
+    IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
 
     IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
     igraph_vector_null(result);
@@ -826,8 +826,8 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
         /* Aggregate betweenness scores for the edges we have reached in this
          * traversal */
-        while (!igraph_stack_empty(&S)) {
-            igraph_integer_t actnode = igraph_stack_pop(&S);
+        while (!igraph_stack_int_empty(&S)) {
+            igraph_integer_t actnode = igraph_stack_int_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
@@ -855,7 +855,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
     IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
 
-    igraph_stack_destroy(&S);
+    igraph_stack_int_destroy(&S);
     igraph_inclist_destroy(&inclist);
     igraph_inclist_destroy(&fathers);
     igraph_vector_destroy(&dist);
@@ -915,7 +915,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_adjlist_t adjlist, fathers;
     igraph_inclist_t inclist;
     igraph_integer_t source, j;
-    igraph_stack_t S;
+    igraph_stack_int_t S;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_integer_t father;
@@ -940,8 +940,8 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
 
-    IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
-    IGRAPH_FINALLY(igraph_stack_destroy, &S);
+    IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
@@ -1022,8 +1022,8 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
-        while (!igraph_stack_empty(&S)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_stack_pop(&S);
+        while (!igraph_stack_int_empty(&S)) {
+            igraph_integer_t actnode = (igraph_integer_t) igraph_stack_int_pop(&S);
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff;
@@ -1081,7 +1081,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_Free(tmpscore);
     igraph_Free(nrgeo);
     igraph_vector_destroy(&dist);
-    igraph_stack_destroy(&S);
+    igraph_stack_int_destroy(&S);
     igraph_adjlist_destroy(&fathers);
     if (weights) {
         igraph_inclist_destroy(&inclist);
@@ -1146,7 +1146,7 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
     unsigned char *is_target;
-    igraph_stack_t S;
+    igraph_stack_int_t S;
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
@@ -1185,8 +1185,8 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
-    IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
-    IGRAPH_FINALLY(igraph_stack_destroy, &S);
+    IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
 
     if (!igraph_es_is_all(&eids)) {
         /* result needed only for a subset of the vertices */
@@ -1239,8 +1239,8 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
-        while (!igraph_stack_empty(&S)) {
-            igraph_integer_t actnode = igraph_stack_pop(&S);
+        while (!igraph_stack_int_empty(&S)) {
+            igraph_integer_t actnode = igraph_stack_int_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff;
@@ -1294,7 +1294,7 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         igraph_vector_scale(res, 0.5);
     }
 
-    igraph_stack_destroy(&S);
+    igraph_stack_int_destroy(&S);
     igraph_Free(tmpscore);
     igraph_Free(nrgeo);
     igraph_vector_destroy(&dist);

@@ -123,14 +123,14 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     igraph_integer_t no_of_nodes = igraph_vcount(graph1);
     igraph_integer_t no_of_edges = igraph_ecount(graph1);
     igraph_vector_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
-    igraph_vector_t in_1, in_2, out_1, out_2;
+    igraph_vector_int_t in_1, in_2, out_1, out_2;
     igraph_integer_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
     igraph_vector_int_t *inneis_1, *inneis_2, *outneis_1, *outneis_2;
     igraph_integer_t matched_nodes = 0;
     igraph_integer_t depth;
     igraph_integer_t cand1, cand2;
     igraph_integer_t last1, last2;
-    igraph_stack_t path;
+    igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
     igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
     igraph_integer_t vsize;
@@ -223,12 +223,12 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     }
     igraph_vector_fill(core_2, -1);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&in_1, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&in_2, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&out_1, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes);
-    IGRAPH_CHECK(igraph_stack_init(&path, 0));
-    IGRAPH_FINALLY(igraph_stack_destroy, &path);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_1, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_2, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&out_1, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&out_2, no_of_nodes);
+    IGRAPH_CHECK(igraph_stack_int_init(&path, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj1);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -242,7 +242,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     IGRAPH_VECTOR_INIT_FINALLY(&outdeg1, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&outdeg2, 0);
 
-    IGRAPH_CHECK(igraph_stack_reserve(&path, no_of_nodes * 2));
+    IGRAPH_CHECK(igraph_stack_int_reserve(&path, no_of_nodes * 2));
     IGRAPH_CHECK(igraph_degree(graph1, &indeg1, igraph_vss_all(),
                                IGRAPH_IN, IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_degree(graph2, &indeg2, igraph_vss_all(),
@@ -336,8 +336,8 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
             /**************************************************************/
             /* dead end, step back, if possible. Otherwise we'll terminate */
             if (depth >= 1) {
-                last2 = igraph_stack_pop(&path);
-                last1 = igraph_stack_pop(&path);
+                last2 = igraph_stack_int_pop(&path);
+                last1 = igraph_stack_int_pop(&path);
                 matched_nodes -= 1;
                 VECTOR(*core_1)[last1] = -1;
                 VECTOR(*core_2)[last2] = -1;
@@ -558,8 +558,8 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
             if (!end && (xin1 == xin2 && xout1 == xout2)) {
                 /* Ok, we add the (cand1, cand2) pair to the mapping */
                 depth += 1;
-                IGRAPH_CHECK(igraph_stack_push(&path, cand1));
-                IGRAPH_CHECK(igraph_stack_push(&path, cand2));
+                IGRAPH_CHECK(igraph_stack_int_push(&path, cand1));
+                IGRAPH_CHECK(igraph_stack_int_push(&path, cand2));
                 matched_nodes += 1;
                 VECTOR(*core_1)[cand1] = cand2;
                 VECTOR(*core_2)[cand2] = cand1;
@@ -639,11 +639,11 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     igraph_lazy_adjlist_destroy(&inadj2);
     igraph_lazy_adjlist_destroy(&outadj1);
     igraph_lazy_adjlist_destroy(&inadj1);
-    igraph_stack_destroy(&path);
-    igraph_vector_destroy(&out_2);
-    igraph_vector_destroy(&out_1);
-    igraph_vector_destroy(&in_2);
-    igraph_vector_destroy(&in_1);
+    igraph_stack_int_destroy(&path);
+    igraph_vector_int_destroy(&out_2);
+    igraph_vector_int_destroy(&out_1);
+    igraph_vector_int_destroy(&in_2);
+    igraph_vector_int_destroy(&in_1);
     IGRAPH_FINALLY_CLEAN(13);
     if (!map21) {
         igraph_vector_destroy(core_2);
@@ -1031,7 +1031,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_integer_t depth;
     igraph_integer_t cand1, cand2;
     igraph_integer_t last1, last2;
-    igraph_stack_t path;
+    igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
     igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
     igraph_integer_t vsize;
@@ -1098,8 +1098,8 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     IGRAPH_VECTOR_INIT_FINALLY(&in_2, no_of_nodes2);
     IGRAPH_VECTOR_INIT_FINALLY(&out_1, no_of_nodes1);
     IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes2);
-    IGRAPH_CHECK(igraph_stack_init(&path, 0));
-    IGRAPH_FINALLY(igraph_stack_destroy, &path);
+    IGRAPH_CHECK(igraph_stack_int_init(&path, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj1);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -1113,7 +1113,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     IGRAPH_VECTOR_INIT_FINALLY(&outdeg1, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&outdeg2, 0);
 
-    IGRAPH_CHECK(igraph_stack_reserve(&path, no_of_nodes2 * 2));
+    IGRAPH_CHECK(igraph_stack_int_reserve(&path, no_of_nodes2 * 2));
     IGRAPH_CHECK(igraph_degree(graph1, &indeg1, igraph_vss_all(),
                                IGRAPH_IN, IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_degree(graph2, &indeg2, igraph_vss_all(),
@@ -1207,8 +1207,8 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
             /**************************************************************/
             /* dead end, step back, if possible. Otherwise we'll terminate */
             if (depth >= 1) {
-                last2 = igraph_stack_pop(&path);
-                last1 = igraph_stack_pop(&path);
+                last2 = igraph_stack_int_pop(&path);
+                last1 = igraph_stack_int_pop(&path);
                 matched_nodes -= 1;
                 VECTOR(*core_1)[last1] = -1;
                 VECTOR(*core_2)[last2] = -1;
@@ -1385,8 +1385,8 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
             if (!end && (xin1 >= xin2 && xout1 >= xout2)) {
                 /* Ok, we add the (cand1, cand2) pair to the mapping */
                 depth += 1;
-                IGRAPH_CHECK(igraph_stack_push(&path, cand1));
-                IGRAPH_CHECK(igraph_stack_push(&path, cand2));
+                IGRAPH_CHECK(igraph_stack_int_push(&path, cand1));
+                IGRAPH_CHECK(igraph_stack_int_push(&path, cand2));
                 matched_nodes += 1;
                 VECTOR(*core_1)[cand1] = cand2;
                 VECTOR(*core_2)[cand2] = cand1;
@@ -1466,7 +1466,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_lazy_adjlist_destroy(&inadj2);
     igraph_lazy_adjlist_destroy(&outadj1);
     igraph_lazy_adjlist_destroy(&inadj1);
-    igraph_stack_destroy(&path);
+    igraph_stack_int_destroy(&path);
     igraph_vector_destroy(&out_2);
     igraph_vector_destroy(&out_1);
     igraph_vector_destroy(&in_2);

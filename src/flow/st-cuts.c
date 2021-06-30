@@ -600,7 +600,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 }
 
 typedef struct igraph_i_all_st_cuts_minimal_dfs_data_t {
-    igraph_stack_t *stack;
+    igraph_stack_int_t *stack;
     igraph_vector_bool_t *nomark;
     const igraph_vector_bool_t *GammaX;
     igraph_integer_t root;
@@ -614,7 +614,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
         void *extra) {
 
     igraph_i_all_st_cuts_minimal_dfs_data_t *data = extra;
-    igraph_stack_t *stack = data->stack;
+    igraph_stack_int_t *stack = data->stack;
     igraph_vector_bool_t *nomark = data->nomark;
     const igraph_vector_bool_t *GammaX = data->GammaX;
     const igraph_vector_t *map = data->map;
@@ -623,11 +623,11 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
     if (VECTOR(*GammaX)[realvid]) {
-        if (!igraph_stack_empty(stack)) {
-            igraph_integer_t top = igraph_stack_top(stack);
+        if (!igraph_stack_int_empty(stack)) {
+            igraph_integer_t top = igraph_stack_int_top(stack);
             VECTOR(*nomark)[top] = 1; /* we just found a smaller one */
         }
-        IGRAPH_CHECK(igraph_stack_push(stack, realvid));
+        IGRAPH_CHECK(igraph_stack_int_push(stack, realvid));
     }
 
     return IGRAPH_SUCCESS;
@@ -639,15 +639,15 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_outcb(
         igraph_integer_t dist,
         void *extra) {
     igraph_i_all_st_cuts_minimal_dfs_data_t *data = extra;
-    igraph_stack_t *stack = data->stack;
+    igraph_stack_int_t *stack = data->stack;
     const igraph_vector_t *map = data->map;
     igraph_integer_t realvid = VECTOR(*map)[vid];
 
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
-    if (!igraph_stack_empty(stack) &&
-        igraph_stack_top(stack) == realvid) {
-        igraph_stack_pop(stack);
+    if (!igraph_stack_int_empty(stack) &&
+        igraph_stack_int_top(stack) == realvid) {
+        igraph_stack_int_pop(stack);
     }
 
     return IGRAPH_SUCCESS;
@@ -662,15 +662,15 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                                         igraph_vector_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_stack_t stack;
+    igraph_stack_int_t stack;
     igraph_vector_bool_t nomark;
     igraph_i_all_st_cuts_minimal_dfs_data_t data;
     igraph_integer_t i;
 
     IGRAPH_UNUSED(X);
 
-    IGRAPH_CHECK(igraph_stack_init(&stack, 10));
-    IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, 10));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
     IGRAPH_CHECK(igraph_vector_bool_init(&nomark, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &nomark);
 
@@ -708,7 +708,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
     }
 
     igraph_vector_bool_destroy(&nomark);
-    igraph_stack_destroy(&stack);
+    igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

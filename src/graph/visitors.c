@@ -481,7 +481,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t adjlist;
-    igraph_stack_t stack;
+    igraph_stack_int_t stack;
     igraph_vector_char_t added;
     igraph_vector_int_t nptr;
     igraph_error_t ret;
@@ -505,8 +505,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_stack_init(&stack, 100));
-    IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, 100));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_of_nodes));
@@ -515,7 +515,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 # define FREE_ALL() do {            \
         igraph_vector_int_destroy(&nptr);            \
         igraph_lazy_adjlist_destroy(&adjlist);        \
-        igraph_stack_destroy(&stack);                 \
+        igraph_stack_int_destroy(&stack);                 \
         igraph_vector_char_destroy(&added);           \
         IGRAPH_FINALLY_CLEAN(4); } while (0)
 
@@ -532,7 +532,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
 # undef VINIT
 
-    IGRAPH_CHECK(igraph_stack_push(&stack, root));
+    IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
     VECTOR(added)[root] = 1;
     if (father) {
         VECTOR(*father)[root] = -1;
@@ -554,7 +554,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     for (actroot = 0; actroot < no_of_nodes; ) {
 
         /* 'root' first, then all other vertices */
-        if (igraph_stack_empty(&stack)) {
+        if (igraph_stack_int_empty(&stack)) {
             if (!unreachable) {
                 break;
             }
@@ -562,7 +562,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 actroot++;
                 continue;
             }
-            IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
+            IGRAPH_CHECK(igraph_stack_int_push(&stack, actroot));
             VECTOR(added)[actroot] = 1;
             if (father) {
                 VECTOR(*father)[actroot] = -1;
@@ -585,8 +585,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             actroot++;
         }
 
-        while (!igraph_stack_empty(&stack)) {
-            igraph_integer_t actvect = igraph_stack_top(&stack);
+        while (!igraph_stack_int_empty(&stack)) {
+            igraph_integer_t actvect = igraph_stack_int_top(&stack);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             igraph_integer_t n = igraph_vector_int_size(neis);
             igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, actvect);
@@ -601,7 +601,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             }
             if (any) {
                 /* There is such a neighbor, add it */
-                IGRAPH_CHECK(igraph_stack_push(&stack, nei));
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, nei));
                 VECTOR(added)[nei] = 1;
                 if (father) {
                     VECTOR(*father)[ nei ] = actvect;
@@ -627,7 +627,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
             } else {
                 /* There is no such neighbor, finished with the subtree */
-                igraph_stack_pop(&stack);
+                igraph_stack_int_pop(&stack);
                 if (order_out) {
                     VECTOR(*order_out)[rank_out++] = actvect;
                 }
