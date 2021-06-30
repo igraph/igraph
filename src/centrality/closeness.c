@@ -331,7 +331,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
                             igraph_real_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t already_counted;
+    igraph_vector_int_t already_counted;
     igraph_vector_int_t *neis;
     igraph_integer_t i, j;
     igraph_integer_t nodes_reached;
@@ -366,7 +366,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
         IGRAPH_ERROR("Invalid mode for closeness.", IGRAPH_EINVMODE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&already_counted, no_of_nodes);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -435,7 +435,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
 
     /* Clean */
     igraph_dqueue_destroy(&q);
-    igraph_vector_destroy(&already_counted);
+    igraph_vector_int_destroy(&already_counted);
     igraph_vit_destroy(&vit);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(4);
