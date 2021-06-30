@@ -269,7 +269,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
 static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
                                       igraph_vector_t *components,
                                       igraph_vector_int_t *leaveout,
-                                      unsigned long int *mark,
+                                      igraph_integer_t *mark,
                                       igraph_dqueue_int_t *Q) {
 
     /* Another trick: we use the same 'leaveout' vector to mark the
@@ -334,7 +334,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
                                      const igraph_adjlist_t *adjlist,
                                      igraph_vector_t *components,
                                      igraph_vector_int_t *leaveout,
-                                     unsigned long int *mark,
+                                     igraph_integer_t *mark,
                                      igraph_vector_t *sorter) {
 
     /* We need to stote N(C), the neighborhood of C, but only if it is
@@ -454,7 +454,7 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     igraph_vector_int_t leaveout;
     igraph_vector_bool_t already_tried;
     igraph_integer_t try_next = 0;
-    unsigned long int mark = 1;
+    igraph_integer_t mark = 1;
     igraph_integer_t v;
 
     igraph_adjlist_t adjlist;
