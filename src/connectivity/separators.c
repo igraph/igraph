@@ -192,8 +192,7 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
  *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
- * \param candidate Pointer to a vector of igraph_integer_tegers, the
- *        candidate minimal separator.
+ * \param candidate The candidate minimal separators.
  * \param res Pointer to a boolean variable, the result is stored
  *        here.
  * \return Error code.
