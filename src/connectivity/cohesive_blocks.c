@@ -71,7 +71,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
                                   igraph_integer_t *no,
                                   /* working area follows */
                                   igraph_vector_int_t *compid,
-                                  igraph_dqueue_t *Q,
+                                  igraph_dqueue_int_t *Q,
                                   igraph_vector_t *neis) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -79,7 +79,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
     igraph_integer_t cno = 0;
 
     igraph_vector_int_clear(components);
-    igraph_dqueue_clear(Q);
+    igraph_dqueue_int_clear(Q);
     IGRAPH_CHECK(igraph_vector_int_resize(compid, no_of_nodes));
     igraph_vector_int_null(compid);
 
@@ -92,12 +92,12 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
             continue;
         }
 
-        IGRAPH_CHECK(igraph_dqueue_push(Q, i));
+        IGRAPH_CHECK(igraph_dqueue_int_push(Q, i));
         IGRAPH_CHECK(igraph_vector_int_push_back(components, i));
         VECTOR(*compid)[i] = ++cno;
 
-        while (!igraph_dqueue_empty(Q)) {
-            igraph_integer_t node = (igraph_integer_t) igraph_dqueue_pop(Q);
+        while (!igraph_dqueue_int_empty(Q)) {
+            igraph_integer_t node = (igraph_integer_t) igraph_dqueue_int_pop(Q);
             igraph_integer_t j, n;
             IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
             n = igraph_vector_size(neis);
@@ -112,11 +112,11 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
                     if (!VECTOR(*compid)[v]) {
                         VECTOR(*compid)[v] = cno; /* could be anything positive */
                         IGRAPH_CHECK(igraph_vector_int_push_back(components, v));
-                        IGRAPH_CHECK(igraph_dqueue_push(Q, v));
+                        IGRAPH_CHECK(igraph_dqueue_int_push(Q, v));
                     }
                 }
             }
-        } /* while !igraph_dqueue_empty */
+        } /* while !igraph_dqueue_int_empty */
 
         IGRAPH_CHECK(igraph_vector_int_push_back(components, -1));
 
@@ -234,7 +234,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_bool_t marked;
 
     igraph_vector_int_t compid;
-    igraph_dqueue_t bfsQ;
+    igraph_dqueue_int_t bfsQ;
     igraph_vector_t neis;
 
     if (igraph_is_directed(graph)) {
@@ -284,8 +284,8 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_bool_init(&marked, 0));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &marked);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_CHECK(igraph_dqueue_init(&bfsQ, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &bfsQ);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&bfsQ, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &bfsQ);
     IGRAPH_CHECK(igraph_vector_int_init(&compid, 0));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &compid);
     IGRAPH_CHECK(igraph_vector_int_init(&components, 0));
@@ -434,7 +434,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     igraph_vector_int_destroy(&components);
     igraph_vector_int_destroy(&compid);
-    igraph_dqueue_destroy(&bfsQ);
+    igraph_dqueue_int_destroy(&bfsQ);
     igraph_vector_destroy(&neis);
     igraph_vector_bool_destroy(&marked);
     igraph_vector_int_destroy(&compvertices);

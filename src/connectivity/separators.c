@@ -40,7 +40,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
                                  igraph_integer_t except,
                                  igraph_bool_t *res,
                                  igraph_vector_bool_t *removed,
-                                 igraph_dqueue_t *Q,
+                                 igraph_dqueue_int_t *Q,
                                  igraph_vector_t *neis,
                                  igraph_integer_t no_of_nodes) {
 
@@ -103,17 +103,17 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_dqueue_push(Q, start));
+    IGRAPH_CHECK(igraph_dqueue_int_push(Q, start));
     VECTOR(*removed)[start] = 1;
-    while (!igraph_dqueue_empty(Q)) {
-        igraph_integer_t node = igraph_dqueue_pop(Q);
+    while (!igraph_dqueue_int_empty(Q)) {
+        igraph_integer_t node = igraph_dqueue_int_pop(Q);
         igraph_integer_t j, n;
         IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
         n = igraph_vector_size(neis);
         for (j = 0; j < n; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (!VECTOR(*removed)[nei]) {
-                IGRAPH_CHECK(igraph_dqueue_push(Q, nei));
+                IGRAPH_CHECK(igraph_dqueue_int_push(Q, nei));
                 VECTOR(*removed)[nei] = 1;
             }
         }
@@ -152,7 +152,7 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_bool_t removed;
-    igraph_dqueue_t Q;
+    igraph_dqueue_int_t Q;
     igraph_vector_t neis;
     igraph_vit_t vit;
 
@@ -160,15 +160,15 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
-    IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
     IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed,
                                        &Q, &neis, no_of_nodes));
 
     igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_int_destroy(&Q);
     igraph_vector_bool_destroy(&removed);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
@@ -210,7 +210,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_bool_t removed;
-    igraph_dqueue_t Q;
+    igraph_dqueue_int_t Q;
     igraph_vector_t neis;
     igraph_integer_t candsize;
     igraph_vit_t vit;
@@ -221,8 +221,8 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
-    IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
     /* Is it a separator at all? */
@@ -248,7 +248,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
     }
 
     igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_int_destroy(&Q);
     igraph_vector_bool_destroy(&removed);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
@@ -261,16 +261,16 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
 #define UPDATEMARK() do {                              \
         (*mark)++;                         \
         if (!(*mark)) {                    \
-            igraph_vector_null(leaveout);                \
+            igraph_vector_int_null(leaveout);                \
             (*mark)=1;                       \
         }                                                  \
     } while (0)
 
 static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
                                       igraph_vector_t *components,
-                                      igraph_vector_t *leaveout,
+                                      igraph_vector_int_t *leaveout,
                                       unsigned long int *mark,
-                                      igraph_dqueue_t *Q) {
+                                      igraph_dqueue_int_t *Q) {
 
     /* Another trick: we use the same 'leaveout' vector to mark the
      * vertices that were already found in the BFS
@@ -278,7 +278,7 @@ static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist
 
     igraph_integer_t i, no_of_nodes = igraph_adjlist_size(adjlist);
 
-    igraph_dqueue_clear(Q);
+    igraph_dqueue_int_clear(Q);
     igraph_vector_clear(components);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -288,11 +288,11 @@ static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist
         }
 
         VECTOR(*leaveout)[i] = *mark;
-        igraph_dqueue_push(Q, i);
+        igraph_dqueue_int_push(Q, i);
         igraph_vector_push_back(components, i);
 
-        while (!igraph_dqueue_empty(Q)) {
-            igraph_integer_t act_node = igraph_dqueue_pop(Q);
+        while (!igraph_dqueue_int_empty(Q)) {
+            igraph_integer_t act_node = igraph_dqueue_int_pop(Q);
             igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, act_node);
             igraph_integer_t j, n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
@@ -300,7 +300,7 @@ static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist
                 if (VECTOR(*leaveout)[nei] == *mark) {
                     continue;
                 }
-                IGRAPH_CHECK(igraph_dqueue_push(Q, nei));
+                IGRAPH_CHECK(igraph_dqueue_int_push(Q, nei));
                 VECTOR(*leaveout)[nei] = *mark;
                 igraph_vector_push_back(components, nei);
             }
@@ -333,7 +333,7 @@ static igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps
 static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
                                      const igraph_adjlist_t *adjlist,
                                      igraph_vector_t *components,
-                                     igraph_vector_t *leaveout,
+                                     igraph_vector_int_t *leaveout,
                                      unsigned long int *mark,
                                      igraph_vector_t *sorter) {
 
@@ -451,7 +451,7 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
      */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t leaveout;
+    igraph_vector_int_t leaveout;
     igraph_vector_bool_t already_tried;
     igraph_integer_t try_next = 0;
     unsigned long int mark = 1;
@@ -459,14 +459,14 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
 
     igraph_adjlist_t adjlist;
     igraph_vector_t components;
-    igraph_dqueue_t Q;
+    igraph_dqueue_int_t Q;
     igraph_vector_t sorter;
 
     igraph_vector_ptr_clear(separators);
     IGRAPH_FINALLY(igraph_i_separators_free, separators);
 
-    IGRAPH_CHECK(igraph_vector_init(&leaveout, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_destroy, &leaveout);
+    IGRAPH_CHECK(igraph_vector_int_init(&leaveout, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &leaveout);
     IGRAPH_CHECK(igraph_vector_bool_init(&already_tried, 0));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &already_tried);
     IGRAPH_CHECK(igraph_vector_init(&components, 0));
@@ -474,8 +474,8 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&components, no_of_nodes * 2));
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
     IGRAPH_CHECK(igraph_vector_init(&sorter, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &sorter);
     IGRAPH_CHECK(igraph_vector_reserve(&sorter, no_of_nodes));
@@ -546,11 +546,11 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     /* --------------------------------------------------------------- */
 
     igraph_vector_destroy(&sorter);
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_int_destroy(&Q);
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_destroy(&components);
     igraph_vector_bool_destroy(&already_tried);
-    igraph_vector_destroy(&leaveout);
+    igraph_vector_int_destroy(&leaveout);
     IGRAPH_FINALLY_CLEAN(7);  /* +1 for separators */
 
     return IGRAPH_SUCCESS;
