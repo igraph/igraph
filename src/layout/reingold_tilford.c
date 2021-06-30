@@ -44,7 +44,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     igraph_integer_t no_of_newedges;
     igraph_vector_bool_t visited;
     igraph_integer_t i, j, n;
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
 
@@ -53,22 +53,22 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     /* traverse from real_root and see what nodes you cannot reach */
     no_of_newedges = 0;
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, no_of_nodes);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     /* start from real_root and go BFS */
-    IGRAPH_CHECK(igraph_dqueue_push(&q, real_root));
-    while (!igraph_dqueue_empty(&q)) {
-        igraph_integer_t actnode = igraph_dqueue_pop(&q);
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, real_root));
+    while (!igraph_dqueue_int_empty(&q)) {
+        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
         VECTOR(visited)[actnode] = 1;
         for (j = 0; j < n; j++) {
             igraph_integer_t neighbor = VECTOR(*neis)[j];
             if (!VECTOR(visited)[neighbor]) {
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
             }
         }
     }
@@ -96,7 +96,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
         }
     }
 
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     igraph_vector_bool_destroy(&visited);
     IGRAPH_FINALLY_CLEAN(3);
@@ -137,13 +137,13 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
                                             igraph_integer_t root) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, n, j;
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
     struct igraph_i_reingold_tilford_vertex *vdata;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
@@ -172,11 +172,11 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
     MATRIX(*res, root, 1) = 0;
 
     /* Step 1: assign Y coordinates based on BFS and setup parents vector */
-    IGRAPH_CHECK(igraph_dqueue_push(&q, root));
-    IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-    while (!igraph_dqueue_empty(&q)) {
-        igraph_integer_t actnode = igraph_dqueue_pop(&q);
-        igraph_integer_t actdist = igraph_dqueue_pop(&q);
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, root));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
+    while (!igraph_dqueue_int_empty(&q)) {
+        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+        igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
 
@@ -186,8 +186,8 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
                 continue;
             }
             MATRIX(*res, neighbor, 1) = actdist + 1;
-            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-            IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             vdata[neighbor].parent = actnode;
             vdata[neighbor].level = actdist + 1;
         }
@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
     /* Step 3: calculate real coordinates based on X offsets */
     igraph_i_layout_reingold_tilford_calc_coords(vdata, res, root, no_of_nodes, vdata[root].offset);
 
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_adjlist_destroy(&allneis);
     igraph_free(vdata);
     IGRAPH_FINALLY_CLEAN(3);

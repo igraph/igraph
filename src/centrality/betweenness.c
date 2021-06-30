@@ -69,19 +69,19 @@ static int igraph_i_sspf(
     igraph_adjlist_t *adjlist,
     igraph_real_t cutoff
 ) {
-    igraph_dqueue_t queue;
+    igraph_dqueue_int_t queue;
     const igraph_vector_int_t *neis;
     igraph_vector_int_t *v;
     igraph_integer_t nlen;
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&queue, 100);
 
-    IGRAPH_CHECK(igraph_dqueue_push(&queue, source));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&queue, source));
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
-    while (!igraph_dqueue_empty(&queue)) {
-        igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&queue);
+    while (!igraph_dqueue_int_empty(&queue)) {
+        igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_int_pop(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && VECTOR(*dist)[actnode] > cutoff + 1) {
@@ -104,7 +104,7 @@ static int igraph_i_sspf(
             if (VECTOR(*dist)[neighbor] == 0) {
                 /* We have found 'neighbor' for the first time */
                 VECTOR(*dist)[neighbor] = VECTOR(*dist)[actnode] + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&queue, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&queue, neighbor));
             }
 
             if (VECTOR(*dist)[neighbor] == VECTOR(*dist)[actnode] + 1 &&
@@ -117,7 +117,7 @@ static int igraph_i_sspf(
         }
     }
 
-    igraph_dqueue_destroy(&queue);
+    igraph_dqueue_int_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -150,19 +150,19 @@ static int igraph_i_sspf_edge(
     const igraph_inclist_t *inclist,
     igraph_real_t cutoff
 ) {
-    igraph_dqueue_t queue;
+    igraph_dqueue_int_t queue;
     const igraph_vector_int_t *neis;
     igraph_vector_int_t *v;
     igraph_integer_t nlen;
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&queue, 100);
 
-    IGRAPH_CHECK(igraph_dqueue_push(&queue, source));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&queue, source));
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
-    while (!igraph_dqueue_empty(&queue)) {
-        igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&queue);
+    while (!igraph_dqueue_int_empty(&queue)) {
+        igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_int_pop(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && VECTOR(*dist)[actnode] > cutoff + 1) {
@@ -186,7 +186,7 @@ static int igraph_i_sspf_edge(
             if (VECTOR(*dist)[neighbor] == 0) {
                 /* We have found 'neighbor' for the first time */
                 VECTOR(*dist)[neighbor] = VECTOR(*dist)[actnode] + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&queue, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&queue, neighbor));
             }
 
             if (VECTOR(*dist)[neighbor] == VECTOR(*dist)[actnode] + 1 &&
@@ -199,7 +199,7 @@ static int igraph_i_sspf_edge(
         }
     }
 
-    igraph_dqueue_destroy(&queue);
+    igraph_dqueue_int_destroy(&queue);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

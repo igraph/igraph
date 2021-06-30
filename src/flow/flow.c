@@ -678,31 +678,31 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         /* We need to find all vertices from which the target is reachable
            in the residual graph. We do a breadth-first search, going
            backwards. */
-        igraph_dqueue_t Q;
+        igraph_dqueue_int_t Q;
         igraph_vector_bool_t added;
         igraph_integer_t marked = 0;
 
         IGRAPH_CHECK(igraph_vector_bool_init(&added, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, &added);
 
-        IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-        IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+        IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+        IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
 
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, target));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
         VECTOR(added)[target] = 1;
         marked++;
-        while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&Q);
+        while (!igraph_dqueue_int_empty(&Q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
                 igraph_integer_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
                     VECTOR(added)[nei] = 1;
                     marked++;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                 }
             }
         }
-        igraph_dqueue_destroy(&Q);
+        igraph_dqueue_int_destroy(&Q);
         IGRAPH_FINALLY_CLEAN(1);
 
         /* Now we marked each vertex that is on one side of the cut,
@@ -747,7 +747,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     if (flow) {
         /* Initialize the backward distances, with a breadth-first search
            from the source */
-        igraph_dqueue_t Q;
+        igraph_dqueue_int_t Q;
         igraph_vector_int_t added;
         igraph_integer_t j, k, l;
         igraph_t flow_graph;
@@ -756,29 +756,29 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
         IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
-        IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-        IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+        IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+        IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
 
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, source));
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, source));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
         VECTOR(added)[source] = 1;
-        while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&Q);
-            igraph_integer_t actdist = igraph_dqueue_pop(&Q);
+        while (!igraph_dqueue_int_empty(&Q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
             DIST(actnode) = actdist;
 
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
                 igraph_integer_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
                     VECTOR(added)[nei] = 1;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist + 1));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actdist + 1));
                 }
             }
-        } /* !igraph_dqueue_empty(&Q) */
+        } /* !igraph_dqueue_int_empty(&Q) */
 
         igraph_vector_int_destroy(&added);
-        igraph_dqueue_destroy(&Q);
+        igraph_dqueue_int_destroy(&Q);
         IGRAPH_FINALLY_CLEAN(2);
 
         /* Reinitialize the buckets */

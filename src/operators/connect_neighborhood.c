@@ -63,7 +63,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
                                 igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_t q;
+    igraph_dqueue_int_t q;
     igraph_vector_t edges;
     igraph_integer_t i, j, in;
     igraph_integer_t *added;
@@ -87,7 +87,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
         IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -98,14 +98,14 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
             for (j = 0; j < in; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
                 added[nei] = i + 1;
-                igraph_dqueue_push(&q, nei);
-                igraph_dqueue_push(&q, 1);
+                igraph_dqueue_int_push(&q, nei);
+                igraph_dqueue_int_push(&q, 1);
             }
         }
 
-        while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             igraph_neighbors(graph, &neis, actnode, mode);
             n = igraph_vector_size(&neis);
@@ -115,8 +115,8 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
-                        IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
-                        IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
                         if (mode != IGRAPH_ALL || i < nei) {
                             if (mode == IGRAPH_IN) {
                                 IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
@@ -150,7 +150,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
     } /* for i < no_of_nodes */
 
     igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_free(added);
     IGRAPH_FINALLY_CLEAN(3);
 

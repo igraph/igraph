@@ -107,7 +107,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     igraph_error_t ret;
 
-    igraph_dqueue_t Q;
+    igraph_dqueue_int_t Q;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t actroot = 0;
     igraph_vector_char_t added;
@@ -151,8 +151,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
@@ -211,8 +211,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         if (VECTOR(added)[actroot]) {
             continue;
         }
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actroot));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
         VECTOR(added)[actroot] = 1;
         if (father) {
             VECTOR(*father)[actroot] = -1;
@@ -220,9 +220,9 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
         pred_vec = -1;
 
-        while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actvect = igraph_dqueue_pop(&Q);
-            igraph_integer_t actdist = igraph_dqueue_pop(&Q);
+        while (!igraph_dqueue_int_empty(&Q)) {
+            igraph_integer_t actvect = igraph_dqueue_int_pop(&Q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
             igraph_integer_t succ_vec;
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
                                                                 actvect);
@@ -245,16 +245,16 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                 igraph_integer_t nei = VECTOR(*neis)[i];
                 if (! VECTOR(added)[nei]) {
                     VECTOR(added)[nei] = 1;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist + 1));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actdist + 1));
                     if (father) {
                         VECTOR(*father)[nei] = actvect;
                     }
                 }
             }
 
-            succ_vec = igraph_dqueue_empty(&Q) ? -1L :
-                       igraph_dqueue_head(&Q);
+            succ_vec = igraph_dqueue_int_empty(&Q) ? -1L :
+                       igraph_dqueue_int_head(&Q);
             if (callback) {
                 IGRAPH_CHECK_CALLBACK(
                     callback(graph, (igraph_integer_t) actvect, (igraph_integer_t)
@@ -281,7 +281,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 cleanup:
 
     igraph_lazy_adjlist_destroy(&adjlist);
-    igraph_dqueue_destroy(&Q);
+    igraph_dqueue_int_destroy(&Q);
     igraph_vector_char_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -331,7 +331,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
                       igraph_vector_t *vids, igraph_vector_t *layers,
                       igraph_vector_t *parents) {
 
-    igraph_dqueue_t q;
+    igraph_dqueue_int_t q;
     igraph_integer_t num_visited = 0;
     igraph_vector_t neis;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -355,8 +355,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
     /* results */
     if (vids) {
@@ -370,8 +370,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
     }
 
     /* ok start with vid */
-    IGRAPH_CHECK(igraph_dqueue_push(&q, vid));
-    IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, vid));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
     if (layers) {
         IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
     }
@@ -384,9 +384,9 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
     num_visited++;
     added[vid] = 1;
 
-    while (!igraph_dqueue_empty(&q)) {
-        igraph_integer_t actvect = igraph_dqueue_pop(&q);
-        igraph_integer_t actdist = igraph_dqueue_pop(&q);
+    while (!igraph_dqueue_int_empty(&q)) {
+        igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
+        igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvect,
                                       mode));
         for (i = 0; i < igraph_vector_size(&neis); i++) {
@@ -396,8 +396,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
                 if (parents) {
                     VECTOR(*parents)[neighbor] = actvect;
                 }
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
                 if (layers && lastlayer != actdist + 1) {
                     IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
                 }
@@ -408,14 +408,14 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
                 lastlayer = actdist + 1;
             }
         } /* for i in neis */
-    } /* while ! dqueue_empty */
+    } /* while ! dqueue_int_empty */
 
     if (layers) {
         IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
     }
 
     igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(3);
 

@@ -339,7 +339,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
 
     igraph_integer_t actdist = 0;
 
-    igraph_dqueue_t q;
+    igraph_dqueue_int_t q;
 
     igraph_integer_t nodes_to_calc;
     igraph_vit_t vit;
@@ -367,7 +367,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&already_counted, no_of_nodes);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
@@ -380,17 +380,17 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
          IGRAPH_VIT_NEXT(vit), i++) {
         nodes_reached = 0;
 
-        igraph_dqueue_clear(&q);
-        IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(vit)));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+        igraph_dqueue_int_clear(&q);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, IGRAPH_VIT_GET(vit)));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         VECTOR(already_counted)[IGRAPH_VIT_GET(vit)] = i + 1;
 
         IGRAPH_PROGRESS("Closeness: ", 100.0 * i / nodes_to_calc, NULL);
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t act = igraph_dqueue_pop(&q);
-            actdist = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            actdist = igraph_dqueue_int_pop(&q);
 
             if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */
@@ -407,8 +407,8 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
                     continue;
                 }
                 VECTOR(already_counted)[neighbor] = i + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
         }
 
@@ -434,7 +434,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
     IGRAPH_PROGRESS("Closeness: ", 100.0, NULL);
 
     /* Clean */
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&already_counted);
     igraph_vit_destroy(&vit);
     igraph_adjlist_destroy(&allneis);
@@ -459,7 +459,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
 
     igraph_integer_t actdist = 0;
 
-    igraph_dqueue_t q;
+    igraph_dqueue_int_t q;
 
     igraph_integer_t nodes_to_calc;
     igraph_vit_t vit;
@@ -475,7 +475,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
@@ -489,17 +489,17 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
     {
         igraph_integer_t source = IGRAPH_VIT_GET(vit);
 
-        igraph_dqueue_clear(&q);
-        IGRAPH_CHECK(igraph_dqueue_push(&q, source));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+        igraph_dqueue_int_clear(&q);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         VECTOR(already_counted)[source] = i + 1;
 
         IGRAPH_PROGRESS("Harmonic centrality: ", 100.0 * i / nodes_to_calc, NULL);
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t act = igraph_dqueue_pop(&q);
-            actdist = igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            actdist = igraph_dqueue_int_pop(&q);
 
             if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */
@@ -518,8 +518,8 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
                     continue;
                 }
                 VECTOR(already_counted)[neighbor] = i + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
         }
     }
@@ -531,7 +531,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
     IGRAPH_PROGRESS("Harmonic centrality: ", 100.0, NULL);
 
     /* Clean */
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_vector_destroy(&already_counted);
     igraph_vit_destroy(&vit);
     igraph_adjlist_destroy(&allneis);
