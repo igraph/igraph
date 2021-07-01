@@ -1538,7 +1538,7 @@ cleanup:
  *    (in vertex id order) from the pattern graph.
  * \param maps Pointer vector or a null pointer. If not a null
  *    pointer, then all subgraph isomorphisms are stored in the
- *    pointer vector, in \c igraph_vector_t objects.
+ *    pointer vector, in \c igraph_vector_int_t objects.
  * \param induced Boolean, whether to search for induced matching
  *    subgraphs.
  * \param time_limit Processor time limit in seconds. Supply zero
