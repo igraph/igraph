@@ -66,7 +66,7 @@ int main() {
     igraph_vector_ptr_t cuts, partition1s;
     igraph_integer_t i, n;
 
-    igraph_marked_queue_t S;
+    igraph_marked_queue_int_t S;
     igraph_estack_t T;
     igraph_integer_t v;
     igraph_vector_t Isv;
@@ -92,10 +92,10 @@ int main() {
                  -1);
 
     /* S={s,a} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_start_batch(&S);
-    igraph_marked_queue_push(&S, 10);
-    igraph_marked_queue_push(&S, 0);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_start_batch(&S);
+    igraph_marked_queue_int_push(&S, 10);
+    igraph_marked_queue_int_push(&S, 0);
 
     /* T={t} */
     igraph_estack_init(&T, igraph_vcount(&g), 1);
@@ -112,7 +112,7 @@ int main() {
 
     igraph_vector_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -122,7 +122,7 @@ int main() {
                  -1);
 
     /* S={}, T={} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
     igraph_vector_init(&Isv, 0);
@@ -134,7 +134,7 @@ int main() {
 
     igraph_vector_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -144,7 +144,7 @@ int main() {
                  -1);
 
     /* S={}, T={0} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
     igraph_estack_push(&T, 0);
@@ -158,7 +158,7 @@ int main() {
 
     igraph_vector_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -168,8 +168,8 @@ int main() {
                  -1);
 
     /* S={0}, T={} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_push(&S, 0);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_push(&S, 0);
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
@@ -182,7 +182,7 @@ int main() {
 
     igraph_vector_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -192,8 +192,8 @@ int main() {
                  -1);
 
     /* S={0}, T={1} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_push(&S, 0);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_push(&S, 0);
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
     igraph_estack_push(&T, 1);
@@ -207,7 +207,7 @@ int main() {
 
     igraph_vector_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -217,9 +217,9 @@ int main() {
                  -1);
 
     /* S={0,1}, T={} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_push(&S, 0);
-    igraph_marked_queue_push(&S, 1);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_push(&S, 0);
+    igraph_marked_queue_int_push(&S, 1);
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
@@ -232,7 +232,7 @@ int main() {
 
     igraph_vector_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */

@@ -41,7 +41,7 @@
 #include "flow/flow_internal.h"
 
 typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
-                                                   const igraph_marked_queue_t *S,
+                                                   const igraph_marked_queue_int_t *S,
                                                    const igraph_estack_t *T,
                                                    igraph_integer_t source,
                                                    igraph_integer_t target,
@@ -656,7 +656,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_outcb(
 static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                                         const igraph_t *domtree,
                                         igraph_integer_t root,
-                                        const igraph_marked_queue_t *X,
+                                        const igraph_marked_queue_int_t *X,
                                         const igraph_vector_bool_t *GammaX,
                                         const igraph_vector_t *invmap,
                                         igraph_vector_t *minimal) {
@@ -716,7 +716,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 
 /* not 'static' because used in igraph_all_st_cuts.c test program */
 igraph_error_t igraph_i_all_st_cuts_pivot(
-    const igraph_t *graph, const igraph_marked_queue_t *S,
+    const igraph_t *graph, const igraph_marked_queue_int_t *S,
     const igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
     igraph_integer_t *v, igraph_vector_t *Isv, void *arg
 ) {
@@ -744,7 +744,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&keep, 0);
     for (i = 0; i < no_of_nodes; i++) {
-        if (!igraph_marked_queue_iselement(S, i)) {
+        if (!igraph_marked_queue_int_iselement(S, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&keep, i));
         }
     }
@@ -778,11 +778,11 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     /* TODO: use the adjacency list, instead of neighbors() */
     IGRAPH_CHECK(igraph_vector_bool_init(&GammaS, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &GammaS);
-    if (igraph_marked_queue_size(S) == 0) {
+    if (igraph_marked_queue_int_size(S) == 0) {
         VECTOR(GammaS)[(igraph_integer_t) VECTOR(Sbar_map)[source] - 1] = 1;
     } else {
         for (i = 0; i < no_of_nodes; i++) {
-            if (igraph_marked_queue_iselement(S, i)) {
+            if (igraph_marked_queue_int_iselement(S, i)) {
                 igraph_vector_t neis;
                 igraph_integer_t j;
                 IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -791,7 +791,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 n = igraph_vector_size(&neis);
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
-                    if (!igraph_marked_queue_iselement(S, nei)) {
+                    if (!igraph_marked_queue_int_iselement(S, nei)) {
                         VECTOR(GammaS)[nei] = 1;
                     }
                 }
@@ -923,7 +923,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
    handling */
 
 igraph_error_t igraph_provan_shier_list(
-    const igraph_t *graph, igraph_marked_queue_t *S,
+    const igraph_t *graph, igraph_marked_queue_int_t *S,
     igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
     igraph_vector_ptr_t *result, igraph_provan_shier_pivot_t *pivot,
     void *pivot_arg
@@ -938,11 +938,11 @@ igraph_error_t igraph_provan_shier_list(
 
     pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
     if (igraph_vector_size(&Isv) == 0) {
-        if (igraph_marked_queue_size(S) != 0 &&
-            igraph_marked_queue_size(S) != no_of_nodes) {
+        if (igraph_marked_queue_int_size(S) != 0 &&
+            igraph_marked_queue_int_size(S) != no_of_nodes) {
             igraph_vector_t *vec = IGRAPH_CALLOC(1, igraph_vector_t);
-            IGRAPH_CHECK(igraph_vector_init(vec, igraph_marked_queue_size(S)));
-            IGRAPH_CHECK(igraph_marked_queue_as_vector(S, vec));
+            IGRAPH_CHECK(igraph_vector_init(vec, igraph_marked_queue_int_size(S)));
+            IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, vec));
             IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
         }
     } else {
@@ -957,11 +957,11 @@ igraph_error_t igraph_provan_shier_list(
         igraph_estack_pop(T);
 
         /* Add Isv to S */
-        IGRAPH_CHECK(igraph_marked_queue_start_batch(S));
+        IGRAPH_CHECK(igraph_marked_queue_int_start_batch(S));
         n = igraph_vector_size(&Isv);
         for (i = 0; i < n; i++) {
-            if (!igraph_marked_queue_iselement(S, (igraph_integer_t) VECTOR(Isv)[i])) {
-                IGRAPH_CHECK(igraph_marked_queue_push(S, (igraph_integer_t) VECTOR(Isv)[i]));
+            if (!igraph_marked_queue_int_iselement(S, (igraph_integer_t) VECTOR(Isv)[i])) {
+                IGRAPH_CHECK(igraph_marked_queue_int_push(S, (igraph_integer_t) VECTOR(Isv)[i]));
             }
         }
 
@@ -971,7 +971,7 @@ igraph_error_t igraph_provan_shier_list(
             graph, S, T, source, target, result, pivot, pivot_arg));
 
         /* Take out Isv from S */
-        igraph_marked_queue_pop_back_batch(S);
+        igraph_marked_queue_int_pop_back_batch(S);
     }
 
     igraph_vector_destroy(&Isv);
@@ -1028,7 +1028,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_marked_queue_t S;
+    igraph_marked_queue_int_t S;
     igraph_estack_t T;
     igraph_vector_ptr_t *mypartition1s = partition1s, vpartition1s;
     igraph_integer_t i, nocuts;
@@ -1046,8 +1046,8 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
         igraph_vector_ptr_clear(mypartition1s);
     }
 
-    IGRAPH_CHECK(igraph_marked_queue_init(&S, no_of_nodes));
-    IGRAPH_FINALLY(igraph_marked_queue_destroy, &S);
+    IGRAPH_CHECK(igraph_marked_queue_int_init(&S, no_of_nodes));
+    IGRAPH_FINALLY(igraph_marked_queue_int_destroy, &S);
     IGRAPH_CHECK(igraph_estack_init(&T, no_of_nodes, 0));
     IGRAPH_FINALLY(igraph_estack_destroy, &T);
 
@@ -1113,7 +1113,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
     }
 
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     IGRAPH_FINALLY_CLEAN(2);
 
     if (!partition1s) {
@@ -1203,7 +1203,7 @@ typedef struct igraph_i_all_st_mincuts_data_t {
 } igraph_i_all_st_mincuts_data_t;
 
 static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
-                                         const igraph_marked_queue_t *S,
+                                         const igraph_marked_queue_int_t *S,
                                          const igraph_estack_t *T,
                                          igraph_integer_t source,
                                          igraph_integer_t target,
@@ -1224,7 +1224,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     IGRAPH_UNUSED(source); IGRAPH_UNUSED(target);
 
-    if (igraph_marked_queue_size(S) == no_of_nodes) {
+    if (igraph_marked_queue_int_size(S) == no_of_nodes) {
         igraph_vector_clear(Isv);
         return IGRAPH_SUCCESS;
     }
@@ -1235,7 +1235,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&keep, 0);
     for (i = 0; i < no_of_nodes; i++) {
-        if (!igraph_marked_queue_iselement(S, i)) {
+        if (!igraph_marked_queue_int_iselement(S, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&keep, i));
         }
     }
@@ -1360,7 +1360,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_t residual;
     igraph_vector_int_t NtoL;
     igraph_integer_t newsource, newtarget;
-    igraph_marked_queue_t S;
+    igraph_marked_queue_int_t S;
     igraph_estack_t T;
     igraph_i_all_st_mincuts_data_t pivot_data;
     igraph_vector_bool_t VE1bool;
@@ -1467,8 +1467,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* -------------------------------------------------------------------- */
     /* Everything is ready, list the cuts, using the right PIVOT
        function  */
-    IGRAPH_CHECK(igraph_marked_queue_init(&S, no_of_nodes));
-    IGRAPH_FINALLY(igraph_marked_queue_destroy, &S);
+    IGRAPH_CHECK(igraph_marked_queue_int_init(&S, no_of_nodes));
+    IGRAPH_FINALLY(igraph_marked_queue_int_destroy, &S);
     IGRAPH_CHECK(igraph_estack_init(&T, no_of_nodes, 0));
     IGRAPH_FINALLY(igraph_estack_destroy, &T);
 
@@ -1558,7 +1558,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     }
 
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_vector_bool_destroy(&VE1bool);
     igraph_vector_destroy(&VE1);
     igraph_vector_int_destroy(&NtoL);
