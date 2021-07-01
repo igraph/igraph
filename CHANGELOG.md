@@ -208,7 +208,22 @@
 
  - The community parameter `igraph_community_leading_eigenvector_callback_t` is
    now an `igraph_integer_t` instead of `long int`.
-   
+
+ - `igraph_isomorphic_vf2()`, `igraph_isomorphic_function_vf2()`,
+   `igraph_isohandler_t`, `igraph_subisomorphic_vf2()`,
+   `igraph_subisomorphic_function_vf2()` and `igraph_isomorphic_bliss()`
+   now all use `igraph_vector_int_t` for their map12 and map21 parameters.
+
+ - The `igraph_vector_ptr_t` maps parameters in `igraph_subisomorphic_lad()`,
+   `igraph_get_isomorphisms_vf2()` and `igraph_get_subisomorphisms_vf2()` now
+   contain `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its map
+   parameter.
+
+ - `igraph_canonical_permutation()` now uses an `igraph_vector_int_t` for its
+   labeling parameter.
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

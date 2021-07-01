@@ -113,8 +113,8 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                                    const igraph_vector_int_t *vertex_color2,
                                    const igraph_vector_int_t *edge_color1,
                                    const igraph_vector_int_t *edge_color2,
-                                   igraph_vector_t *map12,
-                                   igraph_vector_t *map21,
+                                   igraph_vector_int_t *map12,
+                                   igraph_vector_int_t *map21,
                                    igraph_isohandler_t *isohandler_fn,
                                    igraph_isocompat_t *node_compat_fn,
                                    igraph_isocompat_t *edge_compat_fn,
@@ -122,7 +122,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph1);
     igraph_integer_t no_of_edges = igraph_ecount(graph1);
-    igraph_vector_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
+    igraph_vector_int_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
     igraph_vector_int_t in_1, in_2, out_1, out_2;
     igraph_integer_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
     igraph_vector_int_t *inneis_1, *inneis_2, *outneis_1, *outneis_2;
@@ -209,19 +209,19 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
 
     if (map12) {
         core_1 = map12;
-        IGRAPH_CHECK(igraph_vector_resize(core_1, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(core_1, no_of_nodes));
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(core_1, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(core_1, no_of_nodes);
     }
-    igraph_vector_fill(core_1, -1);
+    igraph_vector_int_fill(core_1, -1);
     if (map21) {
         core_2 = map21;
-        IGRAPH_CHECK(igraph_vector_resize(core_2, no_of_nodes));
-        igraph_vector_null(core_2);
+        IGRAPH_CHECK(igraph_vector_int_resize(core_2, no_of_nodes));
+        igraph_vector_int_null(core_2);
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(core_2, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(core_2, no_of_nodes);
     }
-    igraph_vector_fill(core_2, -1);
+    igraph_vector_int_fill(core_2, -1);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_1, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_2, no_of_nodes);
@@ -646,11 +646,11 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     igraph_vector_int_destroy(&in_1);
     IGRAPH_FINALLY_CLEAN(13);
     if (!map21) {
-        igraph_vector_destroy(core_2);
+        igraph_vector_int_destroy(core_2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (!map12) {
-        igraph_vector_destroy(core_1);
+        igraph_vector_int_destroy(core_1);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -682,8 +682,8 @@ static igraph_bool_t igraph_i_isocompat_edge_cb(
     return data->edge_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
 }
 
-static igraph_error_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
-                                              igraph_vector_t *map21,
+static igraph_error_t igraph_i_isomorphic_vf2(igraph_vector_int_t *map12,
+                                              igraph_vector_int_t *map21,
                                               void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
@@ -752,8 +752,8 @@ igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *gra
                           const igraph_vector_int_t *vertex_color2,
                           const igraph_vector_int_t *edge_color1,
                           const igraph_vector_int_t *edge_color2,
-                          igraph_bool_t *iso, igraph_vector_t *map12,
-                          igraph_vector_t *map21,
+                          igraph_bool_t *iso, igraph_vector_int_t *map12,
+                          igraph_vector_int_t *map21,
                           igraph_isocompat_t *node_compat_fn,
                           igraph_isocompat_t *edge_compat_fn,
                           void *arg) {
@@ -771,18 +771,18 @@ igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *gra
                  ncb, ecb, &data));
     if (! *iso) {
         if (map12) {
-            igraph_vector_clear(map12);
+            igraph_vector_int_clear(map12);
         }
         if (map21) {
-            igraph_vector_clear(map21);
+            igraph_vector_int_clear(map21);
         }
     }
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_count_isomorphisms_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
+        const igraph_vector_int_t *map12,
+        const igraph_vector_int_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_integer_t *count = data->arg;
@@ -856,26 +856,26 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
 static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
     igraph_integer_t i, n = igraph_vector_ptr_size(data);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *vec = VECTOR(*data)[i];
-        igraph_vector_destroy(vec);
+        igraph_vector_int_t *vec = VECTOR(*data)[i];
+        igraph_vector_int_destroy(vec);
         igraph_free(vec);
     }
 }
 
 static igraph_error_t igraph_i_get_isomorphisms_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
+        const igraph_vector_int_t *map12,
+        const igraph_vector_int_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_vector_ptr_t *ptrvector = data->arg;
-    igraph_vector_t *newvector = IGRAPH_CALLOC(1, igraph_vector_t);
+    igraph_vector_int_t *newvector = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_UNUSED(map12);
     if (!newvector) {
         IGRAPH_ERROR("", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, newvector);
-    IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
-    IGRAPH_FINALLY(igraph_vector_destroy, newvector);
+    IGRAPH_CHECK(igraph_vector_int_copy(newvector, map21));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, newvector);
     IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, newvector));
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -1012,8 +1012,8 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                                       const igraph_vector_int_t *vertex_color2,
                                       const igraph_vector_int_t *edge_color1,
                                       const igraph_vector_int_t *edge_color2,
-                                      igraph_vector_t *map12,
-                                      igraph_vector_t *map21,
+                                      igraph_vector_int_t *map12,
+                                      igraph_vector_int_t *map21,
                                       igraph_isohandler_t *isohandler_fn,
                                       igraph_isocompat_t *node_compat_fn,
                                       igraph_isocompat_t *edge_compat_fn,
@@ -1023,8 +1023,8 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
              no_of_nodes2 = igraph_vcount(graph2);
     igraph_integer_t no_of_edges1 = igraph_ecount(graph1),
              no_of_edges2 = igraph_ecount(graph2);
-    igraph_vector_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
-    igraph_vector_t in_1, in_2, out_1, out_2;
+    igraph_vector_int_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
+    igraph_vector_int_t in_1, in_2, out_1, out_2;
     igraph_integer_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
     igraph_vector_int_t *inneis_1, *inneis_2, *outneis_1, *outneis_2;
     igraph_integer_t matched_nodes = 0;
@@ -1082,22 +1082,22 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 
     if (map12) {
         core_1 = map12;
-        IGRAPH_CHECK(igraph_vector_resize(core_1, no_of_nodes1));
+        IGRAPH_CHECK(igraph_vector_int_resize(core_1, no_of_nodes1));
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(core_1, no_of_nodes1);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(core_1, no_of_nodes1);
     }
-    igraph_vector_fill(core_1, -1);
+    igraph_vector_int_fill(core_1, -1);
     if (map21) {
         core_2 = map21;
-        IGRAPH_CHECK(igraph_vector_resize(core_2, no_of_nodes2));
+        IGRAPH_CHECK(igraph_vector_int_resize(core_2, no_of_nodes2));
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(core_2, no_of_nodes2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(core_2, no_of_nodes2);
     }
-    igraph_vector_fill(core_2, -1);
-    IGRAPH_VECTOR_INIT_FINALLY(&in_1, no_of_nodes1);
-    IGRAPH_VECTOR_INIT_FINALLY(&in_2, no_of_nodes2);
-    IGRAPH_VECTOR_INIT_FINALLY(&out_1, no_of_nodes1);
-    IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes2);
+    igraph_vector_int_fill(core_2, -1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_1, no_of_nodes1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_2, no_of_nodes2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&out_1, no_of_nodes1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&out_2, no_of_nodes2);
     IGRAPH_CHECK(igraph_stack_int_init(&path, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -1467,17 +1467,17 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_lazy_adjlist_destroy(&outadj1);
     igraph_lazy_adjlist_destroy(&inadj1);
     igraph_stack_int_destroy(&path);
-    igraph_vector_destroy(&out_2);
-    igraph_vector_destroy(&out_1);
-    igraph_vector_destroy(&in_2);
-    igraph_vector_destroy(&in_1);
+    igraph_vector_int_destroy(&out_2);
+    igraph_vector_int_destroy(&out_1);
+    igraph_vector_int_destroy(&in_2);
+    igraph_vector_int_destroy(&in_1);
     IGRAPH_FINALLY_CLEAN(13);
     if (!map21) {
-        igraph_vector_destroy(core_2);
+        igraph_vector_int_destroy(core_2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (!map12) {
-        igraph_vector_destroy(core_1);
+        igraph_vector_int_destroy(core_1);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -1485,8 +1485,8 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 }
 
 static igraph_error_t igraph_i_subisomorphic_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
+        const igraph_vector_int_t *map12,
+        const igraph_vector_int_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
@@ -1543,8 +1543,8 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
                              const igraph_vector_int_t *vertex_color2,
                              const igraph_vector_int_t *edge_color1,
                              const igraph_vector_int_t *edge_color2,
-                             igraph_bool_t *iso, igraph_vector_t *map12,
-                             igraph_vector_t *map21,
+                             igraph_bool_t *iso, igraph_vector_int_t *map12,
+                             igraph_vector_int_t *map21,
                              igraph_isocompat_t *node_compat_fn,
                              igraph_isocompat_t *edge_compat_fn,
                              void *arg) {
@@ -1563,18 +1563,18 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
                  ncb, ecb, &data));
     if (! *iso) {
         if (map12) {
-            igraph_vector_clear(map12);
+            igraph_vector_int_clear(map12);
         }
         if (map21) {
-            igraph_vector_clear(map21);
+            igraph_vector_int_clear(map21);
         }
     }
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_count_subisomorphisms_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
+        const igraph_vector_int_t *map12,
+        const igraph_vector_int_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_integer_t *count = data->arg;
@@ -1651,26 +1651,26 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
 static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
     igraph_integer_t i, n = igraph_vector_ptr_size(data);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *vec = VECTOR(*data)[i];
-        igraph_vector_destroy(vec);
+        igraph_vector_int_t *vec = VECTOR(*data)[i];
+        igraph_vector_int_destroy(vec);
         igraph_free(vec);
     }
 }
 
 static igraph_error_t igraph_i_get_subisomorphisms_vf2(
-        const igraph_vector_t *map12,
-        const igraph_vector_t *map21,
+        const igraph_vector_int_t *map12,
+        const igraph_vector_int_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_vector_ptr_t *vector = data->arg;
-    igraph_vector_t *newvector = IGRAPH_CALLOC(1, igraph_vector_t);
+    igraph_vector_int_t *newvector = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_UNUSED(map12);
     if (!newvector) {
         IGRAPH_ERROR("", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, newvector);
-    IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
-    IGRAPH_FINALLY(igraph_vector_destroy, newvector);
+    IGRAPH_CHECK(igraph_vector_int_copy(newvector, map21));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, newvector);
     IGRAPH_CHECK(igraph_vector_ptr_push_back(vector, newvector));
     IGRAPH_FINALLY_CLEAN(2);
 

@@ -1361,7 +1361,7 @@ static igraph_error_t igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, 
 static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstSol, bool induced,
                        Tdomain* D, Tgraph* Gp, Tgraph* Gt,
                        igraph_integer_t *invalid, igraph_bool_t *iso,
-                       igraph_vector_t *map, igraph_vector_ptr_t *maps,
+                       igraph_vector_int_t *map, igraph_vector_ptr_t *maps,
                        igraph_integer_t *nbNodes, igraph_integer_t *nbFail, igraph_integer_t *nbSol,
                        clock_t *begin, igraph_vector_ptr_t *alloc_history) {
     /* if firstSol then search for the first solution; otherwise search
@@ -1374,7 +1374,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
     igraph_integer_t* nbVal;
     igraph_integer_t* globalMatching;
     clock_t end = clock();
-    igraph_vector_t *vec;
+    igraph_vector_int_t *vec;
     igraph_integer_t* val;
     bool result;
 
@@ -1416,20 +1416,20 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
             *iso = 1;
         }
         (*nbSol)++;
-        if (map && igraph_vector_size(map) == 0) {
-            IGRAPH_CHECK(igraph_vector_resize(map, Gp->nbVertices));
+        if (map && igraph_vector_int_size(map) == 0) {
+            IGRAPH_CHECK(igraph_vector_int_resize(map, Gp->nbVertices));
             for (u = 0; u < Gp->nbVertices; u++) {
                 VECTOR(*map)[u] = VECTOR(D->val)[ VECTOR(D->firstVal)[u] ];
             }
         }
         if (maps) {
-            vec = IGRAPH_CALLOC(1, igraph_vector_t);
+            vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (!vec) {
                 IGRAPH_ERROR("LAD failed", IGRAPH_ENOMEM);
             }
             IGRAPH_FINALLY(igraph_free, vec);
-            IGRAPH_CHECK(igraph_vector_init(vec, Gp->nbVertices));
-            IGRAPH_FINALLY(igraph_vector_destroy, vec);
+            IGRAPH_CHECK(igraph_vector_int_init(vec, Gp->nbVertices));
+            IGRAPH_FINALLY(igraph_vector_int_destroy, vec);
             for (u = 0; u < Gp->nbVertices; u++) {
                 VECTOR(*vec)[u] = VECTOR(D->val)[ VECTOR(D->firstVal)[u] ];
             }
@@ -1555,7 +1555,7 @@ cleanup:
 
 igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
                              const igraph_vector_ptr_t *domains,
-                             igraph_bool_t *iso, igraph_vector_t *map,
+                             igraph_bool_t *iso, igraph_vector_int_t *map,
                              igraph_vector_ptr_t *maps,
                              igraph_bool_t induced, igraph_integer_t time_limit) {
 
@@ -1594,7 +1594,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
         *iso = (igraph_vcount(pattern) == 0);
     }
     if (map)  {
-        igraph_vector_clear(map);
+        igraph_vector_int_clear(map);
     }
     if (maps) {
         igraph_vector_ptr_clear(maps);

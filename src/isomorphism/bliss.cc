@@ -211,11 +211,11 @@ public:
 
     void operator ()(unsigned int n, const unsigned int *aut) {
         int err;
-        igraph_vector_t *newvector = IGRAPH_CALLOC(1, igraph_vector_t);
+        igraph_vector_int_t *newvector = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! newvector) {
             throw bad_alloc();
         }
-        err = igraph_vector_init(newvector, n);
+        err = igraph_vector_int_init(newvector, n);
         if (err) {
             throw bad_alloc();
         }
@@ -254,7 +254,7 @@ public:
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
 igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
-                                 igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+                                 igraph_vector_int_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);
@@ -270,7 +270,7 @@ igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_
             return IGRAPH_INTERRUPTED;
         }
 
-        IGRAPH_CHECK(igraph_vector_resize(labeling, N));
+        IGRAPH_CHECK(igraph_vector_int_resize(labeling, N));
         for (unsigned int i = 0; i < N; i++) {
             VECTOR(*labeling)[i] = cl[i];
         }
@@ -443,14 +443,14 @@ igraph_error_t igraph_automorphism_group(
  */
 igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
                             const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
-                            igraph_bool_t *iso, igraph_vector_t *map12,
-                            igraph_vector_t *map21, igraph_bliss_sh_t sh,
+                            igraph_bool_t *iso, igraph_vector_int_t *map12,
+                            igraph_vector_int_t *map21, igraph_bliss_sh_t sh,
                             igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph1);
     igraph_integer_t no_of_edges = igraph_ecount(graph1);
-    igraph_vector_t perm1, perm2;
-    igraph_vector_t vmap12, *mymap12 = &vmap12;
+    igraph_vector_int_t perm1, perm2;
+    igraph_vector_int_t vmap12, *mymap12 = &vmap12;
     igraph_vector_t from, to, index;
     igraph_vector_t from2, to2, index2;
     igraph_bool_t directed;
@@ -481,10 +481,10 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     if (no_of_nodes != igraph_vcount(graph2) ||
         no_of_edges != igraph_ecount(graph2)) {
         if (map12) {
-            igraph_vector_clear(map12);
+            igraph_vector_int_clear(map12);
         }
         if (map21) {
-            igraph_vector_clear(map21);
+            igraph_vector_int_clear(map21);
         }
         return IGRAPH_SUCCESS;
     }
@@ -492,16 +492,16 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     if (map12) {
         mymap12 = map12;
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(mymap12, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(mymap12, 0);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&perm1, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&perm2, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&perm1, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&perm2, no_of_nodes);
 
     IGRAPH_CHECK(igraph_canonical_permutation(graph1, colors1, &perm1, sh, info1));
     IGRAPH_CHECK(igraph_canonical_permutation(graph2, colors2, &perm2, sh, info2));
 
-    IGRAPH_CHECK(igraph_vector_resize(mymap12, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_resize(mymap12, no_of_nodes));
 
     /* The inverse of perm2 is produced in mymap12 */
     for (i = 0; i < no_of_nodes; i++) {
@@ -512,10 +512,10 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         VECTOR(perm2)[i] = VECTOR(*mymap12)[ (igraph_integer_t) VECTOR(perm1)[i] ];
     }
     /* Copy it to mymap12 */
-    igraph_vector_update(mymap12, &perm2);
+    igraph_vector_int_update(mymap12, &perm2);
 
-    igraph_vector_destroy(&perm1);
-    igraph_vector_destroy(&perm2);
+    igraph_vector_int_destroy(&perm1);
+    igraph_vector_int_destroy(&perm2);
     IGRAPH_FINALLY_CLEAN(2);
 
     /* Check isomorphism, we apply the permutation in mymap12 to graph1
@@ -585,22 +585,22 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     if (*iso) {
         /* The inverse of mymap12 */
         if (map21) {
-            IGRAPH_CHECK(igraph_vector_resize(map21, no_of_nodes));
+            IGRAPH_CHECK(igraph_vector_int_resize(map21, no_of_nodes));
             for (i = 0; i < no_of_nodes; i++) {
                 VECTOR(*map21)[ (igraph_integer_t) VECTOR(*mymap12)[i] ] = i;
             }
         }
     } else {
         if (map12) {
-            igraph_vector_clear(map12);
+            igraph_vector_int_clear(map12);
         }
         if (map21) {
-            igraph_vector_clear(map21);
+            igraph_vector_int_clear(map21);
         }
     }
 
     if (!map12) {
-        igraph_vector_destroy(mymap12);
+        igraph_vector_int_destroy(mymap12);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

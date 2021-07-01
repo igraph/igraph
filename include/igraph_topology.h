@@ -60,7 +60,7 @@ IGRAPH_EXPORT igraph_error_t igraph_subisomorphic(const igraph_t *graph1, const 
 /* LAD */
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
                                            const igraph_vector_ptr_t *domains,
-                                           igraph_bool_t *iso, igraph_vector_t *map,
+                                           igraph_bool_t *iso, igraph_vector_int_t *map,
                                            igraph_vector_ptr_t *maps,
                                            igraph_bool_t induced, igraph_integer_t time_limit);
 
@@ -83,8 +83,8 @@ IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, c
  */
 
 
-typedef igraph_error_t igraph_isohandler_t(const igraph_vector_t *map12,
-        const igraph_vector_t *map21, void *arg);
+typedef igraph_error_t igraph_isohandler_t(const igraph_vector_int_t *map12,
+        const igraph_vector_int_t *map21, void *arg);
 
 /**
  * \typedef igraph_isocompat_t
@@ -122,8 +122,8 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const
                                         const igraph_vector_int_t *edge_color1,
                                         const igraph_vector_int_t *edge_color2,
                                         igraph_bool_t *iso,
-                                        igraph_vector_t *map12,
-                                        igraph_vector_t *map21,
+                                        igraph_vector_int_t *map12,
+                                        igraph_vector_int_t *map21,
                                         igraph_isocompat_t *node_compat_fn,
                                         igraph_isocompat_t *edge_compat_fn,
                                         void *arg);
@@ -132,7 +132,8 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *grap
                                                  const igraph_vector_int_t *vertex_color2,
                                                  const igraph_vector_int_t *edge_color1,
                                                  const igraph_vector_int_t *edge_color2,
-                                                 igraph_vector_t *map12, igraph_vector_t *map21,
+                                                 igraph_vector_int_t *map12,
+                                                 igraph_vector_int_t *map21,
                                                  igraph_isohandler_t *isohandler_fn,
                                                  igraph_isocompat_t *node_compat_fn,
                                                  igraph_isocompat_t *edge_compat_fn,
@@ -163,8 +164,8 @@ IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, co
                                            const igraph_vector_int_t *edge_color1,
                                            const igraph_vector_int_t *edge_color2,
                                            igraph_bool_t *iso,
-                                           igraph_vector_t *map12,
-                                           igraph_vector_t *map21,
+                                           igraph_vector_int_t *map12,
+                                           igraph_vector_int_t *map21,
                                            igraph_isocompat_t *node_compat_fn,
                                            igraph_isocompat_t *edge_compat_fn,
                                            void *arg);
@@ -174,8 +175,8 @@ IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *g
                                                     const igraph_vector_int_t *vertex_color2,
                                                     const igraph_vector_int_t *edge_color1,
                                                     const igraph_vector_int_t *edge_color2,
-                                                    igraph_vector_t *map12,
-                                                    igraph_vector_t *map21,
+                                                    igraph_vector_int_t *map12,
+                                                    igraph_vector_int_t *map21,
                                                     igraph_isohandler_t *isohandler_fn,
                                                     igraph_isocompat_t *node_compat_fn,
                                                     igraph_isocompat_t *edge_compat_fn,
@@ -256,12 +257,12 @@ typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
                IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM
              } igraph_bliss_sh_t;
 
-IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_t *labeling,
+IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_t *labeling,
                                                igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 IGRAPH_EXPORT igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
                                           const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
-                                          igraph_bool_t *iso, igraph_vector_t *map12,
-                                          igraph_vector_t *map21,
+                                          igraph_bool_t *iso, igraph_vector_int_t *map12,
+                                          igraph_vector_int_t *map21,
                                           igraph_bliss_sh_t sh,
                                           igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
 
