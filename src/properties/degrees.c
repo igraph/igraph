@@ -389,8 +389,8 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     if (!weights) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-        for (igraph_integer_t i; i < no_of_nodes; i++) {
-            VECTOR(*res)[i] = (igraph_real_t) VECTOR(degrees)[i];
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            VECTOR(*res)[i] = VECTOR(degrees)[i];
         }
         igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);

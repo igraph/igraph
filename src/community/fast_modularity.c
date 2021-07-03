@@ -633,8 +633,8 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     igraph_eit_t edgeit;
     igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
     igraph_i_fastgreedy_community_list communities;
-    igraph_vector_int_t a;
-    igraph_vector_t a_real;
+    igraph_vector_t a;
+    igraph_vector_int_t degrees;
     igraph_real_t q, *dq, bestq, weight_sum, loop_weight_sum;
     igraph_bool_t has_multiple;
     igraph_matrix_t merges_local;
@@ -651,7 +651,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
 
     total_joins = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
 
-    if (weights != 0) {
+    if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Length of weight vector must agree with number of edges.", IGRAPH_EINVAL);
         }
@@ -692,7 +692,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     }
 
     /* Create degree vector */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&a, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&a, no_of_nodes);
     if (weights) {
         debug("Calculating weighted degrees\n");
         for (i = 0; i < no_of_edges; i++) {
@@ -701,31 +701,37 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         }
     } else {
         debug("Calculating degrees\n");
-        IGRAPH_CHECK(igraph_degree(graph, &a, igraph_vss_all(), IGRAPH_ALL, 1));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, 1));
+        for (i = 0; i < no_of_nodes; i++) {
+            VECTOR(a)[i] = VECTOR(degrees)[i];
+        }
+        igraph_vector_int_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* Create list of communities */
     debug("Creating community list\n");
     communities.n = no_of_nodes;
     communities.no_of_communities = no_of_nodes;
-    communities.e = (igraph_i_fastgreedy_community*)calloc((size_t) no_of_nodes, sizeof(igraph_i_fastgreedy_community));
+    communities.e = IGRAPH_CALLOC(no_of_nodes, igraph_i_fastgreedy_community);
     if (communities.e == 0) {
         IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, communities.e);
-    communities.heap = (igraph_i_fastgreedy_community**)calloc((size_t) no_of_nodes, sizeof(igraph_i_fastgreedy_community*));
+    communities.heap = IGRAPH_CALLOC(no_of_nodes, igraph_i_fastgreedy_community*);
     if (communities.heap == 0) {
         IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, communities.heap);
-    communities.heapindex = (igraph_integer_t*)calloc((size_t)no_of_nodes, sizeof(igraph_integer_t));
+    communities.heapindex = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (communities.heapindex == 0) {
         IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_FINALLY(igraph_i_fastgreedy_community_list_destroy, &communities);
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_vector_ptr_init(&communities.e[i].neis, 0);
+        IGRAPH_CHECK(igraph_vector_ptr_init(&communities.e[i].neis, 0));
         communities.e[i].id = i;
         communities.e[i].size = 1;
     }
@@ -795,7 +801,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
          * the heap (to avoid maxdq == 0) */
         if (communities.e[i].maxdq != 0) {
             communities.heap[j] = &communities.e[i];
-            communities.heapindex[i] = (igraph_integer_t) j;
+            communities.heapindex[i] = j;
             j++;
         } else {
             communities.heapindex[i] = -1;
@@ -808,17 +814,11 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     if (q == 0) {
         /* All the weights are zero */
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&a_real, igraph_vector_int_size(&a));
-        for (igraph_integer_t i; i < igraph_vector_int_size(&a); i++) {
-            VECTOR(a_real)[i] = VECTOR(a)[i];
-        }
-        igraph_vector_scale(&a_real, 1.0 / q);
+        igraph_vector_scale(&a, 1.0 / q);
         q = loop_weight_sum / q;
         for (i = 0; i < no_of_nodes; i++) {
-            q -= VECTOR(a_real)[i] * VECTOR(a_real)[i];
+            q -= VECTOR(a)[i] * VECTOR(a)[i];
         }
-        igraph_vector_destroy(&a_real);
-        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* Initialize "best modularity" value and best merge counter */
@@ -1063,7 +1063,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_FREE(pairs);
     IGRAPH_FREE(dq);
     igraph_i_fastgreedy_community_list_destroy(&communities);
-    igraph_vector_int_destroy(&a);
+    igraph_vector_destroy(&a);
     IGRAPH_FINALLY_CLEAN(4);
 
     if (membership) {
