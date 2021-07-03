@@ -334,7 +334,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
                 VECTOR(*knnk)[i] = mynan;
             }
         }
-        igraph_vector_destroy(&deghist);
+        igraph_vector_int_destroy(&deghist);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
