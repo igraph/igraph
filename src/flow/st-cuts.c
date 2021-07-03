@@ -1164,8 +1164,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
     for (i = 0; i < no_of_nodes; i++) {
         if (!ACTIVE(i)) {
             igraph_integer_t j, n;
-            IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, i,
-                                          IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, i, IGRAPH_OUT));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];

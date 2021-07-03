@@ -385,14 +385,13 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
         for (i = 0; i < nov; i++) {
-            igraph_degree(graph, &deg, igraph_vss_1((igraph_integer_t) i),
-                          IGRAPH_ALL, IGRAPH_LOOPS);
+            igraph_degree(graph, &deg, igraph_vss_1(i), IGRAPH_ALL, IGRAPH_LOOPS);
             if (VECTOR(deg)[0] == 0) {
                 if (names == 0) {
                     ret = fprintf(outstream, "# %" IGRAPH_PRId "\n", i);
                 } else {
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
-                                 igraph_vss_1((igraph_integer_t) i), &nvec));
+                                 igraph_vss_1(i), &nvec));
                     igraph_strvector_get(&nvec, 0, &str);
                     ret = fprintf(outstream, "# %s\n", str);
                 }

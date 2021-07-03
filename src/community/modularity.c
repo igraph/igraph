@@ -332,7 +332,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                                        IGRAPH_LOOPS));
             IGRAPH_CHECK(igraph_degree(graph, &out_deg_int, igraph_vss_all(), IGRAPH_OUT,
                                        IGRAPH_LOOPS));
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (i = 0; i < no_of_nodes; i++) {
                 VECTOR(in_deg)[i] = VECTOR(in_deg_int)[i];
                 VECTOR(out_deg)[i] = VECTOR(out_deg_int)[i];
             }
@@ -363,7 +363,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
             IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_int, no_of_nodes);
             IGRAPH_CHECK(igraph_degree(graph, &deg_int, igraph_vss_all(), IGRAPH_ALL,
                                        IGRAPH_LOOPS));
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (i = 0; i < no_of_nodes; i++) {
                 VECTOR(deg)[i] = VECTOR(deg_int)[i];
             }
             igraph_vector_int_destroy(&deg_int);
