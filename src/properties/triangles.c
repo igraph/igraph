@@ -136,7 +136,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     igraph_integer_t maxdegree = 0;
     igraph_integer_t i, j, k, nn;
     igraph_lazy_adjlist_t adjlist;
-    igraph_vector_int_t degree; 
+    igraph_vector_int_t degree;
     igraph_vector_t indexv, avids, rank, triangles;
     igraph_vector_int_t order;
     igraph_integer_t *neis;
@@ -842,7 +842,7 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
     igraph_vector_int_destroy(&degree);
     igraph_vector_destroy(&strength);
     igraph_vector_int_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
