@@ -30,11 +30,15 @@ igraph_bool_t check_laplacian(igraph_t* graph, const igraph_matrix_t* matrix, co
 
     igraph_vector_init(&vec, 0);
     igraph_vector_init(&res, igraph_vcount(graph));
+    igraph_vector_int_init(&degrees, igraph_vcount(graph));
 
     if (w) {
         igraph_strength(graph, &vec, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, w);
     } else {
         igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
+        for (i = 0; i < igraph_vcount(graph); i++) {
+            VECTOR(vec)[i] = VECTOR(degrees)[i];
+        }
     }
 
     for (i = 0; i < igraph_vcount(graph); i++) {
