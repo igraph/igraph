@@ -24,6 +24,7 @@
 #include "igraph_centrality.h"
 
 #include "igraph_interface.h"
+#include "igraph_structural.h"
 
 /**
  * \function igraph_constraint
@@ -82,11 +83,10 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     igraph_vit_t vit;
     igraph_integer_t nodes_to_calc;
     igraph_integer_t a, b, c, i, j, q, vsize, vsize2;
-    igraph_integer_t edge, from, to, edge2;
+    igraph_integer_t edge, edge2;
 
     igraph_vector_t contrib;
     igraph_vector_t degree;
-    igraph_vector_int_t degree_int;
     igraph_vector_t ineis_in, ineis_out, jneis_in, jneis_out;
 
     if (weights != 0 && igraph_vector_size(weights) != no_of_edges) {
@@ -104,24 +104,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
-    if (weights == 0) {
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree_int, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &degree_int, igraph_vss_all(),
-                                   IGRAPH_ALL, IGRAPH_NO_LOOPS));
-        for (a = 0; a < no_of_nodes; a++) {
-            VECTOR(degree)[a] = VECTOR(degree_int)[a];
-        }
-        igraph_vector_int_destroy(&degree_int);
-        IGRAPH_FINALLY_CLEAN(1);
-    } else {
-        for (a = 0; a < no_of_edges; a++) {
-            igraph_edge(graph, a, &from, &to);
-            if (from != to) {
-                VECTOR(degree)[from] += VECTOR(*weights)[a];
-                VECTOR(degree)[to  ] += VECTOR(*weights)[a];
-            }
-        }
-    }
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS, 0));
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     igraph_vector_null(res);

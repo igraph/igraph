@@ -149,7 +149,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
     /* note: we cannot do this in the previous loop because at that time we are
      * not sure yet if a path exists */
     for (i = 0; i < n; i++) {
-        if ((*has_cycle && ((igraph_integer_t) VECTOR(degree)[i]) > 0) || (!*has_cycle && ((igraph_integer_t) VECTOR(degree)[i]) %2 == 1)) {
+        if ((*has_cycle && VECTOR(degree)[i] > 0) || (!*has_cycle && VECTOR(degree)[i] %2 == 1)) {
             *start_of_path = i;
             break;
         }

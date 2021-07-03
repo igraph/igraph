@@ -77,7 +77,7 @@ igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
         igraph_degree(graph, &degrees, igraph_vss_all(), mode, /*loops=*/ 1);
         igraph_vector_resize(res, igraph_vector_int_size(&degrees));
         for (igraph_integer_t i = 0; i < igraph_vcount(graph); i++) {
-            VECTOR(*res)[i] = (igraph_real_t) VECTOR(degrees)[i];
+            VECTOR(*res)[i] = VECTOR(degrees)[i];
         }
         igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);
