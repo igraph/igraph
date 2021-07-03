@@ -85,7 +85,8 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     igraph_integer_t edge, from, to, edge2;
 
     igraph_vector_t contrib;
-    igraph_vector_int_t degree;
+    igraph_vector_t degree;
+    igraph_vector_int_t degree_int;
     igraph_vector_t ineis_in, ineis_out, jneis_in, jneis_out;
 
     if (weights != 0 && igraph_vector_size(weights) != no_of_edges) {
@@ -93,7 +94,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&contrib, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&ineis_in, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&ineis_out, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&jneis_in, 0);
@@ -104,8 +105,14 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
     if (weights == 0) {
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree_int, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &degree_int, igraph_vss_all(),
                                    IGRAPH_ALL, IGRAPH_NO_LOOPS));
+        for (a = 0; a < no_of_nodes; a++) {
+            VECTOR(degree)[a] = VECTOR(degree_int)[a];
+        }
+        igraph_vector_int_destroy(&degree_int);
+        IGRAPH_FINALLY_CLEAN(1);
     } else {
         for (a = 0; a < no_of_edges; a++) {
             igraph_edge(graph, a, &from, &to);
@@ -298,7 +305,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_destroy(&jneis_in);
     igraph_vector_destroy(&ineis_out);
     igraph_vector_destroy(&ineis_in);
-    igraph_vector_int_destroy(&degree);
+    igraph_vector_destroy(&degree);
     igraph_vector_destroy(&contrib);
     IGRAPH_FINALLY_CLEAN(7);
 
