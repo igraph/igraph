@@ -76,7 +76,8 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     float temp_global;
     igraph_integer_t perm_pointer = 0;
     float barycenter_x = 0, barycenter_y = 0;
-    igraph_vector_int_t phi;
+    igraph_vector_t phi;
+    igraph_vector_int_t degrees;
     igraph_vector_t neis;
     const float elen_des2 = 128 * 128;
     const float gamma = 1 / 16.0f;
@@ -125,13 +126,20 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY(igraph_vector_float_destroy, &skew_gauge);
     IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&phi, no_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 10);
 
     RNG_BEGIN();
 
     /* Initialization */
-    igraph_degree(graph, &phi, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_nodes);
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
+    for (i = 0; i < no_nodes; i++) {
+        VECTOR(phi)[i] = VECTOR(degrees)[i];
+    }
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(1);
+
     if (!use_seed) {
         const igraph_real_t width_half = no_nodes * 100, height_half = width_half;
         IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
@@ -238,7 +246,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     RNG_END();
 
     igraph_vector_destroy(&neis);
-    igraph_vector_int_destroy(&phi);
+    igraph_vector_destroy(&phi);
     igraph_vector_int_destroy(&perm);
     igraph_vector_float_destroy(&skew_gauge);
     igraph_vector_float_destroy(&temp);
