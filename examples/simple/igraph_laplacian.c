@@ -25,21 +25,12 @@
 
 igraph_bool_t check_laplacian(igraph_t* graph, const igraph_matrix_t* matrix, const igraph_vector_t* w) {
     igraph_vector_t vec, res;
-    igraph_vector_int_t degrees;
     igraph_integer_t i, j;
 
     igraph_vector_init(&vec, 0);
     igraph_vector_init(&res, igraph_vcount(graph));
-    igraph_vector_int_init(&degrees, igraph_vcount(graph));
 
-    if (w) {
-        igraph_strength(graph, &vec, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, w);
-    } else {
-        igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
-        for (i = 0; i < igraph_vcount(graph); i++) {
-            VECTOR(vec)[i] = VECTOR(degrees)[i];
-        }
-    }
+    igraph_strength(graph, &vec, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, w);
 
     for (i = 0; i < igraph_vcount(graph); i++) {
         VECTOR(vec)[i] = sqrt(VECTOR(vec)[i]);
@@ -58,7 +49,6 @@ igraph_bool_t check_laplacian(igraph_t* graph, const igraph_matrix_t* matrix, co
     }
 
     igraph_vector_destroy(&vec);
-    igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&res);
 
     return 1;
