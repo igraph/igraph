@@ -48,16 +48,16 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
 
     /* find maximum degree and a corresponding vertex */
     {
-        igraph_vector_t degree;
+        igraph_vector_int_t degree;
 
-        IGRAPH_CHECK(igraph_vector_init(&degree, 0));
-        IGRAPH_FINALLY(igraph_vector_destroy, &degree);
+        IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 0));
 
-        vertex = igraph_vector_which_max(&degree);
+        vertex = igraph_vector_int_which_max(&degree);
         maxdeg = VECTOR(degree)[vertex];
 
-        igraph_vector_destroy(&degree);
+        igraph_vector_int_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

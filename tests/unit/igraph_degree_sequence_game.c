@@ -20,10 +20,10 @@
 
 #include "test_utilities.inc"
 
-igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_vector_t *observed) {
+igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_vector_int_t *observed) {
     igraph_integer_t i, n = igraph_vector_int_size(expected);
 
-    if (igraph_vector_size(observed) != n) {
+    if (igraph_vector_int_size(observed) != n) {
         return 0;
     }
 
@@ -39,7 +39,7 @@ igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_
 int main() {
     igraph_t g;
     igraph_vector_int_t outdeg, indeg, empty;
-    igraph_vector_t degrees;
+    igraph_vector_int_t degrees;
     igraph_bool_t is_simple, is_connected;
 
     igraph_integer_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
@@ -56,7 +56,7 @@ int main() {
 
     /* This vector is used to check that the degrees of the result
      * match the requested degrees. */
-    igraph_vector_init(&degrees, 0);
+    igraph_vector_int_init(&degrees, 0);
 
     /* Configuration model, undirected non-simple graphs */
 
@@ -209,7 +209,7 @@ int main() {
     /* This degree sequence contains a zero degree, so it cannot be realized by a connected graph. */
     CHECK_ERROR(igraph_degree_sequence_game(&g, &indeg, NULL, IGRAPH_DEGSEQ_VL), IGRAPH_EINVAL);
 
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&empty);
 
     VERIFY_FINALLY_STACK();

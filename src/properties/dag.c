@@ -62,7 +62,8 @@
 igraph_error_t igraph_topological_sorting(
         const igraph_t* graph, igraph_vector_int_t *res, igraph_neimode_t mode) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t degrees, neis;
+    igraph_vector_int_t degrees;
+    igraph_vector_t neis;
     igraph_dqueue_int_t sources;
     igraph_neimode_t deg_mode;
     igraph_integer_t node, i, j;
@@ -77,7 +78,7 @@ igraph_error_t igraph_topological_sorting(
         IGRAPH_ERROR("Invalid mode", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&sources, 0));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &sources);
@@ -114,7 +115,7 @@ igraph_error_t igraph_topological_sorting(
         IGRAPH_ERROR("The graph has cycles; topological sorting is only possible in acyclic graphs", IGRAPH_EINVAL);
     }
 
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&neis);
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
@@ -142,7 +143,8 @@ igraph_error_t igraph_topological_sorting(
  */
 igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t degrees, neis;
+    igraph_vector_int_t degrees;
+    igraph_vector_t neis;
     igraph_dqueue_int_t sources;
     igraph_integer_t i, j, nei, vertices_left;
 
@@ -151,7 +153,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&sources, 0));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &sources);
@@ -192,7 +194,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         IGRAPH_WARNING("vertices_left < 0 in igraph_is_dag, possible bug");
     }
 
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&neis);
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
@@ -207,7 +209,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *closure) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t deg;
+    igraph_vector_int_t deg;
     igraph_vector_t new_edges;
     igraph_vector_t ancestors;
     igraph_integer_t root;
@@ -221,7 +223,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&new_edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&ancestors, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&neighbors, 0);
     IGRAPH_CHECK(igraph_stack_int_init(&path, 0));
@@ -281,7 +283,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
     igraph_stack_int_destroy(&path);
     igraph_vector_destroy(&neighbors);
     igraph_vector_destroy(&ancestors);
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(5);
 
     IGRAPH_CHECK(igraph_create(closure, &new_edges, no_of_nodes,

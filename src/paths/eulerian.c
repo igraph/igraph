@@ -42,10 +42,10 @@ has_cycle is set to 1 if a cycle exists, 0 otherwise
 */
 static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_integer_t odd;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_vector_int_t csize;
     /* boolean vector to mark singletons: */
-    igraph_vector_t nonsingleton;
+    igraph_vector_int_t nonsingleton;
     igraph_integer_t i, n, vsize;
     igraph_integer_t cluster_count;
     /* number of self-looping singletons: */
@@ -89,7 +89,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
 
     /* the graph is connected except for singletons */
     /* find singletons (including those with self-loops) */
-    IGRAPH_VECTOR_INIT_FINALLY(&nonsingleton, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nonsingleton, 0);
     IGRAPH_CHECK(igraph_degree(graph, &nonsingleton, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
     /* check the degrees for odd/even:
@@ -97,7 +97,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
      * - > 2 odd means no path
      * plus there are a few corner cases with singletons
      */
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
     odd = 0;
     es = 0;
@@ -122,15 +122,15 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
              * 1+ edges in the non-singleton part of the graph. */
             *has_path = 0;
             *has_cycle = 0;
-            igraph_vector_destroy(&nonsingleton);
-            igraph_vector_destroy(&degree);
+            igraph_vector_int_destroy(&nonsingleton);
+            igraph_vector_int_destroy(&degree);
             IGRAPH_FINALLY_CLEAN(2);
 
             return IGRAPH_SUCCESS;
         }
     }
 
-    igraph_vector_destroy(&nonsingleton);
+    igraph_vector_int_destroy(&nonsingleton);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* this is the usual algorithm on the connected part of the graph */
@@ -155,7 +155,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
         }
     }
 
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -166,10 +166,10 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
     igraph_integer_t incoming_excess, outgoing_excess, n;
     igraph_integer_t i, vsize;
     igraph_integer_t cluster_count;
-    igraph_vector_t out_degree, in_degree;
+    igraph_vector_int_t out_degree, in_degree;
     igraph_vector_int_t csize;
     /* boolean vector to mark singletons: */
-    igraph_vector_t nonsingleton;
+    igraph_vector_int_t nonsingleton;
     /* number of self-looping singletons: */
     igraph_integer_t es;
     /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
@@ -215,16 +215,16 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
 
     /* the graph is weakly connected except for singletons */
     /* find the singletons (including those with self-loops) */
-    IGRAPH_VECTOR_INIT_FINALLY(&nonsingleton, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nonsingleton, 0);
     IGRAPH_CHECK(igraph_degree(graph, &nonsingleton, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
 
     /* checking if no. of incoming edges == outgoing edges
      * plus there are a few corner cases with singletons */
-    IGRAPH_VECTOR_INIT_FINALLY(&out_degree, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &out_degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
 
-    IGRAPH_VECTOR_INIT_FINALLY(&in_degree, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &in_degree, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
     es = 0;
     ens = 0;
@@ -251,9 +251,9 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
              * 1+ edges in the non-singleton part of the graph. */
             *has_path = 0;
             *has_cycle = 0;
-            igraph_vector_destroy(&nonsingleton);
-            igraph_vector_destroy(&in_degree);
-            igraph_vector_destroy(&out_degree);
+            igraph_vector_int_destroy(&nonsingleton);
+            igraph_vector_int_destroy(&in_degree);
+            igraph_vector_int_destroy(&out_degree);
             IGRAPH_FINALLY_CLEAN(3);
 
             return IGRAPH_SUCCESS;
@@ -286,9 +286,9 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
         if (incoming_excess > 1 || outgoing_excess > 1) {
             *has_path = 0;
             *has_cycle = 0;
-            igraph_vector_destroy(&nonsingleton);
-            igraph_vector_destroy(&in_degree);
-            igraph_vector_destroy(&out_degree);
+            igraph_vector_int_destroy(&nonsingleton);
+            igraph_vector_int_destroy(&in_degree);
+            igraph_vector_int_destroy(&out_degree);
             IGRAPH_FINALLY_CLEAN(3);
 
             return IGRAPH_SUCCESS;
@@ -300,9 +300,9 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
     *has_cycle = (incoming_excess == 0) && (outgoing_excess == 0);
     /* either way, the start was set already */
 
-    igraph_vector_destroy(&nonsingleton);
-    igraph_vector_destroy(&in_degree);
-    igraph_vector_destroy(&out_degree);
+    igraph_vector_int_destroy(&nonsingleton);
+    igraph_vector_int_destroy(&in_degree);
+    igraph_vector_int_destroy(&out_degree);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -346,7 +346,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
     igraph_inclist_t il;
     igraph_stack_int_t path, tracker, edge_tracker, edge_path;
     igraph_vector_bool_t visited_list;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
 
     n = igraph_vcount(graph);
     m = igraph_ecount(graph);
@@ -363,7 +363,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
     IGRAPH_CHECK(igraph_stack_int_init(&path, n));
@@ -446,7 +446,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
     igraph_stack_int_destroy(&edge_tracker);
     igraph_vector_bool_destroy(&visited_list);
     igraph_inclist_destroy(&il);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
@@ -459,7 +459,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
     igraph_inclist_t il;
     igraph_stack_int_t path, tracker, edge_tracker, edge_path;
     igraph_vector_bool_t visited_list;
-    igraph_vector_t remaining_out_edges;
+    igraph_vector_int_t remaining_out_edges;
 
     n = igraph_vcount(graph);
     m = igraph_ecount(graph);
@@ -495,7 +495,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&remaining_out_edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&remaining_out_edges, 0);
     IGRAPH_CHECK(igraph_degree(graph, &remaining_out_edges, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
 
     curr = start_of_path;
@@ -558,7 +558,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
     igraph_stack_int_destroy(&edge_tracker);
     igraph_vector_bool_destroy(&visited_list);
     igraph_inclist_destroy(&il);
-    igraph_vector_destroy(&remaining_out_edges);
+    igraph_vector_int_destroy(&remaining_out_edges);
     IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;

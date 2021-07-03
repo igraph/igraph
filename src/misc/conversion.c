@@ -907,7 +907,8 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
        sequence. If the removal of u turns the neighbor into a leaf which is < u,
        we repeat the procedure for the new leaf and so on. */
     igraph_integer_t u;
-    igraph_vector_t degrees, neighbors;
+    igraph_vector_int_t degrees;
+    igraph_vector_t neighbors;
     igraph_integer_t prufer_index = 0;
     igraph_integer_t n = igraph_vcount(graph);
     igraph_bool_t is_tree = 0;
@@ -923,7 +924,7 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(prufer, n - 2));
-    IGRAPH_VECTOR_INIT_FINALLY(&degrees, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, n);
     IGRAPH_VECTOR_INIT_FINALLY(&neighbors, 1);
 
     IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
@@ -964,7 +965,7 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
         }
     }
 
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&neighbors);
     IGRAPH_FINALLY_CLEAN(2);
 

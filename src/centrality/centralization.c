@@ -132,6 +132,7 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
                                  igraph_bool_t normalized) {
 
     igraph_vector_t myscores;
+    igraph_vector_int_t degrees;
     igraph_vector_t *scores = res;
     igraph_real_t *tmax = theoretical_max, mytmax;
 
@@ -143,8 +144,13 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
         scores = &myscores;
         IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
     }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
 
-    IGRAPH_CHECK(igraph_degree(graph, scores, igraph_vss_all(), mode, loops));
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, loops));
+
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&degrees); i++) {
+        VECTOR(*scores)[i] = VECTOR(degrees)[i];
+    }
 
     IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops,
                  tmax));
@@ -155,6 +161,8 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
         igraph_vector_destroy(scores);
         IGRAPH_FINALLY_CLEAN(1);
     }
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

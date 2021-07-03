@@ -59,18 +59,18 @@ igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                      igraph_vs_t vids, igraph_neimode_t mode,
                      igraph_bool_t loops) {
 
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
 
     IGRAPH_CHECK(igraph_degree(graph, &tmp, vids, mode, loops));
-    if (igraph_vector_size(&tmp) == 0) {
+    if (igraph_vector_int_size(&tmp) == 0) {
         *res = 0;
     } else {
-        *res = (igraph_integer_t) igraph_vector_max(&tmp);
+        *res = igraph_vector_int_max(&tmp);
     }
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -89,7 +89,8 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
     igraph_integer_t i, j, no_vids;
     igraph_vit_t vit;
     igraph_vector_t my_knn_v, *my_knn = knn;
-    igraph_vector_t strength, deg;
+    igraph_vector_t strength;
+    igraph_vector_int_t deg;
     igraph_integer_t maxdeg;
     igraph_vector_t deghist;
     igraph_real_t mynan = IGRAPH_NAN;
@@ -110,7 +111,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
     }
 
     /* Get degree of neighbours */
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(),
                                neighbor_degree_mode, IGRAPH_LOOPS));
     IGRAPH_VECTOR_INIT_FINALLY(&strength, no_of_nodes);
@@ -178,7 +179,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
     }
 
     igraph_vector_destroy(&strength);
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(2);
 
     if (!knn) {
@@ -262,7 +263,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     igraph_integer_t i, j, no_vids;
     igraph_vit_t vit;
     igraph_vector_t my_knn_v, *my_knn = knn;
-    igraph_vector_t deg;
+    igraph_vector_int_t deg;
     igraph_integer_t maxdeg;
     igraph_vector_t deghist;
     igraph_real_t mynan = IGRAPH_NAN;
@@ -290,7 +291,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_resize(knn, no_vids));
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(),
                                neighbor_degree_mode, IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg, igraph_vss_all(), mode, IGRAPH_LOOPS));
@@ -338,7 +339,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     }
 
     igraph_vector_destroy(&neis);
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&deg);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -381,12 +382,21 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     igraph_integer_t no_vids;
+    igraph_vector_int_t degrees;
     igraph_vector_t neis;
     igraph_integer_t i;
 
     if (!weights) {
-        return igraph_degree(graph, res, vids, mode, loops);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
+        for (igraph_integer_t i; i < no_of_nodes; i++) {
+            VECTOR(*res)[i] = (igraph_real_t) VECTOR(degrees)[i];
+        }
+        igraph_vector_int_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(1);
+        return IGRAPH_SUCCESS;
     }
+
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
@@ -478,13 +488,13 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
                                      igraph_order_t order,
                                      igraph_bool_t only_indices) {
     igraph_integer_t i, n;
-    igraph_vector_t degrees;
+    igraph_vector_int_t degrees;
     igraph_vector_int_t vs_vec;
-    IGRAPH_VECTOR_INIT_FINALLY(&degrees, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-    IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, outvids, order == IGRAPH_DESCENDING));
+    IGRAPH_CHECK(igraph_vector_int_qsort_ind(&degrees, outvids, order == IGRAPH_DESCENDING));
     if (only_indices || igraph_vs_is_all(&vids) ) {
-        igraph_vector_destroy(&degrees);
+        igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vs_vec, 0);
@@ -494,7 +504,7 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
             VECTOR(*outvids)[i] = VECTOR(vs_vec)[VECTOR(*outvids)[i]];
         }
         igraph_vector_int_destroy(&vs_vec);
-        igraph_vector_destroy(&degrees);
+        igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(2);
     }
     return IGRAPH_SUCCESS;

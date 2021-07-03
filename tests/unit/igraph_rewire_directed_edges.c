@@ -22,7 +22,7 @@
 int main() {
     igraph_t g, g_copy;
     igraph_bool_t same;
-    igraph_vector_t degrees;
+    igraph_vector_int_t degrees;
     igraph_vs_t vertices;
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -52,11 +52,11 @@ int main() {
     /*Out-star remains out-star if outs are moved*/
     igraph_small(&g, 10, IGRAPH_DIRECTED, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, -1);
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 1.0, /*loops*/ 0, /*mode*/ IGRAPH_OUT) == IGRAPH_SUCCESS);
-    igraph_vector_init(&degrees, 0);
+    igraph_vector_int_init(&degrees, 0);
     igraph_vs_1(&vertices, 0);
     igraph_degree(&g, &degrees, vertices, IGRAPH_ALL, 0);
     IGRAPH_ASSERT(VECTOR(degrees)[0] == 9);
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
     igraph_vs_destroy(&vertices);
 
     /*A few erroneous calls*/

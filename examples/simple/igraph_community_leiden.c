@@ -26,7 +26,7 @@
 int main() {
     igraph_t graph;
     igraph_vector_int_t membership;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_integer_t nb_clusters;
     igraph_real_t quality;
 
@@ -57,7 +57,7 @@ int main() {
     printf("\n");
 
     /* Initialize degree vector to use for optimizing modularity */
-    igraph_vector_init(&degree, igraph_vcount(&graph));
+    igraph_vector_int_init(&degree, igraph_vcount(&graph));
     igraph_degree(&graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1);
 
     /* Perform Leiden algorithm using modularity */
@@ -68,7 +68,7 @@ int main() {
     igraph_vector_int_print(&membership);
     printf("\n");
 
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_vector_int_destroy(&membership);
     igraph_destroy(&graph);
 

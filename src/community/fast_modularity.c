@@ -633,7 +633,8 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     igraph_eit_t edgeit;
     igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
     igraph_i_fastgreedy_community_list communities;
-    igraph_vector_t a;
+    igraph_vector_int_t a;
+    igraph_vector_t a_real;
     igraph_real_t q, *dq, bestq, weight_sum, loop_weight_sum;
     igraph_bool_t has_multiple;
     igraph_matrix_t merges_local;
@@ -691,7 +692,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     }
 
     /* Create degree vector */
-    IGRAPH_VECTOR_INIT_FINALLY(&a, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&a, no_of_nodes);
     if (weights) {
         debug("Calculating weighted degrees\n");
         for (i = 0; i < no_of_edges; i++) {
@@ -807,11 +808,17 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     if (q == 0) {
         /* All the weights are zero */
     } else {
-        igraph_vector_scale(&a, 1.0 / q);
+        IGRAPH_VECTOR_INIT_FINALLY(&a_real, igraph_vector_int_size(&a));
+        for (igraph_integer_t i; i < igraph_vector_int_size(&a); i++) {
+            VECTOR(a_real)[i] = VECTOR(a)[i];
+        }
+        igraph_vector_scale(&a_real, 1.0 / q);
         q = loop_weight_sum / q;
         for (i = 0; i < no_of_nodes; i++) {
-            q -= VECTOR(a)[i] * VECTOR(a)[i];
+            q -= VECTOR(a_real)[i] * VECTOR(a_real)[i];
         }
+        igraph_vector_destroy(&a_real);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* Initialize "best modularity" value and best merge counter */
@@ -1056,7 +1063,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_FREE(pairs);
     IGRAPH_FREE(dq);
     igraph_i_fastgreedy_community_list_destroy(&communities);
-    igraph_vector_destroy(&a);
+    igraph_vector_int_destroy(&a);
     IGRAPH_FINALLY_CLEAN(4);
 
     if (membership) {

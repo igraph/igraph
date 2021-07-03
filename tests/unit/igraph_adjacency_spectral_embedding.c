@@ -40,6 +40,7 @@ int main() {
     igraph_t graph;
     igraph_matrix_t U, V;
     igraph_arpack_options_t options;
+    igraph_vector_int_t degrees;
     igraph_vector_t cvec;
 
     igraph_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
@@ -49,8 +50,12 @@ int main() {
     igraph_arpack_options_init(&options);
 
     igraph_vector_init(&cvec, 0);
-    igraph_degree(&graph, &cvec, igraph_vss_all(), IGRAPH_ALL,
+    igraph_vector_int_init(&degrees, 0);
+    igraph_degree(&graph, &degrees, igraph_vss_all(), IGRAPH_ALL,
                   IGRAPH_LOOPS);
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&degrees); i++) {
+        VECTOR(cvec)[i] = VECTOR(degrees)[i];
+    }
     igraph_vector_scale(&cvec, .5);
 
     igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,
@@ -65,6 +70,7 @@ int main() {
     print_matrix_first_row_positive(&V, "%8.4f");
 
     igraph_vector_destroy(&cvec);
+    igraph_vector_int_destroy(&degrees);
     igraph_matrix_destroy(&V);
     igraph_matrix_destroy(&U);
 

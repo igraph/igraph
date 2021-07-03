@@ -36,7 +36,7 @@ static igraph_error_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_integer_t i;
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -56,7 +56,7 @@ static igraph_error_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     if (directed) {
 
@@ -215,7 +215,7 @@ static igraph_error_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_
 
     }
 
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_eit_destroy(&edgeit);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -272,7 +272,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t from, to;
     igraph_integer_t ffrom, fto;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_integer_t i;
 
     if (!res && !sparseres) {
@@ -298,7 +298,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                IGRAPH_OUT, IGRAPH_NO_LOOPS));
@@ -421,7 +421,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
     }
 
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_eit_destroy(&edgeit);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;

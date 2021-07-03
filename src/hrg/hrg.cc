@@ -928,7 +928,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_internal = (no_of_nodes - 1) / 2;
-    igraph_vector_t deg, idx;
+    igraph_vector_int_t deg, idx;
     igraph_integer_t root = 0;
     igraph_integer_t d0 = 0, d1 = 0, d2 = 0;
     igraph_integer_t ii = 0, il = 0;
@@ -967,7 +967,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 0);
 
     // Every vertex, except for the root must have in-degree one.
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_IN,
@@ -1016,7 +1016,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     // Create an index, that maps the root node as first, then
     // the internal nodes, then the leaf nodes
-    IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no_of_nodes);
     VECTOR(idx)[root] = - (ii++) - 1;
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t d = VECTOR(deg)[i];
@@ -1073,8 +1073,8 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     igraph_vector_destroy(&path);
     igraph_vector_destroy(&neis);
-    igraph_vector_destroy(&idx);
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&idx);
+    igraph_vector_int_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;

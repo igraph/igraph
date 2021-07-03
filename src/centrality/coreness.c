@@ -62,7 +62,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     igraph_integer_t *bin, *vert, *pos;
     igraph_integer_t maxdeg;
     igraph_integer_t i, j = 0;
-    igraph_vector_t cores_tmp;
+    igraph_vector_int_t cores_tmp;
     igraph_vector_t neis;
     igraph_neimode_t omode;
 
@@ -95,7 +95,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
 
     /* temporary solution until we change igraph_degree() to return an
      * igraph_vector_int_t in its second argument */
-    IGRAPH_VECTOR_INIT_FINALLY(&cores_tmp, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&cores_tmp, no_of_nodes);
 
     /* maximum degree + degree of vertices */
     IGRAPH_CHECK(igraph_degree(graph, &cores_tmp, igraph_vss_all(), mode,
@@ -103,7 +103,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(*cores)[i] = VECTOR(cores_tmp)[i];
     }
-    igraph_vector_destroy(&cores_tmp);
+    igraph_vector_int_destroy(&cores_tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     maxdeg = igraph_vector_int_max(cores);

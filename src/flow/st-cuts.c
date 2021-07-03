@@ -1148,12 +1148,12 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
                                            igraph_vector_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(Sbar);
-    igraph_vector_t indeg;
+    igraph_vector_int_t indeg;
     igraph_integer_t i, minsize;
     igraph_vector_t neis;
 
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(Sbar, &indeg, igraph_vss_all(),
                                IGRAPH_IN, /*loops=*/ 1));
@@ -1191,7 +1191,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
 #undef ACTIVE
 #undef ZEROIN
 
-    igraph_vector_destroy(&indeg);
+    igraph_vector_int_destroy(&indeg);
     igraph_vector_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(2);
 

@@ -26,8 +26,8 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t v, v2;
-    igraph_vector_int_t v3;
+    igraph_vector_t v;
+    igraph_vector_int_t v2, v3;
     int i, ret;
 
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 0, /*A=*/ 1, 1,
@@ -60,18 +60,18 @@ int main() {
     if (igraph_ecount(&g) != igraph_vector_int_sum(&v3)) {
         return 5;
     }
-    igraph_vector_init(&v2, 0);
+    igraph_vector_int_init(&v2, 0);
     igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, 1);
     for (i = 0; i < igraph_vcount(&g); i++) {
         if (VECTOR(v3)[i] != VECTOR(v2)[i]) {
             igraph_vector_int_print(&v3);
             printf("\n");
-            igraph_vector_print(&v2);
+            igraph_vector_int_print(&v2);
             return 6;
         }
     }
     igraph_vector_int_destroy(&v3);
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_destroy(&v2);
     igraph_destroy(&g);
 
     /* outpref, we cannot really test this quantitatively,

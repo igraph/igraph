@@ -377,11 +377,11 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         igraph_integer_t nov = igraph_vcount(graph);
         igraph_integer_t i;
         int ret = 0;
-        igraph_vector_t deg;
+        igraph_vector_int_t deg;
         igraph_strvector_t nvec;
         char *str;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&deg, 1);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 1);
         IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
         for (i = 0; i < nov; i++) {
@@ -402,7 +402,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             }
         }
         igraph_strvector_destroy(&nvec);
-        igraph_vector_destroy(&deg);
+        igraph_vector_int_destroy(&deg);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

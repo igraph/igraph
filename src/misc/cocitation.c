@@ -162,6 +162,7 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
 igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
+    igraph_vector_int_t degrees;
     igraph_neimode_t mode0;
     igraph_integer_t i, no_of_nodes;
 
@@ -174,16 +175,19 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     no_of_nodes = igraph_vcount(graph);
 
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &weights, igraph_vss_all(), mode0, 1));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, 1));
     for (i = 0; i < no_of_nodes; i++) {
+        VECTOR(weights)[i] = VECTOR(degrees)[i];
         if (VECTOR(weights)[i] > 1) {
             VECTOR(weights)[i] = 1.0 / log(VECTOR(weights)[i]);
         }
     }
 
     IGRAPH_CHECK(igraph_cocitation_real(graph, res, vids, mode0, &weights));
+    igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&weights);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
 

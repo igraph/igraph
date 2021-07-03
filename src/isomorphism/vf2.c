@@ -132,7 +132,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     igraph_integer_t last1, last2;
     igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
-    igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+    igraph_vector_int_t indeg1, indeg2, outdeg1, outdeg2;
     igraph_integer_t vsize;
 
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
@@ -237,10 +237,10 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj2);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj2);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg2, 0);
 
     IGRAPH_CHECK(igraph_stack_int_reserve(&path, no_of_nodes * 2));
     IGRAPH_CHECK(igraph_degree(graph1, &indeg1, igraph_vss_all(),
@@ -631,10 +631,10 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
         }
     }
 
-    igraph_vector_destroy(&outdeg2);
-    igraph_vector_destroy(&outdeg1);
-    igraph_vector_destroy(&indeg2);
-    igraph_vector_destroy(&indeg1);
+    igraph_vector_int_destroy(&outdeg2);
+    igraph_vector_int_destroy(&outdeg1);
+    igraph_vector_int_destroy(&indeg2);
+    igraph_vector_int_destroy(&indeg1);
     igraph_lazy_adjlist_destroy(&outadj2);
     igraph_lazy_adjlist_destroy(&inadj2);
     igraph_lazy_adjlist_destroy(&outadj1);
@@ -1033,7 +1033,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_integer_t last1, last2;
     igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
-    igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+    igraph_vector_int_t indeg1, indeg2, outdeg1, outdeg2;
     igraph_integer_t vsize;
 
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
@@ -1108,10 +1108,10 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj2);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj2);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg2, 0);
 
     IGRAPH_CHECK(igraph_stack_int_reserve(&path, no_of_nodes2 * 2));
     IGRAPH_CHECK(igraph_degree(graph1, &indeg1, igraph_vss_all(),
@@ -1458,10 +1458,10 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
         }
     }
 
-    igraph_vector_destroy(&outdeg2);
-    igraph_vector_destroy(&outdeg1);
-    igraph_vector_destroy(&indeg2);
-    igraph_vector_destroy(&indeg1);
+    igraph_vector_int_destroy(&outdeg2);
+    igraph_vector_int_destroy(&outdeg1);
+    igraph_vector_int_destroy(&indeg2);
+    igraph_vector_int_destroy(&indeg1);
     igraph_lazy_adjlist_destroy(&outadj2);
     igraph_lazy_adjlist_destroy(&inadj2);
     igraph_lazy_adjlist_destroy(&outadj1);

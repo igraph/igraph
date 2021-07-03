@@ -48,24 +48,29 @@ void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, 
 void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
 
     igraph_vector_int_t membership;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
+    igraph_vector_t strength;
     igraph_integer_t nb_clusters = igraph_vcount(graph);
     igraph_real_t quality;
     igraph_real_t m;
 
-    igraph_vector_init(&degree, igraph_vcount(graph));
+    igraph_vector_int_init(&degree, igraph_vcount(graph));
+    igraph_vector_init(&strength, igraph_vcount(graph));
     if (edge_weights) {
-        igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1, edge_weights);
+        igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL, 1, edge_weights);
         m = igraph_vector_sum(edge_weights);
     } else {
         igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1);
+        for (igraph_integer_t i = 0; i < igraph_vcount(graph); i++) {
+            VECTOR(strength)[i] = VECTOR(degree)[i];
+        }
         m = (igraph_real_t)igraph_ecount(graph);
     }
 
     /* Initialize with singleton partition. */
     igraph_vector_int_init(&membership, igraph_vcount(graph));
-
-    igraph_community_leiden(graph, edge_weights, &degree, 1.0 / (2 * m), 0.01, 0, &membership, &nb_clusters, &quality);
+    
+    igraph_community_leiden(graph, edge_weights, &strength, 1.0 / (2 * m), 0.01, 0, &membership, &nb_clusters, &quality);
 
     if (isnan(quality)) {
         printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is nan.\n", nb_clusters);
@@ -78,7 +83,7 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     printf("\n");
 
     igraph_vector_int_destroy(&membership);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
 }
 
 int main() {

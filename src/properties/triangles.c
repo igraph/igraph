@@ -136,7 +136,8 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     igraph_integer_t maxdegree = 0;
     igraph_integer_t i, j, k, nn;
     igraph_lazy_adjlist_t adjlist;
-    igraph_vector_t indexv, avids, rank, triangles, degree;
+    igraph_vector_int_t degree; 
+    igraph_vector_t indexv, avids, rank, triangles;
     igraph_vector_int_t order;
     igraph_integer_t *neis;
 
@@ -174,7 +175,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     /* Degree, ordering, ranking */
     affected_nodes = igraph_vector_size(&avids);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, affected_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, affected_nodes);
     for (i = 0; i < affected_nodes; i++) {
         igraph_integer_t v = VECTOR(avids)[i];
         igraph_vector_int_t *neis2;
@@ -185,8 +186,8 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
             maxdegree = deg;
         }
     }
-    igraph_vector_order1_int(&degree, &order, maxdegree + 1);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_order1_int(&degree, &order, maxdegree + 1);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_VECTOR_INIT_FINALLY(&rank, affected_nodes);
     for (i = 0; i < affected_nodes; i++) {
@@ -566,7 +567,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     igraph_integer_t *neis;
     igraph_vector_int_t order;
     igraph_vector_t rank;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
 
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis1, *neis2;
@@ -578,14 +579,14 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = igraph_vector_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_order1_int(&degree, &order, maxdegree));
+    maxdegree = igraph_vector_int_max(&degree) + 1;
+    IGRAPH_CHECK(igraph_vector_int_order1_int(&degree, &order, maxdegree));
 
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
@@ -742,7 +743,9 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order;
-    igraph_vector_t degree, rank;
+    igraph_vector_int_t degree;
+    igraph_vector_t strength;
+    igraph_vector_t rank;
     igraph_integer_t maxdegree;
     igraph_inclist_t incident;
     igraph_vector_int_t neis;
@@ -756,14 +759,15 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
      */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&strength, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = igraph_vector_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_order1_int(&degree, &order, maxdegree));
+    maxdegree = igraph_vector_int_max(&degree) + 1;
+    IGRAPH_CHECK(igraph_vector_int_order1_int(&degree, &order, maxdegree));
 
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
+    IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL,
                                  IGRAPH_LOOPS, weights));
 
     IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
@@ -791,7 +795,7 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
 
         adj1 = igraph_inclist_get(&incident, node);
         adjlen1 = igraph_vector_int_size(adj1);
-        triples = VECTOR(degree)[node] * (adjlen1 - 1) / 2.0;
+        triples = VECTOR(strength)[node] * (adjlen1 - 1) / 2.0;
         /* Mark the neighbors of the node */
         for (i = 0; i < adjlen1; i++) {
             igraph_integer_t edge = VECTOR(*adj1)[i];
@@ -835,7 +839,8 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
     igraph_vector_int_destroy(&neis);
     igraph_inclist_destroy(&incident);
     igraph_vector_destroy(&rank);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
+    igraph_vector_destroy(&strength);
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(6);
 

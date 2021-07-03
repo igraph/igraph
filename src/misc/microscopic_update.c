@@ -426,7 +426,7 @@ static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
                                                igraph_bool_t islocal) {
 
     igraph_integer_t nvert;
-    igraph_vector_t degv;
+    igraph_vector_int_t degv;
     *updates = 1;
 
     /* sanity checks */
@@ -479,13 +479,13 @@ static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
     if (islocal) {
         /* Moving on ahead with vertex isolation test, since local perspective */
         /* is requested. */
-        IGRAPH_VECTOR_INIT_FINALLY(&degv, 1);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degv, 1);
         IGRAPH_CHECK(igraph_degree(graph, &degv, igraph_vss_1(vid),
                                    mode, IGRAPH_NO_LOOPS));
         if (VECTOR(degv)[0] < 1) {
             *updates = 0;
         }
-        igraph_vector_destroy(&degv);
+        igraph_vector_int_destroy(&degv);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -735,7 +735,7 @@ igraph_error_t igraph_moran_process(const igraph_t *graph,
     igraph_integer_t b = -1;  /* vertex chosen for death */
     igraph_integer_t e, nedge, u, v;
     igraph_real_t r;          /* random number */
-    igraph_vector_t deg;
+    igraph_vector_int_t deg;
     igraph_vector_t V;        /* vector of cumulative proportionate values */
     igraph_vit_t vA;          /* vertex list */
     igraph_eit_t eA;          /* edge list */
@@ -784,7 +784,7 @@ igraph_error_t igraph_moran_process(const igraph_t *graph,
     r = RNG_UNIF01();
     RNG_END();
     i = 0;
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 1);
     while (!IGRAPH_VIT_END(vA)) {
         u = IGRAPH_VIT_GET(vA);
         IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(u), mode,
@@ -860,7 +860,7 @@ igraph_error_t igraph_moran_process(const igraph_t *graph,
 
     igraph_eit_destroy(&eA);
     igraph_es_destroy(&es);
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&deg);
     igraph_vit_destroy(&vA);
     igraph_vs_destroy(&vs);
     igraph_vector_destroy(&V);

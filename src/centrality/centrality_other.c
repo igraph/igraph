@@ -138,7 +138,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
 
     igraph_vector_t values;
     igraph_matrix_t vectors;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     int no_of_nodes_int;
@@ -187,7 +187,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
     IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, options->n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, options->n);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                IGRAPH_ALL, /*loops=*/ 0));
     RNG_BEGIN();
@@ -199,7 +199,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         }
     }
     RNG_END();
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
     options->n = no_of_nodes_int;
@@ -580,7 +580,7 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
 typedef struct igraph_i_kleinberg_data_t {
     igraph_adjlist_t *in;
     igraph_adjlist_t *out;
-    igraph_vector_t *tmp;
+    igraph_vector_int_t *tmp;
 } igraph_i_kleinberg_data_t;
 
 /* struct for the weighted variant of the HITS algorithm */
@@ -588,7 +588,7 @@ typedef struct igraph_i_kleinberg_data2_t {
     const igraph_t *graph;
     igraph_inclist_t *in;
     igraph_inclist_t *out;
-    igraph_vector_t *tmp;
+    igraph_vector_int_t *tmp;
     const igraph_vector_t *weights;
 } igraph_i_kleinberg_data2_t;
 
@@ -599,7 +599,7 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
     igraph_adjlist_t *in = data->in;
     igraph_adjlist_t *out = data->out;
-    igraph_vector_t *tmp = data->tmp;
+    igraph_vector_int_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
@@ -634,7 +634,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
     igraph_inclist_t *in = data->in;
     igraph_inclist_t *out = data->out;
-    igraph_vector_t *tmp = data->tmp;
+    igraph_vector_int_t *tmp = data->tmp;
     const igraph_vector_t *weights = data->weights;
     const igraph_t *g = data->graph;
     igraph_vector_int_t *neis;
@@ -675,7 +675,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
     igraph_adjlist_t *inadjlist, *outadjlist;
     igraph_inclist_t *ininclist, *outinclist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
     igraph_vector_t values;
     igraph_matrix_t vectors;
     igraph_i_kleinberg_data_t extra;
@@ -725,7 +725,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
     IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, options->n);
 
     if (inout == 0) {
         inadjlist = &myinadjlist;
@@ -786,7 +786,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     if (value) {
@@ -927,8 +927,8 @@ typedef struct igraph_i_pagerank_data_t {
     const igraph_t *graph;
     igraph_adjlist_t *adjlist;
     igraph_real_t damping;
-    igraph_vector_t *outdegree;
-    igraph_vector_t *tmp;
+    igraph_vector_int_t *outdegree;
+    igraph_vector_int_t *tmp;
     igraph_vector_t *reset;
 } igraph_i_pagerank_data_t;
 
@@ -937,8 +937,8 @@ typedef struct igraph_i_pagerank_data2_t {
     igraph_inclist_t *inclist;
     const igraph_vector_t *weights;
     igraph_real_t damping;
-    igraph_vector_t *outdegree;
-    igraph_vector_t *tmp;
+    igraph_vector_int_t *outdegree;
+    igraph_vector_int_t *tmp;
     igraph_vector_t *reset;
 } igraph_i_pagerank_data2_t;
 
@@ -947,8 +947,8 @@ static igraph_error_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *
 
     igraph_i_pagerank_data_t *data = extra;
     igraph_adjlist_t *adjlist = data->adjlist;
-    igraph_vector_t *outdegree = data->outdegree;
-    igraph_vector_t *tmp = data->tmp;
+    igraph_vector_int_t *outdegree = data->outdegree;
+    igraph_vector_int_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
@@ -1011,8 +1011,8 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
     const igraph_t *graph = data->graph;
     igraph_inclist_t *inclist = data->inclist;
     const igraph_vector_t *weights = data->weights;
-    igraph_vector_t *outdegree = data->outdegree;
-    igraph_vector_t *tmp = data->tmp;
+    igraph_vector_int_t *outdegree = data->outdegree;
+    igraph_vector_int_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
     igraph_integer_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
@@ -1344,9 +1344,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_matrix_t values;
     igraph_matrix_t vectors;
     igraph_neimode_t dirmode;
-    igraph_vector_t outdegree;
-    igraph_vector_t indegree;
-    igraph_vector_t tmp;
+    igraph_vector_int_t outdegree;
+    igraph_vector_int_t indegree;
+    igraph_vector_int_t tmp;
     igraph_vector_t normalized_reset;
 
     igraph_integer_t i;
@@ -1425,9 +1425,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         dirmode = IGRAPH_ALL;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdegree, options->n);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indegree, options->n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdegree, options->n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, options->n);
 
     RNG_BEGIN();
 
@@ -1547,9 +1547,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_destroy(&tmp);
-    igraph_vector_destroy(&outdegree);
-    igraph_vector_destroy(&indegree);
+    igraph_vector_int_destroy(&tmp);
+    igraph_vector_int_destroy(&outdegree);
+    igraph_vector_int_destroy(&indegree);
     IGRAPH_FINALLY_CLEAN(3);
 
     if (value) {
