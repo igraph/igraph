@@ -225,18 +225,12 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         IGRAPH_CHECK(igraph_strength(graph, &instrengths, igraph_vss_all(), IGRAPH_IN, 0, weights));
         IGRAPH_CHECK(igraph_strength(graph, &outstrengths, igraph_vss_all(), IGRAPH_OUT, 0, weights));
     } else {
-        igraph_vector_t indegrees_real, outdegrees_real;
-        IGRAPH_VECTOR_INIT_FINALLY(&indegrees_real, no_of_nodes);
-        IGRAPH_VECTOR_INIT_FINALLY(&outdegrees_real, no_of_nodes);
+        IGRAPH_CHECK(igraph_vector_resize(&instrengths, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_resize(&outstrengths, no_of_nodes));
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            VECTOR(indegrees_real)[i] = VECTOR(indegrees)[i];
-            VECTOR(outdegrees_real)[i] = VECTOR(outdegrees)[i];
+            VECTOR(instrengths)[i] = VECTOR(indegrees)[i];
+            VECTOR(outstrengths)[i] = VECTOR(outdegrees)[i];
         }
-        IGRAPH_CHECK(igraph_vector_update(&instrengths, &indegrees_real));
-        IGRAPH_CHECK(igraph_vector_update(&outstrengths, &outdegrees_real));
-        igraph_vector_destroy(&indegrees_real);
-        igraph_vector_destroy(&outdegrees_real);
-        IGRAPH_FINALLY_CLEAN(2);
     }
 
     /* Find initial sources and sinks */
