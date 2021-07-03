@@ -26,7 +26,7 @@
 void print_vector(igraph_vector_int_t *v, FILE *f) {
     igraph_integer_t i;
     for (i = 0; i < igraph_vector_int_size(v); i++) {
-        fprintf(f, " %" IGRAPH_PRId "", (igraph_integer_t) VECTOR(*v)[i]);
+        fprintf(f, " %" IGRAPH_PRId "", VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
@@ -78,7 +78,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_int_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 1;
@@ -120,7 +120,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_int_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 2;
@@ -164,7 +164,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_int_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 6;
@@ -182,7 +182,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_int_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 8;
@@ -208,7 +208,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_int_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 12;
