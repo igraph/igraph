@@ -31,7 +31,7 @@
 
 #include <math.h>
 
-int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids, igraph_neimode_t mode,
                            igraph_vector_t *weights);
 
@@ -68,7 +68,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
 igraph_error_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_vs_t vids) {
-    return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT, 0);
+    return igraph_i_cocitation_real(graph, res, vids, IGRAPH_OUT, 0);
 }
 
 /**
@@ -104,7 +104,7 @@ igraph_error_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
 
 igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
                        const igraph_vs_t vids) {
-    return igraph_cocitation_real(graph, res, vids, IGRAPH_IN, 0);
+    return igraph_i_cocitation_real(graph, res, vids, IGRAPH_IN, 0);
 }
 
 /**
@@ -184,14 +184,14 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_cocitation_real(graph, res, vids, mode0, &weights));
+    IGRAPH_CHECK(igraph_i_cocitation_real(graph, res, vids, mode0, &weights));
     igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&weights);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
 
-int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
