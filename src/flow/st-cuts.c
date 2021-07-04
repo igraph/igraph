@@ -604,7 +604,7 @@ typedef struct igraph_i_all_st_cuts_minimal_dfs_data_t {
     igraph_vector_bool_t *nomark;
     const igraph_vector_bool_t *GammaX;
     igraph_integer_t root;
-    const igraph_vector_t *map;
+    const igraph_vector_int_t *map;
 } igraph_i_all_st_cuts_minimal_dfs_data_t;
 
 static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
@@ -617,7 +617,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
     igraph_stack_int_t *stack = data->stack;
     igraph_vector_bool_t *nomark = data->nomark;
     const igraph_vector_bool_t *GammaX = data->GammaX;
-    const igraph_vector_t *map = data->map;
+    const igraph_vector_int_t *map = data->map;
     igraph_integer_t realvid = VECTOR(*map)[vid];
 
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
@@ -640,7 +640,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_outcb(
         void *extra) {
     igraph_i_all_st_cuts_minimal_dfs_data_t *data = extra;
     igraph_stack_int_t *stack = data->stack;
-    const igraph_vector_t *map = data->map;
+    const igraph_vector_int_t *map = data->map;
     igraph_integer_t realvid = VECTOR(*map)[vid];
 
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
@@ -658,7 +658,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                                         igraph_integer_t root,
                                         const igraph_marked_queue_int_t *X,
                                         const igraph_vector_bool_t *GammaX,
-                                        const igraph_vector_t *invmap,
+                                        const igraph_vector_int_t *invmap,
                                         igraph_vector_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -723,7 +723,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_t Sbar;
-    igraph_vector_t Sbar_map, Sbar_invmap;
+    igraph_vector_int_t Sbar_map, Sbar_invmap;
     igraph_vector_int_t keep;
     igraph_t domtree;
     igraph_vector_int_t leftout;
@@ -739,8 +739,8 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_UNUSED(arg);
 
     /* We need to create the graph induced by Sbar */
-    IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&Sbar_invmap, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Sbar_map, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Sbar_invmap, 0);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&keep, 0);
     for (i = 0; i < no_of_nodes; i++) {
@@ -779,7 +779,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_CHECK(igraph_vector_bool_init(&GammaS, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &GammaS);
     if (igraph_marked_queue_int_size(S) == 0) {
-        VECTOR(GammaS)[(igraph_integer_t) VECTOR(Sbar_map)[source] - 1] = 1;
+        VECTOR(GammaS)[VECTOR(Sbar_map)[source] - 1] = 1;
     } else {
         for (i = 0; i < no_of_nodes; i++) {
             if (igraph_marked_queue_int_iselement(S, i)) {
@@ -912,8 +912,8 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     igraph_destroy(&domtree);
     igraph_vector_int_destroy(&leftout);
     igraph_destroy(&Sbar);
-    igraph_vector_destroy(&Sbar_map);
-    igraph_vector_destroy(&Sbar_invmap);
+    igraph_vector_int_destroy(&Sbar_map);
+    igraph_vector_int_destroy(&Sbar_invmap);
     IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
@@ -1144,7 +1144,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
 
 static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
                                            const igraph_vector_bool_t *active,
-                                           const igraph_vector_t *invmap,
+                                           const igraph_vector_int_t *invmap,
                                            igraph_vector_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(Sbar);
@@ -1158,7 +1158,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
     IGRAPH_CHECK(igraph_degree(Sbar, &indeg, igraph_vss_all(),
                                IGRAPH_IN, /*loops=*/ 1));
 
-#define ACTIVE(x) (VECTOR(*active)[(igraph_integer_t)VECTOR(*invmap)[(x)]])
+#define ACTIVE(x) (VECTOR(*active)[VECTOR(*invmap)[(x)]])
 #define ZEROIN(x) (VECTOR(indeg)[(x)]==0)
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -1215,7 +1215,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, j;
-    igraph_vector_t Sbar_map, Sbar_invmap;
+    igraph_vector_int_t Sbar_map, Sbar_invmap;
     igraph_vector_int_t keep;
     igraph_t Sbar;
     igraph_vector_t M;
@@ -1229,8 +1229,8 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     }
 
     /* Create the graph induced by Sbar */
-    IGRAPH_VECTOR_INIT_FINALLY(&Sbar_map, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&Sbar_invmap, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Sbar_map, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Sbar_invmap, 0);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&keep, 0);
     for (i = 0; i < no_of_nodes; i++) {
@@ -1295,8 +1295,8 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_vector_destroy(&M);
     igraph_destroy(&Sbar);
     igraph_vector_int_destroy(&keep);
-    igraph_vector_destroy(&Sbar_invmap);
-    igraph_vector_destroy(&Sbar_map);
+    igraph_vector_int_destroy(&Sbar_invmap);
+    igraph_vector_int_destroy(&Sbar_map);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;

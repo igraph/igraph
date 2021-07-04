@@ -46,6 +46,11 @@
  - `igraph_bridges()` now uses an `igraph_vector_int_t` to return the list of
    bridges, not an `igraph_vector_t`.
 
+ - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
+   mapping from block indices to parent block indices; also, it uses a pointer
+   vector of `igraph_vector_int_t`s to return the blocks themselves instead of
+   a pointer vector of `igraph_vector_t`.
+
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
 
@@ -55,8 +60,17 @@
  - `igraph_decompose()` now uses an `igraph_integer_t` for its `maxcompno` and
    `minelements` arguments instead of a `long int`.
 
+ - `igraph_degree()` now uses an `igraph_vector_int_t` to return the degrees.
+   If you need the degrees in a vector containing floating-point numbers
+   instead (e.g., because you want to pass them on to some other function that
+   takes an `igraph_vector_t`), use `igraph_strength()` instead with a null
+   weight vector.
+
  - `igraph_degree_sequnce_game()` now takes degree sequences represented as
    `igraph_vector_int_t` instead of `igraph_vector_t`.
+
+ - `igraph_delete_vertices_idx()` now uses `igraph_vector_int_t` vectors to
+   return the mapping and the inverse mapping of old vertex IDs to new ones.
 
  - `igraph_dfs()` now takes an `igraph_vector_int_t` for its `order`, `order_out`,
    `father` and `dist` arguments instead of an `igraph_vector_t`. Furthermore,
@@ -95,6 +109,9 @@
    as their size arguments instead of an `int`.
 
  - `igraph_hrg_size()` now returns an `igraph_integer_t` instead of an `int`.
+
+ - `igraph_induced_subgraph_map()` now uses `igraph_vector_int_t` vectors to
+   return the mapping and the inverse mapping of old vertex IDs to new ones.
 
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
    sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.

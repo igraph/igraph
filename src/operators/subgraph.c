@@ -35,8 +35,8 @@
  */
 static igraph_error_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
                                              const igraph_vs_t vids,
-                                             igraph_vector_t *map,
-                                             igraph_vector_t *invmap) {
+                                             igraph_vector_int_t *map,
+                                             igraph_vector_int_t *invmap) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t delete = IGRAPH_VECTOR_NULL;
     char *remain;
@@ -90,8 +90,8 @@ static igraph_error_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, i
 static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                                                  igraph_t *res,
                                                  const igraph_vs_t vids,
-                                                 igraph_vector_t *map,
-                                                 igraph_vector_t *invmap) {
+                                                 igraph_vector_int_t *map,
+                                                 igraph_vector_int_t *invmap) {
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_new_nodes = 0;
@@ -201,10 +201,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
 
     /* Fill "map" from "vids_old2new" if needed */
     if (map) {
-        IGRAPH_CHECK(igraph_vector_resize(map, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(*map)[i] = VECTOR(vids_old2new)[i];
-        }
+        IGRAPH_CHECK(igraph_vector_int_update(map, &vids_old2new));
     }
 
     /* Get rid of some vectors that are not needed anymore */
@@ -236,10 +233,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
 
     /* Fill "invmap" from "vids_new2old" if needed */
     if (invmap) {
-        IGRAPH_CHECK(igraph_vector_resize(invmap, no_of_new_nodes));
-        for (i = 0; i < no_of_new_nodes; i++) {
-            VECTOR(*invmap)[i] = VECTOR(vids_new2old)[i];
-        }
+        IGRAPH_CHECK(igraph_vector_int_update(invmap, &vids_new2old));
     }
 
     /* Get rid of the remaining stuff */
@@ -326,8 +320,8 @@ static igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
 igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 const igraph_vs_t vids,
                                 igraph_subgraph_implementation_t impl,
-                                igraph_vector_t *map,
-                                igraph_vector_t *invmap) {
+                                igraph_vector_int_t *map,
+                                igraph_vector_int_t *invmap) {
 
     if (impl == IGRAPH_SUBGRAPH_AUTO) {
         IGRAPH_CHECK(igraph_i_induced_subgraph_suggest_implementation(graph, vids, &impl));

@@ -59,6 +59,18 @@ static void igraph_i_cohesive_blocks_free_vectors(igraph_vector_ptr_t *ptr) {
     }
 }
 
+static void igraph_i_cohesive_blocks_free_int_vectors(igraph_vector_ptr_t *ptr) {
+    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
+
+    for (i = 0; i < n; i++) {
+        igraph_vector_int_t *v = VECTOR(*ptr)[i];
+        if (v) {
+            igraph_vector_int_destroy(v);
+            igraph_free(v);
+        }
+    }
+}
+
 /* This is kind of a BFS to find the components of the graph, after
  * deleting the vertices marked in 'excluded'.
  * These vertices are not put in the BFS queue, but they are added to
@@ -127,10 +139,10 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
-                                      const igraph_vector_t *haystack) {
-    igraph_integer_t nlen = igraph_vector_size(needle);
-    igraph_integer_t hlen = igraph_vector_size(haystack);
+static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
+                                      const igraph_vector_int_t *haystack) {
+    igraph_integer_t nlen = igraph_vector_int_size(needle);
+    igraph_integer_t hlen = igraph_vector_int_size(haystack);
     igraph_integer_t np = 0, hp = 0;
 
     if (hlen < nlen) {
@@ -174,8 +186,8 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
  *    \ref igraph_is_simple().
  * \param blocks If not a null pointer, then it must be an initialized
  *    vector of pointers and the cohesive blocks are stored here.
- *    Each block is encoded with a numeric vector, that contains the
- *    vertex ids of the block.
+ *    Each block is encoded with a vector of type \c igraph_vector_int_t that
+ *    contains the vertex IDs of the block.
  * \param cohesion If not a null pointer, then it must be an initialized
  *    vector and the cohesion of the blocks is stored here, in the same
  *    order as the blocks in the \p blocks pointer vector.
@@ -198,7 +210,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
 igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                            igraph_vector_ptr_t *blocks,
                            igraph_vector_t *cohesion,
-                           igraph_vector_t *parent,
+                           igraph_vector_int_t *parent,
                            igraph_t *block_tree) {
 
     /* Some implementation comments. Everything is relatively
@@ -257,7 +269,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_vector_clear(cohesion);
     }
     if (parent)   {
-        igraph_vector_clear(parent);
+        igraph_vector_int_clear(parent);
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&Q, 1));
@@ -266,7 +278,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&Qmapping, 1));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &Qmapping);
-    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_vectors, &Qmapping);
+    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_int_vectors, &Qmapping);
 
     IGRAPH_CHECK(igraph_vector_int_init(&Qparent, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &Qparent);
@@ -365,7 +377,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         IGRAPH_STATUSF((" %li new candidates,", 0, no));
 
         for (i = 0; i < no; i++) {
-            igraph_vector_t *newmapping;
+            igraph_vector_int_t *newmapping;
             igraph_t *newgraph;
             igraph_integer_t maxdeg;
 
@@ -379,12 +391,12 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_int_push_back(&compvertices, v));
             }
 
-            newmapping = IGRAPH_CALLOC(1, igraph_vector_t);
+            newmapping = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (!newmapping) {
                 IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
             }
             IGRAPH_FINALLY(igraph_free, newmapping);
-            IGRAPH_VECTOR_INIT_FINALLY(newmapping, 0);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(newmapping, 0);
             newgraph = IGRAPH_CALLOC(1, igraph_t);
             if (!newgraph) {
                 IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
@@ -415,7 +427,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             } else {
                 igraph_destroy(newgraph);
                 igraph_free(newgraph);
-                igraph_vector_destroy(newmapping);
+                igraph_vector_int_destroy(newmapping);
                 igraph_free(newmapping);
                 IGRAPH_FINALLY_CLEAN(4);
             }
@@ -466,9 +478,9 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         /* Rewrite the mappings */
         for (i = 1; i < Qptr; i++) {
             igraph_integer_t p = VECTOR(Qparent)[i];
-            igraph_vector_t *mapping = VECTOR(Qmapping)[i];
-            igraph_vector_t *pmapping = VECTOR(Qmapping)[p];
-            igraph_integer_t j, n = igraph_vector_size(mapping);
+            igraph_vector_int_t *mapping = VECTOR(Qmapping)[i];
+            igraph_vector_int_t *pmapping = VECTOR(Qmapping)[p];
+            igraph_integer_t j, n = igraph_vector_int_size(mapping);
 
             if (!pmapping) {
                 continue;
@@ -484,14 +496,14 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
            We check this now. */
         for (i = 1; i < noblocks; i++) {
             igraph_integer_t j, ic;
-            igraph_vector_t *ivec;
+            igraph_vector_int_t *ivec;
             if (!VECTOR(Qcheck)[i] || VECTOR(removed)[i]) {
                 continue;
             }
             ivec = VECTOR(Qmapping)[i];
             ic = VECTOR(Qcohesion)[i];
             for (j = 1; j < noblocks; j++) {
-                igraph_vector_t *jvec;
+                igraph_vector_int_t *jvec;
                 igraph_integer_t jc;
                 if (j == i || !VECTOR(Qcheck)[j] || VECTOR(removed)[j]) {
                     continue;
@@ -515,7 +527,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_resize(cohesion, noblocks));
         }
         if (parent) {
-            IGRAPH_CHECK(igraph_vector_resize(parent, noblocks));
+            IGRAPH_CHECK(igraph_vector_int_resize(parent, noblocks));
         }
 
         for (i = 0; i < Qptr; i++) {
@@ -551,12 +563,12 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
         /* Plus the original graph */
         if (blocks) {
-            igraph_vector_t *orig = IGRAPH_CALLOC(1, igraph_vector_t);
+            igraph_vector_int_t *orig = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (!orig) {
                 IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
             }
             IGRAPH_FINALLY(igraph_free, orig);
-            IGRAPH_CHECK(igraph_vector_init_seq(orig, 0, igraph_vcount(graph) - 1));
+            IGRAPH_CHECK(igraph_vector_int_init_seq(orig, 0, igraph_vcount(graph) - 1));
             VECTOR(*blocks)[0] = orig;
             IGRAPH_FINALLY_CLEAN(1);
         }
@@ -588,7 +600,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_bool_destroy(&Qcheck);
     igraph_vector_int_destroy(&Qcohesion);
     igraph_vector_int_destroy(&Qparent);
-    igraph_i_cohesive_blocks_free_vectors(&Qmapping);
+    igraph_i_cohesive_blocks_free_int_vectors(&Qmapping);
     IGRAPH_FINALLY_CLEAN(4);
 
     igraph_vector_ptr_destroy(&Qmapping);

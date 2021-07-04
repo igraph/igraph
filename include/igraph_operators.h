@@ -75,8 +75,8 @@ IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t mult
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                               const igraph_vs_t vids,
                                               igraph_subgraph_implementation_t impl,
-                                              igraph_vector_t *map,
-                                              igraph_vector_t *invmap);
+                                              igraph_vector_int_t *map,
+                                              igraph_vector_int_t *invmap);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                           const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
 IGRAPH_EXPORT igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
