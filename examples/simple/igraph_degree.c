@@ -216,6 +216,7 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&v);
+    igraph_vector_destroy(&v2);
 
     return 0;
 }
