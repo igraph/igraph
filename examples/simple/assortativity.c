@@ -112,6 +112,7 @@ int main() {
     printf("%.5f\n", res);
 
     igraph_vector_int_destroy(&degree);
+    igraph_vector_destroy(&types);
 
     /*---------------------*/
 
@@ -229,7 +230,6 @@ int main() {
     printf("%.5f\n", res);
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&types);
 
     return 0;
 }
