@@ -592,22 +592,22 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t k
 ) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t deg, order;
+    igraph_vector_int_t deg, order;
     igraph_integer_t i;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
                                /*loops=*/ 0));
 
-    IGRAPH_CHECK(igraph_vector_order1(&deg, &order, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_order1_int(&deg, &order, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_int_resize(res, k));
     for (i = 0; i < k; i++) {
         VECTOR(*res)[i] = VECTOR(order)[no_of_nodes - 1 - i];
     }
 
-    igraph_vector_destroy(&order);
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&order);
+    igraph_vector_int_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

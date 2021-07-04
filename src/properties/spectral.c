@@ -300,8 +300,7 @@ igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                               IGRAPH_OUT, IGRAPH_NO_LOOPS));
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, 0));
 
     if (directed) {
         if (!normalized) {

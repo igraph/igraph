@@ -2033,12 +2033,12 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
         *res = 0;
         *found = 1;
     } else {
-        igraph_vector_t degree;
-        IGRAPH_VECTOR_INIT_FINALLY(&degree, 0);
+        igraph_vector_int_t degree;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
         if (!igraph_is_directed(graph)) {
             IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                        IGRAPH_OUT, IGRAPH_LOOPS));
-            if (igraph_vector_min(&degree) == 1) {
+            if (igraph_vector_int_min(&degree) == 1) {
                 *res = 1;
                 *found = 1;
             }
@@ -2046,19 +2046,19 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
             /* directed, check both in- & out-degree */
             IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                        IGRAPH_OUT, IGRAPH_LOOPS));
-            if (igraph_vector_min(&degree) == 1) {
+            if (igraph_vector_int_min(&degree) == 1) {
                 *res = 1;
                 *found = 1;
             } else {
                 IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                            IGRAPH_IN, IGRAPH_LOOPS));
-                if (igraph_vector_min(&degree) == 1) {
+                if (igraph_vector_int_min(&degree) == 1) {
                     *res = 1;
                     *found = 1;
                 }
             }
         }
-        igraph_vector_destroy(&degree);
+        igraph_vector_int_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
     }
     return IGRAPH_SUCCESS;

@@ -132,7 +132,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     igraph_integer_t last1, last2;
     igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
-    igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+    igraph_vector_int_t indeg1, indeg2, outdeg1, outdeg2;
     igraph_integer_t vsize;
 
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
@@ -237,10 +237,10 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj2);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj2);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg2, 0);
 
     IGRAPH_CHECK(igraph_stack_int_reserve(&path, no_of_nodes * 2));
     IGRAPH_CHECK(igraph_degree(graph1, &indeg1, igraph_vss_all(),
@@ -355,7 +355,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                     out_2_size += 1;
                 }
 
-                inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) last1);
+                inneis_1 = igraph_lazy_adjlist_get(&inadj1, last1);
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -364,7 +364,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         in_1_size -= 1;
                     }
                 }
-                outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) last1);
+                outneis_1 = igraph_lazy_adjlist_get(&outadj1, last1);
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -373,7 +373,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         out_1_size -= 1;
                     }
                 }
-                inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) last2);
+                inneis_2 = igraph_lazy_adjlist_get(&inadj2, last2);
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -382,7 +382,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         in_2_size -= 1;
                     }
                 }
-                outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) last2);
+                outneis_2 = igraph_lazy_adjlist_get(&outadj2, last2);
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -401,10 +401,10 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
             /* step forward if worth, check if worth first */
             igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
             igraph_bool_t end = 0;
-            inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) cand1);
-            outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) cand1);
-            inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) cand2);
-            outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) cand2);
+            inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
+            outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
+            inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
+            outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
             if (VECTOR(indeg1)[cand1] != VECTOR(indeg2)[cand2] ||
                 VECTOR(outdeg1)[cand1] != VECTOR(outdeg2)[cand2]) {
                 end = 1;
@@ -412,9 +412,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
             if (vertex_color1 && VECTOR(*vertex_color1)[cand1] != VECTOR(*vertex_color2)[cand2]) {
                 end = 1;
             }
-            if (node_compat_fn && !node_compat_fn(graph1, graph2,
-                                                  (igraph_integer_t) cand1,
-                                                  (igraph_integer_t) cand2, arg)) {
+            if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, arg)) {
                 end = 1;
             }
 
@@ -428,11 +426,9 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         end = 1;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, (igraph_integer_t) node,
-                                       (igraph_integer_t) cand1, /*directed=*/ 1,
+                        igraph_get_eid(graph1, &eid1, node, cand1, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, (igraph_integer_t) node2,
-                                       (igraph_integer_t) cand2, /*directed=*/ 1,
+                        igraph_get_eid(graph2, &eid2, node2, cand2, /*directed=*/ 1,
                                        /*error=*/ 1);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
@@ -462,11 +458,9 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         end = 1;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, (igraph_integer_t) cand1,
-                                       (igraph_integer_t) node, /*directed=*/ 1,
+                        igraph_get_eid(graph1, &eid1, cand1, node, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, (igraph_integer_t) cand2,
-                                       (igraph_integer_t) node2, /*directed=*/ 1,
+                        igraph_get_eid(graph2, &eid2, cand2, node2, /*directed=*/ 1,
                                        /*error=*/ 1);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
@@ -496,11 +490,9 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         end = 1;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, (igraph_integer_t) node2,
-                                       (igraph_integer_t) cand1, /*directed=*/ 1,
+                        igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, (igraph_integer_t) node,
-                                       (igraph_integer_t) cand2, /*directed=*/ 1,
+                        igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1,
                                        /*error=*/ 1);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
@@ -530,11 +522,9 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         end = 1;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, (igraph_integer_t) cand1,
-                                       (igraph_integer_t) node2, /*directed=*/ 1,
+                        igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, (igraph_integer_t) cand2,
-                                       (igraph_integer_t) node, /*directed=*/ 1,
+                        igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1,
                                        /*error=*/ 1);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
@@ -578,7 +568,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                     out_2_size -= 1;
                 }
 
-                inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) cand1);
+                inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -587,7 +577,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         in_1_size += 1;
                     }
                 }
-                outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) cand1);
+                outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -596,7 +586,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         out_1_size += 1;
                     }
                 }
-                inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) cand2);
+                inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -605,7 +595,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
                         in_2_size += 1;
                     }
                 }
-                outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) cand2);
+                outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -631,10 +621,10 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
         }
     }
 
-    igraph_vector_destroy(&outdeg2);
-    igraph_vector_destroy(&outdeg1);
-    igraph_vector_destroy(&indeg2);
-    igraph_vector_destroy(&indeg1);
+    igraph_vector_int_destroy(&outdeg2);
+    igraph_vector_int_destroy(&outdeg1);
+    igraph_vector_int_destroy(&indeg2);
+    igraph_vector_int_destroy(&indeg1);
     igraph_lazy_adjlist_destroy(&outadj2);
     igraph_lazy_adjlist_destroy(&inadj2);
     igraph_lazy_adjlist_destroy(&outadj1);
@@ -907,11 +897,10 @@ static igraph_error_t igraph_i_get_isomorphisms_vf2(
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it is empty if the input graphs
  *   are not isomorphic. Otherwise it contains pointers to
- *   \ref igraph_vector_int_t objects, each vector is an
+ *   \c igraph_vector_int_t objects, each vector is an
  *   isomorphic mapping of \p graph2 to \p graph1. Please note that
- *   you need to 1) Destroy the vectors via \ref
- *   igraph_vector_int_destroy(), 2) free them via
- *   \ref igraph_free() and then 3) call \ref
+ *   you need to 1) Destroy the vectors via \c igraph_vector_int_destroy(),
+ *   2) free them via \ref igraph_free() and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
  * \param node_compat_fn A pointer to a function of type \ref
@@ -1033,7 +1022,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_integer_t last1, last2;
     igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
-    igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+    igraph_vector_int_t indeg1, indeg2, outdeg1, outdeg2;
     igraph_integer_t vsize;
 
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
@@ -1108,10 +1097,10 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inadj2);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &outadj2);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdeg2, 0);
 
     IGRAPH_CHECK(igraph_stack_int_reserve(&path, no_of_nodes2 * 2));
     IGRAPH_CHECK(igraph_degree(graph1, &indeg1, igraph_vss_all(),
@@ -1226,7 +1215,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     out_2_size += 1;
                 }
 
-                inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) last1);
+                inneis_1 = igraph_lazy_adjlist_get(&inadj1, last1);
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -1235,7 +1224,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         in_1_size -= 1;
                     }
                 }
-                outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) last1);
+                outneis_1 = igraph_lazy_adjlist_get(&outadj1, last1);
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -1244,7 +1233,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         out_1_size -= 1;
                     }
                 }
-                inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) last2);
+                inneis_2 = igraph_lazy_adjlist_get(&inadj2, last2);
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -1253,7 +1242,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         in_2_size -= 1;
                     }
                 }
-                outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) last2);
+                outneis_2 = igraph_lazy_adjlist_get(&outadj2, last2);
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -1272,10 +1261,10 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
             /* step forward if worth, check if worth first */
             igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
             igraph_bool_t end = 0;
-            inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) cand1);
-            outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) cand1);
-            inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) cand2);
-            outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) cand2);
+            inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
+            outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
+            inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
+            outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
             if (VECTOR(indeg1)[cand1] < VECTOR(indeg2)[cand2] ||
                 VECTOR(outdeg1)[cand1] < VECTOR(outdeg2)[cand2]) {
                 end = 1;
@@ -1283,9 +1272,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
             if (vertex_color1 && VECTOR(*vertex_color1)[cand1] != VECTOR(*vertex_color2)[cand2]) {
                 end = 1;
             }
-            if (node_compat_fn && !node_compat_fn(graph1, graph2,
-                                                  (igraph_integer_t) cand1,
-                                                  (igraph_integer_t) cand2, arg)) {
+            if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, arg)) {
                 end = 1;
             }
 
@@ -1323,11 +1310,9 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         end = 1;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, (igraph_integer_t) node2,
-                                       (igraph_integer_t) cand1, /*directed=*/ 1,
+                        igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, (igraph_integer_t) node,
-                                       (igraph_integer_t) cand2, /*directed=*/ 1,
+                        igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1,
                                        /*error=*/ 1);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
@@ -1357,11 +1342,9 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         end = 1;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, (igraph_integer_t) cand1,
-                                       (igraph_integer_t) node2, /*directed=*/ 1,
+                        igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1,
                                        /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, (igraph_integer_t) cand2,
-                                       (igraph_integer_t) node, /*directed=*/ 1,
+                        igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1,
                                        /*error=*/ 1);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
@@ -1405,7 +1388,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     out_2_size -= 1;
                 }
 
-                inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) cand1);
+                inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -1414,7 +1397,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         in_1_size += 1;
                     }
                 }
-                outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) cand1);
+                outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -1423,7 +1406,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         out_1_size += 1;
                     }
                 }
-                inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) cand2);
+                inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -1432,7 +1415,7 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         in_2_size += 1;
                     }
                 }
-                outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) cand2);
+                outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -1458,10 +1441,10 @@ igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
         }
     }
 
-    igraph_vector_destroy(&outdeg2);
-    igraph_vector_destroy(&outdeg1);
-    igraph_vector_destroy(&indeg2);
-    igraph_vector_destroy(&indeg1);
+    igraph_vector_int_destroy(&outdeg2);
+    igraph_vector_int_destroy(&outdeg1);
+    igraph_vector_int_destroy(&indeg2);
+    igraph_vector_int_destroy(&indeg1);
     igraph_lazy_adjlist_destroy(&outadj2);
     igraph_lazy_adjlist_destroy(&inadj2);
     igraph_lazy_adjlist_destroy(&outadj1);
@@ -1702,11 +1685,10 @@ static igraph_error_t igraph_i_get_subisomorphisms_vf2(
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it contains pointers to
- *   \ref igraph_vector_int_t objects, each vector is an
- *   isomorphic mapping of \p graph2 to a subgraph of \p graph1. Please note that
- *   you need to 1) Destroy the vectors via \ref
- *   igraph_vector_int_destroy(), 2) free them via
- *   \ref igraph_free() and then 3) call \ref
+ *   \c igraph_vector_int_t objects, each vector is an isomorphic mapping of
+ *   \p graph2 to a subgraph of \p graph1. Please note that you need to
+ *   1) Destroy the vectors via \c igraph_vector_int_destroy(), 2) free them
+ *   via \ref igraph_free() and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
  * \param node_compat_fn A pointer to a function of type \ref

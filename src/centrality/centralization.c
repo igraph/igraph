@@ -21,6 +21,7 @@
 #include "igraph_centrality.h"
 
 #include "igraph_interface.h"
+#include "igraph_structural.h"
 #include "igraph_vector.h"
 
 #include "core/math.h"
@@ -144,10 +145,8 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
         IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
     }
 
-    IGRAPH_CHECK(igraph_degree(graph, scores, igraph_vss_all(), mode, loops));
-
-    IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops,
-                 tmax));
+    IGRAPH_CHECK(igraph_strength(graph, scores, igraph_vss_all(), mode, loops, 0));
+    IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops, tmax));
 
     *centralization = igraph_centralization(scores, *tmax, normalized);
 

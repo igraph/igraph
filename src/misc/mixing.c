@@ -24,6 +24,7 @@
 #include "igraph_mixing.h"
 
 #include "igraph_interface.h"
+#include "igraph_structural.h"
 
 /**
  * \function igraph_assortativity_nominal
@@ -276,25 +277,28 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                 igraph_bool_t directed) {
 
     directed = directed && igraph_is_directed(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (directed) {
         igraph_vector_t indegree, outdegree;
-        igraph_vector_init(&indegree, 0);
-        igraph_vector_init(&outdegree, 0);
-        igraph_degree(graph, &indegree, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1);
-        igraph_degree(graph, &outdegree, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1);
+        IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+        IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
+        IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, 0));
+        IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, 0));
         igraph_vector_add_constant(&indegree, -1);
         igraph_vector_add_constant(&outdegree, -1);
-        igraph_assortativity(graph, &outdegree, &indegree, res, /*directed=*/ 1);
+        IGRAPH_CHECK(igraph_assortativity(graph, &outdegree, &indegree, res, /*directed=*/ 1));
         igraph_vector_destroy(&indegree);
         igraph_vector_destroy(&outdegree);
+        IGRAPH_FINALLY_CLEAN(2);
     } else {
         igraph_vector_t degree;
-        igraph_vector_init(&degree, 0);
-        igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1);
+        IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+        IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, 0));
         igraph_vector_add_constant(&degree, -1);
-        igraph_assortativity(graph, &degree, 0, res, /*directed=*/ 0);
+        IGRAPH_CHECK(igraph_assortativity(graph, &degree, 0, res, /*directed=*/ 0));
         igraph_vector_destroy(&degree);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     return IGRAPH_SUCCESS;

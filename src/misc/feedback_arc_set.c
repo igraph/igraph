@@ -199,7 +199,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
     igraph_dqueue_int_t sources, sinks;
     igraph_vector_t neis;
-    igraph_vector_t indegrees, outdegrees;
+    igraph_vector_int_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
     igraph_integer_t* ordering;
     igraph_integer_t order_next_pos = 0, order_next_neg = -1;
@@ -208,8 +208,8 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     ordering = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_FINALLY(igraph_free, ordering);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&indegrees, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&outdegrees, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&indegrees, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outdegrees, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&instrengths, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&outstrengths, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -225,8 +225,12 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         IGRAPH_CHECK(igraph_strength(graph, &instrengths, igraph_vss_all(), IGRAPH_IN, 0, weights));
         IGRAPH_CHECK(igraph_strength(graph, &outstrengths, igraph_vss_all(), IGRAPH_OUT, 0, weights));
     } else {
-        IGRAPH_CHECK(igraph_vector_update(&instrengths, &indegrees));
-        IGRAPH_CHECK(igraph_vector_update(&outstrengths, &outdegrees));
+        IGRAPH_CHECK(igraph_vector_resize(&instrengths, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_resize(&outstrengths, no_of_nodes));
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            VECTOR(instrengths)[i] = VECTOR(indegrees)[i];
+            VECTOR(outstrengths)[i] = VECTOR(outdegrees)[i];
+        }
     }
 
     /* Find initial sources and sinks */
@@ -371,8 +375,8 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&outstrengths);
     igraph_vector_destroy(&instrengths);
-    igraph_vector_destroy(&outdegrees);
-    igraph_vector_destroy(&indegrees);
+    igraph_vector_int_destroy(&outdegrees);
+    igraph_vector_int_destroy(&indegrees);
     IGRAPH_FINALLY_CLEAN(7);
 
     /* Tidy up the ordering */

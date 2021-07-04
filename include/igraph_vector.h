@@ -161,6 +161,9 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v,
                                        igraph_vector_bool_t *is_nan);
 IGRAPH_EXPORT igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v);
 
+IGRAPH_EXPORT igraph_error_t igraph_vector_int_order1_int(const igraph_vector_int_t* v,
+                                           igraph_vector_int_t* res, igraph_real_t maxval);
+
 __END_DECLS
 
 #endif

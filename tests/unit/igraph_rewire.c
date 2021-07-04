@@ -26,24 +26,24 @@
 static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, igraph_bool_t allow_loops, const char* description) {
 
     igraph_t g;
-    igraph_vector_t indegree_before, outdegree_before, indegree_after, outdegree_after;
+    igraph_vector_int_t indegree_before, outdegree_before, indegree_after, outdegree_after;
 
     igraph_tree(&g, 10, 3, tree_mode);
 
-    igraph_vector_init(&indegree_before, 0);
-    igraph_vector_init(&outdegree_before, 0);
+    igraph_vector_int_init(&indegree_before, 0);
+    igraph_vector_int_init(&outdegree_before, 0);
     igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 1);
     igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 1);
 
     igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_REWIRING_SIMPLE_LOOPS : IGRAPH_REWIRING_SIMPLE, use_adjlist);
 
-    igraph_vector_init(&indegree_after, 0);
-    igraph_vector_init(&outdegree_after, 0);
+    igraph_vector_int_init(&indegree_after, 0);
+    igraph_vector_int_init(&outdegree_after, 0);
     igraph_degree(&g, &indegree_after, igraph_vss_all(), IGRAPH_IN, 1);
     igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, 1);
 
-    if ((!igraph_vector_all_e(&indegree_before, &indegree_after)) ||
-        (!igraph_vector_all_e(&outdegree_before, &outdegree_after))) {
+    if ((!igraph_vector_int_all_e(&indegree_before, &indegree_after)) ||
+        (!igraph_vector_int_all_e(&outdegree_before, &outdegree_after))) {
 
         printf("%s: graph degrees changed. Rewired graph is below.\n", description);
         print_graph(&g);
@@ -52,10 +52,10 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     }
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&indegree_before);
-    igraph_vector_destroy(&outdegree_before);
-    igraph_vector_destroy(&indegree_after);
-    igraph_vector_destroy(&outdegree_after);
+    igraph_vector_int_destroy(&indegree_before);
+    igraph_vector_int_destroy(&outdegree_before);
+    igraph_vector_int_destroy(&indegree_after);
+    igraph_vector_int_destroy(&outdegree_after);
 
 }
 

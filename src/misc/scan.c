@@ -72,7 +72,15 @@ igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
         igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
                         weights);
     } else {
-        igraph_degree(graph, res, igraph_vss_all(), mode, /*loops=*/ 1);
+        igraph_vector_int_t degrees;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
+        igraph_degree(graph, &degrees, igraph_vss_all(), mode, /*loops=*/ 1);
+        igraph_vector_resize(res, igraph_vector_int_size(&degrees));
+        for (igraph_integer_t i = 0; i < igraph_vcount(graph); i++) {
+            VECTOR(*res)[i] = VECTOR(degrees)[i];
+        }
+        igraph_vector_int_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     return IGRAPH_SUCCESS;
 }
@@ -265,7 +273,7 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
     igraph_vector_int_t order;
     igraph_vector_int_t rank;
-    igraph_vector_t degree, *edge1 = &degree; /* reuse degree as edge1 */
+    igraph_vector_int_t degree, *edge1 = &degree; /* reuse degree as edge1 */
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
@@ -273,12 +281,12 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
     igraph_vector_int_init(&order, no_of_nodes);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = igraph_vector_max(&degree) + 1;
-    igraph_vector_order1_int(&degree, &order, maxdegree);
+    maxdegree = igraph_vector_int_max(&degree) + 1;
+    igraph_vector_int_order1_int(&degree, &order, maxdegree);
     igraph_vector_int_init(&rank, no_of_nodes);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
     for (i = 0; i < no_of_nodes; i++) {
@@ -336,7 +344,7 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     igraph_free(neis);
     igraph_inclist_destroy(&allinc);
     igraph_vector_int_destroy(&rank);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(5);
 
@@ -458,7 +466,14 @@ igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them
     igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0);
     IGRAPH_FINALLY(igraph_destroy, &is);
 
-    igraph_degree(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS);
+    igraph_vector_int_t degrees;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
+    igraph_degree(&is, &degrees, igraph_vss_all(), mode, IGRAPH_LOOPS);
+    for (igraph_integer_t i = 0; i < igraph_vcount(&is); i++) {
+        VECTOR(*res)[i] = VECTOR(degrees)[i];
+    }
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(1);
 
     igraph_destroy(&is);
     IGRAPH_FINALLY_CLEAN(1);

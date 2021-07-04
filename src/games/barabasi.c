@@ -104,11 +104,11 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
 
     /* The first node(s) in the bag */
     if (start_from) {
-        igraph_vector_t deg;
+        igraph_vector_int_t deg;
         igraph_integer_t ii, jj, sn = igraph_vcount(start_from);
         igraph_neimode_t mm = outpref ? IGRAPH_ALL : IGRAPH_IN;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&deg, sn);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, sn);
         IGRAPH_CHECK(igraph_degree(start_from, &deg, igraph_vss_all(), mm,
                                    IGRAPH_LOOPS));
         for (ii = 0; ii < sn; ii++) {
@@ -118,7 +118,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
             }
         }
 
-        igraph_vector_destroy(&deg);
+        igraph_vector_int_destroy(&deg);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         bag[bagp++] = 0;
@@ -184,7 +184,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_integer_t start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
@@ -208,7 +208,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     /* first node(s) */
     if (start_from) {
@@ -216,7 +216,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
         igraph_neimode_t mm = outpref ? IGRAPH_ALL : IGRAPH_IN;
         IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
                                    IGRAPH_LOOPS));
-        IGRAPH_CHECK(igraph_vector_resize(&degree,  no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(&degree,  no_of_nodes));
         for (ii = 0; ii < sn; ii++) {
             IGRAPH_CHECK(igraph_psumtree_update(&sumtree, ii, pow(VECTOR(degree)[ii], power) + A));
         }
@@ -265,7 +265,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     RNG_END();
 
     igraph_psumtree_destroy(&sumtree);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(2);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
@@ -291,7 +291,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
     igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_integer_t start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
@@ -316,7 +316,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     RNG_BEGIN();
 
@@ -326,7 +326,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
         igraph_neimode_t mm = outpref ? IGRAPH_ALL : IGRAPH_IN;
         IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
                                    IGRAPH_LOOPS));
-        IGRAPH_CHECK(igraph_vector_resize(&degree,  no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(&degree,  no_of_nodes));
         for (ii = 0; ii < sn; ii++) {
             IGRAPH_CHECK(igraph_psumtree_update(&sumtree, ii, pow(VECTOR(degree)[ii], power) + A));
         }
@@ -386,7 +386,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
     RNG_END();
 
     igraph_psumtree_destroy(&sumtree);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(2);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
@@ -628,7 +628,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
 
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of nodes must not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
@@ -689,7 +689,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     RNG_BEGIN();
 
@@ -751,7 +751,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
 
     RNG_END();
 
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_psumtree_destroy(&sumtree);
     IGRAPH_FINALLY_CLEAN(2);
 

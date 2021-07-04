@@ -997,7 +997,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  *
  * \example examples/simple/igraph_degree.c
  */
-igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                   const igraph_vs_t vids,
                   igraph_neimode_t mode, igraph_bool_t loops) {
 
@@ -1017,8 +1017,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_t *res,
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
-    igraph_vector_null(res);
+    IGRAPH_CHECK(igraph_vector_int_resize(res, nodes_to_calc));
+    igraph_vector_int_null(res);
 
     if (loops) {
         if (mode & IGRAPH_OUT) {

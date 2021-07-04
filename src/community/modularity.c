@@ -306,6 +306,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
     igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
+    igraph_vector_int_t deg_int, in_deg_int, out_deg_int;
     igraph_integer_t i, j;
     igraph_real_t scaling_factor;
     if (weights && igraph_vector_size(weights) != no_of_edges) {
@@ -325,10 +326,19 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&in_deg, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&out_deg, no_of_nodes);
         if (!weights) {
-            IGRAPH_CHECK(igraph_degree(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&in_deg_int, no_of_nodes);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&out_deg_int, no_of_nodes);
+            IGRAPH_CHECK(igraph_degree(graph, &in_deg_int, igraph_vss_all(), IGRAPH_IN,
                                        IGRAPH_LOOPS));
-            IGRAPH_CHECK(igraph_degree(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
+            IGRAPH_CHECK(igraph_degree(graph, &out_deg_int, igraph_vss_all(), IGRAPH_OUT,
                                        IGRAPH_LOOPS));
+            for (i = 0; i < no_of_nodes; i++) {
+                VECTOR(in_deg)[i] = VECTOR(in_deg_int)[i];
+                VECTOR(out_deg)[i] = VECTOR(out_deg_int)[i];
+            }
+            igraph_vector_int_destroy(&in_deg_int);
+            igraph_vector_int_destroy(&out_deg_int);
+            IGRAPH_FINALLY_CLEAN(2);
         } else {
             IGRAPH_CHECK(igraph_strength(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
                                          IGRAPH_LOOPS, weights));
@@ -350,8 +360,14 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
         if (!weights) {
-            IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_int, no_of_nodes);
+            IGRAPH_CHECK(igraph_degree(graph, &deg_int, igraph_vss_all(), IGRAPH_ALL,
                                        IGRAPH_LOOPS));
+            for (i = 0; i < no_of_nodes; i++) {
+                VECTOR(deg)[i] = VECTOR(deg_int)[i];
+            }
+            igraph_vector_int_destroy(&deg_int);
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
                                          IGRAPH_LOOPS, weights));
