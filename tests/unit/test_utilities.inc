@@ -181,13 +181,13 @@ void print_graph_canon(const igraph_t *graph) {
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t i;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
 
     printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
     printf("vcount: %" IGRAPH_PRId "\n", vcount);
     printf("edges: {\n");
 
-    igraph_vector_init(&edges, 0);
+    igraph_vector_int_init(&edges, 0);
     igraph_get_edgelist(graph, &edges, 0);
 
     /* If the graph is undirected, we make sure that the first vertex of undirected edges
@@ -209,7 +209,7 @@ void print_graph_canon(const igraph_t *graph) {
         printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", (igraph_integer_t) VECTOR(edges)[2*i], (igraph_integer_t) VECTOR(edges)[2*i+1]);
     }
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
 
     printf("}\n");
 }

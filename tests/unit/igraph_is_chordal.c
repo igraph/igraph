@@ -22,20 +22,20 @@
 void call_and_print(igraph_t *graph, igraph_vector_t *alpha, igraph_vector_t *alpham1,
                     igraph_bool_t fill, igraph_bool_t ng) {
     igraph_bool_t chordal;
-    igraph_vector_t fill_in;
+    igraph_vector_int_t fill_in;
     igraph_t newgraph;
-    igraph_vector_init(&fill_in, 0);
+    igraph_vector_int_init(&fill_in, 0);
     IGRAPH_ASSERT(igraph_is_chordal(graph, alpha, alpham1, &chordal,
                   fill ? &fill_in : NULL, ng? &newgraph : NULL) == IGRAPH_SUCCESS);
     printf("Is chordal: %d\nFill in:\n", chordal);
-    print_vector(&fill_in);
+    print_vector_int(&fill_in);
     if (ng) {
         printf("New graph:\n");
         print_graph_canon(&newgraph);
         igraph_destroy(&newgraph);
     }
     printf("\n");
-    igraph_vector_destroy(&fill_in);
+    igraph_vector_int_destroy(&fill_in);
 }
 
 

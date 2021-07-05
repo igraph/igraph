@@ -35,14 +35,14 @@ int main() {
 
     igraph_t g;
     igraph_vector_int_t v;
-    igraph_vector_t v2;
+    igraph_vector_int_t v2;
     igraph_vector_int_t seq;
     igraph_error_t ret;
     igraph_integer_t i, mdeg, ndeg, nedges;
 
     /* Create graph */
     igraph_vector_int_init(&v, 8);
-    igraph_vector_init(&v2, 8);
+    igraph_vector_int_init(&v2, 8);
     VECTOR(v2)[0] = 0;
     VECTOR(v2)[1] = 1;
     VECTOR(v2)[2] = 1;
@@ -86,7 +86,7 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_vector_resize(&v2, 8);
+    igraph_vector_int_resize(&v2, 8);
     VECTOR(v2)[0] = 0;
     VECTOR(v2)[1] = 1;
     VECTOR(v2)[2] = 1;
@@ -216,7 +216,7 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&v);
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_destroy(&v2);
 
     return 0;
 }

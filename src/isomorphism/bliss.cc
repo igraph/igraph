@@ -451,8 +451,8 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     igraph_integer_t no_of_edges = igraph_ecount(graph1);
     igraph_vector_int_t perm1, perm2;
     igraph_vector_int_t vmap12, *mymap12 = &vmap12;
-    igraph_vector_t from, to, index;
-    igraph_vector_t from2, to2, index2;
+    igraph_vector_int_t from, to, index;
+    igraph_vector_int_t from2, to2, index2;
     igraph_bool_t directed;
     igraph_integer_t i, j;
 
@@ -521,12 +521,12 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     /* Check isomorphism, we apply the permutation in mymap12 to graph1
        and should get graph2 */
 
-    IGRAPH_VECTOR_INIT_FINALLY(&from, no_of_edges);
-    IGRAPH_VECTOR_INIT_FINALLY(&to, no_of_edges);
-    IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_edges);
-    IGRAPH_VECTOR_INIT_FINALLY(&from2, no_of_edges * 2);
-    IGRAPH_VECTOR_INIT_FINALLY(&to2, no_of_edges);
-    IGRAPH_VECTOR_INIT_FINALLY(&index2, no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&from, no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&to, no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&from2, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&to2, no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&index2, no_of_edges);
 
     for (i = 0; i < no_of_edges; i++) {
         VECTOR(from)[i] = VECTOR(*mymap12)[ IGRAPH_FROM(graph1, i) ];
@@ -537,7 +537,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
             VECTOR(to)[i] = tmp;
         }
     }
-    igraph_vector_order(&from, &to, &index, no_of_nodes);
+    igraph_vector_int_order(&from, &to, &index, no_of_nodes);
 
     igraph_get_edgelist(graph2, &from2, /*bycol=*/ 1);
     for (i = 0, j = no_of_edges; i < no_of_edges; i++, j++) {
@@ -548,8 +548,8 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
             VECTOR(to2)[i] = tmp;
         }
     }
-    igraph_vector_resize(&from2, no_of_edges);
-    igraph_vector_order(&from2, &to2, &index2, no_of_nodes);
+    igraph_vector_int_resize(&from2, no_of_edges);
+    igraph_vector_int_order(&from2, &to2, &index2, no_of_nodes);
 
     *iso = 1;
     for (i = 0; i < no_of_edges; i++) {
@@ -574,12 +574,12 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         }
     }
 
-    igraph_vector_destroy(&index2);
-    igraph_vector_destroy(&to2);
-    igraph_vector_destroy(&from2);
-    igraph_vector_destroy(&index);
-    igraph_vector_destroy(&to);
-    igraph_vector_destroy(&from);
+    igraph_vector_int_destroy(&index2);
+    igraph_vector_int_destroy(&to2);
+    igraph_vector_int_destroy(&from2);
+    igraph_vector_int_destroy(&index);
+    igraph_vector_int_destroy(&to);
+    igraph_vector_int_destroy(&from);
     IGRAPH_FINALLY_CLEAN(6);
 
     if (*iso) {

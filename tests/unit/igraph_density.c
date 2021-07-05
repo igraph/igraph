@@ -43,9 +43,9 @@ void test_density(const igraph_t *graph, igraph_bool_t loops) {
 int main() {
 
     igraph_t g;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
 
-    igraph_vector_init(&v, 0);
+    igraph_vector_int_init(&v, 0);
 
     /* Test graphs with no vertices and no edges */
     igraph_create(&g, &v, 0, IGRAPH_UNDIRECTED);
@@ -70,7 +70,7 @@ int main() {
     printf("======\n");
 
     /* Test graphs with one vertex and a loop edge */
-    igraph_vector_resize(&v, 2);
+    igraph_vector_int_resize(&v, 2);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 0;
     igraph_create(&g, &v, 1, IGRAPH_UNDIRECTED);
@@ -82,7 +82,7 @@ int main() {
     printf("======\n");
 
     /* Test graphs with one vertex and two loop edges */
-    igraph_vector_resize(&v, 4);
+    igraph_vector_int_resize(&v, 4);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 0;
     VECTOR(v)[2] = 0;
@@ -96,7 +96,7 @@ int main() {
     printf("======\n");
 
     /* Test graphs with two vertices and one edge between them */
-    igraph_vector_resize(&v, 2);
+    igraph_vector_int_resize(&v, 2);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     igraph_create(&g, &v, 2, IGRAPH_UNDIRECTED);
@@ -111,7 +111,7 @@ int main() {
 
     /* Test graphs with two vertices, one edge between them and a loop on one
      * of them */
-    igraph_vector_resize(&v, 4);
+    igraph_vector_int_resize(&v, 4);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 1;
@@ -126,7 +126,7 @@ int main() {
 
     /* Test graphs with two vertices, one edge between them and a loop on both
      * of them */
-    igraph_vector_resize(&v, 6);
+    igraph_vector_int_resize(&v, 6);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 1;
@@ -147,7 +147,7 @@ int main() {
     test_density(&g, 1);
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     VERIFY_FINALLY_STACK();
 

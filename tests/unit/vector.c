@@ -29,6 +29,7 @@
 int main() {
 
     igraph_vector_t v, v2, v3;
+    igraph_vector_int_t v4;
     igraph_integer_t i;
     igraph_real_t *ptr;
     igraph_integer_t pos;
@@ -333,12 +334,12 @@ int main() {
 
     printf("Test rank\n");
     igraph_vector_init_int_end(&v, -1, 0, 1, 2, 6, 5, 2, 1, 0, -1);
-    igraph_vector_init(&v2, 0);
-    igraph_vector_rank(&v, &v2, 7);
+    igraph_vector_int_init(&v4, 0);
+    igraph_vector_rank(&v, &v4, 7);
     print_vector_format(&v, stdout, "%g");
-    print_vector_format(&v2, stdout, "%g");
+    print_vector_int(&v4);
     igraph_vector_destroy(&v);
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_destroy(&v4);
 
     printf("Test order\n");
     igraph_vector_init_int_end(&v,  -1, 1, 1, 2, 2, -1);

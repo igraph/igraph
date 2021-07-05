@@ -34,31 +34,31 @@ void print_vector(igraph_vector_t *v) {
 int main() {
 
     igraph_t left, right, isec;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     igraph_vector_ptr_t glist;
     igraph_t g1, g2, g3;
     igraph_vector_t edge_map1, edge_map2;
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
     igraph_create(&left, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 1, 0, 5, 4, 1, 2, 3, 2, -1);
+    igraph_vector_int_init_int_end(&v, -1, 1, 0, 5, 4, 1, 2, 3, 2, -1);
     igraph_create(&right, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_vector_init(&edge_map1, 0);
     igraph_vector_init(&edge_map2, 0);
 
     igraph_intersection(&isec, &left, &right, &edge_map1, &edge_map2);
-    igraph_vector_init(&v, 0);
+    igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&isec, &v, 0);
     printf("---\n");
-    print_vector(&v);
+    igraph_vector_int_print(&v);
     print_vector(&edge_map1);
     print_vector(&edge_map2);
     printf("---\n");
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&left);
     igraph_destroy(&right);
     igraph_destroy(&isec);
@@ -76,12 +76,12 @@ int main() {
 
     /* graph list with an empty graph */
     igraph_vector_ptr_init(&glist, 3);
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
     igraph_create(&g1, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
+    igraph_vector_int_destroy(&v);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
     igraph_create(&g2, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_empty(&g3, 10, IGRAPH_DIRECTED);
 
     VECTOR(glist)[0] = &g1;
@@ -99,15 +99,15 @@ int main() {
 
     /* "proper" graph list */
     igraph_vector_ptr_init(&glist, 3);
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
     igraph_create(&g1, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, 3, 2, 4, 5, 6, 5, -1);
+    igraph_vector_int_destroy(&v);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, 3, 2, 4, 5, 6, 5, -1);
     igraph_create(&g2, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
-    igraph_vector_init_int_end(&v, -1, 2, 3, 1, 0, 1, 2, 3, 2, 4, 5, 6, 5, 2, 3, -1);
+    igraph_vector_int_destroy(&v);
+    igraph_vector_int_init_int_end(&v, -1, 2, 3, 1, 0, 1, 2, 3, 2, 4, 5, 6, 5, 2, 3, -1);
     igraph_create(&g3, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     VECTOR(glist)[0] = &g1;
     VECTOR(glist)[1] = &g2;

@@ -58,13 +58,13 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
     char name[255];
     NNode *node1, *node2;
     DLList_Iter<NNode*> iter;
-    igraph_vector_t edgelist;
+    igraph_vector_int_t edgelist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t ii;
     const char *empty = "";
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edgelist, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, no_of_edges * 2);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0 /* rowwise */));
 
     for (ii = 0; ii < no_of_nodes; ii++) {
@@ -101,7 +101,7 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    igraph_vector_destroy(&edgelist);
+    igraph_vector_int_destroy(&edgelist);
 
     node1 = iter.First(net->node_list);
     while (!iter.End()) {

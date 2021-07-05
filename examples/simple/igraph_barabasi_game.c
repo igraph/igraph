@@ -26,7 +26,7 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     igraph_vector_int_t v2, v3;
     int i, ret;
 
@@ -42,14 +42,14 @@ int main() {
         return 3;
     }
 
-    igraph_vector_init(&v, 0);
+    igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
     for (i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
             return 4;
         }
     }
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 
     /* out-degree sequence */
@@ -78,7 +78,7 @@ int main() {
        would need to set random seed */
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 1, /*A=*/ 1, 1,
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
-    igraph_vector_init(&v, 0);
+    igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
     for (i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
@@ -88,7 +88,7 @@ int main() {
     if (!igraph_is_directed(&g)) {
         return 8;
     }
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 
     /* Error tests */

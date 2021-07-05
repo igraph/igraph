@@ -25,11 +25,11 @@
 #include <stdarg.h>
 
 void print(igraph_t *g) {
-    igraph_vector_t el;
+    igraph_vector_int_t el;
     igraph_integer_t i, j, n;
     char ch = igraph_is_directed(g) ? '>' : '-';
 
-    igraph_vector_init(&el, 0);
+    igraph_vector_int_init(&el, 0);
     igraph_get_edgelist(g, &el, 0);
     n = igraph_ecount(g);
 
@@ -39,7 +39,7 @@ void print(igraph_t *g) {
     }
     printf("\n");
 
-    igraph_vector_destroy(&el);
+    igraph_vector_int_destroy(&el);
 }
 
 int main() {

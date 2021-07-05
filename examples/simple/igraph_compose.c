@@ -26,7 +26,7 @@
 int main() {
 
     igraph_t g1, g2, res;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     igraph_vector_t map1, map2;
 
     igraph_vector_init(&map1, 0);
@@ -77,13 +77,13 @@ int main() {
     igraph_destroy(&g2);
 
     /* proper directed graph */
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
     igraph_create(&g1, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 2, 4, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 2, 4, 5, 6, -1);
     igraph_create(&g2, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_compose(&res, &g1, &g2, &map1, &map2);
     igraph_write_graph_edgelist(&res, stdout);
@@ -94,13 +94,13 @@ int main() {
     igraph_destroy(&g2);
 
     /* undirected graph */
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
     igraph_create(&g1, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 0, 4, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 0, 4, 5, 6, -1);
     igraph_create(&g2, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_compose(&res, &g1, &g2, &map1, &map2);
     igraph_write_graph_edgelist(&res, stdout);

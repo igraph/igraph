@@ -57,11 +57,11 @@ int main() {
     const igraph_integer_t n = 10; /* number of vertices in test graph */
 
     /* edges of the test graph */
-    igraph_vector_t edges;
-    igraph_real_t edge_data[] = {0., 1., 0., 6., 0., 7., 0., 8., 0., 9., 1., 2., 1., 3., 1., 4., 1.,
-                                 6., 1., 7., 1., 8., 1., 9., 2., 3., 2., 5., 2., 6., 2., 7., 2., 9.,
-                                 3., 5., 3., 6., 3., 7., 3., 9., 4., 5., 4., 6., 4., 7., 4., 9., 5.,
-                                 8., 6., 7., 6., 8., 7., 8., 8., 9.
+    igraph_vector_int_t edges;
+    igraph_integer_t edge_data[] = {0, 1, 0, 6, 0, 7, 0, 8, 0, 9, 1, 2, 1, 3, 1, 4, 1,
+                                 6, 1, 7, 1, 8, 1, 9, 2, 3, 2, 5, 2, 6, 2, 7, 2, 9,
+                                 3, 5, 3, 6, 3, 7, 3, 9, 4, 5, 4, 6, 4, 7, 4, 9, 5,
+                                 8, 6, 7, 6, 8, 7, 8, 8, 9
                                 };
 
     /* vertex weights in test graph,
@@ -78,7 +78,7 @@ int main() {
 
 
     /* create graph */
-    igraph_vector_init_copy(&edges, edge_data, (sizeof edge_data) / sizeof(igraph_real_t));
+    igraph_vector_int_init_copy(&edges, edge_data, (sizeof edge_data) / sizeof(igraph_real_t));
     igraph_create(&graph, &edges, n, /* directed= */ 0);
 
     /* set up vertex weight vector */
@@ -170,7 +170,7 @@ int main() {
     igraph_vector_ptr_destroy(&result);
     igraph_vector_destroy(&vertex_weights);
     igraph_destroy(&graph);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
 
     VERIFY_FINALLY_STACK();
 

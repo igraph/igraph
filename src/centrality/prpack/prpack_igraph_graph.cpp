@@ -14,7 +14,7 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     const igraph_bool_t treat_as_directed = igraph_is_directed(g) && directed;
     igraph_es_t es;
     igraph_eit_t eit;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     long int i, j, eid, sum, temp, num_ignored_es;
     int *p_head, *p_head_copy;
     double* p_weight = 0;
@@ -75,11 +75,11 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
         igraph_eit_destroy(&eit);
     } else {
         // Select all the edges and iterate over them by the target vertices
-        igraph_vector_init(&neis, 0);
+        igraph_vector_int_init(&neis, 0);
 
         for (i = 0; i < num_vs; i++) {
             igraph_incident(g, &neis, i, IGRAPH_ALL);
-            temp = igraph_vector_size(&neis);
+            temp = igraph_vector_int_size(&neis);
 
             // TODO: should loop edges be added in both directions?
             p_head_copy = p_head;
@@ -104,7 +104,7 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
             tails[i] = p_head - p_head_copy;
         }
 
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&neis);
     }
 
     // Decrease num_es by the number of ignored edges

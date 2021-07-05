@@ -308,7 +308,7 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *                weights when breaking the cycles.
  */
 igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
-                           igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
+                           igraph_t *extd_graph, igraph_vector_int_t *extd_to_orig_eids,
                            const igraph_vector_t* layers, igraph_real_t hgap, igraph_real_t vgap,
                            igraph_integer_t maxiter, const igraph_vector_t *weights) {
     igraph_integer_t i, j, k, l, m, nei;
@@ -330,7 +330,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     if (extd_graph != 0) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&extd_edgelist, 0);
         if (extd_to_orig_eids != 0) {
-            igraph_vector_clear(extd_to_orig_eids);
+            igraph_vector_int_clear(extd_to_orig_eids);
         }
     }
 
@@ -434,7 +434,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
                         IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, i));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, nei));
                         if (extd_to_orig_eids != 0) {
-                            IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(extd_to_orig_eids, eid));
                         }
                     }
                 } else if (VECTOR(layers_own)[i] > VECTOR(layers_own)[nei]) {
@@ -459,12 +459,12 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
                             IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id - m));
                             IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id - m));
                             if (extd_to_orig_eids != 0) {
-                                IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(extd_to_orig_eids, eid));
                             }
                         }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, nei));
                         if (extd_to_orig_eids != 0) {
-                            IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(extd_to_orig_eids, eid));
                         }
                     }
                 } else {
@@ -487,12 +487,12 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
                             IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id));
                             IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id++));
                             if (extd_to_orig_eids != 0) {
-                                IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(extd_to_orig_eids, eid));
                             }
                         }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, nei));
                         if (extd_to_orig_eids != 0) {
-                            IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(extd_to_orig_eids, eid));
                         }
                     }
                 }

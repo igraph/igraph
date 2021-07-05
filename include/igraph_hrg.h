@@ -65,7 +65,8 @@ __BEGIN_DECLS
  */
 
 typedef struct igraph_hrg_t {
-    igraph_vector_t left, right, prob, edges, vertices;
+    igraph_vector_t left, right, prob, vertices;
+    igraph_vector_int_t edges;
 } igraph_hrg_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n);

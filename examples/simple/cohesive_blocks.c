@@ -55,7 +55,7 @@ int doit(igraph_t *g) {
 
     igraph_vector_ptr_destroy(&blocks);
     igraph_vector_destroy(&cohesion);
-    igraph_vector_destroy(&parent);
+    igraph_vector_int_destroy(&parent);
     igraph_destroy(&block_tree);
 
     return 0;

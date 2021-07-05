@@ -28,7 +28,7 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     igraph_vector_int_t res;
     igraph_bool_t is_dag;
     int ret;
@@ -56,7 +56,7 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     /* Add a cycle: 5 -> 0 */
-    igraph_vector_init_int(&v, 2, 5, 0);
+    igraph_vector_int_init_int(&v, 2, 5, 0);
     igraph_add_edges(&g, &v, 0);
     igraph_is_dag(&g, &is_dag);
     if (is_dag) {
@@ -67,7 +67,7 @@ int main() {
         return 1;
     }
 
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 
     /* This graph is the same but undirected */

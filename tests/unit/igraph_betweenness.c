@@ -26,10 +26,11 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t bet, bet2, weights, edges;
+    igraph_vector_t bet, bet2, weights;
+    igraph_vector_int_t edges;
     igraph_real_t cutoff = 0.0;
 
-    igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
+    igraph_integer_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
                                 6, 9, 7, 20, 9, 10, 9, 20, 10, 19,
                                 11, 12, 11, 20, 12, 15, 13, 15,
@@ -121,7 +122,7 @@ int main() {
 
     printf("\nNon-trivial weighted graph\n");
     printf("==========================================================\n");
-    igraph_vector_view(&edges, nontriv, sizeof(nontriv) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&edges, nontriv, sizeof(nontriv) / sizeof(igraph_real_t));
     igraph_create(&g, &edges, 0, /* directed= */ 0);
     igraph_vector_view(&weights, nontriv_weights,
                        sizeof(nontriv_weights) / sizeof(igraph_real_t));

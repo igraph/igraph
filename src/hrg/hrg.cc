@@ -280,7 +280,7 @@ igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->left,      n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->right,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      n - 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&hrg->edges,     n - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->edges,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->vertices,  n - 1);
     IGRAPH_FINALLY_CLEAN(5);
     return IGRAPH_SUCCESS;
@@ -301,7 +301,7 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
     igraph_vector_destroy(&hrg->left);
     igraph_vector_destroy(&hrg->right);
     igraph_vector_destroy(&hrg->prob);
-    igraph_vector_destroy(&hrg->edges);
+    igraph_vector_int_destroy(&hrg->edges);
     igraph_vector_destroy(&hrg->vertices);
 }
 
@@ -340,7 +340,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     ret  = igraph_vector_resize(&hrg->left, newsize - 1);
     ret |= igraph_vector_resize(&hrg->right, newsize - 1);
     ret |= igraph_vector_resize(&hrg->prob, newsize - 1);
-    ret |= igraph_vector_resize(&hrg->edges, newsize - 1);
+    ret |= igraph_vector_int_resize(&hrg->edges, newsize - 1);
     ret |= igraph_vector_resize(&hrg->vertices, newsize - 1);
 
     igraph_set_error_handler(oldhandler);
@@ -349,7 +349,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
         igraph_vector_resize(&hrg->left, origsize);
         igraph_vector_resize(&hrg->right, origsize);
         igraph_vector_resize(&hrg->prob, origsize);
-        igraph_vector_resize(&hrg->edges, origsize);
+        igraph_vector_int_resize(&hrg->edges, origsize);
         igraph_vector_resize(&hrg->vertices, origsize);
         IGRAPH_ERROR("Cannot resize HRG", ret);
     }
@@ -586,7 +586,7 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
     igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
     igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
     igraph_integer_t no_of_edges = no_of_nodes - 1;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t i, idx = 0;
     igraph_vector_ptr_t vattrs;
     igraph_vector_t prob;
@@ -604,7 +604,7 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
         VECTOR(prob)[orig_nodes + i] = VECTOR(hrg->prob)[i];
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_vector_ptr_init(&vattrs, 1));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vattrs);
     VECTOR(vattrs)[0] = &rec;
@@ -625,7 +625,7 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, 0));
 
     igraph_vector_ptr_destroy(&vattrs);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&prob);
     IGRAPH_FINALLY_CLEAN(4);  // + 1 for graph
 
@@ -811,10 +811,10 @@ static igraph_error_t rankCandidatesByProbability(simpleGraph *sg, dendro *d,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t recordPredictions(pblock *br_list, igraph_vector_t *edges,
+static igraph_error_t recordPredictions(pblock *br_list, igraph_vector_int_t *edges,
                       igraph_vector_t *prob, int mk) {
 
-    IGRAPH_CHECK(igraph_vector_resize(edges, mk * 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, mk * 2));
     IGRAPH_CHECK(igraph_vector_resize(prob, mk));
 
     for (int i = mk - 1, idx = 0, idx2 = 0; i >= 0; i--) {
@@ -850,7 +850,7 @@ static igraph_error_t recordPredictions(pblock *br_list, igraph_vector_t *edges,
  */
 
 igraph_error_t igraph_hrg_predict(const igraph_t *graph,
-                       igraph_vector_t *edges,
+                       igraph_vector_int_t *edges,
                        igraph_vector_t *prob,
                        igraph_hrg_t *hrg,
                        igraph_bool_t start,
@@ -932,7 +932,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     igraph_integer_t root = 0;
     igraph_integer_t d0 = 0, d1 = 0, d2 = 0;
     igraph_integer_t ii = 0, il = 0;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_vector_t path;
 
     // --------------------------------------------------------
@@ -1032,7 +1032,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     }
 
     igraph_hrg_resize(hrg, no_of_internal + 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ri = VECTOR(idx)[i];
         if (ri >= 0) {
@@ -1045,7 +1045,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     }
 
     // Calculate the number of vertices and edges in each subtree
-    igraph_vector_null(&hrg->edges);
+    igraph_vector_int_null(&hrg->edges);
     igraph_vector_null(&hrg->vertices);
     IGRAPH_VECTOR_INIT_FINALLY(&path, 0);
     IGRAPH_CHECK(igraph_vector_push_back(&path, VECTOR(idx)[root]));
@@ -1072,7 +1072,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     }
 
     igraph_vector_destroy(&path);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&idx);
     igraph_vector_int_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(4);

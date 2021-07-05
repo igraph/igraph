@@ -30,11 +30,11 @@
 typedef struct {
     int n, m;
     igraph_bool_t directed, mutual, circular;
-    igraph_real_t *edges;
+    igraph_integer_t *edges;
 } ring_test_t;
 
 #define RING_TEST(id, n, m, di, mu, ci, ...) \
-    igraph_real_t ring_ ## id ## _edges[] = { __VA_ARGS__ };      \
+    igraph_integer_t ring_ ## id ## _edges[] = { __VA_ARGS__ };      \
     ring_test_t ring_ ## id = { n, m, di, mu, ci, ring_ ## id ## _edges }
 
 /*---------------n--m--di-mu-ci--edges-------------------------------------*/
@@ -131,7 +131,7 @@ int check_ring_properties(const igraph_t *ring, igraph_bool_t circular) {
 
 int check_ring(const ring_test_t *test) {
     igraph_t graph, othergraph;
-    igraph_vector_t otheredges;
+    igraph_vector_int_t otheredges;
     igraph_bool_t iso;
     int ret;
 
@@ -144,7 +144,7 @@ int check_ring(const ring_test_t *test) {
     }
 
     /* Check that it is isomorphic to the stored graph */
-    igraph_vector_view(&otheredges, test->edges, test->m * 2);
+    igraph_vector_int_view(&otheredges, test->edges, test->m * 2);
     igraph_create(&othergraph, &otheredges, test->n, test->directed);
     igraph_isomorphic(&graph, &othergraph, &iso);
     if (!iso) {

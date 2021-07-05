@@ -437,9 +437,9 @@ void graph_molloy_hash::print(FILE *f) {
 igraph_error_t graph_molloy_hash::print(igraph_t *graph) {
     igraph_integer_t i, j;
     igraph_integer_t ptr = 0;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, a); // every edge is counted twice....
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, a); // every edge is counted twice....
 
     for (i = 0; i < n; i++) {
         for (j = 0; j < HASH_SIZE(deg[i]); j++) {
@@ -453,7 +453,7 @@ igraph_error_t graph_molloy_hash::print(igraph_t *graph) {
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, /*undirected=*/ 0));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

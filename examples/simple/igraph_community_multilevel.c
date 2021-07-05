@@ -49,7 +49,8 @@ void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_in
 
 int main() {
     igraph_t g;
-    igraph_vector_t modularity, edges;
+    igraph_vector_t modularity;
+    igraph_vector_int_t edges;
     igraph_vector_int_t membership;
     igraph_matrix_int_t memberships;
     int i, j, k;
@@ -84,18 +85,18 @@ int main() {
     igraph_destroy(&g);
 
     /* Ring of 30 cliques */
-    igraph_vector_init(&edges, 0);
+    igraph_vector_int_init(&edges, 0);
     for (i = 0; i < 30; i++) {
         for (j = 0; j < 5; j++) {
             for (k = j + 1; k < 5; k++) {
-                igraph_vector_push_back(&edges, i * 5 + j);
-                igraph_vector_push_back(&edges, i * 5 + k);
+                igraph_vector_int_push_back(&edges, i * 5 + j);
+                igraph_vector_int_push_back(&edges, i * 5 + k);
             }
         }
     }
     for (i = 0; i < 30; i++) {
-        igraph_vector_push_back(&edges, i * 5 % 150);
-        igraph_vector_push_back(&edges, (i * 5 + 6) % 150);
+        igraph_vector_int_push_back(&edges, i * 5 % 150);
+        igraph_vector_int_push_back(&edges, (i * 5 + 6) % 150);
     }
     igraph_create(&g, &edges, 150, 0);
     igraph_community_multilevel(&g, 0, 1, &membership, &memberships, &modularity);
@@ -104,7 +105,7 @@ int main() {
 
     igraph_vector_destroy(&modularity);
     igraph_vector_int_destroy(&membership);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_matrix_int_destroy(&memberships);
 
     return 0;
