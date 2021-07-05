@@ -78,7 +78,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     float barycenter_x = 0, barycenter_y = 0;
     igraph_vector_t phi;
     igraph_vector_int_t degrees;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     const float elen_des2 = 128 * 128;
     const float gamma = 1 / 16.0f;
     const float alpha_o = (float)M_PI;
@@ -127,7 +127,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
     IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 10);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 10);
 
     RNG_BEGIN();
 
@@ -194,7 +194,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
         }
 
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
-        nlen = igraph_vector_size(&neis);
+        nlen = igraph_vector_int_size(&neis);
         for (j = 0; j < nlen; j++) {
             igraph_integer_t u = VECTOR(neis)[j];
             float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
@@ -245,7 +245,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
 
     RNG_END();
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_destroy(&phi);
     igraph_vector_int_destroy(&perm);
     igraph_vector_float_destroy(&skew_gauge);

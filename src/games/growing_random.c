@@ -59,7 +59,7 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t no_of_nodes = n;
     igraph_integer_t no_of_neighbors = m;
     igraph_integer_t no_of_edges;
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
 
     igraph_integer_t resp = 0;
 
@@ -74,7 +74,7 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 
     no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     RNG_BEGIN();
 
@@ -96,7 +96,7 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
     RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

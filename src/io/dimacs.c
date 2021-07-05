@@ -82,7 +82,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                              igraph_vector_t *capacity,
                              igraph_bool_t directed) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = -1;
     igraph_integer_t no_of_edges = -1;
     igraph_integer_t tsource = -1;
@@ -94,7 +94,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 #define PROBLEM_EDGE  1
 #define PROBLEM_MAX   2
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     if (capacity) {
         igraph_vector_clear(capacity);
     }
@@ -155,7 +155,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 igraph_strvector_clear(problem);
                 IGRAPH_CHECK(igraph_strvector_add(problem, prob));
             }
-            IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
             break;
 
         case 'n':
@@ -201,8 +201,8 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
             if (read != 3) {
                 IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from - 1));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - 1));
             if (capacity) {
                 IGRAPH_CHECK(igraph_vector_push_back(capacity, cap));
             }
@@ -218,8 +218,8 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
             if (read != 2) {
                 IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from - 1));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - 1));
             break;
 
         default:
@@ -239,7 +239,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
 
     IGRAPH_FINALLY_CLEAN(1);
 

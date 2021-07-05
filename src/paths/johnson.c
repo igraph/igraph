@@ -74,7 +74,8 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_t newgraph;
-    igraph_vector_t edges, newweights;
+    igraph_vector_int_t edges;
+    igraph_vector_t newweights;
     igraph_matrix_t bfres;
     igraph_integer_t i, ptr;
     igraph_integer_t nr, nc;
@@ -122,15 +123,15 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     /* Add a new node to the graph, plus edges from it to all the others. */
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2 + no_of_nodes * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2 + no_of_nodes * 2);
     igraph_get_edgelist(graph, &edges, /*bycol=*/ 0);
-    igraph_vector_resize(&edges, no_of_edges * 2 + no_of_nodes * 2);
+    igraph_vector_int_resize(&edges, no_of_edges * 2 + no_of_nodes * 2);
     for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
         VECTOR(edges)[ptr++] = no_of_nodes;
         VECTOR(edges)[ptr++] = i;
     }
     IGRAPH_CHECK(igraph_add_edges(&newgraph, &edges, 0));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_vector_reserve(&newweights, no_of_edges + no_of_nodes));

@@ -54,8 +54,8 @@ igraph_error_t igraph_simple_interconnected_islands_game(
         igraph_integer_t n_inter) {
 
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_vector_t s = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t s = IGRAPH_VECTOR_NULL;
     igraph_integer_t number_of_nodes;
     double max_possible_edges_per_island;
     double max_edges_per_island;
@@ -88,8 +88,8 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     maxedges = max_edges_per_island * islands_n + number_of_inter_island_edges;
 
     /* reserve enough space for all the edges */
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, maxedges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, maxedges));
 
     RNG_BEGIN();
 
@@ -101,12 +101,12 @@ igraph_error_t igraph_simple_interconnected_islands_game(
         end_island = start_island + islands_size - 1;
 
         /* create the random numbers to be used (into s) */
-        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, max_edges_per_island));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&s, max_edges_per_island));
 
         last = RNG_GEOM(islands_pin);
         while (last < max_possible_edges_per_island) { /* max_edges_per_island */
-            IGRAPH_CHECK(igraph_vector_push_back(&s, last));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&s, last));
             myrand = RNG_GEOM(islands_pin);
             last += myrand; /* RNG_GEOM(islands_pin); */
             last += 1;
@@ -115,19 +115,19 @@ igraph_error_t igraph_simple_interconnected_islands_game(
 
 
         /* change this to edges ! */
-        vsize = igraph_vector_size(&s);
+        vsize = igraph_vector_int_size(&s);
         for (i = 0; i < vsize; i++) {
             igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
             igraph_integer_t from = (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
             to += start_island;
             from += start_island;
 
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
 
         /* clear the memory used for random number for this island */
-        igraph_vector_destroy(&s);
+        igraph_vector_int_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
 
 
@@ -138,8 +138,8 @@ igraph_error_t igraph_simple_interconnected_islands_game(
                 igraph_integer_t from = RNG_INTEGER(start_island, end_island);
                 igraph_integer_t to = RNG_INTEGER(i * islands_size, (i + 1) * islands_size - 1);
 
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
             }
 
         }
@@ -151,7 +151,7 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     IGRAPH_CHECK(igraph_create(graph, &edges, number_of_nodes, 0));
 
     /* clean remaining things */
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

@@ -91,7 +91,7 @@
 igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
                                igraph_bool_t loops, igraph_bool_t multiple) {
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t no_of_nodes;
     igraph_integer_t outnodes, innodes, nodes;
     igraph_vector_t cum_fitness_in, cum_fitness_out;
@@ -181,8 +181,8 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     if (multiple) {
         /* Generating when multiple edges are allowed */
 
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_edges));
 
         while (no_of_edges > 0) {
             /* Report progress after every 10000 edges */
@@ -201,8 +201,8 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
                 continue;
             }
 
-            igraph_vector_push_back(&edges, from);
-            igraph_vector_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from);
+            igraph_vector_int_push_back(&edges, to);
 
             no_of_edges--;
         }
@@ -211,7 +211,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, is_directed));
 
         /* Clear the edge list */
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         /* Multiple edges are disallowed */

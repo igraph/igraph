@@ -253,20 +253,20 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  *
  * \example examples/simple/igraph_add_edges.c
  */
-igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
+igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
                      void *attr) {
     igraph_integer_t no_of_edges = igraph_vector_size(&graph->from);
-    igraph_integer_t edges_to_add = igraph_vector_size(edges) / 2;
+    igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
     igraph_integer_t i = 0;
     igraph_error_handler_t *oldhandler;
     int ret1, ret2;
     igraph_vector_t newoi, newii;
     igraph_bool_t directed = igraph_is_directed(graph);
 
-    if (igraph_vector_size(edges) % 2 != 0) {
+    if (igraph_vector_int_size(edges) % 2 != 0) {
         IGRAPH_ERROR("invalid (odd) length of edges vector", IGRAPH_EINVEVECTOR);
     }
-    if (!igraph_vector_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
+    if (!igraph_vector_int_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
         IGRAPH_ERROR("cannot add edges", IGRAPH_EINVVID);
     }
 
@@ -735,7 +735,7 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  *
  * \example examples/simple/igraph_neighbors.c
  */
-igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
+igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
         igraph_neimode_t mode) {
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
         return igraph_i_neighbors(graph, neis, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
@@ -744,7 +744,7 @@ igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, ig
     }
 }
 
-igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode,
+igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
     if (should_filter_duplicates) {                                                        \
@@ -791,7 +791,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, 
         length += (VECTOR(graph->is)[node + 1] - VECTOR(graph->is)[node]);
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(neis, length));
+    IGRAPH_CHECK(igraph_vector_int_resize(neis, length));
 
     /* The loops below produce an ordering what is consistent with the
      * ordering returned by igraph_neighbors(), and this should be preserved.
@@ -884,7 +884,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_t *neis, 
         }
 
     }
-    IGRAPH_CHECK(igraph_vector_resize(neis, length));
+    IGRAPH_CHECK(igraph_vector_int_resize(neis, length));
 
     return IGRAPH_SUCCESS;
 #undef DEDUPLICATE_IF_NEEDED
@@ -1733,7 +1733,7 @@ igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_int_t 
  * Time complexity: O(d), the number of incident edges to \p pnode.
  */
 
-igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
+igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode) {
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
         return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
@@ -1742,7 +1742,7 @@ igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igr
     }
 }
 
-igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t pnode,
+igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
     if (should_filter_duplicates) {                                                        \
@@ -1790,7 +1790,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, i
         length += (VECTOR(graph->is)[node + 1] - VECTOR(graph->is)[node]);
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(eids, length));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, length));
 
     /* The loops below produce an ordering what is consistent with the
      * ordering returned by igraph_neighbors(), and this should be preserved.
@@ -1878,7 +1878,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_t *eids, i
             VECTOR(*eids)[idx++] = eid2;
         }
     }
-    IGRAPH_CHECK(igraph_vector_resize(eids, length));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, length));
     return IGRAPH_SUCCESS;
 #undef DEDUPLICATE_IF_NEEDED
 }

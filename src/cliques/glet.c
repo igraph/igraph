@@ -141,7 +141,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
 
     igraph_vector_int_t mark, map;
     igraph_vector_int_t edges;
-    igraph_vector_t neis, newedges;
+    igraph_vector_int_t neis, newedges;
     igraph_integer_t c, nc = igraph_vector_ptr_size(cliques);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -172,16 +172,16 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     }
     freedata.result = *result;
 
-    igraph_vector_init(&newedges, 100);
-    IGRAPH_FINALLY(igraph_vector_destroy, &newedges);
+    igraph_vector_int_init(&newedges, 100);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &newedges);
     igraph_vector_int_init(&mark, no_of_nodes);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
     igraph_vector_int_init(&map, no_of_nodes);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &map);
     igraph_vector_int_init(&edges, 100);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
-    igraph_vector_init(&neis, 10);
-    IGRAPH_FINALLY(igraph_vector_destroy, &neis);
+    igraph_vector_int_init(&neis, 10);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
 
     if (clique_thr) {
         igraph_vector_resize(clique_thr, nc);
@@ -202,7 +202,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
         igraph_vector_t *neww = (*resultweights) + c;
         igraph_t *newgraph = (*result) + c;
         igraph_vector_int_clear(&edges);
-        igraph_vector_clear(&newedges);
+        igraph_vector_int_clear(&newedges);
 
         /* --------------------------------------------------- */
 
@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
         for (v = 0; v < clsize; v++) {
             igraph_integer_t i, neilen, node = VECTOR(*clique)[v];
             igraph_incident(graph, &neis, node, IGRAPH_ALL);
-            neilen = igraph_vector_size(&neis);
+            neilen = igraph_vector_int_size(&neis);
             VECTOR(mark)[node] = c + 1;
             for (i = 0; i < neilen; i++) {
                 igraph_integer_t edge = VECTOR(neis)[i];
@@ -275,8 +275,8 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
                     igraph_vector_int_push_back(newids, VECTOR(*ids)[to]);
                 }
                 igraph_vector_push_back(neww, w);
-                igraph_vector_push_back(&newedges, VECTOR(map)[from]);
-                igraph_vector_push_back(&newedges, VECTOR(map)[to]);
+                igraph_vector_int_push_back(&newedges, VECTOR(map)[from]);
+                igraph_vector_int_push_back(&newedges, VECTOR(map)[to]);
             }
         }
 
@@ -286,11 +286,11 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
 
     } /* c < nc */
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&mark);
     igraph_vector_int_destroy(&map);
-    igraph_vector_destroy(&newedges);
+    igraph_vector_int_destroy(&newedges);
     IGRAPH_FINALLY_CLEAN(6);  /* + freedata */
 
     return IGRAPH_SUCCESS;
@@ -596,7 +596,8 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_cliques = igraph_vector_ptr_size(cliques);
     igraph_vector_int_t vcl, vclidx, ecl, eclidx, cel, celidx;
-    igraph_vector_t edgelist, newweights, normfact;
+    igraph_vector_int_t edgelist;
+    igraph_vector_t newweights, normfact;
     igraph_integer_t i, total_vertices, e, ptr, total_edges;
     igraph_bool_t simple;
 
@@ -666,8 +667,8 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &ecl);
     IGRAPH_CHECK(igraph_vector_int_init(&eclidx, no_of_edges + 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &eclidx);
-    IGRAPH_CHECK(igraph_vector_init(&edgelist, no_of_edges * 2));
-    IGRAPH_FINALLY(igraph_vector_destroy, &edgelist);
+    IGRAPH_CHECK(igraph_vector_int_init(&edgelist, no_of_edges * 2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, /*by_col=*/ 0));
     for (i = 0, e = 0, ptr = 0; e < no_of_edges; e++) {
         igraph_integer_t from = VECTOR(edgelist)[i++];
@@ -692,7 +693,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     }
     VECTOR(eclidx)[e] = ptr;
 
-    igraph_vector_destroy(&edgelist);
+    igraph_vector_int_destroy(&edgelist);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Convert the edge-clique list to a clique-edge list */

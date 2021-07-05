@@ -1127,7 +1127,7 @@ igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
                                  igraph_bool_t directed) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     CS_INT no_of_nodes = A->cs->m;
     CS_INT no_of_edges = A->cs->p[A->cs->n];
     CS_INT *p = A->cs->p;
@@ -1140,7 +1140,7 @@ static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparse
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     while (*p < no_of_edges) {
         while (to < * (p + 1)) {
@@ -1154,11 +1154,11 @@ static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparse
         from++;
         p++;
     }
-    igraph_vector_resize(&edges, e);
+    igraph_vector_int_resize(&edges, e);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -1167,7 +1167,7 @@ static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparse
 static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t *A,
                                       igraph_bool_t directed) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     CS_INT no_of_nodes = A->cs->m;
     CS_INT no_of_edges = A->cs->nz;
     CS_INT *i = A->cs->p;
@@ -1178,7 +1178,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (e = 0; e < 2 * no_of_edges; i++, j++) {
         if (directed || *i >= *j) {
@@ -1186,11 +1186,11 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
             VECTOR(edges)[e++] = (*j);
         }
     }
-    igraph_vector_resize(&edges, e);
+    igraph_vector_int_resize(&edges, e);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -1228,7 +1228,7 @@ igraph_error_t igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
 static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A,
                                           igraph_bool_t directed, const char *attr,
                                           igraph_bool_t loops,
-                                          igraph_vector_t *edges,
+                                          igraph_vector_int_t *edges,
                                           igraph_vector_t *weights) {
 
     CS_INT no_of_edges = A->cs->p[A->cs->n];
@@ -1241,7 +1241,7 @@ static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A
 
     IGRAPH_UNUSED(attr);
 
-    igraph_vector_resize(edges, no_of_edges * 2);
+    igraph_vector_int_resize(edges, no_of_edges * 2);
     igraph_vector_resize(weights, no_of_edges);
 
     while (*p < no_of_edges) {
@@ -1259,7 +1259,7 @@ static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A
         p++;
     }
 
-    igraph_vector_resize(edges, e);
+    igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, w);
 
     return IGRAPH_SUCCESS;
@@ -1269,7 +1269,7 @@ static igraph_error_t igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat
                                                igraph_bool_t directed,
                                                const char *attr,
                                                igraph_bool_t loops,
-                                               igraph_vector_t *edges,
+                                               igraph_vector_int_t *edges,
                                                igraph_vector_t *weights) {
 
     IGRAPH_UNUSED(A); IGRAPH_UNUSED(directed); IGRAPH_UNUSED(attr);
@@ -1284,7 +1284,8 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
                               igraph_bool_t directed, const char *attr,
                               igraph_bool_t loops) {
 
-    igraph_vector_t edges, weights;
+    igraph_vector_int_t edges;
+    igraph_vector_t weights;
     CS_INT pot_edges = A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
     const char* default_attr = "weight";
     igraph_vector_ptr_t attr_vec;
@@ -1295,7 +1296,7 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, pot_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, pot_edges * 2);
     IGRAPH_VECTOR_INIT_FINALLY(&weights, pot_edges);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
 
@@ -1317,13 +1318,13 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
     /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, (igraph_integer_t) no_of_nodes, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
-    if (igraph_vector_size(&edges) > 0) {
+    if (igraph_vector_int_size(&edges) > 0) {
         IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
     }
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Cleanup */
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&weights);
     igraph_vector_ptr_destroy(&attr_vec);
     IGRAPH_FINALLY_CLEAN(3);

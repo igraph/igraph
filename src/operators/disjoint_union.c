@@ -67,7 +67,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
     igraph_integer_t no_of_nodes_right = igraph_vcount(right);
     igraph_integer_t no_of_edges_left = igraph_ecount(left);
     igraph_integer_t no_of_edges_right = igraph_ecount(right);
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_bool_t directed_left = igraph_is_directed(left);
     igraph_integer_t from, to;
     igraph_integer_t i;
@@ -77,24 +77,24 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges,
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges,
                                        2 * (no_of_edges_left + no_of_edges_right)));
     for (i = 0; i < no_of_edges_left; i++) {
         igraph_edge(left, (igraph_integer_t) i, &from, &to);
-        igraph_vector_push_back(&edges, from);
-        igraph_vector_push_back(&edges, to);
+        igraph_vector_int_push_back(&edges, from);
+        igraph_vector_int_push_back(&edges, to);
     }
     for (i = 0; i < no_of_edges_right; i++) {
         igraph_edge(right, (igraph_integer_t) i, &from, &to);
-        igraph_vector_push_back(&edges, from + no_of_nodes_left);
-        igraph_vector_push_back(&edges, to + no_of_nodes_left);
+        igraph_vector_int_push_back(&edges, from + no_of_nodes_left);
+        igraph_vector_int_push_back(&edges, to + no_of_nodes_left);
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t)
                                (no_of_nodes_left + no_of_nodes_right),
                                directed_left));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
@@ -134,7 +134,7 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
                                const igraph_vector_ptr_t *graphs) {
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = 1;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_edges = 0;
     igraph_integer_t shift = 0;
     igraph_t *graph;
@@ -154,8 +154,8 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_edges));
 
     for (i = 0; i < no_of_graphs; i++) {
         igraph_integer_t ec;
@@ -163,14 +163,14 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
         ec = igraph_ecount(graph);
         for (j = 0; j < ec; j++) {
             igraph_edge(graph, (igraph_integer_t) j, &from, &to);
-            igraph_vector_push_back(&edges, from + shift);
-            igraph_vector_push_back(&edges, to + shift);
+            igraph_vector_int_push_back(&edges, from + shift);
+            igraph_vector_int_push_back(&edges, to + shift);
         }
         shift += igraph_vcount(graph);
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) shift, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }

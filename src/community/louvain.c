@@ -94,15 +94,15 @@ static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
 }
 
 /* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
-static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids) {
+static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_int_t *eids) {
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t i, l = -1, last_from = -1, last_to = -1;
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_i_multilevel_link *links;
 
     /* Make sure there's enough space in eids to store the new edge IDs */
-    IGRAPH_CHECK(igraph_vector_resize(eids, ecount));
+    IGRAPH_CHECK(igraph_vector_int_resize(eids, ecount));
 
     links = IGRAPH_CALLOC(ecount, igraph_i_multilevel_link);
     if (links == 0) {
@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
     igraph_qsort((void*)links, (size_t) ecount, sizeof(igraph_i_multilevel_link),
                  igraph_i_multilevel_link_cmp);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     for (i = 0; i < ecount; i++) {
         if (links[i].from == last_from && links[i].to == last_to) {
             VECTOR(*eids)[links[i].id] = l;
@@ -131,8 +131,8 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
         last_from = links[i].from;
         last_to = links[i].to;
 
-        igraph_vector_push_back(&edges, last_from);
-        igraph_vector_push_back(&edges, last_to);
+        igraph_vector_int_push_back(&edges, last_from);
+        igraph_vector_int_push_back(&edges, last_to);
 
         l++;
 
@@ -145,7 +145,7 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
     igraph_destroy(graph);
     IGRAPH_CHECK(igraph_create(graph, &edges, igraph_vcount(graph), directed));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -180,7 +180,7 @@ static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) 
 static igraph_error_t igraph_i_multilevel_community_links(
         const igraph_t *graph,
         const igraph_i_multilevel_community_list *communities,
-        igraph_integer_t vertex, igraph_vector_t *edges,
+        igraph_integer_t vertex, igraph_vector_int_t *edges,
         igraph_real_t *weight_all, igraph_real_t *weight_inside, igraph_real_t *weight_loop,
         igraph_vector_t *links_community, igraph_vector_t *links_weight) {
 
@@ -198,7 +198,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
     /* Get the list of incident edges */
     IGRAPH_CHECK(igraph_incident(graph, edges, vertex, IGRAPH_ALL));
 
-    n = igraph_vector_size(edges);
+    n = igraph_vector_int_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);
     if (links == 0) {
         IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
@@ -269,7 +269,7 @@ static igraph_real_t igraph_i_multilevel_community_modularity_gain(
  * The membership vector will also be rewritten by the underlying
  * igraph_membership_reindex call */
 static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_int_t *membership) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -286,7 +286,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
@@ -310,7 +310,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -358,7 +358,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_bool_t changed = 0;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_int_t temp_membership;
     igraph_i_multilevel_community_list communities;
     igraph_vector_t node_order;
@@ -385,7 +385,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     /* Initialize data structures */
     IGRAPH_VECTOR_INIT_FINALLY(&links_community, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&links_weight, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&temp_membership, vcount);
     IGRAPH_CHECK(igraph_vector_int_resize(membership, vcount));
 
@@ -554,7 +554,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_free(communities.item);
     igraph_vector_destroy(&links_community);
     igraph_vector_destroy(&links_weight);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&node_order);
     IGRAPH_FINALLY_CLEAN(5);
 

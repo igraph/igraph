@@ -73,7 +73,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     igraph_integer_t no_of_nodes = nodes;
     igraph_integer_t no_of_neighbors = 0;
     igraph_integer_t no_of_edges;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t i, j;
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
@@ -115,7 +115,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
@@ -175,7 +175,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -237,7 +237,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_integer_t no_of_neighbors;
     igraph_integer_t binwidth;
     igraph_integer_t no_of_edges;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
     igraph_integer_t edgeptr = 0;
@@ -282,7 +282,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
 
     binwidth = nodes / aging_bins + 1;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
@@ -365,7 +365,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

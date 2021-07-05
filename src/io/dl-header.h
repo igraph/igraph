@@ -35,7 +35,7 @@ typedef struct {
     int mode;
     igraph_integer_t n;
     igraph_integer_t from, to;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_t weights;
     igraph_strvector_t labels;
     igraph_trie_t trie;

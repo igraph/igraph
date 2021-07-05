@@ -65,7 +65,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     igraph_integer_t no_of_nodes, no_of_edges;
     igraph_integer_t allstrings;
     igraph_integer_t i, j, idx = 0;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_int_t digits, table;
     igraph_vector_int_t index1, index2;
     igraph_integer_t actb = 0;
@@ -87,7 +87,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     no_of_edges = no_of_nodes * m;
     allstrings = pow(m + 1, n + 1);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_CHECK(igraph_vector_int_init(&table, n + 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &table);
@@ -149,7 +149,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
 
     /* Now come the edges at last */
     for (i = 0; i < no_of_nodes; i++) {
@@ -166,8 +166,8 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
             if (to < 0) {
                 continue;
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
     }
 
@@ -178,7 +178,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

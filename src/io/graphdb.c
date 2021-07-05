@@ -77,12 +77,12 @@ static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
 igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
                               igraph_bool_t directed) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t nodes;
     igraph_integer_t i, j;
     igraph_bool_t end = 0;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     nodes = igraph_i_read_graph_graphdb_getword(instream);
     if (nodes < 0) {
@@ -100,8 +100,8 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
                 end = 1;
                 break;
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
     }
 
@@ -111,7 +111,7 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) nodes,
                                directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
 
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;

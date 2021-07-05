@@ -91,11 +91,11 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     igraph_integer_t new_no_of_nodes = no_of_nodes * 2;
     igraph_integer_t new_no_of_edges = no_of_nodes + no_of_edges * 2;
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t edgeptr = 0, capptr = 0;
     igraph_integer_t i;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, new_no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, new_no_of_edges * 2);
 
     if (capacity) {
         IGRAPH_CHECK(igraph_vector_resize(capacity, new_no_of_edges));
@@ -131,7 +131,7 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     IGRAPH_CHECK(igraph_create(graphbar, &edges, new_no_of_nodes,
                                IGRAPH_DIRECTED));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -142,7 +142,7 @@ static igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
                                    igraph_t *residual,
                                    igraph_vector_t *residual_capacity,
                                    const igraph_vector_t *flow,
-                                   igraph_vector_t *tmp) {
+                                   igraph_vector_int_t *tmp) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -155,7 +155,7 @@ static igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(tmp, no_new_edges * 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(tmp, no_new_edges * 2));
     if (residual_capacity) {
         IGRAPH_CHECK(igraph_vector_resize(residual_capacity, no_new_edges));
     }
@@ -185,7 +185,7 @@ igraph_error_t igraph_residual_graph(const igraph_t *graph,
                           igraph_vector_t *residual_capacity,
                           const igraph_vector_t *flow) {
 
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (igraph_vector_size(capacity) != no_of_edges) {
@@ -195,12 +195,12 @@ igraph_error_t igraph_residual_graph(const igraph_t *graph,
         IGRAPH_ERROR("Invalid `flow' vector size", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
 
     IGRAPH_CHECK(igraph_i_residual_graph(graph, capacity, residual,
                                          residual_capacity, flow, &tmp));
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -210,7 +210,7 @@ static igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
                                            const igraph_vector_t *capacity,
                                            igraph_t *residual,
                                            const igraph_vector_t *flow,
-                                           igraph_vector_t *tmp) {
+                                           igraph_vector_int_t *tmp) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -227,7 +227,7 @@ static igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(tmp, no_new_edges * 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(tmp, no_new_edges * 2));
 
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = IGRAPH_FROM(graph, i);
@@ -253,7 +253,7 @@ igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
                                   const igraph_vector_t *capacity,
                                   igraph_t *residual,
                                   const igraph_vector_t *flow) {
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (capacity && igraph_vector_size(capacity) != no_of_edges) {
@@ -262,12 +262,12 @@ igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
     if (igraph_vector_size(flow) != no_of_edges) {
         IGRAPH_ERROR("Invalid `flow' vector size", IGRAPH_EINVAL);
     }
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
 
     IGRAPH_CHECK(igraph_i_reverse_residual_graph(graph, capacity, residual,
                  flow, &tmp));
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -567,9 +567,9 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(8);
 
     if (domtree) {
-        igraph_vector_t edges;
+        igraph_vector_int_t edges;
         igraph_integer_t ptr = 0;
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, component_size * 2 - 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, component_size * 2 - 2);
         for (i = 0; i < no_of_nodes; i++) {
             if (i != root && VECTOR(*mydom)[i] >= 0) {
                 if (mode == IGRAPH_OUT) {
@@ -583,7 +583,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         }
         IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes,
                                    IGRAPH_DIRECTED));
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
 
         IGRAPH_I_ATTRIBUTE_DESTROY(domtree);
@@ -783,19 +783,19 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     } else {
         for (i = 0; i < no_of_nodes; i++) {
             if (igraph_marked_queue_int_iselement(S, i)) {
-                igraph_vector_t neis;
+                igraph_vector_int_t neis;
                 igraph_integer_t j;
-                IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+                IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
                 IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
                                               IGRAPH_OUT));
-                n = igraph_vector_size(&neis);
+                n = igraph_vector_int_size(&neis);
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (!igraph_marked_queue_int_iselement(S, nei)) {
                         VECTOR(GammaS)[nei] = 1;
                     }
                 }
-                igraph_vector_destroy(&neis);
+                igraph_vector_int_destroy(&neis);
                 IGRAPH_FINALLY_CLEAN(1);
             }
         }
@@ -1150,9 +1150,9 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
     igraph_integer_t no_of_nodes = igraph_vcount(Sbar);
     igraph_vector_int_t indeg;
     igraph_integer_t i, minsize;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(Sbar, &indeg, igraph_vss_all(),
@@ -1165,7 +1165,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
         if (!ACTIVE(i)) {
             igraph_integer_t j, n;
             IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, i, IGRAPH_OUT));
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
             for (j = 0; j < n; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
                 VECTOR(indeg)[nei] -= 1;
@@ -1191,7 +1191,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
 #undef ZEROIN
 
     igraph_vector_int_destroy(&indeg);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

@@ -300,15 +300,15 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*   for (i=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);  */
 /*        i++, IGRAPH_VIT_NEXT(vit)) { */
 /*     igraph_integer_t node=IGRAPH_VIT_GET(vit); */
-/*     igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, node); */
-/*     igraph_integer_t n1=igraph_vector_size(neis); */
+/*     igraph_vector_int_t *neis=igraph_lazy_adjlist_get(&adjlist, node); */
+/*     igraph_integer_t n1=igraph_vector_int_size(neis); */
 /*     igraph_real_t triangles=0; */
 /*     igraph_real_t triples=(double)n1*(n1-1); */
 /*     IGRAPH_ALLOW_INTERRUPTION(); */
 /*     for (j=0; j<n1; j++) { */
 /*       igraph_integer_t node2=VECTOR(*neis)[j]; */
-/*       igraph_vector_t *neis2=igraph_lazy_adjlist_get(&adjlist, node2); */
-/*       igraph_integer_t n2=igraph_vector_size(neis2); */
+/*       igraph_vector_int_t *neis2=igraph_lazy_adjlist_get(&adjlist, node2); */
+/*       igraph_integer_t n2=igraph_vector_int_size(neis2); */
 /*       igraph_integer_t l1=0, l2=0; */
 /*       while (l1 < n1 && l2 < n2) { */
 /*  igraph_integer_t nei1=VECTOR(*neis)[l1]; */

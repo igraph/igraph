@@ -50,7 +50,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                     igraph_bool_t loops,
                     const igraph_attribute_combination_t *edge_comb) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t edge;
@@ -106,8 +106,8 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     if (attr) {
         IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
     }
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
 
     IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_FROM));
     IGRAPH_FINALLY(igraph_es_destroy, &es);
@@ -131,8 +131,8 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
             }
         } else {
             /* Edge to be kept */
-            igraph_vector_push_back(&edges, from);
-            igraph_vector_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from);
+            igraph_vector_int_push_back(&edges, to);
             if (attr) {
                 actedge++;
                 VECTOR(mergeinto)[edge] = actedge;
@@ -148,7 +148,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     IGRAPH_CHECK(igraph_create(&res, &edges, (igraph_integer_t) no_of_nodes,
                                igraph_is_directed(graph)));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_FINALLY(igraph_destroy, &res);

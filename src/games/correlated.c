@@ -63,7 +63,8 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_real_t q = p + corr * (1 - p);
     igraph_real_t p_del = 1 - q;
     igraph_real_t p_add = ((1 - q) * (p / (1 - p)));
-    igraph_vector_t add, delete, edges, newedges;
+    igraph_vector_t add, delete;
+    igraph_vector_int_t edges, newedges;
     igraph_real_t last;
     igraph_integer_t p_e = 0, p_a = 0, p_d = 0;
     igraph_integer_t no_add, no_del;
@@ -95,25 +96,25 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     }
     if (corr == 1) {
         /* We don't copy, because we don't need the attributes.... */
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
         IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
         if (permutation) {
-            newec = igraph_vector_size(&edges);
+            newec = igraph_vector_int_size(&edges);
             for (i = 0; i < newec; i++) {
                 int tmp = VECTOR(edges)[i];
                 VECTOR(edges)[i] = VECTOR(*permutation)[tmp];
             }
         }
         IGRAPH_CHECK(igraph_create(new_graph, &edges, no_of_nodes, directed));
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&newedges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&newedges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&add, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&delete, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
 
@@ -166,7 +167,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         VECTOR(delete)[i] = CODE(from, to);
     }
 
-    IGRAPH_CHECK(igraph_vector_reserve(&newedges,
+    IGRAPH_CHECK(igraph_vector_int_reserve(&newedges,
                                        (no_of_edges - no_del + no_add) * 2));
 
     /* Now we can do the merge. Additional edges are tricky, because
@@ -187,8 +188,8 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         if (next_e <= next_a && next_e < next_d) {
 
             /* keep an edge */
-            IGRAPH_CHECK(igraph_vector_push_back(&newedges, VECTOR(edges)[2 * p_e]));
-            IGRAPH_CHECK(igraph_vector_push_back(&newedges, VECTOR(edges)[2 * p_e + 1]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&newedges, VECTOR(edges)[2 * p_e]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&newedges, VECTOR(edges)[2 * p_e + 1]));
             p_e ++; UPD_E(); UPD_A()
 
         } else if (next_e <= next_a && next_e == next_d) {
@@ -211,20 +212,20 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
                 to = (igraph_integer_t) floor((sqrt(8 * next_a + 1) + 1) / 2);
                 from = (igraph_integer_t) (next_a - (((igraph_real_t)to) * (to - 1)) / 2);
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&newedges, from));
-            IGRAPH_CHECK(igraph_vector_push_back(&newedges, to));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&newedges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&newedges, to));
             p_a++; UPD_A();
 
         }
     }
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&add);
     igraph_vector_destroy(&delete);
     IGRAPH_FINALLY_CLEAN(3);
 
     if (permutation) {
-        newec = igraph_vector_size(&newedges);
+        newec = igraph_vector_int_size(&newedges);
         for (i = 0; i < newec; i++) {
             igraph_integer_t tmp = VECTOR(newedges)[i];
             VECTOR(newedges)[i] = VECTOR(*permutation)[tmp];
@@ -233,7 +234,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 
     IGRAPH_CHECK(igraph_create(new_graph, &newedges, no_of_nodes, directed));
 
-    igraph_vector_destroy(&newedges);
+    igraph_vector_int_destroy(&newedges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

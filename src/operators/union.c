@@ -108,7 +108,7 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_integer_t no_of_nodes = 0;
     igraph_bool_t directed = 1;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_ptr_t edge_vects, order_vects;
     igraph_vector_int_t no_edges;
     igraph_integer_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
@@ -132,7 +132,7 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
         IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vectors, edgemaps);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_init(&no_edges, no_of_graphs));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &no_edges);
 
@@ -178,7 +178,7 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
     /* Query and sort the edge lists */
     for (i = 0; i < no_of_graphs; i++) {
         igraph_integer_t k, j, n = VECTOR(no_edges)[i];
-        igraph_vector_t *edges = VECTOR(edge_vects)[i];
+        igraph_vector_int_t *edges = VECTOR(edge_vects)[i];
         igraph_vector_int_t *order = VECTOR(order_vects)[i];
         IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], edges, /*bycol=*/0));
         if (!directed) {
@@ -217,8 +217,8 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
         }
 
         /* add the edge */
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, tailfrom));
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, tailto));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tailfrom));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tailto));
 
         /* update edge lists, we just modify the 'order' vectors */
         for (j = 0; j < no_of_graphs; j++) {
@@ -250,7 +250,7 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     if (edgemaps) {
         IGRAPH_FINALLY_CLEAN(1);

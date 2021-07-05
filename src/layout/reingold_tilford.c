@@ -39,7 +39,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     igraph_neimode_t mode,
     igraph_integer_t real_root,
     igraph_integer_t no_of_nodes,
-    igraph_vector_t *pnewedges) {
+    igraph_vector_int_t *pnewedges) {
 
     igraph_integer_t no_of_newedges;
     igraph_vector_bool_t visited;
@@ -48,7 +48,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
 
-    igraph_vector_resize(pnewedges, 0);
+    igraph_vector_int_resize(pnewedges, 0);
 
     /* traverse from real_root and see what nodes you cannot reach */
     no_of_newedges = 0;
@@ -80,7 +80,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     /* if any nodes are unreachable, add edges between them and real_root */
     if (no_of_newedges != 0) {
 
-        igraph_vector_resize(pnewedges, no_of_newedges * 2);
+        igraph_vector_int_resize(pnewedges, no_of_newedges * 2);
         j = 0;
         for (i = 0; i < no_of_nodes; i++) {
             if (!VECTOR(visited)[i]) {
@@ -507,7 +507,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
     const igraph_vector_t *proots = roots;
     igraph_neimode_t mode2;
     igraph_integer_t i;
-    igraph_vector_t newedges;
+    igraph_vector_int_t newedges;
 
     /* TODO: possible speedup could be achieved if we use a table for storing
      * the children of each node in the tree. (Now the implementation uses a
@@ -516,7 +516,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
      */
 
     /* at various steps it might be necessary to add edges to the graph */
-    IGRAPH_VECTOR_INIT_FINALLY(&newedges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&newedges, 0);
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
@@ -611,7 +611,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
             IGRAPH_CHECK(igraph_add_vertices(&extended,
                                              (igraph_integer_t) plus_levels, 0));
 
-            igraph_vector_resize(&newedges, plus_levels * 2);
+            igraph_vector_int_resize(&newedges, plus_levels * 2);
 
             for (i = 0; i < igraph_vector_size(roots); i++) {
                 igraph_integer_t rl = VECTOR(*rootlevel)[i];
@@ -704,7 +704,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
         /* add edges from the roots to real_root */
         no_of_newedges = igraph_vector_size(proots);
-        igraph_vector_resize(&newedges, no_of_newedges * 2);
+        igraph_vector_int_resize(&newedges, no_of_newedges * 2);
         for (i = 0; i < no_of_newedges; i++) {
             VECTOR(newedges)[2 * i] = no_of_nodes - 1;
             VECTOR(newedges)[2 * i + 1] = VECTOR(*proots)[i];
@@ -716,7 +716,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
     /* prepare edges to unreachable parts of the graph */
     IGRAPH_CHECK(igraph_i_layout_reingold_tilford_unreachable(pextended, mode, real_root, no_of_nodes, &newedges));
 
-    if (igraph_vector_size(&newedges) != 0) {
+    if (igraph_vector_int_size(&newedges) != 0) {
         /* Make copy of the graph unless it exists already */
         if (pextended == graph) {
             pextended = &extended;
@@ -726,7 +726,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
     }
-    igraph_vector_destroy(&newedges);
+    igraph_vector_int_destroy(&newedges);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* ----------------------------------------------------------------------- */

@@ -78,7 +78,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
                                 igraph_bool_t directed,
                                 igraph_vector_t *node_type_vec) {
     igraph_integer_t i, j;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_t cumdist;
     igraph_real_t maxcum;
     igraph_vector_t *nodetypes;
@@ -129,7 +129,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         IGRAPH_ERROR("The preference matrix must be symmetric when generating undirected graphs.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types + 1);
 
     if (type_dist) {
@@ -177,8 +177,8 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
             igraph_integer_t type2 = VECTOR(*nodetypes)[node2];
             /*    printf("unif: %f, %f, types: %li, %li\n", uni1, uni2, type1, type2); */
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, node1));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, node2));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, node1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, node2));
             }
         }
     }
@@ -193,7 +193,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
     igraph_vector_destroy(&cumdist);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

@@ -90,7 +90,7 @@ igraph_error_t igraph_intersection(igraph_t *res,
  *        pointer vector and the mappings of edges from the graphs to the
  *        result graph will be stored here, in the same order as
  *        \p graphs. Each mapping is stored in a separate
- *        \type igraph_vector_t object. For the edges that are not in
+ *        \type igraph_vector_int_t object. For the edges that are not in
  *        the intersection, -1 is stored.
  * \return Error code.
  * \sa \ref igraph_intersection() for the intersection of two graphs,
@@ -108,7 +108,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_integer_t no_of_nodes = 0;
     igraph_bool_t directed = 1;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_ptr_t edge_vects, order_vects;
     igraph_integer_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
     igraph_vector_int_t no_edges;
@@ -132,7 +132,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
         IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vectors, edgemaps);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_init(&no_edges, no_of_graphs));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &no_edges);
 
@@ -180,7 +180,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
     /* Query and sort the edge lists */
     for (i = 0; i < no_of_graphs; i++) {
         igraph_integer_t k, j, n = VECTOR(no_edges)[i];
-        igraph_vector_t *edges = VECTOR(edge_vects)[i];
+        igraph_vector_int_t *edges = VECTOR(edge_vects)[i];
         igraph_vector_int_t *order = VECTOR(order_vects)[i];
         IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], edges, /*bycol=*/0));
         if (!directed) {
@@ -245,8 +245,8 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
         /* Add the edge, if the smallest tail element was present
            in all graphs. */
         if (allsame) {
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, tailfrom));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, tailto));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tailfrom));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tailto));
         }
 
         /* Drop edges matching the smalles tail elements
@@ -286,7 +286,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
 
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     if (edgemaps) {
         IGRAPH_FINALLY_CLEAN(1);

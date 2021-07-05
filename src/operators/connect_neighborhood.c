@@ -64,10 +64,10 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t i, j, in;
     igraph_integer_t *added;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
 
     if (order < 0) {
         IGRAPH_ERROR("Negative order, cannot connect neighborhood", IGRAPH_EINVAL);
@@ -81,19 +81,19 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
         igraph_neighbors(graph, &neis, (igraph_integer_t) i, mode);
-        in = igraph_vector_size(&neis);
+        in = igraph_vector_int_size(&neis);
         if (order > 1) {
             for (j = 0; j < in; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
@@ -108,7 +108,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             igraph_neighbors(graph, &neis, actnode, mode);
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
                 for (j = 0; j < n; j++) {
@@ -119,11 +119,11 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
                         if (mode != IGRAPH_ALL || i < nei) {
                             if (mode == IGRAPH_IN) {
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                             } else {
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
                             }
                         }
                     }
@@ -135,11 +135,11 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
                         added[nei] = i + 1;
                         if (mode != IGRAPH_ALL || i < nei) {
                             if (mode == IGRAPH_IN) {
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                             } else {
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                                IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
                             }
                         }
                     }
@@ -149,14 +149,14 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
         } /* while q not empty */
     } /* for i < no_of_nodes */
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&q);
     igraph_free(added);
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, 0));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

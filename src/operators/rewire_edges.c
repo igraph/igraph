@@ -32,7 +32,7 @@
 
 static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
                                              igraph_bool_t loops,
-                                             igraph_vector_t *edges) {
+                                             igraph_vector_int_t *edges) {
 
     igraph_integer_t no_verts = igraph_vcount(graph);
     igraph_integer_t no_edges = igraph_ecount(graph);
@@ -224,7 +224,7 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t endpoints = no_of_edges * 2;
     igraph_integer_t to_rewire;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
 
     if (prob < 0 || prob > 1) {
         IGRAPH_ERROR("Rewiring probability should be between zero and one",
@@ -236,7 +236,7 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, endpoints);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, endpoints);
 
     RNG_BEGIN();
 
@@ -270,7 +270,7 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
 
     IGRAPH_CHECK(igraph_create(&newgraph, &edges, (igraph_integer_t) no_of_nodes,
                                igraph_is_directed(graph)));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
@@ -340,9 +340,9 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
         igraph_integer_t no_of_nodes = igraph_vcount(graph);
         igraph_integer_t to_rewire;
         igraph_integer_t offset = 0;
-        igraph_vector_t edges;
+        igraph_vector_int_t edges;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * no_of_edges);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * no_of_edges);
 
         switch (mode) {
         case IGRAPH_IN:
@@ -375,7 +375,7 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges, (igraph_integer_t) no_of_nodes,
                                    igraph_is_directed(graph)));
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
 
         IGRAPH_FINALLY(igraph_destroy, &newgraph);

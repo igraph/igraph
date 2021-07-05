@@ -102,7 +102,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_chordal(const igraph_t *graph,
                                     const igraph_vector_t *alpha,
                                     const igraph_vector_t *alpham1,
                                     igraph_bool_t *chordal,
-                                    igraph_vector_t *fill_in,
+                                    igraph_vector_int_t *fill_in,
                                     igraph_t *newgraph);
 IGRAPH_EXPORT igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
                                                      igraph_vs_t vids,

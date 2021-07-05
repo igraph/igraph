@@ -580,7 +580,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
         igraph_neimode_t mode) {
     igraph_integer_t i, k, v;
     igraph_real_t q;
-    igraph_vector_t adj;
+    igraph_vector_int_t adj;
     igraph_bool_t updates;
 
     IGRAPH_CHECK(igraph_i_microscopic_standard_tests(graph, vid, quantities,
@@ -599,14 +599,14 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
     /* Random permutation of adj(v). This ensures that if there are multiple */
     /* candidates with an optimal strategy, then we choose one such candidate */
     /* at random. */
-    IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
     IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
-    IGRAPH_CHECK(igraph_vector_shuffle(&adj));
+    IGRAPH_CHECK(igraph_vector_int_shuffle(&adj));
     /* maximum deterministic imitation */
     i = vid;
     q = (igraph_real_t)VECTOR(*quantities)[vid];
     if (optimality == IGRAPH_MAXIMUM) {
-        for (k = 0; k < igraph_vector_size(&adj); k++) {
+        for (k = 0; k < igraph_vector_int_size(&adj); k++) {
             v = (igraph_integer_t) VECTOR(adj)[k];
             if ((igraph_real_t)VECTOR(*quantities)[v] > q) {
                 i = v;
@@ -614,7 +614,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
             }
         }
     } else { /* minimum deterministic imitation */
-        for (k = 0; k < igraph_vector_size(&adj); k++) {
+        for (k = 0; k < igraph_vector_int_size(&adj); k++) {
             v = (igraph_integer_t) VECTOR(adj)[k];
             if ((igraph_real_t)VECTOR(*quantities)[v] < q) {
                 i = v;
@@ -625,7 +625,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
     /* Now i is a vertex with a locally optimal quantity, the value of which */
     /* is q. Update the strategy of vid to that of i. */
     VECTOR(*strategies)[vid] = VECTOR(*strategies)[i];
-    igraph_vector_destroy(&adj);
+    igraph_vector_int_destroy(&adj);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -1137,7 +1137,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
                                 igraph_neimode_t mode) {
     igraph_bool_t updates;
     igraph_integer_t u;
-    igraph_vector_t adj;
+    igraph_vector_int_t adj;
     igraph_integer_t i;
 
     /* sanity checks */
@@ -1155,7 +1155,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     }
 
     /* immediate neighbours of v */
-    IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
     IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
 
     /* Blind imitation. Let v be the vertex whose strategy we want to revise. */
@@ -1165,9 +1165,9 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     /* quantity (e.g. fitness) of v. Here v retains its current strategy if */
     /* the chosen vertex u is indeed v itself. */
     if (algo == IGRAPH_IMITATE_BLIND) {
-        IGRAPH_CHECK(igraph_vector_push_back(&adj, vid));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&adj, vid));
         RNG_BEGIN();
-        i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = RNG_INTEGER(0, igraph_vector_int_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
@@ -1179,7 +1179,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     /* retains its current strategy. */
     else if (algo == IGRAPH_IMITATE_AUGMENTED) {
         RNG_BEGIN();
-        i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = RNG_INTEGER(0, igraph_vector_int_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid]) {
@@ -1193,7 +1193,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     /* Otherwise v retains its current strategy. */
     else if (algo == IGRAPH_IMITATE_CONTRACTED) {
         RNG_BEGIN();
-        i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = RNG_INTEGER(0, igraph_vector_int_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid]) {
@@ -1202,7 +1202,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
     }
 
     /* clean up */
-    igraph_vector_destroy(&adj);
+    igraph_vector_int_destroy(&adj);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

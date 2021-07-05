@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
     char *added_edges;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t eids = IGRAPH_VECTOR_NULL;
     igraph_integer_t i, j;
 
     igraph_vector_int_clear(res);
@@ -229,7 +229,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
         IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, already_added);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -242,13 +242,13 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
         already_added[i] = 1;
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
         while (! igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t tmp_size;
+            igraph_integer_t eids_size;
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_incident(graph, &tmp, act_node,
+            IGRAPH_CHECK(igraph_incident(graph, &eids, act_node,
                                          IGRAPH_ALL));
-            tmp_size = igraph_vector_size(&tmp);
-            for (j = 0; j < tmp_size; j++) {
-                igraph_integer_t edge = VECTOR(tmp)[j];
+            eids_size = igraph_vector_int_size(&eids);
+            for (j = 0; j < eids_size; j++) {
+                igraph_integer_t edge = VECTOR(eids)[j];
                 if (added_edges[edge] == 0) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
                     if (already_added[to] == 0) {
@@ -264,7 +264,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     igraph_dqueue_int_destroy(&q);
     IGRAPH_FREE(already_added);
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&eids);
     IGRAPH_FREE(added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -282,7 +282,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     igraph_d_indheap_t heap = IGRAPH_D_INDHEAP_NULL;
     igraph_integer_t mode = IGRAPH_ALL;
 
-    igraph_vector_t adj;
+    igraph_vector_int_t adj;
 
     igraph_integer_t i, j;
 
@@ -308,7 +308,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
     IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
-    IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t adj_size;
@@ -320,7 +320,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         already_added[i] = 1;
         /* add all edges of the first vertex */
         igraph_incident(graph, &adj, i, (igraph_neimode_t) mode);
-        adj_size = igraph_vector_size(&adj);
+        adj_size = igraph_vector_int_size(&adj);
         for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, i);
@@ -349,7 +349,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
                     IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                     /* add all outgoing edges */
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
-                    adj_size = igraph_vector_size(&adj);
+                    adj_size = igraph_vector_int_size(&adj);
                     for (j = 0; j < adj_size; j++) {
                         igraph_integer_t edgeno = VECTOR(adj)[j];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, to);
@@ -365,7 +365,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
     igraph_d_indheap_destroy(&heap);
     IGRAPH_FREE(already_added);
-    igraph_vector_destroy(&adj);
+    igraph_vector_int_destroy(&adj);
     IGRAPH_FREE(added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 

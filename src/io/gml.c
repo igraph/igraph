@@ -186,7 +186,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_integer_t i, p;
     igraph_integer_t no_of_nodes = 0, no_of_edges = 0;
     igraph_trie_t trie;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
     igraph_gml_tree_t *gtree;
     igraph_integer_t gidx;
@@ -217,7 +217,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     /* Check version, if present, integer and not '1' then ignored */
     i = igraph_gml_tree_find(context.tree, "Version", 0);
@@ -415,7 +415,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
 
     /* Ok, now the edges, attributes too */
-    IGRAPH_CHECK(igraph_vector_resize(&edges, no_of_edges * 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(&edges, no_of_edges * 2));
     p = -1;
     while ( (p = igraph_gml_tree_find(gtree, "edge", p + 1)) != -1) {
         igraph_gml_tree_t *edge;
@@ -503,7 +503,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
     igraph_i_gml_destroy_attrs(attrs);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_i_gml_parsedata_destroy(&context);
     IGRAPH_FINALLY_CLEAN(3);
 

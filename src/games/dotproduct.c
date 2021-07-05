@@ -62,10 +62,10 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
     igraph_integer_t nrow = igraph_matrix_nrow(vecs);
     igraph_integer_t ncol = igraph_matrix_ncol(vecs);
     int i, j;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_bool_t warned_neg = 0, warned_big = 0;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     RNG_BEGIN();
 
@@ -89,11 +89,11 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
                 warned_big = 1;
                 IGRAPH_WARNING("Greater than 1 connection probability in "
                                "dot-product graph");
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             } else if (RNG_UNIF01() < prob) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             }
         }
     }
@@ -101,7 +101,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
     RNG_END();
 
     igraph_create(graph, &edges, ncol, directed);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

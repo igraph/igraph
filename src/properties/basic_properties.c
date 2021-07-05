@@ -125,7 +125,7 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_t incident;
+    igraph_vector_int_t incident;
     igraph_vit_t vit;
     igraph_real_t s, ent, w;
     igraph_integer_t i, j, k;
@@ -148,14 +148,14 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
         IGRAPH_ERROR("Diversity measure works only if the graph has no multiple edges.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incident, 10);
 
     if (igraph_vs_is_all(&vids)) {
         IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = igraph_vector_size(&incident); j < k; j++) {
+            for (j = 0, k = igraph_vector_int_size(&incident); j < k; j++) {
                 w = VECTOR(*weights)[(igraph_integer_t) VECTOR(incident)[j]];
                 s += w;
                 ent += (w * log(w));
@@ -174,7 +174,7 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, v,
                                          /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = igraph_vector_size(&incident); j < k; j++) {
+            for (j = 0, k = igraph_vector_int_size(&incident); j < k; j++) {
                 w = VECTOR(*weights)[(igraph_integer_t) VECTOR(incident)[j]];
                 s += w;
                 ent += (w * log(w));
@@ -186,7 +186,7 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_destroy(&incident);
+    igraph_vector_int_destroy(&incident);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -240,7 +240,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                        igraph_reciprocity_t mode) {
 
     igraph_integer_t nonrec = 0, rec = 0, loops = 0;
-    igraph_vector_t inneis, outneis;
+    igraph_vector_int_t inneis, outneis;
     igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
@@ -255,8 +255,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&inneis, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&inneis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ip, op;
@@ -264,8 +264,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
         igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
 
         ip = op = 0;
-        while (ip < igraph_vector_size(&inneis) &&
-               op < igraph_vector_size(&outneis)) {
+        while (ip < igraph_vector_int_size(&inneis) &&
+               op < igraph_vector_int_size(&outneis)) {
             if (VECTOR(inneis)[ip] < VECTOR(outneis)[op]) {
                 nonrec += 1;
                 ip++;
@@ -288,8 +288,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                 op++;
             }
         }
-        nonrec += (igraph_vector_size(&inneis) - ip) +
-                  (igraph_vector_size(&outneis) - op);
+        nonrec += (igraph_vector_int_size(&inneis) - ip) +
+                  (igraph_vector_int_size(&outneis) - op);
     }
 
     if (mode == IGRAPH_RECIPROCITY_DEFAULT) {
@@ -302,8 +302,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
         *res = (igraph_real_t) rec / (rec + nonrec);
     }
 
-    igraph_vector_destroy(&inneis);
-    igraph_vector_destroy(&outneis);
+    igraph_vector_int_destroy(&inneis);
+    igraph_vector_int_destroy(&outneis);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }

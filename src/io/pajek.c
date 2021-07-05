@@ -132,7 +132,7 @@ void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
 igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_trie_t vattrnames;
     igraph_vector_ptr_t vattrs;
     igraph_trie_t eattrnames;
@@ -140,7 +140,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_integer_t i, j;
     igraph_i_pajek_parsedata_t context;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&vattrnames, 1);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&vattrs, 0);
@@ -232,7 +232,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         IGRAPH_FREE(rec);
     }
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_ptr_destroy(&eattrs);
     igraph_trie_destroy(&eattrnames);
     igraph_vector_ptr_destroy(&vattrs);

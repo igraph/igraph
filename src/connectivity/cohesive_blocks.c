@@ -84,7 +84,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
                                   /* working area follows */
                                   igraph_vector_int_t *compid,
                                   igraph_dqueue_int_t *Q,
-                                  igraph_vector_t *neis) {
+                                  igraph_vector_int_t *neis) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
@@ -112,7 +112,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
             igraph_integer_t node = (igraph_integer_t) igraph_dqueue_int_pop(Q);
             igraph_integer_t j, n;
             IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
-            n = igraph_vector_size(neis);
+            n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
                 igraph_integer_t v = VECTOR(*neis)[j];
                 if (VECTOR(*excluded)[v]) {
@@ -247,7 +247,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     igraph_vector_int_t compid;
     igraph_dqueue_int_t bfsQ;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_ERROR("Cohesive blocking only works on undirected graphs",
@@ -295,7 +295,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&compvertices, 0);
     IGRAPH_CHECK(igraph_vector_bool_init(&marked, 0));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &marked);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&bfsQ, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &bfsQ);
     IGRAPH_CHECK(igraph_vector_int_init(&compid, 0));
@@ -447,7 +447,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_int_destroy(&components);
     igraph_vector_int_destroy(&compid);
     igraph_dqueue_int_destroy(&bfsQ);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_bool_destroy(&marked);
     igraph_vector_int_destroy(&compvertices);
     igraph_vector_ptr_destroy(&separators);
@@ -574,9 +574,9 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         }
 
         if (block_tree) {
-            igraph_vector_t edges;
+            igraph_vector_int_t edges;
             igraph_integer_t eptr = 0;
-            IGRAPH_VECTOR_INIT_FINALLY(&edges, noblocks * 2 - 2);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, noblocks * 2 - 2);
             for (i = 1; i < Qptr; i++) {
                 if (VECTOR(removed)[i]) {
                     continue;
@@ -587,7 +587,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
             IGRAPH_CHECK(igraph_create(block_tree, &edges, noblocks,
                                        IGRAPH_DIRECTED));
-            igraph_vector_destroy(&edges);
+            igraph_vector_int_destroy(&edges);
             IGRAPH_FINALLY_CLEAN(1);
         }
 

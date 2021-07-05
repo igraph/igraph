@@ -128,14 +128,14 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode, igraph_loops_t loops,
                         igraph_multiple_t multiple) {
     igraph_integer_t i, j, n;
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view", IGRAPH_EINVMODE);
     }
 
-    igraph_vector_init(&tmp, 0);
-    IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
+    igraph_vector_int_init(&tmp, 0);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp);
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
@@ -154,7 +154,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
         IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, mode));
 
-        n = igraph_vector_size(&tmp);
+        n = igraph_vector_int_size(&tmp);
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
         for (j = 0; j < n; j++) {
             VECTOR(al->adjs[i])[j] = VECTOR(tmp)[j];
@@ -165,7 +165,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         ));
     }
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
@@ -228,7 +228,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_bool_t loops) {
     igraph_integer_t i, j, k, n;
     igraph_bool_t* seen;
-    igraph_vector_t vec;
+    igraph_vector_int_t vec;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_EINVMODE);
@@ -253,7 +253,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, seen);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
     for (i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
@@ -264,7 +264,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
             seen[i] = 1;
             n--;
         }
-        for (j = 0; j < igraph_vector_size(&vec); j++) {
+        for (j = 0; j < igraph_vector_int_size(&vec); j++) {
             if (! seen [ (igraph_integer_t) VECTOR(vec)[j] ] ) {
                 n--;
                 seen[ (igraph_integer_t) VECTOR(vec)[j] ] = 1;
@@ -279,7 +279,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
     }
 
     IGRAPH_FREE(seen);
-    igraph_vector_destroy(&vec);
+    igraph_vector_int_destroy(&vec);
     IGRAPH_FINALLY_CLEAN(3);
     return IGRAPH_SUCCESS;
 }
@@ -711,14 +711,14 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_neimode_t mode,
                         igraph_loops_t loops) {
     igraph_integer_t i, j, n;
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_EINVMODE);
     }
 
-    igraph_vector_init(&tmp, 0);
-    IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
+    igraph_vector_int_init(&tmp, 0);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp);
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
@@ -736,7 +736,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));
 
-        n = igraph_vector_size(&tmp);
+        n = igraph_vector_int_size(&tmp);
         IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], n));
 
         for (j = 0; j < n; j++) {
@@ -750,7 +750,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
         }
     }
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
@@ -992,7 +992,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
     IGRAPH_FINALLY(igraph_free, al->adjs);
 
-    IGRAPH_CHECK(igraph_vector_init(&al->dummy, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&al->dummy, 0));
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -1010,7 +1010,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
 void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
     igraph_lazy_adjlist_clear(al);
-    igraph_vector_destroy(&al->dummy);
+    igraph_vector_int_destroy(&al->dummy);
     IGRAPH_FREE(al->adjs);
 }
 
@@ -1065,7 +1065,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
             return 0;
         }
 
-        n = igraph_vector_size(&al->dummy);
+        n = igraph_vector_int_size(&al->dummy);
         ret = igraph_vector_int_init(al->adjs[no], n);
         if (ret != 0) {
             IGRAPH_FREE(al->adjs[no]);
@@ -1152,7 +1152,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, il->incs);
 
-    IGRAPH_CHECK(igraph_vector_init(&il->dummy, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&il->dummy, 0));
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -1171,7 +1171,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
 
 void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
     igraph_lazy_inclist_clear(il);
-    igraph_vector_destroy(&il->dummy);
+    igraph_vector_int_destroy(&il->dummy);
     IGRAPH_FREE(il->incs);
 }
 
@@ -1227,7 +1227,7 @@ igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
             return 0;
         }
 
-        n = igraph_vector_size(&il->dummy);
+        n = igraph_vector_int_size(&il->dummy);
         ret = igraph_vector_int_init(il->incs[no], n);
         if (ret != 0) {
             IGRAPH_FREE(il->incs[no]);

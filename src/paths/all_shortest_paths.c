@@ -117,7 +117,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     igraph_dqueue_int_t q;
     igraph_vector_int_t *vptr;
     igraph_vector_int_t *vptr_e;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_vector_int_t ptrlist;
     igraph_vector_int_t ptrhead;
     igraph_integer_t n, j, i, t;
@@ -144,7 +144,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &path_edge);
     /* neis is a temporary vector holding the neighbors of the
      * node being examined */
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     /* ptrlist stores indices into the paths vector, in the order
      * of how they were found. ptrhead is a second-level index that
      * will be used to find paths that terminate in a given vertex */
@@ -258,7 +258,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
         }
 
-        n = igraph_vector_size(&neis);
+        n = igraph_vector_int_size(&neis);
         for (j = 0; j < n; j++) {
             igraph_integer_t neighbor;
             igraph_integer_t fatherptr;
@@ -409,7 +409,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_FREE(geodist);
     igraph_vector_int_destroy(&ptrlist);
     igraph_vector_int_destroy(&ptrhead);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_ptr_destroy(&paths);
     igraph_vector_ptr_destroy(&path_edge);
     igraph_vit_destroy(&vit);

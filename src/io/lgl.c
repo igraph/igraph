@@ -101,7 +101,8 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
                           igraph_add_weights_t weights,
                           igraph_bool_t directed) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL, ws = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_t ws = IGRAPH_VECTOR_NULL;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
@@ -110,7 +111,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     igraph_i_lgl_parsedata_t context;
 
     IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
 
     context.has_weights = 0;
@@ -171,7 +172,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
         IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_trie_destroy(&trie);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&ws);
     igraph_lgl_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);

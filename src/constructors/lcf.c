@@ -47,7 +47,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
                       const igraph_vector_t *shifts,
                       igraph_integer_t repeats) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_shifts = igraph_vector_size(shifts);
     igraph_integer_t ptr = 0, i, sptr = 0;
     igraph_integer_t no_of_nodes = n;
@@ -56,7 +56,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     if (repeats < 0) {
         IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
     }
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * no_of_edges);
 
     if (no_of_nodes > 0) {
         /* Create a ring first */
@@ -80,7 +80,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                IGRAPH_UNDIRECTED));
     IGRAPH_CHECK(igraph_simplify(graph, 1 /* true */, 1 /* true */, NULL));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

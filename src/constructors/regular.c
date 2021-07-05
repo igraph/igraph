@@ -74,7 +74,7 @@
 igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
                 igraph_integer_t center) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t i;
 
     if (n < 0) {
@@ -89,9 +89,9 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
     }
 
     if (mode != IGRAPH_STAR_MUTUAL) {
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, (n - 1) * 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, (n - 1) * 2);
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, (n - 1) * 2 * 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, (n - 1) * 2 * 2);
     }
 
     if (mode == IGRAPH_STAR_OUT) {
@@ -129,7 +129,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
 
     IGRAPH_CHECK(igraph_create(graph, &edges, 0,
                                (mode != IGRAPH_STAR_UNDIRECTED)));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -182,7 +182,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 
     igraph_integer_t dims = igraph_vector_int_size(dimvector);
     igraph_integer_t no_of_nodes = igraph_vector_int_prod(dimvector);
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t *coords, *weights;
     igraph_integer_t i, j;
     int carry, pos;
@@ -210,8 +210,8 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_nodes * dims +
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_nodes * dims +
                                        mutual * directed * no_of_nodes * dims));
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -226,8 +226,8 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                 }
                 if (new_nei != i + 1 &&
                     (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed)) {
-                    igraph_vector_push_back(&edges, i); /* reserved */
-                    igraph_vector_push_back(&edges, new_nei - 1); /* reserved */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                    igraph_vector_int_push_back(&edges, new_nei - 1); /* reserved */
                 }
             } /* if circular || coords[j] */
             if (mutual && directed && (circular || coords[j] != 0)) {
@@ -239,8 +239,8 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                 }
                 if (new_nei != i + 1 &&
                     (VECTOR(*dimvector)[j] != 2 || !circular)) {
-                    igraph_vector_push_back(&edges, i); /* reserved */
-                    igraph_vector_push_back(&edges, new_nei - 1); /* reserved */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                    igraph_vector_int_push_back(&edges, new_nei - 1); /* reserved */
                 }
             } /* if circular || coords[0] */
         } /* for j<dims */
@@ -270,7 +270,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
     /* clean up */
     IGRAPH_FREE(coords);
     IGRAPH_FREE(weights);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -357,7 +357,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
                 igraph_tree_mode_t type) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t i, j;
     igraph_integer_t idx = 0;
     igraph_integer_t to = 1;
@@ -370,7 +370,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
         IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
 
     i = 0;
     if (type == IGRAPH_TREE_OUT) {
@@ -393,7 +393,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, type != IGRAPH_TREE_UNDIRECTED));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
@@ -440,7 +440,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 igraph_error_t igraph_extended_chordal_ring(
     igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_t *W,
     igraph_bool_t directed) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t period = igraph_matrix_ncol(W);
     igraph_integer_t nrow   = igraph_matrix_nrow(W);
     igraph_integer_t i, j, mpos = 0, epos = 0;
@@ -454,7 +454,7 @@ igraph_error_t igraph_extended_chordal_ring(
                      "number of nodes", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (nodes + nodes * nrow));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (nodes + nodes * nrow));
 
     for (i = 0; i < nodes - 1; i++) {
         VECTOR(edges)[epos++] = i;
@@ -484,7 +484,7 @@ igraph_error_t igraph_extended_chordal_ring(
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }

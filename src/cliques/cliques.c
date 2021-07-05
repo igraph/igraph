@@ -57,7 +57,7 @@ static igraph_error_t igraph_i_find_k_cliques(
         igraph_real_t **new_member_storage,
         igraph_integer_t old_clique_count,
         igraph_integer_t *clique_count,
-        igraph_vector_t *neis,
+        igraph_vector_int_t *neis,
         igraph_bool_t independent_vertices) {
 
     igraph_integer_t j, k, l, m, n, new_member_storage_size;
@@ -148,7 +148,7 @@ static igraph_error_t igraph_i_find_k_cliques(
                      * if we are looking for cliques and check for the absence of an
                      * edge if we are looking for independent vertex sets */
                     IGRAPH_CHECK(igraph_neighbors(graph, neis, v1, IGRAPH_ALL));
-                    l = igraph_vector_search(neis, 0, v2, 0);
+                    l = igraph_vector_int_search(neis, 0, v2, 0);
                     if ((l && !independent_vertices) || (!l && independent_vertices)) {
                         /* Found a new clique, step forward in new_member_storage */
                         if (m == n || v2 > (*new_member_storage)[m - 1]) {
@@ -193,7 +193,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
                             igraph_bool_t independent_vertices) {
 
     igraph_integer_t no_of_nodes;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_real_t *member_storage = 0, *new_member_storage, *c1;
     igraph_integer_t i, j, k, clique_count, old_clique_count;
 
@@ -212,7 +212,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
 
     igraph_vector_ptr_clear(res);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
 
     /* Will be resized later, if needed. */
@@ -295,7 +295,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
 
     igraph_free(member_storage);
     igraph_free(new_member_storage);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(4); /* 3 here, +1 is igraph_i_cliques_free_res */
 
     return IGRAPH_SUCCESS;

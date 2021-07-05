@@ -39,7 +39,7 @@ IGRAPH_EXPORT igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, i
 IGRAPH_EXPORT igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr);
 IGRAPH_EXPORT void igraph_destroy(igraph_t *graph);
 IGRAPH_EXPORT igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from);
-IGRAPH_EXPORT igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
+IGRAPH_EXPORT igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
                                    void *attr);
 IGRAPH_EXPORT igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv,
                                       void *attr);
@@ -50,7 +50,7 @@ IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const i
                                              igraph_vector_int_t *invidx);
 IGRAPH_EXPORT igraph_integer_t igraph_vcount(const igraph_t *graph);
 IGRAPH_EXPORT igraph_integer_t igraph_ecount(const igraph_t *graph);
-IGRAPH_EXPORT igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t vid,
+IGRAPH_EXPORT igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t vid,
                                    igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_bool_t igraph_is_directed(const igraph_t *graph);
 IGRAPH_EXPORT igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
@@ -71,7 +71,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph
                                         const igraph_vector_int_t *pairs,
                                         const igraph_vector_int_t *path,
                                         igraph_bool_t directed, igraph_bool_t error);
-IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
+IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t vid,
                                   igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *igraph2, igraph_bool_t *res);
 

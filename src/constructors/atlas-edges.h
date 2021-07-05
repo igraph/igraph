@@ -35,7 +35,7 @@ __BEGIN_DECLS
 
 #include "igraph_types.h"
 
-const igraph_real_t igraph_i_atlas_edges[] = {
+const igraph_integer_t igraph_i_atlas_edges[] = {
     0, 0,
     1, 0,
     2, 0,

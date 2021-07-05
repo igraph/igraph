@@ -533,7 +533,8 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     const igraph_t *graph, const igraph_inclist_t *edges_per_node, const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
     const igraph_vector_int_t *membership, const igraph_vector_int_t *refined_membership, const igraph_integer_t nb_refined_clusters,
     igraph_t *aggregated_graph, igraph_vector_t *aggregated_edge_weights, igraph_vector_t *aggregated_node_weights, igraph_vector_int_t *aggregated_membership) {
-    igraph_vector_t aggregated_edges, edge_weight_to_cluster;
+    igraph_vector_int_t aggregated_edges;
+    igraph_vector_t edge_weight_to_cluster;
     igraph_vector_ptr_t refined_clusters;
     igraph_vector_int_t *incident_edges;
     igraph_vector_t neighbor_clusters;
@@ -547,8 +548,8 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     IGRAPH_CHECK(igraph_i_community_get_clusters(refined_membership, &refined_clusters));
 
     /* Initialize new edges */
-    IGRAPH_CHECK(igraph_vector_init(&aggregated_edges, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &aggregated_edges);
+    IGRAPH_CHECK(igraph_vector_int_init(&aggregated_edges, 0));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &aggregated_edges);
 
     /* We clear the aggregated edge weights, we will push each new edge weight */
     igraph_vector_clear(aggregated_edge_weights);
@@ -602,8 +603,8 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
             igraph_integer_t c2 = VECTOR(neighbor_clusters)[i];
 
             /* Add edge */
-            IGRAPH_CHECK(igraph_vector_push_back(&aggregated_edges, c));
-            IGRAPH_CHECK(igraph_vector_push_back(&aggregated_edges, c2));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&aggregated_edges, c));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&aggregated_edges, c2));
 
             /* Add edge weight */
             IGRAPH_CHECK(igraph_vector_push_back(aggregated_edge_weights, VECTOR(edge_weight_to_cluster)[c2]));
@@ -627,7 +628,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     IGRAPH_CHECK(igraph_create(aggregated_graph, &aggregated_edges, nb_refined_clusters,
                                IGRAPH_UNDIRECTED));
 
-    igraph_vector_destroy(&aggregated_edges);
+    igraph_vector_int_destroy(&aggregated_edges);
 
     IGRAPH_FINALLY_CLEAN(1);
 

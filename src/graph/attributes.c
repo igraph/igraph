@@ -92,7 +92,7 @@ igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
 }
 
 igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
-                                 const igraph_vector_t *edges, void *attr) {
+                                 const igraph_vector_int_t *edges, void *attr) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_edges(graph, edges, attr);
     } else {

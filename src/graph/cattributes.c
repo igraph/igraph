@@ -1648,13 +1648,13 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
 /*   } */
 /* } */
 
-static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
+static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
                                          igraph_vector_ptr_t *nattr) {
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;
     igraph_integer_t ealno = igraph_vector_ptr_size(eal);
-    igraph_integer_t ne = igraph_vector_size(edges) / 2;
+    igraph_integer_t ne = igraph_vector_int_size(edges) / 2;
     igraph_integer_t origlen = igraph_ecount(graph) - ne;
     igraph_integer_t nattrno = nattr == 0 ? 0 : igraph_vector_ptr_size(nattr);
     igraph_vector_t news;

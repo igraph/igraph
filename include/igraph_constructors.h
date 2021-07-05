@@ -37,7 +37,7 @@ __BEGIN_DECLS
 /* Constructors, deterministic                        */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_t *edges, igraph_integer_t n,
+IGRAPH_EXPORT igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges, igraph_integer_t n,
                                 igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                                ...);

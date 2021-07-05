@@ -155,7 +155,9 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_order1(const igraph_vector_t* v,
 IGRAPH_EXPORT igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
                                            igraph_vector_int_t* res, igraph_real_t maxval);
 IGRAPH_EXPORT igraph_error_t igraph_vector_order2(igraph_vector_t *v);
-IGRAPH_EXPORT igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_vector_int_rank(const igraph_vector_int_t *v, igraph_vector_int_t *res,
+                                     igraph_integer_t nodes);
+IGRAPH_EXPORT igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_int_t *res,
                                      igraph_integer_t nodes);
 IGRAPH_EXPORT igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v,
                                        igraph_vector_bool_t *is_nan);

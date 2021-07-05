@@ -101,16 +101,16 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
     igraph_vector_int_t vids_old2new, vids_new2old;
     igraph_vector_int_t eids_new2old;
     igraph_vector_int_t vids_vec;
-    igraph_vector_t nei_edges;
-    igraph_vector_t new_edges;
+    igraph_vector_int_t nei_edges;
+    igraph_vector_int_t new_edges;
     igraph_vit_t vit;
 
     /* The order of initialization is important here, they will be destroyed in the
      * opposite order */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids_new2old, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_new2old, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&new_edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&nei_edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&new_edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nei_edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_vec, 0);
 
@@ -149,7 +149,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
         igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
-        n = igraph_vector_size(&nei_edges);
+        n = igraph_vector_int_size(&nei_edges);
 
         if (directed) {
             /* directed graph; this is easier */
@@ -161,8 +161,8 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
                     continue;
                 }
 
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to - 1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to - 1));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
             }
         } else {
@@ -192,8 +192,8 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
                     }
                 }
 
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
             }
         }
@@ -206,7 +206,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
 
     /* Get rid of some vectors that are not needed anymore */
     igraph_vector_int_destroy(&vids_old2new);
-    igraph_vector_destroy(&nei_edges);
+    igraph_vector_int_destroy(&nei_edges);
     IGRAPH_FINALLY_CLEAN(2);
 
     /* Create the new graph */
@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
     IGRAPH_I_ATTRIBUTE_DESTROY(res);
 
     /* Now we can also get rid of the new_edges vector */
-    igraph_vector_destroy(&new_edges);
+    igraph_vector_int_destroy(&new_edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Make sure that the newly created graph is destroyed if something happens from

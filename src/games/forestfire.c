@@ -32,8 +32,8 @@
 #include "core/interruption.h"
 
 typedef struct igraph_i_forest_fire_data_t {
-    igraph_vector_t *inneis;
-    igraph_vector_t *outneis;
+    igraph_vector_int_t *inneis;
+    igraph_vector_int_t *outneis;
     igraph_integer_t no_of_nodes;
 } igraph_i_forest_fire_data_t;
 
@@ -41,8 +41,8 @@ typedef struct igraph_i_forest_fire_data_t {
 static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
     igraph_integer_t i;
     for (i = 0; i < data->no_of_nodes; i++) {
-        igraph_vector_destroy(data->inneis + i);
-        igraph_vector_destroy(data->outneis + i);
+        igraph_vector_int_destroy(data->inneis + i);
+        igraph_vector_int_destroy(data->outneis + i);
     }
 }
 
@@ -109,8 +109,8 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     igraph_vector_int_t visited;
     igraph_integer_t no_of_nodes = nodes, actnode, i;
-    igraph_vector_t edges;
-    igraph_vector_t *inneis, *outneis;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t *inneis, *outneis;
     igraph_i_forest_fire_data_t data;
     igraph_dqueue_int_t neiq;
     igraph_integer_t ambs = pambs;
@@ -135,14 +135,14 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    inneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_t);
+    inneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
     if (!inneis) {
         IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, inneis);
-    outneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_t);
+    outneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
     if (!outneis) {
         IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
     }
@@ -152,8 +152,8 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     data.no_of_nodes = no_of_nodes;
     IGRAPH_FINALLY(igraph_i_forest_fire_free, &data);
     for (i = 0; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_vector_init(inneis + i, 0));
-        IGRAPH_CHECK(igraph_vector_init(outneis + i, 0));
+        IGRAPH_CHECK(igraph_vector_int_init(inneis + i, 0));
+        IGRAPH_CHECK(igraph_vector_int_init(outneis + i, 0));
     }
 
     IGRAPH_CHECK(igraph_vector_int_init(&visited, no_of_nodes));
@@ -166,10 +166,10 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     if (VECTOR(visited)[(nei)] != actnode+1) {                     \
         VECTOR(visited)[(nei)] = actnode+1;                          \
         IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, nei));                \
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, actnode));      \
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));          \
-        IGRAPH_CHECK(igraph_vector_push_back(outneis+actnode, nei)); \
-        IGRAPH_CHECK(igraph_vector_push_back(inneis+nei, actnode));  \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode));      \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));          \
+        IGRAPH_CHECK(igraph_vector_int_push_back(outneis+actnode, nei)); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(inneis+nei, actnode));  \
     }
 
     IGRAPH_PROGRESS("Forest fire: ", 0.0, NULL);
@@ -191,10 +191,10 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
         while (!igraph_dqueue_int_empty(&neiq)) {
             igraph_integer_t actamb = igraph_dqueue_int_pop(&neiq);
-            igraph_vector_t *outv = outneis + actamb;
-            igraph_vector_t *inv = inneis + actamb;
-            igraph_integer_t no_in = igraph_vector_size(inv);
-            igraph_integer_t no_out = igraph_vector_size(outv);
+            igraph_vector_int_t *outv = outneis + actamb;
+            igraph_vector_int_t *inv = inneis + actamb;
+            igraph_integer_t no_in = igraph_vector_int_size(inv);
+            igraph_integer_t no_out = igraph_vector_int_size(outv);
             igraph_integer_t neis_out = RNG_GEOM(param_geom_out);
             igraph_integer_t neis_in = RNG_GEOM(param_geom_in);
             /* outgoing neighbors */
@@ -256,7 +256,7 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_FINALLY_CLEAN(5);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

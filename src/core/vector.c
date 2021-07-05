@@ -335,7 +335,7 @@ igraph_error_t igraph_vector_int_order1_int(const igraph_vector_int_t* v,
 }
 
 igraph_error_t igraph_vector_rank(
-        const igraph_vector_t *v, igraph_vector_t *res, igraph_integer_t nodes) {
+        const igraph_vector_t *v, igraph_vector_int_t *res, igraph_integer_t nodes) {
 
     igraph_vector_t rad;
     igraph_vector_t ptr;
@@ -344,7 +344,7 @@ igraph_error_t igraph_vector_rank(
 
     IGRAPH_VECTOR_INIT_FINALLY(&rad, nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&ptr, edges);
-    IGRAPH_CHECK(igraph_vector_resize(res, edges));
+    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
         igraph_integer_t elem = VECTOR(*v)[i];

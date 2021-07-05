@@ -740,7 +740,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
                              igraph_integer_t *isoclass) {
     igraph_integer_t nodes = igraph_vector_size(vids);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
 
     unsigned char mul, idx;
     const unsigned int *arr_idx, *arr_code;
@@ -753,7 +753,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     if (directed) {
         if (nodes == 3) {
@@ -780,7 +780,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
     for (i = 0; i < nodes; i++) {
         igraph_integer_t from = VECTOR(*vids)[i];
         igraph_neighbors(graph, &neis, (igraph_integer_t) from, IGRAPH_OUT);
-        s = igraph_vector_size(&neis);
+        s = igraph_vector_int_size(&neis);
         for (j = 0; j < s; j++) {
             igraph_integer_t nei = VECTOR(neis)[j], to;
             if (igraph_vector_search(vids, 0, nei, &to)) {
@@ -791,7 +791,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
     }
 
     *isoclass = (igraph_integer_t) arr_code[code];
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
@@ -818,7 +818,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
  */
 igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                            igraph_integer_t number, igraph_bool_t directed) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     const unsigned int *classedges;
     igraph_integer_t power;
     igraph_integer_t code;
@@ -829,7 +829,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (directed) {
         if (size == 3) {
@@ -882,8 +882,8 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     pos = 0;
     while (code > 0) {
         if (code >= power) {
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2 * pos]));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2 * pos + 1]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, classedges[2 * pos]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, classedges[2 * pos + 1]));
             code -= power;
         }
         power /= 2;
@@ -891,7 +891,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, size, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }

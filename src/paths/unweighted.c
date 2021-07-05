@@ -282,7 +282,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
     igraph_integer_t i, j, vsize;
-    igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t tmp = IGRAPH_VECTOR_NULL;
 
     igraph_vit_t vit;
 
@@ -312,7 +312,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, father);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     /* Mark the vertices we need to reach */
@@ -349,7 +349,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
 
         IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode));
-        vsize = igraph_vector_size(&tmp);
+        vsize = igraph_vector_int_size(&tmp);
         for (j = 0; j < vsize; j++) {
             igraph_integer_t edge = VECTOR(tmp)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, act);
@@ -453,7 +453,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     /* Clean */
     IGRAPH_FREE(father);
     igraph_dqueue_int_destroy(&q);
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
 

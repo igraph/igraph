@@ -45,7 +45,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     char message[256];
     igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
     igraph_vector_int_t eids;
-    igraph_vector_t edgevec, alledges;
+    igraph_vector_int_t edgevec, alledges;
     igraph_bool_t directed, loops, ok;
     igraph_es_t es;
     igraph_adjlist_t al;
@@ -67,10 +67,10 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
          */
         IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-        IGRAPH_VECTOR_INIT_FINALLY(&alledges, no_of_edges * 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&alledges, no_of_edges * 2);
         igraph_get_edgelist(graph, &alledges, /*bycol=*/ 0);
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&edgevec, 4);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edgevec, 4);
         es = igraph_ess_vector(&eids);
     }
 
@@ -208,10 +208,10 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     IGRAPH_PROGRESS("Random rewiring: ", 100.0, 0);
 
     if (use_adjlist) {
-        igraph_vector_destroy(&alledges);
+        igraph_vector_int_destroy(&alledges);
         igraph_adjlist_destroy(&al);
     } else {
-        igraph_vector_destroy(&edgevec);
+        igraph_vector_int_destroy(&edgevec);
     }
 
     igraph_vector_int_destroy(&eids);

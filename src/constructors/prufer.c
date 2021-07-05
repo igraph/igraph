@@ -52,7 +52,7 @@
  */
 igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
     igraph_vector_int_t degree;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t n;
     igraph_integer_t i, k;
     igraph_integer_t u, v; /* vertices */
@@ -61,7 +61,7 @@ igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *pr
     n = igraph_vector_int_size(prufer) + 2;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, n); /* initializes vector to zeros */
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
 
     /* build out-degree vector (i.e. number of child vertices) and verify Prufer sequence */
     for (i = 0; i < n - 2; ++i) {
@@ -111,7 +111,7 @@ igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *pr
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) n, /* directed = */ 0));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(2);
 

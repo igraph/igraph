@@ -115,7 +115,7 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_multiple_t multiple;
-    igraph_vector_t dummy;
+    igraph_vector_int_t dummy;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
@@ -153,7 +153,7 @@ typedef struct igraph_lazy_inclist_t {
     igraph_integer_t length;
     igraph_vector_int_t **incs;
     igraph_neimode_t mode;
-    igraph_vector_t dummy;
+    igraph_vector_int_t dummy;
     igraph_loops_t loops;
 } igraph_lazy_inclist_t;
 

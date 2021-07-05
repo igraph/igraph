@@ -156,7 +156,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     igraph_vector_int_t try_idx;
     float move_radius = width / 2;
     float fine_tuning_factor = 0.01f;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     float min_x = width / 2, max_x = -width / 2, min_y = height / 2, max_y = -height / 2;
 
     igraph_integer_t no_tries = 30;
@@ -196,7 +196,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     IGRAPH_FINALLY(igraph_vector_float_destroy, &try_y);
     IGRAPH_CHECK(igraph_vector_int_init_seq(&try_idx, 0, no_tries - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &try_idx);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 100);
 
     RNG_BEGIN();
 
@@ -336,7 +336,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
                 if (w_edge_lengths != 0) {
                     igraph_integer_t len, j;
                     igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
-                    len = igraph_vector_size(&neis);
+                    len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
                         float odx = old_x - MATRIX(*res, u, 0);
@@ -352,7 +352,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
                 if (w_edge_crossings != 0) {
                     igraph_integer_t len, j, no = 0;
                     igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
-                    len = igraph_vector_size(&neis);
+                    len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
                         float u_x = MATRIX(*res, u, 0);
@@ -403,7 +403,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
                     /* All other nodes from all of v's incident edges */
                     igraph_incident(graph, &neis, v, IGRAPH_ALL);
-                    no = igraph_vector_size(&neis);
+                    no = igraph_vector_int_size(&neis);
                     for (e = 0; e < no; e++) {
                         igraph_integer_t mye = VECTOR(neis)[e];
                         igraph_integer_t u = IGRAPH_OTHER(graph, mye, v);
@@ -453,7 +453,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
     RNG_END();
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&try_idx);
     igraph_vector_float_destroy(&try_x);
     igraph_vector_float_destroy(&try_y);

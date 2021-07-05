@@ -41,7 +41,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
                                  igraph_bool_t *res,
                                  igraph_vector_bool_t *removed,
                                  igraph_dqueue_int_t *Q,
-                                 igraph_vector_t *neis,
+                                 igraph_vector_int_t *neis,
                                  igraph_integer_t no_of_nodes) {
 
     igraph_integer_t start = 0;
@@ -109,7 +109,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
         igraph_integer_t node = igraph_dqueue_int_pop(Q);
         igraph_integer_t j, n;
         IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
-        n = igraph_vector_size(neis);
+        n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (!VECTOR(*removed)[nei]) {
@@ -153,7 +153,7 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_bool_t removed;
     igraph_dqueue_int_t Q;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, candidate, &vit));
@@ -162,12 +162,12 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
     IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed,
                                        &Q, &neis, no_of_nodes));
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&Q);
     igraph_vector_bool_destroy(&removed);
     igraph_vit_destroy(&vit);
@@ -211,7 +211,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_bool_t removed;
     igraph_dqueue_int_t Q;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_integer_t candsize;
     igraph_vit_t vit;
 
@@ -223,7 +223,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
     IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     /* Is it a separator at all? */
     IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed,
@@ -247,7 +247,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
         (*res) = (*res) ? 0 : 1;    /* opposite */
     }
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&Q);
     igraph_vector_bool_destroy(&removed);
     igraph_vit_destroy(&vit);

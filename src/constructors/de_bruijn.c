@@ -59,7 +59,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     /* n - length of strings */
 
     igraph_integer_t no_of_nodes, no_of_edges;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t i, j;
     igraph_integer_t mm = m;
 
@@ -78,21 +78,21 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     no_of_nodes = pow(m, n);
     no_of_edges = no_of_nodes * m;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t basis = (i * mm) % no_of_nodes;
         for (j = 0; j < m; j++) {
-            igraph_vector_push_back(&edges, i);
-            igraph_vector_push_back(&edges, basis + j);
+            igraph_vector_int_push_back(&edges, i);
+            igraph_vector_int_push_back(&edges, basis + j);
         }
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                IGRAPH_DIRECTED));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

@@ -106,7 +106,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_t parents;
     igraph_vector_t edges;
     igraph_2dgrid_t grid;
-    igraph_vector_t eids;
+    igraph_vector_int_t eids;
     igraph_vector_t forcex;
     igraph_vector_t forcey;
 
@@ -139,7 +139,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges));
-    IGRAPH_VECTOR_INIT_FINALLY(&eids, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&forcey, no_of_nodes);
 
@@ -231,7 +231,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             IGRAPH_ALLOW_INTERRUPTION();
             IGRAPH_CHECK(igraph_incident(graph, &eids, vid,
                                          IGRAPH_ALL));
-            for (k = 0; k < igraph_vector_size(&eids); k++) {
+            for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
                 igraph_integer_t from, to;
                 igraph_edge(graph, eid, &from, &to);
@@ -340,7 +340,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_destroy(&parents);
     igraph_vector_destroy(&edges);
     igraph_2dgrid_destroy(&grid);
-    igraph_vector_destroy(&eids);
+    igraph_vector_int_destroy(&eids);
     igraph_vector_destroy(&forcex);
     igraph_vector_destroy(&forcey);
     IGRAPH_FINALLY_CLEAN(9);

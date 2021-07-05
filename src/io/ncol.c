@@ -102,7 +102,8 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                            igraph_add_weights_t weights,
                            igraph_bool_t directed) {
 
-    igraph_vector_t edges, ws;
+    igraph_vector_int_t edges;
+    igraph_vector_t ws;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
     igraph_integer_t no_of_nodes;
     igraph_integer_t no_predefined = 0;
@@ -114,7 +115,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     IGRAPH_CHECK(igraph_empty(graph, 0, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
     IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
@@ -179,10 +180,10 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
-    if (igraph_vector_empty(&edges)) {
+    if (igraph_vector_int_empty(&edges)) {
         no_of_nodes = 0;
     } else {
-        no_of_nodes = igraph_vector_max(&edges) + 1;
+        no_of_nodes = igraph_vector_int_max(&edges) + 1;
     }
 
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, pname));
@@ -196,7 +197,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     }
     igraph_vector_destroy(&ws);
     igraph_trie_destroy(&trie);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_ncol_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 

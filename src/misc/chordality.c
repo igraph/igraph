@@ -272,7 +272,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                       const igraph_vector_t *alpha,
                       const igraph_vector_t *alpham1,
                       igraph_bool_t *chordal,
-                      igraph_vector_t *fill_in,
+                      igraph_vector_int_t *fill_in,
                       igraph_t *newgraph) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -283,7 +283,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     igraph_adjlist_t adjlist;
     igraph_vector_int_t mark;
     igraph_bool_t calc_edges = fill_in || newgraph;
-    igraph_vector_t *my_fill_in = fill_in, v_fill_in;
+    igraph_vector_int_t *my_fill_in = fill_in, v_fill_in;
 
     /*****************/
     /* local v, w, x */
@@ -333,7 +333,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     }
 
     if (!fill_in && newgraph) {
-        IGRAPH_VECTOR_INIT_FINALLY(&v_fill_in, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v_fill_in, 0);
         my_fill_in = &v_fill_in;
     }
 
@@ -343,7 +343,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, no_of_nodes);
     if (my_fill_in) {
-        igraph_vector_clear(my_fill_in);
+        igraph_vector_int_clear(my_fill_in);
     }
 
     if (chordal) {
@@ -412,8 +412,8 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                     }
 
                     if (my_fill_in) {
-                        IGRAPH_CHECK(igraph_vector_push_back(my_fill_in, x));
-                        IGRAPH_CHECK(igraph_vector_push_back(my_fill_in, w));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(my_fill_in, x));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(my_fill_in, w));
                     }
 
                     if (!calc_edges) {
@@ -456,7 +456,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     }
 
     if (!fill_in && newgraph) {
-        igraph_vector_destroy(&v_fill_in);
+        igraph_vector_int_destroy(&v_fill_in);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

@@ -71,12 +71,12 @@
 igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
                                igraph_integer_t n, igraph_bool_t directed) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t from, to;
     int c;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, 100));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 100));
 
     /* skip all whitespace */
     do {
@@ -97,8 +97,8 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
         if (read != 1) {
             IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR);
         }
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
         /* skip all whitespace */
         do {
@@ -108,7 +108,7 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }

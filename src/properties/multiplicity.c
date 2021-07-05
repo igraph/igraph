@@ -54,13 +54,13 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     if (vc == 0 || ec == 0) {
         *res = 1;
     } else {
-        igraph_vector_t neis;
+        igraph_vector_int_t neis;
         igraph_integer_t i, j, n;
         igraph_bool_t found = 0;
-        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc; i++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
                     found = 1; break;
@@ -71,7 +71,7 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
             }
         }
         *res = !found;
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -107,14 +107,14 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     if (vc == 0 || ec == 0) {
         *res = 0;
     } else {
-        igraph_vector_t neis;
+        igraph_vector_int_t neis;
         igraph_integer_t i, j, n;
         igraph_bool_t found = 0;
-        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc && !found; i++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
                                           IGRAPH_OUT));
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
             for (j = 1; j < n; j++) {
                 if (VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
                     /* If the graph is undirected, loop edges appear twice in the neighbor
@@ -133,7 +133,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
             }
         }
         *res = found;
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

@@ -63,7 +63,7 @@ static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
 igraph_error_t igraph_contract_vertices(igraph_t *graph,
                              const igraph_vector_int_t *mapping,
                              const igraph_attribute_combination_t *vertex_comb) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t vattr = vertex_comb && igraph_has_attribute_table();
@@ -76,8 +76,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
 
     if (no_of_nodes > 0) {
         last = igraph_vector_int_max(mapping);
@@ -90,8 +90,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
         igraph_integer_t nfrom = VECTOR(*mapping)[from];
         igraph_integer_t nto = VECTOR(*mapping)[to];
 
-        igraph_vector_push_back(&edges, nfrom);
-        igraph_vector_push_back(&edges, nto);
+        igraph_vector_int_push_back(&edges, nfrom);
+        igraph_vector_int_push_back(&edges, nto);
 
         if (nfrom > last) {
             last = nfrom;
@@ -106,7 +106,7 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     IGRAPH_CHECK(igraph_create(&res, &edges, no_new_vertices,
                                igraph_is_directed(graph)));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_FINALLY(igraph_destroy, &res);

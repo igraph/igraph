@@ -318,7 +318,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t no_of_components;  /* number of components of the original graph */
     igraph_vector_int_t membership;         /* components of the original graph */
-    igraph_vector_t extd_edgelist;   /* edge list of the extended graph */
+    igraph_vector_int_t extd_edgelist;   /* edge list of the extended graph */
     igraph_vector_t layers_own;  /* layer indices after having eliminated empty layers */
     igraph_real_t dx = 0, dx2 = 0; /* displacement of the current component on the X axis */
     igraph_vector_t layer_to_y; /* mapping from layer indices to final Y coordinates */
@@ -328,7 +328,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     }
 
     if (extd_graph != 0) {
-        IGRAPH_VECTOR_INIT_FINALLY(&extd_edgelist, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&extd_edgelist, 0);
         if (extd_to_orig_eids != 0) {
             igraph_vector_clear(extd_to_orig_eids);
         }
@@ -383,11 +383,11 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
         igraph_vector_t old2new_vertex_ids;
         igraph_vector_t new2old_vertex_ids;
         igraph_vector_t new_layers;
-        igraph_vector_t edgelist;
-        igraph_vector_t neis;
+        igraph_vector_int_t edgelist;
+        igraph_vector_int_t neis;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&edgelist, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         IGRAPH_VECTOR_INIT_FINALLY(&new2old_vertex_ids, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&old2new_vertex_ids, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&new_layers, 0);
@@ -416,7 +416,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
              * Add the neighbors of this vertex, excluding loops */
             IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) i,
                                          IGRAPH_OUT));
-            j = igraph_vector_size(&neis);
+            j = igraph_vector_int_size(&neis);
             for (k = 0; k < j; k++) {
                 igraph_integer_t eid = VECTOR(neis)[k];
                 if (directed) {
@@ -431,66 +431,66 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
                     /* Edge goes within the same layer, we don't need this in the
                      * layered graph, but we need it in the extended graph */
                     if (extd_graph != 0) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
-                        IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, i));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, nei));
                         if (extd_to_orig_eids != 0) {
                             IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
                         }
                     }
                 } else if (VECTOR(layers_own)[i] > VECTOR(layers_own)[nei]) {
                     /* Edge goes upwards, we have to flip it */
-                    IGRAPH_CHECK(igraph_vector_push_back(&edgelist,
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist,
                                                          VECTOR(old2new_vertex_ids)[nei]));
                     for (l = VECTOR(layers_own)[nei] + 1;
                          l < VECTOR(layers_own)[i]; l++) {
                         IGRAPH_CHECK(igraph_vector_push_back(&new_layers, l));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id++));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist, next_new_vertex_id));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist, next_new_vertex_id++));
                     }
-                    IGRAPH_CHECK(igraph_vector_push_back(&edgelist,
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist,
                                                          VECTOR(old2new_vertex_ids)[i]));
                     /* Also add the edge to the extended graph if needed, but this time
                      * with the proper orientation */
                     if (extd_graph != 0) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, i));
                         next_extd_vertex_id += VECTOR(layers_own)[i] - VECTOR(layers_own)[nei] - 1;
                         for (l = VECTOR(layers_own)[i] - 1, m = 1;
                              l > VECTOR(layers_own)[nei]; l--, m++) {
-                            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id - m));
-                            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id - m));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id - m));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id - m));
                             if (extd_to_orig_eids != 0) {
                                 IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
                             }
                         }
-                        IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, nei));
                         if (extd_to_orig_eids != 0) {
                             IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
                         }
                     }
                 } else {
                     /* Edge goes downwards */
-                    IGRAPH_CHECK(igraph_vector_push_back(&edgelist,
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist,
                                                          VECTOR(old2new_vertex_ids)[i]));
                     for (l = VECTOR(layers_own)[i] + 1;
                          l < VECTOR(layers_own)[nei]; l++) {
                         IGRAPH_CHECK(igraph_vector_push_back(&new_layers, l));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edgelist, next_new_vertex_id++));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist, next_new_vertex_id));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist, next_new_vertex_id++));
                     }
-                    IGRAPH_CHECK(igraph_vector_push_back(&edgelist,
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist,
                                                          VECTOR(old2new_vertex_ids)[nei]));
                     /* Also add the edge to the extended graph */
                     if (extd_graph != 0) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, i));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, i));
                         for (l = VECTOR(layers_own)[i] + 1;
                              l < VECTOR(layers_own)[nei]; l++) {
-                            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id));
-                            IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, next_extd_vertex_id++));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, next_extd_vertex_id++));
                             if (extd_to_orig_eids != 0) {
                                 IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
                             }
                         }
-                        IGRAPH_CHECK(igraph_vector_push_back(&extd_edgelist, nei));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&extd_edgelist, nei));
                         if (extd_to_orig_eids != 0) {
                             IGRAPH_CHECK(igraph_vector_push_back(extd_to_orig_eids, eid));
                         }
@@ -513,7 +513,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
             IGRAPH_FINALLY(igraph_destroy, &subgraph);
 
             /*
-            igraph_vector_print(&edgelist);
+            igraph_vector_int_print(&edgelist);
             igraph_vector_print(&new_layers);
             */
 
@@ -568,8 +568,8 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
         igraph_vector_destroy(&new_layers);
         igraph_vector_destroy(&old2new_vertex_ids);
         igraph_vector_destroy(&new2old_vertex_ids);
-        igraph_vector_destroy(&edgelist);
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&edgelist);
+        igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(5);
     }
 
@@ -581,7 +581,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     if (extd_graph != 0) {
         IGRAPH_CHECK(igraph_create(extd_graph, &extd_edgelist, (igraph_integer_t)
                                    next_extd_vertex_id, igraph_is_directed(graph)));
-        igraph_vector_destroy(&extd_edgelist);
+        igraph_vector_int_destroy(&extd_edgelist);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -719,9 +719,9 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
         igraph_vector_t* barycenters) {
     igraph_integer_t i, j, m, n;
     igraph_vector_t* layer_members = igraph_i_layering_get(layering, layer_index);
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     n = igraph_vector_size(layer_members);
     IGRAPH_CHECK(igraph_vector_resize(barycenters, n));
@@ -730,7 +730,7 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t)
                                       VECTOR(*layer_members)[i], direction));
-        m = igraph_vector_size(&neis);
+        m = igraph_vector_int_size(&neis);
         if (m == 0) {
             /* No neighbors in this direction. Just use the current X coordinate */
             VECTOR(*barycenters)[i] = MATRIX(*layout, i, 0);
@@ -742,7 +742,7 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
         }
     }
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -761,7 +761,8 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
     igraph_integer_t iter, layer_index;
     igraph_vector_t* layer_members;
-    igraph_vector_t neis, barycenters;
+    igraph_vector_int_t neis;
+    igraph_vector_t barycenters;
     igraph_vector_int_t sort_indices;
     igraph_bool_t changed;
 
@@ -779,7 +780,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&barycenters, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sort_indices, 0);
 
     /* Start the effective part of the Sugiyama algorithm */
@@ -862,7 +863,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     }
 
     igraph_vector_destroy(&barycenters);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&sort_indices);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -896,7 +897,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_t neis1, neis2;
+    igraph_vector_int_t neis1, neis2;
     igraph_vector_t xs[4];
     igraph_vector_t roots, align;
     igraph_vector_t vertex_to_the_left;
@@ -904,11 +905,11 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
 
     /*
     {
-      igraph_vector_t edgelist;
-      IGRAPH_VECTOR_INIT_FINALLY(&edgelist, 0);
+      igraph_vector_int_t edgelist;
+      IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, 0);
       IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0));
-      igraph_vector_print(&edgelist);
-      igraph_vector_destroy(&edgelist);
+      igraph_vector_int_print(&edgelist);
+      igraph_vector_int_destroy(&edgelist);
       IGRAPH_FINALLY_CLEAN(1);
 
       for (i = 0; i < no_of_layers; i++) {
@@ -922,8 +923,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &ignored_edges);
 
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_to_the_left, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis2, 0);
 
     /* First, find all type 1 conflicts and mark one of the edges participating
      * in the conflict as being ignored. If one of the edges in the conflict
@@ -935,16 +936,16 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         n = igraph_vector_size(vertices);
 
         /* Find all the edges from this layer to the next */
-        igraph_vector_clear(&neis1);
+        igraph_vector_int_clear(&neis1);
         for (j = 0; j < n; j++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis2, (igraph_integer_t)
                                           VECTOR(*vertices)[j], IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_vector_append(&neis1, &neis2));
+            IGRAPH_CHECK(igraph_vector_int_append(&neis1, &neis2));
         }
 
         /* Consider all pairs of edges and check whether they are in a type 1
          * conflict */
-        n = igraph_vector_size(&neis1);
+        n = igraph_vector_int_size(&neis1);
         for (j = 0; j < n; j++) {
             igraph_integer_t u = IGRAPH_FROM(graph, j);
             igraph_integer_t v = IGRAPH_TO(graph, j);
@@ -977,8 +978,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         }
     }
 
-    igraph_vector_destroy(&neis1);
-    igraph_vector_destroy(&neis2);
+    igraph_vector_int_destroy(&neis1);
+    igraph_vector_int_destroy(&neis2);
     IGRAPH_FINALLY_CLEAN(2);
 
     /*
@@ -1088,10 +1089,11 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
     igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_neimode_t neimode = (reverse ? IGRAPH_OUT : IGRAPH_IN);
-    igraph_vector_t neis, xs;
+    igraph_vector_int_t neis;
+    igraph_vector_t xs;
     igraph_vector_int_t inds;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&xs, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
 
@@ -1136,7 +1138,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) vertex,
                                           neimode));
 
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
             if (n == 0)
                 /* No neighbors in this direction, continue */
             {
@@ -1202,7 +1204,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
     }
 
     igraph_vector_int_destroy(&inds);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_destroy(&xs);
     IGRAPH_FINALLY_CLEAN(3);
 

@@ -433,7 +433,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
         const igraph_adjlist_t *adjlist,
         igraph_dqueue_int_t *q,
         igraph_integer_t *already_counted,
-        igraph_vector_t *vertex_neis,
+        igraph_vector_int_t *vertex_neis,
         igraph_vector_char_t *nei_mask,
         igraph_real_t *res,
         igraph_integer_t vertex,
@@ -449,7 +449,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
     memset(already_counted, 0, no_of_nodes * sizeof(igraph_integer_t));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
-    vertex_neis_size = igraph_vector_size(vertex_neis);
+    vertex_neis_size = igraph_vector_int_size(vertex_neis);
 
     igraph_vector_char_fill(nei_mask, 0);
     neighbor_count = 0;
@@ -524,7 +524,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
         const igraph_t *graph,
         igraph_lazy_inclist_t *inclist,
         igraph_2wheap_t *Q,
-        igraph_vector_t *vertex_neis,
+        igraph_vector_int_t *vertex_neis,
         igraph_vector_char_t *nei_mask, /* true if the corresponding node is a neighbour of 'vertex' */
         igraph_real_t *res,
         igraph_integer_t vertex,
@@ -552,7 +552,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
     igraph_integer_t neighbor_count; /* unlike 'inc_edges_size', 'neighbor_count' does not count self-loops or multi-edges */
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
-    vertex_neis_size = igraph_vector_size(vertex_neis);
+    vertex_neis_size = igraph_vector_int_size(vertex_neis);
 
     igraph_vector_char_fill(nei_mask, 0);
     neighbor_count = 0;
@@ -706,7 +706,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t nodes_to_calc; /* no. of vertices includes in computation */
     igraph_vit_t vit;
-    igraph_vector_t vertex_neis;
+    igraph_vector_int_t vertex_neis;
     igraph_vector_char_t nei_mask;
     igraph_integer_t i;
 
@@ -720,7 +720,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
      */
     IGRAPH_CHECK(igraph_vector_char_init(&nei_mask, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &nei_mask);
-    IGRAPH_VECTOR_INIT_FINALLY(&vertex_neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_neis, 0);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -806,7 +806,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
     }
 
     igraph_vit_destroy(&vit);
-    igraph_vector_destroy(&vertex_neis);
+    igraph_vector_int_destroy(&vertex_neis);
     igraph_vector_char_destroy(&nei_mask);
     IGRAPH_FINALLY_CLEAN(3);
 

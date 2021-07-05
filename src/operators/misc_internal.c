@@ -51,7 +51,7 @@ void igraph_i_union_intersection_destroy_vector_ints(igraph_vector_ptr_t *v) {
 }
 
 int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
-    igraph_vector_t *edgelist = edges;
+    igraph_vector_int_t *edgelist = edges;
     igraph_integer_t edge1 = (*(const igraph_integer_t*) e1) * 2;
     igraph_integer_t edge2 = (*(const igraph_integer_t*) e2) * 2;
     igraph_integer_t from1 = VECTOR(*edgelist)[edge1];
@@ -83,8 +83,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
     igraph_integer_t no_edges_left = igraph_ecount(left);
     igraph_integer_t no_edges_right = igraph_ecount(right);
     igraph_bool_t directed = igraph_is_directed(left);
-    igraph_vector_t edges;
-    igraph_vector_t edges1, edges2;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t edges1, edges2;
     igraph_vector_int_t order1, order2;
     igraph_integer_t i, j, eptr = 0;
     igraph_integer_t idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
@@ -95,9 +95,9 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
                      "and undirected graph", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges1, no_edges_left * 2);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges2, no_edges_right * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges1, no_edges_left * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges2, no_edges_right * 2);
     IGRAPH_CHECK(igraph_vector_int_init(&order1, no_edges_left));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &order1);
     IGRAPH_CHECK(igraph_vector_int_init(&order2, no_edges_right));
@@ -196,8 +196,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
             (idx1 < no_edges_left && from1 == from2 && to1 < to2)) {
             /* Edge from first graph */
             if (mode == IGRAPH_MERGE_MODE_UNION) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, from1));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, to1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to1));
                 if (edge_map1) {
                     VECTOR(*edge_map1)[edge1] = eptr;
                 }
@@ -209,8 +209,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
                    (idx2 < no_edges_right && from1 == from2 && to2 < to1)) {
             /* Edge from second graph */
             if (mode == IGRAPH_MERGE_MODE_UNION) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, from2));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, to2));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from2));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to2));
                 if (edge_map2) {
                     VECTOR(*edge_map2)[edge2] = eptr;
                 }
@@ -219,8 +219,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
             INC2();
         } else {
             /* Edge from both */
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from1));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to1));
             if (mode == IGRAPH_MERGE_MODE_UNION) {
                 if (edge_map1) {
                     VECTOR(*edge_map1)[edge1] = eptr;
@@ -248,12 +248,12 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
 
     igraph_vector_int_destroy(&order2);
     igraph_vector_int_destroy(&order1);
-    igraph_vector_destroy(&edges2);
-    igraph_vector_destroy(&edges1);
+    igraph_vector_int_destroy(&edges2);
+    igraph_vector_int_destroy(&edges1);
     IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

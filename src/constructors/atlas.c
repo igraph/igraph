@@ -62,7 +62,7 @@
 igraph_error_t igraph_atlas(igraph_t *graph, int number) {
 
     igraph_integer_t pos, n, e;
-    igraph_vector_t v = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
 
     if (number < 0 ||
         number >= (int) (sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_integer_t))) {
@@ -74,7 +74,7 @@ igraph_error_t igraph_atlas(igraph_t *graph, int number) {
     e = (igraph_integer_t) igraph_i_atlas_edges[pos + 1];
 
     IGRAPH_CHECK(igraph_create(graph,
-                               igraph_vector_view(&v, igraph_i_atlas_edges + pos + 2,
+                               igraph_vector_int_view(&v, igraph_i_atlas_edges + pos + 2,
                                        e * 2),
                                n, IGRAPH_UNDIRECTED));
 

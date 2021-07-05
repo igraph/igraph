@@ -65,7 +65,7 @@ igraph_error_t igraph_difference(igraph_t *res,
     igraph_integer_t no_of_nodes = no_of_nodes_orig;
     igraph_integer_t smaller_nodes;
     igraph_bool_t directed = igraph_is_directed(orig);
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_vector_int_t edge_ids;
     igraph_vector_int_t *nei1, *nei2;
     igraph_inclist_t inc_orig, inc_sub;
@@ -78,7 +78,7 @@ igraph_error_t igraph_difference(igraph_t *res,
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_ids, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_inclist_init(orig, &inc_orig, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inc_orig);
     IGRAPH_CHECK(igraph_inclist_init(sub, &inc_sub, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
@@ -106,8 +106,8 @@ igraph_error_t igraph_difference(igraph_t *res,
                 n2--;
             } else if (v1 > v2) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edge_ids, e1));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v1));
                 n1--;
                 /* handle loop edges properly in undirected graphs */
                 if (!directed && i == v1) {
@@ -127,8 +127,8 @@ igraph_error_t igraph_difference(igraph_t *res,
             v1 = IGRAPH_OTHER(orig, e1, i);
             if (directed || v1 >= i) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edge_ids, e1));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v1));
 
                 /* handle loop edges properly in undirected graphs */
                 if (!directed && v1 == i) {
@@ -149,8 +149,8 @@ igraph_error_t igraph_difference(igraph_t *res,
             v1 = IGRAPH_OTHER(orig, e1, i);
             if (directed || v1 >= i) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edge_ids, e1));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v1));
 
                 /* handle loop edges properly in undirected graphs */
                 if (!directed && v1 == i) {
@@ -166,7 +166,7 @@ igraph_error_t igraph_difference(igraph_t *res,
     IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Attributes */

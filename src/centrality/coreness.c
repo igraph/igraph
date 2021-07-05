@@ -62,7 +62,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     igraph_integer_t *bin, *vert, *pos;
     igraph_integer_t maxdeg;
     igraph_integer_t i, j = 0;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_neimode_t omode;
 
     if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
@@ -131,11 +131,11 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     bin[0] = 0;
 
     /* this is the main algorithm */
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, maxdeg);
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t v = vert[i];
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, omode));
-        for (j = 0; j < igraph_vector_size(&neis); j++) {
+        for (j = 0; j < igraph_vector_int_size(&neis); j++) {
             igraph_integer_t u = VECTOR(neis)[j];
             if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
                 igraph_integer_t du = VECTOR(*cores)[u];
@@ -154,7 +154,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
         }
     }
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_free(bin);

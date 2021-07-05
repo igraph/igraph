@@ -76,7 +76,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     context.from = 0;
     context.to = 0;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&context.edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&context.edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&context.weights, 0);
     IGRAPH_CHECK(igraph_strvector_init(&context.labels, 0));
     IGRAPH_FINALLY(igraph_strvector_destroy, &context.labels);
@@ -98,7 +98,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     /* Extend the weight vector, if needed */
     n = igraph_vector_size(&context.weights);
-    n2 = igraph_vector_size(&context.edges) / 2;
+    n2 = igraph_vector_int_size(&context.edges) / 2;
     if (n != 0) {
         igraph_vector_resize(&context.weights, n2);
         for (; n < n2; n++) {
@@ -108,7 +108,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     /* Check number of vertices */
     if (n2 > 0) {
-        n = igraph_vector_max(&context.edges);
+        n = igraph_vector_int_max(&context.edges);
     } else {
         n = 0;
     }
@@ -166,7 +166,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_trie_destroy(&context.trie);
     igraph_strvector_destroy(&context.labels);
-    igraph_vector_destroy(&context.edges);
+    igraph_vector_int_destroy(&context.edges);
     igraph_vector_destroy(&context.weights);
     igraph_dl_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);

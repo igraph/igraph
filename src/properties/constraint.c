@@ -87,7 +87,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 
     igraph_vector_t contrib;
     igraph_vector_t degree;
-    igraph_vector_t ineis_in, ineis_out, jneis_in, jneis_out;
+    igraph_vector_int_t ineis_in, ineis_out, jneis_in, jneis_out;
 
     if (weights != 0 && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid length of weight vector", IGRAPH_EINVAL);
@@ -95,10 +95,10 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&contrib, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&ineis_in, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&ineis_out, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&jneis_in, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&jneis_out, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ineis_in, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ineis_out, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&jneis_in, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&jneis_out, 0);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -119,19 +119,19 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                      IGRAPH_OUT));
 
         /* NaN for isolates */
-        if (igraph_vector_size(&ineis_in) == 0 &&
-            igraph_vector_size(&ineis_out) == 0) {
+        if (igraph_vector_int_size(&ineis_in) == 0 &&
+            igraph_vector_int_size(&ineis_out) == 0) {
             VECTOR(*res)[a] = IGRAPH_NAN;
         }
 
         /* zero their contribution */
-        vsize = igraph_vector_size(&ineis_in);
+        vsize = igraph_vector_int_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
             j = IGRAPH_OTHER(graph, edge, i);
             VECTOR(contrib)[j] = 0.0;
         }
-        vsize = igraph_vector_size(&ineis_out);
+        vsize = igraph_vector_int_size(&ineis_out);
         for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_out)[b];
             j = IGRAPH_OTHER(graph, edge, i);
@@ -139,7 +139,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         }
 
         /* add the direct contributions, in-neighbors and out-neighbors */
-        vsize = igraph_vector_size(&ineis_in);
+        vsize = igraph_vector_int_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
             j = IGRAPH_OTHER(graph, edge, i);
@@ -153,7 +153,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             }
         }
         if (igraph_is_directed(graph)) {
-            vsize = igraph_vector_size(&ineis_out);
+            vsize = igraph_vector_int_size(&ineis_out);
             for (b = 0; b < vsize; b++) {
                 edge = (igraph_integer_t) VECTOR(ineis_out)[b];
                 j = IGRAPH_OTHER(graph, edge, i);
@@ -169,7 +169,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         }
 
         /* add the indirect contributions, in-in, in-out, out-in, out-out */
-        vsize = igraph_vector_size(&ineis_in);
+        vsize = igraph_vector_int_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
             j = IGRAPH_OTHER(graph, edge, i);
@@ -180,7 +180,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                          IGRAPH_IN));
             IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j,
                                          IGRAPH_OUT));
-            vsize2 = igraph_vector_size(&jneis_in);
+            vsize2 = igraph_vector_int_size(&jneis_in);
             for (c = 0; c < vsize2; c++) {
                 edge2 = (igraph_integer_t) VECTOR(jneis_in)[c];
                 q = IGRAPH_OTHER(graph, edge2, j);
@@ -196,7 +196,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                 }
             }
             if (igraph_is_directed(graph)) {
-                vsize2 = igraph_vector_size(&jneis_out);
+                vsize2 = igraph_vector_int_size(&jneis_out);
                 for (c = 0; c < vsize2; c++) {
                     edge2 = (igraph_integer_t) VECTOR(jneis_out)[c];
                     q = IGRAPH_OTHER(graph, edge2, j);
@@ -214,7 +214,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             }
         }
         if (igraph_is_directed(graph)) {
-            vsize = igraph_vector_size(&ineis_out);
+            vsize = igraph_vector_int_size(&ineis_out);
             for (b = 0; b < vsize; b++) {
                 edge = (igraph_integer_t) VECTOR(ineis_out)[b];
                 j = IGRAPH_OTHER(graph, edge, i);
@@ -225,7 +225,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                              IGRAPH_IN));
                 IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j,
                                              IGRAPH_OUT));
-                vsize2 = igraph_vector_size(&jneis_in);
+                vsize2 = igraph_vector_int_size(&jneis_in);
                 for (c = 0; c < vsize2; c++) {
                     edge2 = (igraph_integer_t) VECTOR(jneis_in)[c];
                     q = IGRAPH_OTHER(graph, edge2, j);
@@ -240,7 +240,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                         }
                     }
                 }
-                vsize2 = igraph_vector_size(&jneis_out);
+                vsize2 = igraph_vector_int_size(&jneis_out);
                 for (c = 0; c < vsize2; c++) {
                     edge2 = (igraph_integer_t) VECTOR(jneis_out)[c];
                     q = IGRAPH_OTHER(graph, edge2, j);
@@ -259,7 +259,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         }
 
         /* squared sum of the contributions */
-        vsize = igraph_vector_size(&ineis_in);
+        vsize = igraph_vector_int_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
             j = IGRAPH_OTHER(graph, edge, i);
@@ -270,7 +270,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             VECTOR(contrib)[j] = 0.0;
         }
         if (igraph_is_directed(graph)) {
-            vsize =  igraph_vector_size(&ineis_out);
+            vsize =  igraph_vector_int_size(&ineis_out);
             for (b = 0; b < vsize; b++) {
                 edge = (igraph_integer_t) VECTOR(ineis_out)[b];
                 j = IGRAPH_OTHER(graph, edge, i);
@@ -284,10 +284,10 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     }
 
     igraph_vit_destroy(&vit);
-    igraph_vector_destroy(&jneis_out);
-    igraph_vector_destroy(&jneis_in);
-    igraph_vector_destroy(&ineis_out);
-    igraph_vector_destroy(&ineis_in);
+    igraph_vector_int_destroy(&jneis_out);
+    igraph_vector_int_destroy(&jneis_in);
+    igraph_vector_int_destroy(&ineis_out);
+    igraph_vector_int_destroy(&ineis_in);
     igraph_vector_destroy(&degree);
     igraph_vector_destroy(&contrib);
     IGRAPH_FINALLY_CLEAN(7);

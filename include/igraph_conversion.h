@@ -52,7 +52,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *gra
                                                   igraph_sparsemat_t *sparsemat,
                                                   igraph_bool_t column_wise);
 
-IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
+IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol);
 
 IGRAPH_EXPORT igraph_error_t igraph_to_directed(igraph_t *graph,
                                      igraph_to_directed_t flags);

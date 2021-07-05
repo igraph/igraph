@@ -198,7 +198,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                                     const igraph_vector_t *weights, igraph_vector_t *layers) {
     igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
     igraph_dqueue_int_t sources, sinks;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     igraph_vector_int_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
     igraph_integer_t* ordering;
@@ -212,7 +212,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outdegrees, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&instrengths, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&outstrengths, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&sources, 0));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &sources);
     IGRAPH_CHECK(igraph_dqueue_int_init(&sinks, 0));
@@ -264,7 +264,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Get the neighbors and decrease their degrees */
             IGRAPH_CHECK(igraph_incident(graph, &neis, i,
                                          IGRAPH_OUT));
-            j = igraph_vector_size(&neis);
+            j = igraph_vector_int_size(&neis);
             for (i = 0; i < j; i++) {
                 eid = VECTOR(neis)[i];
                 k = IGRAPH_TO(graph, eid);
@@ -296,7 +296,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Get the neighbors and decrease their degrees */
             IGRAPH_CHECK(igraph_incident(graph, &neis, i,
                                          IGRAPH_IN));
-            j = igraph_vector_size(&neis);
+            j = igraph_vector_int_size(&neis);
             for (i = 0; i < j; i++) {
                 eid = VECTOR(neis)[i];
                 k = IGRAPH_FROM(graph, eid);
@@ -332,7 +332,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Remove outgoing edges */
             IGRAPH_CHECK(igraph_incident(graph, &neis, v,
                                          IGRAPH_OUT));
-            j = igraph_vector_size(&neis);
+            j = igraph_vector_int_size(&neis);
             for (i = 0; i < j; i++) {
                 eid = VECTOR(neis)[i];
                 k = IGRAPH_TO(graph, eid);
@@ -349,7 +349,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Remove incoming edges */
             IGRAPH_CHECK(igraph_incident(graph, &neis, v,
                                          IGRAPH_IN));
-            j = igraph_vector_size(&neis);
+            j = igraph_vector_int_size(&neis);
             for (i = 0; i < j; i++) {
                 eid = VECTOR(neis)[i];
                 k = IGRAPH_FROM(graph, eid);
@@ -372,7 +372,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
     igraph_dqueue_int_destroy(&sinks);
     igraph_dqueue_int_destroy(&sources);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_destroy(&outstrengths);
     igraph_vector_destroy(&instrengths);
     igraph_vector_int_destroy(&outdegrees);
@@ -408,7 +408,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         igraph_vector_int_view(&order_vec, ordering, no_of_nodes);
 
-        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&ranks, 0);
 
         IGRAPH_CHECK(igraph_vector_int_qsort_ind(&order_vec, &ranks, 0));
@@ -416,7 +416,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t from = VECTOR(ranks)[i];
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
-            k = igraph_vector_size(&neis);
+            k = igraph_vector_int_size(&neis);
             for (j = 0; j < k; j++) {
                 igraph_integer_t to = VECTOR(neis)[j];
                 if (from == to) {
@@ -431,7 +431,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             }
         }
 
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&neis);
         igraph_vector_int_destroy(&ranks);
         IGRAPH_FINALLY_CLEAN(2);
     }
