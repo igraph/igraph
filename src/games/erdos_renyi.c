@@ -41,6 +41,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 ) {
 
     igraph_integer_t no_of_nodes = n;
+    igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_int_t s = IGRAPH_VECTOR_NULL;
     igraph_integer_t vsize;
@@ -90,15 +91,15 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         vsize = igraph_vector_int_size(&s);
         if (directed && loops) {
             for (i = 0; i < vsize; i++) {
-                igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes);
-                igraph_integer_t from = (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
+                igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
+                igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
             }
         } else if (directed && !loops) {
             for (i = 0; i < vsize; i++) {
-                igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes);
-                igraph_integer_t from = (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
+                igraph_integer_t to = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
+                igraph_integer_t from = VECTOR(s)[i] - to * (no_of_nodes_real - 1);
                 if (from == to) {
                     to = no_of_nodes - 1;
                 }
@@ -138,6 +139,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 
     igraph_integer_t no_of_nodes = n;
     igraph_integer_t no_of_edges = m;
+    igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
 
@@ -183,15 +185,15 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
             slen = igraph_vector_size(&s);
             if (directed && loops) {
                 for (i = 0; i < slen; i++) {
-                    igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes);
-                    igraph_integer_t from = (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
+                    igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
+                    igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
                 }
             } else if (directed && !loops) {
                 for (i = 0; i < slen; i++) {
-                    igraph_integer_t from = floor(VECTOR(s)[i] / (no_of_nodes - 1));
-                    igraph_integer_t to = (VECTOR(s)[i] - ((igraph_real_t)from) * (no_of_nodes - 1));
+                    igraph_integer_t from = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
+                    igraph_integer_t to = VECTOR(s)[i] - from * (no_of_nodes - 1);
                     if (from == to) {
                         to = no_of_nodes - 1;
                     }
