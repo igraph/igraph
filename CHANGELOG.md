@@ -241,6 +241,67 @@
  - `igraph_canonical_permutation()` now uses an `igraph_vector_int_t` for its
    labeling parameter.
 
+ - `struct igraph_lazy_adjlist_t` now uses an `igraph_vector_int_t` for its
+   dummy field.
+
+ - `struct igraph_lazy_inclist_t` now uses an `igraph_vector_int_t` for its
+   dummy field.
+
+ - The `add_edges()` field in `struct igraph_attribute_table_t` now uses an
+   `igraph_vector_int_t` for its `edges` parameter.
+
+ - `igraph_create_bipartite()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
+
+ - `igraph_create()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
+
+ - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
+   `res` parameter.
+
+ - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
+   `cut`, `partition` and `partion2` parameters.
+
+ - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
+   `cut`, `partition` and `partion2` parameters.
+
+ - `igraph_mincut()` now uses an `igraph_vector_int_t` for its
+   `cut`, `partition` and `partion2` parameters.
+
+ - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
+
+ - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
+   `neis` parameter.
+
+ - `igraph_incident()` now uses an `igraph_vector_int_t` for its
+   `eids` parameter.
+
+ - `igraph_is_chordal()` now uses an `igraph_vector_int_t` for its
+   `fill_in` parameter.
+
+ - `igraph_vector_rank()` now uses an `igraph_vector_int_t` for its
+   `res` parameter.
+
+ - `igraph_hrg_t` now uses an `igraph_vector_int_t` for its
+   `edges` field.
+
+ - `igraph_layout_sugiyama()` now uses an `igraph_vector_int_t` for its
+   `extd_to_orig_eids` parameter.
+
+ - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
+   `outdeg` and `indeg` parameters.
+
+ - `igraph_hrg_predict()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
+
+ - `igraph_union()` now uses an `igraph_vector_int_t` for its
+   `edge_map1` and `edge_map2` parameters.
+
+ - `igraph_intersection()` now uses an `igraph_vector_int_t` for its
+   `edge_map1` and `edge_map2` parameters.
+
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
