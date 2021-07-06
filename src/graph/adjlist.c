@@ -1049,7 +1049,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
         igraph_integer_t pno) {
     igraph_integer_t no = pno;
     igraph_integer_t i, n;
-    int ret;
+    igraph_error_t ret;
 
     if (al->adjs[no] == 0) {
         ret = igraph_neighbors(al->graph, &al->dummy, no, al->mode);
@@ -1210,7 +1210,7 @@ igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il) {
 igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
         igraph_integer_t pno) {
     igraph_integer_t no = pno;
-    int ret;
+    igraph_error_t ret;
     igraph_integer_t i, n;
 
     if (il->incs[no] == 0) {
