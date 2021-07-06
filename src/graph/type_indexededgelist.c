@@ -1718,7 +1718,7 @@ igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_int_t 
  * \brief Gives the incident edges of a vertex.
  *
  * \param graph The graph object.
- * \param eids An initialized \type vector_t object. It will be resized
+ * \param eids An initialized vector. It will be resized
  * to hold the result.
  * \param pnode A vertex id.
  * \param mode Specifies what kind of edges to include for directed

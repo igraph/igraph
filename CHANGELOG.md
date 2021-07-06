@@ -298,8 +298,14 @@
  - `igraph_union()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
 
+ - The `edgemaps` parameter of `igraph_union_many()` is now a vector of
+   `igraph_vector_int_t` pointers.
+
  - `igraph_intersection()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
+
+ - The `edgemaps` parameter of `igraph_intersection_many()` is now a vector of
+   `igraph_vector_int_t` pointers.
 
 
 ### Added

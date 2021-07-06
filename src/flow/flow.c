@@ -1140,14 +1140,14 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
  * \param graph The input graph.
  * \param value Pointer to a real variable, the value of the cut is
  *        stored here.
- * \param cut Pointer to a real vector, the edge ids that are included
+ * \param cut Pointer to an initialized vector, the edge ids that are included
  *        in the cut are stored here. This argument is ignored if it
  *        is a null pointer.
- * \param partition Pointer to a real vector, the vertex ids of the
+ * \param partition Pointer to an initialized vector, the vertex ids of the
  *        vertices in the first partition of the cut are stored
  *        here. The first partition is always the one that contains the
  *        source vertex. This argument is ignored if it is a null pointer.
- * \param partition2 Pointer to a real vector, the vertex ids of the
+ * \param partition2 Pointer to an initialized vector, the vertex ids of the
  *        vertices in the second partition of the cut are stored here.
  *        The second partition is always the one that contains the
  *        target vertex. This argument is ignored if it is a null pointer.

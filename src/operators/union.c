@@ -90,7 +90,7 @@ igraph_error_t igraph_union(igraph_t *res,
  *        pointer vector and the mappings of edges from the graphs to the
  *        result graph will be stored here, in the same order as
  *        \p graphs. Each mapping is stored in a separate
- *        \type igraph_vector_t object.
+ *        \type igraph_vector_int_t object.
  * \return Error code.
  * \sa \ref igraph_union() for the union of two graphs, \ref
  * igraph_intersection_many(), \ref igraph_intersection() and \ref
