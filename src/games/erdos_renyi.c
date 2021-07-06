@@ -109,14 +109,14 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         } else if (!directed && loops) {
             for (i = 0; i < vsize; i++) {
                 igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
-                igraph_integer_t from = (VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2);
+                igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
             }
         } else { /* !directed && !loops */
             for (i = 0; i < vsize; i++) {
                 igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
-                igraph_integer_t from = (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
+                igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
             }
@@ -141,7 +141,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_integer_t no_of_edges = m;
     igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_vector_t s = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t s = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -176,13 +176,13 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 
             igraph_integer_t slen;
 
-            IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
             IGRAPH_CHECK(igraph_random_sample(&s, 0, maxedges - 1, no_of_edges));
 
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_int_size(&s) * 2));
 
-            slen = igraph_vector_size(&s);
+            slen = igraph_vector_int_size(&s);
             if (directed && loops) {
                 for (i = 0; i < slen; i++) {
                     igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
@@ -193,7 +193,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
             } else if (directed && !loops) {
                 for (i = 0; i < slen; i++) {
                     igraph_integer_t from = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
-                    igraph_integer_t to = VECTOR(s)[i] - from * (no_of_nodes - 1);
+                    igraph_integer_t to = VECTOR(s)[i] - from * (no_of_nodes_real - 1);
                     if (from == to) {
                         to = no_of_nodes - 1;
                     }
@@ -203,20 +203,20 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
             } else if (!directed && loops) {
                 for (i = 0; i < slen; i++) {
                     igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
-                    igraph_integer_t from = (VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2);
+                    igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
                 }
             } else { /* !directed && !loops */
                 for (i = 0; i < slen; i++) {
                     igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
-                    igraph_integer_t from = (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
+                    igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
                 }
             }
 
-            igraph_vector_destroy(&s);
+            igraph_vector_int_destroy(&s);
             IGRAPH_FINALLY_CLEAN(1);
             IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
             igraph_vector_int_destroy(&edges);

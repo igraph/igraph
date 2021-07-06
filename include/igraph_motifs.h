@@ -78,7 +78,7 @@ IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_callback(const igraph_t *grap
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
                                                  int size, const igraph_vector_t *cut_prob,
                                                  igraph_integer_t sample_size,
-                                                 const igraph_vector_t *sample);
+                                                 const igraph_vector_int_t *sample);
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
                                            int size, const igraph_vector_t *cut_prob);
 

@@ -485,7 +485,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
                                    int size, const igraph_vector_t *cut_prob,
                                    igraph_integer_t sample_size,
-                                   const igraph_vector_t *parsample) {
+                                   const igraph_vector_int_t *parsample) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t neis;
@@ -494,7 +494,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     igraph_vector_t adjverts; /* this is V_E */
     igraph_stack_int_t stack;     /* this is S */
     igraph_integer_t *added;
-    igraph_vector_t *sample;
+    igraph_vector_int_t *sample;
     igraph_integer_t sam;
     igraph_integer_t i;
 
@@ -503,9 +503,9 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
-    if (parsample && igraph_vector_size(parsample) != 0) {
-        igraph_real_t min, max;
-        igraph_vector_minmax(parsample, &min, &max);
+    if (parsample && igraph_vector_int_size(parsample) != 0) {
+        igraph_integer_t min, max;
+        igraph_vector_int_minmax(parsample, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
             IGRAPH_ERROR("Sample vertex id out of range.", IGRAPH_EINVAL);
         }
@@ -529,16 +529,16 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     if (parsample == NULL) {
-        sample = IGRAPH_CALLOC(1, igraph_vector_t);
+        sample = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (sample == NULL) {
             IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, sample);
-        IGRAPH_VECTOR_INIT_FINALLY(sample, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(sample, 0);
         IGRAPH_CHECK(igraph_random_sample(sample, 0, no_of_nodes - 1, sample_size));
     } else {
-        sample = (igraph_vector_t*)parsample;
-        sample_size = (igraph_integer_t) igraph_vector_size(sample);
+        sample = (igraph_vector_int_t*) parsample;
+        sample_size = igraph_vector_int_size(sample);
     }
 
     *est = 0;
@@ -660,10 +660,10 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
     RNG_END();
 
-    (*est) *= ((double)no_of_nodes / sample_size);
+    (*est) *= ((igraph_real_t) no_of_nodes / sample_size);
 
     if (parsample == 0) {
-        igraph_vector_destroy(sample);
+        igraph_vector_int_destroy(sample);
         IGRAPH_FREE(sample);
         IGRAPH_FINALLY_CLEAN(2);
     }

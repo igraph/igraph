@@ -72,7 +72,7 @@ typedef struct igraph_plfit_result_t {
 
 IGRAPH_EXPORT igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
                                       igraph_integer_t binwidth);
-IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l, igraph_integer_t h,
                                        igraph_integer_t length);
 IGRAPH_EXPORT igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_int_t *resverts,
                                      igraph_matrix_t *rescoords);

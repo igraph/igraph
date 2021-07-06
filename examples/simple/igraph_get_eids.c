@@ -106,7 +106,7 @@ int check_multi() {
     igraph_t g;
     igraph_vector_int_t vec;
     igraph_vector_int_t eids;
-    igraph_vector_t eids2;
+    igraph_vector_int_t eids2;
     igraph_error_t ret;
     igraph_integer_t i;
 
@@ -177,7 +177,7 @@ int check_multi() {
                          /*start_from=*/ 0);
     igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 0, /*edge_comb=*/ 0);
 
-    igraph_vector_init(&eids2, NODES / 2);
+    igraph_vector_int_init(&eids2, NODES / 2);
     igraph_random_sample(&eids2, 0, igraph_ecount(&g) - 1, NODES / 2);
     igraph_vector_int_init(&vec, NODES);
     for (i = 0; i < NODES / 2; i++) {
@@ -206,7 +206,7 @@ int check_multi() {
     }
 
     igraph_vector_int_destroy(&eids);
-    igraph_vector_destroy(&eids2);
+    igraph_vector_int_destroy(&eids2);
     igraph_vector_int_destroy(&vec);
     igraph_destroy(&g);
 
