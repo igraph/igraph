@@ -26,7 +26,7 @@
 void print_vector(igraph_vector_int_t *v, FILE *f) {
     igraph_integer_t i;
     for (i = 0; i < igraph_vector_int_size(v); i++) {
-        fprintf(f, " %" IGRAPH_PRId "", (igraph_integer_t) VECTOR(*v)[i]);
+        fprintf(f, " %" IGRAPH_PRId "", VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
@@ -35,7 +35,7 @@ int main() {
 
     igraph_t g;
     igraph_vector_int_t v;
-    int ret;
+    igraph_error_t ret;
 
     igraph_vector_int_init(&v, 8);
     VECTOR(v)[0] = 0;

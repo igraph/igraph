@@ -81,7 +81,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
     printf("===\n");
 
     /* Add some loop edges */
-    igraph_vector_int_init_real(&vec, 4, 1.0, 1.0, 2.0, 2.0);
+    igraph_vector_int_init_int(&vec, 4, 1, 1, 2, 2);
     igraph_add_edges(&g, &vec, 0);
     igraph_vector_int_destroy(&vec);
     if (weights) {
@@ -100,7 +100,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
     printf("===\n");
 
     /* Duplicate some edges */
-    igraph_vector_int_init_real(&vec, 4, 1.0, 2.0, 3.0, 4.0);
+    igraph_vector_int_init_int(&vec, 4, 1, 2, 3, 4);
     igraph_add_edges(&g, &vec, 0);
     igraph_vector_int_destroy(&vec);
     if (weights) {
@@ -157,7 +157,7 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
     ok = ok && check_laplacian(&g, &m, weights);
 
     /* Add some loop edges */
-    igraph_vector_int_init_real(&vec, 4, 1.0, 1.0, 2.0, 2.0);
+    igraph_vector_int_init_int(&vec, 4, 1, 1, 2, 2);
     igraph_add_edges(&g, &vec, 0);
     igraph_vector_int_destroy(&vec);
     if (weights) {
@@ -175,7 +175,7 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
     ok = ok && check_laplacian(&g, &m, weights);
 
     /* Duplicate some edges */
-    igraph_vector_int_init_real(&vec, 4, 1.0, 2.0, 3.0, 4.0);
+    igraph_vector_int_init_int(&vec, 4, 1, 2, 3, 4);
     igraph_add_edges(&g, &vec, 0);
     igraph_vector_int_destroy(&vec);
     if (weights) {
@@ -214,7 +214,7 @@ int main() {
     int i;
     igraph_vector_t weights;
 
-    igraph_vector_init_real(&weights, 5, 1.0, 2.0, 3.0, 4.0, 5.0);
+    igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);
 
     for (i = 0; i < 8; i++) {
         igraph_bool_t is_normalized = i / 4;
