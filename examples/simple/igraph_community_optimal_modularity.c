@@ -52,9 +52,9 @@ int main() {
     igraph_vector_t weights;
     igraph_real_t modularity;
     igraph_bool_t simple;
-    int retval;
+    igraph_error_t retval;
 
-    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(double));
+    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0]));
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
     igraph_vector_init(&weights, 0);

@@ -161,7 +161,8 @@ void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
 
 /* Edge comparisong function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {
-    const igraph_real_t *edge1 = (igraph_real_t *) e1, *edge2 = (igraph_real_t *) e2;
+    const igraph_integer_t *edge1 = (igraph_integer_t *) e1;
+    const igraph_integer_t *edge2 = (igraph_integer_t *) e2;
     if (edge1[0] < edge2[0]) {
         return -1;
     } else if (edge1[0] > edge2[0]) {

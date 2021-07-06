@@ -18,7 +18,7 @@ int main() {
                            32,33
   };
 
-  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(double));
+  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0]));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
   igraph_vector_int_init(&result, 0);

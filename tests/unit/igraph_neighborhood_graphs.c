@@ -20,7 +20,7 @@
 #include "test_utilities.inc"
 
 void print_and_destroy(igraph_vector_ptr_t *result) {
-    int i;
+    igraph_integer_t i;
     igraph_t *g;
     for (i = 0; i < igraph_vector_ptr_size(result); i++) {
         g = VECTOR(*result)[i];

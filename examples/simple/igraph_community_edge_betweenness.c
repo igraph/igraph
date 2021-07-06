@@ -106,13 +106,13 @@ void test_weighted() {
     igraph_vector_t edges_sol1, edges_sol2, eb_sol1_lo, eb_sol1_hi, eb_sol2_lo, eb_sol2_hi;
 
     igraph_vector_view(&edges_sol1, edges_array1,
-                       sizeof(edges_array1) / sizeof(double));
+                       sizeof(edges_array1) / sizeof(edges_array1[0]));
     igraph_vector_view(&edges_sol2, edges_array2,
-                       sizeof(edges_array2) / sizeof(double));
-    igraph_vector_view(&eb_sol1_lo, eb_array1_lo, sizeof(eb_array1_lo) / sizeof(double));
-    igraph_vector_view(&eb_sol2_lo, eb_array2_lo, sizeof(eb_array2_lo) / sizeof(double));
-    igraph_vector_view(&eb_sol1_hi, eb_array1_hi, sizeof(eb_array1_hi) / sizeof(double));
-    igraph_vector_view(&eb_sol2_hi, eb_array2_hi, sizeof(eb_array2_hi) / sizeof(double));
+                       sizeof(edges_array2) / sizeof(edges_array2[0]));
+    igraph_vector_view(&eb_sol1_lo, eb_array1_lo, sizeof(eb_array1_lo) / sizeof(eb_array1_lo[0]));
+    igraph_vector_view(&eb_sol2_lo, eb_array2_lo, sizeof(eb_array2_lo) / sizeof(eb_array2_lo[0]));
+    igraph_vector_view(&eb_sol1_hi, eb_array1_hi, sizeof(eb_array1_hi) / sizeof(eb_array1_hi[0]));
+    igraph_vector_view(&eb_sol2_hi, eb_array2_hi, sizeof(eb_array2_hi) / sizeof(eb_array2_hi[0]));
 
     /* Small graph as follows: A--B--C--A, A--D--E--A, B--D, C--E */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,

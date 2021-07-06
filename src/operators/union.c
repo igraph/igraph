@@ -151,8 +151,7 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
             if (!VECTOR(*edgemaps)[i]) {
                 IGRAPH_ERROR("Cannot union graphs", IGRAPH_ENOMEM);
             }
-            IGRAPH_CHECK(igraph_vector_init(VECTOR(*edgemaps)[i],
-                                            VECTOR(no_edges)[i]));
+            IGRAPH_CHECK(igraph_vector_int_init(VECTOR(*edgemaps)[i], VECTOR(no_edges)[i]));
         }
     }
 
