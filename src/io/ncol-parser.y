@@ -96,13 +96,13 @@ input :    /* empty */
 ;
 
 edge :   edgeid edgeid NEWLINE        {
-           igraph_vector_push_back(context->vector, $1);
-           igraph_vector_push_back(context->vector, $2);
+           igraph_vector_int_push_back(context->vector, $1);
+           igraph_vector_int_push_back(context->vector, $2);
            igraph_vector_push_back(context->weights, 0);
        }
        | edgeid edgeid weight NEWLINE {
-           igraph_vector_push_back(context->vector, $1);
-           igraph_vector_push_back(context->vector, $2);
+           igraph_vector_int_push_back(context->vector, $1);
+           igraph_vector_int_push_back(context->vector, $2);
            igraph_vector_push_back(context->weights, $3);
            context->has_weights = 1;
        }

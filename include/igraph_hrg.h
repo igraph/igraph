@@ -100,7 +100,7 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
                                        int num_samples);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_predict(const igraph_t *graph,
-                                     igraph_vector_t *edges,
+                                     igraph_vector_int_t *edges,
                                      igraph_vector_t *prob,
                                      igraph_hrg_t *hrg,
                                      igraph_bool_t start,

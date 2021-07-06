@@ -395,7 +395,8 @@ static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igr
                                         igraph_neimode_t mode) {
 
     igraph_t is;
-    igraph_vector_t map2;
+    igraph_vector_int_t map2;
+    igraph_vector_t weights;
     igraph_integer_t i, m;
 
     if (!weights_them) {
@@ -406,22 +407,24 @@ static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igr
         IGRAPH_ERROR("Invalid weights length for scan-0", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&map2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&map2, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&weights, 0);
     igraph_intersection(&is, us, them, /*map1=*/ 0, &map2);
     IGRAPH_FINALLY(igraph_destroy, &is);
 
     /* Rewrite the map as edge weights */
-    m = igraph_vector_size(&map2);
+    m = igraph_vector_int_size(&map2);
     for (i = 0; i < m; i++) {
-        VECTOR(map2)[i] = VECTOR(*weights_them)[ (igraph_integer_t) VECTOR(map2)[i] ];
+        VECTOR(weights)[i] = VECTOR(*weights_them)[ (igraph_integer_t) VECTOR(map2)[i] ];
     }
 
     igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS,
-                    /*weights=*/ &map2);
+                    /*weights=*/ &weights);
 
     igraph_destroy(&is);
-    igraph_vector_destroy(&map2);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_int_destroy(&map2);
+    igraph_vector_destroy(&weights);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }

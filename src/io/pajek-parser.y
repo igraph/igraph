@@ -323,8 +323,8 @@ arcsdefs: /* empty */ | arcsdefs arcsline;
 arcsline: NEWLINE |
           arcfrom arcto { context->actedge++;
                           context->mode=2; } weight edgeparams NEWLINE  {
-  igraph_vector_push_back(context->vector, $1-1);
-  igraph_vector_push_back(context->vector, $2-1); }
+  igraph_vector_int_push_back(context->vector, $1-1);
+  igraph_vector_int_push_back(context->vector, $2-1); }
 ;
 
 arcfrom: longint;
@@ -339,8 +339,8 @@ edgesdefs: /* empty */ | edgesdefs edgesline;
 edgesline: NEWLINE |
           edgefrom edgeto { context->actedge++;
                             context->mode=2; } weight edgeparams NEWLINE {
-  igraph_vector_push_back(context->vector, $1-1);
-  igraph_vector_push_back(context->vector, $2-1); }
+  igraph_vector_int_push_back(context->vector, $1-1);
+  igraph_vector_int_push_back(context->vector, $2-1); }
 ;
 
 edgefrom: longint;
@@ -442,8 +442,8 @@ arctolist: /* empty */ | arctolist arclistto;
 arclistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
 arclistto: longint {
-  igraph_vector_push_back(context->vector, context->actfrom);
-  igraph_vector_push_back(context->vector, labs($1)-1);
+  igraph_vector_int_push_back(context->vector, context->actfrom);
+  igraph_vector_int_push_back(context->vector, labs($1)-1);
 };
 
 edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
@@ -457,8 +457,8 @@ edgetolist: /* empty */ | edgetolist edgelistto;
 edgelistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
 edgelistto: longint {
-  igraph_vector_push_back(context->vector, context->actfrom);
-  igraph_vector_push_back(context->vector, labs($1)-1);
+  igraph_vector_int_push_back(context->vector, context->actfrom);
+  igraph_vector_int_push_back(context->vector, labs($1)-1);
 };
 
 /* -----------------------------------------------------*/
@@ -481,13 +481,13 @@ adjmatrixentry: number {
     if (context->vcount2==0) {
       context->actedge++;
       igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);
-      igraph_vector_push_back(context->vector, context->actfrom);
-      igraph_vector_push_back(context->vector, context->actto);
+      igraph_vector_int_push_back(context->vector, context->actfrom);
+      igraph_vector_int_push_back(context->vector, context->actto);
     } else if (context->vcount2 + context->actto < context->vcount) {
       context->actedge++;
       igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);
-      igraph_vector_push_back(context->vector, context->actfrom);
-      igraph_vector_push_back(context->vector,
+      igraph_vector_int_push_back(context->vector, context->actfrom);
+      igraph_vector_int_push_back(context->vector,
                               context->vcount2+context->actto);
     }
   }
@@ -736,9 +736,9 @@ igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *con
 }
 
 igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
-  const igraph_vector_t *edges=context->vector;
+  const igraph_vector_int_t *edges=context->vector;
   igraph_integer_t i, n1=context->vcount2;
-  igraph_integer_t ne=igraph_vector_size(edges);
+  igraph_integer_t ne=igraph_vector_int_size(edges);
 
   for (i=0; i<ne; i+=2) {
     igraph_integer_t v1 = VECTOR(*edges)[i];

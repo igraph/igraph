@@ -37,7 +37,7 @@ int main() {
     igraph_vector_int_t v;
     igraph_vector_ptr_t glist;
     igraph_t g1, g2, g3;
-    igraph_vector_t edge_map1, edge_map2;
+    igraph_vector_int_t edge_map1, edge_map2;
 
     igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
     igraph_create(&left, &v, 0, IGRAPH_DIRECTED);
@@ -47,23 +47,23 @@ int main() {
     igraph_create(&right, &v, 0, IGRAPH_DIRECTED);
     igraph_vector_int_destroy(&v);
 
-    igraph_vector_init(&edge_map1, 0);
-    igraph_vector_init(&edge_map2, 0);
+    igraph_vector_int_init(&edge_map1, 0);
+    igraph_vector_int_init(&edge_map2, 0);
 
     igraph_intersection(&isec, &left, &right, &edge_map1, &edge_map2);
     igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&isec, &v, 0);
     printf("---\n");
     igraph_vector_int_print(&v);
-    print_vector(&edge_map1);
-    print_vector(&edge_map2);
+    igraph_vector_int_print(&edge_map1);
+    igraph_vector_int_print(&edge_map2);
     printf("---\n");
     igraph_vector_int_destroy(&v);
     igraph_destroy(&left);
     igraph_destroy(&right);
     igraph_destroy(&isec);
-    igraph_vector_destroy(&edge_map1);
-    igraph_vector_destroy(&edge_map2);
+    igraph_vector_int_destroy(&edge_map1);
+    igraph_vector_int_destroy(&edge_map2);
 
     /* empty graph list */
     igraph_vector_ptr_init(&glist, 0);

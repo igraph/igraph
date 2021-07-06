@@ -141,9 +141,9 @@ zerooneseq: | zerooneseq zeroone { } ;
 
 zeroone: DIGIT {
   if (igraph_dl_yyget_text(scanner)[0]=='1') {
-    IGRAPH_CHECK(igraph_vector_push_back(&context->edges,
+    IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
                                          context->from));
-    IGRAPH_CHECK(igraph_vector_push_back(&context->edges,
+    IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
                                          context->to));
   }
   context->to += 1;
@@ -245,9 +245,9 @@ from: NUM { context->from=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
                                                           igraph_dl_yyget_leng(scanner)); } ;
 
 tolist: {} | tolist integer {
-  IGRAPH_CHECK(igraph_vector_push_back(&context->edges,
+  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
                                        context->from-1));
-  IGRAPH_CHECK(igraph_vector_push_back(&context->edges, $2-1));
+  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, $2-1));
  } ;
 
 labelednodelist1data: {} /* nothing, empty graph */
@@ -261,9 +261,9 @@ fromelabel: elabel {
  };
 
 labeltolist: | labeltolist elabel {
-  IGRAPH_CHECK(igraph_vector_push_back(&context->edges,
+  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
                                        context->from));
-  IGRAPH_CHECK(igraph_vector_push_back(&context->edges, $2));
+  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, $2));
  } ;
 
 %%
@@ -287,8 +287,8 @@ int igraph_i_dl_add_str(char *newstr, yy_size_t length,
 
 int igraph_i_dl_add_edge(long int from, long int to,
                          igraph_i_dl_parsedata_t *context) {
-  IGRAPH_CHECK(igraph_vector_push_back(&context->edges, from));
-  IGRAPH_CHECK(igraph_vector_push_back(&context->edges, to));
+  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, from));
+  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, to));
   return 0;
 }
 
@@ -296,7 +296,7 @@ int igraph_i_dl_add_edge_w(long int from, long int to,
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context) {
   long int n=igraph_vector_size(&context->weights);
-  long int n2=igraph_vector_size(&context->edges)/2;
+  long int n2=igraph_vector_int_size(&context->edges)/2;
   if (n != n2) {
     igraph_vector_resize(&context->weights, n2);
     for (; n<n2; n++) {

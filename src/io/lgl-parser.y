@@ -102,13 +102,13 @@ vertexdef : HASH edgeid NEWLINE       { context->actvertex=$2; } ;
 edges :   /* empty */ | edges edge ;
 
 edge :   edgeid NEWLINE             {
-             igraph_vector_push_back(context->vector, context->actvertex);
-             igraph_vector_push_back(context->vector, $1);
+             igraph_vector_int_push_back(context->vector, context->actvertex);
+             igraph_vector_int_push_back(context->vector, $1);
              igraph_vector_push_back(context->weights, 0);
            }
        | edgeid weight NEWLINE      {
-             igraph_vector_push_back(context->vector, context->actvertex);
-             igraph_vector_push_back(context->vector, $1);
+             igraph_vector_int_push_back(context->vector, context->actvertex);
+             igraph_vector_int_push_back(context->vector, $1);
              igraph_vector_push_back(context->weights, $2);
              context->has_weights = 1;
            }

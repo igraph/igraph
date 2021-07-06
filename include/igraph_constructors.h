@@ -71,7 +71,7 @@ IGRAPH_EXPORT igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t
                                     igraph_integer_t repeats);
 IGRAPH_EXPORT igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...);
 IGRAPH_EXPORT igraph_error_t igraph_realize_degree_sequence(igraph_t *graph,
-                                                 const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
+                                                 const igraph_vector_int_t *outdeg, const igraph_vector_int_t *indeg,
                                                  igraph_edge_type_sw_t allowed_edge_types,
                                                  igraph_realize_degseq_t method);
 

@@ -43,12 +43,12 @@ int main() {
     igraph_t left, right, uni;
     igraph_vector_int_t v;
     igraph_vector_ptr_t glist;
-    igraph_vector_t edge_map1, edge_map2;
+    igraph_vector_int_t edge_map1, edge_map2;
     igraph_vector_ptr_t edgemaps;
     igraph_integer_t i;
 
-    igraph_vector_init(&edge_map1, 0);
-    igraph_vector_init(&edge_map2, 0);
+    igraph_vector_int_init(&edge_map1, 0);
+    igraph_vector_int_init(&edge_map2, 0);
 
     igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 2, 2, 3, -1);
     igraph_create(&left, &v, 0, IGRAPH_DIRECTED);
@@ -60,14 +60,14 @@ int main() {
 
     igraph_union(&uni, &left, &right, &edge_map1, &edge_map2);
     igraph_write_graph_edgelist(&uni, stdout);
-    igraph_vector_print(&edge_map1);
-    igraph_vector_print(&edge_map2);
+    igraph_vector_int_print(&edge_map1);
+    igraph_vector_int_print(&edge_map2);
 
     igraph_destroy(&uni);
     igraph_destroy(&left);
     igraph_destroy(&right);
-    igraph_vector_destroy(&edge_map1);
-    igraph_vector_destroy(&edge_map2);
+    igraph_vector_int_destroy(&edge_map1);
+    igraph_vector_int_destroy(&edge_map2);
 
     /* Empty graph list */
     igraph_vector_ptr_init(&glist, 0);

@@ -66,7 +66,7 @@
 igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
                   igraph_integer_t n, igraph_bool_t directed) {
     igraph_bool_t has_edges = igraph_vector_int_size(edges) > 0;
-    igraph_real_t max = has_edges ? igraph_vector_int_max(edges) + 1 : 0;
+    igraph_integer_t max = has_edges ? igraph_vector_int_max(edges) + 1 : 0;
 
     if (igraph_vector_int_size(edges) % 2 != 0) {
         IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);

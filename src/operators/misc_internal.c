@@ -75,7 +75,7 @@ int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
 
 igraph_error_t igraph_i_merge(igraph_t *res, int mode,
                    const igraph_t *left, const igraph_t *right,
-                   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+                   igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2) {
 
     igraph_integer_t no_of_nodes_left = igraph_vcount(left);
     igraph_integer_t no_of_nodes_right = igraph_vcount(right);
@@ -106,20 +106,20 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
     if (edge_map1) {
         switch (mode) {
         case IGRAPH_MERGE_MODE_UNION:
-            IGRAPH_CHECK(igraph_vector_resize(edge_map1, no_edges_left));
+            IGRAPH_CHECK(igraph_vector_int_resize(edge_map1, no_edges_left));
             break;
         case IGRAPH_MERGE_MODE_INTERSECTION:
-            igraph_vector_clear(edge_map1);
+            igraph_vector_int_clear(edge_map1);
             break;
         }
     }
     if (edge_map2) {
         switch (mode) {
         case IGRAPH_MERGE_MODE_UNION:
-            IGRAPH_CHECK(igraph_vector_resize(edge_map2, no_edges_right));
+            IGRAPH_CHECK(igraph_vector_int_resize(edge_map2, no_edges_right));
             break;
         case IGRAPH_MERGE_MODE_INTERSECTION:
-            igraph_vector_clear(edge_map2);
+            igraph_vector_int_clear(edge_map2);
             break;
         }
     }
@@ -230,10 +230,10 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
                 }
             } else if (mode == IGRAPH_MERGE_MODE_INTERSECTION) {
                 if (edge_map1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map1, edge1));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map1, edge1));
                 }
                 if (edge_map2) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map2, edge2));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map2, edge2));
                 }
             }
             eptr++;
