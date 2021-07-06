@@ -277,11 +277,11 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
  */
 
 igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
-    IGRAPH_VECTOR_INIT_FINALLY(&hrg->left,      n - 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&hrg->right,     n - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->left,      n - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->right,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      n - 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->edges,     n - 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&hrg->vertices,  n - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->vertices,  n - 1);
     IGRAPH_FINALLY_CLEAN(5);
     return IGRAPH_SUCCESS;
 }
@@ -298,11 +298,11 @@ igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
  */
 
 void igraph_hrg_destroy(igraph_hrg_t *hrg) {
-    igraph_vector_destroy(&hrg->left);
-    igraph_vector_destroy(&hrg->right);
+    igraph_vector_int_destroy(&hrg->left);
+    igraph_vector_int_destroy(&hrg->right);
     igraph_vector_destroy(&hrg->prob);
     igraph_vector_int_destroy(&hrg->edges);
-    igraph_vector_destroy(&hrg->vertices);
+    igraph_vector_int_destroy(&hrg->vertices);
 }
 
 /**
@@ -316,7 +316,7 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
  */
 
 igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
-    return igraph_vector_size(&hrg->left) + 1;
+    return igraph_vector_int_size(&hrg->left) + 1;
 }
 
 /**
@@ -337,20 +337,20 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     igraph_error_handler_t *oldhandler =
         igraph_set_error_handler(igraph_error_handler_ignore);
 
-    ret  = igraph_vector_resize(&hrg->left, newsize - 1);
-    ret |= igraph_vector_resize(&hrg->right, newsize - 1);
+    ret  = igraph_vector_int_resize(&hrg->left, newsize - 1);
+    ret |= igraph_vector_int_resize(&hrg->right, newsize - 1);
     ret |= igraph_vector_resize(&hrg->prob, newsize - 1);
     ret |= igraph_vector_int_resize(&hrg->edges, newsize - 1);
-    ret |= igraph_vector_resize(&hrg->vertices, newsize - 1);
+    ret |= igraph_vector_int_resize(&hrg->vertices, newsize - 1);
 
     igraph_set_error_handler(oldhandler);
 
     if (ret) {
-        igraph_vector_resize(&hrg->left, origsize);
-        igraph_vector_resize(&hrg->right, origsize);
+        igraph_vector_int_resize(&hrg->left, origsize);
+        igraph_vector_int_resize(&hrg->right, origsize);
         igraph_vector_resize(&hrg->prob, origsize);
         igraph_vector_int_resize(&hrg->edges, origsize);
-        igraph_vector_resize(&hrg->vertices, origsize);
+        igraph_vector_int_resize(&hrg->vertices, origsize);
         IGRAPH_ERROR("Cannot resize HRG", ret);
     }
 
@@ -610,8 +610,8 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
     VECTOR(vattrs)[0] = &rec;
 
     for (i = 0; i < orig_nodes - 1; i++) {
-        int left = VECTOR(hrg->left)[i];
-        int right = VECTOR(hrg->right)[i];
+        igraph_integer_t left = VECTOR(hrg->left)[i];
+        igraph_integer_t right = VECTOR(hrg->right)[i];
 
         VECTOR(edges)[idx++] = orig_nodes + i;
         VECTOR(edges)[idx++] = left < 0 ? orig_nodes - left - 1 : left;
@@ -732,7 +732,7 @@ static igraph_error_t MCMCEquilibrium_Sample(dendro *d, int num_samples) {
     return IGRAPH_SUCCESS;
 }
 
-static int QsortPartition (pblock* array, int left, int right, int index) {
+static int QsortPartition (pblock* array, igraph_integer_t left, igraph_integer_t right, igraph_integer_t index) {
     pblock p_value, temp;
     p_value.L = array[index].L;
     p_value.i = array[index].i;
@@ -749,8 +749,8 @@ static int QsortPartition (pblock* array, int left, int right, int index) {
     array[index].i = temp.i;
     array[index].j = temp.j;
 
-    int stored = left;
-    for (int i = left; i < right; i++) {
+    igraph_integer_t stored = left;
+    for (igraph_integer_t i = left; i < right; i++) {
         if (array[i].L <= p_value.L) {
             // swap(array[stored], array[i])
             temp.L = array[i].L;
@@ -779,10 +779,10 @@ static int QsortPartition (pblock* array, int left, int right, int index) {
     return stored;
 }
 
-static void QsortMain (pblock* array, int left, int right) {
+static void QsortMain (pblock* array, igraph_integer_t left, igraph_integer_t right) {
     if (right > left) {
-        int pivot = left;
-        int part  = QsortPartition(array, left, right, pivot);
+        igraph_integer_t pivot = left;
+        igraph_integer_t part  = QsortPartition(array, left, right, pivot);
         QsortMain(array, left,   part - 1);
         QsortMain(array, part + 1, right  );
     }
@@ -1039,14 +1039,14 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
             continue;
         }
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-        VECTOR(hrg->left )[-ri - 1] = VECTOR(idx)[ (int) VECTOR(neis)[0] ];
-        VECTOR(hrg->right)[-ri - 1] = VECTOR(idx)[ (int) VECTOR(neis)[1] ];
+        VECTOR(hrg->left )[-ri - 1] = VECTOR(idx)[ VECTOR(neis)[0] ];
+        VECTOR(hrg->right)[-ri - 1] = VECTOR(idx)[ VECTOR(neis)[1] ];
         VECTOR(hrg->prob )[-ri - 1] = VECTOR(*prob)[i];
     }
 
     // Calculate the number of vertices and edges in each subtree
     igraph_vector_int_null(&hrg->edges);
-    igraph_vector_null(&hrg->vertices);
+    igraph_vector_int_null(&hrg->vertices);
     IGRAPH_VECTOR_INIT_FINALLY(&path, 0);
     IGRAPH_CHECK(igraph_vector_push_back(&path, VECTOR(idx)[root]));
     while (!igraph_vector_empty(&path)) {

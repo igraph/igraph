@@ -65,7 +65,10 @@ __BEGIN_DECLS
  */
 
 typedef struct igraph_hrg_t {
-    igraph_vector_t left, right, prob, vertices;
+    igraph_vector_int_t left;
+    igraph_vector_int_t right;
+    igraph_vector_t prob;
+    igraph_vector_int_t vertices;
     igraph_vector_int_t edges;
 } igraph_hrg_t;
 
