@@ -31,7 +31,7 @@ int main() {
     igraph_integer_t chord[] = { 0, 50 };
 
     igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 1);
-    igraph_vector_int_view(&v, chord, sizeof(chord) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&v, chord, sizeof(chord) / sizeof(chord[0]));
     igraph_add_edges(&g, &v, 0);
     igraph_girth(&g, &girth, 0);
     if (girth != 51) {

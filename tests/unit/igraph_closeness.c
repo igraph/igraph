@@ -52,11 +52,10 @@ void simple_test_case_with_weights_undirected() {
     printf("\nSimple test case, with weights, undirected\n");
 
     igraph_vector_init(&vector_actual_results, 0);
-    igraph_vector_int_view(&vector_edges, real_edges, sizeof(real_edges)/sizeof(igraph_real_t));
+    igraph_vector_int_view(&vector_edges, real_edges, sizeof(real_edges)/sizeof(real_edges[0]));
     igraph_create(&g, &vector_edges, /*number of vertices*/ 2, IGRAPH_DIRECTED);
 
-    igraph_vector_view(&vector_weights, real_weights,
-                       sizeof(real_weights)/sizeof(igraph_real_t));
+    igraph_vector_view(&vector_weights, real_weights, sizeof(real_weights)/sizeof(real_weights[0]));
 
     /* NOT NORMALISED TEST BELOW */
 
@@ -144,10 +143,10 @@ void advanced_test_case_with_weights() {
 
 
     igraph_vector_init(&vector_actual_results, 0);
-    igraph_vector_int_view(&vector_edges, real_edges, sizeof(real_edges)/sizeof(igraph_real_t));
+    igraph_vector_int_view(&vector_edges, real_edges, sizeof(real_edges) / sizeof(real_edges[0]));
     igraph_create(&g, &vector_edges, /*number of vertices*/ 2, IGRAPH_DIRECTED);
 
-    igraph_vector_view(&vector_weights, real_weights, sizeof(real_weights)/sizeof(igraph_real_t));
+    igraph_vector_view(&vector_weights, real_weights, sizeof(real_weights) / sizeof(real_weights[0]));
 
     /* TEST FOR UNDIRECTED GRAPH */
 
@@ -205,7 +204,7 @@ void test_cutoff() {
     igraph_vector_init(&closeness, 0);
     igraph_vector_init(&reachable, 0);
 
-    for (i=0; i < sizeof(cutoff_vec) / sizeof(igraph_real_t); ++i) {
+    for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
         printf("\nRange-limited closeness with cutoff %g\n", cutoff_vec[i]);
         igraph_closeness_cutoff(&g, &closeness, &reachable, &all_reachable,
                                 igraph_vss_all(), IGRAPH_ALL, NULL, /* normalized */ 1,
@@ -238,7 +237,7 @@ void test_cutoff_directed() {
     igraph_vector_init(&closeness, 0);
     igraph_vector_init(&reachable, 0);
 
-    for (i=0; i < sizeof(cutoff_vec) / sizeof(igraph_real_t); ++i) {
+    for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
         printf("\nRange-limited directed closeness with cutoff %g\n", cutoff_vec[i]);
         igraph_closeness_cutoff(&g, &closeness, &reachable, &all_reachable,
                                 igraph_vss_all(), IGRAPH_OUT, NULL, /* normalized */ 1,
@@ -273,7 +272,7 @@ void test_cutoff_weighted() {
     igraph_vector_init(&reachable, 0);
     igraph_vector_init_seq(&weights, 1, 3);
 
-    for (i=0; i < sizeof(cutoff_vec) / sizeof(igraph_real_t); ++i) {
+    for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
         printf("\nRange-limited weighted closeness with cutoff %g\n", cutoff_vec[i]);
         igraph_closeness_cutoff(&g, &closeness, &reachable, &all_reachable,
                                 igraph_vss_all(), IGRAPH_ALL, &weights, /* normalized */ 1,

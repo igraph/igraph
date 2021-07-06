@@ -195,7 +195,7 @@ void print_graph_canon(const igraph_t *graph) {
     if (! igraph_is_directed(graph)) {
         for (i=0; i < ecount; ++i) {
             if (VECTOR(edges)[2*i] > VECTOR(edges)[2*i+1]) {
-                igraph_real_t tmp = VECTOR(edges)[2*i];
+                igraph_integer_t tmp = VECTOR(edges)[2*i];
                 VECTOR(edges)[2*i] = VECTOR(edges)[2*i+1];
                 VECTOR(edges)[2*i+1] = tmp;
             }
@@ -203,10 +203,10 @@ void print_graph_canon(const igraph_t *graph) {
     }
 
     /* Sort the edge list */
-    igraph_qsort(&VECTOR(edges)[0], ecount, 2*sizeof(igraph_real_t), &edge_compare);
+    igraph_qsort(&VECTOR(edges)[0], ecount, 2*sizeof(igraph_integer_t), &edge_compare);
 
     for (i=0; i < ecount; ++i) {
-        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", (igraph_integer_t) VECTOR(edges)[2*i], (igraph_integer_t) VECTOR(edges)[2*i+1]);
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", VECTOR(edges)[2*i], VECTOR(edges)[2*i+1]);
     }
 
     igraph_vector_int_destroy(&edges);

@@ -42,7 +42,7 @@ int main() {
 
     /* A toy graph, three components maximum, with at least 2 vertices each */
     igraph_create(&g,
-                  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(igraph_real_t)),
+                  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0])),
                   0, IGRAPH_DIRECTED);
     igraph_decompose(&g, &complist, IGRAPH_WEAK, 3, 2);
     for (i = 0; i < igraph_vector_ptr_size(&complist); i++) {

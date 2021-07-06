@@ -43,7 +43,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_integer_t no_of_nodes = n;
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_int_t s = IGRAPH_VECTOR_NULL;
-    int retval = 0;
     igraph_integer_t vsize;
 
     if (n < 0) {
@@ -54,9 +53,9 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     }
 
     if (p == 0.0 || no_of_nodes <= 1) {
-        IGRAPH_CHECK(retval = igraph_empty(graph, n, directed));
+        IGRAPH_CHECK(igraph_empty(graph, n, directed));
     } else if (p == 1.0) {
-        IGRAPH_CHECK(retval = igraph_full(graph, n, directed, loops));
+        IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
     } else {
 
         igraph_integer_t i;
@@ -124,24 +123,23 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
         igraph_vector_int_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
-        IGRAPH_CHECK(retval = igraph_create(graph, &edges, n, directed));
+        IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
         igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_erdos_renyi_game_gnm(
-    igraph_t *graph, igraph_integer_t n, igraph_real_t m,
+    igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
     igraph_bool_t directed, igraph_bool_t loops
 ) {
 
     igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges = (igraph_integer_t) m;
+    igraph_integer_t no_of_edges = m;
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    int retval = 0;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -151,7 +149,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     }
 
     if (m == 0.0 || no_of_nodes <= 1) {
-        IGRAPH_CHECK(retval = igraph_empty(graph, n, directed));
+        IGRAPH_CHECK(igraph_empty(graph, n, directed));
     } else {
 
         igraph_integer_t i;
@@ -171,14 +169,13 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         }
 
         if (maxedges == no_of_edges) {
-            retval = igraph_full(graph, n, directed, loops);
+            IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
         } else {
 
             igraph_integer_t slen;
 
             IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-            IGRAPH_CHECK(igraph_random_sample(&s, 0, maxedges - 1,
-                                              (igraph_integer_t) no_of_edges));
+            IGRAPH_CHECK(igraph_random_sample(&s, 0, maxedges - 1, no_of_edges));
 
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
             IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
@@ -219,13 +216,13 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 
             igraph_vector_destroy(&s);
             IGRAPH_FINALLY_CLEAN(1);
-            retval = igraph_create(graph, &edges, n, directed);
+            IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
             igraph_vector_int_destroy(&edges);
             IGRAPH_FINALLY_CLEAN(1);
         }
     }
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -271,12 +268,12 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 igraph_error_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
                             igraph_integer_t n, igraph_real_t p_or_m,
                             igraph_bool_t directed, igraph_bool_t loops) {
-    int retval = 0;
+    igraph_error_t retval;
 
     if (type == IGRAPH_ERDOS_RENYI_GNP) {
         retval = igraph_erdos_renyi_game_gnp(graph, n, p_or_m, directed, loops);
     } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
-        retval = igraph_erdos_renyi_game_gnm(graph, n, p_or_m, directed, loops);
+        retval = igraph_erdos_renyi_game_gnm(graph, n, (igraph_integer_t) p_or_m, directed, loops);
     } else {
         IGRAPH_ERROR("Invalid type", IGRAPH_EINVAL);
     }

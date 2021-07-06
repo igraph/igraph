@@ -133,7 +133,7 @@ int main() {
         igraph_vector_int_init(VECTOR(evecs)[i], 0);
     }
 
-    igraph_vector_view(&weights_vec, weights_data_0, sizeof(weights_data_0) / sizeof(igraph_real_t));
+    igraph_vector_view(&weights_vec, weights_data_0, sizeof(weights_data_0) / sizeof(weights_data_0[0]));
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ vs,
                                            &weights_vec, IGRAPH_OUT,
@@ -214,7 +214,7 @@ int main() {
                  0, 1, 0, 3, 1, 3, 1, 4, 2, 1, 3, 2, 3, 4, 4, 0, 4, 2,
                  -1);
 
-    igraph_vector_view(&weights_vec, weights_data_1, sizeof(weights_data_1) / sizeof(igraph_real_t));
+    igraph_vector_view(&weights_vec, weights_data_1, sizeof(weights_data_1) / sizeof(weights_data_1[0]));
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ vs,
                                            &weights_vec, IGRAPH_OUT,
@@ -237,7 +237,7 @@ int main() {
     /* Same graph with negative loop */
     igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_vector_view(&weights_vec, weights_data_2,
-                       sizeof(weights_data_2) / sizeof(igraph_real_t));
+                       sizeof(weights_data_2) / sizeof(weights_data_2[0]));
     IGRAPH_ASSERT(igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                                          /*from=*/ 0, /*to=*/ vs,
                                                          &weights_vec, IGRAPH_OUT,

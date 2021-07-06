@@ -65,7 +65,7 @@ int main() {
                  -1);
 
     igraph_vector_view(&weights, weights_data,
-                       sizeof(weights_data) / sizeof(igraph_real_t));
+                       sizeof(weights_data) / sizeof(weights_data[0]));
 
     igraph_matrix_init(&res, 0, 0);
     igraph_shortest_paths_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(),

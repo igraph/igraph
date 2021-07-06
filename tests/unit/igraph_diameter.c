@@ -49,7 +49,7 @@ int main() {
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 0);
     igraph_vector_int_init(&path_vertex, 0);
     igraph_vector_int_init(&path_edge, 0);
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
+    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
     printf("diameter: %g, from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", result,
             from, to);
@@ -60,7 +60,7 @@ int main() {
 
     //disconnected graph
     printf("disconnected ring graph\n");
-    igraph_vector_int_view(&edge_vec, vec, sizeof(vec) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&edge_vec, vec, sizeof(vec) / sizeof(vec[0]));
     igraph_es_vector(&edge_sele, &edge_vec);
     igraph_delete_edges(&g, edge_sele);
     printf("The largest path in one connected component\n");

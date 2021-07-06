@@ -40,13 +40,13 @@ int main() {
     igraph_vector_destroy(&vector);
 
     /* Non-empty vector, descending */
-    igraph_vector_view(&vector, values, sizeof(values) / sizeof(igraph_real_t));
+    igraph_vector_view(&vector, values, sizeof(values) / sizeof(values[0]));
     igraph_vector_int_init(&indices, 0);
     igraph_vector_qsort_ind(&vector, &indices, /* descending = */ 1);
     print_vector_int(&indices);
 
     /* Non-empty vector, ascending */
-    igraph_vector_view(&vector, values2, sizeof(values2) / sizeof(igraph_real_t));
+    igraph_vector_view(&vector, values2, sizeof(values2) / sizeof(values2[0]));
     igraph_vector_qsort_ind(&vector, &indices, /* descending = */ 0);
     print_vector_int(&indices);
 

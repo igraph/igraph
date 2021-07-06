@@ -157,7 +157,7 @@ int main() {
 
     /*---------------------*/
 
-    igraph_small(&g, sizeof(football_types) / sizeof(igraph_real_t),
+    igraph_small(&g, sizeof(football_types) / sizeof(football_types[0]),
                  IGRAPH_UNDIRECTED,
                  0, 1, 2, 3, 0, 4, 4, 5, 3, 5, 2, 6, 6, 7, 7, 8, 8, 9, 0, 9, 4, 9, 5, 10, 10, 11, 5, 11,
                  3, 11, 12, 13, 2, 13, 2, 14, 12, 14, 14, 15, 13, 15, 2, 15, 4, 16, 9, 16, 0, 16,
@@ -225,7 +225,7 @@ int main() {
                  -1);
     igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 1, /*edge_comb=*/ 0);
     igraph_vector_view(&types, football_types,
-                       sizeof(football_types) / sizeof(igraph_real_t));
+                       sizeof(football_types) / sizeof(football_types[0]));
     igraph_assortativity_nominal(&g, &types, &res, /*directed=*/ 0);
     printf("%.5f\n", res);
 

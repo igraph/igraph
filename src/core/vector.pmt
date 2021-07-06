@@ -1692,8 +1692,8 @@ void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
  * \param v The vector object.
  * \param low The lower limit of the interval (inclusive).
  * \param high The higher limit of the interval (inclusive).
- * \return True (positive integer) if all vector elements are in the
- *   interval, false (zero) otherwise. If any element is NaN, it will
+ * \return True (positive integer) if the vector is empty or all vector elements
+ *   are in the interval, false (zero) otherwise. If any element is NaN, it will
  *   return \c 0 (=false).
  *
  * Time complexity: O(n), the number

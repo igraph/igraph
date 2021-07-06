@@ -122,10 +122,10 @@ int main() {
 
     printf("\nNon-trivial weighted graph\n");
     printf("==========================================================\n");
-    igraph_vector_int_view(&edges, nontriv, sizeof(nontriv) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&edges, nontriv, sizeof(nontriv) / sizeof(nontriv[0]));
     igraph_create(&g, &edges, 0, /* directed= */ 0);
     igraph_vector_view(&weights, nontriv_weights,
-                       sizeof(nontriv_weights) / sizeof(igraph_real_t));
+                       sizeof(nontriv_weights) / sizeof(nontriv_weights[0]));
     igraph_vector_init(&bet, 0);
 
     igraph_betweenness(/*graph=*/ &g, /*res=*/ &bet, /*vids=*/ igraph_vss_all(),

@@ -78,11 +78,11 @@ int main() {
 
 
     /* create graph */
-    igraph_vector_int_init_copy(&edges, edge_data, (sizeof edge_data) / sizeof(igraph_real_t));
+    igraph_vector_int_init_copy(&edges, edge_data, (sizeof edge_data) / sizeof(edge_data[0]));
     igraph_create(&graph, &edges, n, /* directed= */ 0);
 
     /* set up vertex weight vector */
-    igraph_vector_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(igraph_real_t));
+    igraph_vector_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(vertex_weight_data[0]));
 
     /* initialize result vector_ptr */
     igraph_vector_ptr_init(&result, 0);

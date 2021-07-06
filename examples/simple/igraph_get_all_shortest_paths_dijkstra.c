@@ -143,7 +143,7 @@ int main() {
 
     /* Same ring, but with weights */
 
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
+    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
                 /*vertices=*/ &vertices, /*edges=*/ NULL, /*nrgeo=*/ &nrgeo,
@@ -174,7 +174,7 @@ int main() {
                  2, 1,
                  -1);
 
-    igraph_vector_view(&weights_vec, weights2, sizeof(weights2) / sizeof(igraph_real_t));
+    igraph_vector_view(&weights_vec, weights2, sizeof(weights2) / sizeof(weights2[0]));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
                 /*vertices=*/ &vertices, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,

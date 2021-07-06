@@ -34,7 +34,7 @@ int main() {
     igraph_vs_t vs;
     igraph_integer_t size;
 
-    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(igraph_integer_t));
     igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
 
     /* Create iterator based on a vector (view) */
@@ -68,9 +68,9 @@ int main() {
     igraph_vs_vector_small(&vs, 0, 2, 4, 0, 2, 4, 2, -1);
     igraph_vit_create(&g, vs, &vit);
     igraph_vs_size(&g, &vs, &size);
-    printf("%" IGRAPH_PRId " ", (igraph_integer_t) size);
+    printf("%" IGRAPH_PRId " ", size);
     for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        printf("%" IGRAPH_PRId " ", (igraph_integer_t) IGRAPH_VIT_GET(vit));
+        printf("%" IGRAPH_PRId " ", IGRAPH_VIT_GET(vit));
     }
     printf("\n");
 
