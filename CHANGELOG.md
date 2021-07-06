@@ -27,6 +27,9 @@
    generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
    variant of the same data type.
 
+ - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its `edges`
+   parameter.
+
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
@@ -46,6 +49,9 @@
  - `igraph_bridges()` now uses an `igraph_vector_int_t` to return the list of
    bridges, not an `igraph_vector_t`.
 
+ - `igraph_canonical_permutation()` now uses an `igraph_vector_int_t` for its
+   labeling parameter.
+
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
    mapping from block indices to parent block indices; also, it uses a pointer
    vector of `igraph_vector_int_t`s to return the blocks themselves instead of
@@ -56,6 +62,12 @@
 
  - `igraph_convex_hull()` now uses an `igraph_vector_int_t` to return the
    indices of the input vertices that were chosen to be in the convex hull.
+
+ - `igraph_create()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
+
+ - `igraph_create_bipartite()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
 
  - `igraph_decompose()` now uses an `igraph_integer_t` for its `maxcompno` and
    `minelements` arguments instead of a `long int`.
@@ -87,6 +99,9 @@
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
+ - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
+   `res` parameter.
+
  - `igraph_get_eids()` and `igraph_get_eids_multi()` now use `igraph_vector_int_t`
    to return lists of edge IDs and to receive lists of vertex IDs.
 
@@ -105,13 +120,32 @@
    `igraph_get_shortest_paths_dijkstra()` now contain `igraph_vector_int_t` vectors
    instead of `igraph_vector_t`.
 
+ - The `igraph_vector_ptr_t` maps parameters in `igraph_get_isomorphisms_vf2()`
+   and `igraph_get_subisomorphisms_vf2()` now contain `igraph_vector_int_t`,
+   not `igraph_vector_t`.
+
  - `igraph_hrg_init()` and `igraph_hrg_resize()` now takes an `igraph_integer_t`
    as their size arguments instead of an `int`.
 
+ - `igraph_hrg_predict()` now uses an `igraph_vector_int_t` for its
+   `edges` parameter.
+
  - `igraph_hrg_size()` now returns an `igraph_integer_t` instead of an `int`.
+
+ - `igraph_incident()` now uses an `igraph_vector_int_t` for its
+   `eids` parameter.
 
  - `igraph_induced_subgraph_map()` now uses `igraph_vector_int_t` vectors to
    return the mapping and the inverse mapping of old vertex IDs to new ones.
+
+ - `igraph_intersection()` now uses an `igraph_vector_int_t` for its
+   `edge_map1` and `edge_map2` parameters.
+
+ - The `edgemaps` parameter of `igraph_intersection_many()` is now a vector of
+   `igraph_vector_int_t` pointers.
+
+ - `igraph_is_chordal()` now uses an `igraph_vector_int_t` for its
+   `fill_in` parameter.
 
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
    sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.
@@ -121,6 +155,45 @@
    use an `igraph_vector_int_t` to return the matching instead of an
    `igraph_vector_long_t`.
 
+ - `igraph_isomorphic_vf2()`, `igraph_isomorphic_function_vf2()` and
+   `igraph_isohandler_t` now all use `igraph_vector_int_t` for their `map12` and
+   `map21` parameters.
+
+ - The dimension vector parameter for `igraph_lattice()` is now an
+   `igraph_vector_int_t` instead of `igraph_vector_t`.
+
+ - The width parameter of `igraph_layout_grid()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - The width and height parameters of `igraph_layout_grid_3d()` are now
+   `igraph_integer_t` instead of `long int`.
+
+ - The dimension parameter of `igraph_layout_mds()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - The maxiter parameter of `igraph_layout_sugiyama()` is now an `igraph_integer_t`
+   instead of `long int`. Also, the function now uses an `igraph_vector_int_t`
+   for its `extd_to_orig_eids` parameter.
+
+ - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
+   instead of `long int`.
+
+ - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
+   `cut`, `partition` and `partition2` parameters.
+
+ - `igraph_mincut()` now uses an `igraph_vector_int_t` for its
+   `cut`, `partition` and `partition2` parameters.
+
+ - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
+   `neis` parameter.
+
+ - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
+   `outdeg` and `indeg` parameters.
+
+ - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
+   use an `igraph_vector_int_t` to return the vertex IDs instead of an
+   `igraph_vector_t`.
+
  - `igraph_spanner()` now uses an `igraph_vector_int_t` to return the vector
    of edge IDs in the spanner instead of an `igraph_vector_t`.
 
@@ -129,14 +202,30 @@
    return the vector of edge IDs in the spanning tree instead of an
    `igraph_vector_t`.
 
- - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
-   use an `igraph_vector_int_t` to return the vertex IDs instead of an
-   `igraph_vector_t`.
+ - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
+   `cut`, `partition` and `partition2` parameters.
 
  - `igraph_subcomponent()` now uses an `igraph_integer_t` for the seed vertex
    instead of an `igraph_real_t`. It also uses an `igraph_vector_int_t` to
    return the list of vertices in the same component as the seed vertex instead
    of an `igraph_vector_t`.
+
+ - `igraph_subisomorphic_vf2()`, `igraph_subisomorphic_function_vf2()` and
+   `igraph_isomorphic_bliss()` now all use `igraph_vector_int_t` for their `map12`
+   and `map21` parameters.
+
+ - The `igraph_vector_ptr_t` maps parameters in `igraph_subisomorphic_lad()`,
+   `igraph_get_isomorphisms_vf2()` and `igraph_get_subisomorphisms_vf2()` now
+   contain `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its map
+   parameter.
+
+ - `igraph_union()` now uses an `igraph_vector_int_t` for its
+   `edge_map1` and `edge_map2` parameters.
+
+ - The `edgemaps` parameter of `igraph_union_many()` is now a vector of
+   `igraph_vector_int_t` pointers.
 
  - `igraph_vs_vector()`, `igraph_vss_vector()` and `igraph_vs_vector_copy()` now
    all take an `igraph_vector_int_t` as the vector of vertex IDs, not an
@@ -151,7 +240,9 @@
    indexing, _not_ `long int`. Please refer to the headers for the exact details;
    the list of affected functions is too large to include here.
 
- - The `add_vertices()` function in the attribute handler now takes an
+ - The `add_edges()` function in the attribute handler now takes an
+   `igraph_vector_int_t` for its `edges` parameter instead of an
+   `igraph_vector_t`. The `add_vertices()` function now takes an
    `igraph_integer_t` for the vertex count instead of a `long int`. The
    `permute_vertices()` and `permute_edges()` functions in the attribute
    handler tables now take an `igraph_vector_int_t` instead of an
@@ -169,9 +260,6 @@
  - `igraph_sparsemat_transpose()` now takes an `igraph_bool_t` as its `values`
    argument instead of an `int`. In practice, it has always been treated as a
    boolean.
-
-  - The dimension vector parameter for `igraph_lattice()` is now an
-    `igraph_vector_int_t` instead of `igraph_vector_t`.
 
  - Functions that used an `igraph_vector_t` to represent cluster size
    and cluster membership now use an `igraph_vector_int_t` instead. These are:
@@ -201,111 +289,6 @@
  - Every `igraph_spmatrix_*()` function and struct now uses `igraph_integer_t`
    instead of `long int` for the numbers of rows and columns, and row and column
    indexes.
-
- - The position parameters in `igraph_vector_ptr_insert()`,
-   `igraph_vector_ptr_e()`, `igraph_vector_ptr_set()`,
-   `igraph_vector_ptr_remove()` now all are of type `igraph_integer_t` instead
-   of `long int`. The length parameters in `igraph_vector_ptr_init_copy()` and
-   `igraph_vector_ptr_view()` are also change to `igraph_integer_t`.
-
- - The width parameter of `igraph_layout_grid()` is now an `igraph_integer_t`
-   instead of `long int`.
-
- - The width and height parameters of `igraph_layout_grid_3d()` are now
-   `igraph_integer_t` instead of `long int`.
-
- - The dimension parameter of `igraph_layout_mds()` is now an `igraph_integer_t`
-   instead of `long int`.
-
- - The maxiter parameter of `igraph_layout_sugiyama()` is now an `igraph_integer_t`
-   instead of `long int`.
-
- - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
-   instead of `long int`.
-
- - The community parameter `igraph_community_leading_eigenvector_callback_t` is
-   now an `igraph_integer_t` instead of `long int`.
-
- - `igraph_isomorphic_vf2()`, `igraph_isomorphic_function_vf2()`,
-   `igraph_isohandler_t`, `igraph_subisomorphic_vf2()`,
-   `igraph_subisomorphic_function_vf2()` and `igraph_isomorphic_bliss()`
-   now all use `igraph_vector_int_t` for their map12 and map21 parameters.
-
- - The `igraph_vector_ptr_t` maps parameters in `igraph_subisomorphic_lad()`,
-   `igraph_get_isomorphisms_vf2()` and `igraph_get_subisomorphisms_vf2()` now
-   contain `igraph_vector_int_t`, not `igraph_vector_t`.
-
- - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its map
-   parameter.
-
- - `igraph_canonical_permutation()` now uses an `igraph_vector_int_t` for its
-   labeling parameter.
-
- - `struct igraph_lazy_adjlist_t` now uses an `igraph_vector_int_t` for its
-   dummy field.
-
- - `struct igraph_lazy_inclist_t` now uses an `igraph_vector_int_t` for its
-   dummy field.
-
- - The `add_edges()` field in `struct igraph_attribute_table_t` now uses an
-   `igraph_vector_int_t` for its `edges` parameter.
-
- - `igraph_create_bipartite()` now uses an `igraph_vector_int_t` for its
-   `edges` parameter.
-
- - `igraph_create()` now uses an `igraph_vector_int_t` for its
-   `edges` parameter.
-
- - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
-   `res` parameter.
-
- - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
-   `cut`, `partition` and `partion2` parameters.
-
- - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
-   `cut`, `partition` and `partion2` parameters.
-
- - `igraph_mincut()` now uses an `igraph_vector_int_t` for its
-   `cut`, `partition` and `partion2` parameters.
-
- - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its
-   `edges` parameter.
-
- - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
-   `neis` parameter.
-
- - `igraph_incident()` now uses an `igraph_vector_int_t` for its
-   `eids` parameter.
-
- - `igraph_is_chordal()` now uses an `igraph_vector_int_t` for its
-   `fill_in` parameter.
-
- - `igraph_vector_rank()` now uses an `igraph_vector_int_t` for its
-   `res` parameter.
-
- - `igraph_hrg_t` now uses an `igraph_vector_int_t` for its
-   `edges` field.
-
- - `igraph_layout_sugiyama()` now uses an `igraph_vector_int_t` for its
-   `extd_to_orig_eids` parameter.
-
- - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
-   `outdeg` and `indeg` parameters.
-
- - `igraph_hrg_predict()` now uses an `igraph_vector_int_t` for its
-   `edges` parameter.
-
- - `igraph_union()` now uses an `igraph_vector_int_t` for its
-   `edge_map1` and `edge_map2` parameters.
-
- - The `edgemaps` parameter of `igraph_union_many()` is now a vector of
-   `igraph_vector_int_t` pointers.
-
- - `igraph_intersection()` now uses an `igraph_vector_int_t` for its
-   `edge_map1` and `edge_map2` parameters.
-
- - The `edgemaps` parameter of `igraph_intersection_many()` is now a vector of
-   `igraph_vector_int_t` pointers.
 
 
 ### Added
