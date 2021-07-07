@@ -1185,6 +1185,162 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
     return retval;
 }
 
+static igraph_error_t igraph_i_random_sample_alga_real(igraph_vector_t *res,
+                                       igraph_integer_t l, igraph_integer_t h,
+                                       igraph_integer_t length) {
+    igraph_real_t N = h - l + 1;
+    igraph_real_t n = length;
+
+    igraph_real_t top = N - n;
+    igraph_real_t Nreal = N;
+    igraph_real_t S = 0;
+    igraph_real_t V, quot;
+
+    l = l - 1;
+
+    while (n >= 2) {
+        V = RNG_UNIF01();
+        S = 1;
+        quot = top / Nreal;
+        while (quot > V) {
+            S += 1;
+            top = -1.0 + top;
+            Nreal = -1.0 + Nreal;
+            quot = (quot * top) / Nreal;
+        }
+        l += S;
+        igraph_vector_push_back(res, l);    /* allocated */
+        Nreal = -1.0 + Nreal; n = -1 + n;
+    }
+
+    S = floor(round(Nreal) * RNG_UNIF01());
+    l += S + 1;
+    igraph_vector_push_back(res, l);  /* allocated */
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+                         igraph_integer_t length) {
+    igraph_real_t N = h - l + 1;
+    igraph_real_t n = length;
+    int retval;
+
+    igraph_real_t nreal = length;
+    igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
+    igraph_real_t Nreal = N;
+    igraph_real_t Vprime;
+    igraph_real_t qu1 = -n + 1 + N;
+    igraph_real_t qu1real = -nreal + 1.0 + Nreal;
+    igraph_real_t negalphainv = -13;
+    igraph_real_t threshold = -negalphainv * n;
+    igraph_real_t S;
+
+    /* getting back some sense of sanity */
+    if (l > h) {
+        IGRAPH_ERROR("Lower limit is greater than upper limit", IGRAPH_EINVAL);
+    }
+    /* now we know that l <= h */
+    if (length > N) {
+        IGRAPH_ERROR("Sample size exceeds size of candidate pool", IGRAPH_EINVAL);
+    }
+
+    /* treat rare cases quickly */
+    if (l == h) {
+        IGRAPH_CHECK(igraph_vector_resize(res, 1));
+        VECTOR(*res)[0] = l;
+        return IGRAPH_SUCCESS;
+    }
+    if (length == 0) {
+        igraph_vector_clear(res);
+        return IGRAPH_SUCCESS;
+    }
+    if (length == N) {
+        long int i = 0;
+        IGRAPH_CHECK(igraph_vector_resize(res, length));
+        for (i = 0; i < length; i++) {
+            VECTOR(*res)[i] = l++;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_clear(res);
+    IGRAPH_CHECK(igraph_vector_reserve(res, length));
+
+    RNG_BEGIN();
+
+    Vprime = exp(log(RNG_UNIF01()) * ninv);
+    l = l - 1;
+
+    while (n > 1 && threshold < N) {
+        igraph_real_t X, U;
+        igraph_real_t limit, t;
+        igraph_real_t negSreal, y1, y2, top, bottom;
+        igraph_real_t nmin1inv = 1.0 / (-1.0 + nreal);
+        while (1) {
+            while (1) {
+                X = Nreal * (-Vprime + 1.0);
+                S = floor(X);
+                /* if (S==0) { S=1; } */
+                if (S < qu1) {
+                    break;
+                }
+                Vprime = exp(log(RNG_UNIF01()) * ninv);
+            }
+            U = RNG_UNIF01();
+            negSreal = -S;
+
+            y1 = exp(log(U * Nreal / qu1real) * nmin1inv);
+            Vprime = y1 * (-X / Nreal + 1.0) * (qu1real / (negSreal + qu1real));
+            if (Vprime <= 1.0) {
+                break;
+            }
+
+            y2 = 1.0;
+            top = -1.0 + Nreal;
+            if (-1 + n > S) {
+                bottom = -nreal + Nreal;
+                limit = -S + N;
+            } else {
+                bottom = -1.0 + negSreal + Nreal;
+                limit = qu1;
+            }
+            for (t = -1 + N; t >= limit; t--) {
+                y2 = (y2 * top) / bottom;
+                top = -1.0 + top;
+                bottom = -1.0 + bottom;
+            }
+            if (Nreal / (-X + Nreal) >= y1 * exp(log(y2)*nmin1inv)) {
+                Vprime = exp(log(RNG_UNIF01()) * nmin1inv);
+                break;
+            }
+            Vprime = exp(log(RNG_UNIF01()) * ninv);
+        }
+
+        l += S + 1;
+        igraph_vector_push_back(res, l);    /* allocated */
+        N = -S + (-1 + N);   Nreal = negSreal + (-1.0 + Nreal);
+        n = -1 + n;   nreal = -1.0 + nreal; ninv = nmin1inv;
+        qu1 = -S + qu1; qu1real = negSreal + qu1real;
+        threshold = threshold + negalphainv;
+    }
+
+    if (n > 1) {
+        retval = igraph_i_random_sample_alga_real(res, (igraph_integer_t) l + 1,
+                                             (igraph_integer_t) h,
+                                             (igraph_integer_t) n);
+    } else {
+        retval = 0;
+        S = floor(N * Vprime);
+        l += S + 1;
+        igraph_vector_push_back(res, l);    /* allocated */
+    }
+
+    RNG_END();
+
+    return retval;
+}
+
 #ifdef USING_R
 
 /* These are never called. But they are correct, nevertheless */
