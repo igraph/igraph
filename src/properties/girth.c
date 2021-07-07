@@ -75,7 +75,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_lazy_adjlist_t adjlist;
-    igraph_integer_t mincirc = LONG_MAX, minvertex = 0;
+    igraph_integer_t mincirc = IGRAPH_INTEGER_MAX, minvertex = 0;
     igraph_integer_t node;
     igraph_bool_t triangle = 0;
     igraph_vector_int_t *neis;
@@ -154,7 +154,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     } /* node */
 
     if (girth) {
-        if (mincirc == LONG_MAX) {
+        if (mincirc == IGRAPH_INTEGER_MAX) {
             *girth = mincirc = 0;
         } else {
             *girth = mincirc;

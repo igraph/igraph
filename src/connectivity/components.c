@@ -544,7 +544,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
 
 
     if (maxcompno < 0) {
-        maxcompno = LONG_MAX;
+        maxcompno = IGRAPH_INTEGER_MAX;
     }
 
     igraph_vector_ptr_clear(components);
@@ -648,7 +648,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     igraph_t *newg;
 
     if (maxcompno < 0) {
-        maxcompno = LONG_MAX;
+        maxcompno = IGRAPH_INTEGER_MAX;
     }
 
     igraph_vector_ptr_clear(components);

@@ -1587,7 +1587,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
                      "or vice versa", IGRAPH_EINVAL);
     }
     if (time_limit <= 0) {
-        time_limit = INT_MAX;
+        time_limit = IGRAPH_INTEGER_MAX;
     }
 
     if (iso)  {

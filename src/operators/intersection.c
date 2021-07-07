@@ -208,7 +208,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
     while (allne) {
 
         /* Look for the smallest tail element */
-        for (j = 0, tailfrom = LONG_MAX, tailto = LONG_MAX; j < no_of_graphs; j++) {
+        for (j = 0, tailfrom = IGRAPH_INTEGER_MAX, tailto = IGRAPH_INTEGER_MAX; j < no_of_graphs; j++) {
             igraph_integer_t edge = igraph_vector_int_tail(VECTOR(order_vects)[j]);
             igraph_vector_int_t *ev = VECTOR(edge_vects)[j];
             igraph_integer_t from = VECTOR(*ev)[2 * edge];

@@ -540,7 +540,7 @@ void preassign(AP *p) {
 
     while (TRUE) {
         /* find unassigned row with least number of zeroes > 0 */
-        min = INT_MAX;
+        min = IGRAPH_INTEGER_MAX;
         r = 0;
         for (i = 1; i <= n; i++)
             if (rz[i] > 0 && rz[i] < min && ri[i] == UNASSIGNED) {
@@ -554,7 +554,7 @@ void preassign(AP *p) {
 
         /* find unassigned column in row r with least number of zeroes */
         c = 0;
-        min = INT_MAX;
+        min = IGRAPH_INTEGER_MAX;
         for (i = 1; i <= n; i++)
             if (p->c[r][i] == 0 && cz[i] < min && ci[i] == UNASSIGNED) {
                 min = cz[i];
