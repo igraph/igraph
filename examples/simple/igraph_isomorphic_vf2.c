@@ -51,8 +51,7 @@ int main() {
     /* Without colors, number of isomorphisms */
     igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, 0, 0, &count, 0, 0, 0);
     if (count != 200) {
-        fprintf(stderr, "Count without colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 200, count);
+        fprintf(stderr, "Count without colors failed, expected 200, got %" IGRAPH_PRId ".\n", count);
         return 2;
     }
 
@@ -71,8 +70,7 @@ int main() {
     }
     igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
     if (count != 100) {
-        fprintf(stderr, "Count with two colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 100, count);
+        fprintf(stderr, "Count with two colors failed, expected 100, got %" IGRAPH_PRId ".\n", count);
         return 4;
     }
 
@@ -82,8 +80,7 @@ int main() {
     }
     igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
     if (count != 1) {
-        fprintf(stderr, "Count with separate colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 1, count);
+        fprintf(stderr, "Count with separate colors failed, expected 1, got %" IGRAPH_PRId ".\n", count);
         return 5;
     }
 
@@ -130,8 +127,7 @@ int main() {
     igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0,
                                      &count, 0, 0, 0);
     if (count != 42) {
-        fprintf(stderr, "Count with one color failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 42, count);
+        fprintf(stderr, "Count with one color failed, expected 42, got %" IGRAPH_PRId ".\n", count);
         return 31;
     }
 
@@ -147,8 +143,7 @@ int main() {
     igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0,
                                      &count, 0, 0, 0);
     if (count != 21) {
-        fprintf(stderr, "Count with two colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 21, count);
+        fprintf(stderr, "Count with two colors failed, expected 21, got %" IGRAPH_PRId ".\n", count);
         return 32;
     }
 
@@ -184,8 +179,7 @@ int main() {
     }
     igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count, 0, 0, 0);
     if (count != 100) {
-        fprintf(stderr, "Count with two edge colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 100, count);
+        fprintf(stderr, "Count with two edge colors failed, expected 100, got %" IGRAPH_PRId ".\n", count);
         return 42;
     }
 
@@ -195,8 +189,7 @@ int main() {
     }
     igraph_count_isomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2, &count, 0, 0, 0);
     if (count != 1) {
-        fprintf(stderr, "Count with separate edge colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 1, count);
+        fprintf(stderr, "Count with separate edge colors failed, expected 1, got %" IGRAPH_PRId ".\n", count);
         return 43;
     }
 
@@ -242,8 +235,7 @@ int main() {
     igraph_count_subisomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2,
                                      &count, 0, 0, 0);
     if (count != 42) {
-        fprintf(stderr, "Count with one edge color failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 42, count);
+        fprintf(stderr, "Count with one edge color failed, expected 42, got %" IGRAPH_PRId ".\n", count);
         return 51;
     }
 
@@ -259,8 +251,7 @@ int main() {
     igraph_count_subisomorphisms_vf2(&ring1, &ring2, 0, 0, &color1, &color2,
                                      &count, 0, 0, 0);
     if (count != 22) {
-        fprintf(stderr, "Count with two edge colors failed, expected %" IGRAPH_PRId ", got %" IGRAPH_PRId ".\n",
-                (igraph_integer_t) 22, count);
+        fprintf(stderr, "Count with two edge colors failed, expected 22, got %" IGRAPH_PRId ".\n", count);
         return 52;
     }
 

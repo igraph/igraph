@@ -27,7 +27,7 @@
 int main() {
 
     igraph_t g, gbar;
-    igraph_integer_t k1, k2 = (igraph_integer_t) INT_MAX;
+    igraph_integer_t k1, k2 = INT_MAX;
     igraph_real_t tmpk;
     igraph_integer_t i, j, n;
     igraph_maxflow_stats_t stats;
@@ -62,7 +62,7 @@ int main() {
     igraph_destroy(&g);
 
     if (k1 != k2) {
-        printf("k1 = %" IGRAPH_PRId " while k2 = %" IGRAPH_PRId "\n", (igraph_integer_t) k1, (igraph_integer_t) k2);
+        printf("k1 = %" IGRAPH_PRId " while k2 = %" IGRAPH_PRId "\n", k1, k2);
         return 1;
     }
 

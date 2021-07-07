@@ -47,8 +47,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (from != prev) {
-            IGRAPH_CHECK(igraph_incident(graph, &adjedges, (igraph_integer_t) from,
-                                         IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL));
         }
         n = igraph_vector_int_size(&adjedges);
         for (j = 0; j < n; j++) {
@@ -59,8 +58,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
             }
         }
 
-        IGRAPH_CHECK(igraph_incident(graph, &adjedges2, (igraph_integer_t) to,
-                                     IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL));
         n = igraph_vector_int_size(&adjedges2);
         for (j = 0; j < n; j++) {
             igraph_integer_t e = VECTOR(adjedges2)[j];
@@ -77,8 +75,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
     igraph_vector_int_destroy(&adjedges2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    igraph_create(linegraph, &edges, (igraph_integer_t) no_of_edges,
-                  igraph_is_directed(graph));
+    igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -101,8 +98,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (from != prev) {
-            IGRAPH_CHECK(igraph_incident(graph, &adjedges, (igraph_integer_t) from,
-                                         IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_IN));
         }
         n = igraph_vector_int_size(&adjedges);
         for (j = 0; j < n; j++) {
@@ -116,7 +112,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
 
     igraph_vector_int_destroy(&adjedges);
     IGRAPH_FINALLY_CLEAN(1);
-    igraph_create(linegraph, &edges, (igraph_integer_t) no_of_edges, igraph_is_directed(graph));
+    igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

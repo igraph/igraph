@@ -88,7 +88,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
  * \sa \ref igraph_layout_circle() and other layout generators.
  */
 igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
-                       igraph_integer_t center, const igraph_vector_t *order) {
+                       igraph_integer_t center, const igraph_vector_int_t *order) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t c = center;
@@ -99,7 +99,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     if (center < 0 || center >= no_of_nodes) {
         IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVAL);
     }
-    if (order && igraph_vector_size(order) != no_of_nodes) {
+    if (order && igraph_vector_int_size(order) != no_of_nodes) {
         IGRAPH_ERROR("Invalid order vector length.", IGRAPH_EINVAL);
     }
 
@@ -110,7 +110,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     } else {
         for (i = 0, step = 2 * M_PI / (no_of_nodes - 1), phi = 0;
              i < no_of_nodes; i++) {
-            igraph_integer_t node = order ? (igraph_integer_t) VECTOR(*order)[i] : i;
+            igraph_integer_t node = order ? VECTOR(*order)[i] : i;
             if (order && (node < 0 || node >= no_of_nodes)) {
                 IGRAPH_ERROR("Elements in the order vector are not all vertices of the graph.", IGRAPH_EINVAL);
             }

@@ -505,11 +505,11 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
 
     /* The inverse of perm2 is produced in mymap12 */
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(*mymap12)[ (igraph_integer_t)VECTOR(perm2)[i] ] = i;
+        VECTOR(*mymap12)[ VECTOR(perm2)[i] ] = i;
     }
     /* Now we produce perm2^{-1} o perm1 in perm2 */
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(perm2)[i] = VECTOR(*mymap12)[ (igraph_integer_t) VECTOR(perm1)[i] ];
+        VECTOR(perm2)[i] = VECTOR(*mymap12)[ VECTOR(perm1)[i] ];
     }
     /* Copy it to mymap12 */
     igraph_vector_int_update(mymap12, &perm2);
@@ -567,7 +567,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
 
     if (*iso && colors1 != NULL) {
         for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(*colors1)[i] != VECTOR(*colors2)[(igraph_integer_t) VECTOR(*mymap12)[i] ]) {
+            if (VECTOR(*colors1)[i] != VECTOR(*colors2)[ VECTOR(*mymap12)[i] ]) {
                 *iso = 0;
                 break;
             }
@@ -587,7 +587,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         if (map21) {
             IGRAPH_CHECK(igraph_vector_int_resize(map21, no_of_nodes));
             for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(*map21)[ (igraph_integer_t) VECTOR(*mymap12)[i] ] = i;
+                VECTOR(*map21)[ VECTOR(*mymap12)[i] ] = i;
             }
         }
     } else {

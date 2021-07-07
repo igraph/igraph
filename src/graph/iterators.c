@@ -630,9 +630,9 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         }
         IGRAPH_FINALLY(igraph_free, seen);
         for (i = 0; i < igraph_vector_int_size(&vec); i++) {
-            if (!seen[(igraph_integer_t)VECTOR(vec)[i]]) {
+            if (!seen[ VECTOR(vec)[i] ]) {
                 (*result)--;
-                seen[(igraph_integer_t)VECTOR(vec)[i]] = 1;
+                seen[ VECTOR(vec)[i] ] = 1;
             }
         }
         igraph_free(seen);
@@ -739,9 +739,9 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         }
         IGRAPH_FINALLY(igraph_free, seen);
         for (i = 0; i < igraph_vector_int_size(&vec); i++) {
-            if (! seen [ (igraph_integer_t) VECTOR(vec)[i] ] ) {
+            if (! seen [ VECTOR(vec)[i] ] ) {
                 n--;
-                seen[ (igraph_integer_t) VECTOR(vec)[i] ] = 1;
+                seen[ VECTOR(vec)[i] ] = 1;
             }
         }
         IGRAPH_CHECK(igraph_vector_int_resize(vec_int, n));
@@ -1684,9 +1684,9 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         for (i = 0; i < no_of_nodes; i++) {
             igraph_incident(graph, &adj, i, IGRAPH_ALL);
             for (j = 0; j < igraph_vector_int_size(&adj); j++) {
-                if (!added[ (igraph_integer_t)VECTOR(adj)[j] ]) {
+                if (!added[ VECTOR(adj)[j] ]) {
                     igraph_vector_int_push_back(vec, VECTOR(adj)[j]);
-                    added[ (igraph_integer_t)VECTOR(adj)[j] ] += 1;
+                    added[ VECTOR(adj)[j] ] += 1;
                 }
             }
         }

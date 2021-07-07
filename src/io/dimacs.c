@@ -231,14 +231,13 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
     }
 
     if (source) {
-        *source = (igraph_integer_t) tsource - 1;
+        *source = tsource - 1;
     }
     if (target) {
-        *target = (igraph_integer_t) ttarget - 1;
+        *target = ttarget - 1;
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
 
     IGRAPH_FINALLY_CLEAN(1);

@@ -112,7 +112,7 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
 
     for (i = 0; i < ecount; i++) {
         igraph_integer_t from, to;
-        igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+        igraph_edge(graph, i, &from, &to);
         links[i].from = from;
         links[i].to = to;
         links[i].id = i;
@@ -307,8 +307,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
     /* Create the new graph */
     igraph_destroy(graph);
     no_of_nodes = igraph_vector_int_max(membership) + 1;
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -413,7 +412,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     for (i = 0; i < ecount; i++) {
         igraph_integer_t ffrom, fto;
         igraph_real_t weight = 1;
-        igraph_edge(graph, (igraph_integer_t) i, &ffrom, &fto);
+        igraph_edge(graph, i, &ffrom, &fto);
 
         weight = VECTOR(*weights)[i];
         communities.item[ffrom].weight_all += weight;
@@ -476,9 +475,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
                 igraph_real_t w = VECTOR(links_weight)[j];
 
                 igraph_real_t q_gain =
-                    igraph_i_multilevel_community_modularity_gain(&communities,
-                                                                  (igraph_integer_t) c,
-                                                                  (igraph_integer_t) ni,
+                    igraph_i_multilevel_community_modularity_gain(&communities, c, ni,
                                                                   weight_all, w, resolution);
                 /* debug("Link %ld -> %ld weight: %lf gain: %lf\n", ni, c, (double) w, (double) q_gain); */
                 if (q_gain > max_q_gain) {
@@ -548,7 +545,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_vector_fill(weights, 0);
 
     for (i = 0; i < ecount; i++) {
-        VECTOR(*weights)[(igraph_integer_t)VECTOR(edges)[i]] += VECTOR(links_weight)[i];
+        VECTOR(*weights)[VECTOR(edges)[i]] += VECTOR(links_weight)[i];
     }
 
     igraph_free(communities.item);

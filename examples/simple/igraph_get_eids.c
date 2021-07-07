@@ -122,17 +122,17 @@ int check_multi() {
                  9, 8,
                  -1);
 
-    igraph_vector_int_view(&vec, q1, sizeof(q1) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&vec, q1, sizeof(q1) / sizeof(q1[0]));
     igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/ 1, /*error=*/ 1);
     igraph_vector_int_sort(&eids);
     print_vector_int(&eids, stdout);
 
-    igraph_vector_int_view(&vec, q2, sizeof(q2) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&vec, q2, sizeof(q2) / sizeof(q2[0]));
     igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/ 0, /*error=*/ 1);
     igraph_vector_int_sort(&eids);
     print_vector_int(&eids, stdout);
 
-    igraph_vector_int_view(&vec, q2, sizeof(q2) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&vec, q2, sizeof(q2) / sizeof(q2[0]));
     igraph_set_error_handler(igraph_error_handler_ignore);
     ret = igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/ 1, /*error=*/1);
     if (ret != IGRAPH_EINVAL) {
@@ -148,12 +148,12 @@ int check_multi() {
                  0, 1, 1, 0, 0, 1, 3, 4, 3, 4, 5, 4, 9, 8,
                  -1);
 
-    igraph_vector_int_view(&vec, q1, sizeof(q1) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&vec, q1, sizeof(q1) / sizeof(q1[0]));
     igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/1, /*error=*/ 1);
     igraph_vector_int_sort(&eids);
     print_vector_int(&eids, stdout);
 
-    igraph_vector_int_view(&vec, q3, sizeof(q3) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&vec, q3, sizeof(q3) / sizeof(q3[0]));
     igraph_set_error_handler(igraph_error_handler_ignore);
     ret = igraph_get_eids_multi(&g, &eids, &vec, 0, /*directed=*/0, /*error=*/ 1);
     if (ret != IGRAPH_EINVAL) {

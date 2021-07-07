@@ -230,8 +230,7 @@ static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t weight = 1;
 
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis,
-                                      (igraph_integer_t) from, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
         if (weights) {
             weight = VECTOR(*weights)[from];
         }

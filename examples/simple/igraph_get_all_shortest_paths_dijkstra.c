@@ -194,7 +194,7 @@ int main() {
     igraph_destroy(&g);
 
     /* Regular lattice with some heavyweight edges */
-    igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(dim[0]));
     igraph_lattice(&g, &dim_vec, 1, 0, 0, 0);
     igraph_vs_vector_small(&vs, 3, 12, 15, -1);
     igraph_vector_init(&weights_vec, 24);

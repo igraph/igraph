@@ -492,8 +492,8 @@ static bool igraph_i_lad_compare(igraph_integer_t size_mu, igraph_integer_t* mu,
        a different element v of mv such that u <= v;
        return false otherwise */
     igraph_integer_t i, j;
-    igraph_qsort(mu, (size_t) size_mu, sizeof(igraph_integer_t), igraph_i_lad_qcompare);
-    igraph_qsort(mv, (size_t) size_mv, sizeof(igraph_integer_t), igraph_i_lad_qcompare);
+    igraph_qsort(mu, (size_t) size_mu, sizeof(mu[0]), igraph_i_lad_qcompare);
+    igraph_qsort(mv, (size_t) size_mv, sizeof(mv[0]), igraph_i_lad_qcompare);
     i = size_mv - 1;
     for (j = size_mu - 1; j >= 0; j--) {
         if (mu[j] > mv[i]) {
@@ -741,7 +741,7 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
     IGRAPH_FINALLY(igraph_vector_int_destroy, &path);
 
     /* initialize matchedWithV and unmatched */
-    memset(matchedWithV, -1, (size_t)sizeOfV * sizeof(igraph_integer_t));
+    memset(matchedWithV, -1, (size_t)sizeOfV * sizeof(matchedWithV[0]));
     for (u = 0; u < sizeOfU; u++) {
         if (VECTOR(*matchedWithU)[u] >= 0) {
             matchedWithV[VECTOR(*matchedWithU)[u]] = u;
@@ -771,10 +771,10 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
     while (nbUnmatched > 0) {
         /* Try to increase the number of matched vertices */
         /* step 1 : build the DAG */
-        memset(markedU, white, (size_t) sizeOfU * sizeof(igraph_integer_t));
-        memset(nbSucc, 0, (size_t) sizeOfU * sizeof(igraph_integer_t));
-        memset(markedV, white, (size_t) sizeOfV * sizeof(igraph_integer_t));
-        memset(nbPred, 0, (size_t) sizeOfV * sizeof(igraph_integer_t));
+        memset(markedU, white, (size_t) sizeOfU * sizeof(markedU[0]));
+        memset(nbSucc, 0, (size_t) sizeOfU * sizeof(nbSucc[0]));
+        memset(markedV, white, (size_t) sizeOfV * sizeof(markedV[0]));
+        memset(nbPred, 0, (size_t) sizeOfV * sizeof(nbPred[0]));
         /* first layer of the DAG from the free nodes of U */
         nbV = 0;
         for (j = 0; j < nbUnmatched; j++) {
@@ -991,8 +991,8 @@ static igraph_error_t igraph_i_lad_SCC(igraph_integer_t nbU, igraph_integer_t nb
 
     /* traversal starting from order[0], then order[1], ... */
     nbSCC = 0;
-    memset(numU, -1, (size_t) nbU * sizeof(igraph_integer_t));
-    memset(numV, -1, (size_t) nbV * sizeof(igraph_integer_t));
+    memset(numU, -1, (size_t) nbU * sizeof(numU[0]));
+    memset(numV, -1, (size_t) nbV * sizeof(numV[0]));
     for (i = 0; i < nbU; i++) {
         u = order[i];
         v = VECTOR(*matchedWithU)[u];
@@ -1232,7 +1232,7 @@ static igraph_error_t igraph_i_lad_checkLAD(igraph_integer_t u, igraph_integer_t
     IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
     IGRAPH_CHECK(igraph_vector_int_init(&matchedWithU, VECTOR(Gp->nbSucc)[u]));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &matchedWithU);
-    memset(num, -1, (size_t) (Gt->nbVertices) * sizeof(igraph_integer_t));
+    memset(num, -1, (size_t) (Gt->nbVertices) * sizeof(num[0]));
     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
         u2 = VECTOR(*Gp_uneis)[i]; /* u2 is adjacent to u */
         /* search for all nodes v2 in D[u2] which are adjacent to v */

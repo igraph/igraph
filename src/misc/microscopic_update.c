@@ -607,7 +607,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
     q = (igraph_real_t)VECTOR(*quantities)[vid];
     if (optimality == IGRAPH_MAXIMUM) {
         for (k = 0; k < igraph_vector_int_size(&adj); k++) {
-            v = (igraph_integer_t) VECTOR(adj)[k];
+            v = VECTOR(adj)[k];
             if ((igraph_real_t)VECTOR(*quantities)[v] > q) {
                 i = v;
                 q = (igraph_real_t)VECTOR(*quantities)[v];
@@ -615,7 +615,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
         }
     } else { /* minimum deterministic imitation */
         for (k = 0; k < igraph_vector_int_size(&adj); k++) {
-            v = (igraph_integer_t) VECTOR(adj)[k];
+            v = VECTOR(adj)[k];
             if ((igraph_real_t)VECTOR(*quantities)[v] < q) {
                 i = v;
                 q = (igraph_real_t)VECTOR(*quantities)[v];
@@ -1169,7 +1169,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
         RNG_BEGIN();
         i = RNG_INTEGER(0, igraph_vector_int_size(&adj) - 1);
         RNG_END();
-        u = (igraph_integer_t) VECTOR(adj)[i];
+        u = VECTOR(adj)[i];
         VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
     }
     /* Augmented imitation. Let v be the vertex whose strategy we want to */
@@ -1181,7 +1181,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
         RNG_BEGIN();
         i = RNG_INTEGER(0, igraph_vector_int_size(&adj) - 1);
         RNG_END();
-        u = (igraph_integer_t) VECTOR(adj)[i];
+        u = VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid]) {
             VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
         }
@@ -1195,7 +1195,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
         RNG_BEGIN();
         i = RNG_INTEGER(0, igraph_vector_int_size(&adj) - 1);
         RNG_END();
-        u = (igraph_integer_t) VECTOR(adj)[i];
+        u = VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid]) {
             VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
         }

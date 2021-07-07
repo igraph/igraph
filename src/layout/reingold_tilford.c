@@ -608,8 +608,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
             pextended = &extended;
             IGRAPH_CHECK(igraph_copy(&extended, graph));
             IGRAPH_FINALLY(igraph_destroy, &extended);
-            IGRAPH_CHECK(igraph_add_vertices(&extended,
-                                             (igraph_integer_t) plus_levels, 0));
+            IGRAPH_CHECK(igraph_add_vertices(&extended, plus_levels, 0));
 
             igraph_vector_int_resize(&newedges, plus_levels * 2);
 

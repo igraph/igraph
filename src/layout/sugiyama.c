@@ -414,8 +414,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
             /* Okay, this vertex is in the component we are considering.
              * Add the neighbors of this vertex, excluding loops */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) i,
-                                         IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT));
             j = igraph_vector_int_size(&neis);
             for (k = 0; k < j; k++) {
                 igraph_integer_t eid = VECTOR(neis)[k];
@@ -508,8 +507,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
             IGRAPH_CHECK(igraph_matrix_init(&layout, next_new_vertex_id, 2));
             IGRAPH_FINALLY(igraph_matrix_destroy, &layout);
-            IGRAPH_CHECK(igraph_create(&subgraph, &edgelist, (igraph_integer_t)
-                                       next_new_vertex_id, 1));
+            IGRAPH_CHECK(igraph_create(&subgraph, &edgelist, next_new_vertex_id, 1));
             IGRAPH_FINALLY(igraph_destroy, &subgraph);
 
             /*
@@ -533,7 +531,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
             /* Assign the horizontal coordinates. This is according to the algorithm
              * of Brandes & Köpf */
             IGRAPH_CHECK(igraph_i_layout_sugiyama_place_nodes_horizontally(&subgraph, &layout,
-                         &layering, hgap, (igraph_integer_t) component_size));
+                         &layering, hgap, component_size));
 
             /* Re-assign rows into the result matrix, and at the same time, */
             /* adjust dx so that the next component does not overlap this one */
@@ -579,8 +577,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     IGRAPH_FINALLY_CLEAN(3);
 
     if (extd_graph != 0) {
-        IGRAPH_CHECK(igraph_create(extd_graph, &extd_edgelist, (igraph_integer_t)
-                                   next_extd_vertex_id, igraph_is_directed(graph)));
+        IGRAPH_CHECK(igraph_create(extd_graph, &extd_edgelist, next_extd_vertex_id, igraph_is_directed(graph)));
         igraph_vector_int_destroy(&extd_edgelist);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1135,8 +1132,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
             }
 
             /* Find the neighbors of vertex j in layer i */
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) vertex,
-                                          neimode));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, vertex, neimode));
 
             n = igraph_vector_int_size(&neis);
             if (n == 0)
@@ -1152,7 +1148,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
                 /* Sort the neighbors by their X coordinates */
                 IGRAPH_CHECK(igraph_vector_resize(&xs, n));
                 for (k = 0; k < n; k++) {
-                    VECTOR(xs)[k] = X_POS((igraph_integer_t)VECTOR(neis)[k]);
+                    VECTOR(xs)[k] = X_POS(VECTOR(neis)[k]);
                 }
                 IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, 0));
 
@@ -1186,8 +1182,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
                 }
                 /* Is the edge between medians[k] and vertex ignored
                  * because of a type 1 conflict? */
-                IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) vertex,
-                                            (igraph_integer_t) medians[k], 0, 1));
+                IGRAPH_CHECK(igraph_get_eid(graph, &eid, vertex, medians[k], 0, 1));
                 if (VECTOR(*ignored_edges)[eid]) {
                     continue;
                 }

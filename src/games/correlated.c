@@ -203,14 +203,14 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
             /* add an edge */
             igraph_integer_t to, from;
             if (directed) {
-                to = (igraph_integer_t) floor(next_a / no_of_nodes);
-                from = (igraph_integer_t) (next_a - ((igraph_real_t)to) * no_of_nodes);
+                to = floor(next_a / no_of_nodes);
+                from = next_a - ((igraph_real_t)to) * no_of_nodes;
                 if (from == to) {
                     to = no_of_nodes - 1;
                 }
             } else {
-                to = (igraph_integer_t) floor((sqrt(8 * next_a + 1) + 1) / 2);
-                from = (igraph_integer_t) (next_a - (((igraph_real_t)to) * (to - 1)) / 2);
+                to = floor((sqrt(8 * next_a + 1) + 1) / 2);
+                from = next_a - (((igraph_real_t)to) * (to - 1)) / 2;
             }
             IGRAPH_CHECK(igraph_vector_int_push_back(&newedges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(&newedges, to));

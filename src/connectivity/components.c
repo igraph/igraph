@@ -132,8 +132,7 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
 
         while ( !igraph_dqueue_int_empty(&q) ) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis,
-                                          (igraph_integer_t) act_node, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
             for (i = 0; i < igraph_vector_int_size(&neis); i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
                 if (already_added[neighbor] == 1) {
@@ -156,7 +155,7 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
     /* Cleaning up */
 
     if (no) {
-        *no = (igraph_integer_t) no_of_clusters - 1;
+        *no = no_of_clusters - 1;
     }
 
     IGRAPH_FREE(already_added);

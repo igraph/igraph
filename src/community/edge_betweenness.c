@@ -116,8 +116,8 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
 
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
         igraph_integer_t edge = VECTOR(*edges)[i];
-        igraph_integer_t from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
-        igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to = IGRAPH_TO(graph, edge);
         igraph_integer_t c1 = VECTOR(mymembership)[from];
         igraph_integer_t c2 = VECTOR(mymembership)[to];
         igraph_real_t actmod;
@@ -228,7 +228,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    igraph_vector_int_t *membership) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t ptr;
+    igraph_vector_int_t ptr;
     igraph_integer_t i, midx = 0;
     igraph_integer_t no_comps;
 
@@ -258,7 +258,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_clusters(graph, 0, 0, &no_comps, IGRAPH_WEAK));
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
     if (res) {
         IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes - no_comps, 2));
     }
@@ -272,12 +272,12 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
         IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
         idx = from + 1;
         while (VECTOR(ptr)[idx - 1] != 0) {
-            idx = (igraph_integer_t) VECTOR(ptr)[idx - 1];
+            idx = VECTOR(ptr)[idx - 1];
         }
         c1 = idx - 1;
         idx = to + 1;
         while (VECTOR(ptr)[idx - 1] != 0) {
-            idx = (igraph_integer_t) VECTOR(ptr)[idx - 1];
+            idx = VECTOR(ptr)[idx - 1];
         }
         c2 = idx - 1;
         if (c1 != c2) {     /* this is a merge */
@@ -298,7 +298,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
         }
     }
 
-    igraph_vector_destroy(&ptr);
+    igraph_vector_int_destroy(&ptr);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -494,8 +494,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
         IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
-        IGRAPH_CHECK(igraph_inclist_init_empty(&fathers,
-                                               (igraph_integer_t) no_of_nodes));
+        IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
         IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
     }
 

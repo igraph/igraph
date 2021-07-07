@@ -148,7 +148,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
-    IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) context.n, pname));
+    IGRAPH_CHECK(igraph_add_vertices(graph, context.n, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 
     if (pweight) {

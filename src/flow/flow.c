@@ -1437,9 +1437,9 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         /* first count the vertices in the partition */
         mark[bignode] = 1;
         for (i = mincut_step - 1; i >= 0; i--) {
-            if ( mark[ (igraph_integer_t) VECTOR(mergehist)[2 * i] ] ) {
+            if ( mark[ VECTOR(mergehist)[2 * i] ] ) {
                 size++;
-                mark [ (igraph_integer_t) VECTOR(mergehist)[2 * i + 1] ] = 1;
+                mark [ VECTOR(mergehist)[2 * i + 1] ] = 1;
             }
         }
 
@@ -1449,7 +1449,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
             idx = 0;
             VECTOR(*partition)[idx++] = bignode;
             for (i = mincut_step - 1; i >= 0; i--) {
-                if (mark[ (igraph_integer_t) VECTOR(mergehist)[2 * i] ]) {
+                if (mark[ VECTOR(mergehist)[2 * i] ]) {
                     VECTOR(*partition)[idx++] = VECTOR(mergehist)[2 * i + 1];
                 }
             }
@@ -1474,7 +1474,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
             igraph_integer_t from, to;
             igraph_vector_int_clear(&mergehist);
             for (i = 0; i < no_of_edges; i++) {
-                igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+                igraph_edge(graph, i, &from, &to);
                 if ((mark[from] && !mark[to]) ||
                     (mark[to] && !mark[from])) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&mergehist, i));
@@ -1814,7 +1814,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, 2 * (no_of_edges + no_of_nodes)));
 
     for (i = 0; i < 2 * no_of_edges; i += 2) {
-        igraph_integer_t to = (igraph_integer_t) VECTOR(edges)[i + 1];
+        igraph_integer_t to = VECTOR(edges)[i + 1];
         if (to != source && to != target) {
             VECTOR(edges)[i + 1] = no_of_nodes + to;
         }

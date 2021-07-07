@@ -228,8 +228,7 @@ igraph_error_t igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
         break;
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               (mode == IGRAPH_ADJ_DIRECTED)));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -558,8 +557,7 @@ igraph_error_t igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjma
     VECTOR(attr_vec)[0] = &attr_rec;
 
     /* Create graph */
-    IGRAPH_CHECK(igraph_empty(graph, (igraph_integer_t) no_of_nodes,
-                              (mode == IGRAPH_ADJ_DIRECTED)));
+    IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
     IGRAPH_FINALLY(igraph_destroy, graph);
     if (igraph_vector_int_size(&edges) > 0) {
         IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
@@ -668,11 +666,9 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
     }
 
     if (mode == IGRAPH_ALL)
-        IGRAPH_CHECK(igraph_create(graph, &edges,
-                                   (igraph_integer_t) no_of_nodes, 0));
+        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 0));
     else
-        IGRAPH_CHECK(igraph_create(graph, &edges,
-                                   (igraph_integer_t) no_of_nodes, 1));
+        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 1));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

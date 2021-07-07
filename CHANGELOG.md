@@ -162,6 +162,9 @@
  - The dimension vector parameter for `igraph_lattice()` is now an
    `igraph_vector_int_t` instead of `igraph_vector_t`.
 
+ - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
+   instead of `long int`.
+
  - The width parameter of `igraph_layout_grid()` is now an `igraph_integer_t`
    instead of `long int`.
 
@@ -171,12 +174,15 @@
  - The dimension parameter of `igraph_layout_mds()` is now an `igraph_integer_t`
    instead of `long int`.
 
+ - The order parameter of `igraph_layout_star()` is now an `igraph_vector_int_t`
+   instead of an `igraph_vector_t`.
+
  - The maxiter parameter of `igraph_layout_sugiyama()` is now an `igraph_integer_t`
    instead of `long int`. Also, the function now uses an `igraph_vector_int_t`
    for its `extd_to_orig_eids` parameter.
 
- - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
-   instead of `long int`.
+ - The shifts parameter of `igraph_lcf_vector()` is now an `igraph_vector_int_t`
+   instead of an `igraph_vector_t`.
 
  - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.

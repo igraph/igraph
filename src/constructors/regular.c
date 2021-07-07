@@ -261,8 +261,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 
     } /* for i<no_of_nodes */
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     if (nei >= 2) {
         IGRAPH_CHECK(igraph_connect_neighborhood(graph, nei, IGRAPH_ALL));
     }

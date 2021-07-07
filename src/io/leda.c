@@ -194,7 +194,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t eid = IGRAPH_EIT_GET(it);
-            igraph_edge(graph, (igraph_integer_t) eid, &from, &to);
+            igraph_edge(graph, eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, 1, 0);
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
@@ -218,7 +218,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t eid = IGRAPH_EIT_GET(it);
             const char* str = STR(values, eid);
-            igraph_edge(graph, (igraph_integer_t) eid, &from, &to);
+            igraph_edge(graph, eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, 1, 0);
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;

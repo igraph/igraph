@@ -81,7 +81,7 @@ static int igraph_i_sspf(
     nrgeo[source] = 1;
 
     while (!igraph_dqueue_int_empty(&queue)) {
-        igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_int_pop(&queue);
+        igraph_integer_t actnode = igraph_dqueue_int_pop(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && VECTOR(*dist)[actnode] > cutoff + 1) {
@@ -162,7 +162,7 @@ static int igraph_i_sspf_edge(
     nrgeo[source] = 1;
 
     while (!igraph_dqueue_int_empty(&queue)) {
-        igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_int_pop(&queue);
+        igraph_integer_t actnode = igraph_dqueue_int_pop(&queue);
 
         /* Ignore vertices that are more distant than the cutoff */
         if (cutoff >= 0 && VECTOR(*dist)[actnode] > cutoff + 1) {
@@ -1023,7 +1023,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_stack_int_pop(&S);
+            igraph_integer_t actnode = igraph_stack_int_pop(&S);
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff;

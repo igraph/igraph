@@ -111,7 +111,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         IGRAPH_ERRORF("Number of edges cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_edges);
     }
 
-    no_of_nodes = (igraph_integer_t) igraph_vector_size(fitness_out);
+    no_of_nodes = igraph_vector_size(fitness_out);
     if (no_of_nodes == 0) {
         IGRAPH_CHECK(igraph_empty(graph, 0, is_directed));
         return IGRAPH_SUCCESS;

@@ -850,7 +850,7 @@ static igraph_error_t igraph_i_community_leiden(
                 /* Current aggregate node */
                 igraph_integer_t v_aggregate = VECTOR(aggregate_node)[i];
                 /* New aggregate node */
-                VECTOR(aggregate_node)[i] = (igraph_integer_t)VECTOR(refined_membership)[v_aggregate];
+                VECTOR(aggregate_node)[i] = VECTOR(refined_membership)[v_aggregate];
             }
 
             IGRAPH_CHECK(igraph_i_community_leiden_aggregate(

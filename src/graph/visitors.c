@@ -257,10 +257,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                        igraph_dqueue_int_head(&Q);
             if (callback) {
                 IGRAPH_CHECK_CALLBACK(
-                    callback(graph, (igraph_integer_t) actvect, (igraph_integer_t)
-                             pred_vec, (igraph_integer_t) succ_vec,
-                             (igraph_integer_t) act_rank - 1, (igraph_integer_t) actdist,
-                             extra),
+                    callback(graph, actvect, pred_vec, succ_vec, act_rank - 1, actdist, extra),
                     &ret
                 );
 

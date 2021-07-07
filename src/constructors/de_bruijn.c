@@ -89,8 +89,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
         }
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               IGRAPH_DIRECTED));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

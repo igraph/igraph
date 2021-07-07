@@ -55,11 +55,11 @@ int test_graph_from_leda_tutorial() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, 0, 0);
     if (matching_size != 6) {
-        printf("matching_size is %" IGRAPH_PRId ", expected: 6\n", (igraph_integer_t)matching_size);
+        printf("matching_size is %" IGRAPH_PRId ", expected: 6\n", matching_size);
         return 1;
     }
     if (matching_weight != 6) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: 6\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 6\n", (igraph_integer_t) matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
@@ -112,11 +112,11 @@ int test_weighted_graph_from_mit_notes() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_size != 4) {
-        printf("matching_size is %" IGRAPH_PRId ", expected: 4\n", (igraph_integer_t)matching_size);
+        printf("matching_size is %" IGRAPH_PRId ", expected: 4\n", matching_size);
         return 1;
     }
     if (matching_weight != 19) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: 19\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 19\n", (igraph_integer_t) matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
@@ -220,7 +220,7 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, igraph_int
     igraph_vector_int_print(&matching);
     if (matching_weight != exp_weight) {
         printf("matching_weight is %" IGRAPH_PRId ", expected: %" IGRAPH_PRId "\n", (igraph_integer_t)matching_weight,
-               (igraph_integer_t)exp_weight);
+               exp_weight);
         return 2;
     }
 

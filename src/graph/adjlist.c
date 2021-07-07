@@ -265,9 +265,9 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
             n--;
         }
         for (j = 0; j < igraph_vector_int_size(&vec); j++) {
-            if (! seen [ (igraph_integer_t) VECTOR(vec)[j] ] ) {
+            if (! seen [ VECTOR(vec)[j] ] ) {
                 n--;
-                seen[ (igraph_integer_t) VECTOR(vec)[j] ] = 1;
+                seen[ VECTOR(vec)[j] ] = 1;
             }
         }
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));

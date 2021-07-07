@@ -28,7 +28,7 @@ int main() {
     /* Use IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS instead of 1/TRUE and 0/FALSE for better readability. */
     igraph_full(&graph, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     printf("The undirected complete graph on %" IGRAPH_PRId " vertices has %" IGRAPH_PRId " edges.\n",
-           (igraph_integer_t) igraph_vcount(&graph), (igraph_integer_t) igraph_ecount(&graph));
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     /* Remember to destroy the object at the end. */
     igraph_destroy(&graph);
@@ -36,21 +36,21 @@ int main() {
     /* Create a directed complete graph. */
     igraph_full(&graph, n_vertices, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
     printf("The directed complete graph on %" IGRAPH_PRId " vertices has %" IGRAPH_PRId " edges.\n",
-           (igraph_integer_t) igraph_vcount(&graph), (igraph_integer_t) igraph_ecount(&graph));
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     igraph_destroy(&graph);
 
     /* Create an undirected complete graph with self-loops. */
     igraph_full(&graph, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     printf("The undirected complete graph on %" IGRAPH_PRId " vertices with self-loops has %" IGRAPH_PRId " edges.\n",
-           (igraph_integer_t) igraph_vcount(&graph), (igraph_integer_t) igraph_ecount(&graph));
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     igraph_destroy(&graph);
 
     /* Create a directed graph with self-loops. */
     igraph_full(&graph, n_vertices, IGRAPH_DIRECTED, IGRAPH_LOOPS);
     printf("The directed complete graph on %" IGRAPH_PRId " vertices with self-loops has %" IGRAPH_PRId " edges.\n",
-           (igraph_integer_t) igraph_vcount(&graph), (igraph_integer_t) igraph_ecount(&graph));
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     igraph_destroy(&graph);
 

@@ -264,7 +264,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph,
-                                 name, igraph_ess_1((igraph_integer_t) i), &numv));
+                                 name, igraph_ess_1(i), &numv));
                     if (VECTOR(numv)[0] == (igraph_integer_t)VECTOR(numv)[0]) {
                         CHECK(fprintf(outstream, "    %s=%" IGRAPH_PRId "\n", newname, (igraph_integer_t)VECTOR(numv)[0]));
                     } else {
@@ -275,14 +275,14 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                     char *s, *news;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph,
-                                 name, igraph_ess_1((igraph_integer_t) i), &strv));
+                                 name, igraph_ess_1(i), &strv));
                     igraph_strvector_get(&strv, 0, &s);
                     IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
                     CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                     IGRAPH_FREE(news);
                 } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph,
-                                 name, igraph_ess_1((igraph_integer_t) i), &boolv));
+                                 name, igraph_ess_1(i), &boolv));
                     CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
                     IGRAPH_WARNING("A boolean edge attribute was converted to numeric");
                 } else {

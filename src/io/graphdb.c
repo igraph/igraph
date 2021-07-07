@@ -109,8 +109,7 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
         IGRAPH_ERROR("Truncated graphdb file", IGRAPH_EFILE);
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
     igraph_vector_int_destroy(&edges);
 
     IGRAPH_FINALLY_CLEAN(1);

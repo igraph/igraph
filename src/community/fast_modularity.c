@@ -253,7 +253,7 @@ static void igraph_i_fastgreedy_community_list_dump_heap(
     }
     debug("Heap index:\n");
     for (i = 0; i < list->no_of_communities; i++) {
-        debug("%" IGRAPH_PRId " ", (igraph_integer_t)list->heapindex[i]);
+        debug("%" IGRAPH_PRId " ", list->heapindex[i]);
     }
     debug("\nEND\n");
 }
@@ -317,7 +317,7 @@ static void igraph_i_fastgreedy_community_list_remove2(
 
     /* First adjust the index */
     i = list->heap[list->no_of_communities - 1]->maxdq->first;
-    list->heapindex[i] = (igraph_integer_t) idx;
+    list->heapindex[i] = idx;
     list->heapindex[comm] = -1;
 
     /* Now remove the element */
@@ -1024,7 +1024,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         if (merges) {
             MATRIX(*merges, no_of_joins, 0) = communities.e[to].id;
             MATRIX(*merges, no_of_joins, 1) = communities.e[from].id;
-            communities.e[to].id = (igraph_integer_t) (no_of_nodes + no_of_joins);
+            communities.e[to].id = no_of_nodes + no_of_joins;
         }
 
         /* Update vector a */
@@ -1068,8 +1068,8 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
 
     if (membership) {
         IGRAPH_CHECK(igraph_community_to_membership(merges,
-                     (igraph_integer_t) no_of_nodes,
-                     /*steps=*/ (igraph_integer_t) best_no_of_joins,
+                     no_of_nodes,
+                     /*steps=*/ best_no_of_joins,
                      membership,
                      /*csize=*/ 0));
     }

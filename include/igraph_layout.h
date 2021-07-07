@@ -56,7 +56,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_
 IGRAPH_EXPORT igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
                                        igraph_vs_t order);
 IGRAPH_EXPORT igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
-                                     igraph_integer_t center, const igraph_vector_t *order);
+                                     igraph_integer_t center, const igraph_vector_int_t *order);
 IGRAPH_EXPORT igraph_error_t igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, igraph_integer_t width);
 IGRAPH_EXPORT igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                                      igraph_matrix_t *res,

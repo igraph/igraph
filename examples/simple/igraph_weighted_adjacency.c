@@ -35,7 +35,7 @@ void print(igraph_t *g) {
 
     for (i = 0, j = 0; i < n; i++, j += 2) {
         printf("%" IGRAPH_PRId " --%c %" IGRAPH_PRId ": %" IGRAPH_PRId "\n",
-               (igraph_integer_t)VECTOR(el)[j], ch, (igraph_integer_t)VECTOR(el)[j + 1], (igraph_integer_t)EAN(g, "weight", i));
+               VECTOR(el)[j], ch, VECTOR(el)[j + 1], (igraph_integer_t)EAN(g, "weight", i));
     }
     printf("\n");
 

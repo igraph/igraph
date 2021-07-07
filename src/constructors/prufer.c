@@ -109,7 +109,7 @@ igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *pr
     VECTOR(edges)[ec++] = v;
     VECTOR(edges)[ec++] = u;
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) n, /* directed = */ 0));
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, /* directed = */ 0));
 
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&degree);

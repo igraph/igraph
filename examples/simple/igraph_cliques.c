@@ -133,7 +133,7 @@ int main() {
             igraph_largest_cliques(&g, &result);
         }
         n = igraph_vector_ptr_size(&result);
-        printf("%" IGRAPH_PRId " cliques found\n", (igraph_integer_t)n);
+        printf("%" IGRAPH_PRId " cliques found\n", n);
         canonicalize_list(&result);
         for (i = 0; i < n; i++) {
             igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
@@ -144,7 +144,7 @@ int main() {
     }
 
     igraph_clique_number(&g, &omega);
-    printf("omega=%" IGRAPH_PRId "\n", (igraph_integer_t)omega);
+    printf("omega=%" IGRAPH_PRId "\n", omega);
 
     test_callback(&g);
 

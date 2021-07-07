@@ -498,8 +498,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, 0)); /* TODO */
-    IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) no_of_nodes,
-                                     &vattrs));
+    IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, &vattrs));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
     igraph_i_gml_destroy_attrs(attrs);
@@ -698,19 +697,19 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             IGRAPH_FINALLY(igraph_free, newname);
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name,
-                             igraph_vss_1((igraph_integer_t) i), &numv));
+                             igraph_vss_1(i), &numv));
                 CHECK(fprintf(outstream, "    %s ", newname));
                 CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                 CHECK(fputc('\n', outstream));
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                 char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
-                             igraph_vss_1((igraph_integer_t) i), &strv));
+                             igraph_vss_1(i), &strv));
                 igraph_strvector_get(&strv, 0, &s);
                 CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
-                             igraph_vss_1((igraph_integer_t) i), &boolv));
+                             igraph_vss_1(i), &boolv));
                 CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
                 IGRAPH_WARNING("A boolean vertex attribute was converted to numeric");
             } else {

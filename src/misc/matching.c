@@ -190,9 +190,9 @@ igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
                                       IGRAPH_ALL));
         n = igraph_vector_int_size(&neis);
         for (j = 0; j < n; j++) {
-            if (VECTOR(*matching)[(igraph_integer_t)VECTOR(neis)[j]] == -1) {
+            if (VECTOR(*matching)[VECTOR(neis)[j]] == -1) {
                 if (types == 0 ||
-                    VECTOR(*types)[i] != VECTOR(*types)[(igraph_integer_t)VECTOR(neis)[j]]) {
+                    VECTOR(*types)[i] != VECTOR(*types)[VECTOR(neis)[j]]) {
                     valid = 0; break;
                 }
             }
@@ -417,7 +417,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
                                       IGRAPH_ALL));
         n = igraph_vector_int_size(&neis);
         for (i = 0; i < n; i++) {
-            if (VECTOR(labels)[(igraph_integer_t)VECTOR(neis)[i]] < label_u) {
+            if (VECTOR(labels)[VECTOR(neis)[i]] < label_u) {
                 u = VECTOR(neis)[i];
                 label_u = VECTOR(labels)[u];
                 label_changed++;
@@ -644,8 +644,8 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     IGRAPH_CHECK(igraph_get_edgelist(graph, &vec2, 0));
 #define IS_TIGHT(i) (VECTOR(slack)[i] <= eps)
     for (i = 0, j = 0; i < no_of_edges; i++, j += 2) {
-        u = (igraph_integer_t) VECTOR(vec2)[j];
-        v = (igraph_integer_t) VECTOR(vec2)[j + 1];
+        u = VECTOR(vec2)[j];
+        v = VECTOR(vec2)[j + 1];
         VECTOR(slack)[i] = VECTOR(labels)[u] + VECTOR(labels)[v] - VECTOR(*weights)[i];
         if (IS_TIGHT(i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&vec1, u));
@@ -748,7 +748,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
             neis2 = igraph_adjlist_get(&tight_phantom_edges, v);
             n = igraph_vector_int_size(neis2);
             for (i = 0; i < n; i++) {
-                u = (igraph_integer_t) VECTOR(*neis2)[i];
+                u = VECTOR(*neis2)[i];
                 /* Have we seen u already? */
                 if (VECTOR(parent)[u] >= 0) {
                     continue;
@@ -849,7 +849,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         }
         min_slack_2 = IGRAPH_INFINITY;
         for (i = 0; i < n; i++) {
-            u = (igraph_integer_t) VECTOR(vec1)[i];
+            u = VECTOR(vec1)[i];
             /* u is surely from the smaller set, but we are interested in it
              * only if it is reachable from an unmatched vertex */
             if (VECTOR(parent)[u] < 0) {
@@ -866,27 +866,27 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
 
         n = igraph_vector_int_size(&vec1);
         for (i = 0; i < n; i++) {
-            u = (igraph_integer_t) VECTOR(vec1)[i];
+            u = VECTOR(vec1)[i];
             /* u is a reachable node in A; get its incident edges.
              *
              * There are two types of incident edges: 1) real edges,
              * 2) phantom edges. Phantom edges were treated earlier
              * when we determined the initial value for min_slack. */
-            debug("Trying to expand along vertex %ld\n", u);
+            debug("Trying to expand along vertex %" IGRAPH_PRId "\n", u);
             neis = igraph_inclist_get(&inclist, u);
             k = igraph_vector_int_size(neis);
             for (j = 0; j < k; j++) {
                 /* v is the vertex sitting at the other end of an edge incident
                  * on u; check whether it was reached */
                 v = IGRAPH_OTHER(graph, VECTOR(*neis)[j], u);
-                debug("  Edge %" IGRAPH_PRId " -- %ld (ID=%ld)\n", u, v, (igraph_integer_t)VECTOR(*neis)[j]);
+                debug("  Edge %" IGRAPH_PRId " -- %" IGRAPH_PRId " (ID=%" IGRAPH_PRId ")\n", u, v, VECTOR(*neis)[j]);
                 if (VECTOR(parent)[v] >= 0) {
                     /* v was reached, so we are not interested in it */
-                    debug("    %ld was reached, so we are not interested in it\n", v);
+                    debug("    %" IGRAPH_PRId " was reached, so we are not interested in it\n", v);
                     continue;
                 }
                 /* v is the ID of the edge from now on */
-                v = (igraph_integer_t) VECTOR(*neis)[j];
+                v = VECTOR(*neis)[j];
                 if (VECTOR(slack)[v] < min_slack) {
                     min_slack = VECTOR(slack)[v];
                     min_slack_u = u;
@@ -903,15 +903,15 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
              * Also update the dual solution */
             n = igraph_vector_int_size(&vec1);
             for (i = 0; i < n; i++) {
-                u = (igraph_integer_t) VECTOR(vec1)[i];
+                u = VECTOR(vec1)[i];
                 VECTOR(labels)[u] -= min_slack;
                 neis = igraph_inclist_get(&inclist, u);
                 k = igraph_vector_int_size(neis);
                 for (j = 0; j < k; j++) {
                     debug("  Decreasing slack of edge %" IGRAPH_PRId " (%" IGRAPH_PRId "--%" IGRAPH_PRId ") by %.4f\n",
-                          (igraph_integer_t)VECTOR(*neis)[j], u,
+                          VECTOR(*neis)[j], u,
                           IGRAPH_OTHER(graph, VECTOR(*neis)[j], u), min_slack);
-                    VECTOR(slack)[(igraph_integer_t)VECTOR(*neis)[j]] -= min_slack;
+                    VECTOR(slack)[VECTOR(*neis)[j]] -= min_slack;
                 }
                 dual -= min_slack;
             }
@@ -920,15 +920,15 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
              * Also update the dual solution */
             n = igraph_vector_int_size(&vec2);
             for (i = 0; i < n; i++) {
-                u = (igraph_integer_t) VECTOR(vec2)[i];
+                u = VECTOR(vec2)[i];
                 VECTOR(labels)[u] += min_slack;
                 neis = igraph_inclist_get(&inclist, u);
                 k = igraph_vector_int_size(neis);
                 for (j = 0; j < k; j++) {
-                    debug("  Increasing slack of edge %ld (%ld--%ld) by %.4f\n",
-                          (igraph_integer_t)VECTOR(*neis)[j], u,
-                          IGRAPH_OTHER(graph, (igraph_integer_t)VECTOR(*neis)[j], u), min_slack);
-                    VECTOR(slack)[(igraph_integer_t)VECTOR(*neis)[j]] += min_slack;
+                    debug("  Increasing slack of edge %" IGRAPH_PRId " (%" IGRAPH_PRId"--%" IGRAPH_PRId ") by %.4f\n",
+                          VECTOR(*neis)[j], u,
+                          IGRAPH_OTHER(graph, VECTOR(*neis)[j], u), min_slack);
+                    VECTOR(slack)[VECTOR(*neis)[j]] += min_slack;
                 }
                 dual += min_slack;
             }

@@ -67,7 +67,7 @@ IGRAPH_EXPORT igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t 
 IGRAPH_EXPORT igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
 IGRAPH_EXPORT igraph_error_t igraph_famous(igraph_t *graph, const char *name);
 IGRAPH_EXPORT igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
-                                    const igraph_vector_t *shifts,
+                                    const igraph_vector_int_t *shifts,
                                     igraph_integer_t repeats);
 IGRAPH_EXPORT igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...);
 IGRAPH_EXPORT igraph_error_t igraph_realize_degree_sequence(igraph_t *graph,

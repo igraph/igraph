@@ -328,7 +328,7 @@ igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
         it->vid = MATRIX(grid->startidx, it->x, it->y);
     }
 
-    return (igraph_integer_t) ret;
+    return ret;
 }
 
 igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
@@ -343,5 +343,5 @@ igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
         it->nei = MATRIX(grid->startidx, it->nx[it->ncells], it->ny[it->ncells]);
     }
 
-    return (igraph_integer_t) ret;
+    return ret;
 }

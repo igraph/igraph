@@ -109,7 +109,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
         VECTOR(*compid)[i] = ++cno;
 
         while (!igraph_dqueue_int_empty(Q)) {
-            igraph_integer_t node = (igraph_integer_t) igraph_dqueue_int_pop(Q);
+            igraph_integer_t node = igraph_dqueue_int_pop(Q);
             igraph_integer_t j, n;
             IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
             n = igraph_vector_int_size(neis);

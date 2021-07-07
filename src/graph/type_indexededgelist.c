@@ -491,10 +491,8 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create start vectors, no memory is needed for this */
-    igraph_i_create_start(&graph->os, &graph->from, &graph->oi,
-                          (igraph_integer_t) no_of_nodes);
-    igraph_i_create_start(&graph->is, &graph->to,   &graph->ii,
-                          (igraph_integer_t) no_of_nodes);
+    igraph_i_create_start(&graph->os, &graph->from, &graph->oi, no_of_nodes);
+    igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
 
     /* Nothing to deallocate... */
     return IGRAPH_SUCCESS;

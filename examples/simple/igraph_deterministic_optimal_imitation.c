@@ -201,7 +201,7 @@ igraph_error_t petersen_game_test() {
         /* maximum deterministic imitation */
         igraph_vector_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
-                /*vertex*/ (igraph_integer_t)i,
+                /*vertex*/ i,
                 /*optimality*/ IGRAPH_MAXIMUM,
                 /*quantities*/ &quant,
                 /*strategies*/ &stratcopy,
@@ -214,7 +214,7 @@ igraph_error_t petersen_game_test() {
         /* minimum deterministic imitation */
         igraph_vector_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
-                /*vertex*/ (igraph_integer_t)i,
+                /*vertex*/ i,
                 /*optimality*/ IGRAPH_MINIMUM,
                 /*quantities*/ &quant,
                 /*strategies*/ &stratcopy,

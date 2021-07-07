@@ -123,8 +123,7 @@ static igraph_error_t igraph_i_degree_sequence_game_simple(igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -298,7 +297,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed(igraph_
     no_of_nodes = igraph_vector_int_size(out_seq);
 
     /* Allocate required data structures */
-    IGRAPH_CHECK(igraph_adjlist_init_empty(&al, (igraph_integer_t) no_of_nodes));
+    IGRAPH_CHECK(igraph_adjlist_init_empty(&al, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out_stubs, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&out_stubs, outsum));
