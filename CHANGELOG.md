@@ -96,6 +96,9 @@
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
    `dom` and `leftout` arguments instead of an `igraph_vector_t`.
 
+ - `igraph_edges()` now takes an `igraph_vector_int_t` for its
+   `edges` argument instead of an `igraph_vector_t`.
+
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 

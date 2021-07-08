@@ -1126,7 +1126,7 @@ igraph_error_t igraph_edge(const igraph_t *graph, igraph_integer_t eid,
  */
 
 igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
-                 igraph_vector_t *edges) {
+                 igraph_vector_int_t *edges) {
 
     igraph_eit_t eit;
     igraph_integer_t n, ptr = 0;
@@ -1134,7 +1134,7 @@ igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
     IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
     n = IGRAPH_EIT_SIZE(eit);
-    IGRAPH_CHECK(igraph_vector_resize(edges, n * 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, n * 2));
     if (igraph_is_directed(graph)) {
         for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
             igraph_integer_t e = IGRAPH_EIT_GET(eit);
