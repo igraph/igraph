@@ -99,7 +99,7 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
 
     /* Mark the neighbors of the node */
     for (i = 0; i < neilen1; i++) {
-        neis[ (igraph_integer_t) VECTOR(*neis1)[i] ] = node + 1;
+        neis[ VECTOR(*neis1)[i] ] = node + 1;
     }
 
     for (i = 0; i < neilen1; i++) {

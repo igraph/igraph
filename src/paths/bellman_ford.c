@@ -163,7 +163,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
                 continue;
             }
 
-            neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) j);
+            neis = igraph_lazy_inclist_get(&inclist, j);
             nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
@@ -374,7 +374,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             continue;
         }
 
-        neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) j);
+        neis = igraph_lazy_inclist_get(&inclist, j);
         nlen = igraph_vector_int_size(neis);
 
         for (k = 0; k < nlen; k++) {

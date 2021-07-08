@@ -63,11 +63,11 @@ __BEGIN_DECLS
  */
 
 typedef igraph_error_t igraph_motifs_handler_t(const igraph_t *graph,
-        igraph_vector_t *vids,
+        igraph_vector_int_t *vids,
         int isoclass,
         void* extra);
 
-IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
+IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_int_t *hist,
                                         int size, const igraph_vector_t *cut_prob);
 
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
@@ -84,7 +84,7 @@ IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igr
 
 IGRAPH_EXPORT igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                                      igraph_integer_t *asym, igraph_integer_t *null);
-IGRAPH_EXPORT igraph_error_t igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_triad_census(const igraph_t *igraph, igraph_vector_int_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
                                          igraph_real_t *res4);
 

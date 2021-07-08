@@ -837,7 +837,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_push_back(&order, minnei));
 
         /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
+        neis = igraph_lazy_inclist_get(&inclist, minnei);
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];

@@ -164,8 +164,7 @@ igraph_error_t igraph_difference(igraph_t *res,
     igraph_inclist_destroy(&inc_sub);
     igraph_inclist_destroy(&inc_orig);
     IGRAPH_FINALLY_CLEAN(2);
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

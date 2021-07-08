@@ -62,7 +62,7 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     neis1 = igraph_lazy_adjlist_get(&adjlist, node);
     neilen1 = igraph_vector_int_size(neis1);
     for (j = 0; j < neilen1; j++) {
-        neis[ (igraph_integer_t)VECTOR(*neis1)[j] ] = i + 1;
+        neis[ VECTOR(*neis1)[j] ] = i + 1;
     }
     triangles = 0;
 

@@ -45,7 +45,7 @@ int main() {
     igraph_integer_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
     igraph_integer_t inarr[]  = {3, 6, 2, 0, 2, 2, 4, 3, 3, 3};
 
-    igraph_integer_t n = sizeof(outarr) / sizeof(igraph_integer_t);
+    igraph_integer_t n = sizeof(outarr) / sizeof(outarr[0]);
 
     igraph_rng_seed(igraph_rng_default(), 333);
 

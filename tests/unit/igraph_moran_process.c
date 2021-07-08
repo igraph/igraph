@@ -174,7 +174,7 @@ int moran_one_test() {
     for (i = 0; i < igraph_vector_size(&quant); i++) {
         if (VECTOR(quant)[i] != VECTOR(quantcp)[i]) {
             /* found the new clone vertex */
-            v = (igraph_integer_t)i;
+            v = i;
             q = (igraph_real_t)VECTOR(quantcp)[i];
             break;
         }
@@ -187,7 +187,7 @@ int moran_one_test() {
     for (i = 0; i < igraph_vector_size(&quant); i++) {
         if (VECTOR(quant)[i] == q) {
             /* found the vertex chosen for reproduction */
-            u = (igraph_integer_t)i;
+            u = i;
             break;
         }
     }

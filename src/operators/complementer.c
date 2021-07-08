@@ -68,8 +68,7 @@ igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
-                                      IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
         if (loops) {
             for (j = no_of_nodes - 1; j >= *limit; j--) {
                 if (igraph_vector_int_empty(&neis) || j > igraph_vector_int_tail(&neis)) {
@@ -93,8 +92,7 @@ igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, igraph_is_directed(graph)));
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&neis);
     IGRAPH_I_ATTRIBUTE_DESTROY(res);

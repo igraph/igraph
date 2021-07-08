@@ -66,8 +66,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
         VECTOR(edges)[p++] = VECTOR(*permutation)[ IGRAPH_TO(graph, i) ];
     }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, igraph_is_directed(graph)));
 
     /* Attributes */
     if (graph->attr) {

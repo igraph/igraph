@@ -284,8 +284,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
     igraph_vector_int_destroy(&no_edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     if (edgemaps) {

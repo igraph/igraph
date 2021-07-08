@@ -145,8 +145,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     igraph_es_destroy(&es);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(&res, &edges, (igraph_integer_t) no_of_nodes,
-                               igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_create(&res, &edges, no_of_nodes, igraph_is_directed(graph)));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

@@ -126,8 +126,7 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
     igraph_vector_int_destroy(&neis2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

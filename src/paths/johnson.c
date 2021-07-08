@@ -118,8 +118,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     IGRAPH_MATRIX_INIT_FINALLY(&bfres, 0, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&newweights, 0);
 
-    IGRAPH_CHECK(igraph_empty(&newgraph, (igraph_integer_t) no_of_nodes + 1,
-                              igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_empty(&newgraph, no_of_nodes + 1, igraph_is_directed(graph)));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     /* Add a new node to the graph, plus edges from it to all the others. */
@@ -145,7 +144,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
        new vertex.  */
 
     IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(&newgraph, &bfres,
-                 igraph_vss_1((igraph_integer_t) no_of_nodes),
+                 igraph_vss_1(no_of_nodes),
                  igraph_vss_all(), &newweights, IGRAPH_OUT));
 
     igraph_destroy(&newgraph);

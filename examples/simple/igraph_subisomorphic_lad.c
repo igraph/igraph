@@ -39,7 +39,8 @@ void print_maps(igraph_vector_int_t *map, igraph_vector_ptr_t *maps) {
  * the RANDESU motif finder */
 void test_motifs() {
     igraph_t graph;
-    igraph_vector_t randesu_counts, lad_counts;
+    igraph_vector_int_t randesu_counts;
+    igraph_vector_t lad_counts;
     igraph_vector_t cut_prob;
     igraph_integer_t i, n;
     igraph_bool_t equal;
@@ -77,12 +78,12 @@ void test_motifs() {
     }
 
     igraph_vector_init(&cut_prob, 3);
-    igraph_vector_init(&randesu_counts, 0);
+    igraph_vector_int_init(&randesu_counts, 0);
     igraph_motifs_randesu(&graph, &randesu_counts, 3, &cut_prob);
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
-        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+        if (VECTOR(randesu_counts)[i] < 0) {
             continue;
         }
         if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
@@ -99,7 +100,7 @@ void test_motifs() {
         printf("Total 3-vertex directed subgraph count is incorrect.\n");
     }
 
-    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_int_destroy(&randesu_counts);
     igraph_vector_destroy(&lad_counts);
     igraph_vector_destroy(&cut_prob);
 
@@ -130,12 +131,12 @@ void test_motifs() {
     }
 
     igraph_vector_init(&cut_prob, 4);
-    igraph_vector_init(&randesu_counts, 0);
+    igraph_vector_int_init(&randesu_counts, 0);
     igraph_motifs_randesu(&graph, &randesu_counts, 4, &cut_prob);
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
-        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+        if (VECTOR(randesu_counts)[i] < 0) {
             continue;
         }
         if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
@@ -152,7 +153,7 @@ void test_motifs() {
         printf("Total 4-vertex directed subgraph count is incorrect.\n");
     }
 
-    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_int_destroy(&randesu_counts);
     igraph_vector_destroy(&lad_counts);
     igraph_vector_destroy(&cut_prob);
 
@@ -162,7 +163,8 @@ void test_motifs() {
 
 void test_motifs_undirected() {
     igraph_t graph;
-    igraph_vector_t randesu_counts, lad_counts;
+    igraph_vector_int_t randesu_counts;
+    igraph_vector_t lad_counts;
     igraph_vector_t cut_prob;
     igraph_integer_t i, n;
     igraph_bool_t equal;
@@ -200,12 +202,12 @@ void test_motifs_undirected() {
     }
 
     igraph_vector_init(&cut_prob, 3);
-    igraph_vector_init(&randesu_counts, 0);
+    igraph_vector_int_init(&randesu_counts, 0);
     igraph_motifs_randesu(&graph, &randesu_counts, 3, &cut_prob);
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
-        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+        if (VECTOR(randesu_counts)[i] < 0) {
             continue;
         }
         if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
@@ -222,7 +224,7 @@ void test_motifs_undirected() {
         printf("Total 3-vertex undirected subgraph count is incorrect.\n");
     }
 
-    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_int_destroy(&randesu_counts);
     igraph_vector_destroy(&lad_counts);
     igraph_vector_destroy(&cut_prob);
 
@@ -253,12 +255,12 @@ void test_motifs_undirected() {
     }
 
     igraph_vector_init(&cut_prob, 4);
-    igraph_vector_init(&randesu_counts, 0);
+    igraph_vector_int_init(&randesu_counts, 0);
     igraph_motifs_randesu(&graph, &randesu_counts, 4, &cut_prob);
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
-        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+        if (VECTOR(randesu_counts)[i] < 0) {
             continue;
         }
         if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
@@ -275,7 +277,7 @@ void test_motifs_undirected() {
         printf("Total 4-vertex undirected subgraph count is incorrect.\n");
     }
 
-    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_int_destroy(&randesu_counts);
     igraph_vector_destroy(&lad_counts);
     igraph_vector_destroy(&cut_prob);
 

@@ -604,7 +604,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
             }
 
             /* Now check all neighbors of 'minnei' for a shorter path */
-            neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
+            neis = igraph_lazy_inclist_get(inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_real_t altdist, curdist;

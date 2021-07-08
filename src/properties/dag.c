@@ -104,8 +104,8 @@ igraph_error_t igraph_topological_sorting(
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, mode));
         j = igraph_vector_int_size(&neis);
         for (i = 0; i < j; i++) {
-            VECTOR(degrees)[(igraph_integer_t)VECTOR(neis)[i]]--;
-            if (VECTOR(degrees)[(igraph_integer_t)VECTOR(neis)[i]] == 0) {
+            VECTOR(degrees)[ VECTOR(neis)[i] ]--;
+            if (VECTOR(degrees)[ VECTOR(neis)[i] ] == 0) {
                 IGRAPH_CHECK(igraph_dqueue_int_push(&sources, VECTOR(neis)[i]));
             }
         }
@@ -178,7 +178,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_IN));
         j = igraph_vector_int_size(&neis);
         for (i = 0; i < j; i++) {
-            nei = (igraph_integer_t)VECTOR(neis)[i];
+            nei = VECTOR(neis)[i];
             if (nei == node) {
                 continue;
             }

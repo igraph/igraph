@@ -38,10 +38,10 @@ void print_vector(igraph_vector_t *v) {
     printf("\n");
 }
 
-igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
+igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
                           int isoclass, void* extra) {
     printf("Class %d: ", isoclass);
-    igraph_vector_print(vids);
+    igraph_vector_int_print(vids);
     return 0;
 }
 

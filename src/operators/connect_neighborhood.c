@@ -92,7 +92,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
 
     for (i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
-        igraph_neighbors(graph, &neis, (igraph_integer_t) i, mode);
+        igraph_neighbors(graph, &neis, i, mode);
         in = igraph_vector_int_size(&neis);
         if (order > 1) {
             for (j = 0; j < in; j++) {
