@@ -12,7 +12,7 @@ int main() {
     };
 
     igraph_vector_int_t edges;
-    igraph_vector_int_t tri;
+    igraph_vector_t tri;
     igraph_t graph;
 
     igraph_set_warning_handler(igraph_warning_handler_ignore);
@@ -21,16 +21,16 @@ int main() {
 
     igraph_create(&graph, &edges, vc, 1 /* directed=true */);
 
-    igraph_vector_int_init(&tri, 0);
+    igraph_vector_init(&tri, 0);
 
     igraph_triad_census(&graph, &tri);
-    print_vector_int(&tri);
+    print_vector_round(&tri);
 
     igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL); /* convert to undirected */
     igraph_triad_census(&graph, &tri);
-    print_vector_int(&tri);
+    print_vector_round(&tri);
 
-    igraph_vector_int_destroy(&tri);
+    igraph_vector_destroy(&tri);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

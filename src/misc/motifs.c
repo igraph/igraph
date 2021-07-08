@@ -41,7 +41,7 @@
 static igraph_error_t igraph_i_motifs_randesu_update_hist(
         const igraph_t *graph,
         igraph_vector_int_t *vids, int isoclass, void* extra) {
-    igraph_vector_int_t *hist = (igraph_vector_int_t*)extra;
+    igraph_vector_t *hist = (igraph_vector_t*)extra;
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(vids);
     VECTOR(*hist)[isoclass]++;
     return IGRAPH_SUCCESS;
@@ -107,7 +107,7 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  *
  * \example examples/simple/igraph_motifs_randesu.c
  */
-igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_int_t *hist,
+igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                           int size, const igraph_vector_t *cut_prob) {
     int histlen;
 
@@ -125,17 +125,17 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_int_t 
         histlen = igraph_is_directed(graph) ? 218 : 11;
     }
 
-    IGRAPH_CHECK(igraph_vector_int_resize(hist, histlen));
-    igraph_vector_int_null(hist);
+    IGRAPH_CHECK(igraph_vector_resize(hist, histlen));
+    igraph_vector_null(hist);
 
     IGRAPH_CHECK(igraph_motifs_randesu_callback(graph, size, cut_prob,
                  &igraph_i_motifs_randesu_update_hist, hist));
 
     if (size == 3) {
         if (igraph_is_directed(graph)) {
-            VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[3] = -1;
+            VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[3] = IGRAPH_NAN;
         } else {
-            VECTOR(*hist)[0] = VECTOR(*hist)[1] = -1;
+            VECTOR(*hist)[0] = VECTOR(*hist)[1] = IGRAPH_NAN;
         }
     } else if (size == 4) {
         if (igraph_is_directed(graph)) {
@@ -144,11 +144,11 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_int_t 
                                   };
             int i, n = sizeof(not_connected) / sizeof(not_connected[0]);
             for (i = 0; i < n; i++) {
-                VECTOR(*hist)[not_connected[i]] = -1;
+                VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
             }
         } else {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[2] =
-                    VECTOR(*hist)[3] = VECTOR(*hist)[5] = -1;
+                    VECTOR(*hist)[3] = VECTOR(*hist)[5] = IGRAPH_NAN;
         }
     }
 
@@ -1074,11 +1074,11 @@ igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_int_t *res) {
+igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
     igraph_vector_t cut_prob;
     igraph_real_t m2, m4;
-    igraph_vector_int_t tmp;
+    igraph_vector_t tmp;
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_real_t total;
 
@@ -1086,10 +1086,10 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_int_t *r
         IGRAPH_WARNING("Triad census called on an undirected graph");
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&cut_prob, 3); /* all zeros */
-    IGRAPH_CHECK(igraph_vector_int_resize(res, 16));
-    igraph_vector_int_null(res);
+    IGRAPH_CHECK(igraph_vector_resize(res, 16));
+    igraph_vector_null(res);
     IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
     IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
 
@@ -1102,7 +1102,7 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_int_t *r
         VECTOR(tmp)[0] = 0;
         VECTOR(tmp)[1] = m2;
         VECTOR(tmp)[3] = m4;
-        VECTOR(tmp)[0] = total - igraph_vector_int_sum(&tmp);
+        VECTOR(tmp)[0] = total - igraph_vector_sum(&tmp);
 
         VECTOR(*res)[0] = VECTOR(tmp)[0];
         VECTOR(*res)[1] = VECTOR(tmp)[1];
@@ -1123,7 +1123,7 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_int_t *r
     } else {
         VECTOR(tmp)[0] = 0;
         VECTOR(tmp)[1] = m2;
-        VECTOR(tmp)[0] = total - igraph_vector_int_sum(&tmp);
+        VECTOR(tmp)[0] = total - igraph_vector_sum(&tmp);
 
         VECTOR(*res)[0] = VECTOR(tmp)[0];
         VECTOR(*res)[2] = VECTOR(tmp)[1];
@@ -1132,7 +1132,7 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_int_t *r
     }
 
     igraph_vector_destroy(&cut_prob);
-    igraph_vector_int_destroy(&tmp);
+    igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

@@ -193,9 +193,6 @@
  - `igraph_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
 
- - `igraph_motifs_randesu()` returns the motif histogram in an
-   `igraph_vector_int_t` instead of an `igraph_vector_t`.
-
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t`
    with the vertex IDs instead of an `igraph_vector_t`.
 
@@ -235,9 +232,6 @@
 
  - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its map
    parameter.
-
- - `igraph_triad_census()` now uses an `igraph_vector_int_t` for the census
-   result instead of an `igraph_vector_t`.
 
  - `igraph_union()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
