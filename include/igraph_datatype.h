@@ -74,10 +74,10 @@ typedef struct igraph_s {
     igraph_bool_t directed;
     igraph_vector_t from;
     igraph_vector_t to;
-    igraph_vector_t oi;
-    igraph_vector_t ii;
-    igraph_vector_t os;
-    igraph_vector_t is;
+    igraph_vector_int_t oi;
+    igraph_vector_int_t ii;
+    igraph_vector_int_t os;
+    igraph_vector_int_t is;
     void *attr;
 } igraph_t;
 

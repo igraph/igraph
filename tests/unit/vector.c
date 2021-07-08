@@ -344,12 +344,12 @@ int main() {
     printf("Test order\n");
     igraph_vector_init_int_end(&v,  -1, 1, 1, 2, 2, -1);
     igraph_vector_init_int_end(&v2, -1, 2, 3, 1, 3, -1);
-    igraph_vector_init(&v3, 0);
-    igraph_vector_order(&v, &v2, &v3, 3);
-    print_vector_format(&v3, stdout, "%g");
+    igraph_vector_int_init(&v4, 0);
+    igraph_vector_order(&v, &v2, &v4, 3);
+    print_vector_int(&v4);
     igraph_vector_destroy(&v);
     igraph_vector_destroy(&v2);
-    igraph_vector_destroy(&v3);
+    igraph_vector_int_destroy(&v4);
 
     printf("Test fill\n");
 
