@@ -29,7 +29,7 @@
 int main() {
 
     igraph_vector_t v, v2, v3;
-    igraph_vector_int_t v4;
+    igraph_vector_int_t v4, v5, v6;
     igraph_integer_t i;
     igraph_real_t *ptr;
     igraph_integer_t pos;
@@ -109,7 +109,7 @@ int main() {
     printf("\n");
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_init_seq, igraph_vector_order\n");
+    printf("Test igraph_vector_init_seq, igraph_vector_order1\n");
     igraph_vector_init_seq(&v, 1, 10);
     igraph_vector_init(&v2, 0);
     igraph_vector_order1(&v, &v2, 10);
@@ -342,13 +342,13 @@ int main() {
     igraph_vector_int_destroy(&v4);
 
     printf("Test order\n");
-    igraph_vector_init_int_end(&v,  -1, 1, 1, 2, 2, -1);
-    igraph_vector_init_int_end(&v2, -1, 2, 3, 1, 3, -1);
+    igraph_vector_int_init_int_end(&v5, -1, 1, 1, 2, 2, -1);
+    igraph_vector_int_init_int_end(&v6, -1, 2, 3, 1, 3, -1);
     igraph_vector_int_init(&v4, 0);
-    igraph_vector_order(&v, &v2, &v4, 3);
+    igraph_vector_int_order(&v5, &v6, &v4, 3);
     print_vector_int(&v4);
-    igraph_vector_destroy(&v);
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_destroy(&v5);
+    igraph_vector_int_destroy(&v6);
     igraph_vector_int_destroy(&v4);
 
     printf("Test fill\n");
