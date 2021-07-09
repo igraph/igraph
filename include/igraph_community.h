@@ -102,20 +102,20 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            igraph_real_t *codelength);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                                    igraph_vector_t *result,
+                                                    igraph_vector_int_t *result,
                                                     igraph_vector_t *edge_betweenness,
                                                     igraph_matrix_t *merges,
-                                                    igraph_vector_t *bridges,
+                                                    igraph_vector_int_t *bridges,
                                                     igraph_vector_t *modularity,
                                                     igraph_vector_int_t *membership,
                                                     igraph_bool_t directed,
                                                     const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                                  const igraph_bool_t directed,
-                                                 const igraph_vector_t *edges,
+                                                 const igraph_vector_int_t *edges,
                                                  const igraph_vector_t *weights,
                                                  igraph_matrix_t *merges,
-                                                 igraph_vector_t *bridges,
+                                                 igraph_vector_int_t *bridges,
                                                  igraph_vector_t *modularity,
                                                  igraph_vector_int_t *membership);
 

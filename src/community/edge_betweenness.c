@@ -61,10 +61,10 @@ static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *me
 
 static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              const igraph_bool_t directed,
-                                             const igraph_vector_t *edges,
+                                             const igraph_vector_int_t *edges,
                                              const igraph_vector_t *weights,
                                              igraph_matrix_t *res,
-                                             igraph_vector_t *bridges,
+                                             igraph_vector_int_t *bridges,
                                              igraph_vector_t *modularity,
                                              igraph_vector_int_t *membership) {
 
@@ -95,8 +95,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                               2));
         }
         if (bridges) {
-            IGRAPH_CHECK(igraph_vector_resize(bridges,
-                                              no_of_nodes - no_comps));
+            IGRAPH_CHECK(igraph_vector_int_resize(bridges, no_of_nodes - no_comps));
         }
     }
 
@@ -114,7 +113,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         VECTOR(*modularity)[0] = maxmod;
     }
 
-    for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
+    for (i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
         igraph_integer_t edge = VECTOR(*edges)[i];
         igraph_integer_t from = IGRAPH_FROM(graph, edge);
         igraph_integer_t to = IGRAPH_TO(graph, edge);
@@ -220,10 +219,10 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  */
 igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    const igraph_bool_t directed,
-                                   const igraph_vector_t *edges,
+                                   const igraph_vector_int_t *edges,
                                    const igraph_vector_t *weights,
                                    igraph_matrix_t *res,
-                                   igraph_vector_t *bridges,
+                                   igraph_vector_int_t *bridges,
                                    igraph_vector_t *modularity,
                                    igraph_vector_int_t *membership) {
 
@@ -238,7 +237,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
             igraph_matrix_resize(res, 0, 2);
         }
         if (bridges) {
-            igraph_vector_clear(bridges);
+            igraph_vector_int_clear(bridges);
         }
         if (modularity) {
             igraph_vector_clear(modularity);
@@ -263,11 +262,11 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
         IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes - no_comps, 2));
     }
     if (bridges) {
-        IGRAPH_CHECK(igraph_vector_resize(bridges, no_of_nodes - no_comps));
+        IGRAPH_CHECK(igraph_vector_int_resize(bridges, no_of_nodes - no_comps));
     }
 
-    for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
-        igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
+    for (i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
+        igraph_integer_t edge = VECTOR(*edges)[i];
         igraph_integer_t from, to, c1, c2, idx;
         IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
         idx = from + 1;
@@ -387,10 +386,10 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \example examples/simple/igraph_community_edge_betweenness.c
  */
 igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                      igraph_vector_t *result,
+                                      igraph_vector_int_t *result,
                                       igraph_vector_t *edge_betweenness,
                                       igraph_matrix_t *merges,
-                                      igraph_vector_t *bridges,
+                                      igraph_vector_int_t *bridges,
                                       igraph_vector_t *modularity,
                                       igraph_vector_int_t *membership,
                                       igraph_bool_t directed,
@@ -422,12 +421,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_2wheap_t heap;
 
     if (result == 0) {
-        result = IGRAPH_CALLOC(1, igraph_vector_t);
+        result = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (result == 0) {
             IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, result);
-        IGRAPH_VECTOR_INIT_FINALLY(result, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(result, 0);
         result_owned = 1;
     }
 
@@ -501,7 +500,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_CHECK(igraph_stack_int_init(&stack, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
 
-    IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
+    IGRAPH_CHECK(igraph_vector_int_resize(result, no_of_edges));
     if (edge_betweenness) {
         IGRAPH_CHECK(igraph_vector_resize(edge_betweenness, no_of_edges));
         if (no_of_edges > 0) {
@@ -740,7 +739,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     if (result_owned) {
-        igraph_vector_destroy(result);
+        igraph_vector_int_destroy(result);
         IGRAPH_FREE(result);
         IGRAPH_FINALLY_CLEAN(2);
     }

@@ -57,6 +57,10 @@
    vector of `igraph_vector_int_t`s to return the blocks themselves instead of
    a pointer vector of `igraph_vector_t`.
 
+ - `igraph_community_edge_betweenness()` now uses an `igraph_vector_int_t` to
+   return the edge IDs in the order of their removal as well as the list of edge
+   IDs whose removal broke a single component into two.
+
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
 
