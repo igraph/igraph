@@ -713,7 +713,7 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
         code |= arr_idx[idx];
     }
 
-    *isoclass = (igraph_integer_t) arr_code[code];
+    *isoclass = arr_code[code];
     return IGRAPH_SUCCESS;
 }
 
@@ -790,7 +790,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
         }
     }
 
-    *isoclass = (igraph_integer_t) arr_code[code];
+    *isoclass = arr_code[code];
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;

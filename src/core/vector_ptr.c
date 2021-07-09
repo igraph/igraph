@@ -683,12 +683,12 @@ static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const v
  */
 
 igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
-        igraph_vector_t *inds, cmp_t cmp) {
+        igraph_vector_int_t *inds, cmp_t cmp) {
     igraph_integer_t i;
     uintptr_t *vind, first;
     igraph_integer_t n = igraph_vector_ptr_size(v);
 
-    IGRAPH_CHECK(igraph_vector_resize(inds, n));
+    IGRAPH_CHECK(igraph_vector_int_resize(inds, n));
     if (n == 0) {
         return IGRAPH_SUCCESS;
     }
@@ -750,21 +750,21 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
  *
  * Time complexity: O(n), the size of the vector.
  */
-igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_vector_t* index) {
+igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_vector_int_t* index) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     IGRAPH_ASSERT(index != NULL);
     IGRAPH_ASSERT(index->stor_begin != NULL);
-    IGRAPH_ASSERT(igraph_vector_ptr_size(v) >= igraph_vector_size(index));
+    IGRAPH_ASSERT(igraph_vector_ptr_size(v) >= igraph_vector_int_size(index));
 
     igraph_vector_ptr_t v_copy;
     void** v_ptr;
-    igraph_real_t *ind_ptr;
+    igraph_integer_t *ind_ptr;
 
     /* There is a more space-efficient algorithm that needs O(1) space only,
      * but it messes up the index vector, which we don't want */
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&v_copy, igraph_vector_size(index)));
+    IGRAPH_CHECK(igraph_vector_ptr_init(&v_copy, igraph_vector_int_size(index)));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &v_copy);
 
     for (
@@ -772,10 +772,10 @@ igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_ve
         ind_ptr < index->end;
         v_ptr++, ind_ptr++
     ) {
-        *v_ptr = VECTOR(*v)[(igraph_integer_t) *ind_ptr];
+        *v_ptr = VECTOR(*v)[*ind_ptr];
     }
 
-    IGRAPH_CHECK(igraph_vector_ptr_resize(v, igraph_vector_size(index)));
+    IGRAPH_CHECK(igraph_vector_ptr_resize(v, igraph_vector_int_size(index)));
     igraph_vector_ptr_copy_to(&v_copy, VECTOR(*v));
 
     igraph_vector_ptr_destroy(&v_copy);

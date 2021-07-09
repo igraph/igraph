@@ -718,7 +718,8 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
-    igraph_vector_t dists, index;
+    igraph_vector_t dists;
+    igraph_vector_int_t index;
     igraph_vector_int_t order;
     igraph_vector_ptr_t parents, parents_edge;
 
@@ -1175,13 +1176,13 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         }
 
         /* sort the paths by the target vertices */
-        IGRAPH_VECTOR_INIT_FINALLY(&index, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&index, 0);
         igraph_vector_ptr_sort_ind(vertices, &index, igraph_i_vector_tail_cmp);
         IGRAPH_CHECK(igraph_vector_ptr_permute(vertices, &index));
         if (edges) {
             IGRAPH_CHECK(igraph_vector_ptr_permute(edges, &index));
         }
-        igraph_vector_destroy(&index);
+        igraph_vector_int_destroy(&index);
         IGRAPH_FINALLY_CLEAN(1);
 
         /* we can now restore the original destructors of the path and the

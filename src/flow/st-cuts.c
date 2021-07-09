@@ -659,7 +659,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                                         const igraph_marked_queue_int_t *X,
                                         const igraph_vector_bool_t *GammaX,
                                         const igraph_vector_int_t *invmap,
-                                        igraph_vector_t *minimal) {
+                                        igraph_vector_int_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_stack_int_t stack;
@@ -700,10 +700,10 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                             igraph_i_all_st_cuts_minimal_dfs_outcb,
                             /*extra=*/ &data));
 
-    igraph_vector_clear(minimal);
+    igraph_vector_int_clear(minimal);
     for (i = 0; i < no_of_nodes; i++) {
         if (!VECTOR(nomark)[i]) {
-            IGRAPH_CHECK(igraph_vector_push_back(minimal, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(minimal, i));
         }
     }
 
@@ -729,7 +729,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     igraph_vector_int_t leftout;
     igraph_integer_t i, nomin, n;
     igraph_integer_t root;
-    igraph_vector_t M;
+    igraph_vector_int_t M;
     igraph_vector_bool_t GammaS;
     igraph_vector_int_t Nuv;
     igraph_vector_t Isv_min;
@@ -811,7 +811,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         VECTOR(GammaS)[VECTOR(leftout)[i]] = 0;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&M, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&M, 0);
     if (igraph_ecount(&domtree) > 0) {
         IGRAPH_CHECK(igraph_i_all_st_cuts_minimal(graph, &domtree, root, S,
                      &GammaS, &Sbar_invmap, &M));
@@ -827,14 +827,14 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         }
     }
 
-    nomin = igraph_vector_size(&M);
+    nomin = igraph_vector_int_size(&M);
     for (i = 0; i < nomin; i++) {
         /* -------------------------------------------------------------*/
         /* For each v in M find the set Nu(v)=dom(Sbar, v)-K
            Nu(v) contains all vertices that are dominated by v, for every
            v, this is a subtree of the dominator tree, rooted at v. The
            different subtrees are disjoint. */
-        igraph_integer_t min = VECTOR(Sbar_map)[(igraph_integer_t) VECTOR(M)[i] ] - 1;
+        igraph_integer_t min = VECTOR(Sbar_map)[ VECTOR(M)[i] ] - 1;
         igraph_integer_t nuvsize, isvlen, j;
         IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
                                 /*unreachable=*/ 0, /*order=*/ &Nuv,
@@ -907,7 +907,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     igraph_vector_int_destroy(&Nuv);
     IGRAPH_FINALLY_CLEAN(3);
 
-    igraph_vector_destroy(&M);
+    igraph_vector_int_destroy(&M);
     igraph_vector_bool_destroy(&GammaS);
     igraph_destroy(&domtree);
     igraph_vector_int_destroy(&leftout);
@@ -1145,7 +1145,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
 static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
                                            const igraph_vector_bool_t *active,
                                            const igraph_vector_int_t *invmap,
-                                           igraph_vector_t *minimal) {
+                                           igraph_vector_int_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(Sbar);
     igraph_vector_int_t indeg;
@@ -1179,7 +1179,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(minimal, minsize));
+    IGRAPH_CHECK(igraph_vector_int_resize(minimal, minsize));
 
     for (minsize = 0, i = 0; i < no_of_nodes; i++) {
         if (ACTIVE(i) && ZEROIN(i)) {
@@ -1218,7 +1218,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_vector_int_t Sbar_map, Sbar_invmap;
     igraph_vector_int_t keep;
     igraph_t Sbar;
-    igraph_vector_t M;
+    igraph_vector_int_t M;
     igraph_integer_t nomin;
 
     IGRAPH_UNUSED(source); IGRAPH_UNUSED(target);
@@ -1251,16 +1251,16 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     /* ------------------------------------------------------------- */
     /* Identify the set M of minimal elements that are active */
-    IGRAPH_VECTOR_INIT_FINALLY(&M, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&M, 0);
     IGRAPH_CHECK(igraph_i_all_st_mincuts_minimal(&Sbar, active,
                  &Sbar_invmap, &M));
 
     /* ------------------------------------------------------------- */
     /* Now find a minimal element that is not in T */
     igraph_vector_clear(Isv);
-    nomin = igraph_vector_size(&M);
+    nomin = igraph_vector_int_size(&M);
     for (i = 0; i < nomin; i++) {
-        igraph_integer_t min = VECTOR(Sbar_invmap)[ (igraph_integer_t) VECTOR(M)[i] ];
+        igraph_integer_t min = VECTOR(Sbar_invmap)[ VECTOR(M)[i] ];
         if (min != target)
             if (!igraph_estack_iselement(T, min)) {
                 break;
@@ -1271,7 +1271,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
            that can reach the pivot element */
         igraph_vector_t Isv_min;
         IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
-        *v = VECTOR(Sbar_invmap)[ (igraph_integer_t) VECTOR(M)[i] ];
+        *v = VECTOR(Sbar_invmap)[ VECTOR(M)[i] ];
         /* TODO: restricted == keep ? */
         IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ 0,
                                 /*mode=*/ IGRAPH_IN, /*unreachable=*/ 0,
@@ -1292,7 +1292,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_destroy(&M);
+    igraph_vector_int_destroy(&M);
     igraph_destroy(&Sbar);
     igraph_vector_int_destroy(&keep);
     igraph_vector_int_destroy(&Sbar_invmap);
