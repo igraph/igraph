@@ -28,7 +28,7 @@
 #define NO_CLIQUES 10
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int permutation(igraph_vector_t *vec) {
+void permutation(igraph_vector_int_t *vec) {
     int i, r, tmp;
     for (i = 0; i < CLIQUE_SIZE; i++) {
         r = INT(NODES - 1);
@@ -36,7 +36,6 @@ int permutation(igraph_vector_t *vec) {
         VECTOR(*vec)[i] = VECTOR(*vec)[r];
         VECTOR(*vec)[r] = tmp;
     }
-    return 0;
 }
 
 int sort_cmp(const void *a, const void *b) {
@@ -79,17 +78,17 @@ void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
 int main() {
 
     igraph_t g, g2, cli;
-    igraph_vector_t perm;
+    igraph_vector_int_t perm;
     igraph_vector_ptr_t cliques;
     igraph_integer_t no;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
     /* Create a graph that has a random component, plus a number of
        relatively small cliques */
 
-    igraph_vector_init_seq(&perm, 0, NODES - 1);
+    igraph_vector_int_init_seq(&perm, 0, NODES - 1);
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, NODES, NODES,
                             /*directed=*/ 0, /*loops=*/ 0);
     igraph_full(&cli, CLIQUE_SIZE, /*directed=*/ 0, /*loops=*/ 0);
@@ -108,7 +107,7 @@ int main() {
     }
     igraph_simplify(&g, /*multiple=*/ 1, /*loop=*/ 0, /*edge_comb=*/ 0);
 
-    igraph_vector_destroy(&perm);
+    igraph_vector_int_destroy(&perm);
     igraph_destroy(&cli);
 
     /* Find the maximal cliques */

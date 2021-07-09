@@ -5,9 +5,9 @@
 
 #include "test_utilities.inc"
 
-int random_permutation(igraph_vector_t *vec) {
+void random_permutation(igraph_vector_int_t *vec) {
     /* We just do size(vec) * 2 swaps */
-    igraph_integer_t one, two, tmp, i, n = igraph_vector_size(vec);
+    igraph_integer_t one, two, tmp, i, n = igraph_vector_int_size(vec);
     for (i = 0; i < 2 * n; i++) {
         one = (double)rand() / RAND_MAX * n;
         two = (double)rand() / RAND_MAX * n;
@@ -15,7 +15,6 @@ int random_permutation(igraph_vector_t *vec) {
         one = two;
         two = tmp;
     }
-    return 0;
 }
 
 
@@ -105,14 +104,14 @@ void test4() {
 
 void test_bliss() {
     igraph_t ring1, ring2, directed_ring;
-    igraph_vector_t perm;
+    igraph_vector_int_t perm;
     igraph_bool_t iso;
     igraph_bliss_info_t info;
     igraph_vector_int_t color;
     igraph_vector_ptr_t generators;
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-    igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
     random_permutation(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
 
@@ -182,7 +181,7 @@ void test_bliss() {
 
     igraph_vector_int_destroy(&color);
 
-    igraph_vector_destroy(&perm);
+    igraph_vector_int_destroy(&perm);
 
     igraph_destroy(&ring1);
     igraph_destroy(&ring2);

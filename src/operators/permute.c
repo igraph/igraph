@@ -39,8 +39,8 @@
  * \param res Pointer to an uninitialized graph object. The new graph
  *    is created here.
  * \param permutation The permutation to apply. Vertex 0 is mapped to
- *    the first element of the vector, vertex 1 to the second,
- * etc. Note that it is not checked that the vector contains every
+ *    the first element of the vector, vertex 1 to the second, etc. Note that
+ *    it is not checked that the vector contains every
  *    element only once, and no range checking is performed either.
  * \return Error code.
  *
@@ -48,14 +48,14 @@
  * vertices and edges.
  */
 igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
-                            const igraph_vector_t *permutation) {
+                            const igraph_vector_int_t *permutation) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t edges;
     igraph_integer_t i, p = 0;
 
-    if (igraph_vector_size(permutation) != no_of_nodes) {
+    if (igraph_vector_int_size(permutation) != no_of_nodes) {
         IGRAPH_ERROR("Permute vertices: invalid permutation vector size", IGRAPH_EINVAL);
     }
 
@@ -79,7 +79,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
         if (igraph_vector_size(&vtypes) != 0) {
             IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_nodes);
             for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(index)[(igraph_integer_t) VECTOR(*permutation)[i]] = i;
+                VECTOR(index)[VECTOR(*permutation)[i]] = i;
             }
             IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &index));
             igraph_vector_int_destroy(&index);

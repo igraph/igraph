@@ -85,13 +85,13 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
             p_head_copy = p_head;
             for (j = 0; j < temp; j++) {
                 if (weights != 0) {
-                    if (VECTOR(*weights)[(long int)VECTOR(neis)[j]] <= 0) {
+                    if (VECTOR(*weights)[VECTOR(neis)[j]] <= 0) {
                         // Ignore
                         num_ignored_es++;
                         continue;
                     }
 
-                    *p_weight = VECTOR(*weights)[(long int)VECTOR(neis)[j]];
+                    *p_weight = VECTOR(*weights)[VECTOR(neis)[j]];
                     ++p_weight;
                 }
 

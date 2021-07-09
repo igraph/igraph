@@ -29,7 +29,7 @@ int main() {
 
     igraph_t ring1, ring2;
     igraph_vector_int_t color1, color2;
-    igraph_vector_t perm;
+    igraph_vector_int_t perm;
     igraph_bool_t iso;
     igraph_integer_t count;
     igraph_integer_t i;
@@ -37,8 +37,8 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 12345);
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-    igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
-    igraph_vector_shuffle(&perm);
+    igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_shuffle(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
 
     /* Without colors */
@@ -66,7 +66,7 @@ int main() {
 
     /* Two colors, just counting */
     for (i = 0; i < igraph_vector_int_size(&color1); i += 2) {
-        VECTOR(color1)[i] = VECTOR(color2)[(igraph_integer_t)VECTOR(perm)[i]] = 1;
+        VECTOR(color1)[i] = VECTOR(color2)[VECTOR(perm)[i]] = 1;
     }
     igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
     if (count != 100) {
@@ -76,7 +76,7 @@ int main() {
 
     /* Separate colors for each vertex */
     for (i = 0; i < igraph_vector_int_size(&color1); i++) {
-        VECTOR(color1)[i] = VECTOR(color2)[(igraph_integer_t)VECTOR(perm)[i]] = i;
+        VECTOR(color1)[i] = VECTOR(color2)[VECTOR(perm)[i]] = i;
     }
     igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
     if (count != 1) {
@@ -100,7 +100,7 @@ int main() {
     VECTOR(color1)[0] = 1;
     VECTOR(color1)[1] = 1;
     VECTOR(color2)[0] = 1;
-    VECTOR(color2)[((igraph_integer_t)VECTOR(perm)[1] + 1) % igraph_vcount(&ring2)] = 1;
+    VECTOR(color2)[(VECTOR(perm)[1] + 1) % igraph_vcount(&ring2)] = 1;
     igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0, 0, 0, 0);
     if (iso) {
         fprintf(stderr, "Second negative test failed.\n");
@@ -110,7 +110,7 @@ int main() {
     igraph_vector_int_destroy(&color1);
     igraph_vector_int_destroy(&color2);
 
-    igraph_vector_destroy(&perm);
+    igraph_vector_int_destroy(&perm);
     igraph_destroy(&ring2);
     igraph_destroy(&ring1);
 
@@ -158,10 +158,10 @@ int main() {
     /* ---------------------------------------------------------------- */
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_vector_init_seq(&perm, 0, igraph_ecount(&ring1) - 1);
-    igraph_vector_shuffle(&perm);
+    igraph_vector_int_init_seq(&perm, 0, igraph_ecount(&ring1) - 1);
+    igraph_vector_int_shuffle(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
-    igraph_vector_destroy(&perm);
+    igraph_vector_int_destroy(&perm);
 
     /* Everything has the same color */
     igraph_vector_int_init(&color1, igraph_ecount(&ring1));

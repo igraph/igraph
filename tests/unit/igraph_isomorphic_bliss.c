@@ -32,7 +32,7 @@ int main() {
     igraph_t g1, g2;
     igraph_t ring1, ring2;
     igraph_vector_int_t color1, color2;
-    igraph_vector_t perm;
+    igraph_vector_int_t perm;
     igraph_bool_t iso;
 
     igraph_bliss_sh_t sh_values[] = {
@@ -56,8 +56,8 @@ int main() {
         printf("Splitting heuristic: %s\n", sh_names[i]);
 
         igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-        igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
-        igraph_vector_shuffle(&perm);
+        igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+        igraph_vector_int_shuffle(&perm);
         igraph_permute_vertices(&ring1, &ring2, &perm);
 
         /* Without colors */
@@ -103,7 +103,7 @@ int main() {
         igraph_vector_int_destroy(&color1);
         igraph_vector_int_destroy(&color2);
 
-        igraph_vector_destroy(&perm);
+        igraph_vector_int_destroy(&perm);
         igraph_destroy(&ring2);
         igraph_destroy(&ring1);
 

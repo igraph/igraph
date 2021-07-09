@@ -199,6 +199,9 @@
  - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
    `neis` parameter.
 
+ - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
+   permutation vector.
+
  - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
    `outdeg` and `indeg` parameters.
 

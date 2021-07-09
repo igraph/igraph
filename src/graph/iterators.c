@@ -1661,12 +1661,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         for (i = 0; i < no_of_nodes; i++) {
             igraph_incident(graph, &adj, i, mode);
-            /* TODO: switch back to igraph_vector_int_int_append() once 'adj' is an
-             * igraph_vector_int_t */
-            length = igraph_vector_int_size(&adj);
-            for (j = 0; j < length; j++) {
-                igraph_vector_int_push_back(vec, VECTOR(adj)[j]);
-            }
+            igraph_vector_int_append(vec, &adj);
         }
         igraph_vector_int_destroy(&adj);
         IGRAPH_FINALLY_CLEAN(1);
@@ -1683,7 +1678,8 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_free, added);
         for (i = 0; i < no_of_nodes; i++) {
             igraph_incident(graph, &adj, i, IGRAPH_ALL);
-            for (j = 0; j < igraph_vector_int_size(&adj); j++) {
+            length = igraph_vector_int_size(&adj);
+            for (j = 0; j < length; j++) {
                 if (!added[ VECTOR(adj)[j] ]) {
                     igraph_vector_int_push_back(vec, VECTOR(adj)[j]);
                     added[ VECTOR(adj)[j] ] += 1;
