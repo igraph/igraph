@@ -67,7 +67,7 @@
  * Time complexity: O(n*d*o), where n is the number vertices for which
  * the calculation is performed, d is the average degree, o is the order.
  */
-igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int_t *res,
                              igraph_vs_t vids, igraph_integer_t order,
                              igraph_neimode_t mode,
                              igraph_integer_t mindist) {
@@ -98,7 +98,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-    IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
+    IGRAPH_CHECK(igraph_vector_int_resize(res, IGRAPH_VIT_SIZE(vit)));
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);
