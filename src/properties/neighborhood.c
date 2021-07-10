@@ -175,7 +175,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
  * \param res An initialized pointer vector. Note that the objects
  *    (pointers) in the vector will \em not be freed, but the pointer
  *    vector will be resized as needed. The result of the calculation
- *    will be stored here in \ref igraph_vector_int_t objects.
+ *    will be stored here in igraph_vector_int_t objects.
  * \param vids The vertices for which the calculation is performed.
  * \param order Integer giving the order of the neighborhood.
  * \param mode Specifies how to use the direction of the edges if a
