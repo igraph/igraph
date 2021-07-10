@@ -134,6 +134,9 @@
    and `igraph_get_subisomorphisms_vf2()` now contain `igraph_vector_int_t`,
    not `igraph_vector_t`.
 
+ - `igraph_girth()` now uses an `igraph_vector_int_t` for its
+   `circle` parameter.
+
  - `igraph_hrg_init()` and `igraph_hrg_resize()` now takes an `igraph_integer_t`
    as their size arguments instead of an `int`.
 

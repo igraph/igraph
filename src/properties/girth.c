@@ -70,7 +70,7 @@
  * \example examples/simple/igraph_girth.c
  */
 igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
-                 igraph_vector_t *circle) {
+                 igraph_vector_int_t *circle) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -163,7 +163,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 
     /* Store the actual circle, if needed */
     if (circle) {
-        IGRAPH_CHECK(igraph_vector_resize(circle, mincirc));
+        IGRAPH_CHECK(igraph_vector_int_resize(circle, mincirc));
         if (mincirc != 0) {
             igraph_integer_t i, n, idx = 0;
             igraph_dqueue_int_clear(&q);

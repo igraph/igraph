@@ -211,7 +211,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t deg;
     igraph_vector_int_t new_edges;
-    igraph_vector_t ancestors;
+    igraph_vector_int_t ancestors;
     igraph_integer_t root;
     igraph_vector_int_t neighbors;
     igraph_stack_int_t path;
@@ -224,7 +224,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&new_edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&ancestors, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ancestors, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
     IGRAPH_CHECK(igraph_stack_int_init(&path, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
@@ -250,10 +250,10 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
                 igraph_stack_int_pop(&path);
                 node = igraph_stack_int_pop(&path);
                 if (!VECTOR(done)[node]) {
-                    igraph_vector_pop_back(&ancestors);
+                    igraph_vector_int_pop_back(&ancestors);
                     VECTOR(done)[node] = 1;
                 }
-                n = igraph_vector_size(&ancestors);
+                n = igraph_vector_int_size(&ancestors);
                 for (j = 0; j < n; j++) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, node));
                     IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges,
@@ -263,7 +263,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
                 /* Getting into a node */
                 igraph_integer_t n, j;
                 if (!VECTOR(done)[node]) {
-                    IGRAPH_CHECK(igraph_vector_push_back(&ancestors, node));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&ancestors, node));
                 }
                 IGRAPH_CHECK(igraph_neighbors(graph, &neighbors,
                                               node, IGRAPH_IN));
@@ -282,7 +282,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
     igraph_vector_bool_destroy(&done);
     igraph_stack_int_destroy(&path);
     igraph_vector_int_destroy(&neighbors);
-    igraph_vector_destroy(&ancestors);
+    igraph_vector_int_destroy(&ancestors);
     igraph_vector_int_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(5);
 
