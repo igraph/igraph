@@ -103,6 +103,9 @@
  - `igraph_edges()` now takes an `igraph_vector_int_t` for its
    `edges` argument instead of an `igraph_vector_t`.
 
+ - `igraph_establishment_game()` now takes an `igraph_vector_int_t` for its
+   `node_type_vec` argument instead of an `igraph_vector_t`.
+
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
@@ -162,6 +165,9 @@
    use an `igraph_vector_int_t` to return the matching instead of an
    `igraph_vector_long_t`.
 
+ - The `vids` parameter for `igraph_isoclass_subgraph()` is now an
+   `igraph_vector_int_t` instead of `igraph_vector_t`.
+
  - `igraph_isomorphic_vf2()`, `igraph_isomorphic_function_vf2()` and
    `igraph_isohandler_t` now all use `igraph_vector_int_t` for their `map12` and
    `map21` parameters.
@@ -200,6 +206,12 @@
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t`
    with the vertex IDs instead of an `igraph_vector_t`.
 
+ - `igraph_neighborhood_size()` now uses an `igraph_vector_int_t` for its
+   `res` parameter.
+
+ - The `res` parameter of `igraph_neighborhood()` is now a vector of pointers
+   to `igraph_vector_int_t`.
+
  - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
    `neis` parameter.
 
@@ -208,6 +220,12 @@
 
  - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
    `outdeg` and `indeg` parameters.
+
+ - `igraph_similarity_dice_pairs()` now uses an `igraph_vector_int_t` for its
+   `pairs` parameter.
+
+ - `igraph_similarity_jaccard_pairs()` now uses an `igraph_vector_int_t` for its
+   `pairs` parameter.
 
  - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
@@ -238,6 +256,9 @@
    contain `igraph_vector_int_t`, not `igraph_vector_t`.
 
  - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its map
+   parameter.
+
+ - `igraph_unfold_tree()` now uses an `igraph_vector_int_t` for its `vertex_index`
    parameter.
 
  - `igraph_union()` now uses an `igraph_vector_int_t` for its

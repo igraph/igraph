@@ -736,9 +736,9 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
  * Time complexity: O((d+n)*n), d is the average degree in the network,
  * and n is the number of vertices in \c vids.
  */
-igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
+igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_int_t *vids,
                              igraph_integer_t *isoclass) {
-    igraph_integer_t nodes = igraph_vector_size(vids);
+    igraph_integer_t nodes = igraph_vector_int_size(vids);
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_int_t neis;
 
@@ -783,7 +783,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *
         s = igraph_vector_int_size(&neis);
         for (j = 0; j < s; j++) {
             igraph_integer_t nei = VECTOR(neis)[j], to;
-            if (igraph_vector_search(vids, 0, nei, &to)) {
+            if (igraph_vector_int_search(vids, 0, nei, &to)) {
                 idx = (unsigned char) (mul * i + to);
                 code |= arr_idx[idx];
             }

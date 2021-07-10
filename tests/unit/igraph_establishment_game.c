@@ -40,13 +40,13 @@ void init_vm(igraph_vector_t *type_dist,
 int main() {
     igraph_t g;
     igraph_vector_t type_dist;
-    igraph_vector_t node_type_vec;
+    igraph_vector_int_t node_type_vec;
     igraph_matrix_t pref_matrix;
     igraph_bool_t bipartite;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    igraph_vector_init(&node_type_vec, 0);
+    igraph_vector_int_init(&node_type_vec, 0);
     /*No vertices*/
     init_vm(&type_dist, 1, 0, &pref_matrix, 0, 0, 0, 1);
     IGRAPH_ASSERT(igraph_establishment_game(&g, /*nodes*/ 0, /*types*/ 2, /*edges_per_step*/ 0, &type_dist, &pref_matrix, /*directed*/ 0, /*node_type_vec*/ NULL) == IGRAPH_SUCCESS);
@@ -67,9 +67,9 @@ int main() {
     igraph_is_bipartite(&g, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_is_directed(&g));
-    IGRAPH_ASSERT(igraph_vector_min(&node_type_vec) == 0);
-    IGRAPH_ASSERT(igraph_vector_max(&node_type_vec) == 1);
-    IGRAPH_ASSERT(igraph_vector_size(&node_type_vec) == 20);
+    IGRAPH_ASSERT(igraph_vector_int_min(&node_type_vec) == 0);
+    IGRAPH_ASSERT(igraph_vector_int_max(&node_type_vec) == 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(&node_type_vec) == 20);
     DESTROY_GVM();
 
     VERIFY_FINALLY_STACK();
@@ -81,7 +81,7 @@ int main() {
     IGRAPH_ASSERT(igraph_establishment_game(&g, /*nodes*/ 20, /* types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0, /*node_type_vec*/ NULL) == IGRAPH_EINVAL);
     DESTROY_GVM();
 
-    igraph_vector_destroy(&node_type_vec);
+    igraph_vector_int_destroy(&node_type_vec);
 
     VERIFY_FINALLY_STACK();
     return 0;

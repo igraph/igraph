@@ -56,7 +56,7 @@
  */
 igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                        igraph_neimode_t mode, const igraph_vector_t *roots,
-                       igraph_vector_t *vertex_index) {
+                       igraph_vector_int_t *vertex_index) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -82,7 +82,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_edges, no_of_edges);
 
     if (vertex_index) {
-        IGRAPH_CHECK(igraph_vector_resize(vertex_index, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(vertex_index, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
             VECTOR(*vertex_index)[i] = i;
         }
@@ -122,7 +122,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
                         tree_vertex_count++;
                         if (vertex_index) {
-                            IGRAPH_CHECK(igraph_vector_push_back(vertex_index, nei));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(vertex_index, nei));
                         }
 
                         if (from == nei) {

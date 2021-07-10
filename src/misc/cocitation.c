@@ -442,14 +442,14 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
  * \example examples/simple/igraph_similarity.c
  */
 igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
-                                    const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
+                                    const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_integer_t i, j, k, u, v;
     igraph_integer_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
     igraph_bool_t *seen;
 
-    k = igraph_vector_size(pairs);
+    k = igraph_vector_int_size(pairs);
     if (k % 2 != 0) {
         IGRAPH_ERROR("number of elements in `pairs' must be even", IGRAPH_EINVAL);
     }
@@ -562,18 +562,18 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
  */
 igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     igraph_eit_t eit;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&v, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 0);
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     while (!IGRAPH_EIT_END(eit)) {
         igraph_integer_t eid = IGRAPH_EIT_GET(eit);
-        igraph_vector_push_back(&v, IGRAPH_FROM(graph, eid));
-        igraph_vector_push_back(&v, IGRAPH_TO(graph, eid));
+        igraph_vector_int_push_back(&v, IGRAPH_FROM(graph, eid));
+        igraph_vector_int_push_back(&v, IGRAPH_TO(graph, eid));
         IGRAPH_EIT_NEXT(eit);
     }
 
@@ -581,7 +581,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, &v, mode, loops));
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -705,7 +705,7 @@ igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *re
  * \example examples/simple/igraph_similarity.c
  */
 igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
-                                 const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
+                                 const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_integer_t i, n;
 
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, pairs, mode, loops));

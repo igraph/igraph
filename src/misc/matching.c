@@ -309,7 +309,7 @@ igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* graph,
 
 static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_vector_t* labels,
+        const igraph_vector_bool_t* types, igraph_vector_int_t* labels,
         igraph_vector_int_t* matching, igraph_bool_t smaller_set);
 
 /**
@@ -332,7 +332,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
     igraph_integer_t i, j, k, n, no_of_nodes = igraph_vcount(graph);
     igraph_integer_t num_matched;             /* number of matched vertex pairs */
     igraph_vector_int_t match;       /* will store the matching */
-    igraph_vector_t labels;           /* will store the labels */
+    igraph_vector_int_t labels;           /* will store the labels */
     igraph_vector_int_t neis;             /* used to retrieve the neighbors of a node */
     igraph_dqueue_int_t q;           /* a FIFO for push ordering */
     igraph_bool_t smaller_set;        /* denotes which part of the bipartite graph is smaller */
@@ -348,7 +348,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
     /* (1) Initialize data structures */
     IGRAPH_CHECK(igraph_vector_int_init(&match, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &match);
-    IGRAPH_VECTOR_INIT_FINALLY(&labels, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&labels, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&q, 0));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
@@ -456,7 +456,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
     /* Release everything */
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&neis);
-    igraph_vector_destroy(&labels);
+    igraph_vector_int_destroy(&labels);
     igraph_vector_int_destroy(&match);
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -465,7 +465,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
 
 static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_vector_t* labels,
+        const igraph_vector_bool_t* types, igraph_vector_int_t* labels,
         igraph_vector_int_t* match, igraph_bool_t smaller_set) {
     igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
     igraph_dqueue_int_t q;
@@ -474,7 +474,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
     debug("Running global relabeling.\n");
 
     /* Set all the labels to no_of_nodes first */
-    igraph_vector_fill(labels, no_of_nodes);
+    igraph_vector_int_fill(labels, no_of_nodes);
 
     /* Allocate vector for neighbors */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);

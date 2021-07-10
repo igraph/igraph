@@ -93,7 +93,7 @@ IGRAPH_EXPORT igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_v
 
 IGRAPH_EXPORT igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                                      igraph_neimode_t mode, const igraph_vector_t *roots,
-                                     igraph_vector_t *vertex_index);
+                                     igraph_vector_int_t *vertex_index);
 
 IGRAPH_EXPORT igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
                                                     igraph_vector_t *alpha,

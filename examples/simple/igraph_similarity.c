@@ -37,7 +37,8 @@ void print_matrix(igraph_matrix_t *m, FILE *f) {
 
 int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
                       igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_vector_t pairs, res;
+    igraph_vector_int_t pairs;
+    igraph_vector_t res;
     igraph_integer_t i, j, k, n;
     igraph_eit_t eit;
 
@@ -48,11 +49,11 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
 
     /* Second, query the similarities for all pairs using a pair vector */
     n = igraph_vcount(g);
-    igraph_vector_init(&pairs, 0);
+    igraph_vector_int_init(&pairs, 0);
     for (i = 0; i < n; i++) {
         for (j = n - 1; j >= 0; j--) {
-            igraph_vector_push_back(&pairs, i);
-            igraph_vector_push_back(&pairs, j);
+            igraph_vector_int_push_back(&pairs, i);
+            igraph_vector_int_push_back(&pairs, j);
         }
     }
     igraph_similarity_jaccard_pairs(g, &res, &pairs, mode, loops);
@@ -66,7 +67,7 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
             }
         }
     }
-    igraph_vector_destroy(&pairs);
+    igraph_vector_int_destroy(&pairs);
 
     /* Third, query the similarities for all edges */
     igraph_similarity_jaccard_es(g, &res, igraph_ess_all(IGRAPH_EDGEORDER_FROM), mode, loops);
@@ -95,7 +96,8 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
 
 int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
                    igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_vector_t pairs, res;
+    igraph_vector_int_t pairs;
+    igraph_vector_t res;
     igraph_integer_t i, j, k, n;
     igraph_eit_t eit;
 
@@ -106,11 +108,11 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
 
     /* Second, query the similarities for all pairs using a pair vector */
     n = igraph_vcount(g);
-    igraph_vector_init(&pairs, 0);
+    igraph_vector_int_init(&pairs, 0);
     for (i = 0; i < n; i++) {
         for (j = n - 1; j >= 0; j--) {
-            igraph_vector_push_back(&pairs, i);
-            igraph_vector_push_back(&pairs, j);
+            igraph_vector_int_push_back(&pairs, i);
+            igraph_vector_int_push_back(&pairs, j);
         }
     }
     igraph_similarity_dice_pairs(g, &res, &pairs, mode, loops);
@@ -124,7 +126,7 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
             }
         }
     }
-    igraph_vector_destroy(&pairs);
+    igraph_vector_int_destroy(&pairs);
 
     /* Third, query the similarities for all edges */
     igraph_similarity_dice_es(g, &res, igraph_ess_all(IGRAPH_EDGEORDER_FROM), mode, loops);

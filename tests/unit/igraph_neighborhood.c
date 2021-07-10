@@ -21,11 +21,11 @@
 
 void print_and_destroy(igraph_vector_ptr_t *result) {
     int i;
-    igraph_vector_t *v;
+    igraph_vector_int_t *v;
     for (i = 0; i < igraph_vector_ptr_size(result); i++) {
         v = VECTOR(*result)[i];
-        print_vector(v);
-        igraph_vector_destroy(v);
+        print_vector_int(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 }

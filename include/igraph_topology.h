@@ -276,7 +276,7 @@ IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(const igraph_t *graph, co
 IGRAPH_EXPORT igraph_error_t igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
                                        igraph_bool_t *iso);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass);
-IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
+IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_int_t *vids,
                                            igraph_integer_t *isoclass);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                                          igraph_integer_t number, igraph_bool_t directed);

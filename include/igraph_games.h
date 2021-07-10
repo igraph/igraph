@@ -102,7 +102,7 @@ IGRAPH_EXPORT igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_i
                                             const igraph_vector_t *type_dist,
                                             const igraph_matrix_t *pref_matrix,
                                             igraph_bool_t directed,
-                                            igraph_vector_t *node_type_vec);
+                                            igraph_vector_int_t *node_type_vec);
 IGRAPH_EXPORT igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                                   igraph_real_t radius, igraph_bool_t torus,
                                   igraph_vector_t *x, igraph_vector_t *y);

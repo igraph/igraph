@@ -45,7 +45,7 @@ IGRAPH_EXPORT igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, ig
                                             const igraph_vs_t vids, igraph_neimode_t mode,
                                             igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
-                                                  const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
+                                                  const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
                                                const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
 
@@ -53,7 +53,7 @@ IGRAPH_EXPORT igraph_error_t igraph_similarity_dice(const igraph_t *graph, igrap
                                          const igraph_vs_t vids, igraph_neimode_t mode,
                                          igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
-                                               const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
+                                               const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
                                             const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
 
