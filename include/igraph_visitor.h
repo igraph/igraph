@@ -78,12 +78,12 @@ typedef igraph_error_t igraph_bfshandler_t(const igraph_t *graph,
         void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_bfs(const igraph_t *graph,
-                             igraph_integer_t root, const igraph_vector_t *roots,
+                             igraph_integer_t root, const igraph_vector_int_t *roots,
                              igraph_neimode_t mode, igraph_bool_t unreachable,
                              const igraph_vector_int_t *restricted,
-                             igraph_vector_t *order, igraph_vector_t *rank,
-                             igraph_vector_t *father,
-                             igraph_vector_t *pred, igraph_vector_t *succ,
+                             igraph_vector_int_t *order, igraph_vector_int_t *rank,
+                             igraph_vector_int_t *father,
+                             igraph_vector_int_t *pred, igraph_vector_int_t *succ,
                              igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                              void *extra);
 

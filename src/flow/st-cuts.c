@@ -46,7 +46,7 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
                                                    igraph_integer_t source,
                                                    igraph_integer_t target,
                                                    igraph_integer_t *v,
-                                                   igraph_vector_t *Isv,
+                                                   igraph_vector_int_t *Isv,
                                                    void *arg);
 
 /**
@@ -718,7 +718,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 igraph_error_t igraph_i_all_st_cuts_pivot(
     const igraph_t *graph, const igraph_marked_queue_int_t *S,
     const igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
-    igraph_integer_t *v, igraph_vector_t *Isv, void *arg
+    igraph_integer_t *v, igraph_vector_int_t *Isv, void *arg
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -732,8 +732,8 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     igraph_vector_int_t M;
     igraph_vector_bool_t GammaS;
     igraph_vector_int_t Nuv;
-    igraph_vector_t Isv_min;
-    igraph_vector_t GammaS_vec;
+    igraph_vector_int_t Isv_min;
+    igraph_vector_int_t GammaS_vec;
     igraph_integer_t Sbar_size;
 
     IGRAPH_UNUSED(arg);
@@ -817,13 +817,13 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                      &GammaS, &Sbar_invmap, &M));
     }
 
-    igraph_vector_clear(Isv);
+    igraph_vector_int_clear(Isv);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&Nuv, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&GammaS_vec, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv_min, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&GammaS_vec, 0);
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(GammaS)[i]) {
-            IGRAPH_CHECK(igraph_vector_push_back(&GammaS_vec, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&GammaS_vec, i));
         }
     }
 
@@ -863,11 +863,11 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                                 /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
                                 /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
         for (isvlen = 0; isvlen < no_of_nodes; isvlen++) {
-            if (!IGRAPH_FINITE(VECTOR(Isv_min)[isvlen])) {
+            if (VECTOR(Isv_min)[isvlen] < 0) {
                 break;
             }
         }
-        igraph_vector_resize(&Isv_min, isvlen);
+        igraph_vector_int_resize(&Isv_min, isvlen);
 
         /* -------------------------------------------------------------*/
         /* For each c in M check whether Isv-K is included in Tbar. If
@@ -891,19 +891,19 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                                     /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
                                     /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
             for (isvlen = 0; isvlen < no_of_nodes; isvlen++) {
-                if (!IGRAPH_FINITE(VECTOR(Isv_min)[isvlen])) {
+                if (VECTOR(Isv_min)[isvlen] < 0) {
                     break;
                 }
             }
-            igraph_vector_resize(&Isv_min, isvlen);
-            igraph_vector_update(Isv, &Isv_min);
+            igraph_vector_int_resize(&Isv_min, isvlen);
+            igraph_vector_int_update(Isv, &Isv_min);
 
             break;
         }
     }
 
-    igraph_vector_destroy(&GammaS_vec);
-    igraph_vector_destroy(&Isv_min);
+    igraph_vector_int_destroy(&GammaS_vec);
+    igraph_vector_int_destroy(&Isv_min);
     igraph_vector_int_destroy(&Nuv);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -930,14 +930,14 @@ igraph_error_t igraph_provan_shier_list(
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t Isv;
+    igraph_vector_int_t Isv;
     igraph_integer_t v = 0;
     igraph_integer_t i, n;
 
-    IGRAPH_CHECK(igraph_vector_init(&Isv, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&Isv, 0));
 
     pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
-    if (igraph_vector_size(&Isv) == 0) {
+    if (igraph_vector_int_size(&Isv) == 0) {
         if (igraph_marked_queue_int_size(S) != 0 &&
             igraph_marked_queue_int_size(S) != no_of_nodes) {
             igraph_vector_t *vec = IGRAPH_CALLOC(1, igraph_vector_t);
@@ -958,10 +958,10 @@ igraph_error_t igraph_provan_shier_list(
 
         /* Add Isv to S */
         IGRAPH_CHECK(igraph_marked_queue_int_start_batch(S));
-        n = igraph_vector_size(&Isv);
+        n = igraph_vector_int_size(&Isv);
         for (i = 0; i < n; i++) {
-            if (!igraph_marked_queue_int_iselement(S, (igraph_integer_t) VECTOR(Isv)[i])) {
-                IGRAPH_CHECK(igraph_marked_queue_int_push(S, (igraph_integer_t) VECTOR(Isv)[i]));
+            if (!igraph_marked_queue_int_iselement(S, VECTOR(Isv)[i])) {
+                IGRAPH_CHECK(igraph_marked_queue_int_push(S, VECTOR(Isv)[i]));
             }
         }
 
@@ -974,7 +974,7 @@ igraph_error_t igraph_provan_shier_list(
         igraph_marked_queue_int_pop_back_batch(S);
     }
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
 
     return IGRAPH_SUCCESS;
 }
@@ -1207,7 +1207,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
                                          igraph_integer_t source,
                                          igraph_integer_t target,
                                          igraph_integer_t *v,
-                                         igraph_vector_t *Isv,
+                                         igraph_vector_int_t *Isv,
                                          void *arg) {
 
     igraph_i_all_st_mincuts_data_t *data = arg;
@@ -1224,7 +1224,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     IGRAPH_UNUSED(source); IGRAPH_UNUSED(target);
 
     if (igraph_marked_queue_int_size(S) == no_of_nodes) {
-        igraph_vector_clear(Isv);
+        igraph_vector_int_clear(Isv);
         return IGRAPH_SUCCESS;
     }
 
@@ -1257,7 +1257,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
     /* ------------------------------------------------------------- */
     /* Now find a minimal element that is not in T */
-    igraph_vector_clear(Isv);
+    igraph_vector_int_clear(Isv);
     nomin = igraph_vector_int_size(&M);
     for (i = 0; i < nomin; i++) {
         igraph_integer_t min = VECTOR(Sbar_invmap)[ VECTOR(M)[i] ];
@@ -1269,8 +1269,8 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     if (i != nomin) {
         /* OK, we found a pivot element. I(S,v) contains all elements
            that can reach the pivot element */
-        igraph_vector_t Isv_min;
-        IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
+        igraph_vector_int_t Isv_min;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv_min, 0);
         *v = VECTOR(Sbar_invmap)[ VECTOR(M)[i] ];
         /* TODO: restricted == keep ? */
         IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ 0,
@@ -1280,15 +1280,15 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
                                 /*succ=*/ 0, /*dist=*/ 0, /*callback=*/ 0,
                                 /*extra=*/ 0));
         for (j = 0; j < no_of_nodes; j++) {
-            igraph_real_t u = VECTOR(Isv_min)[j];
-            if (!IGRAPH_FINITE(u)) {
+            igraph_integer_t u = VECTOR(Isv_min)[j];
+            if (u < 0) {
                 break;
             }
             if (!igraph_estack_iselement(T, u)) {
-                IGRAPH_CHECK(igraph_vector_push_back(Isv, u));
+                IGRAPH_CHECK(igraph_vector_int_push_back(Isv, u));
             }
         }
-        igraph_vector_destroy(&Isv_min);
+        igraph_vector_int_destroy(&Isv_min);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

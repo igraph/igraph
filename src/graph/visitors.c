@@ -72,15 +72,23 @@
  * \param rank If not a null pointer, then the rank of each vertex is
  *        stored here.
  * \param father If not a null pointer, then the id of the father of
- *        each vertex is stored here.
+ *        each vertex is stored here. When a vertex was not visited
+ *        during the traversal, -2 will be stored as the ID of its father.
+ *        When a vertex was visited during the traversal and it was one of
+ *        the roots of the search trees, -1 will be stored as the ID of
+ *        its father.
  * \param pred If not a null pointer, then the id of vertex that was
  *        visited before the current one is stored here. If there is
  *        no such vertex (the current vertex is the root of a search
- *        tree), then -1 is stored.
+ *        tree), then -1 is stored as the predecessor of the vertex.
+ *        If the vertex was not visited at all, then -2 is stored for
+ *        the predecessor of the vertex.
  * \param succ If not a null pointer, then the id of the vertex that
  *        was visited after the current one is stored here. If there
  *        is no such vertex (the current one is the last in a search
- *        tree), then -1 is stored.
+ *        tree), then -1 is stored as the successor of the vertex.
+ *        If the vertex was not visited at all, then -2 is stored for
+ *        the successor of the vertex.
  * \param dist If not a null pointer, then the distance from the root of
  *        the current search tree is stored here for each vertex. If a
  *        vertex was not reached during the traversal, its distance will
@@ -98,12 +106,12 @@
  * \example examples/simple/igraph_bfs_callback.c
  */
 igraph_error_t igraph_bfs(const igraph_t *graph,
-               igraph_integer_t root, const igraph_vector_t *roots,
+               igraph_integer_t root, const igraph_vector_int_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                const igraph_vector_int_t *restricted,
-               igraph_vector_t *order, igraph_vector_t *rank,
-               igraph_vector_t *father,
-               igraph_vector_t *pred, igraph_vector_t *succ,
+               igraph_vector_int_t *order, igraph_vector_int_t *rank,
+               igraph_vector_int_t *father,
+               igraph_vector_int_t *pred, igraph_vector_int_t *succ,
                igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                void *extra) {
 
@@ -120,15 +128,15 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
     igraph_integer_t pred_vec = -1;
 
     igraph_integer_t rootpos = 0;
-    igraph_integer_t noroots = roots ? igraph_vector_size(roots) : 1;
+    igraph_integer_t noroots = roots ? igraph_vector_int_size(roots) : 1;
 
     if (!roots && (root < 0 || root >= no_of_nodes)) {
         IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
     }
 
     if (roots) {
-        igraph_real_t min, max;
-        igraph_vector_minmax(roots, &min, &max);
+        igraph_integer_t min, max;
+        igraph_vector_int_minmax(roots, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
             IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
         }
@@ -173,20 +181,16 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     /* Resize result vectors, and fill them with IGRAPH_NAN */
 
-# define VINIT(v) if (v) {                      \
-        igraph_vector_resize((v), no_of_nodes);   \
-        igraph_vector_fill((v), IGRAPH_NAN); }
-
-# define VINIT_INT(v) if (v) {                      \
+# define VINIT(v, initial) if (v) {               \
         igraph_vector_int_resize((v), no_of_nodes);   \
-        igraph_vector_int_fill((v), -1); }
+        igraph_vector_int_fill((v), initial); }
 
-    VINIT(order);
-    VINIT(rank);
-    VINIT(father);
-    VINIT(pred);
-    VINIT(succ);
-    VINIT_INT(dist);
+    VINIT(order, -1);
+    VINIT(rank, -1);
+    VINIT(father, -2);
+    VINIT(pred, -2);
+    VINIT(succ, -2);
+    VINIT(dist, -1);
 # undef VINIT
 
     while (1) {
@@ -238,7 +242,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                 VECTOR(*pred)[actvect] = pred_vec;
             }
             if (rank) {
-                VECTOR(*rank) [actvect] = act_rank;
+                VECTOR(*rank)[actvect] = act_rank;
             }
             if (order) {
                 VECTOR(*order)[act_rank++] = actvect;
@@ -452,15 +456,21 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
  * \param order If not null pointer, then the vertex ids of the graph are
- *        stored here, in the same order as they were discovered.
+ *        stored here, in the same order as they were discovered. The tail of
+ *        the vector will be padded with -1 to ensure that the length of the
+ *        vector is the same as the number of vertices, even if some vertices
+ *        were not visited during the traversal.
  * \param order_out If not a null pointer, then the vertex ids of the
  *        graphs are stored here, in the order of the completion of
- *        their subtree.
+ *        their subtree. The tail of the vector will be padded with -1 to ensure
+ *        that the length of the vector is the same as the number of vertices,
+ *        even if some vertices were not visited during the traversal.
  * \param father If not a null pointer, then the id of the father of
  *        each vertex is stored here. -1 will be stored for the root of the
  *        search tree; -2 will be stored for vertices that were not visited.
  * \param dist If not a null pointer, then the distance from the root of
- *        the current search tree is stored here.
+ *        the current search tree is stored here. -1 will be stored for vertices
+ *        that were not visited.
  * \param in_callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_dfshandler_t. This function
  *        will be called, whenever a new vertex is discovered.
@@ -522,16 +532,16 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
         igraph_vector_char_destroy(&added);           \
         IGRAPH_FINALLY_CLEAN(4); } while (0)
 
-    /* Resize result vectors and fill them with IGRAPH_NAN */
+    /* Resize result vectors and fill them with the initial value */
 
-# define VINIT(v) if (v) {                      \
+# define VINIT(v, initial) if (v) {             \
         IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes));       \
-        igraph_vector_int_fill(v, -2); }
+        igraph_vector_int_fill(v, initial); }
 
-    VINIT(order);
-    VINIT(order_out);
-    VINIT(father);
-    VINIT(dist);
+    VINIT(order, -1);
+    VINIT(order_out, -1);
+    VINIT(father, -2);
+    VINIT(dist, -1);
 
 # undef VINIT
 
