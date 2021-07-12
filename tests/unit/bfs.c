@@ -44,8 +44,8 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
 int main() {
 
     igraph_t graph, ring;
-    igraph_vector_t order, rank, father, pred, succ, dist;
-    igraph_vector_int_t restricted;
+    igraph_vector_t order, rank, father, pred, succ;
+    igraph_vector_int_t restricted, dist;
     igraph_vector_t roots;
     igraph_integer_t i;
 
@@ -58,7 +58,7 @@ int main() {
     igraph_vector_init(&father, 0);
     igraph_vector_init(&pred, 0);
     igraph_vector_init(&succ, 0);
-    igraph_vector_init(&dist, 0);
+    igraph_vector_int_init(&dist, 0);
 
     igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
@@ -70,14 +70,14 @@ int main() {
     print_vector_round(&father);
     print_vector_round(&pred);
     print_vector_round(&succ);
-    print_vector_round(&dist);
+    print_vector_int(&dist);
 
     igraph_vector_destroy(&order);
     igraph_vector_destroy(&rank);
     igraph_vector_destroy(&father);
     igraph_vector_destroy(&pred);
     igraph_vector_destroy(&succ);
-    igraph_vector_destroy(&dist);
+    igraph_vector_int_destroy(&dist);
 
     /* Test the callback */
 

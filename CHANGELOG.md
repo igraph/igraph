@@ -41,8 +41,8 @@
    an `igraph_vector_int_t` for the out-degree sequence of the nodes being
    generated instead of an `igraph_vector_t`.
 
- - `igraph_bfs()` now takes an `igraph_vector_int_t` for its `restricted`
-   argument instead of an `igraph_vector_t`.
+ - `igraph_bfs()` now takes an `igraph_vector_int_t` for its `restricted` and
+   `dist` arguments instead of an `igraph_vector_t`.
 
  - `igraph_bfs_simple()` now takes `igraph_vector_int_t` for its `vids`,
    `layers` and `parents` arguments instead of an `igraph_vector_t`.

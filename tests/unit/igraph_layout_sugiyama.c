@@ -31,13 +31,13 @@ int main() {
     igraph_t g, extd_g;
     igraph_matrix_t coords;
     igraph_vector_int_t edgelist, extd_edgelist, extd_to_orig_eids;
-    igraph_vector_t layers;
+    igraph_vector_int_t layers;
 
     igraph_matrix_init(&coords, 0, 0);
     igraph_vector_int_init(&extd_to_orig_eids, 0);
 
     /* Layout on simple graph with predefined layers */
-    igraph_vector_init_int_end(&layers, -1, 0, 1, 1, 2, 3, 3, 4, 4, 5, -1);
+    igraph_vector_int_init_int_end(&layers, -1, 0, 1, 1, 2, 3, 3, 4, 4, 5, -1);
     igraph_vector_int_init_int_end(&edgelist, -1,
                                0, 1, 0, 2, 0, 3, 1, 2, 2, 2, 1, 4, 2, 5, 4, 6, 5, 7, 6, 8, 7, 8,
                                3, 8, 8, 1, 8, 2, -1);
@@ -68,7 +68,7 @@ int main() {
     igraph_vector_int_print(&extd_to_orig_eids);
     printf("===\n");
 
-    igraph_vector_destroy(&layers);
+    igraph_vector_int_destroy(&layers);
 
     /* Same, but with automatic layering */
     igraph_layout_sugiyama(&g, &coords, 0, 0, 0,
@@ -80,14 +80,14 @@ int main() {
     printf("===\n");
 
     /* Layering with gaps in it */
-    igraph_vector_init_int_end(&layers, -1, 0, 2, 2, 4, 6, 6, 12, 12, 15, -1);
+    igraph_vector_int_init_int_end(&layers, -1, 0, 2, 2, 4, 6, 6, 12, 12, 15, -1);
     igraph_layout_sugiyama(&g, &coords, 0, 0, &layers,
                            /* hgap = */ 1,
                            /* vgap = */ 1,
                            /* maxiter = */ 100,
                            /* weights = */ 0);
     igraph_matrix_print(&coords);
-    igraph_vector_destroy(&layers);
+    igraph_vector_int_destroy(&layers);
     printf("===\n");
 
     igraph_vector_int_destroy(&edgelist);

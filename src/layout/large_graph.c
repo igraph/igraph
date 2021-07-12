@@ -303,7 +303,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             }
 
             /*       printf("verties: %li iterations: %li\n",  */
-            /*       (igraph_integer_t) VECTOR(layers)[actlayer+1], pairs); */
+            /*       VECTOR(layers)[actlayer+1], pairs); */
 
             /* apply the changes */
             for (jj = 0; jj < VECTOR(layers)[actlayer + 1]; jj++) {

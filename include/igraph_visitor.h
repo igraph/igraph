@@ -84,7 +84,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs(const igraph_t *graph,
                              igraph_vector_t *order, igraph_vector_t *rank,
                              igraph_vector_t *father,
                              igraph_vector_t *pred, igraph_vector_t *succ,
-                             igraph_vector_t *dist, igraph_bfshandler_t *callback,
+                             igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                              void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,

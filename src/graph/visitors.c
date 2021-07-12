@@ -82,7 +82,9 @@
  *        is no such vertex (the current one is the last in a search
  *        tree), then -1 is stored.
  * \param dist If not a null pointer, then the distance from the root of
- *        the current search tree is stored here.
+ *        the current search tree is stored here for each vertex. If a
+ *        vertex was not reached during the traversal, its distance will
+ *        be -1 in this vector.
  * \param callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_bfshandler_t. This function
  *        will be called, whenever a new vertex is visited.
@@ -102,7 +104,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                igraph_vector_t *order, igraph_vector_t *rank,
                igraph_vector_t *father,
                igraph_vector_t *pred, igraph_vector_t *succ,
-               igraph_vector_t *dist, igraph_bfshandler_t *callback,
+               igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                void *extra) {
 
     igraph_error_t ret;
@@ -175,12 +177,16 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         igraph_vector_resize((v), no_of_nodes);   \
         igraph_vector_fill((v), IGRAPH_NAN); }
 
+# define VINIT_INT(v) if (v) {                      \
+        igraph_vector_int_resize((v), no_of_nodes);   \
+        igraph_vector_int_fill((v), -1); }
+
     VINIT(order);
     VINIT(rank);
     VINIT(father);
     VINIT(pred);
     VINIT(succ);
-    VINIT(dist);
+    VINIT_INT(dist);
 # undef VINIT
 
     while (1) {

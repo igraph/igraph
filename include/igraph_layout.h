@@ -92,7 +92,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_reingold_tilford_circular(const igrap
                                                           const igraph_vector_t *rootlevel);
 IGRAPH_EXPORT igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
                                          igraph_t *extd_graph, igraph_vector_int_t *extd_to_orig_eids,
-                                         const igraph_vector_t* layers, igraph_real_t hgap,
+                                         const igraph_vector_int_t* layers, igraph_real_t hgap,
                                          igraph_real_t vgap, igraph_integer_t maxiter, const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);

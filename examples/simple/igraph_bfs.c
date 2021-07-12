@@ -41,7 +41,8 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
 int main() {
 
     igraph_t graph, ring;
-    igraph_vector_t order, rank, father, pred, succ, dist;
+    igraph_vector_t order, rank, father, pred, succ;
+    igraph_vector_int_t dist;
 
     /* Create a disjoint union of two rings */
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
@@ -56,7 +57,7 @@ int main() {
     igraph_vector_init(&father, 0);
     igraph_vector_init(&pred, 0);
     igraph_vector_init(&succ, 0);
-    igraph_vector_init(&dist, 0);
+    igraph_vector_int_init(&dist, 0);
 
     /* Now call the BFS function */
     igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
@@ -70,7 +71,7 @@ int main() {
     igraph_vector_print(&father);
     igraph_vector_print(&pred);
     igraph_vector_print(&succ);
-    igraph_vector_print(&dist);
+    igraph_vector_int_print(&dist);
 
     /* Cleam up after ourselves */
     igraph_vector_destroy(&order);
@@ -78,7 +79,7 @@ int main() {
     igraph_vector_destroy(&father);
     igraph_vector_destroy(&pred);
     igraph_vector_destroy(&succ);
-    igraph_vector_destroy(&dist);
+    igraph_vector_int_destroy(&dist);
 
     igraph_destroy(&graph);
 

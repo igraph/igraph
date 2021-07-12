@@ -55,7 +55,7 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                             igraph_real_t vgap, igraph_integer_t maxiter) {
 
     igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t layers;
+    igraph_vector_int_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
         IGRAPH_ERRORF("The vertex type vector size (%ld) should be equal to the number of nodes (%ld).",
@@ -65,7 +65,7 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
         IGRAPH_ERRORF("The horizontal gap cannot be negative, got %f.", IGRAPH_EINVAL, hgap);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&layers, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(layers)[i] = VECTOR(*types)[i] ? 0 : 1;
     }
@@ -74,7 +74,7 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                                         /*extd_to_orig_eids=*/ 0, &layers, hgap,
                                         vgap, maxiter, /*weights=*/ 0));
 
-    igraph_vector_destroy(&layers);
+    igraph_vector_int_destroy(&layers);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

@@ -106,7 +106,7 @@ igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_
  * Solves the feedback arc set problem for undirected graphs.
  */
 igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_int_t *result,
-        const igraph_vector_t *weights, igraph_vector_t *layering) {
+        const igraph_vector_t *weights, igraph_vector_int_t *layering) {
     igraph_vector_int_t edges;
     igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
 
@@ -195,7 +195,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
  * Solves the feedback arc set problem using the heuristics of Eades et al.
  */
 igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_int_t *result,
-                                    const igraph_vector_t *weights, igraph_vector_t *layers) {
+                                    const igraph_vector_t *weights, igraph_vector_int_t *layers) {
     igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
     igraph_dqueue_int_t sources, sinks;
     igraph_vector_int_t neis;
@@ -403,8 +403,8 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         igraph_vector_int_t ranks;
         igraph_vector_int_t order_vec;
 
-        IGRAPH_CHECK(igraph_vector_resize(layers, no_of_nodes));
-        igraph_vector_null(layers);
+        IGRAPH_CHECK(igraph_vector_int_resize(layers, no_of_nodes));
+        igraph_vector_int_null(layers);
 
         igraph_vector_int_view(&order_vec, ordering, no_of_nodes);
 
@@ -479,36 +479,36 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vertices_by_components);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &edges_by_components);
     for (i = 0; i < no_of_components; i++) {
-        igraph_vector_t* vptr;
-        vptr = IGRAPH_CALLOC(1, igraph_vector_t);
+        igraph_vector_int_t* vptr;
+        vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, vptr);
-        IGRAPH_CHECK(igraph_vector_init(vptr, 0));
+        IGRAPH_CHECK(igraph_vector_int_init(vptr, 0));
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(vertices_by_components)[i] = vptr;
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_int_destroy);
     for (i = 0; i < no_of_components; i++) {
-        igraph_vector_t* vptr;
-        vptr = IGRAPH_CALLOC(1, igraph_vector_t);
+        igraph_vector_int_t* vptr;
+        vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, vptr);
-        IGRAPH_CHECK(igraph_vector_init(vptr, 0));
+        IGRAPH_CHECK(igraph_vector_int_init(vptr, 0));
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(edges_by_components)[i] = vptr;
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_int_destroy);
     for (i = 0; i < no_of_vertices; i++) {
         j = VECTOR(membership)[i];
-        IGRAPH_CHECK(igraph_vector_push_back(VECTOR(vertices_by_components)[j], i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(VECTOR(vertices_by_components)[j], i));
     }
     for (i = 0; i < no_of_edges; i++) {
         j = VECTOR(membership)[IGRAPH_FROM(graph, i)];
-        IGRAPH_CHECK(igraph_vector_push_back(VECTOR(edges_by_components)[j], i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(VECTOR(edges_by_components)[j], i));
     }
 
 #define VAR2IDX(i, j) (i*(n-1)+j-(i+1)*i/2)
@@ -525,8 +525,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
     /* Solve an IP for feedback arc sets in each of the components */
     for (i = 0; i < no_of_components; i++) {
-        igraph_vector_t* vertices_in_comp = (igraph_vector_t*)VECTOR(vertices_by_components)[i];
-        igraph_vector_t* edges_in_comp = (igraph_vector_t*)VECTOR(edges_by_components)[i];
+        igraph_vector_int_t* vertices_in_comp = (igraph_vector_int_t*)VECTOR(vertices_by_components)[i];
+        igraph_vector_int_t* edges_in_comp = (igraph_vector_int_t*)VECTOR(edges_by_components)[i];
 
         /*
          * Let x_ij denote whether layer(i) < layer(j).
@@ -552,14 +552,14 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
          *
          * max sum_{i<j} (w_ij-w_ji) x_ij
          */
-        n = igraph_vector_size(vertices_in_comp);
+        n = igraph_vector_int_size(vertices_in_comp);
         ip = glp_create_prob();
         IGRAPH_FINALLY(igraph_i_glp_delete_prob, ip);
         glp_set_obj_dir(ip, GLP_MAX);
 
         /* Construct a mapping from vertex IDs to the [0; n-1] range */
         for (j = 0; j < n; j++) {
-            VECTOR(vertex_remapping)[(igraph_integer_t)VECTOR(*vertices_in_comp)[j]] = j;
+            VECTOR(vertex_remapping)[VECTOR(*vertices_in_comp)[j]] = j;
         }
 
         /* Set up variables */
@@ -576,7 +576,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         }
 
         /* Set up coefficients in the goal function */
-        k = igraph_vector_size(edges_in_comp);
+        k = igraph_vector_int_size(edges_in_comp);
         for (j = 0; j < k; j++) {
             l = VECTOR(*edges_in_comp)[j];
             from = VECTOR(vertex_remapping)[IGRAPH_FROM(graph, l)];
@@ -654,7 +654,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         }
 
         /* Find the feedback edges */
-        k = igraph_vector_size(edges_in_comp);
+        k = igraph_vector_int_size(edges_in_comp);
         for (j = 0; j < k; j++) {
             l = VECTOR(*edges_in_comp)[j];
             from = VECTOR(vertex_remapping)[IGRAPH_FROM(graph, l)];
