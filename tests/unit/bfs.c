@@ -44,20 +44,18 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
 int main() {
 
     igraph_t graph, ring;
-    igraph_vector_t order, rank, father, pred, succ;
-    igraph_vector_int_t restricted, dist;
-    igraph_vector_t roots;
+    igraph_vector_int_t restricted, order, rank, father, pred, succ, dist, roots;
     igraph_integer_t i;
 
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);
     igraph_destroy(&ring);
 
-    igraph_vector_init(&order, 0);
-    igraph_vector_init(&rank, 0);
-    igraph_vector_init(&father, 0);
-    igraph_vector_init(&pred, 0);
-    igraph_vector_init(&succ, 0);
+    igraph_vector_int_init(&order, 0);
+    igraph_vector_int_init(&rank, 0);
+    igraph_vector_int_init(&father, 0);
+    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&succ, 0);
     igraph_vector_int_init(&dist, 0);
 
     igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
@@ -65,18 +63,18 @@ int main() {
                &order, &rank, &father, &pred, &succ, &dist,
                /*callback=*/ 0, /*extra=*/ 0);
 
-    print_vector_round(&order);
-    print_vector_round(&rank);
-    print_vector_round(&father);
-    print_vector_round(&pred);
-    print_vector_round(&succ);
+    print_vector_int(&order);
+    print_vector_int(&rank);
+    print_vector_int(&father);
+    print_vector_int(&pred);
+    print_vector_int(&succ);
     print_vector_int(&dist);
 
-    igraph_vector_destroy(&order);
-    igraph_vector_destroy(&rank);
-    igraph_vector_destroy(&father);
-    igraph_vector_destroy(&pred);
-    igraph_vector_destroy(&succ);
+    igraph_vector_int_destroy(&order);
+    igraph_vector_int_destroy(&rank);
+    igraph_vector_int_destroy(&father);
+    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&succ);
     igraph_vector_int_destroy(&dist);
 
     /* Test the callback */
@@ -123,7 +121,7 @@ int main() {
 
     /* Multiple root vertices */
 
-    igraph_vector_init(&roots, 3);
+    igraph_vector_int_init(&roots, 3);
     VECTOR(roots)[0] = 3;
     VECTOR(roots)[1] = 4;
     VECTOR(roots)[2] = 6;
@@ -133,7 +131,7 @@ int main() {
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
 
-    igraph_vector_destroy(&roots);
+    igraph_vector_int_destroy(&roots);
     igraph_vector_int_destroy(&restricted);
     igraph_destroy(&graph);
 

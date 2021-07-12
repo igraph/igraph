@@ -118,10 +118,6 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
                      IGRAPH_EINVAL);
     }
 
-    if (!IGRAPH_FINITE(n)) {
-        IGRAPH_ERROR("number of vertices is not finite (NA, NaN or Inf)", IGRAPH_EINVAL);
-    }
-
     graph->n = 0;
     graph->directed = directed;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->from, 0);

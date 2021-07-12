@@ -69,7 +69,7 @@ int main() {
     igraph_marked_queue_int_t S;
     igraph_estack_t T;
     igraph_integer_t v;
-    igraph_vector_t Isv;
+    igraph_vector_int_t Isv;
 
     /* ----------------------------------------------------------- */
     /* This is the example from the Provan-Shier paper,
@@ -101,16 +101,16 @@ int main() {
     igraph_estack_init(&T, igraph_vcount(&g), 1);
     igraph_estack_push(&T, 11);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 10, /*target=*/ 11,
                                &v, &Isv, NULL);
 
     /* Expected result: v=c, Isv={c,d,e,i} */
     printf("%" IGRAPH_PRId "; ", v);
-    igraph_vector_print(&Isv);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
@@ -125,14 +125,14 @@ int main() {
     igraph_marked_queue_int_init(&S, igraph_vcount(&g));
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
     printf("%" IGRAPH_PRId "; ", v);
-    igraph_vector_print(&Isv);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
@@ -149,14 +149,14 @@ int main() {
     igraph_estack_init(&T, igraph_vcount(&g), 3);
     igraph_estack_push(&T, 0);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
     printf("%" IGRAPH_PRId "; ", v);
-    igraph_vector_print(&Isv);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
@@ -173,14 +173,14 @@ int main() {
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
     printf("%" IGRAPH_PRId "; ", v);
-    igraph_vector_print(&Isv);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
@@ -198,14 +198,14 @@ int main() {
     igraph_estack_init(&T, igraph_vcount(&g), 3);
     igraph_estack_push(&T, 1);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
     printf("%" IGRAPH_PRId "; ", v);
-    igraph_vector_print(&Isv);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
@@ -223,14 +223,14 @@ int main() {
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
     printf("%" IGRAPH_PRId "; ", v);
-    igraph_vector_print(&Isv);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
