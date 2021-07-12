@@ -88,8 +88,8 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs(const igraph_t *graph,
                              void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                                    igraph_vector_t *vids, igraph_vector_t *layers,
-                                    igraph_vector_t *parents);
+                                    igraph_vector_int_t *vids, igraph_vector_int_t *layers,
+                                    igraph_vector_int_t *parents);
 
 /**
  * \function igraph_dfshandler_t

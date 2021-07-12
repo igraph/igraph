@@ -325,8 +325,8 @@ cleanup:
  * \example examples/simple/igraph_bfs_simple.c
  */
 igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                      igraph_vector_t *vids, igraph_vector_t *layers,
-                      igraph_vector_t *parents) {
+                      igraph_vector_int_t *vids, igraph_vector_int_t *layers,
+                      igraph_vector_int_t *parents) {
 
     igraph_dqueue_int_t q;
     igraph_integer_t num_visited = 0;
@@ -357,23 +357,23 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
 
     /* results */
     if (vids) {
-        igraph_vector_clear(vids);
+        igraph_vector_int_clear(vids);
     }
     if (layers) {
-        igraph_vector_clear(layers);
+        igraph_vector_int_clear(layers);
     }
     if (parents) {
-        IGRAPH_CHECK(igraph_vector_resize(parents, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
     }
 
     /* ok start with vid */
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, vid));
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
     if (layers) {
-        IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+        IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
     }
     if (vids) {
-        IGRAPH_CHECK(igraph_vector_push_back(vids, vid));
+        IGRAPH_CHECK(igraph_vector_int_push_back(vids, vid));
     }
     if (parents) {
         VECTOR(*parents)[vid] = vid;
@@ -396,10 +396,10 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
                 if (layers && lastlayer != actdist + 1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
                 }
                 if (vids) {
-                    IGRAPH_CHECK(igraph_vector_push_back(vids, neighbor));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(vids, neighbor));
                 }
                 num_visited++;
                 lastlayer = actdist + 1;
@@ -408,7 +408,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
     } /* while ! dqueue_int_empty */
 
     if (layers) {
-        IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+        IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
     }
 
     igraph_vector_int_destroy(&neis);

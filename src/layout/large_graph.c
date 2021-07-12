@@ -101,10 +101,10 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     igraph_t mst;
     igraph_integer_t root;
     igraph_integer_t no_of_layers, actlayer = 0;
-    igraph_vector_t vids;
-    igraph_vector_t layers;
-    igraph_vector_t parents;
-    igraph_vector_t edges;
+    igraph_vector_int_t vids;
+    igraph_vector_int_t layers;
+    igraph_vector_int_t parents;
+    igraph_vector_int_t edges;
     igraph_2dgrid_t grid;
     igraph_vector_int_t eids;
     igraph_vector_t forcex;
@@ -126,18 +126,18 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     /* Assign the layers */
-    IGRAPH_VECTOR_INIT_FINALLY(&vids, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&layers, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&parents, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, 0);
     IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
-    no_of_layers = igraph_vector_size(&layers) - 1;
+    no_of_layers = igraph_vector_int_size(&layers) - 1;
 
     /* We don't need the mst any more */
     igraph_destroy(&mst);
     igraph_empty(&mst, 0, IGRAPH_UNDIRECTED); /* to make finalization work */
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&forcey, no_of_nodes);
@@ -198,8 +198,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             sy = c * (massy + py) + MATRIX(*res, vid, 1);
 
             /* The neighbors of 'vid' */
-            while (j < VECTOR(layers)[actlayer + 1] &&
-                   VECTOR(parents)[(igraph_integer_t)VECTOR(vids)[j]] == vid) {
+            while (j < VECTOR(layers)[actlayer + 1] && VECTOR(parents)[VECTOR(vids)[j]] == vid) {
                 igraph_real_t rx, ry;
                 if (actlayer == 1) {
                     igraph_real_t phi = 2 * M_PI / (VECTOR(layers)[2] - 1) * (j - 1);
@@ -212,7 +211,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_i_norm2d(&rx, &ry);
                 rx = rx / actlayer * sconst;
                 ry = ry / actlayer * sconst;
-                igraph_2dgrid_add(&grid, (igraph_integer_t) VECTOR(vids)[j], sx + rx, sy + ry);
+                igraph_2dgrid_add(&grid, VECTOR(vids)[j], sx + rx, sy + ry);
                 j++;
             }
         }
@@ -228,15 +227,14 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_integer_t vid = VECTOR(vids)[j];
             igraph_integer_t k;
             IGRAPH_ALLOW_INTERRUPTION();
-            IGRAPH_CHECK(igraph_incident(graph, &eids, vid,
-                                         IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
                 igraph_integer_t from, to;
                 igraph_edge(graph, eid, &from, &to);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
                     (to   != vid && igraph_2dgrid_in(&grid, to))) {
-                    igraph_vector_push_back(&edges, eid);
+                    igraph_vector_int_push_back(&edges, eid);
                 }
             }
         }
@@ -261,11 +259,11 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             maxchange = 0;
 
             /* attractive "forces" along the edges */
-            for (jj = 0; jj < igraph_vector_size(&edges); jj++) {
+            for (jj = 0; jj < igraph_vector_int_size(&edges); jj++) {
                 igraph_integer_t from, to;
                 igraph_real_t xd, yd, dist, force;
                 IGRAPH_ALLOW_INTERRUPTION();
-                igraph_edge(graph, (igraph_integer_t) VECTOR(edges)[jj], &from, &to);
+                igraph_edge(graph, VECTOR(edges)[jj], &from, &to);
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
                 yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
                 dist = hypot(xd, yd);
@@ -285,10 +283,8 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_2dgrid_reset(&grid, &vidit);
             while ( (vid = igraph_2dgrid_next(&grid, &vidit) - 1) != -1) {
                 while ( (nei = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
-                    igraph_real_t xd = MATRIX(*res, vid, 0) -
-                                       MATRIX(*res, nei, 0);
-                    igraph_real_t yd = MATRIX(*res, vid, 1) -
-                                       MATRIX(*res, nei, 1);
+                    igraph_real_t xd = MATRIX(*res, vid, 0) - MATRIX(*res, nei, 0);
+                    igraph_real_t yd = MATRIX(*res, vid, 1) - MATRIX(*res, nei, 1);
                     igraph_real_t dist = hypot(xd, yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
@@ -334,10 +330,10 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     IGRAPH_PROGRESS("Large graph layout", 100.0, 0);
     igraph_destroy(&mst);
-    igraph_vector_destroy(&vids);
-    igraph_vector_destroy(&layers);
-    igraph_vector_destroy(&parents);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&vids);
+    igraph_vector_int_destroy(&layers);
+    igraph_vector_int_destroy(&parents);
+    igraph_vector_int_destroy(&edges);
     igraph_2dgrid_destroy(&grid);
     igraph_vector_int_destroy(&eids);
     igraph_vector_destroy(&forcex);
