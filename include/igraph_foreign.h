@@ -51,7 +51,7 @@ IGRAPH_EXPORT igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *in
                                             int index);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                                            igraph_strvector_t *problem,
-                                           igraph_vector_t *label,
+                                           igraph_vector_int_t *label,
                                            igraph_integer_t *source,
                                            igraph_integer_t *target,
                                            igraph_vector_t *capacity,

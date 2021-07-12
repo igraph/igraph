@@ -76,7 +76,7 @@ static igraph_error_t igraph_i_gml_toreal(igraph_gml_tree_t *node, igraph_intege
 
     switch (type) {
     case IGRAPH_I_GML_TREE_INTEGER:
-        value = igraph_gml_tree_get_integer(node, pos);
+        value = (igraph_real_t) igraph_gml_tree_get_integer(node, pos);
         break;
     case IGRAPH_I_GML_TREE_REAL:
         value = igraph_gml_tree_get_real(node, pos);
@@ -293,7 +293,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 } else {
                     /* already seen, should we update type? */
                     igraph_attribute_record_t *atrec = VECTOR(vattrs)[trieid];
-                    int type1 = atrec->type;
+                    igraph_attribute_type_t type1 = atrec->type;
                     igraph_i_gml_tree_type_t type2 = igraph_gml_tree_type(node, j);
                     if (type1 == IGRAPH_ATTRIBUTE_NUMERIC && type2 == IGRAPH_I_GML_TREE_STRING) {
                         atrec->type = IGRAPH_ATTRIBUTE_STRING;
@@ -357,7 +357,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     } else {
                         /* already seen, should we update type? */
                         igraph_attribute_record_t *atrec = VECTOR(eattrs)[trieid];
-                        int type1 = atrec->type;
+                        igraph_attribute_type_t type1 = atrec->type;
                         igraph_i_gml_tree_type_t type2 = igraph_gml_tree_type(edge, j);
                         if (type1 == IGRAPH_ATTRIBUTE_NUMERIC && type2 == IGRAPH_I_GML_TREE_STRING) {
                             atrec->type = IGRAPH_ATTRIBUTE_STRING;
@@ -384,7 +384,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     /* now we allocate the vectors and strvectors for the attributes */
     for (i = 0; i < igraph_vector_ptr_size(&vattrs); i++) {
         igraph_attribute_record_t *atrec = VECTOR(vattrs)[i];
-        int type = atrec->type;
+        igraph_attribute_type_t type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             atrec->value = p;
@@ -400,7 +400,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     for (i = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
         igraph_attribute_record_t *atrec = VECTOR(eattrs)[i];
-        int type = atrec->type;
+        igraph_attribute_type_t  type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             atrec->value = p;
@@ -433,7 +433,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 igraph_integer_t edgeid = edgeptr / 2;
                 igraph_integer_t trieidx;
                 igraph_attribute_record_t *atrec;
-                int type;
+                igraph_attribute_type_t type;
                 igraph_trie_get(&eattrnames, n, &trieidx);
                 atrec = VECTOR(eattrs)[trieidx];
                 type = atrec->type;
@@ -475,7 +475,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             for (j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *aname = igraph_gml_tree_name(node, j);
                 igraph_attribute_record_t *atrec;
-                int type;
+                igraph_attribute_type_t type;
                 igraph_trie_get(&vattrnames, aname, &k);
                 atrec = VECTOR(vattrs)[k];
                 type = atrec->type;
@@ -596,7 +596,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                            const igraph_vector_t *id, const char *creator) {
     igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames;
-    igraph_vector_t gtypes, vtypes, etypes;
+    igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_vector_t numv;
     igraph_strvector_t strv;
     igraph_vector_bool_t boolv;
@@ -618,9 +618,9 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&enames, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&gtypes, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&vtypes, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&etypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&gtypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&etypes, 0);
     IGRAPH_CHECK(igraph_i_attribute_get_info(graph,
                  &gnames, &gtypes,
                  &vnames, &vtypes,
@@ -633,7 +633,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     /* Check whether there is an 'id' node attribute if the supplied is 0 */
     if (!id) {
         igraph_bool_t found = 0;
-        for (i = 0; i < igraph_vector_size(&vtypes); i++) {
+        for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
             char *n;
             igraph_strvector_get(&vnames, i, &n);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -653,7 +653,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     CHECK(fprintf(outstream, "  directed %i\n", igraph_is_directed(graph) ? 1 : 0));
 
     /* Graph attributes first */
-    for (i = 0; i < igraph_vector_size(&gtypes); i++) {
+    for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
         char *name, *newname;
         igraph_strvector_get(&gnames, i, &name);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
@@ -686,8 +686,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         /* id */
         CHECK(fprintf(outstream, "    id %" IGRAPH_PRId "\n", myid ? (igraph_integer_t)VECTOR(*myid)[i] : i));
         /* other attributes */
-        for (j = 0; j < igraph_vector_size(&vtypes); j++) {
-            int type = (int) VECTOR(vtypes)[j];
+        for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
+            igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(vtypes)[j];
             char *name, *newname;
             igraph_strvector_get(&vnames, j, &name);
             if (!strcmp(name, "id")) {
@@ -734,8 +734,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                       myid ? (igraph_integer_t)VECTOR(*myid)[to] : to));
 
         /* other attributes */
-        for (j = 0; j < igraph_vector_size(&etypes); j++) {
-            int type = (int) VECTOR(etypes)[j];
+        for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
+            igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(etypes)[j];
             char *name, *newname;
             igraph_strvector_get(&enames, j, &name);
             if (!strcmp(name, "source") || !strcmp(name, "target")) {
@@ -779,9 +779,9 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     igraph_vector_bool_destroy(&boolv);
     igraph_strvector_destroy(&strv);
     igraph_vector_destroy(&numv);
-    igraph_vector_destroy(&etypes);
-    igraph_vector_destroy(&vtypes);
-    igraph_vector_destroy(&gtypes);
+    igraph_vector_int_destroy(&etypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&gtypes);
     igraph_strvector_destroy(&enames);
     igraph_strvector_destroy(&vnames);
     igraph_strvector_destroy(&gnames);

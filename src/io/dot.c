@@ -138,7 +138,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     char edgeop[3];
     igraph_strvector_t gnames, vnames, enames;
-    igraph_vector_t gtypes, vtypes, etypes;
+    igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_vector_t numv;
     igraph_strvector_t strv;
     igraph_vector_bool_t boolv;
@@ -146,9 +146,9 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&enames, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&gtypes, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&vtypes, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&etypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&gtypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&etypes, 0);
     IGRAPH_CHECK(igraph_i_attribute_get_info(graph,
                  &gnames, &gtypes,
                  &vnames, &vtypes,
@@ -170,9 +170,9 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     }
 
     /* Write the graph attributes */
-    if (igraph_vector_size(&gtypes) > 0) {
+    if (igraph_vector_int_size(&gtypes) > 0) {
         CHECK(fprintf(outstream, "  graph [\n"));
-        for (i = 0; i < igraph_vector_size(&gtypes); i++) {
+        for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
             char *name, *newname;
             igraph_strvector_get(&gnames, i, &name);
             IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
@@ -207,10 +207,10 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     }
 
     /* Write the vertices */
-    if (igraph_vector_size(&vtypes) > 0) {
+    if (igraph_vector_int_size(&vtypes) > 0) {
         for (i = 0; i < no_of_nodes; i++) {
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " [\n", i));
-            for (j = 0; j < igraph_vector_size(&vtypes); j++) {
+            for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
                 char *name, *newname;
                 igraph_strvector_get(&vnames, j, &name);
                 IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
@@ -252,12 +252,12 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     CHECK(fprintf(outstream, "\n"));
 
     /* Write the edges */
-    if (igraph_vector_size(&etypes) > 0) {
+    if (igraph_vector_int_size(&etypes) > 0) {
         for (i = 0; i < no_of_edges; i++) {
             igraph_integer_t from = IGRAPH_FROM(graph, i);
             igraph_integer_t to = IGRAPH_TO(graph, i);
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " %s %" IGRAPH_PRId " [\n", from, edgeop, to));
-            for (j = 0; j < igraph_vector_size(&etypes); j++) {
+            for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
                 char *name, *newname;
                 igraph_strvector_get(&enames, j, &name);
                 IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
@@ -305,9 +305,9 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     igraph_vector_bool_destroy(&boolv);
     igraph_strvector_destroy(&strv);
     igraph_vector_destroy(&numv);
-    igraph_vector_destroy(&etypes);
-    igraph_vector_destroy(&vtypes);
-    igraph_vector_destroy(&gtypes);
+    igraph_vector_int_destroy(&etypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&gtypes);
     igraph_strvector_destroy(&enames);
     igraph_strvector_destroy(&vnames);
     igraph_strvector_destroy(&gnames);

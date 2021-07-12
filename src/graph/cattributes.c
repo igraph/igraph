@@ -2196,21 +2196,21 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
 
 static igraph_error_t igraph_i_cattribute_get_info(const igraph_t *graph,
                                         igraph_strvector_t *gnames,
-                                        igraph_vector_t *gtypes,
+                                        igraph_vector_int_t *gtypes,
                                         igraph_strvector_t *vnames,
-                                        igraph_vector_t *vtypes,
+                                        igraph_vector_int_t *vtypes,
                                         igraph_strvector_t *enames,
-                                        igraph_vector_t *etypes) {
+                                        igraph_vector_int_t *etypes) {
 
     igraph_strvector_t *names[3] = { gnames, vnames, enames };
-    igraph_vector_t *types[3] = { gtypes, vtypes, etypes };
+    igraph_vector_int_t *types[3] = { gtypes, vtypes, etypes };
     igraph_i_cattributes_t *at = graph->attr;
     igraph_vector_ptr_t *attr[3] = { &at->gal, &at->val, &at->eal };
     igraph_integer_t i, j;
 
     for (i = 0; i < 3; i++) {
         igraph_strvector_t *n = names[i];
-        igraph_vector_t *t = types[i];
+        igraph_vector_int_t *t = types[i];
         igraph_vector_ptr_t *al = attr[i];
         igraph_integer_t len = igraph_vector_ptr_size(al);
 
@@ -2218,7 +2218,7 @@ static igraph_error_t igraph_i_cattribute_get_info(const igraph_t *graph,
             IGRAPH_CHECK(igraph_strvector_resize(n, len));
         }
         if (t) {
-            IGRAPH_CHECK(igraph_vector_resize(t, len));
+            IGRAPH_CHECK(igraph_vector_int_resize(t, len));
         }
 
         for (j = 0; j < len; j++) {
@@ -3101,9 +3101,9 @@ igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
  * Time complexity: O(Ag+Av+Ae), the number of all attributes.
  */
 igraph_error_t igraph_cattribute_list(const igraph_t *graph,
-                           igraph_strvector_t *gnames, igraph_vector_t *gtypes,
-                           igraph_strvector_t *vnames, igraph_vector_t *vtypes,
-                           igraph_strvector_t *enames, igraph_vector_t *etypes) {
+                           igraph_strvector_t *gnames, igraph_vector_int_t *gtypes,
+                           igraph_strvector_t *vnames, igraph_vector_int_t *vtypes,
+                           igraph_strvector_t *enames, igraph_vector_int_t *etypes) {
     return igraph_i_cattribute_get_info(graph, gnames, gtypes, vnames, vtypes,
                                         enames, etypes);
 }

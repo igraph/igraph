@@ -62,11 +62,11 @@ igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
 
 igraph_error_t igraph_i_attribute_get_info(const igraph_t *graph,
                                 igraph_strvector_t *gnames,
-                                igraph_vector_t *gtypes,
+                                igraph_vector_int_t *gtypes,
                                 igraph_strvector_t *vnames,
-                                igraph_vector_t *vtypes,
+                                igraph_vector_int_t *vtypes,
                                 igraph_strvector_t *enames,
-                                igraph_vector_t *etypes);
+                                igraph_vector_int_t *etypes);
 igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph,
                                           igraph_attribute_elemtype_t type,
                                           const char *name);

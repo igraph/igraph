@@ -76,7 +76,7 @@
  */
 igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                              igraph_strvector_t *problem,
-                             igraph_vector_t *label,
+                             igraph_vector_int_t *label,
                              igraph_integer_t *source,
                              igraph_integer_t *target,
                              igraph_vector_t *capacity,
@@ -136,7 +136,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 problem_type = PROBLEM_EDGE;
                 if (label) {
                     igraph_integer_t i;
-                    IGRAPH_CHECK(igraph_vector_resize(label, no_of_nodes));
+                    IGRAPH_CHECK(igraph_vector_int_resize(label, no_of_nodes));
                     for (i = 0; i < no_of_nodes; i++) {
                         VECTOR(*label)[i] = i + 1;
                     }

@@ -298,9 +298,9 @@ typedef struct igraph_attribute_table_t {
                          const igraph_vector_ptr_t *merges,
                          const igraph_attribute_combination_t *comb);
     igraph_error_t (*get_info)(const igraph_t *graph,
-                    igraph_strvector_t *gnames, igraph_vector_t *gtypes,
-                    igraph_strvector_t *vnames, igraph_vector_t *vtypes,
-                    igraph_strvector_t *enames, igraph_vector_t *etypes);
+                    igraph_strvector_t *gnames, igraph_vector_int_t *gtypes,
+                    igraph_strvector_t *vnames, igraph_vector_int_t *vtypes,
+                    igraph_strvector_t *enames, igraph_vector_int_t *etypes);
     igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
                               const char *name);
     igraph_error_t (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
@@ -370,9 +370,9 @@ IGRAPH_EXPORT igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const
                                          igraph_es_t eids, igraph_vector_bool_t *result);
 
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_list(const igraph_t *graph,
-                                         igraph_strvector_t *gnames, igraph_vector_t *gtypes,
-                                         igraph_strvector_t *vnames, igraph_vector_t *vtypes,
-                                         igraph_strvector_t *enames, igraph_vector_t *etypes);
+                                         igraph_strvector_t *gnames, igraph_vector_int_t *gtypes,
+                                         igraph_strvector_t *vnames, igraph_vector_int_t *vtypes,
+                                         igraph_strvector_t *enames, igraph_vector_int_t *etypes);
 IGRAPH_EXPORT igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
                                                        igraph_attribute_elemtype_t type,
                                                        const char *name);

@@ -33,6 +33,9 @@
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
+ - `igraph_attribute_table_t` field `get_info()` now uses
+   `igraph_vector_int_t` to return `gtypes`, `vtypes` and `etypes`.
+
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
    `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
    an `igraph_vector_int_t` for the out-degree sequence of the nodes being
@@ -48,6 +51,9 @@
 
  - `igraph_bridges()` now uses an `igraph_vector_int_t` to return the list of
    bridges, not an `igraph_vector_t`.
+
+ - `igraph_cattribute_list()` now uses `igraph_vector_int_t`
+   to return `gtypes`, `vtypes` and `etypes`.
 
  - `igraph_canonical_permutation()` now uses an `igraph_vector_int_t` for its
    labeling parameter.
@@ -220,6 +226,9 @@
 
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
+
+ - `igraph_read_graph_dimacs()` now uses an `igraph_vector_int_t` for its
+   label parameter.
 
  - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
    `outdeg` and `indeg` parameters.

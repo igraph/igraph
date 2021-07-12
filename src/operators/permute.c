@@ -71,12 +71,12 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     /* Attributes */
     if (graph->attr) {
         igraph_vector_int_t index;
-        igraph_vector_t vtypes;
+        igraph_vector_int_t vtypes;
         IGRAPH_I_ATTRIBUTE_DESTROY(res);
         IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/1, /*vertex=*/0, /*edge=*/1);
-        IGRAPH_VECTOR_INIT_FINALLY(&vtypes, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
         IGRAPH_CHECK(igraph_i_attribute_get_info(graph, 0, 0, 0, &vtypes, 0, 0));
-        if (igraph_vector_size(&vtypes) != 0) {
+        if (igraph_vector_int_size(&vtypes) != 0) {
             IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_nodes);
             for (i = 0; i < no_of_nodes; i++) {
                 VECTOR(index)[VECTOR(*permutation)[i]] = i;
@@ -85,7 +85,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
             igraph_vector_int_destroy(&index);
             IGRAPH_FINALLY_CLEAN(1);
         }
-        igraph_vector_destroy(&vtypes);
+        igraph_vector_int_destroy(&vtypes);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

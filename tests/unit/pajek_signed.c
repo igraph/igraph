@@ -27,13 +27,13 @@
 
 int print_attributes(const igraph_t *g) {
 
-    igraph_vector_t gtypes, vtypes, etypes;
+    igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
     igraph_integer_t i;
 
-    igraph_vector_init(&gtypes, 0);
-    igraph_vector_init(&vtypes, 0);
-    igraph_vector_init(&etypes, 0);
+    igraph_vector_int_init(&gtypes, 0);
+    igraph_vector_int_init(&vtypes, 0);
+    igraph_vector_int_init(&etypes, 0);
     igraph_strvector_init(&gnames, 0);
     igraph_strvector_init(&vnames, 0);
     igraph_strvector_init(&enames, 0);
@@ -74,9 +74,9 @@ int print_attributes(const igraph_t *g) {
     igraph_strvector_destroy(&enames);
     igraph_strvector_destroy(&vnames);
     igraph_strvector_destroy(&gnames);
-    igraph_vector_destroy(&etypes);
-    igraph_vector_destroy(&vtypes);
-    igraph_vector_destroy(&gtypes);
+    igraph_vector_int_destroy(&etypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&gtypes);
 
     return 0;
 }

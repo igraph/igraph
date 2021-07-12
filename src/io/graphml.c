@@ -1493,7 +1493,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     igraph_integer_t l, vc;
     igraph_eit_t it;
     igraph_strvector_t gnames, vnames, enames;
-    igraph_vector_t gtypes, vtypes, etypes;
+    igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_integer_t i;
     igraph_vector_t numv;
     igraph_strvector_t strv;
@@ -1544,16 +1544,16 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&enames, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&gtypes, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&vtypes, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&etypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&gtypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&etypes, 0);
     igraph_i_attribute_get_info(graph,
                                 &gnames, &gtypes,
                                 &vnames, &vtypes,
                                 &enames, &etypes);
 
     /* graph attributes */
-    for (i = 0; i < igraph_vector_size(&gtypes); i++) {
+    for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
         char *name, *name_escaped;
         igraph_strvector_get(&gnames, i, &name);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
@@ -1577,7 +1577,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     }
 
     /* vertex attributes */
-    for (i = 0; i < igraph_vector_size(&vtypes); i++) {
+    for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
         char *name, *name_escaped;
         igraph_strvector_get(&vnames, i, &name);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
@@ -1601,7 +1601,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     }
 
     /* edge attributes */
-    for (i = 0; i < igraph_vector_size(&etypes); i++) {
+    for (i = 0; i < igraph_vector_int_size(&etypes); i++) {
         char *name, *name_escaped;
         igraph_strvector_get(&enames, i, &name);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
@@ -1631,7 +1631,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
 
     /* Write the graph atributes before anything else */
 
-    for (i = 0; i < igraph_vector_size(&gtypes); i++) {
+    for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
         char *name, *name_escaped;
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_strvector_get(&gnames, i, &name);
@@ -1694,7 +1694,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         }
 
-        for (i = 0; i < igraph_vector_size(&vtypes); i++) {
+        for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
             if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_strvector_get(&vnames, i, &name);
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name,
@@ -1769,7 +1769,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         }
 
-        for (i = 0; i < igraph_vector_size(&etypes); i++) {
+        for (i = 0; i < igraph_vector_int_size(&etypes); i++) {
             if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_strvector_get(&enames, i, &name);
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name,
@@ -1849,9 +1849,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     igraph_strvector_destroy(&gnames);
     igraph_strvector_destroy(&vnames);
     igraph_strvector_destroy(&enames);
-    igraph_vector_destroy(&gtypes);
-    igraph_vector_destroy(&vtypes);
-    igraph_vector_destroy(&etypes);
+    igraph_vector_int_destroy(&gtypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&etypes);
     igraph_vector_destroy(&numv);
     igraph_strvector_destroy(&strv);
     igraph_vector_bool_destroy(&boolv);
