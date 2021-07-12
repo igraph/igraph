@@ -446,7 +446,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
     igraph_integer_t i, j;
 
     igraph_dqueue_int_clear(q);
-    memset(already_counted, 0, no_of_nodes * sizeof(igraph_integer_t));
+    memset(already_counted, 0, no_of_nodes * sizeof(already_counted[0]));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_int_size(vertex_neis);

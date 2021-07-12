@@ -345,7 +345,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     /* mark the nodes for which we need the result */
-    memset(geodist, 0, sizeof(igraph_integer_t) * (size_t) no_of_nodes);
+    memset(geodist, 0, sizeof(geodist[0]) * (size_t) no_of_nodes);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         geodist[ IGRAPH_VIT_GET(vit) ] = 1;
     }

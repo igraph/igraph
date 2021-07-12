@@ -122,7 +122,7 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
         vec = (k == 0) ? VECTOR(*ins_p) : VECTOR(*outs_p);
         for (i = 0; i < no_of_nodes; i++) {
             igraph_dqueue_int_clear(&q);
-            memset(geodist, 0, sizeof(igraph_integer_t) * (size_t) no_of_nodes);
+            memset(geodist, 0, sizeof(geodist[0]) * (size_t) no_of_nodes);
             geodist[i] = 1;
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
