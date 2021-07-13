@@ -5,13 +5,13 @@
 #include "test_utilities.inc"
 
 int compare_vectors(const void *p1, const void *p2) {
-    igraph_vector_t *v1, *v2;
+    igraph_vector_int_t *v1, *v2;
     igraph_integer_t s1, s2, i;
 
-    v1 = *((igraph_vector_t **) p1);
-    v2 = *((igraph_vector_t **) p2);
-    s1 = igraph_vector_size(v1);
-    s2 = igraph_vector_size(v2);
+    v1 = *((igraph_vector_int_t **) p1);
+    v2 = *((igraph_vector_int_t **) p2);
+    s1 = igraph_vector_int_size(v1);
+    s2 = igraph_vector_int_size(v2);
     if (s1 < s2) {
         return -1;
     }

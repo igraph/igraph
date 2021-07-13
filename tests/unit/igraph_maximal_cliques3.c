@@ -31,7 +31,7 @@ void sort_cliques(igraph_vector_ptr_t *cliques) {
         igraph_vector_int_t *v = VECTOR(*cliques)[i];
         igraph_vector_int_sort(v);
     }
-    igraph_vector_ptr_sort(cliques, igraph_vector_lex_cmp);
+    igraph_vector_ptr_sort(cliques, igraph_vector_int_lex_cmp);
 }
 
 int print_and_destroy(igraph_vector_ptr_t *cliques) {
