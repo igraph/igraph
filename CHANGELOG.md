@@ -353,11 +353,13 @@
    `igraph_vector_int_t` for its `edges` parameter instead of an
    `igraph_vector_t`. The `add_vertices()` function now takes an
    `igraph_integer_t` for the vertex count instead of a `long int`. The
-   `permute_vertices()` and `permute_edges()` functions in the attribute
-   handler tables now take an `igraph_vector_int_t` instead of an
-   `igraph_vector_t` for the index vectors. These are relevant only to
-   maintainers of higher level interfaces to igraph; they should update their
-   attribute handlers accordingly.
+   `combine_vertices()` and `combine_edges()` functions now take an
+   `igraph_vector_ptr_t` containing vectors of type `igraph_vector_int_t` in
+   their `merges` parameters. The `permute_vertices()` and `permute_edges()`
+   functions in the attribute handler tables now take an `igraph_vector_int_t`
+   instead of an `igraph_vector_t` for the index vectors. These are relevant
+   only to maintainers of higher level interfaces to igraph; they should update
+   their attribute handlers accordingly.
 
  - igraph functions that interface with external libraries such as BLAS or LAPACK
    may now fail if the underlying BLAS or LAPACK implementation cannot handle

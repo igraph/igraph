@@ -59,7 +59,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     igraph_t res;
     igraph_es_t es;
     igraph_eit_t eit;
-    igraph_vector_t mergeinto;
+    igraph_vector_int_t mergeinto;
     igraph_integer_t actedge;
 
     if (!multiple && !loops)
@@ -104,7 +104,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     }
 
     if (attr) {
-        IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&mergeinto, no_of_edges);
     }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
@@ -166,7 +166,7 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                      edge_comb));
 
         igraph_fixed_vectorlist_destroy(&vl);
-        igraph_vector_destroy(&mergeinto);
+        igraph_vector_int_destroy(&mergeinto);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

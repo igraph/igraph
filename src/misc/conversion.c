@@ -550,11 +550,11 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
     } else if (mode == IGRAPH_TO_UNDIRECTED_COLLAPSE) {
         igraph_vector_int_t inadj, outadj;
         igraph_integer_t i;
-        igraph_vector_t mergeinto;
+        igraph_vector_int_t mergeinto;
         igraph_integer_t actedge = 0;
 
         if (attr) {
-            IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&mergeinto, no_of_edges);
         }
 
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
@@ -678,18 +678,18 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
         *graph = newgraph;
 
         if (attr) {
-            igraph_vector_destroy(&mergeinto);
+            igraph_vector_int_destroy(&mergeinto);
             IGRAPH_FINALLY_CLEAN(1);
         }
     } else if (mode == IGRAPH_TO_UNDIRECTED_MUTUAL) {
         igraph_vector_int_t inadj, outadj;
         igraph_integer_t i;
-        igraph_vector_t mergeinto;
+        igraph_vector_int_t mergeinto;
         igraph_integer_t actedge = 0;
 
         if (attr) {
-            IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
-            igraph_vector_fill(&mergeinto, -1);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&mergeinto, no_of_edges);
+            igraph_vector_int_fill(&mergeinto, -1);
         }
 
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
@@ -771,7 +771,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
         *graph = newgraph;
 
         if (attr) {
-            igraph_vector_destroy(&mergeinto);
+            igraph_vector_int_destroy(&mergeinto);
             IGRAPH_FINALLY_CLEAN(1);
         }
     }

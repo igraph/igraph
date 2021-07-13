@@ -28,9 +28,9 @@
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
     igraph_integer_t i, n = igraph_vector_ptr_size(&l->v);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(l->v)[i];
+        igraph_vector_int_t *v = VECTOR(l->v)[i];
         if (v) {
-            igraph_vector_destroy(v);
+            igraph_vector_int_destroy(v);
         }
     }
     igraph_vector_ptr_destroy(&l->v);
@@ -38,13 +38,13 @@ void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
 }
 
 igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
-                                    const igraph_vector_t *from,
+                                    const igraph_vector_int_t *from,
                                     igraph_integer_t size) {
 
     igraph_vector_int_t sizes;
-    igraph_integer_t i, no = igraph_vector_size(from);
+    igraph_integer_t i, no = igraph_vector_int_size(from);
 
-    l->vecs = IGRAPH_CALLOC(size, igraph_vector_t);
+    l->vecs = IGRAPH_CALLOC(size, igraph_vector_int_t);
     if (!l->vecs) {
         IGRAPH_ERROR("Cannot merge attributes for simplify",
                      IGRAPH_ENOMEM);
@@ -61,16 +61,16 @@ igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
         }
     }
     for (i = 0; i < size; i++) {
-        igraph_vector_t *v = &(l->vecs[i]);
-        IGRAPH_CHECK(igraph_vector_init(v, VECTOR(sizes)[i]));
-        igraph_vector_clear(v);
+        igraph_vector_int_t *v = &(l->vecs[i]);
+        IGRAPH_CHECK(igraph_vector_int_init(v, VECTOR(sizes)[i]));
+        igraph_vector_int_clear(v);
         VECTOR(l->v)[i] = v;
     }
     for (i = 0; i < no; i++) {
         igraph_integer_t to = VECTOR(*from)[i];
         if (to >= 0) {
-            igraph_vector_t *v = &(l->vecs[to]);
-            IGRAPH_CHECK(igraph_vector_push_back(v, i));
+            igraph_vector_int_t *v = &(l->vecs[to]);
+            IGRAPH_CHECK(igraph_vector_int_push_back(v, i));
         }
     }
 
