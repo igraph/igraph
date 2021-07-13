@@ -30,6 +30,12 @@
  - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its `edges`
    parameter.
 
+ - `igraph_all_minimal_st_separators()` now returns the separators in
+   an `igraph_vector_ptr_t` containing `igraph_vector_int_t` vectors.
+
+ - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` now return the cuts in
+   an `igraph_vector_ptr_t` containing `igraph_vector_int_t` vectors.
+
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
@@ -55,6 +61,9 @@
 
  - `igraph_bridges()` now uses an `igraph_vector_int_t` to return the list of
    bridges, not an `igraph_vector_t`.
+
+ - `igraph_callaway_traits_game()` returns the node types in an `igraph_vector_int_t`
+   instead of an `igraph_vector_t`.
 
  - `igraph_cattribute_list()` now uses `igraph_vector_int_t`
    to return `gtypes`, `vtypes` and `etypes`.

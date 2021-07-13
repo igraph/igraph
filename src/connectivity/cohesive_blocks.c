@@ -51,18 +51,6 @@ static void igraph_i_cohesive_blocks_free_vectors(igraph_vector_ptr_t *ptr) {
     igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*ptr)[i];
-        if (v) {
-            igraph_vector_destroy(v);
-            igraph_free(v);
-        }
-    }
-}
-
-static void igraph_i_cohesive_blocks_free_int_vectors(igraph_vector_ptr_t *ptr) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
-
-    for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = VECTOR(*ptr)[i];
         if (v) {
             igraph_vector_int_destroy(v);
@@ -278,7 +266,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&Qmapping, 1));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &Qmapping);
-    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_int_vectors, &Qmapping);
+    IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_vectors, &Qmapping);
 
     IGRAPH_CHECK(igraph_vector_int_init(&Qparent, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &Qparent);
@@ -342,8 +330,8 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_bool_resize(&marked, mynodes));
         igraph_vector_bool_null(&marked);
         for (i = 0; i < nsep; i++) {
-            igraph_vector_t *v = VECTOR(separators)[i];
-            igraph_integer_t j, n = igraph_vector_size(v);
+            igraph_vector_int_t *v = VECTOR(separators)[i];
+            igraph_integer_t j, n = igraph_vector_int_size(v);
             for (j = 0; j < n; j++) {
                 igraph_integer_t vv = VECTOR(*v)[j];
                 if (!VECTOR(marked)[vv]) {
@@ -600,7 +588,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_bool_destroy(&Qcheck);
     igraph_vector_int_destroy(&Qcohesion);
     igraph_vector_int_destroy(&Qparent);
-    igraph_i_cohesive_blocks_free_int_vectors(&Qmapping);
+    igraph_i_cohesive_blocks_free_vectors(&Qmapping);
     IGRAPH_FINALLY_CLEAN(4);
 
     igraph_vector_ptr_destroy(&Qmapping);

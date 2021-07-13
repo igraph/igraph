@@ -940,8 +940,8 @@ igraph_error_t igraph_provan_shier_list(
     if (igraph_vector_int_size(&Isv) == 0) {
         if (igraph_marked_queue_int_size(S) != 0 &&
             igraph_marked_queue_int_size(S) != no_of_nodes) {
-            igraph_vector_t *vec = IGRAPH_CALLOC(1, igraph_vector_t);
-            IGRAPH_CHECK(igraph_vector_init(vec, igraph_marked_queue_int_size(S)));
+            igraph_vector_int_t *vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+            IGRAPH_CHECK(igraph_vector_int_init(vec, igraph_marked_queue_int_size(S)));
             IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, vec));
             IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
         }
@@ -990,11 +990,11 @@ igraph_error_t igraph_provan_shier_list(
  *
  * \param graph The input graph, is must be directed.
  * \param cuts An initialized pointer vector, the cuts are stored
- *        here. It is a list of pointers to igraph_vector_t
+ *        here. It is a list of pointers to igraph_vector_int_t
  *        objects. Each vector will contain the ids of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
  *        To free all memory allocated for \c cuts, you need call
- *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param partition1s An initialized pointer vector, the list of
  *        vertex sets, generating the actual edge cuts, are stored
@@ -1003,7 +1003,7 @@ igraph_error_t igraph_provan_shier_list(
  *        form an (s,t) edge-cut in the graph. This argument is
  *        ignored if it is a null pointer.
  *        To free all memory allocated for \c partition1s, you need call
- *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
@@ -1051,7 +1051,7 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
     IGRAPH_CHECK(igraph_estack_init(&T, no_of_nodes, 0));
     IGRAPH_FINALLY(igraph_estack_destroy, &T);
 
-    if (cuts)        {
+    if (cuts) {
         igraph_vector_ptr_clear(cuts);
     }
 
@@ -1069,10 +1069,10 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_int_destroy, &inS);
         IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
         for (i = 0; i < nocuts; i++) {
-            igraph_vector_t *cut;
-            igraph_vector_t *part = VECTOR(*mypartition1s)[i];
+            igraph_vector_int_t *cut;
+            igraph_vector_int_t *part = VECTOR(*mypartition1s)[i];
             igraph_integer_t cutsize = 0;
-            igraph_integer_t j, partlen = igraph_vector_size(part);
+            igraph_integer_t j, partlen = igraph_vector_int_size(part);
             /* Mark elements */
             for (j = 0; j < partlen; j++) {
                 igraph_integer_t v = VECTOR(*part)[j];
@@ -1089,11 +1089,11 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
                 }
             }
             /* Add the edges */
-            cut = IGRAPH_CALLOC(1, igraph_vector_t);
+            cut = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (!cut) {
                 IGRAPH_ERROR("Cannot calculate s-t cuts", IGRAPH_ENOMEM);
             }
-            IGRAPH_VECTOR_INIT_FINALLY(cut, cutsize);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(cut, cutsize);
             cutsize = 0;
             for (j = 0; j < no_of_edges; j++) {
                 igraph_integer_t from = IGRAPH_FROM(graph, j);
@@ -1118,8 +1118,8 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
 
     if (!partition1s) {
         for (i = 0; i < nocuts; i++) {
-            igraph_vector_t *cut = VECTOR(*mypartition1s)[i];
-            igraph_vector_destroy(cut);
+            igraph_vector_int_t *cut = VECTOR(*mypartition1s)[i];
+            igraph_vector_int_destroy(cut);
             igraph_free(cut);
             VECTOR(*mypartition1s)[i] = 0;
         }
@@ -1319,15 +1319,16 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \param value Pointer to a real number, the value of the minimum cut
  *        is stored here, unless it is a null pointer.
  * \param cuts An initialized pointer vector, the cuts are stored
- *        here. It is a list of pointers to igraph_vector_t
+ *        here. It is a list of pointers to \c igraph_vector_int_t
  *        objects. Each vector will contain the ids of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
  *        To free all memory allocated for \c cuts, you need call
- *        \ref igraph_vector_destroy() and then \ref igraph_free() on
+ *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param partition1s An initialized pointer vector, the list of
  *        vertex sets, generating the actual edge cuts, are stored
- *        here. Each vector contains a set of vertex ids. If X is such
+ *        here. It is a list of pointers to \c igraph_vector_int_t
+ *        objects. Each vector contains a set of vertex ids. If X is such
  *        a set, then all edges going from X to the complement of X
  *        form an (s,t) edge-cut in the graph. This argument is
  *        ignored if it is a null pointer.
@@ -1495,23 +1496,23 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_vector_ptr_clear(mypartition1s);
     IGRAPH_CHECK(igraph_vector_ptr_reserve(mypartition1s, nocuts));
     for (i = 0; i < nocuts; i++) {
-        igraph_vector_t *supercut = VECTOR(closedsets)[i];
-        igraph_integer_t j, supercutsize = igraph_vector_size(supercut);
-        igraph_vector_t *cut = IGRAPH_CALLOC(1, igraph_vector_t);
-        IGRAPH_VECTOR_INIT_FINALLY(cut, 0); /* TODO: better allocation */
+        igraph_vector_int_t *supercut = VECTOR(closedsets)[i];
+        igraph_integer_t j, supercutsize = igraph_vector_int_size(supercut);
+        igraph_vector_int_t *cut = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(cut, 0); /* TODO: better allocation */
         for (j = 0; j < supercutsize; j++) {
             igraph_integer_t vtx = VECTOR(*supercut)[j];
             igraph_integer_t ovtx = VECTOR(revmap_ptr)[vtx];
             while (ovtx != 0) {
                 ovtx--;
-                IGRAPH_CHECK(igraph_vector_push_back(cut, ovtx));
+                IGRAPH_CHECK(igraph_vector_int_push_back(cut, ovtx));
                 ovtx = VECTOR(revmap_next)[ovtx];
             }
         }
         igraph_vector_ptr_push_back(mypartition1s, cut);
         IGRAPH_FINALLY_CLEAN(1);
 
-        igraph_vector_destroy(supercut);
+        igraph_vector_int_destroy(supercut);
         igraph_free(supercut);
         VECTOR(closedsets)[i] = 0;
     }
@@ -1528,14 +1529,14 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
         IGRAPH_FINALLY(igraph_vector_int_destroy, &memb);
         IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
         for (i = 0; i < nocuts; i++) {
-            igraph_vector_t *part = VECTOR(*mypartition1s)[i];
-            igraph_integer_t j, n = igraph_vector_size(part);
-            igraph_vector_t *v;
-            v = IGRAPH_CALLOC(1, igraph_vector_t);
+            igraph_vector_int_t *part = VECTOR(*mypartition1s)[i];
+            igraph_integer_t j, n = igraph_vector_int_size(part);
+            igraph_vector_int_t *v;
+            v = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (!v) {
                 IGRAPH_ERROR("Cannot list minimum s-t cuts", IGRAPH_ENOMEM);
             }
-            IGRAPH_VECTOR_INIT_FINALLY(v, 0);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(v, 0);
             for (j = 0; j < n; j++) {
                 igraph_integer_t vtx = VECTOR(*part)[j];
                 VECTOR(memb)[vtx] = i + 1;
@@ -1545,7 +1546,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
                     igraph_integer_t from = IGRAPH_FROM(graph, j);
                     igraph_integer_t to = IGRAPH_TO(graph, j);
                     if (VECTOR(memb)[from] == i + 1 && VECTOR(memb)[to] != i + 1) {
-                        IGRAPH_CHECK(igraph_vector_push_back(v, j)); /* TODO: allocation */
+                        IGRAPH_CHECK(igraph_vector_int_push_back(v, j)); /* TODO: allocation */
                     }
                 }
             }
@@ -1567,8 +1568,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     if (!partition1s) {
         for (i = 0; i < nocuts; i++) {
-            igraph_vector_t *cut = VECTOR(*mypartition1s)[i];
-            igraph_vector_destroy(cut);
+            igraph_vector_int_t *cut = VECTOR(*mypartition1s)[i];
+            igraph_vector_int_destroy(cut);
             igraph_free(cut);
             VECTOR(*mypartition1s)[i] = 0;
         }

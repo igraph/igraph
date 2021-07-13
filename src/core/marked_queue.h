@@ -65,6 +65,6 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_start_batch(igraph_
 IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_int_pop_back_batch(igraph_marked_queue_int_t *q);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_as_vector(const igraph_marked_queue_int_t *q,
-                                                                   igraph_vector_t *vec);
+                                                                   igraph_vector_int_t *vec);
 
 #endif

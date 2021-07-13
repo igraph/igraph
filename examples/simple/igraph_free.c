@@ -11,9 +11,9 @@ int main(void)
    igraph_minimum_size_separators(&graph, &seps);
 
    for (i=0; i<igraph_vector_ptr_size(&seps); i++) {
-     igraph_vector_t *v=VECTOR(seps)[i];
-     igraph_vector_print(v);
-     igraph_vector_destroy(v);
+     igraph_vector_int_t *v=VECTOR(seps)[i];
+     igraph_vector_int_print(v);
+     igraph_vector_int_destroy(v);
      igraph_free(v);
    }
 

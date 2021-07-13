@@ -44,15 +44,15 @@ int test_all_st_cuts(const igraph_t *graph,
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -247,9 +247,9 @@ int main() {
 
     n = igraph_vector_ptr_size(&partition1s);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -268,9 +268,9 @@ int main() {
 
     n = igraph_vector_ptr_size(&partition1s);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -291,15 +291,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -321,15 +321,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -351,15 +351,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -383,15 +383,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -406,10 +406,10 @@ int main() {
     n = igraph_vector_ptr_size(&cuts);
     printf("Cuts only (no partitions):\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);

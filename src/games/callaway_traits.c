@@ -76,12 +76,12 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
                                 const igraph_vector_t *type_dist,
                                 const igraph_matrix_t *pref_matrix,
                                 igraph_bool_t directed,
-                                igraph_vector_t *node_type_vec) {
+                                igraph_vector_int_t *node_type_vec) {
     igraph_integer_t i, j;
     igraph_vector_int_t edges;
     igraph_vector_t cumdist;
     igraph_real_t maxcum;
-    igraph_vector_t *nodetypes;
+    igraph_vector_int_t *nodetypes;
 
     /* Argument contracts */
     if(nodes < 0){
@@ -150,14 +150,14 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
 
     if (node_type_vec) {
         nodetypes = node_type_vec;
-        IGRAPH_CHECK(igraph_vector_resize(nodetypes, nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(nodetypes, nodes));
     } else {
-        nodetypes = IGRAPH_CALLOC(1, igraph_vector_t);
+        nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! nodetypes) {
             IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, nodetypes);
-        IGRAPH_VECTOR_INIT_FINALLY(nodetypes, nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);
     }
 
     RNG_BEGIN();
@@ -186,7 +186,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
     RNG_END();
 
     if (! node_type_vec) {
-        igraph_vector_destroy(nodetypes);
+        igraph_vector_int_destroy(nodetypes);
         IGRAPH_FREE(nodetypes);
         IGRAPH_FINALLY_CLEAN(2);
     }
