@@ -62,6 +62,12 @@
  - `igraph_canonical_permutation()` now uses an `igraph_vector_int_t` for its
    labeling parameter.
 
+ - `igraph_cited_type_game()` now uses an `igraph_vector_int_t` for its
+   types parameter.
+
+ - `igraph_citing_cited_type_game()` now uses an `igraph_vector_int_t` for its
+   types parameter.
+
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
    mapping from block indices to parent block indices; also, it uses a pointer
    vector of `igraph_vector_int_t`s to return the blocks themselves instead of

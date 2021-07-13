@@ -239,7 +239,7 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
  */
 
 igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
-                           const igraph_vector_t *types,
+                           const igraph_vector_int_t *types,
                            const igraph_vector_t *pref,
                            igraph_integer_t edges_per_step,
                            igraph_bool_t directed) {
@@ -250,9 +250,9 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_integer_t i, j, type;
     igraph_integer_t pref_len = igraph_vector_size(pref);
 
-    if (igraph_vector_size(types) != nodes) {
+    if (igraph_vector_int_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") must match number of nodes (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL, igraph_vector_size(types), nodes);
+                      IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
     }
 
     if (nodes == 0) {
@@ -261,9 +261,9 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     /* the case of zero-length type vector is caught above, safe to call vector_min here */
-    if (igraph_vector_min(types) < 0) {
+    if (igraph_vector_int_min(types) < 0) {
         IGRAPH_ERRORF("Types should be non-negative, but found %g.",
-                      IGRAPH_EINVAL, igraph_vector_min(types));
+                      IGRAPH_EINVAL, igraph_vector_int_min(types));
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -321,7 +321,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
 err_pref_too_short:
     IGRAPH_ERRORF("Preference vector should have length at least %ld with the given types.", IGRAPH_EINVAL,
-                  (long) igraph_vector_max(types) + 1);
+                  (long) igraph_vector_int_max(types) + 1);
 
 err_pref_neg:
     IGRAPH_ERRORF("Preferences should be non-negative, but found %g.", IGRAPH_EINVAL,
@@ -378,7 +378,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  */
 
 igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
-                                  const igraph_vector_t *types,
+                                  const igraph_vector_int_t *types,
                                   const igraph_matrix_t *pref,
                                   igraph_integer_t edges_per_step,
                                   igraph_bool_t directed) {
@@ -390,14 +390,14 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     igraph_integer_t no_of_types;
     igraph_integer_t i, j;
 
-    if (igraph_vector_size(types) != nodes) {
+    if (igraph_vector_int_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") not equal to number"
                       " of nodes (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL, igraph_vector_size(types), nodes);
+                      IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
     }
 
     /* avoid calling vector_max on empty vector */
-    no_of_types = nodes == 0 ? 0 : igraph_vector_max(types) + 1;
+    no_of_types = nodes == 0 ? 0 : igraph_vector_int_max(types) + 1;
 
     if (igraph_matrix_ncol(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix columns (%" IGRAPH_PRId ") not "

@@ -138,13 +138,13 @@ IGRAPH_EXPORT igraph_error_t igraph_lastcit_game(igraph_t *graph,
                                       const igraph_vector_t *preference, igraph_bool_t directed);
 
 IGRAPH_EXPORT igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
-                                         const igraph_vector_t *types,
+                                         const igraph_vector_int_t *types,
                                          const igraph_vector_t *pref,
                                          igraph_integer_t edges_per_step,
                                          igraph_bool_t directed);
 
 IGRAPH_EXPORT igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
-                                                const igraph_vector_t *types,
+                                                const igraph_vector_int_t *types,
                                                 const igraph_matrix_t *pref,
                                                 igraph_integer_t edges_per_step,
                                                 igraph_bool_t directed);
