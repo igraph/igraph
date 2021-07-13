@@ -65,7 +65,7 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
 # define MARK_NEIGHBORS(vertex) do {                \
         igraph_integer_t xxx_ =VECTOR(first)[(vertex)];              \
         while (xxx_) {                      \
-            int o= VECTOR(*edges)[xxx_ % 2 ? xxx_ : xxx_-2];    \
+            igraph_integer_t o= VECTOR(*edges)[xxx_ % 2 ? xxx_ : xxx_-2];    \
             VECTOR(marked)[o]=other+1;                \
             xxx_=VECTOR(next)[xxx_-1];                \
         }                               \
