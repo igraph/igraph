@@ -40,15 +40,15 @@ void canonicalize_list(igraph_vector_ptr_t *list) {
 }
 
 /* Prints a clique vector along with its weight */
-void print_weighted_clique(const igraph_vector_t *clique, const igraph_vector_t *vertex_weights) {
-    igraph_integer_t i, n = igraph_vector_size(clique);
-    igraph_real_t clique_weight = 0.0;
+void print_weighted_clique(const igraph_vector_int_t *clique, const igraph_vector_int_t *vertex_weights) {
+    igraph_integer_t i, n = igraph_vector_int_size(clique);
+    igraph_integer_t clique_weight = 0;
     for (i = 0; i < n; i++) {
         int v = VECTOR(*clique)[i];
-        clique_weight += igraph_vector_e(vertex_weights, v);
+        clique_weight += igraph_vector_int_e(vertex_weights, v);
         printf(" %d", v);
     }
-    printf(" w=%.1f\n", clique_weight);
+    printf(" w=%" IGRAPH_PRId "\n", clique_weight);
 }
 
 int main() {
@@ -66,13 +66,13 @@ int main() {
 
     /* vertex weights in test graph,
        note that current implementation only supports integer weights */
-    igraph_vector_t vertex_weights;
-    igraph_real_t vertex_weight_data[] = {3., 2., 3., 5., 2., 3., 1., 3., 5., 5.};
+    igraph_vector_int_t vertex_weights;
+    igraph_integer_t vertex_weight_data[] = {3, 2, 3, 5, 2, 3, 1, 3, 5, 5};
 
     igraph_vector_ptr_t result; /* result clique list */
     igraph_integer_t count; /* number of cliques found */
 
-    igraph_real_t weighted_clique_no;
+    igraph_integer_t weighted_clique_no;
 
     int i;
 
@@ -82,7 +82,7 @@ int main() {
     igraph_create(&graph, &edges, n, /* directed= */ 0);
 
     /* set up vertex weight vector */
-    igraph_vector_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(vertex_weight_data[0]));
+    igraph_vector_int_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(vertex_weight_data[0]));
 
     /* initialize result vector_ptr */
     igraph_vector_ptr_init(&result, 0);
@@ -96,9 +96,9 @@ int main() {
 
     canonicalize_list(&result);
     for (i = 0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
+        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
-        igraph_vector_destroy(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 
@@ -111,9 +111,9 @@ int main() {
 
     canonicalize_list(&result);
     for (i = 0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
+        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
-        igraph_vector_destroy(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 
@@ -126,9 +126,9 @@ int main() {
 
     canonicalize_list(&result);
     for (i = 0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
+        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
-        igraph_vector_destroy(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 
@@ -141,9 +141,9 @@ int main() {
 
     canonicalize_list(&result);
     for (i = 0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
+        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
-        igraph_vector_destroy(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 
@@ -156,19 +156,19 @@ int main() {
 
     canonicalize_list(&result);
     for (i = 0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
+        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
-        igraph_vector_destroy(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 
     igraph_weighted_clique_number(&graph, &vertex_weights, &weighted_clique_no);
-    printf("weighted clique number: %.1f\n", weighted_clique_no);
+    printf("weighted clique number: %" IGRAPH_PRId "\n", weighted_clique_no);
 
 
     /* free data structures */
     igraph_vector_ptr_destroy(&result);
-    igraph_vector_destroy(&vertex_weights);
+    igraph_vector_int_destroy(&vertex_weights);
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&edges);
 

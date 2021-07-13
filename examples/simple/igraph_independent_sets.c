@@ -24,14 +24,6 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-void print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t) VECTOR(*v)[i]);
-    }
-    printf("\n");
-}
-
 int main() {
 
     igraph_t g;
@@ -53,10 +45,10 @@ int main() {
         n = igraph_vector_ptr_size(&result);
         printf("%" IGRAPH_PRId " independent sets found\n", n);
         for (i = 0; i < n; i++) {
-            igraph_vector_t* v;
+            igraph_vector_int_t* v;
             v = igraph_vector_ptr_e(&result, i);
-            print_vector((igraph_vector_t*)v);
-            igraph_vector_destroy(v);
+            igraph_vector_int_print(v);
+            igraph_vector_int_destroy(v);
             igraph_free(v);
         }
     }
@@ -67,10 +59,10 @@ int main() {
     n = igraph_vector_ptr_size(&result);
     printf("%" IGRAPH_PRId " maximal independent sets found\n", n);
     for (i = 0; i < n; i++) {
-        igraph_vector_t* v;
+        igraph_vector_int_t* v;
         v = igraph_vector_ptr_e(&result, i);
-        print_vector((igraph_vector_t*)v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
     igraph_vector_ptr_destroy(&result);

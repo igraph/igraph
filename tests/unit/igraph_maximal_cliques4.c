@@ -28,8 +28,8 @@
 void sort_cliques(igraph_vector_ptr_t *cliques) {
     int i, n = igraph_vector_ptr_size(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_vector_sort(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_sort(v);
     }
     igraph_vector_ptr_sort(cliques, igraph_vector_lex_cmp);
 }
@@ -38,9 +38,9 @@ int print_and_destroy(igraph_vector_ptr_t *cliques) {
     int i, n = igraph_vector_ptr_size(cliques);
     sort_cliques(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
     }
     igraph_vector_ptr_destroy_all(cliques);
     return 0;

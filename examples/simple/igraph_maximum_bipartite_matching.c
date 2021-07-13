@@ -186,52 +186,6 @@ int test_weighted_graph_generated() {
     return 0;
 }
 
-int test_weighted_graph_from_file(const char* fname, int type1_count, igraph_integer_t exp_weight) {
-    igraph_t graph;
-    igraph_vector_bool_t types;
-    igraph_vector_int_t matching;
-    igraph_vector_t weights;
-    igraph_real_t matching_weight;
-    FILE* f;
-    igraph_integer_t i, n;
-
-    f = fopen(fname, "r");
-    if (!f) {
-        fprintf(stderr, "No such file: %s\n", fname);
-        return 1;
-    }
-    igraph_read_graph_ncol(&graph, f, 0, 1, IGRAPH_ADD_WEIGHTS_YES, 0);
-    fclose(f);
-
-    n = igraph_vcount(&graph);
-    igraph_vector_bool_init(&types, n);
-    for (i = 0; i < n; i++) {
-        VECTOR(types)[i] = (i >= type1_count);
-    }
-
-    igraph_vector_int_init(&matching, 0);
-
-    igraph_vector_init(&weights, 0);
-    EANV(&graph, "weight", &weights);
-    igraph_maximum_bipartite_matching(&graph, &types, 0, &matching_weight,
-                                      &matching, &weights, 0);
-    igraph_vector_destroy(&weights);
-
-    igraph_vector_int_print(&matching);
-    if (matching_weight != exp_weight) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: %" IGRAPH_PRId "\n", (igraph_integer_t)matching_weight,
-               exp_weight);
-        return 2;
-    }
-
-    igraph_vector_destroy(&weights);
-    igraph_vector_int_destroy(&matching);
-    igraph_vector_bool_destroy(&types);
-    igraph_destroy(&graph);
-
-    return 0;
-}
-
 // This test addresses issue #1110, where an incorrect
 // types vector (i.e. that doesn't correspond to a bipartite
 // labelling of the graph) would cause a possible infinite loop.

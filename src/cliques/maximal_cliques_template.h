@@ -26,13 +26,13 @@
 #define RESNAME res
 #define SUFFIX
 #define RECORD do {                         \
-        igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
+        igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t);      \
         igraph_integer_t j;                              \
         if (!cl) {                              \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
         }                                   \
         IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));             \
-        IGRAPH_CHECK(igraph_vector_init(cl, clsize));                   \
+        IGRAPH_CHECK(igraph_vector_int_init(cl, clsize));                   \
         for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }    \
     } while (0)
 #define FINALLY do {                    \
@@ -76,13 +76,13 @@
 #define SUFFIX _subset
 #define RECORD do {                         \
         if (res) {                                \
-            igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
+            igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t);      \
             igraph_integer_t j;                              \
             if (!cl) {                              \
                 IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
             }                                   \
             IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));             \
-            IGRAPH_CHECK(igraph_vector_init(cl, clsize));                   \
+            IGRAPH_CHECK(igraph_vector_int_init(cl, clsize));                   \
             for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }    \
         }                                 \
         if (no) { (*no)++; }                              \
@@ -111,12 +111,12 @@
 #define RESNAME cliquehandler_fn, arg
 #define SUFFIX _callback
 #define RECORD do { \
-        igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t); \
+        igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t); \
         igraph_integer_t j; \
         if (!cl) { \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
         } \
-        IGRAPH_CHECK(igraph_vector_init(cl, clsize)); \
+        IGRAPH_CHECK(igraph_vector_int_init(cl, clsize)); \
         for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; } \
         if (!cliquehandler_fn(cl, arg)) \
             return IGRAPH_STOP; \
@@ -128,18 +128,18 @@
 #endif
 
 #ifdef IGRAPH_MC_HIST
-#define RESTYPE igraph_vector_t *hist
+#define RESTYPE igraph_vector_int_t *hist
 #define RESNAME hist
 #define SUFFIX _hist
 #define RECORD do { \
-        igraph_integer_t hsize = igraph_vector_size(hist); \
+        igraph_integer_t hsize = igraph_vector_int_size(hist); \
         if (clsize > hsize) { \
-            igraph_integer_t hcapacity = igraph_vector_capacity(hist); \
+            igraph_integer_t hcapacity = igraph_vector_int_capacity(hist); \
             igraph_integer_t j; \
             igraph_error_t err; \
             if (hcapacity < clsize && clsize < 2*hcapacity) \
-                err = igraph_vector_reserve(hist, 2*hcapacity); \
-            err = igraph_vector_resize(hist, clsize); \
+                err = igraph_vector_int_reserve(hist, 2*hcapacity); \
+            err = igraph_vector_int_resize(hist, clsize); \
             if (err != IGRAPH_SUCCESS) \
                 IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); \
             for (j=hsize; j < clsize; j++) \
@@ -148,8 +148,8 @@
         VECTOR(*hist)[clsize-1] += 1; \
     } while (0)
 #define FINALLY \
-    igraph_vector_clear(hist); \
-    igraph_vector_reserve(hist, 50); /* initially reserve space for 50 elements */
+    igraph_vector_int_clear(hist); \
+    igraph_vector_int_reserve(hist, 50); /* initially reserve space for 50 elements */
 #define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
@@ -160,10 +160,10 @@ static void igraph_i_maximal_cliques_free(void *ptr) {
     igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
     igraph_integer_t i, n = igraph_vector_ptr_size(res);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*res)[i];
+        igraph_vector_int_t *v = VECTOR(*res)[i];
         if (v) {
             IGRAPH_FREE(v);
-            igraph_vector_destroy(v);
+            igraph_vector_int_destroy(v);
         }
     }
     igraph_vector_ptr_clear(res);
@@ -176,10 +176,10 @@ static void igraph_i_maximal_cliques_free_full(void *ptr) {
         igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
         igraph_integer_t i, n = igraph_vector_ptr_size(res);
         for (i = 0; i < n; i++) {
-            igraph_vector_t *v = VECTOR(*res)[i];
+            igraph_vector_int_t *v = VECTOR(*res)[i];
             if (v) {
                 IGRAPH_FREE(v);
-                igraph_vector_destroy(v);
+                igraph_vector_int_destroy(v);
             }
         }
         igraph_vector_ptr_clear(res);

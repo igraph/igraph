@@ -339,7 +339,7 @@ static igraph_error_t igraph_i_maximal_cliques_up(
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed. Note that vertices
@@ -494,8 +494,8 @@ igraph_error_t igraph_maximal_cliques_subset(const igraph_t *graph,
  *
  * This function enumerates all maximal cliques within the given size range
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as a pointer to an \ref igraph_vector_t.  Destroying and
- * freeing this vector is left up to the user.  Use \ref igraph_vector_destroy()
+ * callback function as a pointer to an \ref igraph_vector_int_t.  Destroying and
+ * freeing this vector is left up to the user.  Use \ref igraph_vector_int_destroy()
  * to destroy it first, then free it using \ref igraph_free().
  *
  * </para><para>
@@ -562,7 +562,7 @@ igraph_error_t igraph_maximal_cliques_callback(const igraph_t *graph,
  */
 
 igraph_error_t igraph_maximal_cliques_hist(const igraph_t *graph,
-                                igraph_vector_t *hist,
+                                igraph_vector_int_t *hist,
                                 igraph_integer_t min_size,
                                 igraph_integer_t max_size);
 

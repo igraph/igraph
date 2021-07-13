@@ -29,7 +29,7 @@
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
 void permutation(igraph_vector_int_t *vec) {
-    int i, r, tmp;
+    igraph_integer_t i, r, tmp;
     for (i = 0; i < CLIQUE_SIZE; i++) {
         r = INT(NODES - 1);
         tmp = VECTOR(*vec)[i];
@@ -39,14 +39,14 @@ void permutation(igraph_vector_int_t *vec) {
 }
 
 int sort_cmp(const void *a, const void *b) {
-    const igraph_vector_t **da = (const igraph_vector_t **) a;
-    const igraph_vector_t **db = (const igraph_vector_t **) b;
-    igraph_integer_t i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
+    const igraph_vector_int_t **da = (const igraph_vector_int_t **) a;
+    const igraph_vector_int_t **db = (const igraph_vector_int_t **) b;
+    igraph_integer_t i, alen = igraph_vector_int_size(*da), blen = igraph_vector_int_size(*db);
     if (alen != blen) {
         return (alen < blen) - (alen > blen);
     }
     for (i = 0; i < alen; i++) {
-        int ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
+        igraph_integer_t ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
         if (ea != eb) {
             return (ea > eb) - (ea < eb);
         }
@@ -57,8 +57,8 @@ int sort_cmp(const void *a, const void *b) {
 void sort_cliques(igraph_vector_ptr_t *cliques) {
     igraph_integer_t i, n = igraph_vector_ptr_size(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_vector_sort(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_sort(v);
     }
     igraph_qsort(VECTOR(*cliques), (size_t) n,
                  sizeof(igraph_vector_t *), sort_cmp);
@@ -68,9 +68,9 @@ void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
     int i;
     sort_cliques(cliques);
     for (i = 0; i < igraph_vector_ptr_size(cliques); i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
 }

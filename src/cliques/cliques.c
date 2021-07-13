@@ -43,7 +43,7 @@ static void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
     n = igraph_vector_ptr_size(res);
     for (i = 0; i < n; i++) {
         if (VECTOR(*res)[i] != 0) {
-            igraph_vector_destroy(VECTOR(*res)[i]);
+            igraph_vector_int_destroy(VECTOR(*res)[i]);
             igraph_free(VECTOR(*res)[i]);
         }
     }
@@ -53,22 +53,22 @@ static void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
 static igraph_error_t igraph_i_find_k_cliques(
         const igraph_t *graph,
         igraph_integer_t size,
-        const igraph_real_t *member_storage,
-        igraph_real_t **new_member_storage,
+        const igraph_integer_t *member_storage,
+        igraph_integer_t **new_member_storage,
         igraph_integer_t old_clique_count,
         igraph_integer_t *clique_count,
         igraph_vector_int_t *neis,
         igraph_bool_t independent_vertices) {
 
     igraph_integer_t j, k, l, m, n, new_member_storage_size;
-    const igraph_real_t *c1, *c2;
-    igraph_real_t v1, v2;
+    const igraph_integer_t *c1, *c2;
+    igraph_integer_t v1, v2;
     igraph_bool_t ok;
 
     /* Allocate the storage */
     *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                          (size_t) (size * old_clique_count),
-                                         igraph_real_t);
+                                         igraph_integer_t);
     if (*new_member_storage == 0) {
         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
     }
@@ -166,7 +166,7 @@ static igraph_error_t igraph_i_find_k_cliques(
                     IGRAPH_FINALLY_CLEAN(1);
                     *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                                          (size_t) new_member_storage_size * 2,
-                                                         igraph_real_t);
+                                                         igraph_integer_t);
                     if (*new_member_storage == 0) {
                         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
                     }
@@ -194,7 +194,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
 
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t neis;
-    igraph_real_t *member_storage = 0, *new_member_storage, *c1;
+    igraph_integer_t *member_storage = 0, *new_member_storage, *c1;
     igraph_integer_t i, j, k, clique_count, old_clique_count;
 
     if (igraph_is_directed(graph)) {
@@ -216,14 +216,14 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
     IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
 
     /* Will be resized later, if needed. */
-    member_storage = IGRAPH_CALLOC(1, igraph_real_t);
+    member_storage = IGRAPH_CALLOC(1, igraph_integer_t);
     if (member_storage == 0) {
         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, member_storage);
 
     /* Find all 1-cliques: every vertex will be a clique */
-    new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
+    new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (new_member_storage == 0) {
         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
     }
@@ -240,12 +240,12 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
         IGRAPH_CHECK(igraph_vector_ptr_resize(res, no_of_nodes));
         igraph_vector_ptr_null(res);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
+            igraph_vector_int_t *p = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (p == 0) {
                 IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
             }
             IGRAPH_FINALLY(igraph_free, p);
-            IGRAPH_CHECK(igraph_vector_init(p, 1));
+            IGRAPH_CHECK(igraph_vector_int_init(p, 1));
             VECTOR(*p)[0] = i;
             VECTOR(*res)[i] = p;
             IGRAPH_FINALLY_CLEAN(1);
@@ -279,13 +279,13 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
         /* Add the cliques just found to the result if requested */
         if (i >= min_size && i <= max_size) {
             for (j = 0, k = 0; j < clique_count; j++, k += i) {
-                igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
+                igraph_vector_int_t *p = IGRAPH_CALLOC(1, igraph_vector_int_t);
                 if (p == 0) {
                     IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
                 }
                 IGRAPH_FINALLY(igraph_free, p);
-                IGRAPH_CHECK(igraph_vector_init_copy(p, &new_member_storage[k], i));
-                IGRAPH_FINALLY(igraph_vector_destroy, p);
+                IGRAPH_CHECK(igraph_vector_int_init_copy(p, &new_member_storage[k], i));
+                IGRAPH_FINALLY(igraph_vector_int_destroy, p);
                 IGRAPH_CHECK(igraph_vector_ptr_push_back(res, p));
                 IGRAPH_FINALLY_CLEAN(2);
             }
@@ -318,7 +318,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -367,7 +367,7 @@ igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * Time complexity: Exponential
  *
  */
-igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
+igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_int_t *hist,
                             igraph_integer_t min_size, igraph_integer_t max_size) {
     return igraph_i_cliquer_histogram(graph, hist, min_size, max_size);
 }
@@ -381,8 +381,8 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  * Cliques are fully connected subgraphs of a graph. This function
  * enumerates all cliques within the given size range and calls
  * \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as a pointer to an \ref igraph_vector_t.  Destroying and
- * freeing this vector is left up to the user.  Use \ref igraph_vector_destroy()
+ * callback function as a pointer to an \ref igraph_vector_int_t.  Destroying and
+ * freeing this vector is left up to the user.  Use \ref igraph_vector_int_destroy()
  * to destroy it first, then free it using \ref igraph_free().
  *
  * </para><para>The current implementation of this function
@@ -427,10 +427,9 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
- * \param vertex_weights A vector of vertex weights. The current implementation
- *   will truncate all weights to their integer parts.
+ * \param vertex_weights A vector of vertex weights.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -447,8 +446,8 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  *
  */
 igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
-                            const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
-                            igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
+                            const igraph_vector_int_t *vertex_weights, igraph_vector_ptr_t *res,
+                            igraph_integer_t min_weight, igraph_integer_t max_weight, igraph_bool_t maximal) {
     return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
 }
 
@@ -467,10 +466,9 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
- * \param vertex_weights A vector of vertex weights. The current implementation
- *   will truncate all weights to their integer parts.
+ * \param vertex_weights A vector of vertex weights.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -481,7 +479,7 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * Time complexity: TODO
  */
 igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
-                                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res) {
+                                    const igraph_vector_int_t *vertex_weights, igraph_vector_ptr_t *res) {
     return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
 }
 
@@ -497,9 +495,8 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
  * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
- * \param vertex_weights A vector of vertex weights. The current implementation
- *   will truncate all weights to their integer parts.
- * \param res The largest weight will be returned to the \c igraph_real_t
+ * \param vertex_weights A vector of vertex weights.
+ * \param res The largest weight will be returned to the \c igraph_integer_t
  *   pointed to by this variable.
  * \return Error code.
  *
@@ -509,11 +506,11 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
  *
  */
 igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
-                                  const igraph_vector_t *vertex_weights, igraph_real_t *res) {
+                                  const igraph_vector_int_t *vertex_weights, igraph_integer_t *res) {
     return igraph_i_weighted_clique_number(graph, vertex_weights, res);
 }
 
-typedef igraph_error_t(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);
+typedef igraph_error_t(*igraph_i_maximal_clique_func_t)(const igraph_vector_int_t*, void*, igraph_bool_t*);
 typedef struct {
     igraph_vector_ptr_t* result;
     igraph_integer_t min_size;
@@ -550,7 +547,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -608,7 +605,7 @@ igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
 typedef struct igraph_i_max_ind_vsets_data_t {
     igraph_integer_t matrix_size;
     igraph_adjlist_t adj_list;         /* Adjacency list of the graph */
-    igraph_vector_t deg;                 /* Degrees of individual nodes */
+    igraph_vector_int_t deg;                 /* Degrees of individual nodes */
     igraph_set_t* buckets;               /* Bucket array */
     /* The IS value for each node. Still to be explained :) */
     igraph_integer_t* IS;
@@ -631,17 +628,17 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
     if (level >= clqdata->matrix_size - 1) {
         igraph_integer_t size = 0;
         if (res) {
-            igraph_vector_t *vec;
-            vec = IGRAPH_CALLOC(1, igraph_vector_t);
+            igraph_vector_int_t *vec;
+            vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
             if (vec == 0) {
                 IGRAPH_ERROR("igraph_i_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
             }
-            IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
             for (v1 = 0; v1 < clqdata->matrix_size; v1++)
                 if (clqdata->IS[v1] == 0) {
-                    IGRAPH_CHECK(igraph_vector_push_back(vec, v1));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(vec, v1));
                 }
-            size = igraph_vector_size(vec);
+            size = igraph_vector_int_size(vec);
             if (!clqdata->keep_only_largest) {
                 IGRAPH_CHECK(igraph_vector_ptr_push_back(res, vec));
             } else {
@@ -650,7 +647,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
                      * larger than all previous sets, so we have to clear the list */
                     j = igraph_vector_ptr_size(res);
                     for (v1 = 0; v1 < j; v1++) {
-                        igraph_vector_destroy(VECTOR(*res)[v1]);
+                        igraph_vector_int_destroy(VECTOR(*res)[v1]);
                         free(VECTOR(*res)[v1]);
                     }
                     igraph_vector_ptr_clear(res);
@@ -658,7 +655,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
                 } else if (size == clqdata->largest_set_size) {
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(res, vec));
                 } else {
-                    igraph_vector_destroy(vec);
+                    igraph_vector_int_destroy(vec);
                     free(vec);
                 }
             }
@@ -792,7 +789,7 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -826,7 +823,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&clqdata.deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
@@ -852,7 +849,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
         igraph_set_destroy(&clqdata.buckets[i]);
     }
     igraph_adjlist_destroy(&clqdata.adj_list);
-    igraph_vector_destroy(&clqdata.deg);
+    igraph_vector_int_destroy(&clqdata.deg);
     igraph_free(clqdata.IS);
     igraph_free(clqdata.buckets);
     IGRAPH_FINALLY_CLEAN(4);
@@ -905,7 +902,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     }
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&clqdata.deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
@@ -930,7 +927,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
         igraph_set_destroy(&clqdata.buckets[i]);
     }
     igraph_adjlist_destroy(&clqdata.adj_list);
-    igraph_vector_destroy(&clqdata.deg);
+    igraph_vector_int_destroy(&clqdata.deg);
     igraph_free(clqdata.IS);
     igraph_free(clqdata.buckets);
     IGRAPH_FINALLY_CLEAN(4);
@@ -942,83 +939,44 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 /* MAXIMAL CLIQUES, LARGEST CLIQUES                                      */
 /*************************************************************************/
 
-static igraph_error_t igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void* data,
+static igraph_error_t igraph_i_maximal_cliques_store_max_size(const igraph_vector_int_t* clique, void* data,
                                                    igraph_bool_t* cont) {
     igraph_integer_t* result = (igraph_integer_t*)data;
     IGRAPH_UNUSED(cont);
-    if (*result < igraph_vector_size(clique)) {
-        *result = igraph_vector_size(clique);
+    if (*result < igraph_vector_int_size(clique)) {
+        *result = igraph_vector_int_size(clique);
     }
     return IGRAPH_SUCCESS;
 }
 
-/*
-static igraph_error_t igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
+static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* clique, void* data, igraph_bool_t* cont) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
-    igraph_vector_t* vec;
-
-    IGRAPH_UNUSED(cont);
-    vec = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
-    }
-
-    IGRAPH_CHECK(igraph_vector_copy(vec, clique));
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
-
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* clique, void* data_, igraph_bool_t* cont) {
-    igraph_i_maximal_clique_data_t* data = (igraph_i_maximal_clique_data_t*)data_;
-    igraph_vector_t* vec;
-    igraph_integer_t size = igraph_vector_size(clique);
-
-    IGRAPH_UNUSED(cont);
-    if (size < data->min_size || size > data->max_size) {
-        return IGRAPH_SUCCESS;
-    }
-
-    vec = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
-    }
-
-    IGRAPH_CHECK(igraph_vector_copy(vec, clique));
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(data->result, vec));
-
-    return IGRAPH_SUCCESS;
-}
-*/
-
-static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
-    igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
-    igraph_vector_t* vec;
+    igraph_vector_int_t* vec;
     igraph_integer_t i, n;
 
     IGRAPH_UNUSED(cont);
     /* Is the current clique at least as large as the others that we have found? */
     if (!igraph_vector_ptr_empty(result)) {
-        n = igraph_vector_size(clique);
-        if (n < igraph_vector_size(VECTOR(*result)[0])) {
+        n = igraph_vector_int_size(clique);
+        if (n < igraph_vector_int_size(VECTOR(*result)[0])) {
             return IGRAPH_SUCCESS;
         }
 
-        if (n > igraph_vector_size(VECTOR(*result)[0])) {
+        if (n > igraph_vector_int_size(VECTOR(*result)[0])) {
             for (i = 0; i < igraph_vector_ptr_size(result); i++) {
-                igraph_vector_destroy(VECTOR(*result)[i]);
+                igraph_vector_int_destroy(VECTOR(*result)[i]);
             }
             igraph_vector_ptr_free_all(result);
             igraph_vector_ptr_resize(result, 0);
         }
     }
 
-    vec = IGRAPH_CALLOC(1, igraph_vector_t);
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
         IGRAPH_ERROR("cannot allocate memory for storing next clique", IGRAPH_ENOMEM);
     }
 
-    IGRAPH_CHECK(igraph_vector_copy(vec, clique));
+    IGRAPH_CHECK(igraph_vector_int_copy(vec, clique));
     IGRAPH_CHECK(igraph_vector_ptr_push_back(result, vec));
 
     return IGRAPH_SUCCESS;
@@ -1118,7 +1076,7 @@ static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_m
     igraph_adjlist_t adj_list;
     igraph_stack_ptr_t stack;
     igraph_i_maximal_cliques_stack_frame frame, *new_frame_ptr;
-    igraph_vector_t clique;
+    igraph_vector_int_t clique;
     igraph_vector_int_t new_cand, new_fini, cn, best_cand_nbrs,
                         best_fini_cand_nbrs;
     igraph_bool_t cont = 1;
@@ -1145,7 +1103,7 @@ static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_m
     IGRAPH_FINALLY(igraph_i_maximal_cliques_stack_destroy, &stack);
 
     /* Create the initial (empty) clique */
-    IGRAPH_VECTOR_INIT_FINALLY(&clique, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&clique, 0);
 
     /* Initialize new_cand, new_fini, cn, best_cand_nbrs and best_fini_cand_nbrs (will be used later) */
     igraph_vector_int_init(&new_cand, 0);
@@ -1204,13 +1162,13 @@ static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_m
             IGRAPH_PROGRESS("Maximal cliques: ", 100.0 * nodes_done / nodes_to_check, NULL);
             IGRAPH_ALLOW_INTERRUPTION();
 
-            igraph_vector_pop_back(&clique);
+            igraph_vector_int_pop_back(&clique);
             continue;
         }
 
         /* Try the next node in the clique */
         i = igraph_vector_int_pop_back(&frame.cand_filtered);
-        IGRAPH_CHECK(igraph_vector_push_back(&clique, i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&clique, i));
 
         /* Remove the node from the candidate list */
         found = igraph_vector_int_binsearch(&frame.cand, i, &j); IGRAPH_ASSERT(found);
@@ -1234,20 +1192,20 @@ static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_m
                     break;
                 }
             }
-            igraph_vector_pop_back(&clique);
+            igraph_vector_int_pop_back(&clique);
             continue;
         }
         if (igraph_vector_int_empty(&new_fini) &&
             igraph_vector_int_size(&new_cand) == 1) {
             /* Shortcut: only one node left */
-            IGRAPH_CHECK(igraph_vector_push_back(&clique, VECTOR(new_cand)[0]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&clique, VECTOR(new_cand)[0]));
             IGRAPH_CHECK(func(&clique, data, &cont));
             if (!cont) {
                 /* The callback function requested to stop the search */
                 break;
             }
-            igraph_vector_pop_back(&clique);
-            igraph_vector_pop_back(&clique);
+            igraph_vector_int_pop_back(&clique);
+            igraph_vector_int_pop_back(&clique);
             continue;
         }
 
@@ -1269,7 +1227,7 @@ static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_m
         }
         /* Shortcut here: we don't have to examine new_cand */
         if (best_cand_degree == l) {
-            igraph_vector_pop_back(&clique);
+            igraph_vector_int_pop_back(&clique);
             continue;
         }
         /* Still finding best candidate node */
@@ -1321,7 +1279,7 @@ static igraph_error_t igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_m
     IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
 
     igraph_adjlist_destroy(&adj_list);
-    igraph_vector_destroy(&clique);
+    igraph_vector_int_destroy(&clique);
     igraph_vector_int_destroy(&new_cand);
     igraph_vector_int_destroy(&new_fini);
     igraph_vector_int_destroy(&cn);
@@ -1364,7 +1322,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     }
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&clqdata.deg, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
@@ -1392,7 +1350,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
         igraph_set_destroy(&clqdata.buckets[i]);
     }
     igraph_adjlist_destroy(&clqdata.adj_list);
-    igraph_vector_destroy(&clqdata.deg);
+    igraph_vector_int_destroy(&clqdata.deg);
     igraph_free(clqdata.IS);
     igraph_free(clqdata.buckets);
     IGRAPH_FINALLY_CLEAN(4);
