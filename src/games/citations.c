@@ -363,7 +363,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  * \ref igraph_simplify() on the result to remove multiple edges.
  * \param graph Pointer to an uninitialized graph object.
  * \param nodes The number of vertices in the network.
- * \param types A numeric matrix of length \p nodes, containing the
+ * \param types A numeric vector of length \p nodes, containing the
  *    categories of the vertices. The categories are numbered from
  *    zero.
  * \param pref The preference matrix, a square matrix is required,
