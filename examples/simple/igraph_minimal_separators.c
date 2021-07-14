@@ -29,9 +29,6 @@ int main() {
     igraph_t graph;
     igraph_vector_ptr_t separators;
     igraph_integer_t i, j, m, n;
-    igraph_vector_int_t sep_int;
-
-    igraph_vector_int_init(&sep_int, 0);
 
     igraph_famous(&graph, "zachary");
     igraph_vector_ptr_init(&separators, 0);
@@ -40,20 +37,12 @@ int main() {
     n = igraph_vector_ptr_size(&separators);
     for (i = 0; i < n; i++) {
         igraph_bool_t res;
-        igraph_vector_t *sep = VECTOR(separators)[i];
+        igraph_vector_int_t *sep = VECTOR(separators)[i];
 
-        /* TODO: remove this once we have changed igraph_all_minimal_st_separators
-         * to return vectors of igraph_vector_int_t */
-        m = igraph_vector_size(sep);
-        igraph_vector_int_resize(&sep_int, m);
-        for (j = 0; j < m; j++) {
-            VECTOR(sep_int)[j] = VECTOR(*sep)[j];
-        }
-
-        igraph_is_separator(&graph, igraph_vss_vector(&sep_int), &res);
+        igraph_is_separator(&graph, igraph_vss_vector(sep), &res);
         if (!res) {
             printf("Vertex set %" IGRAPH_PRId " is not a separator!\n", i);
-            igraph_vector_print(sep);
+            igraph_vector_int_print(sep);
             return 1;
         }
     }
@@ -65,8 +54,6 @@ int main() {
         IGRAPH_FREE(v);
     }
     igraph_vector_ptr_destroy(&separators);
-
-    igraph_vector_int_destroy(&sep_int);
 
     return 0;
 }
