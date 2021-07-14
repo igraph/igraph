@@ -45,9 +45,6 @@
  - `igraph_asymmetric_preferennce_game()` now uses an `igraph_vector_int_t` to
    return the types of the nodes in the generated graph.
 
- - `igraph_attribute_table_t` field `get_info()` now uses
-   `igraph_vector_int_t` to return `gtypes`, `vtypes` and `etypes`.
-
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
    `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
    an `igraph_vector_int_t` for the out-degree sequence of the nodes being
@@ -373,11 +370,13 @@
    `igraph_integer_t` for the vertex count instead of a `long int`. The
    `combine_vertices()` and `combine_edges()` functions now take an
    `igraph_vector_ptr_t` containing vectors of type `igraph_vector_int_t` in
-   their `merges` parameters. The `permute_vertices()` and `permute_edges()`
-   functions in the attribute handler tables now take an `igraph_vector_int_t`
-   instead of an `igraph_vector_t` for the index vectors. These are relevant
-   only to maintainers of higher level interfaces to igraph; they should update
-   their attribute handlers accordingly.
+   their `merges` parameters. The `get_info()` function now uses
+   `igraph_vector_int_t` to return the types of the graph, vertex and edge
+   attribute types. The `permute_vertices()` and `permute_edges()` functions in
+   the attribute handler tables now take an `igraph_vector_int_t` instead of an
+   `igraph_vector_t` for the index vectors. These are relevant only to maintainers
+   of higher level interfaces to igraph; they should update their attribute
+   handlers accordingly.
 
  - igraph functions that interface with external libraries such as BLAS or LAPACK
    may now fail if the underlying BLAS or LAPACK implementation cannot handle
