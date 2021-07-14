@@ -39,6 +39,9 @@
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
+ - `igraph_assortativity_nominal()` now accepts vertex types in an `igraph_vector_int_t`
+   instead of an `igraph_vector_t`.
+
  - `igraph_asymmetric_preferennce_game()` now uses an `igraph_vector_int_t` to
    return the types of the nodes in the generated graph.
 

@@ -61,31 +61,32 @@
  */
 
 igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
-                                 const igraph_vector_t *types,
+                                 const igraph_vector_int_t *types,
                                  igraph_real_t *res,
                                  igraph_bool_t directed) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_real_t no_of_edges_real = no_of_edges;   /* for divisions */
     igraph_integer_t no_of_types;
-    igraph_vector_t ai, bi, eii;
+    igraph_vector_int_t ai, bi, eii;
     igraph_integer_t e, i;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
 
-    if (igraph_vector_size(types) != no_of_nodes) {
+    if (igraph_vector_int_size(types) != no_of_nodes) {
         IGRAPH_ERROR("Invalid `types' vector length", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_min(types) < 0) {
+    if (igraph_vector_int_min(types) < 0) {
         IGRAPH_ERROR("Invalid `types' vector", IGRAPH_EINVAL);
     }
 
     directed = directed && igraph_is_directed(graph);
 
-    no_of_types = igraph_vector_max(types) + 1;
-    IGRAPH_VECTOR_INIT_FINALLY(&ai, no_of_types);
-    IGRAPH_VECTOR_INIT_FINALLY(&bi, no_of_types);
-    IGRAPH_VECTOR_INIT_FINALLY(&eii, no_of_types);
+    no_of_types = igraph_vector_int_max(types) + 1;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ai, no_of_types);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&bi, no_of_types);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eii, no_of_types);
 
     for (e = 0; e < no_of_edges; e++) {
         igraph_integer_t from = IGRAPH_FROM(graph, e);
@@ -108,8 +109,8 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     }
 
     for (i = 0; i < no_of_types; i++) {
-        sumaibi += (VECTOR(ai)[i] / no_of_edges) * (VECTOR(bi)[i] / no_of_edges);
-        sumeii  += (VECTOR(eii)[i] / no_of_edges);
+        sumaibi += (VECTOR(ai)[i] / no_of_edges_real) * (VECTOR(bi)[i] / no_of_edges_real);
+        sumeii  += (VECTOR(eii)[i] / no_of_edges_real);
     }
 
     if (!directed) {
@@ -119,9 +120,9 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
 
     *res = (sumeii - sumaibi) / (1.0 - sumaibi);
 
-    igraph_vector_destroy(&eii);
-    igraph_vector_destroy(&bi);
-    igraph_vector_destroy(&ai);
+    igraph_vector_int_destroy(&eii);
+    igraph_vector_int_destroy(&bi);
+    igraph_vector_int_destroy(&ai);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
