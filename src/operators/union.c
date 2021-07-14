@@ -129,7 +129,7 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
     if (edgemaps) {
         IGRAPH_CHECK(igraph_vector_ptr_resize(edgemaps, no_of_graphs));
         igraph_vector_ptr_null(edgemaps);
-        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vector_ints, edgemaps);
+        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vectors, edgemaps);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -158,9 +158,9 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
     /* Allocate memory for the edge lists and their index vectors */
     if (no_of_graphs != 0) {
         IGRAPH_CHECK(igraph_vector_ptr_init(&edge_vects, no_of_graphs));
-        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vector_ints, &edge_vects);
+        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vectors, &edge_vects);
         IGRAPH_CHECK(igraph_vector_ptr_init(&order_vects, no_of_graphs));
-        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vector_ints, &order_vects);
+        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vectors, &order_vects);
     }
     for (i = 0; i < no_of_graphs; i++) {
         VECTOR(edge_vects)[i] = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -240,8 +240,8 @@ igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graph
     }
 
     if (no_of_graphs > 0) {
-        igraph_i_union_intersection_destroy_vector_ints(&order_vects);
-        igraph_i_union_intersection_destroy_vector_ints(&edge_vects);
+        igraph_i_union_intersection_destroy_vectors(&order_vects);
+        igraph_i_union_intersection_destroy_vectors(&edge_vects);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

@@ -513,7 +513,7 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
         igraph_realize_degseq_t method)
 {
     igraph_integer_t node_count = igraph_vector_int_size(deg);
-    igraph_integer_t deg_sum = long(igraph_vector_int_sum(deg));
+    igraph_integer_t deg_sum = igraph_vector_int_sum(deg);
 
     if (deg_sum % 2 != 0) {
         IGRAPH_ERROR("The sum of degrees must be even for an undirected graph.", IGRAPH_EINVAL);
@@ -606,7 +606,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
         igraph_realize_degseq_t method)
 {
     igraph_integer_t node_count = igraph_vector_int_size(outdeg);
-    igraph_integer_t edge_count = long(igraph_vector_int_sum(outdeg));
+    igraph_integer_t edge_count = igraph_vector_int_sum(outdeg);
 
     if (igraph_vector_int_size(indeg) != node_count) {
         IGRAPH_ERROR("In- and out-degree sequences must have the same length.", IGRAPH_EINVAL);

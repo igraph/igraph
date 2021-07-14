@@ -310,7 +310,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
     to->len = from->len;
 
     for (i = 0; i < from->len; i++) {
-        int ret;
+        igraph_error_t ret;
         igraph_strvector_get(from, i, &str);
         ret = igraph_strvector_set(to, i, str);
         if (ret != 0) {

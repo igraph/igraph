@@ -171,7 +171,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
 
     /* Check color distribution */
     if (vertex_color1) {
-        int ret = 0;
+        igraph_bool_t ret = 0;
         igraph_vector_int_t tmp1, tmp2;
         IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, vertex_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
@@ -190,7 +190,7 @@ igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igra
 
     /* Check edge color distribution */
     if (edge_color1) {
-        int ret = 0;
+        igraph_bool_t ret = 0;
         igraph_vector_int_t tmp1, tmp2;
         IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, edge_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
