@@ -39,6 +39,9 @@
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
+ - `igraph_asymmetric_preferennce_game()` now uses an `igraph_vector_int_t` to
+   return the types of the nodes in the generated graph.
+
  - `igraph_attribute_table_t` field `get_info()` now uses
    `igraph_vector_int_t` to return `gtypes`, `vtypes` and `etypes`.
 
@@ -279,6 +282,9 @@
 
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
+
+ - `igraph_preferennce_game()` now uses an `igraph_vector_int_t` to return the
+   types of the nodes in the generated graph.
 
  - `igraph_read_graph_dimacs()` now uses an `igraph_vector_int_t` for its
    label parameter.

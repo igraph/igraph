@@ -241,7 +241,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
             /* compute out-edge cdf for this node if not already done */
             if (IGRAPH_UNLIKELY(! *cd)) {
-                long j;
+                igraph_integer_t j;
 
                 *cd = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (*cd == NULL) {

@@ -31,13 +31,13 @@
 
 static void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
     igraph_integer_t i = 0, n;
-    igraph_vector_t *v;
+    igraph_vector_int_t *v;
 
     n = igraph_vector_ptr_size(vecs);
     for (i = 0; i < n; i++) {
-        v = (igraph_vector_t*)VECTOR(*vecs)[i];
+        v = (igraph_vector_int_t*)VECTOR(*vecs)[i];
         if (v) {
-            igraph_vector_destroy(v);
+            igraph_vector_int_destroy(v);
         }
     }
     igraph_vector_ptr_destroy_all(vecs);
@@ -97,13 +97,13 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                            const igraph_vector_t *type_dist,
                            igraph_bool_t fixed_sizes,
                            const igraph_matrix_t *pref_matrix,
-                           igraph_vector_t *node_type_vec,
+                           igraph_vector_int_t *node_type_vec,
                            igraph_bool_t directed,
                            igraph_bool_t loops) {
 
     igraph_integer_t i, j;
     igraph_vector_int_t edges, s;
-    igraph_vector_t* nodetypes;
+    igraph_vector_int_t* nodetypes;
     igraph_vector_ptr_t vids_by_type;
     igraph_real_t maxcum, maxedges;
 
@@ -159,25 +159,25 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     if (node_type_vec) {
-        IGRAPH_CHECK(igraph_vector_resize(node_type_vec, nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(node_type_vec, nodes));
         nodetypes = node_type_vec;
     } else {
-        nodetypes = IGRAPH_CALLOC(1, igraph_vector_t);
+        nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (nodetypes == 0) {
             IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, nodetypes);
-        IGRAPH_VECTOR_INIT_FINALLY(nodetypes, nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_type, types));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vids_by_type);
     for (i = 0; i < types; i++) {
-        VECTOR(vids_by_type)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
+        VECTOR(vids_by_type)[i] = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (VECTOR(vids_by_type)[i] == 0) {
             IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(vids_by_type)[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(vids_by_type)[i], 0));
     }
     IGRAPH_FINALLY_CLEAN(1);   /* removing igraph_vector_ptr_destroy_all */
     IGRAPH_FINALLY(igraph_i_preference_game_free_vids_by_type, &vids_by_type);
@@ -206,8 +206,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_real_t uni1 = RNG_UNIF(0, maxcum);
             igraph_vector_binsearch(&cumdist, uni1, &type1);
             VECTOR(*nodetypes)[i] = type1 - 1;
-            IGRAPH_CHECK(igraph_vector_push_back(
-                             (igraph_vector_t*)VECTOR(vids_by_type)[type1 - 1], i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(
+                             (igraph_vector_int_t*)VECTOR(vids_by_type)[type1 - 1], i));
         }
 
         igraph_vector_destroy(&cumdist);
@@ -218,20 +218,20 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         if (type_dist) {
             for (i = 0; i < types; i++) {
                 igraph_integer_t no = VECTOR(*type_dist)[i];
-                igraph_vector_t *v = VECTOR(vids_by_type)[i];
+                igraph_vector_int_t *v = VECTOR(vids_by_type)[i];
                 for (j = 0; j < no && an < nodes; j++) {
                     VECTOR(*nodetypes)[an] = i;
-                    IGRAPH_CHECK(igraph_vector_push_back(v, an));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(v, an));
                     an++;
                 }
             }
         } else {
             igraph_integer_t fixno = ceil( (double)nodes / types);
             for (i = 0; i < types; i++) {
-                igraph_vector_t *v = VECTOR(vids_by_type)[i];
+                igraph_vector_int_t *v = VECTOR(vids_by_type)[i];
                 for (j = 0; j < fixno && an < nodes; j++) {
                     VECTOR(*nodetypes)[an++] = i;
-                    IGRAPH_CHECK(igraph_vector_push_back(v, an));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(v, an));
                     an++;
                 }
             }
@@ -246,15 +246,15 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             /* Generating the random subgraph between vertices of type i and j */
             igraph_integer_t k, l;
             igraph_real_t p, last;
-            igraph_vector_t *v1, *v2;
+            igraph_vector_int_t *v1, *v2;
             igraph_integer_t v1_size, v2_size;
 
             IGRAPH_ALLOW_INTERRUPTION();
 
-            v1 = (igraph_vector_t*)VECTOR(vids_by_type)[i];
-            v2 = (igraph_vector_t*)VECTOR(vids_by_type)[j];
-            v1_size = igraph_vector_size(v1);
-            v2_size = igraph_vector_size(v2);
+            v1 = (igraph_vector_int_t*)VECTOR(vids_by_type)[i];
+            v2 = (igraph_vector_int_t*)VECTOR(vids_by_type)[j];
+            v1_size = igraph_vector_int_size(v1);
+            v2_size = igraph_vector_int_size(v2);
 
             p = MATRIX(*pref_matrix, i, j);
             igraph_vector_int_clear(&s);
@@ -263,7 +263,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 if (i > j && !directed) {
                     continue;
                 }
-                maxedges = v1_size * v2_size;
+                maxedges = ((igraph_real_t) v1_size) * v2_size;
             } else {
                 if (directed && loops) {
                     maxedges = v1_size * v1_size;
@@ -341,7 +341,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_FINALLY_CLEAN(2);
 
     if (node_type_vec == 0) {
-        igraph_vector_destroy(nodetypes);
+        igraph_vector_int_destroy(nodetypes);
         IGRAPH_FREE(nodetypes);
         IGRAPH_FINALLY_CLEAN(2);
     }
@@ -396,15 +396,16 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
                                       igraph_integer_t in_types,
                                       const igraph_matrix_t *type_dist_matrix,
                                       const igraph_matrix_t *pref_matrix,
-                                      igraph_vector_t *node_type_out_vec,
-                                      igraph_vector_t *node_type_in_vec,
+                                      igraph_vector_int_t *node_type_out_vec,
+                                      igraph_vector_int_t *node_type_in_vec,
                                       igraph_bool_t loops) {
 
     igraph_integer_t i, j, k;
     igraph_vector_int_t edges, s;
-    igraph_vector_t cumdist, intersect;
-    igraph_vector_t *nodetypes_in;
-    igraph_vector_t *nodetypes_out;
+    igraph_vector_t cumdist;
+    igraph_vector_int_t intersect;
+    igraph_vector_int_t *nodetypes_in;
+    igraph_vector_int_t *nodetypes_out;
     igraph_vector_ptr_t vids_by_intype, vids_by_outtype;
     igraph_real_t maxcum, maxedges;
 
@@ -458,24 +459,24 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
 
     if (node_type_in_vec) {
         nodetypes_in = node_type_in_vec;
-        IGRAPH_CHECK(igraph_vector_resize(nodetypes_in, nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(nodetypes_in, nodes));
     } else {
-        nodetypes_in = IGRAPH_CALLOC(1, igraph_vector_t);
+        nodetypes_in = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (nodetypes_in == 0) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
-        IGRAPH_VECTOR_INIT_FINALLY(nodetypes_in, nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_in, nodes);
     }
 
     if (node_type_out_vec) {
         nodetypes_out = node_type_out_vec;
-        IGRAPH_CHECK(igraph_vector_resize(nodetypes_out, nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(nodetypes_out, nodes));
     } else {
-        nodetypes_out = IGRAPH_CALLOC(1, igraph_vector_t);
+        nodetypes_out = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (nodetypes_out == 0) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
-        IGRAPH_VECTOR_INIT_FINALLY(nodetypes_out, nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_out, nodes);
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_intype, in_types));
@@ -483,18 +484,18 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_outtype, out_types));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vids_by_outtype);
     for (i = 0; i < in_types; i++) {
-        VECTOR(vids_by_intype)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
+        VECTOR(vids_by_intype)[i] = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! VECTOR(vids_by_intype)[i]) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(vids_by_intype)[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(vids_by_intype)[i], 0));
     }
     for (i = 0; i < out_types; i++) {
-        VECTOR(vids_by_outtype)[i] = IGRAPH_CALLOC(1, igraph_vector_t);
+        VECTOR(vids_by_outtype)[i] = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! VECTOR(vids_by_outtype)[i]) {
             IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_init(VECTOR(vids_by_outtype)[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(VECTOR(vids_by_outtype)[i], 0));
     }
     IGRAPH_FINALLY_CLEAN(2);   /* removing igraph_vector_ptr_destroy_all */
     IGRAPH_FINALLY(igraph_i_preference_game_free_vids_by_type, &vids_by_intype);
@@ -524,10 +525,10 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         type1 = (type1 - 1) / out_types;
         VECTOR(*nodetypes_in)[i] = type1;
         VECTOR(*nodetypes_out)[i] = type2;
-        IGRAPH_CHECK(igraph_vector_push_back(
-                         (igraph_vector_t*)VECTOR(vids_by_intype)[type1], i));
-        IGRAPH_CHECK(igraph_vector_push_back(
-                         (igraph_vector_t*)VECTOR(vids_by_outtype)[type2], i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(
+                         (igraph_vector_int_t*)VECTOR(vids_by_intype)[type1], i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(
+                         (igraph_vector_int_t*)VECTOR(vids_by_outtype)[type2], i));
     }
 
     igraph_vector_destroy(&cumdist);
@@ -535,26 +536,26 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&intersect, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&intersect, 0);
     for (i = 0; i < out_types; i++) {
         for (j = 0; j < in_types; j++) {
             igraph_integer_t kk, l;
             igraph_integer_t c = 0;
             igraph_real_t p, last;
-            igraph_vector_t *v1, *v2;
+            igraph_vector_int_t *v1, *v2;
             igraph_integer_t v1_size, v2_size;
 
             IGRAPH_ALLOW_INTERRUPTION();
 
-            v1 = (igraph_vector_t*)VECTOR(vids_by_outtype)[i];
-            v2 = (igraph_vector_t*)VECTOR(vids_by_intype)[j];
-            v1_size = igraph_vector_size(v1);
-            v2_size = igraph_vector_size(v2);
+            v1 = (igraph_vector_int_t*)VECTOR(vids_by_outtype)[i];
+            v2 = (igraph_vector_int_t*)VECTOR(vids_by_intype)[j];
+            v1_size = igraph_vector_int_size(v1);
+            v2_size = igraph_vector_int_size(v2);
 
-            maxedges = v1_size * v2_size;
+            maxedges = ((igraph_real_t) v1_size) * v2_size;
             if (!loops) {
-                IGRAPH_CHECK(igraph_vector_intersect_sorted(v1, v2, &intersect));
-                c = igraph_vector_size(&intersect);
+                IGRAPH_CHECK(igraph_vector_int_intersect_sorted(v1, v2, &intersect));
+                c = igraph_vector_int_size(&intersect);
                 maxedges -= c;
             }
 
@@ -579,7 +580,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
                     if (VECTOR(*v1)[from] == VECTOR(*v2)[to]) {
                         /* remap loop edges */
                         to = v2_size - 1;
-                        igraph_vector_binsearch(&intersect, VECTOR(*v1)[from], &c);
+                        igraph_vector_int_binsearch(&intersect, VECTOR(*v1)[from], &c);
                         from = v1_size - 1;
                         if (VECTOR(*v1)[from] == VECTOR(*v2)[to]) {
                             from--;
@@ -608,19 +609,19 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     RNG_END();
 
     igraph_vector_int_destroy(&s);
-    igraph_vector_destroy(&intersect);
+    igraph_vector_int_destroy(&intersect);
     igraph_i_preference_game_free_vids_by_type(&vids_by_intype);
     igraph_i_preference_game_free_vids_by_type(&vids_by_outtype);
     IGRAPH_FINALLY_CLEAN(4);
 
     if (node_type_out_vec == 0) {
-        igraph_vector_destroy(nodetypes_out);
+        igraph_vector_int_destroy(nodetypes_out);
         IGRAPH_FREE(nodetypes_out);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
     if (node_type_in_vec == 0) {
-        igraph_vector_destroy(nodetypes_in);
+        igraph_vector_int_destroy(nodetypes_in);
         IGRAPH_FREE(nodetypes_in);
         IGRAPH_FINALLY_CLEAN(1);
     }
