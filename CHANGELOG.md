@@ -152,6 +152,9 @@
  - `igraph_get_eids()` and `igraph_get_eids_multi()` now use `igraph_vector_int_t`
    to return lists of edge IDs and to receive lists of vertex IDs.
 
+ - `igraph_get_incidence()` now returns the vertex IDs corresponding to the
+   rows and columns of the incidence matrix as `igraph_vector_int_t`.
+
  - `igraph_get_shortest_path()`, `igraph_get_shortest_path_bellman_ford()` and
    `igraph_get_shortest_path_dijkstra()` now use `igraph_vector_int_t` vectors
    to return the list of vertex and edge IDs in the shortest path.

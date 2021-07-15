@@ -69,8 +69,8 @@ IGRAPH_EXPORT igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_boo
 IGRAPH_EXPORT igraph_error_t igraph_get_incidence(const igraph_t *graph,
                                        const igraph_vector_bool_t *types,
                                        igraph_matrix_t *res,
-                                       igraph_vector_t *row_ids,
-                                       igraph_vector_t *col_ids);
+                                       igraph_vector_int_t *row_ids,
+                                       igraph_vector_int_t *col_ids);
 
 IGRAPH_EXPORT igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                                       igraph_bool_t *res,

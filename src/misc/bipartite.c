@@ -726,8 +726,8 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 igraph_error_t igraph_get_incidence(const igraph_t *graph,
                          const igraph_vector_bool_t *types,
                          igraph_matrix_t *res,
-                         igraph_vector_t *row_ids,
-                         igraph_vector_t *col_ids) {
+                         igraph_vector_int_t *row_ids,
+                         igraph_vector_int_t *col_ids) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -772,10 +772,10 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
     }
 
     if (row_ids) {
-        IGRAPH_CHECK(igraph_vector_resize(row_ids, n1));
+        IGRAPH_CHECK(igraph_vector_int_resize(row_ids, n1));
     }
     if (col_ids) {
-        IGRAPH_CHECK(igraph_vector_resize(col_ids, n2));
+        IGRAPH_CHECK(igraph_vector_int_resize(col_ids, n2));
     }
     if (row_ids || col_ids) {
         for (i = 0; i < no_of_nodes; i++) {

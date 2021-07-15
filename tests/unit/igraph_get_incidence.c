@@ -21,21 +21,21 @@
 
 void call_and_print(igraph_t *graph, igraph_vector_bool_t *types) {
     igraph_matrix_t result;
-    igraph_vector_t row_ids;
-    igraph_vector_t col_ids;
+    igraph_vector_int_t row_ids;
+    igraph_vector_int_t col_ids;
     igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init(&row_ids, 0);
-    igraph_vector_init(&col_ids, 0);
+    igraph_vector_int_init(&row_ids, 0);
+    igraph_vector_int_init(&col_ids, 0);
     IGRAPH_ASSERT(igraph_get_incidence(graph, types, &result, &row_ids, &col_ids) == IGRAPH_SUCCESS);
     printf("Incidence matrix:\n");
     print_matrix(&result);
     printf("Row ids:\n");
-    print_vector(&row_ids);
+    print_vector_int(&row_ids);
     printf("Col ids:\n");
-    print_vector(&col_ids);
+    print_vector_int(&col_ids);
     printf("\n");
-    igraph_vector_destroy(&row_ids);
-    igraph_vector_destroy(&col_ids);
+    igraph_vector_int_destroy(&row_ids);
+    igraph_vector_int_destroy(&col_ids);
     igraph_matrix_destroy(&result);
 }
 
