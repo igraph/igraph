@@ -62,6 +62,9 @@
    of the pointer vectors containing the edges and vertices of the components
    are now of type `igraph_vector_int_t`, not `igraph_vector_t`.
 
+ - `igraph_bipartite_projection()` now uses `igraph_vector_int_t` to return
+   `multiplicity1` and `multiplicity2`, not `igraph_vector_t`.
+
  - `igraph_bridges()` now uses an `igraph_vector_int_t` to return the list of
    bridges, not an `igraph_vector_t`.
 
@@ -85,6 +88,9 @@
 
  - The `igraph_vector_ptr_t` res parameter in `igraph_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - `igraph_closeness()` and `igraph_closeness_cutoff()` now use an 
+   `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
 
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
    mapping from block indices to parent block indices; also, it uses a pointer

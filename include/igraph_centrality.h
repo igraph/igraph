@@ -38,11 +38,11 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
-                                   igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
+                                   igraph_vector_int_t *reachable_count, igraph_bool_t *all_reachable,
                                    const igraph_vs_t vids, igraph_neimode_t mode,
                                    const igraph_vector_t *weights, igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
-                                          igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
+                                          igraph_vector_int_t *reachable_count, igraph_bool_t *all_reachable,
                                           const igraph_vs_t vids, igraph_neimode_t mode,
                                           const igraph_vector_t *weights,
                                           igraph_bool_t normalized,

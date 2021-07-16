@@ -171,7 +171,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                                          const igraph_vector_bool_t *types,
                                          igraph_t *proj,
                                          int which,
-                                         igraph_vector_t *multiplicity) {
+                                         igraph_vector_int_t *multiplicity) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, j, k;
@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
      * throw warnings in the compiler output if we initialize it conditionally */
     IGRAPH_VECTOR_INIT_FINALLY(&mult, multiplicity ? no_of_nodes : 1);
     if (multiplicity) {
-        igraph_vector_clear(multiplicity);
+        igraph_vector_int_clear(multiplicity);
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -263,7 +263,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                     igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2] - 1;
                     igraph_integer_t m = VECTOR(mult)[nei2];
                     VECTOR(edges)[j + 1] = new_nei2;
-                    IGRAPH_CHECK(igraph_vector_push_back(multiplicity, m));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(multiplicity, m));
                 }
             }
         } /* if VECTOR(*type)[i] == which */
@@ -337,8 +337,8 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                 const igraph_vector_bool_t *types,
                                 igraph_t *proj1,
                                 igraph_t *proj2,
-                                igraph_vector_t *multiplicity1,
-                                igraph_vector_t *multiplicity2,
+                                igraph_vector_int_t *multiplicity1,
+                                igraph_vector_int_t *multiplicity2,
                                 igraph_integer_t probe1) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);

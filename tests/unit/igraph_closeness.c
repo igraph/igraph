@@ -192,7 +192,8 @@ void advanced_test_case_with_weights() {
 void test_cutoff() {
 
     igraph_t g;
-    igraph_vector_t closeness, reachable;
+    igraph_vector_t closeness;
+    igraph_vector_int_t reachable;
     igraph_bool_t all_reachable;
     size_t i;
     igraph_real_t cutoff_vec[] = { -1.0, 0.0, 1.0, 2.9, 3.0, 3.1 };
@@ -202,7 +203,7 @@ void test_cutoff() {
     igraph_ring(&g, 4, IGRAPH_UNDIRECTED, 0, 0);
 
     igraph_vector_init(&closeness, 0);
-    igraph_vector_init(&reachable, 0);
+    igraph_vector_int_init(&reachable, 0);
 
     for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
         printf("\nRange-limited closeness with cutoff %g\n", cutoff_vec[i]);
@@ -212,11 +213,11 @@ void test_cutoff() {
         printf("Closeness: ");
         print_vector(&closeness);
         printf("Reachable: ");
-        print_vector_round(&reachable);
+        print_vector_int(&reachable);
         printf("All reachable: %s\n", all_reachable ? "true" : "false");
     }
 
-    igraph_vector_destroy(&reachable);
+    igraph_vector_int_destroy(&reachable);
     igraph_vector_destroy(&closeness);
 
     igraph_destroy(&g);
@@ -225,7 +226,8 @@ void test_cutoff() {
 void test_cutoff_directed() {
 
     igraph_t g;
-    igraph_vector_t closeness, reachable;
+    igraph_vector_t closeness;
+    igraph_vector_int_t reachable;
     igraph_bool_t all_reachable;
     size_t i;
     igraph_real_t cutoff_vec[] = { -1.0, 0.0, 1.0, 2.9, 3.0, 3.1 };
@@ -235,7 +237,7 @@ void test_cutoff_directed() {
     igraph_ring(&g, 4, IGRAPH_DIRECTED, 0, 0);
 
     igraph_vector_init(&closeness, 0);
-    igraph_vector_init(&reachable, 0);
+    igraph_vector_int_init(&reachable, 0);
 
     for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
         printf("\nRange-limited directed closeness with cutoff %g\n", cutoff_vec[i]);
@@ -245,11 +247,11 @@ void test_cutoff_directed() {
         printf("Closeness: ");
         print_vector(&closeness);
         printf("Reachable: ");
-        print_vector_round(&reachable);
+        print_vector_int(&reachable);
         printf("All reachable: %s\n", all_reachable ? "true" : "false");
     }
 
-    igraph_vector_destroy(&reachable);
+    igraph_vector_int_destroy(&reachable);
     igraph_vector_destroy(&closeness);
 
     igraph_destroy(&g);
@@ -258,7 +260,8 @@ void test_cutoff_directed() {
 void test_cutoff_weighted() {
 
     igraph_t g;
-    igraph_vector_t closeness, reachable;
+    igraph_vector_t closeness;
+    igraph_vector_int_t reachable;
     igraph_bool_t all_reachable;
     size_t i;
     igraph_real_t cutoff_vec[] = { -1.0, 0.0, 1.0, 2.9, 3.0, 5.0, 6.0 };
@@ -269,7 +272,7 @@ void test_cutoff_weighted() {
     igraph_ring(&g, 4, IGRAPH_UNDIRECTED, 0, 0);
 
     igraph_vector_init(&closeness, 0);
-    igraph_vector_init(&reachable, 0);
+    igraph_vector_int_init(&reachable, 0);
     igraph_vector_init_seq(&weights, 1, 3);
 
     for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
@@ -280,12 +283,12 @@ void test_cutoff_weighted() {
         printf("Closeness: ");
         print_vector(&closeness);
         printf("Reachable: ");
-        print_vector_round(&reachable);
+        print_vector_int(&reachable);
         printf("All reachable: %s\n", all_reachable ? "true" : "false");
     }
 
     igraph_vector_destroy(&weights);
-    igraph_vector_destroy(&reachable);
+    igraph_vector_int_destroy(&reachable);
     igraph_vector_destroy(&closeness);
 
     igraph_destroy(&g);
@@ -294,14 +297,15 @@ void test_cutoff_weighted() {
 void test_edge_cases() {
 
     igraph_t g;
-    igraph_vector_t closeness, reachable;
+    igraph_vector_t closeness;
+    igraph_vector_int_t reachable;
     igraph_bool_t all_reachable;
     int n;
 
     printf("\n\nEdgeless graphs\n");
 
     igraph_vector_init(&closeness, 0);
-    igraph_vector_init(&reachable, 0);
+    igraph_vector_int_init(&reachable, 0);
 
     for (n=0; n <= 2; ++n) {
         printf("\nEdgeless graph with %d vertices\n", n);
@@ -311,13 +315,13 @@ void test_edge_cases() {
         printf("Closeness: ");
         print_vector(&closeness);
         printf("Reachable: ");
-        print_vector_round(&reachable);
+        print_vector_int(&reachable);
         printf("All reachable: %s\n", all_reachable ? "true" : "false");
 
         igraph_destroy(&g);
     }
 
-    igraph_vector_destroy(&reachable);
+    igraph_vector_int_destroy(&reachable);
     igraph_vector_destroy(&closeness);
 
 }

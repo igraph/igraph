@@ -117,7 +117,7 @@
  *   See \ref igraph_closeness_cutoff() for the range-limited closeness centrality.
  */
 igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
-                     igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
+                     igraph_vector_int_t *reachable_count, igraph_bool_t *all_reachable,
                      const igraph_vs_t vids, igraph_neimode_t mode,
                      const igraph_vector_t *weights,
                      igraph_bool_t normalized) {
@@ -126,7 +126,7 @@ igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
 
 static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                                                 igraph_vector_t *res,
-                                                igraph_vector_t *reachable_count,
+                                                igraph_vector_int_t *reachable_count,
                                                 igraph_bool_t *all_reachable,
                                                 const igraph_vs_t vids,
                                                 igraph_neimode_t mode,
@@ -172,7 +172,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
     if (reachable_count) {
-        igraph_vector_resize(reachable_count, nodes_to_calc);
+        igraph_vector_int_resize(reachable_count, nodes_to_calc);
     }
 
     if (all_reachable) {
@@ -324,7 +324,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  */
 
 igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
-                            igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
+                            igraph_vector_int_t *reachable_count, igraph_bool_t *all_reachable,
                             const igraph_vs_t vids, igraph_neimode_t mode,
                             const igraph_vector_t *weights,
                             igraph_bool_t normalized,
@@ -355,7 +355,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
     if (reachable_count) {
-        igraph_vector_resize(reachable_count, nodes_to_calc);
+        igraph_vector_int_resize(reachable_count, nodes_to_calc);
     }
 
     if (all_reachable) {
