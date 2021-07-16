@@ -73,7 +73,7 @@
 igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_int_t *membership,
                                        const igraph_vector_t *weights,
-                                       const igraph_vector_t *initial,
+                                       const igraph_vector_int_t *initial,
                                        igraph_vector_bool_t *fixed,
                                        igraph_real_t *modularity) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -117,7 +117,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
 
     if (initial) {
-        if (igraph_vector_size(initial) != no_of_nodes) {
+        if (igraph_vector_int_size(initial) != no_of_nodes) {
             IGRAPH_ERROR("Initial labeling vector length must agree with number of nodes.", IGRAPH_EINVAL);
         }
         /* Check if the labels used are valid, initialize membership vector */

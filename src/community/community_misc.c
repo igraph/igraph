@@ -249,7 +249,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
  * Time complexity: should be O(n) for n elements.
  */
 igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
-                              igraph_vector_t *new_to_old,
+                              igraph_vector_int_t *new_to_old,
                               igraph_integer_t *nb_clusters) {
 
     igraph_integer_t i, n = igraph_vector_int_size(membership);
@@ -261,7 +261,7 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
 
     if (new_to_old) {
-        igraph_vector_clear(new_to_old);
+        igraph_vector_int_clear(new_to_old);
     }
 
     /* Clean clusters. We will store the new cluster + 1 so that membership == 0
@@ -279,7 +279,7 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
             VECTOR(new_cluster)[c] = (igraph_real_t)i_nb_clusters;
             i_nb_clusters += 1;
             if (new_to_old) {
-                IGRAPH_CHECK(igraph_vector_push_back(new_to_old, c));
+                IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c));
             }
         }
     }

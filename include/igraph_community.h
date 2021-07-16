@@ -149,7 +149,7 @@ IGRAPH_EXPORT igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                                            igraph_bool_t directed);
 
 IGRAPH_EXPORT igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
-                                            igraph_vector_t *new_to_old,
+                                            igraph_vector_int_t *new_to_old,
                                             igraph_integer_t *nb_clusters);
 
 typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
@@ -217,7 +217,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_fluid_communities(const igraph_t *
 IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_int_t *membership,
                                                      const igraph_vector_t *weights,
-                                                     const igraph_vector_t *initial,
+                                                     const igraph_vector_int_t *initial,
                                                      igraph_vector_bool_t *fixed,
                                                      igraph_real_t *modularity);
 

@@ -107,6 +107,9 @@
    return the edge IDs in the order of their removal as well as the list of edge
    IDs whose removal broke a single component into two.
 
+ - `igraph_community_label_propagation()` now uses an `igraph_vector_int_t` for its
+   `initial` parameter.
+
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
 
@@ -297,6 +300,9 @@
 
  - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
    `outdeg` and `indeg` parameters.
+
+ - `igraph_reindex_membership()` now uses an `igraph_vector_int_t` for its
+   `new_to_old` parameter.
 
  - `igraph_similarity_dice_pairs()` now uses an `igraph_vector_int_t` for its
    `pairs` parameter.
