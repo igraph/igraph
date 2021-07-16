@@ -90,7 +90,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_spinglass_single(const igraph_t *g
 IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                                             const igraph_vector_t *weights,
                                             int steps,
-                                            igraph_matrix_t *merges,
+                                            igraph_matrix_int_t *merges,
                                             igraph_vector_t *modularity,
                                             igraph_vector_int_t *membership);
 
@@ -104,7 +104,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
 IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                                                     igraph_vector_int_t *result,
                                                     igraph_vector_t *edge_betweenness,
-                                                    igraph_matrix_t *merges,
+                                                    igraph_matrix_int_t *merges,
                                                     igraph_vector_int_t *bridges,
                                                     igraph_vector_t *modularity,
                                                     igraph_vector_int_t *membership,
@@ -114,23 +114,23 @@ IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *grap
                                                  const igraph_bool_t directed,
                                                  const igraph_vector_int_t *edges,
                                                  const igraph_vector_t *weights,
-                                                 igraph_matrix_t *merges,
+                                                 igraph_matrix_int_t *merges,
                                                  igraph_vector_int_t *bridges,
                                                  igraph_vector_t *modularity,
                                                  igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                               const igraph_vector_t *weights,
-                                              igraph_matrix_t *merges,
+                                              igraph_matrix_int_t *merges,
                                               igraph_vector_t *modularity,
                                               igraph_vector_int_t *membership);
 
-IGRAPH_EXPORT igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
+IGRAPH_EXPORT igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
                                                  igraph_integer_t nodes,
                                                  igraph_integer_t steps,
                                                  igraph_vector_int_t *membership,
                                                  igraph_vector_int_t *csize);
-IGRAPH_EXPORT igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
+IGRAPH_EXPORT igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merges,
                                                     igraph_integer_t steps,
                                                     igraph_vector_int_t *membership,
                                                     igraph_vector_int_t *csize);
@@ -197,7 +197,7 @@ typedef igraph_error_t igraph_community_leading_eigenvector_callback_t(
 
 IGRAPH_EXPORT igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
                                                        const igraph_vector_t *weights,
-                                                       igraph_matrix_t *merges,
+                                                       igraph_matrix_int_t *merges,
                                                        igraph_vector_int_t *membership,
                                                        igraph_integer_t steps,
                                                        igraph_arpack_options_t *options,

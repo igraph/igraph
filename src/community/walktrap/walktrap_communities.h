@@ -128,7 +128,7 @@ public:
 class Communities {
 private:
     long max_memory;  // size in Byte of maximal memory usage, -1 for no limit
-    igraph_matrix_t *merges;
+    igraph_matrix_int_t *merges;
     igraph_integer_t mergeidx;
     igraph_vector_t *modularity;
 
@@ -150,7 +150,7 @@ public:
     int nb_active_communities;    // number of active communities
 
     Communities(Graph* G, int random_walks_length = 3,
-                long max_memory = -1, igraph_matrix_t *merges = 0,
+                long max_memory = -1, igraph_matrix_int_t *merges = 0,
                 igraph_vector_t *modularity = 0);  // Constructor
     ~Communities();                   // Destructor
 

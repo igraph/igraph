@@ -97,7 +97,7 @@
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
-igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
+igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
                                    igraph_integer_t nodes,
                                    igraph_integer_t steps,
                                    igraph_vector_int_t *membership,
@@ -111,14 +111,14 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
     igraph_vector_int_t own_membership;
     igraph_bool_t using_own_membership = 0;
 
-    if (steps > igraph_matrix_nrow(merges)) {
+    if (steps > igraph_matrix_int_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
-                      IGRAPH_PRId " steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_nrow(merges));
+                      IGRAPH_PRId " steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_int_nrow(merges));
     }
 
-    if (igraph_matrix_ncol(merges) != 2) {
+    if (igraph_matrix_int_ncol(merges) != 2) {
         IGRAPH_ERRORF("The merges matrix should have two columns, but has %ld.",
-                      IGRAPH_EINVAL, igraph_matrix_ncol(merges));
+                      IGRAPH_EINVAL, igraph_matrix_int_ncol(merges));
     }
     if (steps < 0) {
         IGRAPH_ERRORF("Number of steps should be non-negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, steps);

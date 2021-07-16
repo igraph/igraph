@@ -624,7 +624,7 @@ static int igraph_i_fastgreedy_community_update_dq(
  */
 igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                 const igraph_vector_t *weights,
-                                igraph_matrix_t *merges,
+                                igraph_matrix_int_t *merges,
                                 igraph_vector_t *modularity,
                                 igraph_vector_int_t *membership) {
     igraph_integer_t no_of_edges, no_of_nodes, no_of_joins, total_joins;
@@ -637,7 +637,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     igraph_vector_int_t degrees;
     igraph_real_t q, *dq, bestq, weight_sum, loop_weight_sum;
     igraph_bool_t has_multiple;
-    igraph_matrix_t merges_local;
+    igraph_matrix_int_t merges_local;
 
     /*igraph_integer_t join_order[] = { 16,5, 5,6, 6,0, 4,0, 10,0, 26,29, 29,33, 23,33, 27,33, 25,24, 24,31, 12,3, 21,1, 30,8, 8,32, 9,2, 17,1, 11,0, 7,3, 3,2, 13,2, 1,2, 28,31, 31,33, 22,32, 18,32, 20,32, 32,33, 15,33, 14,33, 0,19, 19,2, -1,-1 };*/
     /*igraph_integer_t join_order[] = { 43,42, 42,41, 44,41, 41,36, 35,36, 37,36, 36,29, 38,29, 34,29, 39,29, 33,29, 40,29, 32,29, 14,29, 30,29, 31,29, 6,18, 18,4, 23,4, 21,4, 19,4, 27,4, 20,4, 22,4, 26,4, 25,4, 24,4, 17,4, 0,13, 13,2, 1,2, 11,2, 8,2, 5,2, 3,2, 10,2, 9,2, 7,2, 2,28, 28,15, 12,15, 29,16, 4,15, -1,-1 };*/
@@ -677,14 +677,14 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     if (membership != 0 && merges == 0) {
         /* We need the merge matrix because the user wants the membership
          * vector, so we allocate one on our own */
-        IGRAPH_CHECK(igraph_matrix_init(&merges_local, total_joins, 2));
-        IGRAPH_FINALLY(igraph_matrix_destroy, &merges_local);
+        IGRAPH_CHECK(igraph_matrix_int_init(&merges_local, total_joins, 2));
+        IGRAPH_FINALLY(igraph_matrix_int_destroy, &merges_local);
         merges = &merges_local;
     }
 
     if (merges != 0) {
-        IGRAPH_CHECK(igraph_matrix_resize(merges, total_joins, 2));
-        igraph_matrix_null(merges);
+        IGRAPH_CHECK(igraph_matrix_int_resize(merges, total_joins, 2));
+        igraph_matrix_int_null(merges);
     }
 
     if (modularity != 0) {
@@ -1039,7 +1039,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
      * the excess rows from the merge matrix */
     if (no_of_joins < total_joins) {
         igraph_integer_t *ivec;
-        igraph_integer_t merges_nrow = igraph_matrix_nrow(merges);
+        igraph_integer_t merges_nrow = igraph_matrix_int_nrow(merges);
         ivec = IGRAPH_CALLOC(merges_nrow, igraph_integer_t);
         if (ivec == 0) {
             IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
@@ -1048,7 +1048,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         for (i = 0; i < no_of_joins; i++) {
             ivec[i] = i + 1;
         }
-        igraph_matrix_permdelete_rows(merges, ivec, total_joins - no_of_joins);
+        igraph_matrix_int_permdelete_rows(merges, ivec, total_joins - no_of_joins);
         IGRAPH_FREE(ivec);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1075,7 +1075,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     }
 
     if (merges == &merges_local) {
-        igraph_matrix_destroy(&merges_local);
+        igraph_matrix_int_destroy(&merges_local);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

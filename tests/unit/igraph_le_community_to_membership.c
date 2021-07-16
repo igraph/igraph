@@ -19,18 +19,18 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void print_and_destroy(igraph_vector_int_t *membership, igraph_vector_int_t *csize, igraph_matrix_t *mat) {
+void print_and_destroy(igraph_vector_int_t *membership, igraph_vector_int_t *csize, igraph_matrix_int_t *mat) {
     printf("Membership: ");
     igraph_vector_int_print(membership);
     printf("Csize: ");
     igraph_vector_int_print(csize);
     printf("\n");
     igraph_vector_int_destroy(membership);
-    igraph_matrix_destroy(mat);
+    igraph_matrix_int_destroy(mat);
 }
 
 int main() {
-    igraph_matrix_t merges;
+    igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
     igraph_vector_int_t csize;
 
@@ -38,7 +38,7 @@ int main() {
 
     printf("One member:\n");
     igraph_vector_int_init_int(&membership, 1, 0);
-    igraph_matrix_init(&merges, 0, 2);
+    igraph_matrix_int_init(&merges, 0, 2);
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 0, &membership, &csize) == IGRAPH_SUCCESS);
     print_and_destroy(&membership, &csize, &merges);
 
@@ -46,7 +46,7 @@ int main() {
     igraph_vector_int_init_int(&membership, 5, 0, 1, 2, 3, 4);
     {
         int elem[] = {1, 3};
-        matrix_init_int_row_major(&merges, 1, 2, elem);
+        matrix_int_init_int_row_major(&merges, 1, 2, elem);
     }
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 1, &membership, &csize) == IGRAPH_SUCCESS);
     print_and_destroy(&membership, &csize, &merges);
@@ -55,7 +55,7 @@ int main() {
     igraph_vector_int_init_int(&membership, 12, 0, 0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5);
     {
         int elem[] = {0,3, 2,5};
-        matrix_init_int_row_major(&merges, 2, 2, elem);
+        matrix_int_init_int_row_major(&merges, 2, 2, elem);
     }
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 2, &membership, &csize) == IGRAPH_SUCCESS);
     print_and_destroy(&membership, &csize, &merges);
@@ -69,41 +69,41 @@ int main() {
     igraph_vector_int_init_int(&membership, 5, 0, 1, 2, 3, 4);
     {
         int elem[] = {1,3, 1,4,};
-        matrix_init_int_row_major(&merges, 2, 2, elem);
+        matrix_int_init_int_row_major(&merges, 2, 2, elem);
     }
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 2, &membership, &csize) == IGRAPH_EINVAL);
     igraph_vector_int_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
 
     printf("Negative cluster index.\n");
     igraph_vector_int_init_int(&membership, 5, -1, 0, 1, 2, 3);
     {
         int elem[] = {1,2, 3,4,};
-        matrix_init_int_row_major(&merges, 2, 2, elem);
+        matrix_int_init_int_row_major(&merges, 2, 2, elem);
     }
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 2, &membership, &csize) == IGRAPH_EINVAL);
     igraph_vector_int_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
 
     printf("Skip a cluster index.\n");
     igraph_vector_int_init_int(&membership, 5, 0, 0, 2, 3, 4);
     {
         int elem[] = {1,2, 3,4,};
-        matrix_init_int_row_major(&merges, 2, 2, elem);
+        matrix_int_init_int_row_major(&merges, 2, 2, elem);
     }
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 2, &membership, &csize) == IGRAPH_EINVAL);
     igraph_vector_int_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
 
     printf("Too many steps.\n");
     igraph_vector_int_init_int(&membership, 5, 0, 1, 2, 3, 4);
     {
         int elem[] = {1,2, 3,4,};
-        matrix_init_int_row_major(&merges, 2, 2, elem);
+        matrix_int_init_int_row_major(&merges, 2, 2, elem);
     }
     IGRAPH_ASSERT(igraph_le_community_to_membership(&merges, /*steps*/ 20, &membership, &csize) == IGRAPH_EINVAL);
     igraph_vector_int_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
 
     igraph_vector_int_destroy(&csize);
     VERIFY_FINALLY_STACK();

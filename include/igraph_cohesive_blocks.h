@@ -33,7 +33,7 @@ __BEGIN_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                                          igraph_vector_ptr_t *blocks,
-                                         igraph_vector_t *cohesion,
+                                         igraph_vector_int_t *cohesion,
                                          igraph_vector_int_t *parent,
                                          igraph_t *block_tree);
 

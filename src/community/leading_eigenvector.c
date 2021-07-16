@@ -477,7 +477,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  */
 igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         const igraph_vector_t *weights,
-        igraph_matrix_t *merges,
+        igraph_matrix_int_t *merges,
         igraph_vector_int_t *membership,
         igraph_integer_t steps,
         igraph_arpack_options_t *options,
@@ -951,7 +951,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         l = igraph_vector_size(&mymerges);
         k = communities;
         j = 0;
-        IGRAPH_CHECK(igraph_matrix_resize(merges, l / 2, 2));
+        IGRAPH_CHECK(igraph_matrix_int_resize(merges, l / 2, 2));
         for (i = l; i > 0; i -= 2) {
             igraph_integer_t from = VECTOR(mymerges)[i - 1];
             igraph_integer_t to = VECTOR(mymerges)[i - 2];
@@ -1011,7 +1011,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
+igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merges,
                                       igraph_integer_t steps,
                                       igraph_vector_int_t *membership,
                                       igraph_vector_int_t *csize) {

@@ -389,7 +389,7 @@ Community::~Community() {
 
 
 Communities::Communities(Graph* graph, int random_walks_length,
-                         long m, igraph_matrix_t *pmerges,
+                         long m, igraph_matrix_int_t *pmerges,
                          igraph_vector_t *pmodularity) {
     max_memory = m;
     memory_used = 0;

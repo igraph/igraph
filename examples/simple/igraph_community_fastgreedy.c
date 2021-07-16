@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
+void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_int_t *merges,
                   igraph_vector_int_t *membership, FILE* f) {
     igraph_integer_t i = 0;
     igraph_vector_int_t our_membership;
@@ -56,10 +56,10 @@ int main() {
     igraph_t g;
     igraph_vector_t modularity, weights;
     igraph_vector_int_t membership;
-    igraph_matrix_t merges;
+    igraph_matrix_int_t merges;
 
     igraph_vector_init(&modularity, 0);
-    igraph_matrix_init(&merges, 0, 0);
+    igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_init(&weights, 0);
     igraph_vector_int_init(&membership, 0);
 
@@ -181,7 +181,7 @@ int main() {
     igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&modularity);
     igraph_vector_destroy(&weights);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
 
     return 0;
 }

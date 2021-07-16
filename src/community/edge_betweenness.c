@@ -63,7 +63,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              const igraph_bool_t directed,
                                              const igraph_vector_int_t *edges,
                                              const igraph_vector_t *weights,
-                                             igraph_matrix_t *res,
+                                             igraph_matrix_int_t *res,
                                              igraph_vector_int_t *bridges,
                                              igraph_vector_t *modularity,
                                              igraph_vector_int_t *membership) {
@@ -91,7 +91,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                               no_of_nodes - no_comps + 1));
         }
         if (res) {
-            IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes - no_comps,
+            IGRAPH_CHECK(igraph_matrix_int_resize(res, no_of_nodes - no_comps,
                                               2));
         }
         if (bridges) {
@@ -221,7 +221,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    const igraph_bool_t directed,
                                    const igraph_vector_int_t *edges,
                                    const igraph_vector_t *weights,
-                                   igraph_matrix_t *res,
+                                   igraph_matrix_int_t *res,
                                    igraph_vector_int_t *bridges,
                                    igraph_vector_t *modularity,
                                    igraph_vector_int_t *membership) {
@@ -234,7 +234,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     /* catch null graph early */
     if (no_of_nodes == 0) {
         if (res) {
-            igraph_matrix_resize(res, 0, 2);
+            igraph_matrix_int_resize(res, 0, 2);
         }
         if (bridges) {
             igraph_vector_int_clear(bridges);
@@ -259,7 +259,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
     if (res) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes - no_comps, 2));
+        IGRAPH_CHECK(igraph_matrix_int_resize(res, no_of_nodes - no_comps, 2));
     }
     if (bridges) {
         IGRAPH_CHECK(igraph_vector_int_resize(bridges, no_of_nodes - no_comps));
@@ -388,7 +388,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
 igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                                       igraph_vector_int_t *result,
                                       igraph_vector_t *edge_betweenness,
-                                      igraph_matrix_t *merges,
+                                      igraph_matrix_int_t *merges,
                                       igraph_vector_int_t *bridges,
                                       igraph_vector_t *modularity,
                                       igraph_vector_int_t *membership,

@@ -197,7 +197,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
 
 igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                            igraph_vector_ptr_t *blocks,
-                           igraph_vector_t *cohesion,
+                           igraph_vector_int_t *cohesion,
                            igraph_vector_int_t *parent,
                            igraph_t *block_tree) {
 
@@ -254,7 +254,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_vector_ptr_clear(blocks);
     }
     if (cohesion) {
-        igraph_vector_clear(cohesion);
+        igraph_vector_int_clear(cohesion);
     }
     if (parent)   {
         igraph_vector_int_clear(parent);
@@ -512,7 +512,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_ptr_resize(blocks, noblocks));
         }
         if (cohesion) {
-            IGRAPH_CHECK(igraph_vector_resize(cohesion, noblocks));
+            IGRAPH_CHECK(igraph_vector_int_resize(cohesion, noblocks));
         }
         if (parent) {
             IGRAPH_CHECK(igraph_vector_int_resize(parent, noblocks));

@@ -93,9 +93,15 @@
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
 
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
-   mapping from block indices to parent block indices; also, it uses a pointer
+   mapping from block indices to parent block indices, and the `cohesion`; also, it uses a pointer
    vector of `igraph_vector_int_t`s to return the blocks themselves instead of
    a pointer vector of `igraph_vector_t`.
+
+ - `igraph_community_walktrap()`, `igraph_community_edge_betweenness()`,
+   `igraph_community_eb_get_merges()`, `igraph_community_fastgreedy()`,
+   `igraph_community_to_membership()`, `igraph_le_community_to_membership()`,
+   `igraph_community_leading_eigenvector()` now use an `igraph_vector_int_t`
+   for their `merges` parameter.
 
  - `igraph_community_edge_betweenness()` now uses an `igraph_vector_int_t` to
    return the edge IDs in the order of their removal as well as the list of edge

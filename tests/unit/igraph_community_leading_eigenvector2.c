@@ -29,7 +29,7 @@
 int main() {
 
     igraph_t g;
-    igraph_matrix_t merges;
+    igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
     igraph_vector_t x;
     igraph_arpack_options_t options;
@@ -55,7 +55,7 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_matrix_init(&merges, 0, 0);
+    igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_int_init(&membership, 0);
     igraph_vector_init(&x, 0);
     igraph_arpack_options_init(&options);
@@ -70,7 +70,7 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix_round(&merges);
+    igraph_matrix_int_print(&merges);
     print_vector_int(&membership);
 
     printf("\n");
@@ -84,13 +84,13 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix_round(&merges);
+    igraph_matrix_int_print(&merges);
     print_vector_int(&membership);
 
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&x);
     igraph_vector_int_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

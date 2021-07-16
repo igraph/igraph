@@ -119,7 +119,7 @@ using namespace igraph::walktrap;
 igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
                               int steps,
-                              igraph_matrix_t *merges,
+                              igraph_matrix_int_t *merges,
                               igraph_vector_t *modularity,
                               igraph_vector_int_t *membership) {
 
@@ -141,7 +141,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         igraph_integer_t no;
         IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
                                      &no, IGRAPH_WEAK));
-        IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - no, 2));
+        IGRAPH_CHECK(igraph_matrix_int_resize(merges, no_of_nodes - no, 2));
     }
     if (modularity) {
         IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
