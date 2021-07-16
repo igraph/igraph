@@ -128,18 +128,18 @@
 #endif
 
 #ifdef IGRAPH_MC_HIST
-#define RESTYPE igraph_vector_int_t *hist
+#define RESTYPE igraph_vector_t *hist
 #define RESNAME hist
 #define SUFFIX _hist
 #define RECORD do { \
-        igraph_integer_t hsize = igraph_vector_int_size(hist); \
+        igraph_integer_t hsize = igraph_vector_size(hist); \
         if (clsize > hsize) { \
-            igraph_integer_t hcapacity = igraph_vector_int_capacity(hist); \
+            igraph_integer_t hcapacity = igraph_vector_capacity(hist); \
             igraph_integer_t j; \
             igraph_error_t err; \
             if (hcapacity < clsize && clsize < 2*hcapacity) \
-                err = igraph_vector_int_reserve(hist, 2*hcapacity); \
-            err = igraph_vector_int_resize(hist, clsize); \
+                err = igraph_vector_reserve(hist, 2*hcapacity); \
+            err = igraph_vector_resize(hist, clsize); \
             if (err != IGRAPH_SUCCESS) \
                 IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); \
             for (j=hsize; j < clsize; j++) \
@@ -148,8 +148,8 @@
         VECTOR(*hist)[clsize-1] += 1; \
     } while (0)
 #define FINALLY \
-    igraph_vector_int_clear(hist); \
-    igraph_vector_int_reserve(hist, 50); /* initially reserve space for 50 elements */
+    igraph_vector_clear(hist); \
+    igraph_vector_reserve(hist, 50); /* initially reserve space for 50 elements */
 #define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE

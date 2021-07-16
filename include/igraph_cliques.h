@@ -53,24 +53,24 @@ IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_subset(const igraph_t *graph
                                                 igraph_integer_t min_size,
                                                 igraph_integer_t max_size);
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_hist(const igraph_t *graph,
-                                              igraph_vector_int_t *hist,
+                                              igraph_vector_t *hist,
                                               igraph_integer_t min_size,
                                               igraph_integer_t max_size);
 
 IGRAPH_EXPORT igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                                  igraph_integer_t min_size, igraph_integer_t max_size);
-IGRAPH_EXPORT igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_int_t *hist,
+IGRAPH_EXPORT igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
                                           igraph_integer_t min_size, igraph_integer_t max_size);
 IGRAPH_EXPORT igraph_error_t igraph_largest_cliques(const igraph_t *graph,
                                          igraph_vector_ptr_t *cliques);
 IGRAPH_EXPORT igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
 IGRAPH_EXPORT igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
-                                          const igraph_vector_int_t *vertex_weights, igraph_vector_ptr_t *res,
-                                          igraph_integer_t min_weight, igraph_integer_t max_weight, igraph_bool_t maximal);
+                                          const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
+                                          igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal);
 IGRAPH_EXPORT igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
-                                                  const igraph_vector_int_t *vertex_weights, igraph_vector_ptr_t *res);
+                                                  const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
-                                                const igraph_vector_int_t *vertex_weights, igraph_integer_t *res);
+                                                const igraph_vector_t *vertex_weights, igraph_real_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
                                                  igraph_vector_ptr_t *res,
                                                  igraph_integer_t min_size,

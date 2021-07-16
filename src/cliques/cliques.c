@@ -367,7 +367,7 @@ igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * Time complexity: Exponential
  *
  */
-igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_int_t *hist,
+igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
                             igraph_integer_t min_size, igraph_integer_t max_size) {
     return igraph_i_cliquer_histogram(graph, hist, min_size, max_size);
 }
@@ -427,7 +427,8 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
- * \param vertex_weights A vector of vertex weights.
+ * \param vertex_weights A vector of vertex weights. The current implementation
+ *   will truncate all weights to their integer parts.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
@@ -446,8 +447,8 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  *
  */
 igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
-                            const igraph_vector_int_t *vertex_weights, igraph_vector_ptr_t *res,
-                            igraph_integer_t min_weight, igraph_integer_t max_weight, igraph_bool_t maximal) {
+                            const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
+                            igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
 }
 
@@ -466,7 +467,8 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
- * \param vertex_weights A vector of vertex weights.
+ * \param vertex_weights A vector of vertex weights. The current implementation
+ *   will truncate all weights to their integer parts.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
@@ -479,7 +481,7 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * Time complexity: TODO
  */
 igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
-                                    const igraph_vector_int_t *vertex_weights, igraph_vector_ptr_t *res) {
+                                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res) {
     return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
 }
 
@@ -495,8 +497,9 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
  * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
- * \param vertex_weights A vector of vertex weights.
- * \param res The largest weight will be returned to the \c igraph_integer_t
+ * \param vertex_weights A vector of vertex weights. The current implementation
+ *   will truncate all weights to their integer parts.
+ * \param res The largest weight will be returned to the \c igraph_real_t
  *   pointed to by this variable.
  * \return Error code.
  *
@@ -506,7 +509,7 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
  *
  */
 igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
-                                  const igraph_vector_int_t *vertex_weights, igraph_integer_t *res) {
+                                  const igraph_vector_t *vertex_weights, igraph_real_t *res) {
     return igraph_i_weighted_clique_number(graph, vertex_weights, res);
 }
 

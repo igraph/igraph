@@ -83,9 +83,6 @@
  - `igraph_clique_handler_t()` now uses an `igraph_vector_int_t` for its
    `clique` parameter.
 
- - `igraph_clique_size_hist()` now uses an `igraph_vector_int_t` for its
-   `hist` parameter.
-
  - The `igraph_vector_ptr_t` res parameter in `igraph_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
 
@@ -227,9 +224,6 @@
  - The `igraph_vector_ptr_t` res parameter in `igraph_largest_weighted_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
 
- - The `vertex_weights` parameter for `igraph_largest_weighted_cliques()` is now an
-   `igraph_vector_int_t` instead of `igraph_vector_t`.
-
  - The dimension vector parameter for `igraph_lattice()` is now an
    `igraph_vector_int_t` instead of `igraph_vector_t`.
 
@@ -261,9 +255,6 @@
  - The `igraph_vector_ptr_t` res parameters in `igraph_maximal_cliques()`
    and `igraph_maximal_cliques_subset()` now contain `igraph_vector_int_t`,
    not `igraph_vector_t`.
-
- - `igraph_maximal_cliques_hist()` now uses an `igraph_vector_int_t` for its
-   `hist` parameter.
 
  - The `igraph_vector_ptr_t` res parameter in `igraph_maximal_independent_vertex_sets()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
@@ -346,15 +337,8 @@
    `igraph_vector_t`. Similarly, `igraph_vs_as_vector()` now returns the vector
    of matched vertex IDs in an `igraph_vector_int_t`, not an `igraph_vector_t`.
 
- - The `vertex_weights` parameter for `igraph_weighted_clique_number()` is now an
-   `igraph_vector_int_t` instead of `igraph_vector_t`, and the `res` parameter is
-   an igraph_integer_t.
-
  - The `igraph_vector_ptr_t` res parameter in `igraph_weighted_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
-
- - `igraph_weighted_cliques()` now uses an `igraph_vector_int_t` for its
-   `vertex_weights` parameter, and igraph_integer_t for `min_weight` and `max_weight`.
 
  - `igraph_write_graph_dimacs()` now uses `igraph_integer_t` for the source and
    target vertex index instead of a `long int`.

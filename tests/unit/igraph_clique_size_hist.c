@@ -20,11 +20,11 @@
 #include "test_utilities.inc"
 
 void print_and_destroy(igraph_t *g, int min, int max) {
-    igraph_vector_int_t result;
-    igraph_vector_int_init(&result, 0);
+    igraph_vector_t result;
+    igraph_vector_init(&result, 0);
     IGRAPH_ASSERT(igraph_clique_size_hist(g, &result, min, max) == IGRAPH_SUCCESS);
-    print_vector_int(&result);
-    igraph_vector_int_destroy(&result);
+    print_vector(&result);
+    igraph_vector_destroy(&result);
 }
 
 
