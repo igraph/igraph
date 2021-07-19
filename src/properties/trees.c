@@ -55,12 +55,12 @@
  *
  */
 igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
-                       igraph_neimode_t mode, const igraph_vector_t *roots,
+                       igraph_neimode_t mode, const igraph_vector_int_t *roots,
                        igraph_vector_int_t *vertex_index) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_roots = igraph_vector_size(roots);
+    igraph_integer_t no_of_roots = igraph_vector_int_size(roots);
     igraph_integer_t tree_vertex_count = no_of_nodes;
 
     igraph_vector_int_t edges;
@@ -139,7 +139,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
         } /* ! igraph_dqueue_int_empty(&Q) */
 
-    } /* r < igraph_vector_size(roots) */
+    } /* r < igraph_vector_int_size(roots) */
 
     igraph_vector_bool_destroy(&seen_edges);
     igraph_vector_bool_destroy(&seen_vertices);

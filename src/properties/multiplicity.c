@@ -235,7 +235,7 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
  * average degree (out-degree in directed graphs) of the vertices at the
  * tail of the edges.
  */
-igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es) {
     igraph_eit_t eit;
     igraph_integer_t i, j, n;
     igraph_lazy_inclist_t inclist;
@@ -245,7 +245,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+    IGRAPH_CHECK(igraph_vector_int_resize(res, IGRAPH_EIT_SIZE(eit)));
 
     for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
@@ -266,7 +266,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res
             igraph_integer_t e2 = VECTOR(*neis)[j];
             igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to) {
-                VECTOR(*res)[i] += 1;
+                VECTOR(*res)[i]++;
             }
         }
     }

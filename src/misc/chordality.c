@@ -66,8 +66,8 @@
  */
 
 igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
-                                      igraph_vector_t *alpha,
-                                      igraph_vector_t *alpham1) {
+                                      igraph_vector_int_t *alpha,
+                                      igraph_vector_int_t *alpham1) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t size;
@@ -82,9 +82,9 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
     igraph_integer_t j, v;
 
     if (no_of_nodes == 0) {
-        igraph_vector_clear(alpha);
+        igraph_vector_int_clear(alpha);
         if (alpham1) {
-            igraph_vector_clear(alpham1);
+            igraph_vector_int_clear(alpham1);
         }
         return IGRAPH_SUCCESS;
     }
@@ -97,9 +97,9 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    IGRAPH_CHECK(igraph_vector_resize(alpha, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_resize(alpha, no_of_nodes));
     if (alpham1) {
-        IGRAPH_CHECK(igraph_vector_resize(alpham1, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(alpham1, no_of_nodes));
     }
 
     /***********************************************/
@@ -269,15 +269,15 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
  */
 
 igraph_error_t igraph_is_chordal(const igraph_t *graph,
-                      const igraph_vector_t *alpha,
-                      const igraph_vector_t *alpham1,
+                      const igraph_vector_int_t *alpha,
+                      const igraph_vector_int_t *alpham1,
                       igraph_bool_t *chordal,
                       igraph_vector_int_t *fill_in,
                       igraph_t *newgraph) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_vector_t *my_alpha = alpha, *my_alpham1 = alpham1;
-    igraph_vector_t v_alpha, v_alpham1;
+    const igraph_vector_int_t *my_alpha = alpha, *my_alpham1 = alpham1;
+    igraph_vector_int_t v_alpha, v_alpham1;
     igraph_vector_int_t f, index;
     igraph_integer_t i;
     igraph_adjlist_t adjlist;
@@ -291,14 +291,14 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
 
     igraph_integer_t v, w, x;
 
-    if (alpha && (igraph_vector_size(alpha) != no_of_nodes)) {
-        IGRAPH_ERRORF("Alpha vector size (%ld) not equal to number of nodes (%ld).",
-                      IGRAPH_EINVAL, igraph_vector_size(alpha), no_of_nodes);
+    if (alpha && (igraph_vector_int_size(alpha) != no_of_nodes)) {
+        IGRAPH_ERRORF("Alpha vector size (%" IGRAPH_PRId ") not equal to number of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_int_size(alpha), no_of_nodes);
     }
 
-    if (alpham1 && (igraph_vector_size(alpham1) != no_of_nodes)) {
-        IGRAPH_ERRORF("Inverse alpha vector size (%ld) not equal to number of nodes (%ld).",
-                      IGRAPH_EINVAL, igraph_vector_size(alpham1), no_of_nodes);
+    if (alpham1 && (igraph_vector_int_size(alpham1) != no_of_nodes)) {
+        IGRAPH_ERRORF("Inverse alpha vector size (%" IGRAPH_PRId ") not equal to number of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_int_size(alpham1), no_of_nodes);
     }
 
     if (!chordal && !calc_edges) {
@@ -307,16 +307,16 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     }
 
     if (!alpha && !alpham1) {
-        IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpha, no_of_nodes);
         my_alpha = &v_alpha;
-        IGRAPH_VECTOR_INIT_FINALLY(&v_alpham1, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpham1, no_of_nodes);
         my_alpham1 = &v_alpham1;
         IGRAPH_CHECK(igraph_maximum_cardinality_search(graph,
-                     (igraph_vector_t*) my_alpha,
-                     (igraph_vector_t*) my_alpham1));
+                     (igraph_vector_int_t*) my_alpha,
+                     (igraph_vector_int_t*) my_alpham1));
     } else if (alpha && !alpham1) {
         igraph_integer_t v;
-        IGRAPH_VECTOR_INIT_FINALLY(&v_alpham1, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpham1, no_of_nodes);
         my_alpham1 = &v_alpham1;
         for (v = 0; v < no_of_nodes; v++) {
             igraph_integer_t i = VECTOR(*my_alpha)[v];
@@ -324,7 +324,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
         }
     } else if (!alpha && alpham1) {
         igraph_integer_t i;
-        IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpha, no_of_nodes);
         my_alpha = &v_alpha;
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t v = VECTOR(*my_alpham1)[i];
@@ -461,14 +461,14 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     }
 
     if (!alpha && !alpham1) {
-        igraph_vector_destroy(&v_alpham1);
-        igraph_vector_destroy(&v_alpha);
+        igraph_vector_int_destroy(&v_alpham1);
+        igraph_vector_int_destroy(&v_alpha);
         IGRAPH_FINALLY_CLEAN(2);
     } else if (alpha && !alpham1) {
-        igraph_vector_destroy(&v_alpham1);
+        igraph_vector_int_destroy(&v_alpham1);
         IGRAPH_FINALLY_CLEAN(1);
     } else if (!alpha && alpham1) {
-        igraph_vector_destroy(&v_alpha);
+        igraph_vector_int_destroy(&v_alpha);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

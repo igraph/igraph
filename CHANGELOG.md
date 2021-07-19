@@ -128,6 +128,9 @@
  - `igraph_compose()` now returns the edge maps in an `igraph_vector_int_t`
    instead of an `igraph_vector_t`.
 
+ - `igraph_count_multiple()` now returns the multiplicities in an
+   `igraph_vector_int_t` instead of an `igraph_vector_t`.
+
  - `igraph_decompose()` now uses an `igraph_integer_t` for its `maxcompno` and
    `minelements` arguments instead of a `long int`.
 
@@ -229,7 +232,7 @@
    `igraph_vector_int_t` pointers.
 
  - `igraph_is_chordal()` now uses an `igraph_vector_int_t` for its
-   `fill_in` parameter.
+   `alpha`, `alpham1` and `fill_in` parameters.
 
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
    sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.
@@ -289,6 +292,9 @@
 
  - The `igraph_vector_ptr_t` res parameter in `igraph_maximal_independent_vertex_sets()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - `igraph_maximum_cardinality_search()` now uses an `igraph_vector_int_t` for
+   its `alpha` and `alpham1` arguments.
 
  - `igraph_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
@@ -367,7 +373,7 @@
    parameter.
 
  - `igraph_unfold_tree()` now uses an `igraph_vector_int_t` for its `vertex_index`
-   parameter.
+   and `roots` parameters.
 
  - `igraph_union()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.

@@ -41,7 +41,7 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);
+IGRAPH_EXPORT igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
                                  igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
@@ -92,15 +92,15 @@ IGRAPH_EXPORT igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_v
                                       igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
-                                     igraph_neimode_t mode, const igraph_vector_t *roots,
+                                     igraph_neimode_t mode, const igraph_vector_int_t *roots,
                                      igraph_vector_int_t *vertex_index);
 
 IGRAPH_EXPORT igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
-                                                    igraph_vector_t *alpha,
-                                                    igraph_vector_t *alpham1);
+                                                    igraph_vector_int_t *alpha,
+                                                    igraph_vector_int_t *alpham1);
 IGRAPH_EXPORT igraph_error_t igraph_is_chordal(const igraph_t *graph,
-                                    const igraph_vector_t *alpha,
-                                    const igraph_vector_t *alpham1,
+                                    const igraph_vector_int_t *alpha,
+                                    const igraph_vector_int_t *alpham1,
                                     igraph_bool_t *chordal,
                                     igraph_vector_int_t *fill_in,
                                     igraph_t *newgraph);
