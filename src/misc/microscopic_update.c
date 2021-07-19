@@ -137,11 +137,11 @@ static igraph_error_t igraph_i_ecumulative_proportionate_values(const igraph_t *
     IGRAPH_FINALLY(igraph_eit_destroy, &A);
     while (!IGRAPH_EIT_END(A)) {
         e = IGRAPH_EIT_GET(A);
-        S += (igraph_real_t)VECTOR(*U)[e];
+        S += VECTOR(*U)[e];
         IGRAPH_EIT_NEXT(A);
     }
     /* avoid division by zero later on */
-    if (S == (igraph_real_t)0.0) {
+    if (S == 0.0) {
         igraph_eit_destroy(&A);
         igraph_es_destroy(&es);
         IGRAPH_FINALLY_CLEAN(2);
@@ -162,7 +162,7 @@ static igraph_error_t igraph_i_ecumulative_proportionate_values(const igraph_t *
         e = IGRAPH_EIT_GET(A);
         /* NOTE: Beware of division by zero here. This can happen if the vector */
         /* of values, or the combination of interest, sums to zero. */
-        P = (igraph_real_t)VECTOR(*U)[e] / S;
+        P = VECTOR(*U)[e] / S;
         C += P;
         VECTOR(*V)[i] = C;
         i++;
@@ -290,14 +290,14 @@ static igraph_error_t igraph_i_vcumulative_proportionate_values(const igraph_t *
     IGRAPH_FINALLY(igraph_vit_destroy, &A);
     while (!IGRAPH_VIT_END(A)) {
         v = IGRAPH_VIT_GET(A);
-        S += (igraph_real_t)VECTOR(*U)[v];
+        S += VECTOR(*U)[v];
         IGRAPH_VIT_NEXT(A);
     }
     if (islocal) {
-        S += (igraph_real_t)VECTOR(*U)[vid];
+        S += VECTOR(*U)[vid];
     }
     /* avoid division by zero later on */
-    if (S == (igraph_real_t)0.0) {
+    if (S == 0.0) {
         igraph_vit_destroy(&A);
         igraph_vs_destroy(&vs);
         IGRAPH_FINALLY_CLEAN(2);
@@ -322,7 +322,7 @@ static igraph_error_t igraph_i_vcumulative_proportionate_values(const igraph_t *
         v = IGRAPH_VIT_GET(A);
         /* NOTE: Beware of division by zero here. This can happen if the vector */
         /* of values, or a combination of interest, sums to zero. */
-        P = (igraph_real_t)VECTOR(*U)[v] / S;
+        P = VECTOR(*U)[v] / S;
         C += P;
         VECTOR(*V)[i] = C;
         i++;
@@ -420,7 +420,7 @@ static igraph_error_t igraph_i_vcumulative_proportionate_values(const igraph_t *
 static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
                                                igraph_integer_t vid,
                                                const igraph_vector_t *quantities,
-                                               const igraph_vector_t *strategies,
+                                               const igraph_vector_int_t *strategies,
                                                igraph_neimode_t mode,
                                                igraph_bool_t *updates,
                                                igraph_bool_t islocal) {
@@ -450,7 +450,7 @@ static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
         IGRAPH_ERROR("Size of quantities vector different from number of vertices",
                      IGRAPH_EINVAL);
     }
-    if (nvert != igraph_vector_size(strategies)) {
+    if (nvert != igraph_vector_int_size(strategies)) {
         IGRAPH_ERROR("Size of strategies vector different from number of vertices",
                      IGRAPH_EINVAL);
     }
@@ -498,7 +498,7 @@ static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
  * \brief Adopt a strategy via deterministic optimal imitation.
  *
  * A simple deterministic imitation strategy where a vertex revises its
- * strategy to that which yields a local optimal. Here "local" is with
+ * strategy to that which yields a local optimum. Here "local" is with
  * respect to the immediate neighbours of the vertex. The vertex retains its
  * current strategy where this strategy yields a locally optimal quantity.
  * The quantity in this case could be a measure such as fitness.
@@ -576,7 +576,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
         igraph_integer_t vid,
         igraph_optimal_t optimality,
         const igraph_vector_t *quantities,
-        igraph_vector_t *strategies,
+        igraph_vector_int_t *strategies,
         igraph_neimode_t mode) {
     igraph_integer_t i, k, v;
     igraph_real_t q;
@@ -604,21 +604,21 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_shuffle(&adj));
     /* maximum deterministic imitation */
     i = vid;
-    q = (igraph_real_t)VECTOR(*quantities)[vid];
+    q = VECTOR(*quantities)[vid];
     if (optimality == IGRAPH_MAXIMUM) {
         for (k = 0; k < igraph_vector_int_size(&adj); k++) {
             v = VECTOR(adj)[k];
-            if ((igraph_real_t)VECTOR(*quantities)[v] > q) {
+            if (VECTOR(*quantities)[v] > q) {
                 i = v;
-                q = (igraph_real_t)VECTOR(*quantities)[v];
+                q = VECTOR(*quantities)[v];
             }
         }
     } else { /* minimum deterministic imitation */
         for (k = 0; k < igraph_vector_int_size(&adj); k++) {
             v = VECTOR(adj)[k];
-            if ((igraph_real_t)VECTOR(*quantities)[v] < q) {
+            if (VECTOR(*quantities)[v] < q) {
                 i = v;
-                q = (igraph_real_t)VECTOR(*quantities)[v];
+                q = VECTOR(*quantities)[v];
             }
         }
     }
@@ -728,7 +728,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
 igraph_error_t igraph_moran_process(const igraph_t *graph,
                          const igraph_vector_t *weights,
                          igraph_vector_t *quantities,
-                         igraph_vector_t *strategies,
+                         igraph_vector_int_t *strategies,
                          igraph_neimode_t mode) {
     igraph_bool_t updates;
     igraph_integer_t a = -1;  /* vertex chosen for reproduction */
@@ -969,7 +969,7 @@ igraph_error_t igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     igraph_integer_t vid,
                                     igraph_bool_t islocal,
                                     const igraph_vector_t *quantities,
-                                    igraph_vector_t *strategies,
+                                    igraph_vector_int_t *strategies,
                                     igraph_neimode_t mode) {
     igraph_bool_t updates;
     igraph_integer_t u;
@@ -1133,7 +1133,7 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
                                 igraph_integer_t vid,
                                 igraph_imitate_algorithm_t algo,
                                 const igraph_vector_t *quantities,
-                                igraph_vector_t *strategies,
+                                igraph_vector_int_t *strategies,
                                 igraph_neimode_t mode) {
     igraph_bool_t updates;
     igraph_integer_t u;

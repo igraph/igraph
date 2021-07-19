@@ -140,6 +140,9 @@
  - `igraph_delete_vertices_idx()` now uses `igraph_vector_int_t` vectors to
    return the mapping and the inverse mapping of old vertex IDs to new ones.
 
+ - `igraph_deterministic_optimal_imitation()` now expects the list of strategies
+   in an `igraph_vector_int_t` instead of an `igraph_int_t`.
+
  - `igraph_dfs()` now takes an `igraph_vector_int_t` for its `order`, `order_out`,
    `father` and `dist` arguments instead of an `igraph_vector_t`. Furthermore,
    these vectors will contain -2 for vertices that have not been visited; in
@@ -287,6 +290,9 @@
  - `igraph_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
 
+ - `igraph_moran_process()` now expects the list of strategies in an
+   `igraph_vector_int_t` instead of an `igraph_int_t`.
+
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t`
    with the vertex IDs instead of an `igraph_vector_t`.
 
@@ -314,6 +320,9 @@
  - `igraph_reindex_membership()` now uses an `igraph_vector_int_t` for its
    `new_to_old` parameter.
 
+ - `igraph_roulette_wheel_imitation()` now expects the list of strategies
+   in an `igraph_vector_int_t` instead of an `igraph_int_t`.
+
  - `igraph_similarity_dice_pairs()` now uses an `igraph_vector_int_t` for its
    `pairs` parameter.
 
@@ -331,6 +340,9 @@
    `igraph_random_spanning_tree()` now all use an `igraph_vector_int_t` to
    return the vector of edge IDs in the spanning tree instead of an
    `igraph_vector_t`.
+
+ - `igraph_stochastic_imitation()` now expects the list of strategies
+   in an `igraph_vector_int_t` instead of an `igraph_int_t`.
 
  - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
