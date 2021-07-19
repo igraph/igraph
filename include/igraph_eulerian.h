@@ -30,8 +30,8 @@
 __BEGIN_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
-IGRAPH_EXPORT igraph_error_t igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
-IGRAPH_EXPORT igraph_error_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
+IGRAPH_EXPORT igraph_error_t igraph_eulerian_path(const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res);
+IGRAPH_EXPORT igraph_error_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res);
 
 __END_DECLS
 

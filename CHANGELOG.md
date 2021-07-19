@@ -158,6 +158,10 @@
  - `igraph_establishment_game()` now takes an `igraph_vector_int_t` for its
    `node_type_vec` argument instead of an `igraph_vector_t`.
 
+ - `igraph_eulerian_path()` and `igraph_eulerian_cycle()` now use
+   `igraph_vector_int_t` to return the list of edge and vertex IDs participating
+   in an Eulerian path or cycle instead of an `igraph_vector_t`.
+
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
