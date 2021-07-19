@@ -52,7 +52,7 @@
  */
 igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
                            igraph_real_t corr, igraph_real_t p,
-                           const igraph_vector_t *permutation) {
+                           const igraph_vector_int_t *permutation) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(old_graph);
     igraph_integer_t no_of_edges = igraph_ecount(old_graph);
@@ -81,7 +81,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
                      "Erdos-Renyi game", IGRAPH_EINVAL);
     }
     if (permutation) {
-        if (igraph_vector_size(permutation) != no_of_nodes) {
+        if (igraph_vector_int_size(permutation) != no_of_nodes) {
             IGRAPH_ERROR("Invalid permutation length in correlated Erdos-Renyi game",
                          IGRAPH_EINVAL);
         }
@@ -274,7 +274,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                                 igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
                                 igraph_bool_t directed,
-                                const igraph_vector_t *permutation) {
+                                const igraph_vector_int_t *permutation) {
 
     IGRAPH_CHECK(igraph_erdos_renyi_game(graph1, IGRAPH_ERDOS_RENYI_GNP, n, p,
                                          directed, IGRAPH_NO_LOOPS));

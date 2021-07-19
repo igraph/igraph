@@ -89,7 +89,7 @@
  - The `igraph_vector_ptr_t` res parameter in `igraph_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
 
- - `igraph_closeness()` and `igraph_closeness_cutoff()` now use an 
+ - `igraph_closeness()` and `igraph_closeness_cutoff()` now use an
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
 
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
@@ -115,6 +115,9 @@
 
  - `igraph_convex_hull()` now uses an `igraph_vector_int_t` to return the
    indices of the input vertices that were chosen to be in the convex hull.
+
+ - `igraph_correlated_game()` and `igraph_correlated_pair_game()` now take an
+   `igraph_vector_int_t` as the permutation vector, not an `igraph_vector_t`.
 
  - `igraph_create()` now uses an `igraph_vector_int_t` for its
    `edges` parameter.

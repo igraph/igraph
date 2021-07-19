@@ -192,12 +192,12 @@ IGRAPH_EXPORT igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integ
 
 IGRAPH_EXPORT igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
                                          igraph_real_t corr, igraph_real_t p,
-                                         const igraph_vector_t *permutation);
+                                         const igraph_vector_int_t *permutation);
 
 IGRAPH_EXPORT igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                                               igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
                                               igraph_bool_t directed,
-                                              const igraph_vector_t *permutation);
+                                              const igraph_vector_int_t *permutation);
 
 IGRAPH_EXPORT igraph_error_t igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                                    igraph_random_tree_t method);
