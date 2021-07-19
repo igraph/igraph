@@ -56,10 +56,10 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     const igraph_adjlist_t *adjlist,
     const igraph_inclist_t *inclist,
     const igraph_vector_t *weights,
-    const igraph_vector_t *clustering,
+    const igraph_vector_int_t *clustering,
     const igraph_vector_bool_t *is_cluster_sampled,
     igraph_integer_t v,
-    igraph_vector_t *lightest_eid,
+    igraph_vector_int_t *lightest_eid,
     igraph_vector_t *lightest_weight,
     igraph_vector_int_t *dirty_vids,
     igraph_integer_t *nearest_neighboring_sampled_cluster
@@ -105,7 +105,7 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
 
 static void igraph_i_clear_lightest_edges_to_clusters(
     igraph_vector_int_t *dirty_vids,
-    igraph_vector_t *lightest_eid,
+    igraph_vector_int_t *lightest_eid,
     igraph_vector_t *lightest_weight
 ) {
     igraph_integer_t i, n = igraph_vector_int_size(dirty_vids);
@@ -163,10 +163,11 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t i, j, v, nlen, neighbor, cluster;
     double sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
-    igraph_vector_t clustering, lightest_eid, lightest_weight;
+    igraph_vector_int_t clustering, lightest_eid;
+    igraph_vector_t lightest_weight;
     igraph_vector_bool_t is_cluster_sampled;
     igraph_vector_bool_t is_edge_in_spanner;
-    igraph_vector_t new_clustering;
+    igraph_vector_int_t new_clustering;
     igraph_vector_int_t dirty_vids;
     igraph_vector_int_t *adjacent_vertices;
     igraph_vector_int_t *incident_edges;
@@ -216,15 +217,15 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     // Phase 1: forming the clusters
     // Create a vector which maps the nodes to the centers of the corresponding
     // clusters. At the beginning each node is its own cluster center.
-    IGRAPH_CHECK(igraph_vector_init_seq(&clustering, 0, no_of_nodes - 1));
-    IGRAPH_FINALLY(igraph_vector_destroy, &clustering);
+    IGRAPH_CHECK(igraph_vector_int_init_seq(&clustering, 0, no_of_nodes - 1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &clustering);
 
     // A mapping vector which indicates the neighboring edge with the smallest
     // weight for each cluster central, for a single vertex of interest.
     // Preconditions needed by igraph_i_collect_lightest_edges_to_clusters()
     // are enforced here.
-    IGRAPH_VECTOR_INIT_FINALLY(&lightest_eid, no_of_nodes);
-    igraph_vector_fill(&lightest_eid, -1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&lightest_eid, no_of_nodes);
+    igraph_vector_int_fill(&lightest_eid, -1);
 
     // A mapping vector which indicated the minimum weight to each neighboring
     // cluster, for a single vertex of interest.
@@ -233,7 +234,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     IGRAPH_VECTOR_INIT_FINALLY(&lightest_weight, no_of_nodes);
     igraph_vector_fill(&lightest_weight, IGRAPH_INFINITY);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&new_clustering, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&new_clustering, no_of_nodes);
 
     // A boolean vector whose i-th element is 1 if the i-th vertex is a cluster
     // center that is sampled in the current iteration, 0 otherwise
@@ -256,7 +257,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
             igraph_vector_fill(&lightest_weight, INFINITY);
 
     for (i = 0; i < k - 1; i++) {
-        igraph_vector_fill(&new_clustering, -1);
+        igraph_vector_int_fill(&new_clustering, -1);
         igraph_vector_bool_fill(&is_cluster_sampled, 0);
 
         // Step 1: sample cluster centers
@@ -396,7 +397,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         }
 
         // Commit the new clustering
-        igraph_vector_update(&clustering, &new_clustering);
+        igraph_vector_int_update(&clustering, &new_clustering);
 
         // Remove intra-cluster edges
         for (v = 0; v < no_of_nodes; v++) {
@@ -450,10 +451,10 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     igraph_vector_int_destroy(&dirty_vids);
     igraph_vector_bool_destroy(&is_edge_in_spanner);
     igraph_vector_bool_destroy(&is_cluster_sampled);
-    igraph_vector_destroy(&new_clustering);
+    igraph_vector_int_destroy(&new_clustering);
     igraph_vector_destroy(&lightest_weight);
-    igraph_vector_destroy(&lightest_eid);
-    igraph_vector_destroy(&clustering);
+    igraph_vector_int_destroy(&lightest_eid);
+    igraph_vector_int_destroy(&clustering);
     igraph_adjlist_destroy(&adjlist);
     igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(9);
