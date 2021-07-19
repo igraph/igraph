@@ -125,6 +125,9 @@
  - `igraph_create_bipartite()` now uses an `igraph_vector_int_t` for its
    `edges` parameter.
 
+ - `igraph_compose()` now returns the edge maps in an `igraph_vector_int_t`
+   instead of an `igraph_vector_t`.
+
  - `igraph_decompose()` now uses an `igraph_integer_t` for its `maxcompno` and
    `minelements` arguments instead of a `long int`.
 

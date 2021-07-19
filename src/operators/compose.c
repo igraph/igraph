@@ -65,7 +65,7 @@
  * \example examples/simple/igraph_compose.c
  */
 igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
-                   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+                   igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2) {
 
     igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
     igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
@@ -88,10 +88,10 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis2, 0);
 
     if (edge_map1) {
-        igraph_vector_clear(edge_map1);
+        igraph_vector_int_clear(edge_map1);
     }
     if (edge_map2) {
-        igraph_vector_clear(edge_map2);
+        igraph_vector_int_clear(edge_map2);
     }
 
     for (i = 0; i < no_of_nodes_left; i++) {
@@ -113,10 +113,10 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v2));
                 if (edge_map1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map1, con));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map1, con));
                 }
                 if (edge_map2) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map2, con2));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map2, con2));
                 }
             }
         }
