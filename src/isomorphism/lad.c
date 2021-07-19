@@ -517,7 +517,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
     bool *dom;
     igraph_integer_t *mu, *mv;
     igraph_integer_t matchingSize, u, v, i, j;
-    igraph_vector_t *vec;
+    igraph_vector_int_t *vec;
 
     ALLOC_ARRAY(val, Gp->nbVertices * Gt->nbVertices, igraph_integer_t);
     ALLOC_ARRAY(dom, Gt->nbVertices, bool);
@@ -554,7 +554,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
         if (initialDomains) {
             /* read the list of target vertices which are compatible with u */
             vec = VECTOR(*domains)[u];
-            i = igraph_vector_size(vec);
+            i = igraph_vector_int_size(vec);
             memset(dom, false, sizeof(bool) * (size_t)(Gt->nbVertices));
             for (j = 0; j < i; j++) {
                 v = VECTOR(*vec)[j];
@@ -1525,7 +1525,7 @@ cleanup:
  * \param pattern The smaller graph, it can be directed or undirected.
  * \param target The bigger graph, it can be directed or undirected.
  * \param domains A pointer vector, or a null pointer. If a pointer
- *    vector, then it must contain pointers to \c igraph_vector_t
+ *    vector, then it must contain pointers to \c igraph_vector_int_t
  *    objects and the length of the vector must match the number of
  *    vertices in the \p pattern graph. For each vertex, the ids of
  *    the compatible vertices in the target graph are listed.

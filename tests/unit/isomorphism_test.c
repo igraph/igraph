@@ -118,7 +118,7 @@ void test_bliss() {
     igraph_ring(&directed_ring, 100, /* directed= */ 1, /* mutual = */0, /* circular = */1);
 
     igraph_vector_ptr_init(&generators, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_int_destroy);
 
     igraph_isomorphic_bliss(&ring1, &ring2, NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL);
     if (! iso) {

@@ -210,7 +210,7 @@ public:
     AutCollector(igraph_vector_ptr_t *generators_) : generators(generators_) { }
 
     void operator ()(unsigned int n, const unsigned int *aut) {
-        int err;
+        igraph_error_t err;
         igraph_vector_int_t *newvector = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! newvector) {
             throw bad_alloc();
@@ -345,7 +345,7 @@ igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_i
  * \param colors An optional vertex color vector for the graph. Supply a
  *   null pointer is the graph is not colored.
  * \param generators Must be an initialized pointer vector. It will
- *    contain pointers to \ref igraph_vector_t objects
+ *    contain pointers to \ref igraph_vector_int_t objects
  *    representing generators of the automorphism group.
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.

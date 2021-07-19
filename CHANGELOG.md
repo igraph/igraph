@@ -45,6 +45,9 @@
  - `igraph_asymmetric_preferennce_game()` now uses an `igraph_vector_int_t` to
    return the types of the nodes in the generated graph.
 
+ - `igraph_automorphism_group()` now returns the generators in a pointer vector
+   containing `igraph_vector_int_t` structs, not `igraph_vector_t`.
+
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
    `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
    an `igraph_vector_int_t` for the out-degree sequence of the nodes being
@@ -369,8 +372,9 @@
    `igraph_get_isomorphisms_vf2()` and `igraph_get_subisomorphisms_vf2()` now
    contain `igraph_vector_int_t`, not `igraph_vector_t`.
 
- - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its map
-   parameter.
+ - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its `map`
+   parameter. Also, its `domains` parameter is now a pointer vector containing
+   `igraph_vector_int_t` objects instead of `igraph_vector_t`.
 
  - `igraph_unfold_tree()` now uses an `igraph_vector_int_t` for its `vertex_index`
    and `roots` parameters.

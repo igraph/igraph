@@ -297,7 +297,7 @@ int main() {
                          1, 3, 7, 8, -1, -2
                        };
     igraph_vector_ptr_t domains;
-    igraph_vector_t *v = 0;
+    igraph_vector_int_t *v = 0;
 
     igraph_small(&target, 9, IGRAPH_UNDIRECTED,
                  0, 1, 0, 4, 0, 6,
@@ -354,10 +354,10 @@ int main() {
             v = 0;
         } else {
             if (!v) {
-                v = (igraph_vector_t *) malloc(sizeof(igraph_vector_t));
-                igraph_vector_init(v, 0);
+                v = (igraph_vector_int_t *) malloc(sizeof(igraph_vector_int_t));
+                igraph_vector_int_init(v, 0);
             }
-            igraph_vector_push_back(v, domainsvec[i]);
+            igraph_vector_int_push_back(v, domainsvec[i]);
         }
         i++;
     }
@@ -372,8 +372,8 @@ int main() {
 
     n = igraph_vector_ptr_size(&domains);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(domains)[i];
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(domains)[i];
+        igraph_vector_int_destroy(v);
         free(v);
     }
 
