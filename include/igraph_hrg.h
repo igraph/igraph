@@ -80,7 +80,7 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer
 IGRAPH_EXPORT igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                                  igraph_hrg_t *hrg,
                                  igraph_bool_t start,
-                                 int steps);
+                                 igraph_integer_t steps);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_sample(const igraph_t *graph,
                                     igraph_t *sample,
@@ -96,19 +96,19 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
                                         const igraph_hrg_t *hrg);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
-                                       igraph_vector_t *parents,
+                                       igraph_vector_int_t *parents,
                                        igraph_vector_t *weights,
                                        igraph_hrg_t *hrg,
                                        igraph_bool_t start,
-                                       int num_samples);
+                                       igraph_integer_t num_samples);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_predict(const igraph_t *graph,
                                      igraph_vector_int_t *edges,
                                      igraph_vector_t *prob,
                                      igraph_hrg_t *hrg,
                                      igraph_bool_t start,
-                                     int num_samples,
-                                     int num_bins);
+                                     igraph_integer_t num_samples,
+                                     igraph_integer_t num_bins);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                                     const igraph_t *graph,

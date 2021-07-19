@@ -199,6 +199,9 @@
  - `igraph_hrg_init()` and `igraph_hrg_resize()` now takes an `igraph_integer_t`
    as their size arguments instead of an `int`.
 
+ - `igraph_hrg_consensus()` now returns the parent vector in an `igraph_vector_int_t`
+   instead of an `igraph_vector_t`.
+
  - `igraph_hrg_predict()` now uses an `igraph_vector_int_t` for its
    `edges` parameter.
 

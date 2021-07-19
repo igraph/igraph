@@ -1982,7 +1982,7 @@ int dendro::QsortPartition (block* array, int left, int right, int index) {
     return stored;
 }
 
-void dendro::recordConsensusTree(igraph_vector_t *parents,
+void dendro::recordConsensusTree(igraph_vector_int_t *parents,
                                  igraph_vector_t *weights) {
 
     keyValuePairSplit *curr, *prev;
@@ -2081,7 +2081,7 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
     }
 
     // Return the consensus tree
-    igraph_vector_resize(parents, ii + orig_nodes);
+    igraph_vector_int_resize(parents, ii + orig_nodes);
     if (weights) {
         igraph_vector_resize(weights, ii);
     }
@@ -2110,8 +2110,6 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
             VECTOR(*parents)[i] = -1;
         }
     }
-
-
 }
 
 // **********************************************************************
@@ -2181,7 +2179,7 @@ list* dendro::reversePathToRoot(const int leafIndex) {
 
 // ***********************************************************************
 
-bool dendro::sampleSplitLikelihoods(int &sample_num) {
+bool dendro::sampleSplitLikelihoods(igraph_integer_t &sample_num) {
     // In order to compute the majority agreement dendrogram at
     // equilibrium, we need to calculate the leaf partition defined by
     // each split (internal edge) of the tree. Because splits are only
@@ -2627,7 +2625,7 @@ void graph::resetLinks() {
 
 // **********************************************************************
 
-void graph::setAdjacencyHistograms(const int bin_count) {
+void graph::setAdjacencyHistograms(const igraph_integer_t bin_count) {
     // For all possible adjacencies, setup an edge histograms
     num_bins = bin_count + 1;
     bin_resolution = 1.0 / (double)(bin_count);

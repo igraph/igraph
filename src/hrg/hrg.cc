@@ -81,7 +81,7 @@ struct pblock {
 };
 }
 
-static igraph_error_t markovChainMonteCarlo(dendro *d, unsigned int period,
+static igraph_error_t markovChainMonteCarlo(dendro *d, igraph_integer_t period,
                           igraph_hrg_t *hrg) {
 
     igraph_real_t bestL = d->getLikelihood();
@@ -100,7 +100,7 @@ static igraph_error_t markovChainMonteCarlo(dendro *d, unsigned int period,
     // model averaging sense), you'll need to code that yourself.
 
     // do 'period' MCMC moves before doing anything else
-    for (unsigned int i = 0; i < period; i++) {
+    for (igraph_integer_t i = 0; i < period; i++) {
 
         // make a MCMC move
         IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
@@ -120,10 +120,11 @@ static igraph_error_t markovChainMonteCarlo(dendro *d, unsigned int period,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t markovChainMonteCarlo2(dendro *d, int num_samples) {
+static igraph_error_t markovChainMonteCarlo2(dendro *d, igraph_integer_t num_samples) {
     bool flag_taken;
     double dL, ptest = 1.0 / (50.0 * (double)(d->g->numNodes()));
-    int sample_num = 0, t = 1, thresh = 200 * d->g->numNodes();
+    igraph_integer_t sample_num = 0;
+    int t = 1, thresh = 200 * d->g->numNodes();
 
     // Since we're sampling uniformly at random over the equilibrium
     // walk, we just need to do a bunch of MCMC moves and let the
@@ -222,7 +223,7 @@ static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
 
 static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
                                        dendro *d, simpleGraph **sg,
-                                       int num_bins) {
+                                       igraph_integer_t num_bins) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(igraph);
     igraph_integer_t no_of_edges = igraph_ecount(igraph);
@@ -380,7 +381,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
 igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                    igraph_hrg_t *hrg,
                    igraph_bool_t start,
-                   int steps) {
+                   igraph_integer_t steps) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     dendro *d;
@@ -661,11 +662,11 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
  */
 
 igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
-                         igraph_vector_t *parents,
+                         igraph_vector_int_t *parents,
                          igraph_vector_t *weights,
                          igraph_hrg_t *hrg,
                          igraph_bool_t start,
-                         int num_samples) {
+                         igraph_integer_t num_samples) {
 
     dendro *d;
 
@@ -700,7 +701,7 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t MCMCEquilibrium_Sample(dendro *d, int num_samples) {
+static igraph_error_t MCMCEquilibrium_Sample(dendro *d, igraph_integer_t num_samples) {
 
     // Because moves in the dendrogram space are chosen (Monte
     // Carlo) so that we sample dendrograms with probability
@@ -854,8 +855,8 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
                        igraph_vector_t *prob,
                        igraph_hrg_t *hrg,
                        igraph_bool_t start,
-                       int num_samples,
-                       int num_bins) {
+                       igraph_integer_t num_samples,
+                       igraph_integer_t num_bins) {
 
     dendro *d;
     pblock *br_list;
