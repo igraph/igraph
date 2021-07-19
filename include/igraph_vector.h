@@ -149,8 +149,6 @@ IGRAPH_EXPORT igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 IGRAPH_EXPORT igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_order1(const igraph_vector_t* v,
-                                       igraph_vector_t* res, igraph_integer_t maxval);
-IGRAPH_EXPORT igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
                                            igraph_vector_int_t* res, igraph_integer_t maxval);
 IGRAPH_EXPORT igraph_error_t igraph_vector_order2(igraph_vector_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_int_t *res,
@@ -159,10 +157,10 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v,
                                        igraph_vector_bool_t *is_nan);
 IGRAPH_EXPORT igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_vector_int_order(const igraph_vector_int_t* v, const igraph_vector_int_t *v2,
-                                      igraph_vector_int_t* res, igraph_integer_t maxval);
-IGRAPH_EXPORT igraph_error_t igraph_vector_int_order1_int(const igraph_vector_int_t* v,
+IGRAPH_EXPORT igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
                                            igraph_vector_int_t* res, igraph_integer_t maxval);
+IGRAPH_EXPORT igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v, const igraph_vector_int_t *v2,
+                                      igraph_vector_int_t* res, igraph_integer_t maxval);
 IGRAPH_EXPORT igraph_error_t igraph_vector_int_rank(const igraph_vector_int_t *v, igraph_vector_int_t *res,
                                      igraph_integer_t nodes);
 

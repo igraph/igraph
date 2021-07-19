@@ -401,7 +401,7 @@
    indexing, _not_ `long int`. Please refer to the headers for the exact details;
    the list of affected functions is too large to include here.
 
- - `igraph_vector_order()` was removed; use `igraph_vector_int_order()` instead.
+ - `igraph_vector_order()` was removed; use `igraph_vector_int_pair_order()` instead.
    (The original function worked for vectors containing integers only).
 
  - The `add_edges()` function in the attribute handler now takes an

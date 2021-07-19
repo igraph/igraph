@@ -111,10 +111,10 @@ int main() {
 
     printf("Test igraph_vector_init_seq, igraph_vector_order1\n");
     igraph_vector_init_seq(&v, 1, 10);
-    igraph_vector_init(&v2, 0);
-    igraph_vector_order1(&v, &v2, 10);
-    print_vector_format(&v2, stdout, "%g");
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_init(&v4, 0);
+    igraph_vector_order1(&v, &v4, 10);
+    print_vector_int(&v4);
+    igraph_vector_int_destroy(&v4);
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_resize, igraph_vector_sort\n");
@@ -341,11 +341,11 @@ int main() {
     igraph_vector_destroy(&v);
     igraph_vector_int_destroy(&v4);
 
-    printf("Test order\n");
+    printf("Test pair order\n");
     igraph_vector_int_init_int_end(&v5, -1, 1, 1, 2, 2, -1);
     igraph_vector_int_init_int_end(&v6, -1, 2, 3, 1, 3, -1);
     igraph_vector_int_init(&v4, 0);
-    igraph_vector_int_order(&v5, &v6, &v4, 3);
+    igraph_vector_int_pair_order(&v5, &v6, &v4, 3);
     print_vector_int(&v4);
     igraph_vector_int_destroy(&v5);
     igraph_vector_int_destroy(&v6);

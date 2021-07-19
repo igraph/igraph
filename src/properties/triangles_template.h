@@ -51,8 +51,7 @@ if (no_of_nodes == 0) {
     return IGRAPH_SUCCESS;
 }
 
-igraph_vector_int_init(&order, no_of_nodes);
-IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
+IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
 IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
 IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -63,9 +62,8 @@ for (i = 0; i < no_of_nodes; i++) {
 }
 
 maxdegree = igraph_vector_max(&degree) + 1;
-igraph_vector_order1_int(&degree, &order, maxdegree);
-igraph_vector_int_init(&rank, no_of_nodes);
-IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
+IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
+IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
 for (i = 0; i < no_of_nodes; i++) {
     VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
 }

@@ -597,7 +597,7 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
                                /*loops=*/ 0));
 
-    IGRAPH_CHECK(igraph_vector_int_order1_int(&deg, &order, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_order1(&deg, &order, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_int_resize(res, k));
     for (i = 0; i < k; i++) {
         VECTOR(*res)[i] = VECTOR(order)[no_of_nodes - 1 - i];

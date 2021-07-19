@@ -126,7 +126,8 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 /**
  * \ingroup vector
  * \function igraph_vector_int_order
- * \brief Calculate the order of the elements in an integer vector.
+ * \brief Calculate the order of the elements in a pair of integer vectors of
+ * equal length.
  *
  * </para><para>
  * The smallest element will have order zero, the second smallest
@@ -143,7 +144,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
  * Time complexity: O()
  */
 
-igraph_error_t igraph_vector_int_order(const igraph_vector_int_t* v,
+igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v,
                                        const igraph_vector_int_t* v2,
                                        igraph_vector_int_t* res, igraph_integer_t nodes) {
     igraph_integer_t edges = igraph_vector_int_size(v);
@@ -210,47 +211,6 @@ igraph_error_t igraph_vector_int_order(const igraph_vector_int_t* v,
 }
 
 igraph_error_t igraph_vector_order1(const igraph_vector_t* v,
-                         igraph_vector_t* res, igraph_integer_t nodes) {
-    igraph_integer_t edges = igraph_vector_size(v);
-    igraph_vector_int_t ptr;
-    igraph_vector_int_t rad;
-    igraph_integer_t i, j;
-
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, nodes + 1);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, edges);
-    IGRAPH_CHECK(igraph_vector_resize(res, edges));
-
-    for (i = 0; i < edges; i++) {
-        igraph_integer_t radix = v->stor_begin[i];
-        if (VECTOR(ptr)[radix] != 0) {
-            VECTOR(rad)[i] = VECTOR(ptr)[radix];
-        }
-        VECTOR(ptr)[radix] = i + 1;
-    }
-
-    j = 0;
-    for (i = 0; i < nodes + 1; i++) {
-        if (VECTOR(ptr)[i] != 0) {
-            igraph_integer_t next = VECTOR(ptr)[i] - 1;
-            res->stor_begin[j++] = next;
-            while (VECTOR(rad)[next] != 0) {
-                next = VECTOR(rad)[next] - 1;
-                res->stor_begin[j++] = next;
-            }
-        }
-    }
-
-    igraph_vector_int_destroy(&ptr);
-    igraph_vector_int_destroy(&rad);
-    IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
-}
-
-igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
                              igraph_vector_int_t* res,
                              igraph_integer_t nodes) {
     igraph_integer_t edges = igraph_vector_size(v);
@@ -292,7 +252,7 @@ igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_int_order1_int(const igraph_vector_int_t* v,
+igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
                              igraph_vector_int_t* res,
                              igraph_integer_t nodes) {
     igraph_integer_t edges = igraph_vector_int_size(v);

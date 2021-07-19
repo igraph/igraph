@@ -537,7 +537,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
             VECTOR(to)[i] = tmp;
         }
     }
-    igraph_vector_int_order(&from, &to, &index, no_of_nodes);
+    igraph_vector_int_pair_order(&from, &to, &index, no_of_nodes);
 
     igraph_get_edgelist(graph2, &from2, /*bycol=*/ 1);
     for (i = 0, j = no_of_edges; i < no_of_edges; i++, j++) {
@@ -549,7 +549,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         }
     }
     igraph_vector_int_resize(&from2, no_of_edges);
-    igraph_vector_int_order(&from2, &to2, &index2, no_of_nodes);
+    igraph_vector_int_pair_order(&from2, &to2, &index2, no_of_nodes);
 
     *iso = 1;
     for (i = 0; i < no_of_edges; i++) {

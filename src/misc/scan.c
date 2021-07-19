@@ -270,7 +270,7 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
     maxdegree = igraph_vector_int_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_int_order1_int(&degree, &order, maxdegree));
+    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;

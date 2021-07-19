@@ -292,8 +292,8 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         igraph_set_error_handler(oldhandler);
         IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
     }
-    ret1 = igraph_vector_int_order(&graph->from, &graph->to, &newoi, graph->n);
-    ret2 = igraph_vector_int_order(&graph->to, &graph->from, &newii, graph->n);
+    ret1 = igraph_vector_int_pair_order(&graph->from, &graph->to, &newoi, graph->n);
+    ret2 = igraph_vector_int_pair_order(&graph->to, &graph->from, &newii, graph->n);
     if (ret1 != 0 || ret2 != 0) {
         igraph_vector_int_resize(&graph->from, no_of_edges);
         igraph_vector_int_resize(&graph->to, no_of_edges);
@@ -456,8 +456,8 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     /* Create index, this might require additional memory */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&newoi, remaining_edges);
-    IGRAPH_CHECK(igraph_vector_int_order(&newfrom, &newto, &newoi, no_of_nodes));
-    IGRAPH_CHECK(igraph_vector_int_order(&newto, &newfrom, &graph->ii, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newfrom, &newto, &newoi, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &graph->ii, no_of_nodes));
 
     /* Edge attributes, we need an index that gives the ids of the
        original edges for every new edge.
@@ -603,9 +603,9 @@ igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t ver
         }
     }
     /* update oi & ii */
-    IGRAPH_CHECK(igraph_vector_int_order(&newgraph.from, &newgraph.to, &newgraph.oi,
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.from, &newgraph.to, &newgraph.oi,
                                          remaining_vertices));
-    IGRAPH_CHECK(igraph_vector_int_order(&newgraph.to, &newgraph.from, &newgraph.ii,
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.to, &newgraph.from, &newgraph.ii,
                                          remaining_vertices));
 
     IGRAPH_CHECK(igraph_i_create_start(&newgraph.os, &newgraph.from,
