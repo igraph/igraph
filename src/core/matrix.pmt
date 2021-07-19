@@ -368,33 +368,6 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
 
 /**
  * \ingroup matrix
- * \function igraph_matrix_delete_rows_neg
- * \brief Removes columns from a matrix (for internal use).
- *
- * Time complexity: linear with the number of elements of the original
- * matrix.
- */
-
-igraph_error_t FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
-        const igraph_vector_t *neg, igraph_integer_t nremove) {
-    igraph_integer_t i, j, idx = 0;
-
-    for (i = 0; i < m->ncol; i++) {
-        for (j = 0; j < m->nrow; j++) {
-            if (VECTOR(*neg)[j] >= 0) {
-                MATRIX(*m, idx++, i) = MATRIX(*m, j, i);
-            }
-        }
-        idx = 0;
-    }
-
-    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow - nremove, m->ncol));
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup matrix
  * \function igraph_matrix_copy
  * \brief Copies a matrix.
  *

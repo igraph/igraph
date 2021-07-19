@@ -239,5 +239,3 @@ IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_co
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
     TYPE(igraph_matrix) *m, igraph_integer_t *index, igraph_integer_t nremove);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, delete_rows_neg)(
-    TYPE(igraph_matrix) *m, const igraph_vector_t *neg, igraph_integer_t nremove);

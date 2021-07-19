@@ -108,7 +108,6 @@ int main() {
     igraph_matrix_destroy(&m);
 
     /* TODO: igraph_matrix_permdelete_rows */
-    /* TODO: igraph_matrix_delete_rows_neg */
 
     /* igraph_matrix_copy */
     igraph_matrix_init(&m, 2, 3);
