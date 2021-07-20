@@ -565,6 +565,8 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
         IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
         break;
+    default:
+        break;
     }
 
     return IGRAPH_SUCCESS;
@@ -1446,6 +1448,8 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
         }
         IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
+        break;
+    default:
         break;
     }
     return IGRAPH_SUCCESS;
