@@ -113,11 +113,11 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
 
     if (steps > igraph_matrix_int_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
-                      IGRAPH_PRId " steps, %ld rows.", IGRAPH_EINVAL, steps, igraph_matrix_int_nrow(merges));
+                      IGRAPH_PRId " steps, %" IGRAPH_PRId " rows.", IGRAPH_EINVAL, steps, igraph_matrix_int_nrow(merges));
     }
 
     if (igraph_matrix_int_ncol(merges) != 2) {
-        IGRAPH_ERRORF("The merges matrix should have two columns, but has %ld.",
+        IGRAPH_ERRORF("The merges matrix should have two columns, but has %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, igraph_matrix_int_ncol(merges));
     }
     if (steps < 0) {
@@ -151,12 +151,12 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         if (VECTOR(already_merged)[c1] == 0) {
             VECTOR(already_merged)[c1] = 1;
         } else {
-            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c1);
+            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c1);
         }
         if (VECTOR(already_merged)[c2] == 0) {
             VECTOR(already_merged)[c2] = 1;
         } else {
-            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %ld.", IGRAPH_EINVAL, c2);
+            IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c2);
         }
 
         /* new component? */

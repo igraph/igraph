@@ -172,7 +172,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
     if (reachable_count) {
-        igraph_vector_int_resize(reachable_count, nodes_to_calc);
+        IGRAPH_CHECK(igraph_vector_int_resize(reachable_count, nodes_to_calc));
     }
 
     if (all_reachable) {
@@ -355,7 +355,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
     if (reachable_count) {
-        igraph_vector_int_resize(reachable_count, nodes_to_calc);
+        IGRAPH_CHECK(igraph_vector_int_resize(reachable_count, nodes_to_calc));
     }
 
     if (all_reachable) {

@@ -847,25 +847,23 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
     igraph_vector_int_t order;
     igraph_i_graphlets_order_t sortdata = { cliques, Mu };
 
-    igraph_vector_init(&thresholds, 0);
-    IGRAPH_FINALLY(igraph_vector_destroy, &thresholds);
-    igraph_graphlets_candidate_basis(graph, weights, cliques, &thresholds);
+    IGRAPH_VECTOR_INIT_FINALLY(&thresholds, 0);
+    IGRAPH_CHECK(igraph_graphlets_candidate_basis(graph, weights, cliques, &thresholds));
     igraph_vector_destroy(&thresholds);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_graphlets_project(graph, weights, cliques, Mu, /*startMu=*/ 0, niter);
+    IGRAPH_CHECK(igraph_graphlets_project(graph, weights, cliques, Mu, /*startMu=*/ 0, niter));
 
     nocliques = igraph_vector_ptr_size(cliques);
-    igraph_vector_int_init(&order, nocliques);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, nocliques);
     for (i = 0; i < nocliques; i++) {
         VECTOR(order)[i] = i;
     }
     igraph_qsort_r(VECTOR(order), nocliques, sizeof(VECTOR(order)[0]), &sortdata,
                    igraph_i_graphlets_order_cmp);
 
-    igraph_vector_ptr_index_int(cliques, &order);
-    igraph_vector_index_int(Mu, &order);
+    IGRAPH_CHECK(igraph_vector_ptr_index_int(cliques, &order));
+    IGRAPH_CHECK(igraph_vector_index_int(Mu, &order));
 
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(1);
