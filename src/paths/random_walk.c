@@ -60,7 +60,7 @@
  */
 
 
-igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *walk,
                        igraph_integer_t start, igraph_neimode_t mode,
                        igraph_integer_t steps,
                        igraph_random_walk_stuck_t stuck) {
@@ -84,7 +84,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
-    IGRAPH_CHECK(igraph_vector_resize(walk, steps));
+    IGRAPH_CHECK(igraph_vector_int_resize(walk, steps));
 
     RNG_BEGIN();
 
@@ -96,7 +96,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
         nn = igraph_vector_int_size(neis);
 
         if (IGRAPH_UNLIKELY(nn == 0)) {
-            igraph_vector_resize(walk, i);
+            igraph_vector_int_resize(walk, i);
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
@@ -158,7 +158,7 @@ static void vec_destr(igraph_vector_t *vec) {
  */
 igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
                             const igraph_vector_t *weights,
-                            igraph_vector_t *edgewalk,
+                            igraph_vector_int_t *edgewalk,
                             igraph_integer_t start, igraph_neimode_t mode,
                             igraph_integer_t steps,
                             igraph_random_walk_stuck_t stuck) {
@@ -202,7 +202,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(edgewalk, steps));
+    IGRAPH_CHECK(igraph_vector_int_resize(edgewalk, steps));
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
@@ -227,7 +227,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
         /* are we stuck? */
         if (IGRAPH_UNLIKELY(degree == 0)) {
-            igraph_vector_resize(edgewalk, i); /* can't fail since size is reduced, skip IGRAPH_CHECK */
+            igraph_vector_int_resize(edgewalk, i); /* can't fail since size is reduced, skip IGRAPH_CHECK */
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {

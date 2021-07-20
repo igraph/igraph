@@ -437,11 +437,11 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * of edges.
  */
 igraph_error_t igraph_extended_chordal_ring(
-    igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_t *W,
+    igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_int_t *W,
     igraph_bool_t directed) {
     igraph_vector_int_t edges;
-    igraph_integer_t period = igraph_matrix_ncol(W);
-    igraph_integer_t nrow   = igraph_matrix_nrow(W);
+    igraph_integer_t period = igraph_matrix_int_ncol(W);
+    igraph_integer_t nrow   = igraph_matrix_int_nrow(W);
     igraph_integer_t i, j, mpos = 0, epos = 0;
 
     if (nodes < 3) {

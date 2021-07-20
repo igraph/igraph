@@ -113,7 +113,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
  * \param graph Input graph.
  * \param weight Edge weights.
  * \param ids The ids of the vertices in the input graph.
- * \param cliques A list of vectors, vertex ids for cliques.
+ * \param cliques A list of \c igraph_vector_int_t, vertex ids for cliques.
  * \param result The result is stored here, a list of graphs is stored
  *        here.
  * \param resultids The ids of the vertices in the result graphs is
@@ -194,9 +194,9 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
        subgraphs defined by the cliques. */
 
     for (c = 0; c < nc; c++) {
-        igraph_vector_t *clique = VECTOR(*cliques)[c];
+        igraph_vector_int_t *clique = VECTOR(*cliques)[c];
         igraph_real_t minweight = IGRAPH_INFINITY, nextweight = IGRAPH_INFINITY;
-        igraph_integer_t e, v, clsize = igraph_vector_size(clique);
+        igraph_integer_t e, v, clsize = igraph_vector_int_size(clique);
         igraph_integer_t noe, nov = 0;
         igraph_vector_int_t *newids = (*resultids) + c;
         igraph_vector_t *neww = (*resultweights) + c;
@@ -299,9 +299,9 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
 static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
     igraph_integer_t i, n = igraph_vector_ptr_size(vl);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = (igraph_vector_t*) VECTOR(*vl)[i];
+        igraph_vector_int_t *v = (igraph_vector_int_t*) VECTOR(*vl)[i];
         if (v) {
-            igraph_vector_destroy(v);
+            igraph_vector_int_destroy(v);
         }
     }
     igraph_vector_ptr_destroy(vl);
@@ -368,13 +368,13 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     /* Store cliques at the current level */
     igraph_vector_append(thresholds, &clique_thr);
     for (i = 0; i < nocliques; i++) {
-        igraph_vector_t *cl = (igraph_vector_t*) VECTOR(mycliques)[i];
-        igraph_integer_t j, n = igraph_vector_size(cl);
+        igraph_vector_int_t *cl = (igraph_vector_int_t*) VECTOR(mycliques)[i];
+        igraph_integer_t j, n = igraph_vector_int_size(cl);
         for (j = 0; j < n; j++) {
             igraph_integer_t node = VECTOR(*cl)[j];
             VECTOR(*cl)[j] = VECTOR(*ids)[node];
         }
-        igraph_vector_sort(cl);
+        igraph_vector_int_sort(cl);
     }
     igraph_vector_ptr_append(cliques, &mycliques);
 
@@ -409,7 +409,7 @@ static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *
     igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t t_a = VECTOR(*ddata->thresholds)[*aa];
     igraph_real_t t_b = VECTOR(*ddata->thresholds)[*bb];
-    igraph_vector_t *v_a, *v_b;
+    igraph_vector_int_t *v_a, *v_b;
     igraph_integer_t s_a, s_b;
 
     if (t_a < t_b) {
@@ -418,10 +418,10 @@ static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *
         return 1;
     }
 
-    v_a = (igraph_vector_t*) VECTOR(*ddata->cliques)[*aa];
-    v_b = (igraph_vector_t*) VECTOR(*ddata->cliques)[*bb];
-    s_a = igraph_vector_size(v_a);
-    s_b = igraph_vector_size(v_b);
+    v_a = (igraph_vector_int_t*) VECTOR(*ddata->cliques)[*aa];
+    v_b = (igraph_vector_int_t*) VECTOR(*ddata->cliques)[*bb];
+    s_a = igraph_vector_int_size(v_a);
+    s_b = igraph_vector_int_size(v_b);
 
     if (s_a < s_b) {
         return -1;
@@ -458,15 +458,15 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
     for (i = 0; i < nocliques - 1; i++) {
         igraph_integer_t ri = VECTOR(order)[i];
-        igraph_vector_t *needle = VECTOR(*cliques)[ri];
+        igraph_vector_int_t *needle = VECTOR(*cliques)[ri];
         igraph_real_t thr_i = VECTOR(*thresholds)[ri];
-        igraph_integer_t n_i = igraph_vector_size(needle);
+        igraph_integer_t n_i = igraph_vector_int_size(needle);
         igraph_integer_t j = i + 1;
 
         for (j = i + 1; j < nocliques; j++) {
             igraph_integer_t rj = VECTOR(order)[j];
             igraph_real_t thr_j = VECTOR(*thresholds)[rj];
-            igraph_vector_t *hay;
+            igraph_vector_int_t *hay;
             igraph_integer_t n_j, pi = 0, pj = 0;
 
             /* Done, not found */
@@ -476,7 +476,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
             /* Check size of hay */
             hay = VECTOR(*cliques)[rj];
-            n_j = igraph_vector_size(hay);
+            n_j = igraph_vector_int_size(hay);
             if (n_i > n_j) {
                 continue;
             }
@@ -495,7 +495,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
             }
             if (pi == n_i) {
                 /* Found, delete immediately */
-                igraph_vector_destroy(needle);
+                igraph_vector_int_destroy(needle);
                 igraph_free(needle);
                 VECTOR(*cliques)[ri] = 0;
                 break;
@@ -505,7 +505,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
     /* Remove null pointers from the list of cliques */
     for (i = 0, iptr = 0; i < nocliques; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
         if (v) {
             VECTOR(*cliques)[iptr] = v;
             VECTOR(*thresholds)[iptr] = VECTOR(*thresholds)[i];
@@ -530,8 +530,8 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers.
  *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be a vector of vertex ids. Each elements must be
- *        destroyed using \ref igraph_vector_destroy() and \ref igraph_free().
+ *        vector will be an integer vector of vertex ids. Each elements must be
+ *        destroyed using \c igraph_vector_int_destroy() and \ref igraph_free().
  * \param thresholds An initialized vector, the (highest possible)
  *        weight thresholds for finding the basis subgraphs are stored
  *        here.
@@ -631,8 +631,8 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_init(&celidx, no_cliques + 3));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &celidx);
     for (i = 0, total_vertices = 0, total_edges = 0; i < no_cliques; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_integer_t j, n = igraph_vector_size(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_integer_t j, n = igraph_vector_int_size(v);
         total_vertices += n;
         total_edges += n * (n - 1) / 2;
         VECTOR(celidx)[i + 2] = total_edges;
@@ -652,8 +652,8 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_init(&vcl, total_vertices));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &vcl);
     for (i = 0; i < no_cliques; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_integer_t j, n = igraph_vector_size(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_integer_t j, n = igraph_vector_int_size(v);
         for (j = 0; j < n; j++) {
             igraph_integer_t vv = VECTOR(*v)[j] - vid1;
             igraph_integer_t p = VECTOR(vclidx)[vv + 1];
@@ -713,8 +713,8 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_init(&normfact, no_cliques));
     IGRAPH_FINALLY(igraph_vector_destroy, &normfact);
     for (i = 0; i < no_cliques; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_integer_t n = igraph_vector_size(v);
+        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_integer_t n = igraph_vector_int_size(v);
         VECTOR(normfact)[i] = n * (n + 1) / 2;
     }
 
@@ -768,7 +768,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
  *        ignored.
  * \param weights Weights of the edges in the input graph, a vector.
  * \param cliques The graphlet basis, a pointer vector, in which each
- *        element is a vector of vertex ids.
+ *        element is an \c igraph_vector_int_t of vertex ids.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here. This vector is also used to initialize the
  *        the weight vector for the iterative algorithm, if the
@@ -826,7 +826,7 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers.
  *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be a vector of vertex ids.
+ *        vector will be an \c igraph_vector_int_t  of vertex ids.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here.
  * \param niter Integer scalar, the number of iterations to perform

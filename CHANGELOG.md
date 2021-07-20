@@ -208,6 +208,15 @@
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
 
+ - The `igraph_vector_ptr_t` cliques parameter in `igraph_graphlets()`
+   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - The `igraph_vector_ptr_t` cliques parameter in `igraph_graphlets_candidate_basis()`
+   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+
+ - The `igraph_vector_ptr_t` cliques parameter in `igraph_graphlets_project()`
+   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+
  - `igraph_hrg_init()` and `igraph_hrg_resize()` now takes an `igraph_integer_t`
    as their size arguments instead of an `int`.
 
@@ -276,6 +285,12 @@
  - The dimension parameter of `igraph_layout_mds()` is now an `igraph_integer_t`
    instead of `long int`.
 
+ - The `roots` and `rootlevel` parameters of `igraph_layout_reingold_tilford()`
+   are now `igraph_vector_int_t` instead of `igraph_vector_t`.
+
+ - The `roots` and `rootlevel` parameters of `igraph_layout_reingold_tilford_circular()`
+   are now `igraph_vector_int_t` instead of `igraph_vector_t`.
+
  - The order parameter of `igraph_layout_star()` is now an `igraph_vector_int_t`
    instead of an `igraph_vector_t`.
 
@@ -322,6 +337,12 @@
 
  - `igraph_preferennce_game()` now uses an `igraph_vector_int_t` to return the
    types of the nodes in the generated graph.
+
+ - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
+   `walk` parameter.
+
+ - `igraph_random_edge_walk()` now uses an `igraph_vector_int_t` for its
+   `edgewalk` parameter.
 
  - `igraph_read_graph_dimacs()` now uses an `igraph_vector_int_t` for its
    label parameter.

@@ -60,7 +60,7 @@ IGRAPH_EXPORT igraph_error_t igraph_full_citation(igraph_t *graph, igraph_intege
                                        igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, int number);
 IGRAPH_EXPORT igraph_error_t igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
-                                               const igraph_matrix_t *W, igraph_bool_t directed);
+                                               const igraph_matrix_int_t *W, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);
 
 IGRAPH_EXPORT igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);

@@ -495,16 +495,16 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
 igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    igraph_neimode_t mode,
-                                   const igraph_vector_t *roots,
-                                   const igraph_vector_t *rootlevel) {
+                                   const igraph_vector_int_t *roots,
+                                   const igraph_vector_int_t *rootlevel) {
 
     igraph_integer_t no_of_nodes_orig = igraph_vcount(graph);
     igraph_integer_t no_of_nodes = no_of_nodes_orig;
     igraph_integer_t real_root;
     igraph_t extended;
     const igraph_t *pextended = graph;
-    igraph_vector_t myroots;
-    const igraph_vector_t *proots = roots;
+    igraph_vector_int_t myroots;
+    const igraph_vector_int_t *proots = roots;
     igraph_neimode_t mode2;
     igraph_integer_t i;
     igraph_vector_int_t newedges;
@@ -522,8 +522,8 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
-    if ( (!roots || igraph_vector_size(roots) == 0) &&
-         rootlevel && igraph_vector_size(rootlevel) != 0 ) {
+    if ( (!roots || igraph_vector_int_size(roots) == 0) &&
+         rootlevel && igraph_vector_int_size(rootlevel) != 0 ) {
         IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored");
     }
 
@@ -534,14 +534,14 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
        in,or select the vertex with the maximum degree from each component for
        undirected graphs */
 
-    if (!roots || igraph_vector_size(roots) == 0) {
+    if (!roots || igraph_vector_int_size(roots) == 0) {
 
         igraph_vector_int_t order;
         igraph_vector_int_t membership;
         igraph_integer_t no_comps;
         igraph_integer_t i, noseen = 0;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&myroots, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, no_of_nodes);
 
@@ -559,12 +559,12 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                                          &no_comps, IGRAPH_WEAK));
         }
 
-        IGRAPH_CHECK(igraph_vector_resize(&myroots, no_comps));
+        IGRAPH_CHECK(igraph_vector_int_resize(&myroots, no_comps));
 
         /* go backwards and fill the roots vector with indices [1, no_of_nodes]
            The index 0 is used to signal this root has not been found yet:
            all indices are then decreased by one to [0, no_of_nodes - 1] */
-        igraph_vector_null(&myroots);
+        igraph_vector_int_null(&myroots);
         proots = &myroots;
         for (i = no_of_nodes - 1; noseen < no_comps && i >= 0; i--) {
             igraph_integer_t v = VECTOR(order)[i];
@@ -582,8 +582,8 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         igraph_vector_int_destroy(&order);
         IGRAPH_FINALLY_CLEAN(2);
 
-    } else if (rootlevel && igraph_vector_size(rootlevel) > 0 &&
-               igraph_vector_size(roots) > 1) {
+    } else if (rootlevel && igraph_vector_int_size(rootlevel) > 0 &&
+               igraph_vector_int_size(roots) > 1) {
 
         /* ----------------------------------------------------------------------- */
         /* Many roots were given to us, check 'rootlevel' */
@@ -591,13 +591,13 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         igraph_integer_t plus_levels = 0;
         igraph_integer_t i;
 
-        if (igraph_vector_size(roots) != igraph_vector_size(rootlevel)) {
+        if (igraph_vector_int_size(roots) != igraph_vector_int_size(rootlevel)) {
             IGRAPH_ERROR("Reingold-Tilford: 'roots' and 'rootlevel' lengths differ",
                          IGRAPH_EINVAL);
         }
 
         /* count the rootlevels that are not zero */
-        for (i = 0; i < igraph_vector_size(roots); i++) {
+        for (i = 0; i < igraph_vector_int_size(roots); i++) {
             plus_levels += VECTOR(*rootlevel)[i];
         }
 
@@ -612,7 +612,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
             igraph_vector_int_resize(&newedges, plus_levels * 2);
 
-            for (i = 0; i < igraph_vector_size(roots); i++) {
+            for (i = 0; i < igraph_vector_int_size(roots); i++) {
                 igraph_integer_t rl = VECTOR(*rootlevel)[i];
                 igraph_integer_t rn = VECTOR(*roots)[i];
                 igraph_integer_t j;
@@ -679,7 +679,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
       But for now it's ok like this.
     */
     /* if there is only one root, no need for real_root */
-    if (igraph_vector_size(proots) == 1) {
+    if (igraph_vector_int_size(proots) == 1) {
         real_root = VECTOR(*proots)[0];
         if (real_root < 0 || real_root >= no_of_nodes) {
             IGRAPH_ERROR("Invalid vertex id.", IGRAPH_EINVVID);
@@ -702,7 +702,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         no_of_nodes++;
 
         /* add edges from the roots to real_root */
-        no_of_newedges = igraph_vector_size(proots);
+        no_of_newedges = igraph_vector_int_size(proots);
         igraph_vector_int_resize(&newedges, no_of_newedges * 2);
         for (i = 0; i < no_of_newedges; i++) {
             VECTOR(newedges)[2 * i] = no_of_nodes - 1;
@@ -757,7 +757,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
     /* Remove the roots vector if it was created by us */
     if (proots != roots) {
-        igraph_vector_destroy(&myroots);
+        igraph_vector_int_destroy(&myroots);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -800,8 +800,8 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         igraph_matrix_t *res,
         igraph_neimode_t mode,
-        const igraph_vector_t *roots,
-        const igraph_vector_t *rootlevel) {
+        const igraph_vector_int_t *roots,
+        const igraph_vector_int_t *rootlevel) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
