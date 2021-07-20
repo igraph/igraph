@@ -33,17 +33,19 @@ __BEGIN_DECLS
 /* Vertex selectors                                   */
 /* -------------------------------------------------- */
 
-#define IGRAPH_VS_ALL       0
-#define IGRAPH_VS_ADJ       1
-#define IGRAPH_VS_NONE      2
-#define IGRAPH_VS_1         3
-#define IGRAPH_VS_VECTORPTR 4
-#define IGRAPH_VS_VECTOR    5
-#define IGRAPH_VS_SEQ       6
-#define IGRAPH_VS_NONADJ    7
+typedef enum {
+    IGRAPH_VS_ALL,
+    IGRAPH_VS_ADJ,
+    IGRAPH_VS_NONE,
+    IGRAPH_VS_1,
+    IGRAPH_VS_VECTORPTR,
+    IGRAPH_VS_VECTOR,
+    IGRAPH_VS_SEQ,
+    IGRAPH_VS_NONADJ,
+} igraph_vs_type_t;
 
 typedef struct igraph_vs_t {
-    int type;
+    igraph_vs_type_t type;
     union {
         igraph_integer_t vid;               /* single vertex  */
         const igraph_vector_int_t *vecptr;  /* vector of vertices  */
@@ -95,18 +97,20 @@ IGRAPH_EXPORT igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_v
                                       igraph_vector_int_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
                                  igraph_integer_t *result);
-IGRAPH_EXPORT int igraph_vs_type(const igraph_vs_t *vs);
+IGRAPH_EXPORT igraph_vs_type_t igraph_vs_type(const igraph_vs_t *vs);
 
 /* -------------------------------------------------- */
 /* Vertex iterators                                   */
 /* -------------------------------------------------- */
 
-#define IGRAPH_VIT_SEQ       0
-#define IGRAPH_VIT_VECTOR    1
-#define IGRAPH_VIT_VECTORPTR 2
+typedef enum {
+    IGRAPH_VIT_SEQ,
+    IGRAPH_VIT_VECTOR,
+    IGRAPH_VIT_VECTORPTR,
+} igraph_vit_type_t;
 
 typedef struct igraph_vit_t {
-    int type;
+    igraph_vit_type_t type;
     igraph_integer_t pos;
     igraph_integer_t start;
     igraph_integer_t end;
@@ -217,21 +221,23 @@ IGRAPH_EXPORT igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igrap
 /* Edge Selectors                                     */
 /* -------------------------------------------------- */
 
-#define IGRAPH_ES_ALL       0
-#define IGRAPH_ES_ALLFROM   1
-#define IGRAPH_ES_ALLTO     2
-#define IGRAPH_ES_INCIDENT  3
-#define IGRAPH_ES_NONE      4
-#define IGRAPH_ES_1         5
-#define IGRAPH_ES_VECTORPTR 6
-#define IGRAPH_ES_VECTOR    7
-#define IGRAPH_ES_SEQ       8
-#define IGRAPH_ES_PAIRS     9
-#define IGRAPH_ES_PATH      10
-#define IGRAPH_ES_MULTIPAIRS 11
+typedef enum {
+    IGRAPH_ES_ALL,
+    IGRAPH_ES_ALLFROM,
+    IGRAPH_ES_ALLTO,
+    IGRAPH_ES_INCIDENT,
+    IGRAPH_ES_NONE,
+    IGRAPH_ES_1,
+    IGRAPH_ES_VECTORPTR,
+    IGRAPH_ES_VECTOR,
+    IGRAPH_ES_SEQ,
+    IGRAPH_ES_PAIRS,
+    IGRAPH_ES_PATH,
+    IGRAPH_ES_MULTIPAIRS,
+} igraph_es_type_t;
 
 typedef struct igraph_es_t {
-    int type;
+    igraph_es_type_t type;
     union {
         igraph_integer_t vid;
         igraph_integer_t eid;
@@ -297,19 +303,21 @@ IGRAPH_EXPORT igraph_error_t igraph_es_as_vector(const igraph_t *graph, igraph_e
                                       igraph_vector_int_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
                                  igraph_integer_t *result);
-IGRAPH_EXPORT int igraph_es_type(const igraph_es_t *es);
+IGRAPH_EXPORT igraph_es_type_t igraph_es_type(const igraph_es_t *es);
 
 
 /* -------------------------------------------------- */
 /* Edge Iterators                                     */
 /* -------------------------------------------------- */
 
-#define IGRAPH_EIT_SEQ       0
-#define IGRAPH_EIT_VECTOR    1
-#define IGRAPH_EIT_VECTORPTR 2
+typedef enum {
+    IGRAPH_EIT_SEQ,
+    IGRAPH_EIT_VECTOR,
+    IGRAPH_EIT_VECTORPTR,
+} igraph_eit_type_t;
 
 typedef struct igraph_eit_t {
-    int type;
+    igraph_eit_type_t type;
     igraph_integer_t pos;
     igraph_integer_t start;
     igraph_integer_t end;

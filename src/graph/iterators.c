@@ -574,7 +574,7 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
  * \function igraph_vs_type
  * \brief Returns the type of the vertex selector.
  */
-int igraph_vs_type(const igraph_vs_t *vs) {
+igraph_vs_type_t igraph_vs_type(const igraph_vs_t *vs) {
     return vs->type;
 }
 
@@ -1483,7 +1483,7 @@ igraph_error_t igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
  * \function igraph_es_type
  * \brief Returns the type of the edge selector.
  */
-int igraph_es_type(const igraph_es_t *es) {
+igraph_es_type_t igraph_es_type(const igraph_es_t *es) {
     return es->type;
 }
 
