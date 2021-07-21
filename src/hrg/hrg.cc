@@ -644,8 +644,8 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
  * \param parents An initialized vector, the results are stored
  *   here. For each vertex, the id of its parent vertex is stored, or
  *   -1, if the vertex is the root vertex in the tree. The first n
- *   vertex ids (from 0) refer to the original vertices of the graph,
- *   the other ids refer to vertex groups.
+ *   vertex IDs (from 0) refer to the original vertices of the graph,
+ *   the other IDs refer to vertex groups.
  * \param weights Numeric vector, counts the number of times a given
  *   tree split occured in the generated network samples, for each
  *   internal vertices. The order is the same as in \c parents.

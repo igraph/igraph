@@ -416,7 +416,7 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
  *        directions are ignored.
  * \param separators An initialized pointer vector, the separators
  *        are stored here. It is a list of pointers to igraph_vector_int_t
- *        objects. Each vector will contain the ids of the vertices in
+ *        objects. Each vector will contain the IDs of the vertices in
  *        the separator.
  *        To free all memory allocated for \c separators, you need call
  *        \ref igraph_vector_destroy() and then \ref igraph_free() on
@@ -441,7 +441,7 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
      * there is integer overflow here, then we zero out the mark and set
      * it to one. (We might as well just always zero it out.)
      *
-     * For each separator the vertices are stored in vertex id order.
+     * For each separator the vertices are stored in vertex ID order.
      * This facilitates the comparison of the separators when we find a
      * potential new candidate.
      *
@@ -638,7 +638,7 @@ static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  * \param graph The input graph, which must be undirected.
  * \param separators An initialized pointer vector, the separators
  *        are stored here. It is a list of pointers to igraph_vector_int_t
- *        objects. Each vector will contain the ids of the vertices in
+ *        objects. Each vector will contain the IDs of the vertices in
  *        the separator.
  *        To free all memory allocated for \c separators, you need call
  *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on

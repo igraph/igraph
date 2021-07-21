@@ -258,7 +258,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
 
     /* Now we go over all objects in the graph and collect the attribute names and
-       types. Plus we collect node ids. We also do some checks. */
+       types. Plus we collect node IDs. We also do some checks. */
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
         igraph_integer_t j;
         char cname[100];
@@ -376,7 +376,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
     }
 
-    /* check vertex id uniqueness */
+    /* check vertex ID uniqueness */
     if (igraph_trie_size(&trie) != no_of_nodes) {
         IGRAPH_ERROR("Node 'id' not unique in GML file.", IGRAPH_PARSEERROR);
     }
@@ -563,12 +563,12 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  *
  * </para><para> The <quote>id</quote> vertex attribute is treated specially.
  * If the <parameter>id</parameter> argument is not 0 then it should be a numeric
- * vector with the vertex ids and the <quote>id</quote> vertex attribute is
+ * vector with the vertex IDs and the <quote>id</quote> vertex attribute is
  * ignored (if there is one). If <parameter>id</parameter> is 0 and there is a
  * numeric <quote>id</quote> vertex attribute that is used instead. If ids
- * are not specified in either way then the regular igraph vertex ids are used.
+ * are not specified in either way then the regular igraph vertex IDs are used.
  *
- * </para><para> Note that whichever way vertex ids are specified, their
+ * </para><para> Note that whichever way vertex IDs are specified, their
  * uniqueness is not checked.
  *
  * </para><para> If the graph has edge attributes named <quote>source</quote>
@@ -577,7 +577,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * before calling this function if you want to preserve them.
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
- * \param id Either <code>NULL</code> or a numeric vector with the vertex ids.
+ * \param id Either <code>NULL</code> or a numeric vector with the vertex IDs.
  *        See details above.
  * \param creator An optional string to write to the stream in the creator line.
  *        If this is 0 then the current date and time is added.

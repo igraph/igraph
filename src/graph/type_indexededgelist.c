@@ -237,7 +237,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  * \return Error code:
  *    \c IGRAPH_EINVEVECTOR: invalid (odd)
  *    edges vector length, \c IGRAPH_EINVVID:
- *    invalid vertex id in edges vector.
+ *    invalid vertex ID in edges vector.
  *
  * This function invalidates all iterators.
  *
@@ -459,7 +459,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newfrom, &newto, &newoi, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &graph->ii, no_of_nodes));
 
-    /* Edge attributes, we need an index that gives the ids of the
+    /* Edge attributes, we need an index that gives the IDs of the
        original edges for every new edge.
     */
     if (graph->attr) {
@@ -501,18 +501,18 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  * \brief Removes vertices (with all their edges) from the graph.
  *
  * </para><para>
- * This function changes the ids of the vertices (except in some very
+ * This function changes the IDs of the vertices (except in some very
  * special cases, but these should not be relied on anyway).
  *
  * </para><para>
  * This function invalidates all iterators.
  *
  * \param graph The graph to work on.
- * \param vertices The ids of the vertices to remove in a
+ * \param vertices The IDs of the vertices to remove in a
  *                 vector. The vector may contain the same id more
  *                 than once.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|+|E|),
  * |V| and
@@ -705,7 +705,7 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  * \param graph The graph to work on.
  * \param neis This vector will contain the result. The vector should
  *        be initialized beforehand and will be resized. Starting from igraph
- *        version 0.4 this vector is always sorted, the vertex ids are
+ *        version 0.4 this vector is always sorted, the vertex IDs are
  *        in increasing order. If one neighbor is connected with multiple
  *        edges, the neighbor will be returned multiple times.
  * \param pnode The id of the node for which the adjacent vertices are
@@ -720,7 +720,7 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  *        searched.
  *        This parameter is ignored for undirected graphs.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *         \c IGRAPH_ENOMEM: not enough memory.
  *
@@ -963,7 +963,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * \param graph The graph.
  * \param res Vector, this will contain the result. It should be
  *        initialized and will be resized to be the appropriate size.
- * \param vids Vector, giving the vertex ids of which the degree will
+ * \param vids Vector, giving the vertex IDs of which the degree will
  *        be calculated.
  * \param mode Defines the type of the degree. Valid modes are:
  *        \c IGRAPH_OUT, out-degree;
@@ -974,7 +974,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * \param loops Boolean, gives whether the self-loops should be
  *        counted.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  * Time complexity: O(v) if
@@ -1072,7 +1072,7 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  * \brief Gives the head and tail vertices of an edge.
  *
  * \param graph The graph object.
- * \param eid The edge id.
+ * \param eid The edge ID.
  * \param from Pointer to an \type igraph_integer_t. The tail (head) of
  * the edge will be placed here for undirected (directed) graphs.
  * \param to Pointer to an \type igraph_integer_t. The head (tail) of the
@@ -1196,12 +1196,12 @@ igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
 
 /**
  * \function igraph_get_eid
- * \brief Get the edge id from the end points of an edge.
+ * \brief Get the edge ID from the end points of an edge.
  *
  * For undirected graphs \c pfrom and \c pto are exchangeable.
  *
  * \param graph The graph object.
- * \param eid Pointer to an integer, the edge id will be stored here.
+ * \param eid Pointer to an integer, the edge ID will be stored here.
  * \param pfrom The starting point of the edge.
  * \param pto The end point of the edge.
  * \param directed Logical constant, whether to search for directed
@@ -1229,7 +1229,7 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
     igraph_integer_t nov = igraph_vcount(graph);
 
     if (from < 0 || to < 0 || from > nov - 1 || to > nov - 1) {
-        IGRAPH_ERROR("cannot get edge id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("cannot get edge ID", IGRAPH_EINVVID);
     }
 
     *eid = -1;
@@ -1250,7 +1250,7 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
     if (*eid < 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
         }
     }
 
@@ -1276,11 +1276,11 @@ static igraph_error_t igraph_i_get_eids_pairs(
     igraph_integer_t eid = -1;
 
     if (n % 2 != 0) {
-        IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
+        IGRAPH_ERROR("Cannot get edge IDs, invalid length of edge IDs",
                      IGRAPH_EINVAL);
     }
     if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid vertex ID", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(eids, n / 2));
@@ -1298,7 +1298,7 @@ static igraph_error_t igraph_i_get_eids_pairs(
 
             VECTOR(*eids)[i] = eid;
             if (eid < 0 && error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     } else {
@@ -1310,7 +1310,7 @@ static igraph_error_t igraph_i_get_eids_pairs(
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
             VECTOR(*eids)[i] = eid;
             if (eid < 0 && error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     }
@@ -1330,7 +1330,7 @@ static igraph_error_t igraph_i_get_eids_path(
     igraph_integer_t eid = -1;
 
     if (!igraph_vector_int_isininterval(path, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid vertex ID", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(eids, n == 0 ? 0 : n - 1));
@@ -1348,7 +1348,7 @@ static igraph_error_t igraph_i_get_eids_path(
 
             VECTOR(*eids)[i] = eid;
             if (eid < 0 && error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     } else {
@@ -1360,7 +1360,7 @@ static igraph_error_t igraph_i_get_eids_path(
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
             VECTOR(*eids)[i] = eid;
             if (eid < 0 && error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     }
@@ -1370,12 +1370,12 @@ static igraph_error_t igraph_i_get_eids_path(
 
 /**
  * \function igraph_get_eids
- * Return edge ids based on the adjacent vertices.
+ * Return edge IDs based on the adjacent vertices.
  *
  * This function operates in two modes. If the \c pairs argument is
  * not a null pointer, but the \c path argument is, then it searches
- * for the edge ids of all pairs of vertices given in \c pairs. The
- * pairs of vertex ids are taken consecutively from the vector,
+ * for the edge IDs of all pairs of vertices given in \c pairs. The
+ * pairs of vertex IDs are taken consecutively from the vector,
  * i.e. <code>VECTOR(pairs)[0]</code> and
  * <code>VECTOR(pairs)[1]</code> give the first
  * pair, <code>VECTOR(pairs)[2]</code> and
@@ -1384,7 +1384,7 @@ static igraph_error_t igraph_i_get_eids_path(
  * </para><para>
  * If the \c pairs argument is a null pointer, and \c path is not a
  * null pointer, then the \c path is interpreted as a path given by
- * vertex ids and the edges along the path are returned.
+ * vertex IDs and the edges along the path are returned.
  *
  * </para><para>
  * If neither \c pairs nor \c path are null pointers, then both are
@@ -1398,7 +1398,7 @@ static igraph_error_t igraph_i_get_eids_path(
  *
  * </para><para>
  * If there are multiple edges in the graph, then these are ignored;
- * i.e. for a given pair of vertex ids, always the same edge id is
+ * i.e. for a given pair of vertex IDs, always the same edge ID is
  * returned, even if the pair is given multiple time in \c pairs or in
  * \c path. See \ref igraph_get_eids_multi() for a similar function
  * that works differently in case of multiple edges.
@@ -1407,7 +1407,7 @@ static igraph_error_t igraph_i_get_eids_path(
  * \param eids Pointer to an initialized vector, the result is stored
  *        here. It will be resized as needed.
  * \param pairs Vector giving pairs of vertices, or a null pointer.
- * \param path Vector giving vertex ids along a path, or a null
+ * \param path Vector giving vertex IDs along a path, or a null
  *        pointer.
  * \param directed Logical scalar, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
@@ -1519,16 +1519,16 @@ igraph_error_t igraph_i_get_eids_multipairs(const igraph_t *graph, igraph_vector
     igraph_integer_t eid = -1;
 
     if (n % 2 != 0) {
-        IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
+        IGRAPH_ERROR("Cannot get edge IDs, invalid length of edge IDs",
                      IGRAPH_EINVAL);
     }
     if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid vertex ID", IGRAPH_EINVVID);
     }
 
     seen = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
     if (seen == 0) {
-        IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot get edge IDs", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, seen);
     IGRAPH_CHECK(igraph_vector_int_resize(eids, n / 2));
@@ -1548,7 +1548,7 @@ igraph_error_t igraph_i_get_eids_multipairs(const igraph_t *graph, igraph_vector
             if (eid >= 0) {
                 seen[(eid)] = 1;
             } else if (error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     } else {
@@ -1562,7 +1562,7 @@ igraph_error_t igraph_i_get_eids_multipairs(const igraph_t *graph, igraph_vector
             if (eid >= 0) {
                 seen[(eid)] = 1;
             } else if (error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     }
@@ -1584,12 +1584,12 @@ igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_
     igraph_integer_t eid = -1;
 
     if (!igraph_vector_int_isininterval(path, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid vertex ID", IGRAPH_EINVVID);
     }
 
     seen = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
     if (!seen) {
-        IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot get edge IDs", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, seen);
     IGRAPH_CHECK(igraph_vector_int_resize(eids, n == 0 ? 0 : n - 1));
@@ -1609,7 +1609,7 @@ igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_
             if (eid >= 0) {
                 seen[(eid)] = 1;
             } else if (error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     } else {
@@ -1623,7 +1623,7 @@ igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_
             if (eid >= 0) {
                 seen[(eid)] = 1;
             } else if (error) {
-                IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
             }
         }
     }
@@ -1639,12 +1639,12 @@ igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_
 
 /**
  * \function igraph_get_eids_multi
- * \brief Query edge ids based on their adjacent vertices, handle multiple edges.
+ * \brief Query edge IDs based on their adjacent vertices, handle multiple edges.
  *
  * This function operates in two modes. If the \c pairs argument is
  * not a null pointer, but the \c path argument is, then it searches
- * for the edge ids of all pairs of vertices given in \c pairs. The
- * pairs of vertex ids are taken consecutively from the vector,
+ * for the edge IDs of all pairs of vertices given in \c pairs. The
+ * pairs of vertex IDs are taken consecutively from the vector,
  * i.e. <code>VECTOR(pairs)[0]</code> and
  * <code>VECTOR(pairs)[1]</code> give the first pair,
  * <code>VECTOR(pairs)[2]</code> and <code>VECTOR(pairs)[3]</code> the
@@ -1653,7 +1653,7 @@ igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_
  * </para><para>
  * If the \c pairs argument is a null pointer, and \c path is not a
  * null pointer, then the \c path is interpreted as a path given by
- * vertex ids and the edges along the path are returned.
+ * vertex IDs and the edges along the path are returned.
  *
  * </para><para>
  * If the \c error argument is true, then it is an error to give pairs of
@@ -1667,13 +1667,13 @@ igraph_error_t igraph_i_get_eids_multipath(const igraph_t *graph, igraph_vector_
  * </para><para>
  * This function handles multiple edges properly, i.e. if the same
  * pair is given multiple times and they are indeed connected by
- * multiple edges, then each time a different edge id is reported.
+ * multiple edges, then each time a different edge ID is reported.
  *
  * \param graph The input graph.
  * \param eids Pointer to an initialized vector, the result is stored
  *        here. It will be resized as needed.
  * \param pairs Vector giving pairs of vertices, or a null pointer.
- * \param path Vector giving vertex ids along a path, or a null
+ * \param path Vector giving vertex IDs along a path, or a null
  *        pointer.
  * \param directed Logical scalar, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
@@ -1715,7 +1715,7 @@ igraph_error_t igraph_get_eids_multi(const igraph_t *graph, igraph_vector_int_t 
  * \param graph The graph object.
  * \param eids An initialized vector. It will be resized
  * to hold the result.
- * \param pnode A vertex id.
+ * \param pnode A vertex ID.
  * \param mode Specifies what kind of edges to include for directed
  * graphs. \c IGRAPH_OUT means only outgoing edges, \c IGRAPH_IN only
  * incoming edges, \c IGRAPH_ALL both. This parameter is ignored for

@@ -252,8 +252,8 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
  * </para><para>
  * This function collects the specified vertices and all edges between
  * them to a new graph.
- * As the vertex ids in a graph always start with zero, this function
- * very likely needs to reassign ids to the vertices.
+ * As the vertex IDs in a graph always start with zero, this function
+ * very likely needs to reassign IDs to the vertices.
  * \param graph The graph object.
  * \param res The subgraph, another graph object will be stored here,
  *        do \em not initialize this object before calling this
@@ -277,7 +277,7 @@ static igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *grap
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \c IGRAPH_EINVVID, invalid vertex ID in
  *         \p vids.
  *
  * Time complexity: O(|V|+|E|),
@@ -348,8 +348,8 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
  * </para><para>
  * This function collects the specified edges and their endpoints to a new
  * graph.
- * As the vertex ids in a graph always start with zero, this function
- * very likely needs to reassign ids to the vertices.
+ * As the vertex IDs in a graph always start with zero, this function
+ * very likely needs to reassign IDs to the vertices.
  * \param graph The graph object.
  * \param res The subgraph, another graph object will be stored here,
  *        do \em not initialize this object before calling this
@@ -363,7 +363,7 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
- *         \c IGRAPH_EINVEID, invalid edge id in
+ *         \c IGRAPH_EINVEID, invalid edge ID in
  *         \p eids.
  *
  * Time complexity: O(|V|+|E|),

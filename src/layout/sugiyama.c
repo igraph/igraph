@@ -393,7 +393,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
         igraph_vector_int_fill(&old2new_vertex_ids, -1);
 
-        /* Construct a mapping from the old vertex ids to the new ones */
+        /* Construct a mapping from the old vertex IDs to the new ones */
         for (i = 0, next_new_vertex_id = 0; i < no_of_nodes; i++) {
             if (VECTOR(membership)[i] == comp_idx) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&new_layers, VECTOR(layers_own)[i]));

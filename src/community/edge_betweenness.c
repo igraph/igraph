@@ -192,9 +192,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * \param res Pointer to an initialized matrix, if not \c NULL then the
  *    dendrogram will be stored here, in the same form as for the \ref
  *    igraph_community_walktrap() function: the matrix has two columns
- *    and each line is a merge given by the ids of the merged
- *    components. The component ids are numbered from zero and
- *    component ids smaller than the number of vertices in the graph
+ *    and each line is a merge given by the IDs of the merged
+ *    components. The component IDs are numbered from zero and
+ *    component IDs smaller than the number of vertices in the graph
  *    belong to individual vertices. The non-trivial components
  *    containing at least two vertices are numbered from \c n, where \c n is
  *    the number of vertices in the graph. So if the first line
@@ -346,7 +346,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * hierarchical approach, the result is a dendrogram.
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
- *     stored here, the ids of the removed edges in the order of their
+ *     stored here, the IDs of the removed edges in the order of their
  *     removal. It will be resized as needed. It may be \c NULL if
  *     the edge IDs are not needed by the caller.
  * \param edge_betweenness Pointer to an initialized vector or

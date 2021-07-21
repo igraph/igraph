@@ -110,7 +110,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
  * graph with \ref igraph_to_undirected() .
  *
  * \param graph The undirected input graph.
- * \param weights The edge weights, in the order of the edge ids, must
+ * \param weights The edge weights, in the order of the edge IDs, must
  *    have appropriate length.
  * \param res An initialized vector, the results are stored here.
  * \param vids Vertex selector that specifies the vertices which to calculate

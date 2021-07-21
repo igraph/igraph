@@ -392,10 +392,10 @@ static igraph_error_t igraph_i_community_spinglass_orig(
  * \param weights Pointer to a vector with the weights of the edges.
  *    Alternatively \c NULL can be supplied to have the same weight
  *    for every edge.
- * \param vertex The vertex id of the vertex of which ths community is
+ * \param vertex The vertex ID of the vertex of which ths community is
  *    calculated.
  * \param community Pointer to an initialized vector, the result, the
- *    ids of the vertices in the community of the input vertex will be
+ *    IDs of the vertices in the community of the input vertex will be
  *    stored here. The vector will be resized as needed.
  * \param cohesion Pointer to a real variable, if not \c NULL the
  *     cohesion index of the community will be stored here.
@@ -469,7 +469,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
             IGRAPH_ERROR("Invalid gamme value", IGRAPH_EINVAL);
         }
         if (vertex < 0 || vertex > igraph_vcount(graph)) {
-            IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid vertex ID", IGRAPH_EINVAL);
         }
 
         /* Check whether we have a single component */

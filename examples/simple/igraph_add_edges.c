@@ -70,7 +70,7 @@ int main() {
     igraph_vector_int_sort(&v);
     igraph_vector_int_print(&v);
 
-    /* Error, vector ids */
+    /* Error, vector IDs */
     igraph_vector_int_resize(&v, 4);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;

@@ -40,7 +40,7 @@
  * </para><para>
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
- * vertex ids.
+ * vertex IDs.
  *
  * </para><para>
  * Consider using \ref igraph_bfs_simple instead if you set most of the output
@@ -65,9 +65,9 @@
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
  * \param restricted If not a null pointer, then it must be a pointer
- *        to a vector containing vertex ids. The BFS is carried out
+ *        to a vector containing vertex IDs. The BFS is carried out
  *        only on these vertices.
- * \param order If not null pointer, then the vertex ids of the graph are
+ * \param order If not null pointer, then the vertex IDs of the graph are
  *        stored here, in the same order as they were visited.
  * \param rank If not a null pointer, then the rank of each vertex is
  *        stored here.
@@ -146,7 +146,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         igraph_integer_t min, max;
         igraph_vector_int_minmax(restricted, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid vertex id in restricted set", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid vertex ID in restricted set", IGRAPH_EINVAL);
         }
     }
 
@@ -314,7 +314,7 @@ cleanup:
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
  * \param vids If not a null pointer, then an initialized vector must be passed
- *        here. The ids of the vertices visited during the traversal will be
+ *        here. The IDs of the vertices visited during the traversal will be
  *        stored here, in the same order as they were visited.
  * \param layers If not a null pointer, then an initialized vector must be
  *        passed here. The i-th element of the vector will contain the index
@@ -442,7 +442,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
  * </para><para>
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
- * vertex ids.
+ * vertex IDs.
  *
  * \param graph The input graph.
  * \param root The id of the root vertex.
@@ -455,12 +455,12 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
- * \param order If not null pointer, then the vertex ids of the graph are
+ * \param order If not null pointer, then the vertex IDs of the graph are
  *        stored here, in the same order as they were discovered. The tail of
  *        the vector will be padded with -1 to ensure that the length of the
  *        vector is the same as the number of vertices, even if some vertices
  *        were not visited during the traversal.
- * \param order_out If not a null pointer, then the vertex ids of the
+ * \param order_out If not a null pointer, then the vertex IDs of the
  *        graphs are stored here, in the order of the completion of
  *        their subtree. The tail of the vector will be padded with -1 to ensure
  *        that the length of the vector is the same as the number of vertices,

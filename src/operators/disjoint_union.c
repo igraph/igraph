@@ -33,7 +33,7 @@
  *
  * </para><para>
  * First the vertices of the second graph will be relabeled with new
- * vertex ids to have two disjoint sets of vertex ids, then the union
+ * vertex IDs to have two disjoint sets of vertex IDs, then the union
  * of the two graphs will be formed.
  * If the two graphs have |V1| and |V2| vertices and |E1| and |E2|
  * edges respectively then the new graph will have |V1|+|V2| vertices
@@ -105,7 +105,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  *
  * </para><para>
  * First the vertices in the graphs will be relabeled with new vertex
- * ids to have pairwise disjoint vertex id sets and then the union of
+ * IDs to have pairwise disjoint vertex ID sets and then the union of
  * the graphs is formed.
  * The number of vertices and edges in the result is the total number
  * of vertices and edges in the graphs.

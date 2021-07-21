@@ -58,7 +58,7 @@ int main() {
         return 3;
     }
 
-    /* error test, invalid vertex id */
+    /* error test, invalid vertex ID */
     igraph_es_destroy(&es);
     igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 10, 2, -1);
     ret = igraph_delete_edges(&g, es);

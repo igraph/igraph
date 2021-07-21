@@ -55,11 +55,11 @@
  * fields: the source vertex, the target vertex and the edge capacity.
  *
  * </para><para>
- * Vertex ids are numbered from 1.
+ * Vertex IDs are numbered from 1.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The file to read from.
  * \param source Pointer to an integer, the id of the source node will
- *    be stored here. (The igraph vertex id, which is one less than
+ *    be stored here. (The igraph vertex ID, which is one less than
  *    the actual number in the file.) It is ignored if
  *    <code>NULL</code>.
  * \param target Pointer to an integer, the (igraph) id of the target

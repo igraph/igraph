@@ -473,7 +473,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
  *   igraph 0.5 and before). This parameter also influences how the root
  *   vertices are calculated, if they are not given. See the \p roots parameter.
  * \param roots The index of the root vertex or root vertices.
- *   If this is a non-empty vector then the supplied vertex ids are used
+ *   If this is a non-empty vector then the supplied vertex IDs are used
  *   as the roots of the trees (or a single tree if the graph is connected).
  *   If it is a null pointer of a pointer to an empty vector, then the root
  *   vertices are automatically calculated based on topological sorting,
@@ -682,7 +682,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
     if (igraph_vector_int_size(proots) == 1) {
         real_root = VECTOR(*proots)[0];
         if (real_root < 0 || real_root >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid vertex id.", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVVID);
         }
 
         /* else, we need to make real_root */
@@ -782,7 +782,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
  *   igraph 0.5 and before). This parameter also influences how the root
  *   vertices are calculated, if they are not given. See the \p roots parameter.
  * \param roots The index of the root vertex or root vertices.
- *   If this is a non-empty vector then the supplied vertex ids are used
+ *   If this is a non-empty vector then the supplied vertex IDs are used
  *   as the roots of the trees (or a single tree if the graph is connected).
  *   If it is a null pointer of a pointer to an empty vector, then the root
  *   vertices are automatically calculated based on topological sorting,

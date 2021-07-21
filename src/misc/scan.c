@@ -836,7 +836,7 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         for (i = 0; i < neilen; i++) {
             igraph_integer_t vertex = VECTOR(*nei)[i];
             if (vertex < 0 || vertex >= no_of_nodes) {
-                IGRAPH_ERROR("Invalid vertex id in neighborhood list in local scan",
+                IGRAPH_ERROR("Invalid vertex ID in neighborhood list in local scan",
                              IGRAPH_EINVAL);
             }
             VECTOR(marked)[vertex] = node + 1;

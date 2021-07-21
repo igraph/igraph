@@ -725,8 +725,8 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
  * This function is only implemented for subgraphs with three or four
  * vertices.
  * \param graph The graph object.
- * \param vids A vector containing the vertex ids to be considered as
- *        a subgraph. Each vertex id should be included at most once.
+ * \param vids A vector containing the vertex IDs to be considered as
+ *        a subgraph. Each vertex ID should be included at most once.
  * \param isoclass Pointer to an integer, this will be set to the
  *        isomorphism class.
  * \return Error code.

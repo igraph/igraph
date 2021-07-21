@@ -128,12 +128,12 @@ int main() {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    printf("Too small weight vector size.\n");
+    printf("Weight vector size too small.\n");
     igraph_vector_init_int(&weights, 3, 0, 1, 2);
     igraph_small(&g, 5, 1, 1,0, 2,1, 2,3, 3,4, -1);
     IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
 
-    printf("To great starting vertex id.\n");
+    printf("Starting vertex ID too large.\n");
     IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(&g, NULL, &result, 10, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
 

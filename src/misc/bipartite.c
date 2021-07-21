@@ -245,7 +245,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_i));
                     if (multiplicity) {
                         /* If we need the multiplicity as well, then we put in the
-                           old vertex ids here and rewrite it later */
+                           old vertex IDs here and rewrite it later */
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei2));
                     } else {
                         new_nei2 = VECTOR(vertex_index)[nei2] - 1;
@@ -508,7 +508,7 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
  * \param types Boolean vector giving the vertex types. The length of
  *   the vector defines the number of vertices in the graph.
  * \param edges Vector giving the edges of the graph. The highest
- *   vertex id in this vector must be smaller than the length of the
+ *   vertex ID in this vector must be smaller than the length of the
  *   \p types vector.
  * \param directed Boolean scalar, whether to create a directed
  *   graph.
@@ -538,7 +538,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
         igraph_vector_int_minmax(edges, &min_edge, &max_edge);
     }
     if (min_edge < 0 || max_edge >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative) vertex ID", IGRAPH_EINVVID);
     }
 
     /* Check bipartiteness */
@@ -709,11 +709,11 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  *   vertices. The rows will correspond to vertices with type 0,
  *   the columns correspond to vertices with type 1.
  * \param row_ids Pointer to an initialized vector or a null
- *   pointer. If not a null pointer, then the vertex ids (in the
+ *   pointer. If not a null pointer, then the vertex IDs (in the
  *   graph) corresponding to the rows of the result matrix are stored
  *   here.
  * \param col_ids Pointer to an initialized vector or a null
- *   pointer. If not a null pointer, then the vertex ids corresponding
+ *   pointer. If not a null pointer, then the vertex IDs corresponding
  *   to the columns of the result matrix are stored here.
  * \return Error code.
  *

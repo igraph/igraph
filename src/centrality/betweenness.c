@@ -474,7 +474,7 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex id passed in
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in
  *        \p vids.
  *
  * Time complexity: O(|V||E|),
@@ -520,7 +520,7 @@ igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex id passed in
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in
  *        \p vids.
  *
  * Time complexity: O(|V||E|),

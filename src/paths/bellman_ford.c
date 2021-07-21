@@ -44,7 +44,7 @@
  * \param res The result, a matrix. A pointer to an initialized matrix
  *    should be passed here, the matrix will be resized if needed.
  *    Each row contains the distances from a single source, to all
- *    vertices in the graph, in the order of vertex ids. For unreachable
+ *    vertices in the graph, in the order of vertex IDs. For unreachable
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
@@ -224,27 +224,27 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \ref igraph_get_shortest_paths_dijkstra() .
  *
  * \param graph The input graph, can be directed.
- * \param vertices The result, the ids of the vertices along the paths.
+ * \param vertices The result, the IDs of the vertices along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors. Normally, either this argument, or the \c
  *        edges should be non-null, but no error or warning is given
  *        if they are both null pointers.
- * \param edges The result, the ids of the edges along the paths.
+ * \param edges The result, the IDs of the edges along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors. Normally, either this argument, or the \c
  *        vertices should be non-null, but no error or warning is given
  *        if they are both null pointers.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
  * \param weights The edge weights. There must not be any closed loop in
@@ -280,7 +280,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *         \cli IGRAPH_EINVAL
  *           The weight vector doesn't math the number of edges.
  *         \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
+ *           \p from is invalid vertex ID, or the length of \p to is
  *           not the same as the length of \p vertices or \p edges.
  *         \cli IGRAPH_ENEGLOOP
  *           Bellman-ford algorithm encounted a negative loop.
@@ -500,11 +500,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex ids along
+ *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
  * \param edges Pointer to an uninitialized vector or a null
- *        pointer. If not a null pointer, then the edge ids along the
+ *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.

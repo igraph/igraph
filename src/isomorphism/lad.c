@@ -1527,7 +1527,7 @@ cleanup:
  * \param domains A pointer vector, or a null pointer. If a pointer
  *    vector, then it must contain pointers to \ref igraph_vector_int_t
  *    objects and the length of the vector must match the number of
- *    vertices in the \p pattern graph. For each vertex, the ids of
+ *    vertices in the \p pattern graph. For each vertex, the IDs of
  *    the compatible vertices in the target graph are listed.
  * \param iso Pointer to a boolean, or a null pointer. If not a null
  *    pointer, then the boolean is set to TRUE (1) if a subgraph
@@ -1535,7 +1535,7 @@ cleanup:
  * \param map Pointer to a vector or a null pointer. If not a null
  *    pointer and a subgraph isomorphism is found, the matching
  *    vertices from the target graph are listed here, for each vertex
- *    (in vertex id order) from the pattern graph.
+ *    (in vertex ID order) from the pattern graph.
  * \param maps Pointer vector or a null pointer. If not a null
  *    pointer, then all subgraph isomorphisms are stored in the
  *    pointer vector, in \ref igraph_vector_int_t objects.

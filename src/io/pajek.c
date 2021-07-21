@@ -106,7 +106,7 @@ void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * </para><para>
  * In addition the following vertex attributes might be added: \c id
- * if there are vertex ids in the file, \c x and \c y or \c x
+ * if there are vertex IDs in the file, \c x and \c y or \c x
  * and \c y and \c z if there are vertex coordinates in the file.
  *
  * </para><para>The \c weight edge attribute might be
@@ -590,7 +590,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t id = bipartite ? VECTOR(bip_index)[i] : i;
 
-            /* vertex id */
+            /* vertex ID */
             fprintf(outstream, "%" IGRAPH_PRId, i + 1);
             if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_ID],

@@ -433,7 +433,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *        \cli IGRAPH_BARABASI_BAG
  *          This is the algorithm that was previously (before version
  *          0.6) solely implemented in igraph. It works by putting the
- *          ids of the vertices into a bag (multiset, really), exactly
+ *          IDs of the vertices into a bag (multiset, really), exactly
  *          as many times as their (in-)degree, plus once more. Then
  *          the required number of cited vertices are drawn from the
  *          bag, with replacement. This method might generate multiple

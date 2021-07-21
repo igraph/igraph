@@ -484,7 +484,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \brief Decompose a graph into connected components.
  *
  * Create separate graph for each component of a graph. Note that the
- * vertex ids in the new graphs will be different than in the original
+ * vertex IDs in the new graphs will be different than in the original
  * graph. (Except if there is only one component in the original graph.)
  *
  * \param graph The original graph.
@@ -1258,7 +1258,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * \brief The vertices in the same component as a given vertex.
  *
  * \param graph The graph object.
- * \param res The result, vector with the ids of the vertices in the
+ * \param res The result, vector with the IDs of the vertices in the
  *        same component.
  * \param vertex The id of the vertex of which the component is
  *        searched.
@@ -1281,7 +1281,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  *        \cli IGRAPH_ENOMEM
  *          not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p vertex is an invalid vertex id
+ *           \p vertex is an invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument passed.
  *        \endclist

@@ -175,7 +175,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     igraph_integer_t i;
 
     /* We need to convert this to directed by hand, since we need to be
-       sure that the edge ids will be handled properly to build the new
+       sure that the edge IDs will be handled properly to build the new
        capacity vector. */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -208,7 +208,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     /* The flow has one non-zero value for each real-nonreal edge pair,
        by definition, we convert it to a positive-negative vector. If
        for an edge the flow is negative that means that it is going
-       from the bigger vertex id to the smaller one. For positive
+       from the bigger vertex ID to the smaller one. For positive
        values the direction is the opposite. */
     if (flow) {
         igraph_integer_t i;
@@ -438,16 +438,16 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \param flow If not a null pointer, then it must be a pointer to an
  *        initialized vector. The vector will be resized, and the flow
  *        on each edge will be placed in it, in the order of the edge
- *        ids. For undirected graphs this argument is bit trickier,
+ *        IDs. For undirected graphs this argument is bit trickier,
  *        since for these the flow direction is not predetermined by
  *        the edge direction. For these graphs the elements of the
  *        \p flow vector can be negative, this means that the flow
- *        goes from the bigger vertex id to the smaller one. Positive
- *        values mean that the flow goes from the smaller vertex id to
+ *        goes from the bigger vertex ID to the smaller one. Positive
+ *        values mean that the flow goes from the smaller vertex ID to
  *        the bigger one.
  * \param cut A null pointer or a pointer to an initialized vector.
  *        If not a null pointer, then the minimum cut corresponding to
- *        the maximum flow is stored here, i.e. all edge ids that are
+ *        the maximum flow is stored here, i.e. all edge IDs that are
  *        part of the minimum cut are stored in the vector.
  * \param partition A null pointer or a pointer to an initialized
  *        vector. If not a null pointer, then the first partition of
@@ -1140,14 +1140,14 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
  * \param graph The input graph.
  * \param value Pointer to a real variable, the value of the cut is
  *        stored here.
- * \param cut Pointer to an initialized vector, the edge ids that are included
+ * \param cut Pointer to an initialized vector, the edge IDs that are included
  *        in the cut are stored here. This argument is ignored if it
  *        is a null pointer.
- * \param partition Pointer to an initialized vector, the vertex ids of the
+ * \param partition Pointer to an initialized vector, the vertex IDs of the
  *        vertices in the first partition of the cut are stored
  *        here. The first partition is always the one that contains the
  *        source vertex. This argument is ignored if it is a null pointer.
- * \param partition2 Pointer to an initialized vector, the vertex ids of the
+ * \param partition2 Pointer to an initialized vector, the vertex IDs of the
  *        vertices in the second partition of the cut are stored here.
  *        The second partition is always the one that contains the
  *        target vertex. This argument is ignored if it is a null pointer.
@@ -1189,7 +1189,7 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 /*   igraph_integer_t i; */
 
 /*   /\* We need to convert this to directed by hand, since we need to be */
-/*      sure that the edge ids will be handled properly to build the new */
+/*      sure that the edge IDs will be handled properly to build the new */
 /*      capacity vector. *\/ */
 
 /*   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0); */
@@ -1636,7 +1636,7 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
  *    of the vertices in the second partition will be stored here.
  *    The vector will be resized as needed. This argument is ignored
  *    if it is a NULL pointer.
- * \param cut Pointer to an initialized vector, the ids of the edges
+ * \param cut Pointer to an initialized vector, the IDs of the edges
  *    in the cut will be stored here. This argument is ignored if it
  *    is a NULL pointer.
  * \param capacity A numeric vector giving the capacities of the

@@ -85,7 +85,7 @@
  * \sa \ref igraph_vss_all(), \ref igraph_vs_destroy()
  *
  * This selector includes all vertices of a given graph in
- * increasing vertex id order.
+ * increasing vertex ID order.
  *
  * </para><para>
  * Time complexity: O(1).
@@ -244,7 +244,7 @@ igraph_vs_t igraph_vss_none(void) {
  * This vertex selector selects a single vertex.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param vid The vertex id to be selected.
+ * \param vid The vertex ID to be selected.
  * \return Error Code.
  * \sa \ref igraph_vss_1(), \ref igraph_vs_destroy()
  *
@@ -333,13 +333,13 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_int_t *v) {
  *
  * This function can be used to create a vertex selector with a couple
  * of vertices. Do not forget to include a <code>-1</code> after the
- * last vertex id. The behavior of the function is undefined if you
+ * last vertex ID. The behavior of the function is undefined if you
  * don't use a <code>-1</code> properly.
  *
  * </para><para>
- * Note that the vertex ids supplied will be parsed as
+ * Note that the vertex IDs supplied will be parsed as
  * <code>int</code>'s so you cannot supply arbitrarily large (too
- * large for int) vertex ids here.
+ * large for int) vertex IDs here.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
  * \param ... Additional parameters, these will be the vertex IDs to
@@ -348,7 +348,7 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_int_t *v) {
  * \return Error code.
  * \sa \ref igraph_vs_destroy()
  *
- * Time complexity: O(n), the number of vertex ids supplied.
+ * Time complexity: O(n), the number of vertex IDs supplied.
  */
 
 igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
@@ -428,14 +428,14 @@ igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs, const igraph_vector_int_t 
  * \function igraph_vs_seq
  * \brief Vertex set, an interval of vertices.
  *
- * Creates a vertex selector containing all vertices with vertex id
+ * Creates a vertex selector containing all vertices with vertex ID
  * equal to or bigger than \c from and equal to or smaller than \c
  * to.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param from The first vertex id to be included in the vertex
+ * \param from The first vertex ID to be included in the vertex
  *        selector.
- * \param to The last vertex id to be included in the vertex
+ * \param to The last vertex ID to be included in the vertex
  *        selector.
  * \return Error code.
  * \sa \ref igraph_vss_seq(), \ref igraph_vs_destroy()
@@ -459,9 +459,9 @@ igraph_error_t igraph_vs_seq(igraph_vs_t *vs,
  *
  * The immediate version of \ref igraph_vs_seq().
  *
- * \param from The first vertex id to be included in the vertex
+ * \param from The first vertex ID to be included in the vertex
  *        selector.
- * \param to The last vertex id to be included in the vertex
+ * \param to The last vertex ID to be included in the vertex
  *        selector.
  * \return Error code.
  * \sa \ref igraph_vs_seq()
@@ -659,12 +659,12 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * \brief Creates a vertex iterator from a vertex selector.
  *
  * This function instantiates a vertex selector object with a given
- * graph. This is the step when the actual vertex ids are created from
+ * graph. This is the step when the actual vertex IDs are created from
  * the \em logical notion of the vertex selector based on the graph.
  * E.g. a vertex selector created with \ref igraph_vs_all() contains
  * knowledge that \em all vertices are included in a (yet indefinite)
  * graph. When instantiating it a vertex iterator object is created,
- * this contains the actual vertex ids in the graph supplied as a
+ * this contains the actual vertex IDs in the graph supplied as a
  * parameter.
  *
  * </para><para>
@@ -682,7 +682,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * igraph_vs_none(), \ref igraph_vs_1, \ref igraph_vs_vector, \ref
  * igraph_vs_seq(), \ref igraph_vs_vector(), \ref
  * igraph_vs_vector_small(). O(d) for \ref igraph_vs_adj(), d is the
- * number of vertex ids to be included in the iterator. O(|V|) for
+ * number of vertex IDs to be included in the iterator. O(|V|) for
  * \ref igraph_vs_nonadj(), |V| is the number of vertices in the graph.
  */
 
@@ -775,7 +775,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vit->start = vs.data.vid;
         vit->end = vs.data.vid + 1;
         if (vit->pos >= igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex id", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID", IGRAPH_EINVVID);
         }
         break;
     case IGRAPH_VS_VECTORPTR:
@@ -786,7 +786,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vit->vec = vs.data.vecptr;
         vit->end = igraph_vector_int_size(vit->vec);
         if (!igraph_vector_int_isininterval(vit->vec, 0, igraph_vcount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex id", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID", IGRAPH_EINVVID);
         }
         break;
     case IGRAPH_VS_SEQ:
@@ -865,11 +865,11 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
  * \param es Pointer to an uninitialized edge selector object.
  * \param order Constant giving the order in which the edges will be
  *        included in the selector. Possible values:
- *        \c IGRAPH_EDGEORDER_ID, edge id order.
- *        \c IGRAPH_EDGEORDER_FROM, vertex id order, the id of the
+ *        \c IGRAPH_EDGEORDER_ID, edge ID order.
+ *        \c IGRAPH_EDGEORDER_FROM, vertex ID order, the id of the
  *           \em source vertex counts for directed graphs. The order
  *           of the incident edges of a given vertex is arbitrary.
- *        \c IGRAPH_EDGEORDER_TO, vertex id order, the id of the \em
+ *        \c IGRAPH_EDGEORDER_TO, vertex ID order, the id of the \em
  *           target vertex counts for directed graphs. The order
  *           of the incident edges of a given vertex is arbitrary.
  *        For undirected graph the latter two is the same.
@@ -1022,13 +1022,13 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  *
  * </para><para>
  * Creates an edge selector which serves as a view to a vector
- * containing edge ids. Do not destroy the vector before destroying
+ * containing edge IDs. Do not destroy the vector before destroying
  * the view.
  *
  * Many views can be created to the same vector.
  *
  * \param es Pointer to an uninitialized edge selector.
- * \param v Vector containing edge ids.
+ * \param v Vector containing edge IDs.
  * \return Error code.
  * \sa \ref igraph_ess_vector(), \ref igraph_es_destroy()
  *
@@ -1082,10 +1082,10 @@ igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t 
  * \brief Immediate vector view edge selector.
  *
  * </para><para>
- * This is the immediate version of the vector of edge ids edge
+ * This is the immediate version of the vector of edge IDs edge
  * selector.
  *
- * \param v The vector of edge ids.
+ * \param v The vector of edge IDs.
  * \return Edge selector, initialized.
  * \sa \ref igraph_es_vector()
  *
@@ -1125,15 +1125,15 @@ igraph_error_t igraph_es_fromto(igraph_es_t *es, igraph_vs_t from, igraph_vs_t t
 
 /**
  * \function igraph_es_seq
- * \brief Edge selector, a sequence of edge ids.
+ * \brief Edge selector, a sequence of edge IDs.
  *
- * All edge ids between <code>from</code> and <code>to</code> will be
+ * All edge IDs between <code>from</code> and <code>to</code> will be
  * included in the edge selection. This includes <code>from</code> and
  * excludes <code>to</code>.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param from The first edge id to be included.
- * \param to The last edge id to be included.
+ * \param from The first edge ID to be included.
+ * \param to The last edge ID to be included.
  * \return Error code.
  * \sa \ref igraph_ess_seq(), \ref igraph_es_destroy()
  *
@@ -1151,8 +1151,8 @@ igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_inte
  * \function igraph_ess_seq
  * \brief Immediate version of the sequence edge selector.
  *
- * \param from The first edge id to include.
- * \param to The last edge id to include.
+ * \param from The first edge ID to include.
+ * \param to The last edge ID to include.
  * \return The initialized edge selector.
  * \sa \ref igraph_es_seq()
  *
@@ -1220,9 +1220,9 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
  * argument list must be -1 to denote the end of the argument list.
  *
  * </para><para>
- * Note that the vertex ids supplied will be parsed as
+ * Note that the vertex IDs supplied will be parsed as
  * <code>int</code>'s so you cannot supply arbitrarily large (too
- * large for int) vertex ids here.
+ * large for int) vertex IDs here.
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param directed Whether the graph is directed or not.
@@ -1291,7 +1291,7 @@ igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_int_t *
 
 /**
  * \function igraph_es_path
- * \brief Edge selector, edge ids on a path.
+ * \brief Edge selector, edge IDs on a path.
  *
  * This function takes a vector of vertices and creates a selector of
  * edges between those vertices. Vector {0, 3, 4, 7} will select edges
@@ -1299,7 +1299,7 @@ igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_int_t *
  * to create an iterator using this selector will fail.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param v Pointer to a vector of vertex id's along the path.
+ * \param v Pointer to a vector of vertex ID's along the path.
  * \param directed If edge directions should be taken into account. This
  *                 will be ignored if the graph to select from is undirected.
  * \return Error code.
@@ -1917,7 +1917,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
         if (eit->pos >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_ES_VECTOR:
@@ -1928,7 +1928,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         eit->vec = es.data.vecptr;
         eit->end = igraph_vector_int_size(eit->vec);
         if (!igraph_vector_int_isininterval(eit->vec, 0, igraph_ecount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_ES_SEQ:
@@ -1937,10 +1937,10 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         eit->start = es.data.seq.from;
         eit->end = es.data.seq.to;
         if (eit->start < 0) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         if (eit->end < 0) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         if (eit->start >= igraph_ecount(graph)) {
             IGRAPH_ERROR("Cannot create iterator, starting edge greater than number of edges.", IGRAPH_EINVAL);

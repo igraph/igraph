@@ -101,7 +101,7 @@
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -309,7 +309,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -702,7 +702,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -779,7 +779,7 @@ igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_v
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist

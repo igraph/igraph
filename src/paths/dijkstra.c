@@ -233,27 +233,27 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * If there is more than one path with the smallest weight between two vertices, this
  * function gives only one of them.
  * \param graph The graph object.
- * \param vertices The result, the ids of the vertices along the paths.
+ * \param vertices The result, the IDs of the vertices along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors. Normally, either this argument, or the \c
  *        edges should be non-null, but no error or warning is given
  *        if they are both null pointers.
- * \param edges The result, the ids of the edges along the paths.
+ * \param edges The result, the IDs of the edges along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors. Normally, either this argument, or the \c
  *        vertices should be non-null, but no error or warning is given
  *        if they are both null pointers.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
 * \param weights The edge weights. All edge weights must be
@@ -294,7 +294,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
+ *           \p from is invalid vertex ID, or the length of \p to is
  *           not the same as the length of \p vertices (if not NULL) or
  *           the length of \p edges (if not NULL)
  *        \cli IGRAPH_EINVMODE
@@ -549,11 +549,11 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex ids along
+ *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
  * \param edges Pointer to an uninitialized vector or a null
- *        pointer. If not a null pointer, then the edge ids along the
+ *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.
@@ -664,7 +664,7 @@ static int igraph_i_vector_tail_cmp(const void* a, const void* b) {
  *   as all the target vertices have been found.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
  * \param weights The edge weights. All edge weights must be
@@ -688,7 +688,7 @@ static int igraph_i_vector_tail_cmp(const void* a, const void* b) {
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is an invalid vertex id
+ *           \p from is an invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist

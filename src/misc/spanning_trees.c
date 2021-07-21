@@ -457,7 +457,7 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
     igraph_integer_t vcount = igraph_vcount(graph);
 
     if (vid >= vcount) {
-        IGRAPH_ERROR("Invalid vertex id given for random spanning tree", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid vertex ID given for random spanning tree", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));

@@ -61,7 +61,7 @@
  *           not enough memory for temporary
  *           data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -197,23 +197,23 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
  * If there is more than one geodesic between two vertices, this
  * function gives only one of them.
  * \param graph The graph object.
- * \param vertices The result, the ids of the vertices along the paths.
+ * \param vertices The result, the IDs of the vertices along the paths.
  *        This is a pointer vector, each element points to an \ref igraph_vector_int_t
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors.
- * \param edges The result, the ids of the edges along the paths.
+ * \param edges The result, the IDs of the edges along the paths.
  *        This is a pointer vector, each element points to an \ref igraph_vector_int_t
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
  * \param mode The type of shortest paths to be used for the
@@ -250,7 +250,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
+ *           \p from is invalid vertex ID, or the length of \p to is
  *           not the same as the length of \p res.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
@@ -475,11 +475,11 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  *        undirected. Directed paths are considered in directed
  *        graphs.
  * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex ids along
+ *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
  * \param edges Pointer to an uninitialized vector or a null
- *        pointer. If not a null pointer, then the edge ids along the
+ *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.

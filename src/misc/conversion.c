@@ -57,10 +57,10 @@
  *          the whole matrix is used, a symmetric matrix is returned
  *          if the graph is undirected.
  *        \endclist
- * \param type eids Logical, if true, then the edges ids plus one
+ * \param type eids Logical, if true, then the edges IDs plus one
  *        are stored in the adjacency matrix, instead of the number of
  *        edges between the two vertices. (The plus one is needed, since
- *        edge ids start from zero, and zero means no edge in this case.)
+ *        edge IDs start from zero, and zero means no edge in this case.)
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
@@ -274,7 +274,7 @@ igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatri
  * \function igraph_get_edgelist
  * \brief Returns the list of edges in a graph
  *
- * </para><para>The order of the edges is given by the edge ids.
+ * </para><para>The order of the edges is given by the edge IDs.
  * \param graph Pointer to the graph object
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
@@ -284,7 +284,7 @@ igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatri
  *        <code>res[1]->res[|E|+1]</code>, etc.
  * \return Error code.
  *
- * \sa \ref igraph_edges() to return the result only for some edge ids.
+ * \sa \ref igraph_edges() to return the result only for some edge IDs.
  *
  * Time complexity: O(|E|), the
  * number of edges in the graph.

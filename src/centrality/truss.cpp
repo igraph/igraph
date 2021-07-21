@@ -105,7 +105,7 @@ igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trus
     igraph_vector_int_destroy(&triangles);
     IGRAPH_FINALLY_CLEAN(1);
 
-    // Get the edge ids of the unpacked triangles. Note: a given eid can occur
+    // Get the edge IDs of the unpacked triangles. Note: a given eid can occur
     // multiple times in this list if it is in multiple triangles.
     IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1));
     igraph_vector_int_destroy(&unpacked_triangles);

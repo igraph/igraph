@@ -507,7 +507,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
                 VECTOR(eattr)[igraph_vector_ptr_size(&eattr) - 1] = &eidrec;
             } else {
                 igraph_vector_ptr_pop_back(&eattr);
-                IGRAPH_WARNING("Could not add edge ids, "
+                IGRAPH_WARNING("Could not add edge IDs, "
                                "there is already an 'id' edge attribute");
             }
         }

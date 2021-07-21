@@ -58,7 +58,7 @@ igraph_error_t igraph_difference(igraph_t *res,
 
     /* Quite nasty, but we will use that an edge adjacency list
        contains the vertices according to the order of the
-       vertex ids at the "other" end of the edge. */
+       vertex IDs at the "other" end of the edge. */
 
     igraph_integer_t no_of_nodes_orig = igraph_vcount(orig);
     igraph_integer_t no_of_nodes_sub = igraph_vcount(sub);

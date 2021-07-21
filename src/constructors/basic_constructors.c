@@ -44,17 +44,17 @@
  * \param edges The edges to add, the first two elements are the first
  *        edge, etc.
  * \param n The number of vertices in the graph, if smaller or equal
- *        to the highest vertex id in the \p edges vector it
+ *        to the highest vertex ID in the \p edges vector it
  *        will be increased automatically. So it is safe to give 0
  *        here.
  * \param directed Boolean, whether to create a directed graph or
  *        not. If yes, then the first edge points from the first
- *        vertex id in \p edges to the second, etc.
+ *        vertex ID in \p edges to the second, etc.
  * \return Error code:
  *         \c IGRAPH_EINVEVECTOR: invalid edges
  *         vector (odd number of vertices).
  *         \c IGRAPH_EINVVID: invalid (negative)
- *         vertex id.
+ *         vertex ID.
  *
  * Time complexity: O(|V|+|E|),
  * |V| is the number of vertices,
@@ -72,7 +72,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
         IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
     }
     if (has_edges && !igraph_vector_int_isininterval(edges, 0, max - 1)) {
-        IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative) vertex ID", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_empty(graph, n, directed));

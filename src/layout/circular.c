@@ -31,7 +31,7 @@
 /**
  * \ingroup layout
  * \function igraph_layout_circle
- * \brief Places the vertices uniformly on a circle, in the order of vertex ids.
+ * \brief Places the vertices uniformly on a circle, in the order of vertex IDs.
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
@@ -39,7 +39,7 @@
  * \param order The order of the vertices on the circle. The vertices
  *        not included here, will be placed at (0,0). Supply
  *        \ref igraph_vss_all() here for all vertices, in the order of
- *        their vertex ids.
+ *        their vertex IDs.
  * \return Error code.
  *
  * Time complexity: O(|V|), the
@@ -80,7 +80,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
  * \param center The id of the vertex to put in the center.
  * \param order A numeric vector giving the order of the vertices
  *      (including the center vertex!). If a null pointer, then the
- *      vertices are placed in increasing vertex id order.
+ *      vertices are placed in increasing vertex ID order.
  * \return Error code.
  *
  * Time complexity: O(|V|), linear in the number of vertices.

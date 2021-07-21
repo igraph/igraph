@@ -472,7 +472,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  *        sample. This parameter is only used if the \c parsample
  *        argument is a null pointer.
  * \param parsample Either pointer to an initialized vector or a null
- *        pointer. If a vector then the vertex ids in the vector are
+ *        pointer. If a vector then the vertex IDs in the vector are
  *        used as a sample. If a null pointer then the \c sample_size
  *        argument is used to create a sample of vertices drawn with
  *        uniform probability.
@@ -507,7 +507,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
         igraph_integer_t min, max;
         igraph_vector_int_minmax(parsample, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Sample vertex id out of range.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Sample vertex ID out of range.", IGRAPH_EINVAL);
         }
     }
 

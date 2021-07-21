@@ -112,11 +112,11 @@ static void igraph_i_subclique_next_free(void *ptr) {
  *
  * \param graph Input graph.
  * \param weight Edge weights.
- * \param ids The ids of the vertices in the input graph.
- * \param cliques A list of \ref igraph_vector_int_t, vertex ids for cliques.
+ * \param ids The IDs of the vertices in the input graph.
+ * \param cliques A list of \ref igraph_vector_int_t, vertex IDs for cliques.
  * \param result The result is stored here, a list of graphs is stored
  *        here.
- * \param resultids The ids of the vertices in the result graphs is
+ * \param resultids The IDs of the vertices in the result graphs is
  *        stored here.
  * \param clique_thr The thresholds for the cliques are stored here,
  *        if not a null pointer.
@@ -530,7 +530,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers.
  *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be an integer vector of vertex ids. Each elements must be
+ *        vector will be an integer vector of vertex IDs. Each elements must be
  *        destroyed using \ref igraph_vector_int_destroy() and \ref igraph_free().
  * \param thresholds An initialized vector, the (highest possible)
  *        weight thresholds for finding the basis subgraphs are stored
@@ -762,13 +762,13 @@ int igraph_i_graphlets_project(const igraph_t *graph,
  *
  * Note that the graph projected does not have to be the same that
  * was used to calculate the graphlet basis, but it is assumed that
- * it has the same number of vertices, and the vertex ids of the two
+ * it has the same number of vertices, and the vertex IDs of the two
  * graphs match.
  * \param graph The input graph, it must be a simple graph, edge directions are
  *        ignored.
  * \param weights Weights of the edges in the input graph, a vector.
  * \param cliques The graphlet basis, a pointer vector, in which each
- *        element is an \ref igraph_vector_int_t of vertex ids.
+ *        element is an \ref igraph_vector_int_t of vertex IDs.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here. This vector is also used to initialize the
  *        the weight vector for the iterative algorithm, if the
@@ -826,7 +826,7 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers.
  *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be an \ref igraph_vector_int_t  of vertex ids.
+ *        vector will be an \ref igraph_vector_int_t  of vertex IDs.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here.
  * \param niter Integer scalar, the number of iterations to perform

@@ -57,7 +57,7 @@
  * \param graph The input graph.
  * \param girth Pointer to an integer, if not \c NULL then the result
  *     will be stored here.
- * \param circle Pointer to an initialized vector, the vertex ids in
+ * \param circle Pointer to an initialized vector, the vertex IDs in
  *     the shortest circle will be stored here. If \c NULL then it is
  *     ignored.
  * \return Error code.

@@ -93,7 +93,7 @@ static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
     }
 }
 
-/* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
+/* removes multiple edges and returns new edge IDs for each edge in |E|log|E| */
 static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_int_t *eids) {
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t i, l = -1, last_from = -1, last_to = -1;

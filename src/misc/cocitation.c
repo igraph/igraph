@@ -49,12 +49,12 @@ static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in \p vids, the number of
+ *        number of vertex IDs in \p vids, the number of
  *        columns is the number of vertices in the graph.
- * \param vids The vertex ids of the vertices for which the
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|d^2), |V| is
  * the number of vertices in the graph,
@@ -85,12 +85,12 @@ igraph_error_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in \p vids, the number of
+ *        number of vertex IDs in \p vids, the number of
  *        columns is the number of vertices in the graph.
- * \param vids The vertex ids of the vertices for which the
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|d^2),
  * |V| is the number of vertices in
@@ -130,9 +130,9 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in \p vids, the number of
+ *        number of vertex IDs in \p vids, the number of
  *        columns is the number of vertices in the graph.
- * \param vids The vertex ids of the vertices for which the
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -149,7 +149,7 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  *          degree.
  *        \endclist
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|d^2),
  * |V| is the number of vertices in
@@ -297,8 +297,8 @@ static igraph_error_t igraph_i_neisets_intersect(
  * \param graph The graph object to analyze
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
- *        as the number of vertex ids in \p vids.
- * \param vids The vertex ids of the vertices for which the
+ *        as the number of vertex IDs in \p vids.
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -318,7 +318,7 @@ static igraph_error_t igraph_i_neisets_intersect(
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -426,7 +426,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -544,7 +544,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -600,8 +600,8 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  * \param graph The graph object to analyze
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
- *        as the number of vertex ids in \p vids.
- * \param vids The vertex ids of the vertices for which the
+ *        as the number of vertex IDs in \p vids.
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -621,7 +621,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -689,7 +689,7 @@ igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *re
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -753,7 +753,7 @@ igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist

@@ -402,7 +402,7 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
  *        here. The graph contains the vertices that are unreachable
  *        from the root (if any), these will be isolates.
  * \param leftout Pointer to an initialized vector object, or NULL. If
- *        not NULL, then the ids of the vertices that are unreachable
+ *        not NULL, then the IDs of the vertices that are unreachable
  *        from the root vertex (and thus not part of the dominator
  *        tree) are stored here.
  * \param mode Constant, must be \c IGRAPH_IN or \c IGRAPH_OUT. If it
@@ -444,7 +444,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     igraph_integer_t component_size = 0;
 
     if (root < 0 || root >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid root vertex id for dominator tree",
+        IGRAPH_ERROR("Invalid root vertex ID for dominator tree",
                      IGRAPH_EINVAL);
     }
 
@@ -991,14 +991,14 @@ igraph_error_t igraph_provan_shier_list(
  * \param graph The input graph, is must be directed.
  * \param cuts An initialized pointer vector, the cuts are stored
  *        here. It is a list of pointers to igraph_vector_int_t
- *        objects. Each vector will contain the ids of the edges in
+ *        objects. Each vector will contain the IDs of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
  *        To free all memory allocated for \c cuts, you need call
  *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param partition1s An initialized pointer vector, the list of
  *        vertex sets, generating the actual edge cuts, are stored
- *        here. Each vector contains a set of vertex ids. If X is such
+ *        here. Each vector contains a set of vertex IDs. If X is such
  *        a set, then all edges going from X to the complement of X
  *        form an (s,t) edge-cut in the graph. This argument is
  *        ignored if it is a null pointer.
@@ -1320,7 +1320,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  *        is stored here, unless it is a null pointer.
  * \param cuts An initialized pointer vector, the cuts are stored
  *        here. It is a list of pointers to \ref igraph_vector_int_t
- *        objects. Each vector will contain the ids of the edges in
+ *        objects. Each vector will contain the IDs of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
  *        To free all memory allocated for \c cuts, you need call
  *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
@@ -1328,7 +1328,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \param partition1s An initialized pointer vector, the list of
  *        vertex sets, generating the actual edge cuts, are stored
  *        here. It is a list of pointers to \ref igraph_vector_int_t
- *        objects. Each vector contains a set of vertex ids. If X is such
+ *        objects. Each vector contains a set of vertex IDs. If X is such
  *        a set, then all edges going from X to the complement of X
  *        form an (s,t) edge-cut in the graph. This argument is
  *        ignored if it is a null pointer.

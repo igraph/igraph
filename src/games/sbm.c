@@ -46,7 +46,7 @@
  * Interpretation and evaluation. Social Networks, 14, 5-–61.
  *
  * </para><para>
- * The order of the vertex ids in the generated graph corresponds to
+ * The order of the vertex IDs in the generated graph corresponds to
  * the \p block_sizes argument.
  *
  * \param graph The output graph. This should be a pointer to an

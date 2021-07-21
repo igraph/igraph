@@ -89,7 +89,7 @@ using namespace igraph::walktrap;
  * \param steps Integer constant, the length of the random walks.
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not NULL). Each merge is a
- *     row in a two-column matrix and contains the ids of the merged
+ *     row in a two-column matrix and contains the IDs of the merged
  *     clusters. Clusters are numbered from zero and cluster numbers
  *     smaller than the number of nodes in the network belong to the
  *     individual vertices as singleton clusters. In each step a new

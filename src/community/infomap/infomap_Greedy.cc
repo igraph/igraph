@@ -324,7 +324,7 @@ void Greedy::apply(bool sort) {
 //void Greedy::level(Node ***node_tmp, bool sort) {
 
     //old fct prepare(sort)
-    vector<igraph_integer_t> modSnode;  // will give ids of no-empty modules (nodes)
+    vector<igraph_integer_t> modSnode;  // will give IDs of no-empty modules (nodes)
     igraph_integer_t Nmod = 0;
     if (sort) {
         multimap<double, igraph_integer_t> Msize;

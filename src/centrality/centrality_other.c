@@ -1114,7 +1114,7 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  * \param value Pointer to a real variable, the eigenvalue
  *    corresponding to the PageRank vector is stored here. It should
  *    be always exactly one.
- * \param vids The vertex ids for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -1129,7 +1129,7 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in \p vids.
+ *         \c IGRAPH_EINVVID, invalid vertex ID in \p vids.
  *
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
@@ -1187,7 +1187,7 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \param value Pointer to a real variable, the eigenvalue
  *    corresponding to the PageRank vector is stored here. It should
  *    be always exactly one.
- * \param vids The vertex ids for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -1204,7 +1204,7 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \c IGRAPH_EINVVID, invalid vertex ID in
  *         \p vids or an empty reset vertex sequence in
  *         \p vids_reset.
  *
@@ -1275,7 +1275,7 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \param value Pointer to a real variable, the eigenvalue
  *    corresponding to the PageRank vector is stored here. It should
  *    be always exactly one.
- * \param vids The vertex ids for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -1295,7 +1295,7 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \c IGRAPH_EINVVID, invalid vertex ID in
  *         \p vids or an invalid reset vector in \p reset.
  *
  * Time complexity: depends on the input graph, usually it is O(|E|),

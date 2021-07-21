@@ -186,7 +186,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  *    -1 is stored.
  * \param block_tree If not a null pointer, then it must be a pointer
  *    to an uninitialized graph, and the block hierarchy is stored
- *    here as an igraph graph. The vertex ids correspond to the order
+ *    here as an igraph graph. The vertex IDs correspond to the order
  *    of the blocks in the \p blocks vector.
  * \return Error code.
  *
@@ -202,7 +202,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                            igraph_t *block_tree) {
 
     /* Some implementation comments. Everything is relatively
-       straightforward, except, that we need to follow the vertex ids
+       straightforward, except, that we need to follow the vertex IDs
        of the various subgraphs, without having to store two-way
        mappings at each level. The subgraphs can overlap, this
        complicates things a bit.

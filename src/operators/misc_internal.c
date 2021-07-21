@@ -118,7 +118,7 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
 
     /* We merge the two edge lists. We need to sort them first.
        For undirected graphs, we also need to make sure that
-       for every edge, that larger (non-smaller) vertex id is in the
+       for every edge, that larger (non-smaller) vertex ID is in the
        second column. */
 
     IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ 0));

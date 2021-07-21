@@ -31,7 +31,7 @@
 #include "core/interruption.h"
 #include "core/indheap.h"
 
-/* When vid_ecc is not NULL, only one vertex id should be passed in vids.
+/* When vid_ecc is not NULL, only one vertex ID should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
  * vids. If unconn == FALSE and not all other vertices were reachable from
  * the single given vertex, -1 is returned in vid_ecc. */
@@ -91,7 +91,7 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
                 }
             }
             if (vid_ecc) {
-                /* Return the vertex id of the vertex which has the lowest
+                /* Return the vertex ID of the vertex which has the lowest
                  * degree of the vertices most distant from the starting
                  * vertex. Assumes there is only 1 vid in vids. Used for
                  * pseudo_diameter calculations. */
@@ -270,7 +270,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
     /* We will reach here when vid_start < 0 and the graph has no vertices. */
@@ -592,7 +592,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
     if (!weights) {

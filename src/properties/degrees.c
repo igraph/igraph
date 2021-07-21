@@ -48,7 +48,7 @@
  * \param loops Boolean, gives whether the self-loops should be
  *        counted.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  * Time complexity: O(v) if loops is TRUE, and O(v*d) otherwise. v is the number
@@ -450,15 +450,15 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 
 /**
  * \function igraph_sort_vertex_ids_by_degree
- * \brief Calculate a list of vertex ids sorted by degree of the corresponding vertex.
+ * \brief Calculate a list of vertex IDs sorted by degree of the corresponding vertex.
  *
- * The list of vertex ids is returned in a vector that is sorted
+ * The list of vertex IDs is returned in a vector that is sorted
  * in ascending or descending order of vertex degree.
  *
  * \param graph The input graph.
  * \param outvids Pointer to an initialized vector that will be
  *        resized and will contain the ordered vertex IDs.
- * \param vids Input vertex selector of vertex ids to include in
+ * \param vids Input vertex selector of vertex IDs to include in
  *        calculation.
  * \param mode Defines the type of the degree.
  *        \c IGRAPH_OUT, out-degree,
@@ -472,12 +472,12 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
  *        (\c IGRAPH_ASCENDING) or descending (\c IGRAPH_DESCENDING).
  * \param only_indices If true, then return a sorted list of indices
  *        into a vector corresponding to \c vids, rather than a list
- *        of vertex ids. This parameter is ignored if \c vids is set
+ *        of vertex IDs. This parameter is ignored if \c vids is set
  *        to all vertices via igraph_vs_all() or igraph_vss_all(),
- *        because in this case the indices and vertex ids are the
+ *        because in this case the indices and vertex IDs are the
  *        same.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  */
