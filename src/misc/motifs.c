@@ -65,8 +65,8 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  *
  * </para><para>
  * In a big network the total number of motifs can be very large, so
- * it takes a lot of time to find all of them, a sampling method can
- * be used. This function is capable of doing sampling via the
+ * it takes a lot of time to find all of them. In this case, a sampling
+ * method can be used. This function is capable of doing sampling via the
  * \c cut_prob argument. This argument gives the probability that
  * a branch of the motif search tree will not be explored. See
  * S. Wernicke and F. Rasche: FANMOD: a tool for fast network motif
@@ -111,18 +111,12 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
                           int size, const igraph_vector_t *cut_prob) {
     int histlen;
 
-    if (size != 3 && size != 4) {
-        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
-                     IGRAPH_EINVAL);
-    }
-    if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
-    }
     if (size == 3) {
         histlen = igraph_is_directed(graph) ? 16 : 4;
-    } else {
+    } else if (size == 4) {
         histlen = igraph_is_directed(graph) ? 218 : 11;
+    } else {
+        IGRAPH_ERROR("Only motifs of size 3 and 4 are implemented", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_resize(hist, histlen));
@@ -137,7 +131,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
         } else {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = IGRAPH_NAN;
         }
-    } else if (size == 4) {
+    } else {
         if (igraph_is_directed(graph)) {
             int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
                                     28, 33, 34, 39, 62, 120
@@ -212,16 +206,6 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 
     igraph_bool_t terminate = 0;
 
-    if (size != 3 && size != 4) {
-        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented.",
-                     IGRAPH_EINVAL);
-    }
-
-    if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
-    }
-
     if (size == 3) {
         mul = 3;
         if (igraph_is_directed(graph)) {
@@ -231,7 +215,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
             arr_idx = igraph_i_isoclass_3u_idx;
             arr_code = igraph_i_isoclass2_3u;
         }
-    } else {
+    } else if (size == 4) {
         mul = 4;
         if (igraph_is_directed(graph)) {
             arr_idx = igraph_i_isoclass_4_idx;
@@ -240,6 +224,13 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
             arr_idx = igraph_i_isoclass_4u_idx;
             arr_code = igraph_i_isoclass2_4u;
         }
+    } else {
+        IGRAPH_ERROR("Only motifs of size 3 and 4 are implemented", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
@@ -271,8 +262,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (VECTOR(*cut_prob)[0] == 1 ||
-            RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
+        if (VECTOR(*cut_prob)[0] == 1 || RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
             continue;
         }
 
@@ -499,7 +489,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     igraph_integer_t i;
 
     if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
@@ -708,7 +698,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
     igraph_integer_t i;
 
     if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
