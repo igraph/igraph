@@ -200,10 +200,10 @@ typedef struct igraph_vit_t {
  * \define IGRAPH_VIT_GET
  * \brief Query the current position.
  *
- * Gives the vertex id of the current vertex pointed to by the
+ * Gives the vertex ID of the current vertex pointed to by the
  * iterator.
  * \param vit The vertex iterator.
- * \return The vertex id of the current vertex.
+ * \return The vertex ID of the current vertex.
  *
  * Time complexity: O(1).
  */
@@ -385,7 +385,7 @@ typedef struct igraph_eit_t {
  * \define IGRAPH_EIT_GET
  * \brief Query an edge iterator.
  *
- * Gives the edge id of the current edge pointed to by an iterator.
+ * Gives the edge ID of the current edge pointed to by an iterator.
  * \param eit The edge iterator.
  * \return The id of the current edge.
  *

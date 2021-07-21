@@ -170,7 +170,7 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
  * \param membership The actual membership vector, before recording
  *    the potential change implied by the newly found eigenvalue.
  * \param comm The id of the community that the algorithm tried to
- *    split in the last iteration. The community ids are indexed from
+ *    split in the last iteration. The community IDs are indexed from
  *    zero here!
  * \param eigenvalue The eigenvalue the algorithm has just found.
  * \param eigenvector The eigenvector corresponding to the eigenvalue

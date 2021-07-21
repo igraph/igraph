@@ -98,7 +98,7 @@ IGRAPH_EXPORT igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, F
  * \brief Query a vector in an incidence list.
  *
  * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
- * incidence list containing edge ids. The vector can be modified,
+ * incidence list containing edge IDs. The vector can be modified,
  * resized, etc. as desired.
  * \param il Pointer to the incidence list.
  * \param no The vertex for which the incident edges are returned.
@@ -174,7 +174,7 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  * operations are needed when the incident edges of the same vertex are
  * queried again.
  * \param al The lazy incidence list object.
- * \param no The vertex id to query.
+ * \param no The vertex ID to query.
  * \return Pointer to a vector. It is allowed to modify it and
  *   modification does not affect the original graph.
  *

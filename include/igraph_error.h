@@ -297,9 +297,9 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
  *    number was specified as the number of vertices.
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
- * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex ids. A vertex id
+ * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex IDs. A vertex ID
  *    is either negative or bigger than the number of vertices minus one.
- * \enumval IGRAPH_EINVVID Invalid vertex id, negative or too big.
+ * \enumval IGRAPH_EINVVID Invalid vertex ID, negative or too big.
  * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
  *    square matrix was expected.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
