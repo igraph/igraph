@@ -39,13 +39,13 @@ __BEGIN_DECLS
 typedef struct s_igraph_trie_node {
     igraph_strvector_t strs;
     igraph_vector_ptr_t children;
-    igraph_vector_t values;
+    igraph_vector_int_t values;
 } igraph_trie_node_t;
 
 typedef struct s_igraph_trie {
     igraph_strvector_t strs;
     igraph_vector_ptr_t children;
-    igraph_vector_t values;
+    igraph_vector_int_t values;
     igraph_integer_t maxvalue;
     igraph_bool_t storekeys;
     igraph_strvector_t keys;

@@ -77,7 +77,7 @@ igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
 
 igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
                              const char *key, const char *def,
-                             const char *elem, int elemlen) {
+                             const char *elem, size_t elemlen) {
     igraph_integer_t size = igraph_trie_size(&ht->keys);
     igraph_integer_t newid;
     char *tmp;
