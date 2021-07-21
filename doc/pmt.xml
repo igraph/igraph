@@ -77,7 +77,7 @@ Some examples:
 
 <listitem><para>
   <type>igraph_vector_bool_t</type> is a vector of
-  <type>igraph_bool_t</type> elements, initialize it with
+  <type>igraph_bool_t</type> elements; initialize it with
   <function>igraph_vector_bool_init</function>, destroy it with
   <function>igraph_vector_bool_destroy</function>, etc.
 </para></listitem>

@@ -174,7 +174,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  *    \ref igraph_is_simple().
  * \param blocks If not a null pointer, then it must be an initialized
  *    vector of pointers and the cohesive blocks are stored here.
- *    Each block is encoded with a vector of type \c igraph_vector_int_t that
+ *    Each block is encoded with a vector of type \ref igraph_vector_int_t that
  *    contains the vertex IDs of the block.
  * \param cohesion If not a null pointer, then it must be an initialized
  *    vector and the cohesion of the blocks is stored here, in the same

@@ -54,18 +54,18 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
  *
  * \param graph The graph object.
  * \param vertices Pointer to an initialized pointer vector, the result
- *   will be stored here in \c igraph_vector_int_t objects. Each vector
+ *   will be stored here in \ref igraph_vector_int_t objects. Each vector
  *   object contains the vertices along a shortest path from \p from
  *   to another vertex. The vectors are ordered according to their
  *   target vertex: first the shortest paths to vertex 0, then to
  *   vertex 1, etc. No data is included for unreachable vertices.
  * \param edges Pointer to an initialized pointer vector, the result
- *   will be stored here in \c igraph_vector_int_t objects. Each vector
+ *   will be stored here in \ref igraph_vector_int_t objects. Each vector
  *   object contains the edges along a shortest path from \p from
  *   to another vertex. The vectors are ordered according to their
  *   target vertex: first the shortest paths to vertex 0, then to
  *   vertex 1, etc. No data is included for unreachable vertices.
- * \param nrgeo Pointer to an initialized \c igraph_vector_int_t object or
+ * \param nrgeo Pointer to an initialized \ref igraph_vector_int_t object or
  *   \c NULL. If not \c NULL the number of shortest paths from \p from are
  *   stored here for every vertex in the graph. Note that the values
  *   will be accurate only for those vertices that are in the target

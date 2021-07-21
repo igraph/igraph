@@ -1525,7 +1525,7 @@ cleanup:
  * \param pattern The smaller graph, it can be directed or undirected.
  * \param target The bigger graph, it can be directed or undirected.
  * \param domains A pointer vector, or a null pointer. If a pointer
- *    vector, then it must contain pointers to \c igraph_vector_int_t
+ *    vector, then it must contain pointers to \ref igraph_vector_int_t
  *    objects and the length of the vector must match the number of
  *    vertices in the \p pattern graph. For each vertex, the ids of
  *    the compatible vertices in the target graph are listed.
@@ -1538,7 +1538,7 @@ cleanup:
  *    (in vertex id order) from the pattern graph.
  * \param maps Pointer vector or a null pointer. If not a null
  *    pointer, then all subgraph isomorphisms are stored in the
- *    pointer vector, in \c igraph_vector_int_t objects.
+ *    pointer vector, in \ref igraph_vector_int_t objects.
  * \param induced Boolean, whether to search for induced matching
  *    subgraphs.
  * \param time_limit Processor time limit in seconds. Supply zero

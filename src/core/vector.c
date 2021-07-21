@@ -34,12 +34,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
-#define BASE_FLOAT
-#include "igraph_pmt.h"
-#include "vector.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_FLOAT
-
 #define BASE_CHAR
 #include "igraph_pmt.h"
 #include "vector.pmt"
@@ -132,9 +126,9 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
  * </para><para>
  * The smallest element will have order zero, the second smallest
  * order one, etc.
- * \param v The original \c igraph_vector_int_t object.
- * \param v2 A secondary key, another \c igraph_vector_int_t object.
- * \param res An initialized \c igraph_vector_int_t object, it will be
+ * \param v The original \ref igraph_vector_int_t object.
+ * \param v2 A secondary key, another \ref igraph_vector_int_t object.
+ * \param res An initialized \ref igraph_vector_int_t object, it will be
  *    resized to match the size of \p v. The
  *    result of the computation will be stored here.
  * \param nodes Hint, the largest element in \p v.

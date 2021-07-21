@@ -318,7 +318,7 @@ static igraph_error_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -381,8 +381,8 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  * Cliques are fully connected subgraphs of a graph. This function
  * enumerates all cliques within the given size range and calls
  * \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as a pointer to an \c igraph_vector_int_t.  Destroying and
- * freeing this vector is left up to the user.  Use \c igraph_vector_int_destroy()
+ * callback function as a pointer to an \ref igraph_vector_int_t.  Destroying and
+ * freeing this vector is left up to the user.  Use \ref igraph_vector_int_destroy()
  * to destroy it first, then free it using \ref igraph_free().
  *
  * </para><para>The current implementation of this function
@@ -430,7 +430,7 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -470,7 +470,7 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -550,7 +550,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -792,7 +792,7 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \c igraph_vector_int_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.

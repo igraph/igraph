@@ -409,6 +409,15 @@ WITH
 
 <varname>\g<var></varname>
 
+REPLACE ----- references, \ref command, special case for igraph_vector_int ----
+
+\\ref\b\s*
+igraph_vector_int_(?P<what>\w+)(?P<paren>([\(][\)])?)
+
+WITH --------------------------------------------------------------------------
+
+<link linkend="igraph_vector_\g<what>"><function>igraph_vector_int_\g<what>\g<paren></function></link>
+
 REPLACE ----- references, \ref command ----------------------------------------
 
 \\ref\b\s*

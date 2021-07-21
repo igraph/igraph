@@ -113,7 +113,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
  * \param graph Input graph.
  * \param weight Edge weights.
  * \param ids The ids of the vertices in the input graph.
- * \param cliques A list of \c igraph_vector_int_t, vertex ids for cliques.
+ * \param cliques A list of \ref igraph_vector_int_t, vertex ids for cliques.
  * \param result The result is stored here, a list of graphs is stored
  *        here.
  * \param resultids The ids of the vertices in the result graphs is
@@ -531,7 +531,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \param cliques An initialized vector of pointers.
  *        The graphlet basis is stored here. Each element of the pointer
  *        vector will be an integer vector of vertex ids. Each elements must be
- *        destroyed using \c igraph_vector_int_destroy() and \ref igraph_free().
+ *        destroyed using \ref igraph_vector_int_destroy() and \ref igraph_free().
  * \param thresholds An initialized vector, the (highest possible)
  *        weight thresholds for finding the basis subgraphs are stored
  *        here.
@@ -768,7 +768,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
  *        ignored.
  * \param weights Weights of the edges in the input graph, a vector.
  * \param cliques The graphlet basis, a pointer vector, in which each
- *        element is an \c igraph_vector_int_t of vertex ids.
+ *        element is an \ref igraph_vector_int_t of vertex ids.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here. This vector is also used to initialize the
  *        the weight vector for the iterative algorithm, if the
@@ -826,7 +826,7 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers.
  *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be an \c igraph_vector_int_t  of vertex ids.
+ *        vector will be an \ref igraph_vector_int_t  of vertex ids.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here.
  * \param niter Integer scalar, the number of iterations to perform

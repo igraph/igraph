@@ -198,14 +198,14 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
  * function gives only one of them.
  * \param graph The graph object.
  * \param vertices The result, the ids of the vertices along the paths.
- *        This is a pointer vector, each element points to an \c igraph_vector_int_t
+ *        This is a pointer vector, each element points to an \ref igraph_vector_int_t
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
  *        and fill the ids of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors.
  * \param edges The result, the ids of the edges along the paths.
- *        This is a pointer vector, each element points to an \c igraph_vector_int_t
+ *        This is a pointer vector, each element points to an \ref igraph_vector_int_t
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
  *        and fill the ids of the vertices along the geodesics from/to

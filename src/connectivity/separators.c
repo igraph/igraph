@@ -641,7 +641,7 @@ static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  *        objects. Each vector will contain the ids of the vertices in
  *        the separator.
  *        To free all memory allocated for \c separators, you need call
- *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
+ *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \return Error code.
  *

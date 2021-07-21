@@ -994,7 +994,7 @@ igraph_error_t igraph_provan_shier_list(
  *        objects. Each vector will contain the ids of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
  *        To free all memory allocated for \c cuts, you need call
- *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
+ *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param partition1s An initialized pointer vector, the list of
  *        vertex sets, generating the actual edge cuts, are stored
@@ -1003,7 +1003,7 @@ igraph_error_t igraph_provan_shier_list(
  *        form an (s,t) edge-cut in the graph. This argument is
  *        ignored if it is a null pointer.
  *        To free all memory allocated for \c partition1s, you need call
- *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
+ *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
@@ -1319,15 +1319,15 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \param value Pointer to a real number, the value of the minimum cut
  *        is stored here, unless it is a null pointer.
  * \param cuts An initialized pointer vector, the cuts are stored
- *        here. It is a list of pointers to \c igraph_vector_int_t
+ *        here. It is a list of pointers to \ref igraph_vector_int_t
  *        objects. Each vector will contain the ids of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
  *        To free all memory allocated for \c cuts, you need call
- *        \c igraph_vector_int_destroy() and then \ref igraph_free() on
+ *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \param partition1s An initialized pointer vector, the list of
  *        vertex sets, generating the actual edge cuts, are stored
- *        here. It is a list of pointers to \c igraph_vector_int_t
+ *        here. It is a list of pointers to \ref igraph_vector_int_t
  *        objects. Each vector contains a set of vertex ids. If X is such
  *        a set, then all edges going from X to the complement of X
  *        form an (s,t) edge-cut in the graph. This argument is

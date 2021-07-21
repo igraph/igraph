@@ -897,9 +897,9 @@ static igraph_error_t igraph_i_get_isomorphisms_vf2(
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it is empty if the input graphs
  *   are not isomorphic. Otherwise it contains pointers to
- *   \c igraph_vector_int_t objects, each vector is an
+ *   \ref igraph_vector_int_t objects, each vector is an
  *   isomorphic mapping of \p graph2 to \p graph1. Please note that
- *   you need to 1) Destroy the vectors via \c igraph_vector_int_destroy(),
+ *   you need to 1) Destroy the vectors via \ref igraph_vector_int_destroy(),
  *   2) free them via \ref igraph_free() and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
@@ -1685,9 +1685,9 @@ static igraph_error_t igraph_i_get_subisomorphisms_vf2(
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it contains pointers to
- *   \c igraph_vector_int_t objects, each vector is an isomorphic mapping of
+ *   \ref igraph_vector_int_t objects, each vector is an isomorphic mapping of
  *   \p graph2 to a subgraph of \p graph1. Please note that you need to
- *   1) Destroy the vectors via \c igraph_vector_int_destroy(), 2) free them
+ *   1) Destroy the vectors via \ref igraph_vector_int_destroy(), 2) free them
  *   via \ref igraph_free() and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.

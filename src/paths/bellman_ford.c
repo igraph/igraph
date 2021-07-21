@@ -49,7 +49,7 @@
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
- * \param weights The edge weights. There mustn't be any closed loop in
+ * \param weights The edge weights. There must not be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
  *    vertex of this loop infinitely). Additionally, no edge weight may
@@ -247,7 +247,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \param to Vertex sequence with the ids of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param weights The edge weights. There mustn't be any closed loop in
+ * \param weights The edge weights. There must not be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
  *    vertex of this loop infinitely). If this is a null pointer, then the
@@ -508,7 +508,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.
- * \param weights The edge weights. There mustn't be any closed loop in
+ * \param weights The edge weights. There must not be any closed loop in
  *        the graph that has a negative total weight (since this would allow
  *        us to decrease the weight of any path containing at least a single
  *        vertex of this loop infinitely). If this is a null pointer, then the

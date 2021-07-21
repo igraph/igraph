@@ -36,30 +36,39 @@
  * \section about_igraph_vector_t_objects About \type igraph_vector_t objects
  *
  * <para>The \type igraph_vector_t data type is a simple and efficient
- * interface to arrays containing numbers. It is something
- * similar as (but much simpler than) the \type vector template
- * in the C++ standard library.</para>
+ * interface to arrays containing numbers. It is something similar to (but much
+ * simpler than) the \type vector template in the C++ standard library.</para>
  *
- * <para>Vectors are used extensively in \a igraph, all
- * functions which expect or return a list of numbers use
- * igraph_vector_t to achieve this.</para>
+ * <para>There are multiple variants of \type igraph_vector_t; the basic variant
+ * stores doubles, but there is also \type igraph_vector_int_t for integers (of
+ * type \type igraph_integer_t), \c igraph_vector_bool_t for booleans (of type
+ * \type igraph_bool_t) and so on. Vectors are used extensively in \a igraph; all
+ * functions that expect or return a list of numbers use \type igraph_vector_t or
+ * \type igraph_vector_int_t to achieve this. Integer vectors are typically used
+ * when the vector is supposed to hold vertex or edge identifiers, while
+ * \type igraph_vector_t is used when the vector is expected to hold fractional
+ * numbers or infinities.</para>
  *
- * <para>The \type igraph_vector_t type usually uses
- * O(n) space
- * to store n elements. Sometimes it
- * uses more, this is because vectors can shrink, but even if they
- * shrink, the current implementation does not free a single bit of
- * memory.</para>
+ * <para>The \type igraph_vector_t type and its variants usually use O(n) space
+ * to store n elements. Sometimes they uses more, this is because vectors can
+ * shrink, but even if they shrink, the current implementation does not free a
+ * single bit of memory.</para>
  *
- * <para>The elements in an \type igraph_vector_t
- * object are indexed from zero, we follow the usual C convention
- * here.</para>
+ * <para>The elements in an \type igraph_vector_t object and its variants are
+ * indexed from zero, we follow the usual C convention here.</para>
  *
  * <para>The elements of a vector always occupy a single block of
  * memory, the starting address of this memory block can be queried
  * with the \ref VECTOR macro. This way, vector objects can be used
  * with standard mathematical libraries, like the GNU Scientific
  * Library.</para>
+ *
+ * <para>Almost all of the functions desccribed below for \type igraph_vector_t
+ * also exist for all the other vector type variants. These variants are not
+ * documented separately; you can simply replace \c vector with \c vector_int,
+ * \c vector_bool or something similar if you need a function for another
+ * variant. For instance, to initialize a vector of type \type igraph_vector_int_t,
+ * you need to use \ref igraph_vector_int_init() and not \ref igraph_vector_init().</para>
  */
 
 /**
@@ -88,7 +97,7 @@
  * \type igraph_vector_t destructor, \ref igraph_vector_destroy().</para>
  *
  * <para> Note that vectors created by \ref igraph_vector_view() are special,
- * you mustn't call \ref igraph_vector_destroy() on these.</para>
+ * you must not call \ref igraph_vector_destroy() on these.</para>
  */
 
 /**
