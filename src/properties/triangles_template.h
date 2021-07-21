@@ -40,7 +40,7 @@ igraph_integer_t deg1;
 
 igraph_vector_int_t order;
 igraph_vector_int_t rank;
-igraph_vector_t degree;
+igraph_vector_int_t degree;
 
 if (no_of_nodes == 0) {
 #ifndef TRIANGLES
@@ -52,7 +52,7 @@ if (no_of_nodes == 0) {
 }
 
 IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
 IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
 IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
@@ -61,8 +61,8 @@ for (i = 0; i < no_of_nodes; i++) {
     VECTOR(degree)[i] = igraph_vector_int_size(igraph_adjlist_get(&allneis, i));
 }
 
-maxdegree = igraph_vector_max(&degree) + 1;
-IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
+maxdegree = igraph_vector_int_max(&degree) + 1;
+IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
 IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
 for (i = 0; i < no_of_nodes; i++) {
     VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
@@ -132,7 +132,7 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
 igraph_free(neis);
 igraph_adjlist_destroy(&allneis);
 igraph_vector_int_destroy(&rank);
-igraph_vector_destroy(&degree);
+igraph_vector_int_destroy(&degree);
 igraph_vector_int_destroy(&order);
 IGRAPH_FINALLY_CLEAN(5);
 

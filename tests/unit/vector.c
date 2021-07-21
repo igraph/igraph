@@ -109,14 +109,6 @@ int main() {
     printf("\n");
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_init_seq, igraph_vector_order1\n");
-    igraph_vector_init_seq(&v, 1, 10);
-    igraph_vector_int_init(&v4, 0);
-    igraph_vector_order1(&v, &v4, 10);
-    print_vector_int(&v4);
-    igraph_vector_int_destroy(&v4);
-    igraph_vector_destroy(&v);
-
     printf("Test igraph_vector_resize, igraph_vector_sort\n");
     igraph_vector_init(&v, 20);
     for (i = 0; i < 10; i++) {
@@ -359,6 +351,14 @@ int main() {
         IGRAPH_ASSERT(VECTOR(v)[i] == 1.234567);
     }
     igraph_vector_destroy(&v);
+
+    printf("Test igraph_vector_int_init_seq, igraph_vector_int_order1\n");
+    igraph_vector_int_init_seq(&v4, 1, 10);
+    igraph_vector_int_init(&v5, 0);
+    igraph_vector_int_order1(&v4, &v5, 10);
+    print_vector_int(&v5);
+    igraph_vector_int_destroy(&v4);
+    igraph_vector_int_destroy(&v5);
 
     VERIFY_FINALLY_STACK();
 
