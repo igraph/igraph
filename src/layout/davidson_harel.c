@@ -152,7 +152,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     igraph_vector_int_t perm;
     igraph_bool_t fine_tuning = 0;
     igraph_integer_t round, i;
-    igraph_vector_float_t try_x, try_y;
+    igraph_vector_t try_x, try_y;
     igraph_vector_int_t try_idx;
     float move_radius = width / 2;
     float fine_tuning_factor = 0.01f;
@@ -190,10 +190,8 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
     IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
-    IGRAPH_CHECK(igraph_vector_float_init(&try_x, no_tries));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &try_x);
-    IGRAPH_CHECK(igraph_vector_float_init(&try_y, no_tries));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &try_y);
+    IGRAPH_VECTOR_INIT_FINALLY(&try_x, no_tries);
+    IGRAPH_VECTOR_INIT_FINALLY(&try_y, no_tries);
     IGRAPH_CHECK(igraph_vector_int_init_seq(&try_idx, 0, no_tries - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &try_idx);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 100);
@@ -237,7 +235,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     }
 
     for (i = 0; i < no_tries; i++) {
-        float phi = 2 * M_PI / no_tries * i;
+        double phi = 2 * M_PI / no_tries * i;
         VECTOR(try_x)[i] = cos(phi);
         VECTOR(try_y)[i] = sin(phi);
     }
@@ -265,10 +263,10 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
                 igraph_integer_t ti = VECTOR(try_idx)[t];
 
                 /* Try moving it */
-                float old_x = MATRIX(*res, v, 0);
-                float old_y = MATRIX(*res, v, 1);
-                float new_x = old_x + move_radius * VECTOR(try_x)[ti];
-                float new_y = old_y + move_radius * VECTOR(try_y)[ti];
+                igraph_real_t old_x = MATRIX(*res, v, 0);
+                igraph_real_t old_y = MATRIX(*res, v, 1);
+                igraph_real_t new_x = old_x + move_radius * VECTOR(try_x)[ti];
+                igraph_real_t new_y = old_y + move_radius * VECTOR(try_y)[ti];
 
                 if (new_x < -width / 2) {
                     new_x = -width / 2 - 1e-6;
@@ -455,8 +453,8 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
     igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&try_idx);
-    igraph_vector_float_destroy(&try_x);
-    igraph_vector_float_destroy(&try_y);
+    igraph_vector_destroy(&try_x);
+    igraph_vector_destroy(&try_y);
     igraph_vector_int_destroy(&perm);
     IGRAPH_FINALLY_CLEAN(5);
 
