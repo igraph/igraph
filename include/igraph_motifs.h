@@ -85,8 +85,6 @@ IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igr
 IGRAPH_EXPORT igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                                      igraph_integer_t *asym, igraph_integer_t *null);
 IGRAPH_EXPORT igraph_error_t igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
-                                         igraph_real_t *res4);
 
 IGRAPH_EXPORT igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
                                             igraph_vector_t *res,

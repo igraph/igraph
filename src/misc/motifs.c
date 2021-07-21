@@ -937,12 +937,7 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_triad_census_24
- * TODO
- */
-
-igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
                            igraph_real_t *res4) {
 
     igraph_integer_t vc = igraph_vcount(graph);
@@ -1091,7 +1086,7 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     IGRAPH_CHECK(igraph_vector_resize(res, 16));
     igraph_vector_null(res);
     IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
-    IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
+    IGRAPH_CHECK(igraph_i_triad_census_24(graph, &m2, &m4));
 
     total = ((igraph_real_t)vc) * (vc - 1);
     total *= (vc - 2);
