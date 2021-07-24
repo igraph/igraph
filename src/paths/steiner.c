@@ -12,6 +12,65 @@
 
 
 
+igraph_vector_t generateSubsets(igraph_vector_t* C, igraph_integer_t n,igraph_integer_t graphsize)
+{
+    igraph_integer_t count = pow(2, n);
+
+    igraph_vector_t *allSubsets;
+    
+    igraph_integer_t subsetIndex = graphsize;
+    
+    // The outer for loop will run 2^n times to print all subset .
+    // Here variable i will act as a binary counter
+
+    for (int i = 0; i < count; i++)
+    {
+        // The inner for loop will run n times , As the maximum number of elements a set can have is n
+        // This loop will generate a subset
+        igraph_vector_t newSubset;
+        for (int j = 0; j < n; j++)
+        {
+            // This if condition will check if jth bit in binary representation of  i  is set or not
+            // if the value of (i & (1 << j)) is greater than 0 , include arr[j] in the current subset
+            // otherwise exclude arr[j]
+            if ((i & (1 << j)) > 0)
+            {
+                newSubset.insert(C[j]);
+            }
+        }
+
+        if (newSubset.size() > 1)
+        {
+            allSubsets.push_back(newSubset);
+            //subsetMap[newSubset] = subsetIndex;
+            subsetMap.insert(make_pair(newSubset,subsetIndex));
+            cout << "Adding subset with index" << subsetIndex << "\n";
+            subsetIndex++;
+        }
+    }
+
+/*
+    for (auto const &x : subsetMap)
+    {
+        cout << "Subset = ";
+        igraph_vector_t element = x.first;
+        for (auto f : element)
+        {
+            cout << f << " ";
+        }
+	
+        cout << "\n";
+        std::cout << "Index = " << x.second << std::endl;
+    }
+
+    cout<<"Completed subsets";
+*/
+
+    return allSubsets;
+}
+
+
+
 int igraph_get_all_shortest_paths(const igraph_t *graph,
                                   igraph_vector_t *steiner_terminals,
                                   igraph_neimode_t mode) {
