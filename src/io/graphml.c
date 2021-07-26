@@ -231,9 +231,9 @@ static void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state*
         free(state->data_char);
     }
 
-    igraph_vector_ptr_destroy_all(&state->v_attrs);
-    igraph_vector_ptr_destroy_all(&state->e_attrs);
-    igraph_vector_ptr_destroy_all(&state->g_attrs);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&state->v_attrs);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&state->e_attrs);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&state->g_attrs);
 
     IGRAPH_FINALLY_CLEAN(1);
 }

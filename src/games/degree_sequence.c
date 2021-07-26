@@ -461,7 +461,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_undirected_unifo
     /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
     IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
@@ -525,7 +525,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_undirected_unifo
 
     RNG_END();
 
-    igraph_vector_ptr_destroy_all(&adjlist);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&adjlist);
     igraph_vector_int_destroy(&stubs);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -580,7 +580,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed_uniform
     /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
     IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
@@ -642,7 +642,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed_uniform
 
     RNG_END();
 
-    igraph_vector_ptr_destroy_all(&adjlist);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&adjlist);
     igraph_vector_int_destroy(&out_stubs);
     igraph_vector_int_destroy(&in_stubs);
     IGRAPH_FINALLY_CLEAN(3);

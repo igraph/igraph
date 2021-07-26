@@ -547,7 +547,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     /* Get refined clusters */
     IGRAPH_CHECK(igraph_vector_ptr_init(&refined_clusters, nb_refined_clusters));
     IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&refined_clusters, igraph_vector_int_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &refined_clusters);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &refined_clusters);
     IGRAPH_CHECK(igraph_i_community_get_clusters(refined_membership, &refined_clusters));
 
     /* Initialize new edges */
@@ -623,7 +623,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     igraph_vector_int_destroy(&neighbor_clusters);
     igraph_vector_bool_destroy(&neighbor_cluster_added);
     igraph_vector_destroy(&edge_weight_to_cluster);
-    igraph_vector_ptr_destroy_all(&refined_clusters);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&refined_clusters);
 
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -749,7 +749,7 @@ static igraph_error_t igraph_i_community_leiden(
     /* Initialize clusters */
     IGRAPH_CHECK(igraph_vector_ptr_init(&clusters, n));
     IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&clusters, igraph_vector_int_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &clusters);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &clusters);
 
     /* Initialize aggregate nodes, which initially is identical to simply the
      * nodes in the graph. */
@@ -896,7 +896,7 @@ static igraph_error_t igraph_i_community_leiden(
     /* Free remaining memory */
     igraph_vector_int_destroy(&refined_membership);
     igraph_vector_int_destroy(&aggregate_node);
-    igraph_vector_ptr_destroy_all(&clusters);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&clusters);
     igraph_vector_int_destroy(&tmp_membership);
     igraph_vector_destroy(&tmp_node_weights);
     igraph_vector_destroy(&tmp_edge_weights);

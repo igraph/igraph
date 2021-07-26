@@ -50,13 +50,16 @@ typedef struct s_vector_ptr {
     do { IGRAPH_CHECK(igraph_vector_ptr_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_ptr_destroy, v); } while (0)
 
-IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init      (igraph_vector_ptr_t* v, igraph_integer_t size);
-IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_copy (igraph_vector_ptr_t* v, void** data, igraph_integer_t length);
+IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_integer_t size);
+IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t* v, void** data, igraph_integer_t length);
 IGRAPH_EXPORT const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
                                                                  void *const *data, igraph_integer_t length);
-IGRAPH_EXPORT void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v);
-IGRAPH_EXPORT void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v);
-IGRAPH_EXPORT void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v);
+IGRAPH_EXPORT void igraph_vector_ptr_destroy(igraph_vector_ptr_t* v);
+IGRAPH_EXPORT IGRAPH_DEPRECATED void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v);
+IGRAPH_EXPORT void igraph_vector_ptr_free_items(igraph_vector_ptr_t* v);
+IGRAPH_EXPORT void igraph_vector_ptr_destroy_items(igraph_vector_ptr_t* v, igraph_finally_func_t* func);
+IGRAPH_EXPORT void igraph_vector_ptr_destroy_and_free_items(igraph_vector_ptr_t* v, igraph_finally_func_t* func);
+IGRAPH_EXPORT void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v, igraph_finally_func_t* func);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, igraph_integer_t size);
 IGRAPH_EXPORT igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v);
 IGRAPH_EXPORT igraph_integer_t igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);

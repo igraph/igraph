@@ -45,7 +45,7 @@ int main() {
     igraph_vector_ptr_sort_ind(&vectors, &indices, compare_first_items);
     print_vector_int(&indices);
     igraph_vector_int_destroy(&indices);
-    igraph_vector_ptr_destroy_all(&vectors);
+    igraph_vector_ptr_destroy_all(&vectors, 0);
 
     /* Create vectors of length 1, each containing a value from 'values', and
      * put them in a vector of pointers */
@@ -69,9 +69,8 @@ int main() {
     /* Print and clean up */
     for (i = 0; i < igraph_vector_ptr_size(&vectors); i++) {
         print_vector(VECTOR(vectors)[i]);
-        igraph_vector_destroy(VECTOR(vectors)[i]);
     }
-    igraph_vector_ptr_destroy_all(&vectors);
+    igraph_vector_ptr_destroy_all(&vectors, igraph_vector_destroy);
     igraph_vector_int_destroy(&indices);
 
     /* Check finalizer stack */

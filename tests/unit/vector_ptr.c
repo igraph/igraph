@@ -49,16 +49,16 @@ int main() {
     igraph_vector_ptr_init(&v1, 0);
     igraph_vector_ptr_destroy(&v1);
 
-    /* igraph_vector_ptr_free_all, igraph_vector_ptr_destroy_all */
+    /* igraph_vector_ptr_free_items, igraph_vector_ptr_destroy_all */
     igraph_vector_ptr_init(&v1, 5);
     for (i = 0; i < igraph_vector_ptr_size(&v1); i++) {
         VECTOR(v1)[i] = (void*)malloc(i * 10);
     }
-    igraph_vector_ptr_free_all(&v1);
+    igraph_vector_ptr_free_items(&v1);
     for (i = 0; i < igraph_vector_ptr_size(&v1); i++) {
         VECTOR(v1)[i] = (void*)malloc(i * 10);
     }
-    igraph_vector_ptr_destroy_all(&v1);
+    igraph_vector_ptr_destroy_all(&v1, 0);
 
     /* igraph_vector_ptr_reserve */
     igraph_vector_ptr_init(&v1, 0);
@@ -93,7 +93,7 @@ int main() {
     for (i = 0; i < 10; i++) {
         igraph_vector_ptr_push_back(&v1, (void*)malloc(i * 10));
     }
-    igraph_vector_ptr_destroy_all(&v1);
+    igraph_vector_ptr_destroy_all(&v1, 0);
 
     /* igraph_vector_ptr_e */
     igraph_vector_ptr_init(&v1, 5);
@@ -269,9 +269,10 @@ int main() {
     /* Put the blocks back and destroy the vector */
     igraph_vector_ptr_push_back(&v1, block1);
     igraph_vector_ptr_push_back(&v1, block2);
-    igraph_vector_ptr_destroy_all(&v1);
+    igraph_vector_ptr_destroy_all(&v1, 0);
 
-    if (VECTOR(custom_destructor_stack)[0] != block1 ||
+    if (igraph_vector_ptr_size(&custom_destructor_stack) != 4 ||
+        VECTOR(custom_destructor_stack)[0] != block1 ||
         VECTOR(custom_destructor_stack)[1] != block2 ||
         VECTOR(custom_destructor_stack)[2] != block1 ||
         VECTOR(custom_destructor_stack)[3] != block2

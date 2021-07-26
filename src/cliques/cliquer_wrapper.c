@@ -41,7 +41,7 @@ static void free_clique_list(igraph_vector_ptr_t *vp) {
     for (i = 0; i < len; ++i) {
         igraph_vector_int_destroy((igraph_vector_int_t *) VECTOR(*vp)[i]);
     }
-    igraph_vector_ptr_free_all(vp);
+    igraph_vector_ptr_free_items(vp);
 }
 
 /* We shall use this option struct for all calls to Cliquer */

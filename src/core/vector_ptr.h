@@ -46,6 +46,8 @@ IGRAPH_PRIVATE_EXPORT igraph_finally_func_t* igraph_i_vector_ptr_set_item_destru
 #define IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(v, func) \
     igraph_i_vector_ptr_set_item_destructor((v), (igraph_finally_func_t*)(func))
 
+IGRAPH_PRIVATE_EXPORT void igraph_i_vector_ptr_destroy_with_item_destructor(igraph_vector_ptr_t *v);
+
 __END_DECLS
 
 #endif

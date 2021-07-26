@@ -37,9 +37,8 @@ void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_i
     IGRAPH_ASSERT(igraph_sir(g, beta, gamma, no_sim, &result) == IGRAPH_SUCCESS);
     for (int i = 0; i < igraph_vector_ptr_size(&result); i++) {
         print_sir(VECTOR(result)[i]);
-        igraph_sir_destroy(VECTOR(result)[i]);
     }
-    igraph_vector_ptr_destroy_all(&result);
+    igraph_vector_ptr_destroy_all(&result, &igraph_sir_destroy);
     printf("\n");
 }
 

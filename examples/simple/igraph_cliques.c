@@ -62,7 +62,6 @@ igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
 void test_callback(const igraph_t *graph) {
     igraph_vector_ptr_t list;
     struct userdata ud;
-    igraph_integer_t i, n;
 
     igraph_vector_ptr_init(&list, 0);
     igraph_cliques(graph, &list, 0, 0);
@@ -71,14 +70,7 @@ void test_callback(const igraph_t *graph) {
     ud.list = &list;
 
     igraph_cliques_callback(graph, 0, 0, &handler, (void *) &ud);
-
-    n = igraph_vector_ptr_size(&list);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&list, i);
-        igraph_vector_int_destroy(v);
-    }
-
-    igraph_vector_ptr_destroy_all(&list);
+    igraph_vector_ptr_destroy_all(&list, igraph_vector_int_destroy);
 }
 
 

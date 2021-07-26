@@ -31,9 +31,7 @@ int main() {
     igraph_integer_t i;
 
     igraph_vector_ptr_init(&paths, 0);
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_int_destroy);
     igraph_vector_ptr_init(&paths_edge, 0);
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_edge, igraph_vector_int_destroy);
     igraph_vector_int_init(&nrgeo, 0);
 
     igraph_vector_init(&weights, 0);
@@ -57,7 +55,7 @@ int main() {
         print_vector_int(VECTOR(paths)[i]);
     }
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-    igraph_vector_ptr_free_all(&paths);
+    igraph_vector_ptr_destroy_and_free_items(&paths, igraph_vector_int_destroy);
 
     printf("\nSingleton graph, weighted\n");
     igraph_vector_resize(&weights, igraph_ecount(&graph));
@@ -68,7 +66,7 @@ int main() {
         print_vector_int(VECTOR(paths)[i]);
     }
     IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-    igraph_vector_ptr_free_all(&paths);
+    igraph_vector_ptr_destroy_and_free_items(&paths, igraph_vector_int_destroy);
 
     igraph_destroy(&graph);
 
@@ -88,8 +86,8 @@ int main() {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
 
-    igraph_vector_ptr_free_all(&paths);
-    igraph_vector_ptr_free_all(&paths_edge);
+    igraph_vector_ptr_destroy_and_free_items(&paths, igraph_vector_int_destroy);
+    igraph_vector_ptr_destroy_and_free_items(&paths_edge, igraph_vector_int_destroy);
 
     igraph_destroy(&graph);
 
@@ -113,8 +111,8 @@ int main() {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
 
-    igraph_vector_ptr_free_all(&paths);
-    igraph_vector_ptr_free_all(&paths_edge);
+    igraph_vector_ptr_destroy_and_free_items(&paths, igraph_vector_int_destroy);
+    igraph_vector_ptr_destroy_and_free_items(&paths_edge, igraph_vector_int_destroy);
 
     printf("\nWeighted, uniform weights\n");
     igraph_vector_resize(&weights, igraph_ecount(&graph));
@@ -130,8 +128,8 @@ int main() {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
 
-    igraph_vector_ptr_free_all(&paths);
-    igraph_vector_ptr_free_all(&paths_edge);
+    igraph_vector_ptr_destroy_and_free_items(&paths, igraph_vector_int_destroy);
+    igraph_vector_ptr_destroy_and_free_items(&paths_edge, igraph_vector_int_destroy);
 
     printf("\nWeighted, multiple weighted shortest paths\n");
     VECTOR(weights)[1] = 3.0; /* create path with one more hop, but equal weighted length */
@@ -147,11 +145,8 @@ int main() {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
 
-    igraph_vector_ptr_free_all(&paths);
-    igraph_vector_ptr_free_all(&paths_edge);
-
-    igraph_vector_ptr_destroy(&paths);
-    igraph_vector_ptr_destroy(&paths_edge);
+    igraph_vector_ptr_destroy_all(&paths, igraph_vector_int_destroy);
+    igraph_vector_ptr_destroy_all(&paths_edge, igraph_vector_int_destroy);
     igraph_vector_int_destroy(&nrgeo);
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);

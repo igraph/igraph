@@ -56,6 +56,7 @@
 #include "igraph_qsort.h"
 
 #include "core/interruption.h"
+#include "core/vector_ptr.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -1658,14 +1659,14 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&alloc_history, 0));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &alloc_history);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &alloc_history);
 
     IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (char) induced, &D,
                                     &Gp, &Gt, &invalidDomain, iso, map, maps,
                                     &nbNodes, &nbFail, &nbSol, &begin,
                                     &alloc_history));
 
-    igraph_vector_ptr_destroy_all(&alloc_history);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&alloc_history);
     IGRAPH_FINALLY_CLEAN(1);
 
 exit:

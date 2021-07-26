@@ -97,8 +97,7 @@ int main() {
     /* Check that the search can be stopped correctly */
     igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0);
 
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
-    igraph_vector_ptr_destroy_all(&list);
+    igraph_vector_ptr_destroy_all(&list, igraph_vector_destroy);
 
     igraph_destroy(&graph);
 

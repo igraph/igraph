@@ -27,7 +27,6 @@ void test3() {
     // Verify that no two 3-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
 
     igraph_vector_ptr_init(&graphs3, 0);
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs3, igraph_destroy);
 
     for (i = 0; i < 16; i++) {
         igraph_t *g;
@@ -58,7 +57,7 @@ void test3() {
             }
         }
 
-    igraph_vector_ptr_destroy_all(&graphs3);
+    igraph_vector_ptr_destroy_all(&graphs3, igraph_destroy);
 }
 
 
@@ -69,7 +68,6 @@ void test4() {
     // Verify that no two 4-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
 
     igraph_vector_ptr_init(&graphs4, 0);
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs4, igraph_destroy);
 
     for (i = 0; i < 218; i++) {
         igraph_t *g;
@@ -100,7 +98,7 @@ void test4() {
             }
         }
 
-    igraph_vector_ptr_destroy_all(&graphs4);
+    igraph_vector_ptr_destroy_all(&graphs4, igraph_destroy);
 }
 
 
@@ -120,7 +118,6 @@ void test_bliss() {
     igraph_ring(&directed_ring, 100, /* directed= */ 1, /* mutual = */0, /* circular = */1);
 
     igraph_vector_ptr_init(&generators, 0);
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_int_destroy);
 
     igraph_isomorphic_bliss(&ring1, &ring2, NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL);
     if (! iso) {
@@ -155,7 +152,7 @@ void test_bliss() {
         printf("Bliss automorphism generators may have failed with ring2. "
                "Please verify the generators manually. "
                "Note that the generator set is not guaranteed to be minimal.\n");
-    igraph_vector_ptr_free_all(&generators);
+    igraph_vector_ptr_free_items(&generators);
 
     // For a directed ring, the only generator should be a cyclic permutation.
     igraph_automorphism_group(&directed_ring, NULL, &generators, IGRAPH_BLISS_F, NULL);
@@ -163,7 +160,7 @@ void test_bliss() {
         printf("Bliss automorphism generators may have failed with directed_ring. "
                "Please verify the generators manually. "
                "Note that the generator set is not guaranteed to be minimal.\n");
-    igraph_vector_ptr_free_all(&generators);
+    igraph_vector_ptr_free_items(&generators);
 
     igraph_vector_int_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
 
@@ -179,7 +176,7 @@ void test_bliss() {
         printf("Bliss automorphism generators failed with colored graph.\n");
     }
 
-    igraph_vector_ptr_destroy_all(&generators);
+    igraph_vector_ptr_destroy_all(&generators, igraph_vector_int_destroy);
 
     igraph_vector_int_destroy(&color);
 

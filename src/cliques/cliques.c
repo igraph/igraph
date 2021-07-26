@@ -969,7 +969,7 @@ static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* 
             for (i = 0; i < igraph_vector_ptr_size(result); i++) {
                 igraph_vector_int_destroy(VECTOR(*result)[i]);
             }
-            igraph_vector_ptr_free_all(result);
+            igraph_vector_ptr_free_items(result);
             igraph_vector_ptr_resize(result, 0);
         }
     }

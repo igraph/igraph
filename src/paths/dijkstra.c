@@ -752,14 +752,14 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     /* parents stores a vector for each vertex, listing the parent vertices
      * of each vertex in the traversal */
     IGRAPH_CHECK(igraph_vector_ptr_init(&parents, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents);
     IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents, igraph_vector_destroy);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &parents);
 
     /* parents_edge stores a vector for each vertex, listing the parent edges
      * of each vertex in the traversal */
     IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents_edge);
     IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents_edge, igraph_vector_destroy);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &parents_edge);
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *parent_vec, *parent_edge_vec;
@@ -1018,7 +1018,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             }
             IGRAPH_FINALLY(igraph_free, vertices);
             IGRAPH_CHECK(igraph_vector_ptr_init(vertices, 0));
-            IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, vertices);
+            IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, vertices);
             free_vertices = 1;
 
             /* this is correct; needed to free everyhing at the end */
@@ -1199,7 +1199,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
     /* free the allocated memory */
     if (free_vertices) {
-        igraph_vector_ptr_destroy_all(vertices);
+        igraph_i_vector_ptr_destroy_with_item_destructor(vertices);
         igraph_free(vertices);
         IGRAPH_FINALLY_CLEAN(2);
     }
@@ -1207,8 +1207,8 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_int_destroy(&order);
     IGRAPH_FREE(is_target);
     igraph_vector_destroy(&dists);
-    igraph_vector_ptr_destroy_all(&parents);
-    igraph_vector_ptr_destroy_all(&parents_edge);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&parents);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&parents_edge);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;

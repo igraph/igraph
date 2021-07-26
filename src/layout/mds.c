@@ -247,8 +247,8 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_order, no_of_nodes);
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&layouts, 0));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layouts);
         IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layouts, igraph_matrix_destroy);
+        IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &layouts);
 
         IGRAPH_CHECK(igraph_matrix_init(&dist_submatrix, 0, 0));
         IGRAPH_FINALLY(igraph_matrix_destroy, &dist_submatrix);
@@ -302,7 +302,7 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
 
         igraph_free(seen_vertices);
         igraph_matrix_destroy(&dist_submatrix);
-        igraph_vector_ptr_destroy_all(&layouts);
+        igraph_i_vector_ptr_destroy_with_item_destructor(&layouts);
         igraph_vector_int_destroy(&vertex_order);
         igraph_vector_int_destroy(&comp);
         IGRAPH_FINALLY_CLEAN(5);

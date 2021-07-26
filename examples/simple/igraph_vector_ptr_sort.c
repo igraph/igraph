@@ -34,11 +34,7 @@ int main() {
     }
 
     /* Destroy data structures when we no longer need them */
-    n = igraph_vector_ptr_size(&cliques);
-    for (i = 0; i < n; ++i) {
-        igraph_vector_int_destroy(VECTOR(cliques)[i]);
-    }
-    igraph_vector_ptr_destroy_all(&cliques);
+    igraph_vector_ptr_destroy_all(&cliques, igraph_vector_int_destroy);
 
     igraph_destroy(&graph);
 

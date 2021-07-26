@@ -116,15 +116,6 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *wa
     return IGRAPH_SUCCESS;
 }
 
-
-/* Used as item destructor for 'cdfs' in igraph_random_edge_walk(). */
-static void vec_destr(igraph_vector_t *vec) {
-    if (vec != NULL) {
-        igraph_vector_destroy(vec);
-    }
-}
-
-
 /**
  * \function igraph_random_edge_walk
  * \brief Perform a random walk on a graph and return the traversed edges
@@ -213,11 +204,8 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
     /* cdf vectors will be computed lazily */
     IGRAPH_CHECK(igraph_vector_ptr_init(&cdfs, vc));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &cdfs);
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cdfs, vec_destr);
-    for (i = 0; i < vc; ++i) {
-        VECTOR(cdfs)[i] = NULL;
-    }
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &cdfs);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cdfs, igraph_vector_destroy);
 
     RNG_BEGIN();
 
@@ -287,7 +275,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
     RNG_END();
 
-    igraph_vector_ptr_destroy_all(&cdfs);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&cdfs);
     igraph_vector_destroy(&weight_temp);
     igraph_inclist_destroy(&il);
     IGRAPH_FINALLY_CLEAN(3);

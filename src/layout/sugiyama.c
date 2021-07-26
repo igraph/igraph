@@ -173,7 +173,8 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&layering->layers, num_layers));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layering->layers);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layering->layers, igraph_vector_int_destroy);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &layering->layers);
 
     for (i = 0; i < num_layers; i++) {
         igraph_vector_int_t* vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -181,7 +182,6 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
         VECTOR(layering->layers)[i] = vec;
         IGRAPH_FINALLY_CLEAN(1);
     }
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layering->layers, igraph_vector_int_destroy);
 
     n = igraph_vector_int_size(membership);
     for (i = 0; i < n; i++) {
@@ -199,7 +199,7 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
  * Destroys a layering.
  */
 static void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
-    igraph_vector_ptr_destroy_all(&layering->layers);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&layering->layers);
 }
 
 /**

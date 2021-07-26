@@ -40,9 +40,8 @@ int print_and_destroy(igraph_vector_ptr_t *cliques) {
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = VECTOR(*cliques)[i];
         igraph_vector_int_print(v);
-        igraph_vector_int_destroy(v);
     }
-    igraph_vector_ptr_destroy_all(cliques);
+    igraph_vector_ptr_destroy_all(cliques, igraph_vector_int_destroy);
     return 0;
 }
 

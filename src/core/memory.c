@@ -55,7 +55,7 @@ void igraph_free(void *p) {
  * \function igraph_malloc
  * \brief Allocate memory that can be safely deallocated by igraph functions.
  *
- * Some igraph functions, such as \ref igraph_vector_ptr_free_all() and
+ * Some igraph functions, such as \ref igraph_vector_ptr_free_items() and
  * \ref igraph_vector_ptr_destroy_all() can free memory that may have been
  * allocated by the user.  \c igraph_malloc() works exactly like \c malloc()
  * from the C standard library, but it is guaranteed that it can be safely

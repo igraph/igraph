@@ -35,14 +35,12 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     printf("Vertices:\n");
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
         print_vector_int(VECTOR(vpath)[i]);
-        igraph_vector_int_destroy(VECTOR(vpath)[i]);
     }
     printf("\n");
 
     printf("Edges:\n");
     for (i = 0; i < igraph_vector_ptr_size(&epath); i++) {
         print_vector_int(VECTOR(epath)[i]);
-        igraph_vector_int_destroy(VECTOR(epath)[i]);
     }
     printf("\n");
 
@@ -56,8 +54,8 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
 
     igraph_vector_int_destroy(&inbound_edges);
     igraph_vector_int_destroy(&predecessors);
-    igraph_vector_ptr_destroy_all(&epath);
-    igraph_vector_ptr_destroy_all(&vpath);
+    igraph_vector_ptr_destroy_all(&epath, igraph_vector_int_destroy);
+    igraph_vector_ptr_destroy_all(&vpath, igraph_vector_int_destroy);
 
     return IGRAPH_SUCCESS;
 }
@@ -105,14 +103,12 @@ int test_weighted(
     printf("Vertices:\n");
     for (i = 0; i < igraph_vector_ptr_size(&vpath); i++) {
         print_vector_int(VECTOR(vpath)[i]);
-        igraph_vector_int_destroy(VECTOR(vpath)[i]);
     }
     printf("\n");
 
     printf("Edges:\n");
     for (i = 0; i < igraph_vector_ptr_size(&epath); i++) {
         print_vector_int(VECTOR(epath)[i]);
-        igraph_vector_int_destroy(VECTOR(epath)[i]);
     }
     printf("\n");
 
@@ -126,8 +122,8 @@ int test_weighted(
 
     igraph_vector_int_destroy(&inbound_edges);
     igraph_vector_int_destroy(&predecessors);
-    igraph_vector_ptr_destroy_all(&epath);
-    igraph_vector_ptr_destroy_all(&vpath);
+    igraph_vector_ptr_destroy_all(&epath, igraph_vector_int_destroy);
+    igraph_vector_ptr_destroy_all(&vpath, igraph_vector_int_destroy);
 
     return IGRAPH_SUCCESS;
 }

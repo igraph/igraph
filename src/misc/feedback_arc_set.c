@@ -466,8 +466,10 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     /* Construct vertex and edge lists for each of the components */
     IGRAPH_CHECK(igraph_vector_ptr_init(&vertices_by_components, no_of_components));
     IGRAPH_CHECK(igraph_vector_ptr_init(&edges_by_components, no_of_components));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vertices_by_components);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &edges_by_components);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_int_destroy);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &vertices_by_components);
+    IGRAPH_FINALLY(igraph_i_vector_ptr_destroy_with_item_destructor, &edges_by_components);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_int_t* vptr;
         vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -479,7 +481,6 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(vertices_by_components)[i] = vptr;
     }
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_int_destroy);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_int_t* vptr;
         vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -491,7 +492,6 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(edges_by_components)[i] = vptr;
     }
-    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_int_destroy);
     for (i = 0; i < no_of_vertices; i++) {
         j = VECTOR(membership)[i];
         IGRAPH_CHECK(igraph_vector_int_push_back(VECTOR(vertices_by_components)[j], i));
@@ -659,8 +659,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_ptr_destroy_all(&vertices_by_components);
-    igraph_vector_ptr_destroy_all(&edges_by_components);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&vertices_by_components);
+    igraph_i_vector_ptr_destroy_with_item_destructor(&edges_by_components);
     igraph_vector_destroy(&vertex_remapping);
     igraph_vector_destroy(&ordering);
     igraph_vector_int_destroy(&membership);
