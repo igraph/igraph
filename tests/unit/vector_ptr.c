@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "core/vector_ptr.h"
+
 #include "test_utilities.inc"
 
 igraph_vector_ptr_t custom_destructor_stack;
@@ -255,10 +257,10 @@ int main() {
     block2 = IGRAPH_CALLOC(64, char);
     VECTOR(v1)[0] = block1;
     VECTOR(v1)[1] = block2;
-    if (igraph_vector_ptr_get_item_destructor(&v1) != 0) {
+    if (igraph_i_vector_ptr_get_item_destructor(&v1) != 0) {
         return 24;
     }
-    if (igraph_vector_ptr_set_item_destructor(&v1, &custom_destructor) != 0) {
+    if (igraph_i_vector_ptr_set_item_destructor(&v1, &custom_destructor) != 0) {
         return 25;
     }
     /* Okay, let's clear the vector. This should push the blocks in the

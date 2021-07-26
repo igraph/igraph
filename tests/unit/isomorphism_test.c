@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "core/vector_ptr.h"
+
 #include "test_utilities.inc"
 
 void random_permutation(igraph_vector_int_t *vec) {
@@ -25,7 +27,7 @@ void test3() {
     // Verify that no two 3-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
 
     igraph_vector_ptr_init(&graphs3, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs3, igraph_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs3, igraph_destroy);
 
     for (i = 0; i < 16; i++) {
         igraph_t *g;
@@ -67,7 +69,7 @@ void test4() {
     // Verify that no two 4-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
 
     igraph_vector_ptr_init(&graphs4, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs4, igraph_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs4, igraph_destroy);
 
     for (i = 0; i < 218; i++) {
         igraph_t *g;
@@ -118,7 +120,7 @@ void test_bliss() {
     igraph_ring(&directed_ring, 100, /* directed= */ 1, /* mutual = */0, /* circular = */1);
 
     igraph_vector_ptr_init(&generators, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_int_destroy);
 
     igraph_isomorphic_bliss(&ring1, &ring2, NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL);
     if (! iso) {

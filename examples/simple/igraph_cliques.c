@@ -24,31 +24,6 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-int compare_vectors(const void *p1, const void *p2) {
-    igraph_vector_int_t *v1, *v2;
-    igraph_integer_t s1, s2, i;
-
-    v1 = *((igraph_vector_int_t **) p1);
-    v2 = *((igraph_vector_int_t **) p2);
-    s1 = igraph_vector_int_size(v1);
-    s2 = igraph_vector_int_size(v2);
-    if (s1 < s2) {
-        return -1;
-    }
-    if (s1 > s2) {
-        return 1;
-    }
-    for (i = 0; i < s1; ++i) {
-        if (VECTOR(*v1)[i] < VECTOR(*v2)[i]) {
-            return -1;
-        }
-        if (VECTOR(*v1)[i] > VECTOR(*v2)[i]) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_ptr_t *list) {
     igraph_integer_t i, len;
@@ -56,7 +31,7 @@ void canonicalize_list(igraph_vector_ptr_t *list) {
     for (i = 0; i < len; ++i) {
         igraph_vector_int_sort((igraph_vector_int_t *) VECTOR(*list)[i]);
     }
-    qsort(&(VECTOR(*list)[0]), len, sizeof(void *), &compare_vectors);
+    igraph_vector_ptr_sort(list, &igraph_vector_int_lex_cmp);
 }
 
 struct userdata {
@@ -71,7 +46,7 @@ igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
     ud = (struct userdata *) arg;
     cont = 1; /* true */
 
-    if (compare_vectors(&clique, &(VECTOR(*(ud->list))[ud->i])) != 0) {
+    if (!igraph_vector_int_all_e(clique, VECTOR(*(ud->list))[ud->i])) {
         printf("igraph_cliques() and igraph_cliques_callback() give different results.\n");
         cont = 0; /* false */
     }
@@ -87,6 +62,7 @@ igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
 void test_callback(const igraph_t *graph) {
     igraph_vector_ptr_t list;
     struct userdata ud;
+    igraph_integer_t i, n;
 
     igraph_vector_ptr_init(&list, 0);
     igraph_cliques(graph, &list, 0, 0);
@@ -96,7 +72,12 @@ void test_callback(const igraph_t *graph) {
 
     igraph_cliques_callback(graph, 0, 0, &handler, (void *) &ud);
 
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_int_destroy);
+    n = igraph_vector_ptr_size(&list);
+    for (i = 0; i < n; i++) {
+        igraph_vector_int_t* v = (igraph_vector_int_t*) igraph_vector_ptr_e(&list, i);
+        igraph_vector_int_destroy(v);
+    }
+
     igraph_vector_ptr_destroy_all(&list);
 }
 

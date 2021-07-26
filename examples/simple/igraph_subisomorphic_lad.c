@@ -41,7 +41,7 @@ void test_motifs() {
     igraph_t graph;
     igraph_vector_t randesu_counts, lad_counts;
     igraph_vector_t cut_prob;
-    igraph_integer_t i, n;
+    igraph_integer_t i, j, m, n;
     igraph_bool_t equal;
     igraph_integer_t vcount;
 
@@ -70,7 +70,11 @@ void test_motifs() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        for (j = 0; j < m; j++) {
+            igraph_vector_int_t *v = VECTOR(maps)[j];
+            igraph_vector_int_destroy(v);
+            free(v);
+        }
         igraph_vector_ptr_destroy_all(&maps);
 
         igraph_destroy(&pattern);
@@ -123,7 +127,11 @@ void test_motifs() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        for (j = 0; j < m; j++) {
+            igraph_vector_int_t *v = VECTOR(maps)[j];
+            igraph_vector_int_destroy(v);
+            free(v);
+        }
         igraph_vector_ptr_destroy_all(&maps);
 
         igraph_destroy(&pattern);
@@ -164,7 +172,7 @@ void test_motifs_undirected() {
     igraph_t graph;
     igraph_vector_t randesu_counts, lad_counts;
     igraph_vector_t cut_prob;
-    igraph_integer_t i, n;
+    igraph_integer_t i, j, m, n;
     igraph_bool_t equal;
     igraph_integer_t vcount;
 
@@ -193,7 +201,11 @@ void test_motifs_undirected() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        for (j = 0; j < m; j++) {
+            igraph_vector_int_t *v = VECTOR(maps)[j];
+            igraph_vector_int_destroy(v);
+            free(v);
+        }
         igraph_vector_ptr_destroy_all(&maps);
 
         igraph_destroy(&pattern);
@@ -246,7 +258,11 @@ void test_motifs_undirected() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        for (j = 0; j < m; j++) {
+            igraph_vector_int_t *v = VECTOR(maps)[j];
+            igraph_vector_int_destroy(v);
+            free(v);
+        }
         igraph_vector_ptr_destroy_all(&maps);
 
         igraph_destroy(&pattern);

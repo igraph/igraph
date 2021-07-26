@@ -27,6 +27,8 @@
 #include "igraph_error.h"
 #include "igraph_qsort.h"
 
+#include "vector_ptr.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdint.h>         /* uintptr_t */
 #include <stdlib.h>
@@ -203,7 +205,7 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
     igraph_vector_ptr_free_all(v);
-    igraph_vector_ptr_set_item_destructor(v, 0);
+    igraph_i_vector_ptr_set_item_destructor(v, 0);
     igraph_vector_ptr_destroy(v);
 }
 
@@ -599,7 +601,7 @@ igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_ve
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_set_item_destructor
+ * \function igraph_i_vector_ptr_set_item_destructor
  * \brief Sets the item destructor for this pointer vector.
  *
  * The item destructor is a function which will be called on every non-null
@@ -611,7 +613,7 @@ igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_ve
  *
  * Time complexity: O(1).
  */
-igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(
+igraph_finally_func_t* igraph_i_vector_ptr_set_item_destructor(
     igraph_vector_ptr_t *v, igraph_finally_func_t *func) {
     igraph_finally_func_t* result = v->item_destructor;
 
@@ -622,7 +624,7 @@ igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_get_item_destructor
+ * \function igraph_i_vector_ptr_get_item_destructor
  * \brief Gets the current item destructor for this pointer vector.
  *
  * The item destructor is a function which will be called on every non-null
@@ -634,7 +636,7 @@ igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(
  *
  * Time complexity: O(1).
  */
-igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v) {
+igraph_finally_func_t* igraph_i_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v) {
     IGRAPH_ASSERT(v != 0);
     return v->item_destructor;
 }
@@ -644,7 +646,7 @@ typedef int cmp_t (const void *, const void *);
 /**
  * Comparison function passed to qsort_r from  igraph_vector_ptr_sort_ind
  */
-static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
+static int igraph_i_vector_ptr_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
     cmp_t* cmp = (cmp_t*) thunk;
     uintptr_t *pa = (uintptr_t*) p1;
     uintptr_t *pb = (uintptr_t*) p2;
@@ -704,7 +706,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
 
     first = vind[0];
 
-    igraph_qsort_r(vind, n, sizeof(vind[0]), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
+    igraph_qsort_r(vind, n, sizeof(vind[0]), (void*)cmp, igraph_i_vector_ptr_sort_ind_cmp);
 
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = (vind[i] - first) / sizeof(uintptr_t);

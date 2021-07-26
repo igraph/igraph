@@ -32,6 +32,7 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+#include "core/vector_ptr.h"
 
 #include <string.h>   /* memset */
 
@@ -752,13 +753,13 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
      * of each vertex in the traversal */
     IGRAPH_CHECK(igraph_vector_ptr_init(&parents, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents, igraph_vector_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents, igraph_vector_destroy);
 
     /* parents_edge stores a vector for each vertex, listing the parent edges
      * of each vertex in the traversal */
     IGRAPH_CHECK(igraph_vector_ptr_init(&parents_edge, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &parents_edge);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents_edge, igraph_vector_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&parents_edge, igraph_vector_destroy);
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *parent_vec, *parent_edge_vec;
@@ -1002,9 +1003,8 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         if (edges) {
             igraph_vector_ptr_clear(edges);
-            old_edge_item_destructor = igraph_vector_ptr_get_item_destructor(edges);
-            igraph_vector_ptr_set_item_destructor(edges,
-                                                (igraph_finally_func_t*)igraph_vector_destroy);
+            old_edge_item_destructor = igraph_i_vector_ptr_get_item_destructor(edges);
+            IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(edges, igraph_vector_destroy);
         }
 
         if (vertices) {
@@ -1022,12 +1022,11 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             free_vertices = 1;
 
             /* this is correct; needed to free everyhing at the end */
-            igraph_vector_ptr_set_item_destructor(vertices,
-                                                (igraph_finally_func_t*)igraph_vector_destroy);
+            IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vertices, igraph_vector_destroy);
         }
 
-        old_vertices_item_destructor = igraph_vector_ptr_get_item_destructor(vertices);
-        igraph_vector_ptr_set_item_destructor(vertices, (igraph_finally_func_t*)igraph_vector_destroy);
+        old_vertices_item_destructor = igraph_i_vector_ptr_get_item_destructor(vertices);
+        IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vertices, igraph_vector_destroy);
 
         /* by definition, the shortest path leading to the starting vertex
          * consists of the vertex itself only */
@@ -1190,11 +1189,11 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
          * could potentially fail -- only cleanup is left */
 
         if (vertices) {
-            igraph_vector_ptr_set_item_destructor(vertices, old_vertices_item_destructor);
+            IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vertices, old_vertices_item_destructor);
         }
 
         if (edges) {
-            igraph_vector_ptr_set_item_destructor(edges, old_edge_item_destructor);
+            IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(edges, old_edge_item_destructor);
         }
     }
 

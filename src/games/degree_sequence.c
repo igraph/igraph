@@ -33,6 +33,7 @@
 
 #include "core/interruption.h"
 #include "core/set.h"
+#include "core/vector_ptr.h"
 
 static igraph_error_t igraph_i_degree_sequence_game_simple(igraph_t *graph,
                                        const igraph_vector_int_t *out_seq,
@@ -459,7 +460,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_undirected_unifo
 
     /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
@@ -578,7 +579,7 @@ static igraph_error_t igraph_i_degree_sequence_game_no_multiple_directed_uniform
 
     /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);

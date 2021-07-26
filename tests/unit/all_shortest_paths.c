@@ -18,6 +18,8 @@
 
 #include <igraph.h>
 
+#include "core/vector_ptr.h"
+
 #include "test_utilities.inc"
 
 int main() {
@@ -29,9 +31,9 @@ int main() {
     igraph_integer_t i;
 
     igraph_vector_ptr_init(&paths, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_int_destroy);
     igraph_vector_ptr_init(&paths_edge, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_edge, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths_edge, igraph_vector_int_destroy);
     igraph_vector_int_init(&nrgeo, 0);
 
     igraph_vector_init(&weights, 0);

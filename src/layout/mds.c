@@ -33,6 +33,8 @@
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
+#include "core/vector_ptr.h"
+
 #include <limits.h>
 
 static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
@@ -246,7 +248,7 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&layouts, 0));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layouts);
-        igraph_vector_ptr_set_item_destructor(&layouts, (igraph_finally_func_t*)igraph_matrix_destroy);
+        IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layouts, igraph_matrix_destroy);
 
         IGRAPH_CHECK(igraph_matrix_init(&dist_submatrix, 0, 0));
         IGRAPH_FINALLY(igraph_matrix_destroy, &dist_submatrix);

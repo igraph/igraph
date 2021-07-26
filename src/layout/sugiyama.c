@@ -34,6 +34,7 @@
 #include "igraph_structural.h"
 #include "igraph_types.h"
 
+#include "core/vector_ptr.h"
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
 
@@ -180,7 +181,7 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
         VECTOR(layering->layers)[i] = vec;
         IGRAPH_FINALLY_CLEAN(1);
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layering->layers, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layering->layers, igraph_vector_int_destroy);
 
     n = igraph_vector_int_size(membership);
     for (i = 0; i < n; i++) {

@@ -29,6 +29,7 @@
 #include "igraph_structural.h"
 #include "igraph_visitor.h"
 
+#include "core/vector_ptr.h"
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
 
@@ -478,7 +479,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(vertices_by_components)[i] = vptr;
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_int_destroy);
     for (i = 0; i < no_of_components; i++) {
         igraph_vector_int_t* vptr;
         vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -490,7 +491,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(edges_by_components)[i] = vptr;
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_int_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_int_destroy);
     for (i = 0; i < no_of_vertices; i++) {
         j = VECTOR(membership)[i];
         IGRAPH_CHECK(igraph_vector_int_push_back(VECTOR(vertices_by_components)[j], i));

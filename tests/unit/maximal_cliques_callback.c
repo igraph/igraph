@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "core/vector_ptr.h"
+
 #include "test_utilities.inc"
 
 struct userdata {
@@ -95,7 +97,7 @@ int main() {
     /* Check that the search can be stopped correctly */
     igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0);
 
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
     igraph_vector_ptr_destroy_all(&list);
 
     igraph_destroy(&graph);

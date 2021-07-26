@@ -28,6 +28,7 @@
 
 #include "core/math.h"
 #include "core/trie.h"
+#include "core/vector_ptr.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp */
 
@@ -305,7 +306,7 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     if (ret) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->v_attrs,
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->v_attrs,
                                           igraph_i_graphml_attribute_record_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->v_attrs);
 
@@ -313,7 +314,7 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     if (ret) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->e_attrs,
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->e_attrs,
                                           igraph_i_graphml_attribute_record_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->e_attrs);
 
@@ -321,7 +322,7 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     if (ret) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", ret);
     }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->g_attrs,
+    IGRAPH_I_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->g_attrs,
                                           igraph_i_graphml_attribute_record_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->g_attrs);
 

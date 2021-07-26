@@ -21,21 +21,23 @@ int main() {
     printf("Maximal cliques in lexicographical order:\n");
     igraph_vector_ptr_sort(&cliques, igraph_vector_lex_cmp);
     n = igraph_vector_ptr_size(&cliques);
-    for (i=0; i < n; ++i) {
-        igraph_vector_print(VECTOR(cliques)[i]);
+    for (i = 0; i < n; ++i) {
+        igraph_vector_int_print(VECTOR(cliques)[i]);
     }
 
     /* Print the cliques in colexicographical order */
     printf("\nMaximal cliques in colexicographical order:\n");
     igraph_vector_ptr_sort(&cliques, igraph_vector_colex_cmp);
     n = igraph_vector_ptr_size(&cliques);
-    for (i=0; i < n; ++i) {
-        igraph_vector_print(VECTOR(cliques)[i]);
+    for (i = 0; i < n; ++i) {
+        igraph_vector_int_print(VECTOR(cliques)[i]);
     }
 
     /* Destroy data structures when we no longer need them */
-
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cliques, igraph_vector_destroy);
+    n = igraph_vector_ptr_size(&cliques);
+    for (i = 0; i < n; ++i) {
+        igraph_vector_int_destroy(VECTOR(cliques)[i]);
+    }
     igraph_vector_ptr_destroy_all(&cliques);
 
     igraph_destroy(&graph);
