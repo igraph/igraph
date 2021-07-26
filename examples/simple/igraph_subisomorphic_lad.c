@@ -70,10 +70,10 @@ void test_motifs() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
+        m = igraph_vector_ptr_size(&maps);
         for (j = 0; j < m; j++) {
             igraph_vector_int_t *v = VECTOR(maps)[j];
             igraph_vector_int_destroy(v);
-            free(v);
         }
         igraph_vector_ptr_destroy_all(&maps);
 
@@ -127,10 +127,10 @@ void test_motifs() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
+        m = igraph_vector_ptr_size(&maps);
         for (j = 0; j < m; j++) {
             igraph_vector_int_t *v = VECTOR(maps)[j];
             igraph_vector_int_destroy(v);
-            free(v);
         }
         igraph_vector_ptr_destroy_all(&maps);
 
@@ -201,10 +201,10 @@ void test_motifs_undirected() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
+        m = igraph_vector_ptr_size(&maps);
         for (j = 0; j < m; j++) {
             igraph_vector_int_t *v = VECTOR(maps)[j];
             igraph_vector_int_destroy(v);
-            free(v);
         }
         igraph_vector_ptr_destroy_all(&maps);
 
@@ -258,10 +258,10 @@ void test_motifs_undirected() {
 
         VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
 
+        m = igraph_vector_ptr_size(&maps);
         for (j = 0; j < m; j++) {
             igraph_vector_int_t *v = VECTOR(maps)[j];
             igraph_vector_int_destroy(v);
-            free(v);
         }
         igraph_vector_ptr_destroy_all(&maps);
 
