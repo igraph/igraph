@@ -152,7 +152,7 @@ void test_bliss() {
         printf("Bliss automorphism generators may have failed with ring2. "
                "Please verify the generators manually. "
                "Note that the generator set is not guaranteed to be minimal.\n");
-    igraph_vector_ptr_free_items(&generators);
+    igraph_vector_ptr_destroy_and_free_items(&generators, igraph_vector_int_destroy);
 
     // For a directed ring, the only generator should be a cyclic permutation.
     igraph_automorphism_group(&directed_ring, NULL, &generators, IGRAPH_BLISS_F, NULL);
@@ -160,7 +160,7 @@ void test_bliss() {
         printf("Bliss automorphism generators may have failed with directed_ring. "
                "Please verify the generators manually. "
                "Note that the generator set is not guaranteed to be minimal.\n");
-    igraph_vector_ptr_free_items(&generators);
+    igraph_vector_ptr_destroy_and_free_items(&generators, igraph_vector_int_destroy);
 
     igraph_vector_int_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
 
