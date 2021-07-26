@@ -82,7 +82,7 @@
  * the pointer vector to clean up all items in a pointer vector completely, as
  * well as freeing memory associated to the pointer vector itself. For instance,
  * after an \ref igraph_decompose() call, you can call
- * \c "igraph_vector_ptr_destroy_all(&components, igraph_destroy)" to destroy
+ * \c "igraph_vector_ptr_destroy_all(&amp;components, igraph_destroy)" to destroy
  * all graphs created by \c igraph_decompose() as well as the \c components
  * vector itself.</para>
  */
