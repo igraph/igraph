@@ -62,20 +62,20 @@
  * <para>A few convenience functions are provided for the most common scenarios
  * related to the memory management of pointer vectors:</para>
  *
- * \clist
- * \cli \ref igraph_vector_ptr_free_items() calls \c igraph_free() on all non-null pointers
+ * \ilist
+ * \ili \ref igraph_vector_ptr_free_items() calls \c igraph_free() on all non-null pointers
  * in the pointer vector, and replaces them with null pointers.
- * \cli \ref igraph_vector_ptr_destroy_items() calls a destructor function on all
+ * \ili \ref igraph_vector_ptr_destroy_items() calls a destructor function on all
  * non-null pointers in the pointer vector, and replaces them with null pointers.
  * The destructor function must take a single \c "void*" pointer and return
  * \c void.
- * \cli \ref igraph_vector_ptr_destroy_and_free_items() calls a destructor function
+ * \ili \ref igraph_vector_ptr_destroy_and_free_items() calls a destructor function
  * on all non-null pointers in the pointer vector, frees the pointers and then
  * replaces them with nulls.
- * \cli \ref igraph_vector_ptr_destroy_all() calls a destructor function on all
+ * \ili \ref igraph_vector_ptr_destroy_all() calls a destructor function on all
  * non-null pointers in the pointer vector, frees them and then destroys the
  * entire pointer vector.
- * \endclist
+ * \endilist
  *
  * <para>Most of the time you will need to call \ref igraph_vector_ptr_destroy_all()
  * with an appropriate destructor function that matches the type of the items in
