@@ -41,8 +41,11 @@ int vector_tail_cmp(const void *path1, const void *path2) {
         length1--;
         length2--;
         diff = VECTOR(*vec1)[length1] - VECTOR(*vec2)[length2];
-        if (diff != 0) {
-            return diff;
+        if (diff > 0) {
+            return 1;
+        }
+        if (diff < 0) {
+            return -1;
         }
     }
 

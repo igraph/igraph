@@ -60,7 +60,6 @@
  * \param  cutoff  cutoff length of shortest paths
  */
 static int igraph_i_sspf(
-    const igraph_t *graph,
     igraph_integer_t source,
     igraph_vector_t *dist,
     igraph_real_t *nrgeo,
@@ -617,7 +616,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
         if (weights) {
             IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, cutoff));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf(graph, source, &dist, nrgeo, &S, &fathers, &adjlist, cutoff));
+            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &fathers, &adjlist, cutoff));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
@@ -1017,7 +1016,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         if (weights) {
             IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, -1));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf(graph, source, &dist, nrgeo, &S, &fathers, &adjlist, -1));
+            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &fathers, &adjlist, -1));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this

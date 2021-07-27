@@ -4,7 +4,7 @@ int main() {
 
     igraph_t g;
     igraph_strvector_t names, weights;
-    int i;
+    char i;
     char str[2] = " ";
     igraph_set_attribute_table(&igraph_cattribute_table);
     igraph_small(&g, 7, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 2, 4, 3, 4, -1);

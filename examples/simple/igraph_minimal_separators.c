@@ -28,7 +28,7 @@ int main() {
 
     igraph_t graph;
     igraph_vector_ptr_t separators;
-    igraph_integer_t i, j, m, n;
+    igraph_integer_t i, n;
 
     igraph_famous(&graph, "zachary");
     igraph_vector_ptr_init(&separators, 0);

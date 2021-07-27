@@ -28,7 +28,7 @@ int main() {
     igraph_vector_int_t membership;
     igraph_vector_int_t degree;
     igraph_vector_t weights;
-    igraph_integer_t nb_clusters, i, n;
+    igraph_integer_t nb_clusters, i;
     igraph_real_t quality;
 
     /* Set default seed to get reproducible results */
