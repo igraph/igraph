@@ -57,14 +57,14 @@
  *          the whole matrix is used, a symmetric matrix is returned
  *          if the graph is undirected.
  *        \endclist
- * \param type eids Logical, if true, then the edges IDs plus one
+ * \param eids Logical, if true, then the edges IDs plus one
  *        are stored in the adjacency matrix, instead of the number of
  *        edges between the two vertices. (The plus one is needed, since
  *        edge IDs start from zero, and zero means no edge in this case.)
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
- * \sa igraph_get_adjacency_sparse if you want a sparse matrix representation
+ * \sa igraph_get_adjacency_sparse() if you want a sparse matrix representation
  *
  * Time complexity: O(|V||V|),
  * |V| is the
