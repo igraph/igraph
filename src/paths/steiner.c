@@ -130,7 +130,7 @@ for (int i =0; i < igraph_vector_size(&steiner_terminals); i++)
 {
 	for (int j=0; j < igraph_vector_size(&steiner_vertices); j++)
 	{
-		igraph_matrix_set(&dp_cache,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j],MATRIX(distance,VECTOR[steiner_terminals[i],VECTOR[steiner_vertices][j]));	
+		igraph_matrix_set(&dp_cache,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j],MATRIX(distance,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j]));	
 	
 	}	
 }
@@ -151,56 +151,32 @@ for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(
         }
 	
 	
-	for (int u = 0; u < igraph_vector_size(&steiner_vertices); u++ )
+	for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 	{
+		u = INT_MAX
 		
-		for (int v = 0; v < igraph_vector_size(&steiner_vertices); v++ )
+		for (int subset_D_iterator = 0; subset_D_iterator < igraph_vector_size(&D) ; subset_D_iterator++)
 		{
+			igraph_vector_t E = VECTOR[D][subset_D_iterator];
+			igraph_integer_t indexOfSubsetE = fetchIndexofMapofSets(&E);
 			
-			for (int subset_iterator = 0; subset_iterator < igraph_vector_size(&D); subset_iterator++ )	
-			{ 	
-				igraph_integer_t indexOfSubsetDPrime
-				
-				if(VECTOR[D][subset_iterator].size() == 1)
-             		        {
-                            		indexOfSubsetDPrime = VECTOR[D][subset_iterator];
-                        	}
-                        	else
-                        	{
-                             		indexOfSubsetDPrime = fetchIndexofMapofSets(&VECTOR[D][subset_iterator]);
-                        	}	
-				
+			igraph_vector_t DMinusE = VECTOR[D][subset_D_iterator];
+			igraph_vector_remove(&DMinusE,E);
 			
-				igraph_integer_t DprimetoU = MATRIX[dp_cache][indexOfSubsetDPrime][u];
-				
-				igraph_vector_t DminusDprime = D;
-				igraph_vector_remove(&VECTOR[D][subset_iterator],E);	
-				
-				igraph_integer_t DminusDprime = VECTOR[DminusE][u]
-				igraph_integer_t indexOfSubsetDminusDprime
-				
-				if(DminusDprime.size() == 1)
-             		        {
-                            		indexOfSubsetDminusDprime = VECTOR[DminusDprime][0];
-                        	}
-                        	else
-                        	{
-                             		indexOfSubsetDminusDprime = fetchIndexofMapofSets(&VECTOR[D][subset_iterator]);
-                        	}	
-				
-	
-				MATRIX[dp_cache][indexOfSubsetDminusDprime][u]
-				igraph_integer_t distance_u_v = MATRIX[distance][u][v]
-				
-				if (MATRIX[dp_cache][indexOfSubsetD][v] > DprimetoU + DminusDprime + distance_u_v )
-				{
-					MATRIX[dp_cache][indexOfSubsetD][v] = DprimetoU + DminusDprime + distance_u_v 
-				}			
-				
-				
+			igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(&DMinusE);
+			
+			if ( (MATRIX[dp_cache][indexOfSubsetE][j]) + ( MATRIX[dp_cache][indexOfSubsetDMinusE][j] ) < u )
+			{
+				u = (MATRIX[dp_cache][indexOfSubsetE][j]) + ( MATRIX[dp_cache][indexOfSubsetDMinusE][j];
 			}
-				
+						
 		}
+		
+		for (int i = 0; j < igraph_vector_size(&steiner_vertices) ; j++ )
+		{
+			MATRIX[dp_cache][indexOfSubsetD][i] = min ( MATRIX[dp_cache][indexOfSubsetD][i], MATRIX[distance][i][j] + u )
+		}
+		
 		
 	}
 		
