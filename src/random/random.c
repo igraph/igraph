@@ -1224,7 +1224,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l, 
                          igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
-    int retval;
+    igraph_error_t retval;
 
     igraph_real_t nreal = length;
     igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
@@ -1330,7 +1330,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l, 
                                              (igraph_integer_t) h,
                                              (igraph_integer_t) n);
     } else {
-        retval = 0;
+        retval = IGRAPH_SUCCESS;
         S = floor(N * Vprime);
         l += S + 1;
         igraph_vector_push_back(res, l);    /* allocated */

@@ -31,7 +31,7 @@ typedef struct {
     igraph_vector_t *quantities;
     igraph_vector_int_t *strategies;
     igraph_neimode_t mode;
-    int retval;
+    igraph_error_t retval;
 } strategy_test_t;
 
 /* Error tests, i.e. we expect errors to be raised for each test.

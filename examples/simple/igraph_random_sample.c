@@ -30,7 +30,7 @@ typedef struct {
     igraph_integer_t low;
     igraph_integer_t high;
     igraph_integer_t length;
-    int retval;
+    igraph_error_t retval;
 } sampling_test_t;
 
 /* Error tests. Don't be afraid to crash the library function.
