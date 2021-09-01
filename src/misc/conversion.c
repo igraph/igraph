@@ -57,10 +57,6 @@
  *          the whole matrix is used, a symmetric matrix is returned
  *          if the graph is undirected.
  *        \endclist
- * \param eids Logical, if true, then the edges IDs plus one
- *        are stored in the adjacency matrix, instead of the number of
- *        edges between the two vertices. (The plus one is needed, since
- *        edge IDs start from zero, and zero means no edge in this case.)
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
@@ -72,12 +68,12 @@
  */
 
 igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
-                         igraph_get_adjacency_t type, igraph_bool_t eids) {
+                         igraph_get_adjacency_t type) {
 
     igraph_eit_t edgeit;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    int retval = 0;
+    igraph_error_t retval = 0;
     igraph_integer_t from, to;
     igraph_integer_t ffrom, fto;
 
@@ -92,11 +88,7 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
             igraph_edge(graph, edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
-            if (eids) {
-                MATRIX(*res, from, to) = edge + 1;
-            } else {
-                MATRIX(*res, from, to) += 1;
-            }
+            MATRIX(*res, from, to) += 1;
             IGRAPH_EIT_NEXT(edgeit);
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
@@ -106,17 +98,9 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
             from = ffrom;
             to = fto;
             if (to < from) {
-                if (eids) {
-                    MATRIX(*res, to, from) = edge + 1;
-                } else {
-                    MATRIX(*res, to, from) += 1;
-                }
+                MATRIX(*res, to, from) += 1;
             } else {
-                if (eids) {
-                    MATRIX(*res, from, to) = edge + 1;
-                } else {
-                    MATRIX(*res, from, to) += 1;
-                }
+                MATRIX(*res, from, to) += 1;
             }
             IGRAPH_EIT_NEXT(edgeit);
         }
@@ -127,17 +111,9 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
             from = ffrom;
             to = fto;
             if (to < from) {
-                if (eids) {
-                    MATRIX(*res, from, to) = edge + 1;
-                } else {
-                    MATRIX(*res, from, to) += 1;
-                }
+                MATRIX(*res, from, to) += 1;
             } else {
-                if (eids) {
-                    MATRIX(*res, to, from) = edge + 1;
-                } else {
-                    MATRIX(*res, to, from) += 1;
-                }
+                MATRIX(*res, to, from) += 1;
             }
             IGRAPH_EIT_NEXT(edgeit);
         }
@@ -147,17 +123,9 @@ igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
             igraph_edge(graph, edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
-            if (eids) {
-                MATRIX(*res, from, to) = edge + 1;
-            } else {
-                MATRIX(*res, from, to) += 1;
-            }
+            MATRIX(*res, from, to) += 1;
             if (from != to) {
-                if (eids) {
-                    MATRIX(*res, to, from) = edge + 1;
-                } else {
-                    MATRIX(*res, to, from) += 1;
-                }
+                MATRIX(*res, to, from) += 1;
             }
             IGRAPH_EIT_NEXT(edgeit);
         }
@@ -807,8 +775,7 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
     igraph_real_t sum;
     igraph_integer_t i, j;
 
-    IGRAPH_CHECK(igraph_get_adjacency(graph, matrix,
-                                      IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0));
+    IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, IGRAPH_GET_ADJACENCY_BOTH));
 
     if (!column_wise) {
         for (i = 0; i < no_of_nodes; i++) {
