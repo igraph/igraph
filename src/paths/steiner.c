@@ -85,21 +85,56 @@ int fetchIndexofMapofSets(igraph_vector_t subset)
  return key;
 }
 
+int igraph_steiner_ratio (const igraph_t *graph_contracted , igraph_vector_t *q_terminals , igraph_integer_t vid , igraph_neimode_t mode )
+{
+	
+	igraph_es_t es;
+	igraph_eit_t eit;	
+		
+	if igraph_vector_size(&q_terminals) >= 2
+	{
+		
+		es_vid = igraph_es_incident(&es,vid,mode);
+		igraph_eit_create(&graph, es , &eit);		
+		
+		while(!IGRAPH_EIT_END(eit))
+		{
+			
+			eid = IGRAPH_EIT_GET(eit);	
+		}
+						
+				
+	} 
+
+
+}
 
 
 int igraph_steiner_dreyfus_wagner(const igraph_t *graph,
                                   igraph_vector_t *steiner_terminals,
-                                  igraph_neimode_t mode) {
+                                  igraph_neimode_t mode,const igraph_vector_t *weights) {
         
 
-igraph_integer_t no_of_vertices = (igraph_integer_t) igraph_vcount(&graph);
+
+long int no_of_vertices = (igraph_integer_t) igraph_vcount(&graph);
+long int no_of_edges = igraph_ecount(graph);
+
 
 igraph_vector_t steiner_vertices;
 igraph_matrix_t dp_cache; // dynamic programming table
 igraph_integer_t q;
 igraph_vector_t *allSubsets;
 
+
+if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+    }
+
+
+distance = igraph_shortest_paths_floyd_warshall(&graph,&weights,mode)
+
 igraph_vector_sort(&steiner_terminals);
+
 
 // Creating a vector of steiner vertices. steiner vertices = vertices in graph - steiner terminals
 
@@ -120,7 +155,6 @@ q = VECTOR[steiner_terminals][0];
 igraph_vector_remove(&steiner_terminals,0);
 
 allSubsets = generateSubsets(&steiner_terminals,igraph_vector_size(&steiner_terminals),no_of_vertices);
-
 
 
 
