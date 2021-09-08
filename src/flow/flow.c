@@ -2485,17 +2485,25 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, &partition, &partition2,
                                     source, target, capacity, 0));
 
-        /* Store the maximum flow and determine which side each node is on */
+        /* Store the maximum flow */
         VECTOR(flow_values)[(long int)source] = flow_value;
 
         /* Update the tree */
         /* igraph_maxflow() guarantees that the source vertex will be in &partition
-         * and not in &partition2 */
+         * and not in &partition2 so we need to iterate over &partition to find
+         * all the nodes that are of interest to us */
         n = igraph_vector_size(&partition);
         for (i = 0; i < n; i++) {
             mid = VECTOR(partition)[i];
-            if (mid > source && VECTOR(neighbors)[(long int)mid] == target) {
-                VECTOR(neighbors)[(long int)mid] = source;
+            if (mid != source) {
+                if (VECTOR(neighbors)[(long int)mid] == target) {
+                    VECTOR(neighbors)[(long int)mid] = source;
+                } else if (VECTOR(neighbors)[(long int)target] == mid) {
+                    VECTOR(neighbors)[(long int)target] = source;
+                    VECTOR(neighbors)[(long int)source] = mid;
+                    VECTOR(flow_values)[(long int)source] = VECTOR(flow_values)[(long int)target];
+                    VECTOR(flow_values)[(long int)target] = flow_value;
+                }
             }
         }
     }
