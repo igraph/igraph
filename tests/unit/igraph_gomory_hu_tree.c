@@ -192,6 +192,7 @@ int main() {
 
     /* Make sure we don't blow up without an outgoing flow vector */
     IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, 0, &capacity) == IGRAPH_SUCCESS);
+    igraph_destroy(&tree);
     igraph_destroy(&g);
 
     /* example from Github issue #1810 */
