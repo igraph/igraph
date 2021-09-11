@@ -124,6 +124,8 @@ igraph_vector_t steiner_vertices;
 igraph_matrix_t dp_cache; // dynamic programming table
 igraph_integer_t q;
 igraph_vector_t *allSubsets;
+igraph_matrix_t distance;
+
 
 
 if (igraph_vector_size(weights) != no_of_edges) {
@@ -164,7 +166,7 @@ for (int i =0; i < igraph_vector_size(&steiner_terminals); i++)
 {
 	for (int j=0; j < igraph_vector_size(&steiner_vertices); j++)
 	{
-		igraph_matrix_set(&dp_cache,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j],MATRIX(distance,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j]));	
+		igraph_matrix_set(&dp_cache,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j],MATRIX(*distance,VECTOR[steiner_terminals][i],VECTOR[steiner_vertices][j]));	
 	
 	}	
 }
@@ -199,16 +201,16 @@ for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(
 			
 			igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(&DMinusE);
 			
-			if ( (MATRIX[dp_cache][indexOfSubsetE][j]) + ( MATRIX[dp_cache][indexOfSubsetDMinusE][j] ) < u )
+			if ( (MATRIX(*dp_cache,indexOfSubsetE,j )) + ( MATRIX (*dp_cache,indexOfSubsetDMinusE,j) < u )
 			{
-				u = (MATRIX[dp_cache][indexOfSubsetE][j]) + ( MATRIX[dp_cache][indexOfSubsetDMinusE][j];
+				u = (MATRIX (*dp_cache,indexOfSubsetE,j)) + ( MATRIX(*dp_cache,indexOfSubsetDMinusE,j);
 			}
 						
 		}
 		
 		for (int i = 0; j < igraph_vector_size(&steiner_vertices) ; j++ )
 		{
-			MATRIX[dp_cache][indexOfSubsetD][i] = min ( MATRIX[dp_cache][indexOfSubsetD][i], MATRIX[distance][i][j] + u )
+			MATRIX (*dp_cache,indexOfSubsetD,i) = min ( MATRIX (*dp_cache,indexOfSubsetD,i), MATRIX (*distance,i,j) + u )
 		}
 		
 		
@@ -233,26 +235,19 @@ for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 		
 		igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(&CMinusF);
 		
-		if ( ( MATRIX[dp_cache][indexOfSubsetF][j] ) + ( MATRIX[dp_cache][indexOfSubsetCMinusF][j] ) < u)
+		if ( ( MATRIX (*dp_cache,indexOfSubsetF,j) ) + ( MATRIX (*dp_cache,indexOfSubsetCMinusF,j) ) < u)
 		{
-			u = ( MATRIX[dp_cache][indexOfSubsetF][j] ) + ( MATRIX[dp_cache][indexOfSubsetCMinusF][j] );			
+			u = ( MATRIX (*dp_cache,indexOfSubsetF,j) ) + ( MATRIX (*dp_cache,indexOfSubsetCMinusF,j) );			
 		}
 		
 	}
 	
-	if (MATRIX[distance][q][j] + u < v)
+	if (MATRIX (*distance,q,j) + u < v)
 	{
-		v = MATRIX[distance][q][j] + u;
+		v = MATRIX (*distance,q,j) + u;
 	}
 	
 }
-
-
-
-
-
-
-
 
                                  
 }

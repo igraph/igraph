@@ -13,7 +13,7 @@
 
 using namespace std;
 
-int igraph_shortest_paths_floyd_warshall(const igraph_t *graph,
+igraph_matrix_t igraph_shortest_paths_floyd_warshall(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode)
@@ -33,14 +33,14 @@ int igraph_shortest_paths_floyd_warshall(const igraph_t *graph,
     {
         for (j = 0; j < no_of_nodes; j++)
         {
-            igraph_matrix_t[i][j] = my_infinity;
+            MATRIX(*adj,i,j) = my_infinity;
         }
     }
 
     // distance to the same node = 0
     for (i = 0; i < no_of_nodes; i++)
     {
-        igraph_matrix_t[i][i] = 0;
+         MATRIX(*adj,i,j) = 0;
     }
 
     igraph_matrix_t floyd;
