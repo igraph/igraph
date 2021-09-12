@@ -17,9 +17,13 @@ igraph_vector_t* generateSubsets(igraph_vector_t* C, igraph_integer_t n,igraph_i
     igraph_integer_t count = pow(2, n);
 
     igraph_vector_t *allSubsets;
-    
+        
     igraph_integer_t subsetIndex = graphsize;
     
+    IGRAPH_VECTOR_INIT_FINALLY(&allSubsets,0);
+    
+    
+        
     // The outer for loop will run 2^n times to print all subset .
     // Here variable i will act as a binary counter
 
@@ -128,22 +132,23 @@ igraph_matrix_t distance;
     
 IGRAPH_VECTOR_INIT_FINALLY(&steiner_vertices, 0);
 
-IGRAPH_VECTOR_INIT_FINALLY(&allSubsets, 0);    
-    
-   
+IGRAPH_VECTOR_INIT_FINALLY(&allSubsets, 0);
+
+
+       
 if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
 
 
-distance = igraph_shortest_paths_floyd_warshall(&graph,&weights,mode)
+distance = igraph_shortest_paths_floyd_warshall(&graph,&weights,mode);
 
-igraph_vector_sort(&steiner_terminals);
+IGRAPH_CHECK(igraph_vector_sort(&steiner_terminals));
 
 
 // Creating a vector of steiner vertices. steiner vertices = vertices in graph - steiner terminals
 
-igraph_vector_append(&steiner_vertices,&no_of_vertices);
+IGRAPH_CHECK(igraph_vector_append(&steiner_vertices,&no_of_vertices));
 
 for (int i = 0,j = 0;i < igraph_vector_size(&steiner_terminals); i++,j++)
 {
@@ -178,7 +183,7 @@ for (int i =0; i < igraph_vector_size(&steiner_terminals); i++)
 for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(&dp_cache); i++ )
 {
 	igraph_vector_t D = VECTOR[allsubsets][i];
-	igraph_integer_t indexOfSubsetD
+	igraph_integer_t indexOfSubsetD;
 	
 	if(D.size() == 1)
         {
@@ -213,7 +218,7 @@ for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(
 		
 		for (int i = 0; j < igraph_vector_size(&steiner_vertices) ; j++ )
 		{
-			MATRIX (*dp_cache,indexOfSubsetD,i) = min ( MATRIX (*dp_cache,indexOfSubsetD,i), MATRIX (*distance,i,j) + u )
+			MATRIX (*dp_cache,indexOfSubsetD,i) = min ( MATRIX (*dp_cache,indexOfSubsetD,i), MATRIX (*distance,i,j) + u );
 		}
 		
 		
@@ -252,7 +257,10 @@ for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 	
 }
 
- IGRAPH_FINALLY_CLEAN(1);
+
+igraph_vector_destroy(&steiner_vertices);
+igraph_vector_destroy(&allSubsets);
+igraph_matrix_destroy(&distance);
 
                                  
 }
