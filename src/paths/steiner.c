@@ -125,9 +125,12 @@ igraph_matrix_t dp_cache; // dynamic programming table
 igraph_integer_t q;
 igraph_vector_t *allSubsets;
 igraph_matrix_t distance;
+    
+IGRAPH_VECTOR_INIT_FINALLY(&steiner_vertices, 0);
 
-
-
+IGRAPH_VECTOR_INIT_FINALLY(&allSubsets, 0);    
+    
+   
 if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
@@ -144,7 +147,7 @@ igraph_vector_append(&steiner_vertices,&no_of_vertices);
 
 for (int i = 0,j = 0;i < igraph_vector_size(&steiner_terminals); i++,j++)
 {
-	igraph_vector_remove(&steiner_vertices,i-j);		
+	IGRAPH_CHECK(igraph_vector_remove(&steiner_vertices,i-j));		
 
 }
 
@@ -154,7 +157,7 @@ igraph_matrix_fill(&dp_cache,INT_MAX);
 
 q = VECTOR[steiner_terminals][0];
 
-igraph_vector_remove(&steiner_terminals,0);
+IGRAPH_CHECK(igraph_vector_remove(&steiner_terminals,0));
 
 allSubsets = generateSubsets(&steiner_terminals,igraph_vector_size(&steiner_terminals),no_of_vertices);
 
@@ -197,7 +200,7 @@ for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(
 			igraph_integer_t indexOfSubsetE = fetchIndexofMapofSets(&E);
 			
 			igraph_vector_t DMinusE = D;
-			igraph_vector_remove(&DMinusE,E);
+			IGRAPH_CHECK(igraph_vector_remove(&DMinusE,E));
 			
 			igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(&DMinusE);
 			
@@ -230,7 +233,7 @@ for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 		igraph_integer_t indexOfSubsetF = fetchIndexofMapofSets(&F);
 		
 		igraph_vector_t CMinusF = C;
-		igraph_vector_remove(&CMinusF,F)
+		IGRAPH_CHECK(igraph_vector_remove(&CMinusF,F));
 		
 		
 		igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(&CMinusF);
@@ -248,6 +251,8 @@ for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 	}
 	
 }
+
+ IGRAPH_FINALLY_CLEAN(1);
 
                                  
 }
