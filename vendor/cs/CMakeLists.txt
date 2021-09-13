@@ -82,5 +82,14 @@ target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 use_all_warnings(cxsparse_vendored)
 
 if (MSVC)
-  target_compile_options(cxsparse_vendored PRIVATE /wd4100) # disable unreferenced parameter warning
+  target_compile_options(
+    cxsparse_vendored PRIVATE
+    /wd4100
+  ) # disable unreferenced parameter warning
+else()
+  target_compile_options(
+    cxsparse_vendored PRIVATE
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-unused-variable>
+  )
 endif()
+
