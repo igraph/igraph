@@ -26,7 +26,7 @@ igraph_matrix_t igraph_shortest_paths_floyd_warshall(const igraph_t *graph,
     long int i, j, k;
 
     igraph_matrix_t adj;
-    igraph_matrix_init(&adj,no_of_nodes, no_of_nodes);
+    IGRAPH_CHECK(igraph_matrix_init(&adj,no_of_nodes, no_of_nodes));
 
     // array of minimum distances initialized to ∞ (infinity)
     for (i = 0; i < no_of_nodes; i++)
@@ -44,7 +44,7 @@ igraph_matrix_t igraph_shortest_paths_floyd_warshall(const igraph_t *graph,
     }
 
     igraph_matrix_t floyd;
-    igraph_matrix_init(&floyd, no_of_nodes, no_of_nodes);
+    IGRAPH_CHECK(igraph_matrix_init(&floyd, no_of_nodes, no_of_nodes));
 
     // assign weight of i, j as shortest distance
     for (i = 0; i < no_of_nodes; i++)
