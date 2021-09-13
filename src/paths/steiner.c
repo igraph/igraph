@@ -262,5 +262,8 @@ igraph_vector_destroy(&steiner_vertices);
 igraph_vector_destroy(&allSubsets);
 igraph_matrix_destroy(&distance);
 
+IGRAPH_FINALLY_CLEAN(3);
+                                                             
+
                                  
 }
