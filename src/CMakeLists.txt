@@ -228,6 +228,8 @@ add_library(
   paths/shortest_paths.c
   paths/simple_paths.c
   paths/unweighted.c
+  paths/steiner.c
+  paths/floyd_warshall.c
 
   properties/basic_properties.c
   properties/constraint.c
