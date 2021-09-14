@@ -497,6 +497,9 @@
  - `igraph_rewire_directed_edges()` now generates multigraphs when edge directions
    are ignored, to make it consistent with the directed case.
 
+ - Fixed a bug in `igraph_gomory_hu_tree()` that returned only the equivalent flow
+   tree instead of the cut tree; see Github issue #1810 for more details.
+
 ## [0.9.4] - 2021-05-31
 
 ### Changed
