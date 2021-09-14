@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+ - `igraph_rewire_directed_edges()` now generates multigraphs when edge directions
+   are ignored, to make it consistent with the directed case.
+
 ## [0.9.4] - 2021-05-31
 
 ### Changed

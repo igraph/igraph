@@ -293,9 +293,11 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
  * </para><para> Note that this function modifies the input \p graph,
  * call \ref igraph_copy() if you want to keep it.
  *
+ * </para><para> This function can produce multiple edges between two vertices.
+ *
  * \param graph The input graph, this will be rewired, it can be
- *    directed or undirected. If it is directed, \ref igraph_rewire_edges()
- *    will be called.
+ *    directed or undirected. If it is undirected or \p mode is set to
+ *    IGRAPH_ALL, \ref igraph_rewire_edges() will be called.
  * \param prob The rewiring probability, a constant between zero and
  *    one (inclusive).
  * \param loops Boolean, whether loop edges are allowed in the new
@@ -385,7 +387,7 @@ int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
         *graph = newgraph;
 
     } else {
-        IGRAPH_CHECK(igraph_rewire_edges(graph, prob, loops, /* multiple = */ 0));
+        IGRAPH_CHECK(igraph_rewire_edges(graph, prob, loops, /* multiple = */ 1));
     }
 
     return 0;
