@@ -479,6 +479,9 @@
    instead of `long int` for the numbers of rows and columns, and row and column
    indexes.
 
+ - `igraph_rewire_directed_edges()` now generates multigraphs when edge directions
+   are ignored, to make it consistent with the directed case.
+
 
 ### Added
 
