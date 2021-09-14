@@ -479,10 +479,6 @@
    instead of `long int` for the numbers of rows and columns, and row and column
    indexes.
 
- - `igraph_rewire_directed_edges()` now generates multigraphs when edge directions
-   are ignored, to make it consistent with the directed case.
-
-
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
@@ -493,6 +489,13 @@
 ### Changed
 
  - `igraph_version()` no longer returns an error code.
+
+## [0.9.5]
+
+### Fixed
+
+ - `igraph_rewire_directed_edges()` now generates multigraphs when edge directions
+   are ignored, to make it consistent with the directed case.
 
 ## [0.9.4] - 2021-05-31
 
@@ -928,7 +931,8 @@
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.4..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.5..HEAD
+[0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5
 [0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/igraph/igraph/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/igraph/igraph/compare/0.9.1...0.9.2
