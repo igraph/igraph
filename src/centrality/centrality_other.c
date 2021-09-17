@@ -580,7 +580,7 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
 typedef struct igraph_i_kleinberg_data_t {
     igraph_adjlist_t *in;
     igraph_adjlist_t *out;
-    igraph_vector_int_t *tmp;
+    igraph_vector_t *tmp;
 } igraph_i_kleinberg_data_t;
 
 /* struct for the weighted variant of the HITS algorithm */
@@ -588,7 +588,7 @@ typedef struct igraph_i_kleinberg_data2_t {
     const igraph_t *graph;
     igraph_inclist_t *in;
     igraph_inclist_t *out;
-    igraph_vector_int_t *tmp;
+    igraph_vector_t *tmp;
     const igraph_vector_t *weights;
 } igraph_i_kleinberg_data2_t;
 
@@ -599,7 +599,7 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
     igraph_adjlist_t *in = data->in;
     igraph_adjlist_t *out = data->out;
-    igraph_vector_int_t *tmp = data->tmp;
+    igraph_vector_t *tmp = data->tmp;
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
@@ -634,7 +634,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
     igraph_inclist_t *in = data->in;
     igraph_inclist_t *out = data->out;
-    igraph_vector_int_t *tmp = data->tmp;
+    igraph_vector_t *tmp = data->tmp;
     const igraph_vector_t *weights = data->weights;
     const igraph_t *g = data->graph;
     igraph_vector_int_t *neis;
@@ -675,7 +675,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
     igraph_adjlist_t *inadjlist, *outadjlist;
     igraph_inclist_t *ininclist, *outinclist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_int_t tmp;
+    igraph_vector_t tmp;
     igraph_vector_t values;
     igraph_matrix_t vectors;
     igraph_i_kleinberg_data_t extra;
@@ -725,7 +725,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
     IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, options->n);
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
 
     if (inout == 0) {
         inadjlist = &myinadjlist;
@@ -755,7 +755,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
         IGRAPH_FINALLY(igraph_inclist_destroy, &myoutinclist);
     }
 
-    IGRAPH_CHECK(igraph_degree(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0));
+    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0, 0));
     for (i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
             MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
@@ -786,7 +786,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_vector_int_destroy(&tmp);
+    igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     if (value) {
