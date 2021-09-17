@@ -479,12 +479,16 @@
    instead of `long int` for the numbers of rows and columns, and row and column
    indexes.
 
+ - `igraph_hub_score()` and `igraph_authority_score()` now return a normalized vector
+   for edgeless graphs.
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
+ - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
 
 ### Changed
 

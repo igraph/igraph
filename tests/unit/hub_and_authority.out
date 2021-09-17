@@ -1,0 +1,155 @@
+Null graph:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( )
+value:
+NaN
+authority:
+( )
+value:
+NaN
+
+Calculate hub and authority simultaneously:
+hub:
+( )
+authority:
+( )
+value:
+NaN
+--------------------------------------------------
+
+
+Singleton graph with loop:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( 1 )
+value:
+1
+authority:
+( 1 )
+value:
+1
+
+Calculate hub and authority simultaneously:
+hub:
+( 1 )
+authority:
+( 1 )
+value:
+1
+--------------------------------------------------
+
+
+Three vertices, no links:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( 0.333333 0.333333 0.333333 )
+value:
+NaN
+authority:
+( 0.333333 0.333333 0.333333 )
+value:
+NaN
+
+Calculate hub and authority simultaneously:
+hub:
+( 0.333333 0.333333 0.333333 )
+authority:
+( 0.333333 0.333333 0.333333 )
+value:
+NaN
+--------------------------------------------------
+
+
+Two hubs and one authority:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( 0.707107 0.707107 0 )
+value:
+2
+authority:
+( 0 0 1 )
+value:
+2
+
+Calculate hub and authority simultaneously:
+hub:
+( 0.707107 0.707107 0 )
+authority:
+( 0 0 1 )
+value:
+2
+--------------------------------------------------
+
+
+Stanford example:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( 0.06742 0.0738169 0.63676 0.345405 0.0713449 0.0781142 0.673829 )
+value:
+11.5396
+authority:
+( 0.187448 0.0217301 0.229025 0.873297 0.30004 0.0229951 0.242358 )
+value:
+11.5396
+
+Calculate hub and authority simultaneously:
+hub:
+( 0.06742 0.0738169 0.63676 0.345405 0.0713449 0.0781142 0.673829 )
+authority:
+( 0.187448 0.0217301 0.229025 0.873297 0.30004 0.0229951 0.242358 )
+value:
+11.5396
+--------------------------------------------------
+
+
+Same example with scaling:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( 0.100055 0.109548 0.944987 0.5126 0.10588 0.115926 1 )
+value:
+11.5396
+authority:
+( 0.214644 0.0248828 0.262253 1 0.343572 0.0263314 0.277521 )
+value:
+11.5396
+
+Calculate hub and authority simultaneously:
+hub:
+( 0.100055 0.109548 0.944987 0.5126 0.10588 0.115926 1 )
+authority:
+( 0.214644 0.0248828 0.262253 1 0.343572 0.0263314 0.277521 )
+value:
+11.5396
+--------------------------------------------------
+
+
+Degenerate example:
+--------------------------------------------------
+Calculate hub and authority separately:
+hub:
+( 0.385545 0 0.623824 0 )
+value:
+2.61803
+authority:
+( 0.578317 0.623824 0.357419 0.385545 )
+value:
+2.61803
+
+Calculate hub and authority simultaneously:
+hub:
+( 0.385545 0 0.623824 0 )
+authority:
+( 0 0.850651 0 0.525731 )
+value:
+2.61803
+--------------------------------------------------
+
+
+Checking invalid weight vector.
