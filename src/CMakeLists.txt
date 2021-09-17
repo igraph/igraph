@@ -123,6 +123,9 @@ add_library(
   centrality/centralization.c
   centrality/closeness.c
   centrality/coreness.c
+  centrality/eigenvector.c
+  centrality/hub_authority.c
+  centrality/pagerank.c
   centrality/truss.cpp
   centrality/prpack.cpp
 
