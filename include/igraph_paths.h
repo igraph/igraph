@@ -48,12 +48,12 @@ IGRAPH_EXPORT int igraph_diameter_dijkstra(const igraph_t *graph,
 IGRAPH_EXPORT int igraph_shortest_paths_floyd_warshall(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        const igraph_vector_t *weights,
-                                       igraph_neimode_t mode)
+                                       igraph_neimode_t mode);
 
 
 IGRAPH_EXPORT int igraph_steiner_dreyfus_wagner(const igraph_t *graph,
                                   igraph_vector_t *steiner_terminals,
-                                  igraph_neimode_t mode,const igraph_vector_t *weights) 
+                                  igraph_neimode_t mode,const igraph_vector_t *weights); 
 
 
 IGRAPH_EXPORT int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
