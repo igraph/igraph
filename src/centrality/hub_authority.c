@@ -47,26 +47,34 @@ typedef struct igraph_i_kleinberg_data2_t {
     const igraph_vector_t *weights;
 } igraph_i_kleinberg_data2_t;
 
-/* ARPACK auxiliary routine for the unweighted HITS algorithm */
-static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
-                                         const igraph_real_t *from,
-                                         int n, void *extra) {
-    igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
-    igraph_adjlist_t *in = data->in;
-    igraph_adjlist_t *out = data->out;
-    igraph_vector_t *tmp = data->tmp;
+static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(int n, igraph_vector_t *to,
+        igraph_adjlist_t *in, const igraph_real_t *from) {
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(in, i);
         nlen = igraph_vector_int_size(neis);
-        VECTOR(*tmp)[i] = 0.0;
+        VECTOR(*to)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
-            VECTOR(*tmp)[i] += from[nei];
+            VECTOR(*to)[i] += from[nei];
         }
     }
+    return IGRAPH_SUCCESS;
+}
+
+/* ARPACK auxiliary routine for the unweighted HITS algorithm */
+static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
+                                         const igraph_real_t *from,
+                                         int n, void *extra) {
+    igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
+    igraph_adjlist_t *out = data->out;
+    igraph_vector_t *tmp = data->tmp;
+    igraph_vector_int_t *neis;
+    igraph_integer_t i, j, nlen;
+
+    igraph_i_kleinberg_unweighted_hub_to_auth(n, tmp, data->in, from);
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(out, i);
@@ -81,13 +89,30 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t igraph_i_kleinberg_weighted_hub_to_auth(int n,
+        igraph_vector_t *to, igraph_inclist_t *in, const igraph_t *g,
+        const igraph_real_t *from, const igraph_vector_t *weights) {
+    igraph_vector_int_t *neis;
+    igraph_integer_t nlen, i, j;
+    for (i = 0; i < n; i++) {
+        neis = igraph_inclist_get(in, i);
+        nlen = igraph_vector_int_size(neis);
+        VECTOR(*to)[i] = 0.0;
+        for (j = 0; j < nlen; j++) {
+            igraph_integer_t nei_edge = VECTOR(*neis)[j];
+            igraph_integer_t nei = IGRAPH_OTHER(g, nei_edge, i);
+            VECTOR(*to)[i] += from[nei] * VECTOR(*weights)[nei_edge];
+        }
+    }
+    return IGRAPH_SUCCESS;
+}
+
 /* ARPACK auxiliary routine for the weighted HITS algorithm */
 static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
                                        const igraph_real_t *from,
                                        int n, void *extra) {
 
     igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
-    igraph_inclist_t *in = data->in;
     igraph_inclist_t *out = data->out;
     igraph_vector_t *tmp = data->tmp;
     const igraph_vector_t *weights = data->weights;
@@ -95,16 +120,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
-    for (i = 0; i < n; i++) {
-        neis = igraph_inclist_get(in, i);
-        nlen = igraph_vector_int_size(neis);
-        VECTOR(*tmp)[i] = 0.0;
-        for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei_edge = VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(g, nei_edge, i);
-            VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
-        }
-    }
+    igraph_i_kleinberg_weighted_hub_to_auth(n, tmp, data->in, g, from, weights);
 
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(out, i);
@@ -166,10 +182,8 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights, igraph_arpack_options_t *options) {
 
-    igraph_adjlist_t myinadjlist, myoutadjlist;
-    igraph_inclist_t myininclist, myoutinclist;
-    igraph_adjlist_t *inadjlist, *outadjlist;
-    igraph_inclist_t *ininclist, *outinclist;
+    igraph_adjlist_t inadjlist, outadjlist;
+    igraph_inclist_t ininclist, outinclist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t tmp;
     igraph_vector_t values;
@@ -239,21 +253,16 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
 
-    inadjlist = &myinadjlist;
-    outadjlist = &myoutadjlist;
-    ininclist = &myininclist;
-    outinclist = &myoutinclist;
-
     if (weights == 0) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
-        IGRAPH_FINALLY(igraph_adjlist_destroy, &myinadjlist);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
-        IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &inadjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_FINALLY(igraph_adjlist_destroy, &inadjlist);
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &outadjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_FINALLY(igraph_adjlist_destroy, &outadjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
-        IGRAPH_FINALLY(igraph_inclist_destroy, &myininclist);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
-        IGRAPH_FINALLY(igraph_inclist_destroy, &myoutinclist);
+        IGRAPH_CHECK(igraph_inclist_init(graph, &ininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+        IGRAPH_FINALLY(igraph_inclist_destroy, &ininclist);
+        IGRAPH_CHECK(igraph_inclist_init(graph, &outinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
+        IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
     IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0, 0));
@@ -265,8 +274,8 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
     }
 
-    extra.in = inadjlist; extra.out = outadjlist; extra.tmp = &tmp;
-    extra2.in = ininclist; extra2.out = outinclist; extra2.tmp = &tmp;
+    extra.in = &inadjlist; extra.out = &outadjlist; extra.tmp = &tmp;
+    extra2.in = &ininclist; extra2.out = &outinclist; extra2.tmp = &tmp;
     extra2.graph = graph; extra2.weights = weights;
 
     options->nev = 1;
@@ -276,19 +285,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     if (weights == 0) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
                                            options, 0, &values, &vectors));
-        igraph_adjlist_destroy(&myoutadjlist);
-        igraph_adjlist_destroy(&myinadjlist);
-        IGRAPH_FINALLY_CLEAN(2);
     } else {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_weighted, &extra2,
                                            options, 0, &values, &vectors));
-        igraph_inclist_destroy(&myoutinclist);
-        igraph_inclist_destroy(&myininclist);
-        IGRAPH_FINALLY_CLEAN(2);
     }
 
-    igraph_vector_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(1);
 
     if (value) {
         *value = VECTOR(values)[0];
@@ -339,18 +340,10 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_real_t norm;
         igraph_vector_resize(authority_vector, igraph_vcount(graph));
         igraph_vector_null(authority_vector);
-        IGRAPH_CHECK(igraph_inclist_init(graph, outinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
-        IGRAPH_FINALLY(igraph_inclist_destroy, outinclist);
-        for (int i = 0; i < igraph_vcount(graph); i++) {
-            igraph_vector_int_t *inc = igraph_inclist_get(outinclist, i);
-            for (int j = 0; j < igraph_vector_int_size(inc); j++) {
-                igraph_integer_t edge = VECTOR(*inc)[j];
-                if (weights) {
-                    VECTOR(*authority_vector)[IGRAPH_TO(graph, edge)] += VECTOR(*weights)[edge] * VECTOR(*my_hub_vector_p)[IGRAPH_FROM(graph, edge)];
-                } else {
-                    VECTOR(*authority_vector)[IGRAPH_TO(graph, edge)] += VECTOR(*my_hub_vector_p)[IGRAPH_FROM(graph, edge)];
-                }
-            }
+        if (weights == 0) {
+            igraph_i_kleinberg_unweighted_hub_to_auth(igraph_vcount(graph), authority_vector, &inadjlist, &VECTOR(*my_hub_vector_p)[0]);
+        } else {
+            igraph_i_kleinberg_weighted_hub_to_auth(igraph_vcount(graph), authority_vector, &ininclist, graph, &VECTOR(*my_hub_vector_p)[0], weights);
         }
         if (!scale) {
             norm = 1.0 / igraph_blas_dnrm2(authority_vector);
@@ -358,14 +351,23 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
             norm = 1.0 / igraph_vector_max(authority_vector);
         }
         igraph_vector_scale(authority_vector, norm);
-        igraph_inclist_destroy(outinclist);
-        IGRAPH_FINALLY_CLEAN(1);
     }
 
     if (!hub_vector && authority_vector) {
         igraph_vector_destroy(&my_hub_vector);
         IGRAPH_FINALLY_CLEAN(1);
     }
+    if (weights == 0) {
+        igraph_adjlist_destroy(&outadjlist);
+        igraph_adjlist_destroy(&inadjlist);
+        IGRAPH_FINALLY_CLEAN(2);
+    } else {
+        igraph_inclist_destroy(&outinclist);
+        igraph_inclist_destroy(&ininclist);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+    igraph_vector_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
