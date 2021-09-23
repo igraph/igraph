@@ -46,19 +46,19 @@ Three vertices, no links:
 --------------------------------------------------
 Calculate hub and authority separately:
 hub:
-( 0.333333 0.333333 0.333333 )
+( 1 1 1 )
 value:
 NaN
 authority:
-( 0.333333 0.333333 0.333333 )
+( 1 1 1 )
 value:
 NaN
 
 Calculate hub and authority simultaneously:
 hub:
-( 0.333333 0.333333 0.333333 )
+( 1 1 1 )
 authority:
-( 0.333333 0.333333 0.333333 )
+( 1 1 1 )
 value:
 NaN
 --------------------------------------------------

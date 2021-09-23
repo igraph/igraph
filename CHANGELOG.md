@@ -479,9 +479,6 @@
    instead of `long int` for the numbers of rows and columns, and row and column
    indexes.
 
- - `igraph_hub_score()` and `igraph_authority_score()` now return a normalized vector
-   for edgeless graphs.
-
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

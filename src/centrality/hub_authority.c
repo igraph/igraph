@@ -144,7 +144,7 @@ static igraph_error_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t 
         }
         if (vector) {
             igraph_vector_resize(vector, no_of_nodes);
-            igraph_vector_fill(vector, 1.0 / no_of_nodes);
+            igraph_vector_fill(vector, 1.0);
         }
         return IGRAPH_SUCCESS;
     }
