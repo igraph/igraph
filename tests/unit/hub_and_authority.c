@@ -50,6 +50,9 @@ int main() {
     igraph_t g;
     igraph_vector_t weights;
     igraph_arpack_options_t options;
+    igraph_real_t value;
+
+    igraph_arpack_options_init(&options);
 
     printf("Null graph:\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
@@ -102,7 +105,13 @@ int main() {
     printf("Degenerate example:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED,
         0,1, 1,0, 1,2, 2,1, 2,3, 3,0, -1);
-    print_hub_and_authority(&g, NULL, 0);
+    igraph_hub_and_authority_scores(&g, NULL, NULL, &value,
+                                    0, NULL, &options);
+    printf("--------------------------------------------------\n");
+    printf("value:\n");
+    print_real(stdout, value, "%g");
+    printf("\n");
+    printf("--------------------------------------------------\n\n\n");
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
@@ -114,7 +123,6 @@ int main() {
         0,2, 1,2, -1);
     igraph_vector_init_int(&weights, 3,
         1, 1, 1);
-    igraph_arpack_options_init(&options);
     IGRAPH_ASSERT(igraph_hub_and_authority_scores(&g, NULL, NULL, NULL,
                                     0, &weights, &options) == IGRAPH_EINVAL);
     igraph_destroy(&g);

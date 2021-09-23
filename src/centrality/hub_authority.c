@@ -47,8 +47,9 @@ typedef struct igraph_i_kleinberg_data2_t {
     const igraph_vector_t *weights;
 } igraph_i_kleinberg_data2_t;
 
-static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(int n, igraph_vector_t *to,
-        igraph_adjlist_t *in, const igraph_real_t *from) {
+static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
+        int n, igraph_vector_t *to, const igraph_real_t *from,
+        igraph_adjlist_t *in) {
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
@@ -74,7 +75,7 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
-    igraph_i_kleinberg_unweighted_hub_to_auth(n, tmp, data->in, from);
+    igraph_i_kleinberg_unweighted_hub_to_auth(n, tmp, from, data->in);
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(out, i);
@@ -90,8 +91,8 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
 }
 
 static igraph_error_t igraph_i_kleinberg_weighted_hub_to_auth(int n,
-        igraph_vector_t *to, igraph_inclist_t *in, const igraph_t *g,
-        const igraph_real_t *from, const igraph_vector_t *weights) {
+        igraph_vector_t *to, const igraph_real_t *from, igraph_inclist_t *in,
+        const igraph_t *g, const igraph_vector_t *weights) {
     igraph_vector_int_t *neis;
     igraph_integer_t nlen, i, j;
     for (i = 0; i < n; i++) {
@@ -120,7 +121,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
 
-    igraph_i_kleinberg_weighted_hub_to_auth(n, tmp, data->in, g, from, weights);
+    igraph_i_kleinberg_weighted_hub_to_auth(n, tmp, from, data->in, g, weights);
 
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(out, i);
@@ -338,12 +339,12 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     if (authority_vector) {
         igraph_real_t norm;
-        igraph_vector_resize(authority_vector, igraph_vcount(graph));
+        igraph_vector_resize(authority_vector, no_of_nodes);
         igraph_vector_null(authority_vector);
         if (weights == 0) {
-            igraph_i_kleinberg_unweighted_hub_to_auth(igraph_vcount(graph), authority_vector, &inadjlist, &VECTOR(*my_hub_vector_p)[0]);
+            igraph_i_kleinberg_unweighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &inadjlist);
         } else {
-            igraph_i_kleinberg_weighted_hub_to_auth(igraph_vcount(graph), authority_vector, &ininclist, graph, &VECTOR(*my_hub_vector_p)[0], weights);
+            igraph_i_kleinberg_weighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &ininclist, graph, weights);
         }
         if (!scale) {
             norm = 1.0 / igraph_blas_dnrm2(authority_vector);
