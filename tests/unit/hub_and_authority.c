@@ -23,32 +23,13 @@
 void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_t scale) {
     igraph_arpack_options_t options;
     igraph_vector_t hub_vector, authority_vector;
-    igraph_real_t hub_value, authority_value, value;
+    igraph_real_t value;
 
     igraph_arpack_options_init(&options);
     igraph_vector_init(&hub_vector, 0);
     igraph_vector_init(&authority_vector, 0);
 
     printf("--------------------------------------------------\n");
-    printf("Calculate hub and authority separately:\n");
-    igraph_hub_score(g, &hub_vector, &hub_value,
-                                    scale, weights, &options);
-    igraph_authority_score(g,
-            &authority_vector, &authority_value,
-            scale, weights, &options);
-    vector_chop(&hub_vector, 10e-10);
-    vector_chop(&authority_vector, 10e-10);
-    printf("hub:\n");
-    print_vector(&hub_vector);
-    printf("value:\n");
-    print_real(stdout, hub_value, "%g");
-    printf("\n");
-    printf("authority:\n");
-    print_vector(&authority_vector);
-    printf("value:\n");
-    print_real(stdout, authority_value, "%g");
-    printf("\n\n");
-    printf("Calculate hub and authority simultaneously:\n");
     igraph_hub_and_authority_scores(g, &hub_vector, &authority_vector, &value,
                                     scale, weights, &options);
     vector_chop(&hub_vector, 10e-10);
