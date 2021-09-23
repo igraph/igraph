@@ -1,2 +1,0 @@
-toc.html
-toc-*.html
