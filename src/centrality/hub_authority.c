@@ -202,11 +202,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
             *value = igraph_ecount(graph) ? 1.0 : IGRAPH_NAN;
         }
         if (hub_vector) {
-            igraph_vector_resize(hub_vector, no_of_nodes);
+            IGRAPH_CHECK(igraph_vector_resize(hub_vector, no_of_nodes));
             igraph_vector_fill(hub_vector, 1.0);
         }
         if (authority_vector) {
-            igraph_vector_resize(authority_vector, no_of_nodes);
+            IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
             igraph_vector_fill(authority_vector, 1.0);
         }
         return IGRAPH_SUCCESS;
@@ -232,11 +232,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                 *value = IGRAPH_NAN;
             }
             if (hub_vector) {
-                igraph_vector_resize(hub_vector, no_of_nodes);
+                IGRAPH_CHECK(igraph_vector_resize(hub_vector, no_of_nodes));
                 igraph_vector_fill(hub_vector, 1);
             }
             if (authority_vector) {
-                igraph_vector_resize(authority_vector, no_of_nodes);
+                IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
                 igraph_vector_fill(authority_vector, 1);
             }
             return IGRAPH_SUCCESS;
