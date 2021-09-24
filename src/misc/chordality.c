@@ -244,7 +244,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  * adjacent in the cycle. An equivalent definition is that any
  * chordless cycles have at most three nodes.
  *
- * If either \p alpha or \p alpha1 is given, then the other is
+ * If either \p alpha or \p alpham1 is given, then the other is
  * calculated by taking simply the inverse. If neither are given,
  * then \ref igraph_maximum_cardinality_search() is called to calculate
  * them.
@@ -258,9 +258,13 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  *    pointer.
  * \param chordal Pointer to a boolean. If not NULL the result is stored here.
  * \param fill_in Pointer to an initialized vector, or a \c NULL
- *    pointer. If not a \c NULL pointer, then the fill-in of the graph is
- *    stored here. The fill-in is the set of edges that are needed to
+ *    pointer. If not a \c NULL pointer, then the fill-in, also called the
+ *    chordal completion of the graph is stored here.
+ *    The chordal completion is a set of edges that are needed to
  *    make the graph chordal. The vector is resized as needed.
+ *    Note that the chordal completion returned by this function may not
+ *    be minimal, i.e. some of the returned fill-in edges may not be needed
+ *    to make the graph chordal.
  * \param newgraph Pointer to an uninitialized graph, or a \c NULL
  *   pointer. If not a null pointer, then a new triangulated graph is
  *   created here. This essentially means adding the fill-in edges to
