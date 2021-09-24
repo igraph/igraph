@@ -256,6 +256,7 @@ add_legacy_tests(
   all_shortest_paths
   efficiency
   global_transitivity
+  hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
   igraph_average_path_length
