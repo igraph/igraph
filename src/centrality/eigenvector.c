@@ -481,9 +481,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *     in a directed graph. It is ignored for undirected graphs.
  * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
- * \param weights A null pointer (=no edge weights), or a vector
- *     giving the weights of the edges. The algorithm might result
- *     complex numbers is some weights are negative. In this case only
+ * \param weights A null pointer (= no edge weights), or a vector
+ *     giving the weights of the edges. The algorithm might produce
+ *     complex numbers when some weights are negative. In this case only
  *     the real part is reported.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the

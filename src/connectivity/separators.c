@@ -406,22 +406,35 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
  * separators for some (s,t) vertex pair.
  *
  * </para><para>
+ * Note that some vertex sets returned by this function may not be minimal
+ * with respect to disconnecting the graph (or increasing the number of
+ * connected components). Take for example the 5-vertex graph with edges
+ * <code>0-1-2-3-4-1</code>. This function returns the vertex sets
+ * <code>{1}</code>, <code>{2,4}</code> and <code>{1,3}</code>.
+ * Notice that <code>{1,3}</code> is not minimal with respect to disconnecting
+ * the graph, as <code>{1}</code> would be sufficient for that. However, it is
+ * minimal with respect to separating vertices \c 2 and \c 4.
+ *
+ * </para><para>
  * See more about the implemented algorithm in
  * Anne Berry, Jean-Paul Bordat and Olivier Cogis: Generating All the
  * Minimal Separators of a Graph, In: Peter Widmayer, Gabriele Neyer
  * and Stephan Eidenbenz (editors): Graph-theoretic concepts in
  * computer science, 1665, 167--172, 1999. Springer.
+ * https://doi.org/10.1007/3-540-46784-X_17
  *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
  * \param separators An initialized pointer vector, the separators
- *        are stored here. It is a list of pointers to igraph_vector_int_t
- *        objects. Each vector will contain the IDs of the vertices in
+ *        are stored here. It is a list of pointers to <type>igraph_vector_int_t</type>
+ *        objects. Each vector will contain the ids of the vertices in
  *        the separator.
- *        To free all memory allocated for \c separators, you need call
+ *        To free all memory allocated for \p separators, you need call
  *        \ref igraph_vector_destroy() and then \ref igraph_free() on
  *        each element, before destroying the pointer vector itself.
  * \return Error code.
+ *
+ * \sa \ref igraph_minimum_size_separators()
  *
  * Time complexity: O(n|V|^3), |V| is the number of vertices, n is the
  * number of separators.
