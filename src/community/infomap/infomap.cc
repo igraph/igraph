@@ -220,34 +220,32 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
 /**
  * \function igraph_community_infomap
- * \brief Find community structure that minimizes the expected
- * description length of a random walker trajectory.
+ * \brief Find community structure that minimizes the expected description length of a random walker trajectory.
  *
- * Implementation of the InfoMap community detection algorithm.of
+ * Implementation of the InfoMap community detection algorithm of
  * Martin Rosvall and Carl T. Bergstrom.
  *
- * See :
- * Visualization of the math and the map generator: www.mapequation.org
- * [2] The original paper: M. Rosvall and C. T. Bergstrom, Maps of
- * information flow reveal community structure in complex networks, PNAS
- * 105, 1118 (2008) [http://dx.doi.org/10.1073/pnas.0706851105 ,
- * http://arxiv.org/abs/0707.0609 ]
- * [3] A more detailed paper: M. Rosvall, D. Axelsson, and C. T. Bergstrom,
- * The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).
- * [http://dx.doi.org/10.1140/epjst/e2010-01179-1 ,
- * http://arxiv.org/abs/0906.1405 ]
+ * </para><para>
+ * For more details, see the visualization of the math and the map generator
+ * at https://www.mapequation.org . The original paper describing the algorithm
+ * is: M. Rosvall and C. T. Bergstrom, Maps of information flow reveal community
+ * structure in complex networks, PNAS 105, 1118 (2008)
+ * (http://dx.doi.org/10.1073/pnas.0706851105, http://arxiv.org/abs/0707.0609).
+ * A more detailed paper about the algorithm is: M. Rosvall, D. Axelsson, and
+ * C. T. Bergstrom, The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).
+ * (http://dx.doi.org/10.1140/epjst/e2010-01179-1, http://arxiv.org/abs/0906.1405)
 
  * </para><para>
  * The original C++ implementation of Martin Rosvall is used,
  * see http://www.tp.umu.se/~rosvall/downloads/infomap_undir.tgz .
- * Intergation in igraph has be done by Emmanuel Navarro (who is grateful to
-  * Martin Rosvall and Carl T. Bergstrom for providing this source code.)
+ * Intergation in igraph was done by Emmanuel Navarro (who is grateful to
+ * Martin Rosvall and Carl T. Bergstrom for providing this source code.)
  *
  * </para><para>
  * Note that the graph must not contain isolated vertices.
  *
  * </para><para>
- * If you want to specify a random seed (as in original
+ * If you want to specify a random seed (as in the original
  * implementation) you can use \ref igraph_rng_seed().
  *
  * \param graph The input graph.

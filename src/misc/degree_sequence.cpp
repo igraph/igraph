@@ -690,7 +690,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * S. L. Hakimi,
  * On Realizability of a Set of Integers as Degrees of the Vertices of a Linear Graph,
  * Journal of the SIAM 10, 3 (1962).
- * https://www.jstor.org/stable/2098746
+ * https://www.jstor.org/stable/2098770
  *
  * </para><para>
  * D. J. Kleitman and D. L. Wang,
