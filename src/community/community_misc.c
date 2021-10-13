@@ -271,7 +271,7 @@ int igraph_reindex_membership(igraph_vector_t *membership,
         long int c = (long int)VECTOR(*membership)[i];
 
         if (c < 0) {
-            IGRAPH_ERRORF("Membership indices should non-negative. "
+            IGRAPH_ERRORF("Membership indices should be non-negative. "
             "Found member of cluster %ld.", IGRAPH_EINVAL, c);
         }
 
