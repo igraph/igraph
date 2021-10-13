@@ -162,7 +162,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  * Cohesive blocking is a process through which, given a
  * k-cohesive set of vertices, maximally l-cohesive subsets are
  * recursively identified with l>k. Thus a hiearchy of vertex subsets
- * is found, whith the entire graph G at its root. See the following
+ * is found, with the entire graph G at its root. See the following
  * reference for details: J. Moody and D. R. White. Structural
  * cohesion and embeddedness: A hierarchical concept of social
  * groups. American Sociological Review, 68(1):103--127, Feb 2003.

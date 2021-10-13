@@ -345,7 +345,7 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
         node = net_iter.First(net->node_list);
         SPIN = i_iter.First(new_spins);
         while (!net_iter.End()) {
-            // How many neigbors of each type?
+            // How many neighbors of each type?
             // set them all zero
             for (unsigned long i = 0; i <= q; i++) {
                 neighbours[i] = 0;

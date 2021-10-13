@@ -80,7 +80,7 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
  * of the population might be in three states: susceptible, infected
  * and recovered. Recovered people are assumed to be immune to the
  * disease. Susceptibles become infected with a rate that depends on
- * their number of infected neigbors. Infected people become recovered
+ * their number of infected neighbors. Infected people become recovered
  * with a constant rate. See these parameters below.
  *
  * </para><para>
