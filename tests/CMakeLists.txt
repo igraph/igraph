@@ -287,6 +287,7 @@ add_legacy_tests(
   igraph_pagerank
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
+  igraph_random_walk
   igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
@@ -364,7 +365,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bfs
   bfs_simple
-  igraph_random_walk
+  igraph_random_edge_walk
 )
 
 # topology.at

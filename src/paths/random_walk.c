@@ -31,7 +31,7 @@
 
 /**
  * \function igraph_random_walk
- * Perform a random walk on a graph
+ * \brief Perform a random walk on a graph.
  *
  * Performs a random walk with a given length on a graph, from the given
  * start vertex. Edge directions are (potentially) considered, depending on
@@ -39,11 +39,13 @@
  *
  * \param graph The input graph, it can be directed or undirected.
  *   Multiple edges are respected, so are loop edges.
- * \param walk An allocated vector, the result is stored here.
+ * \param walk An allocated vector, the result is stored here as
+ *   a list of vertex IDs.
  *   It will be resized as needed.
  * \param start The start vertex for the walk.
  * \param steps The number of steps to take. If the random walk gets
- *   stuck, then the \p stuck argument specifies what happens.
+ *   stuck, then the \p stuck argument specifies what happens. The
+ *   starting vertex counts as one step.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
@@ -75,10 +77,14 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *wa
     igraph_integer_t i;
 
     if (start < 0 || start >= vc) {
-        IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Starting vertex must be between 0 and the "
+                      "number of vertices in the graph (%" IGRAPH_PRId
+                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVAL,
+                      vc, start);
     }
     if (steps < 0) {
-        IGRAPH_ERROR("Invalid number of steps", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of steps should be non-negative, got %"
+                      IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
     }
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -100,7 +106,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *wa
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
-                IGRAPH_ERROR("Random walk got stuck", IGRAPH_ERWSTUCK);
+                IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
         start = VECTOR(*walk)[i] = VECTOR(*neis)[ RNG_INTEGER(0, nn - 1) ];
