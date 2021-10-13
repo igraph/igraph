@@ -4,6 +4,8 @@
 
 ### Fixed
 
+ - `igraph_reindex_membership()` does not allow negative membership indices any more.
+
  - `igraph_rewire_directed_edges()` now generates multigraphs when edge directions
    are ignored, to make it consistent with the directed case.
 
