@@ -270,6 +270,11 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     for (i = 0; i < n; i++) {
         igraph_integer_t c = VECTOR(*membership)[i];
 
+        if (c < 0) {
+            IGRAPH_ERRORF("Membership indices should non-negative. "
+            "Found member of cluster %ld.", IGRAPH_EINVAL, c);
+        }
+
         if (c >= n) {
             IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
             "Found member of cluster %ld, but only %ld vertices.", IGRAPH_EINVAL, c, n);
