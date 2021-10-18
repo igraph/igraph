@@ -425,13 +425,6 @@ pacman -S \
       </listitem>
       <listitem>
         <para>
-          <literal>BUILD_TESTING</literal>: whether to build igraph's test suite
-          during the compilation process. Set this option to OFF if you are not
-          interested in building the tests to save some time.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
           <literal>BLA_VENDOR</literal>: controls which library to use for
           <ulink url="https://cmake.org/cmake/help/latest/module/FindBLAS.html">BLAS</ulink>
           and
