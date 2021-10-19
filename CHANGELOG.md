@@ -10,7 +10,12 @@
    are ignored, to make it consistent with the directed case.
 
  - Fixed a bug in `igraph_gomory_hu_tree()` that returned only the equivalent flow
-   tree instead of the cut tree; see Github issue #1810 for more details.
+   tree instead of the cut tree (#1810).
+
+ - Fixed a bug in the `IGRAPH_TO_UNDIRECTED_COLLAPSE` mode of
+   `igraph_to_undirected()` that provided an incorrect merge vector to the
+   attribute handler, leading to problems when edge attributes were merged
+   using an attribute combination (#1814).
 
 ## [0.9.4] - 2021-05-31
 
