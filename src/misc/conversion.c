@@ -443,12 +443,12 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
  *        constant, an undirected edge is created for each directed
  *        one, this version might create graphs with multiple edges;
  *        \c IGRAPH_TO_UNDIRECTED_COLLAPSE: one undirected edge will
- *        be created for each pair of vertices which are connected
+ *        be created for each pair of vertices that are connected
  *        with at least one directed edge, no multiple edges will be
  *        created. \c IGRAPH_TO_UNDIRECTED_MUTUAL creates an undirected
  *        edge for each pair of mutual edges in the directed graph.
- *        Non-mutual edges are lost. This mode might create multiple
- *        edges.
+ *        Non-mutual edges are lost; loop edges are kept unconditionally.
+ *        This mode might create multiple edges.
  * \param edge_comb What to do with the edge attributes. See the igraph
  *        manual section about attributes for details.
  * \return Error code.
@@ -532,11 +532,9 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t n_out, n_in;
             igraph_integer_t p1 = -1, p2 = -1;
-            igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, i,
-                                         IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj, i,
-                                         IGRAPH_IN));
+            igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0, last;
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN));
             n_out = igraph_vector_int_size(&outadj);
             n_in = igraph_vector_int_size(&inadj);
 
@@ -548,71 +546,56 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
         e2 = VECTOR(inadj )[p2]; \
         n2 = IGRAPH_FROM(graph, e2);        \
     }
+#define ADD_NEW_EDGE() { \
+    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i)); \
+    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, last)); \
+}
+#define MERGE_INTO_CURRENT_EDGE(which) { \
+    if (attr) { \
+        VECTOR(mergeinto)[which] = actedge; \
+    } \
+}
 
             STEPOUT();
             STEPIN();
 
             while (p1 < n_out && n1 <= i && p2 < n_in && n2 <= i) {
-                igraph_integer_t last;
-                if (n1 == n2) {
-                    last = n1;
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, n1));
-                    if (attr) {
-                        VECTOR(mergeinto)[e1] = actedge;
-                        VECTOR(mergeinto)[e2] = actedge;
-                        actedge++;
-                    }
-                    while (p1 < n_out && last == n1) {
-                        STEPOUT();
-                    }
-                    while (p2 < n_in  && last == n2) {
-                        STEPIN ();
-                    }
-                } else if (n1 < n2) {
-                    last = n1;
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, n1));
-                    if (attr) {
-                        VECTOR(mergeinto)[e1] = actedge;
-                        actedge++;
-                    }
-                    while (p1 < n_out && last == n1) {
-                        STEPOUT();
-                    }
-                } else { /* n2<n1 */
-                    last = n2;
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, n2));
-                    if (attr) {
-                        VECTOR(mergeinto)[e2] = actedge;
-                        actedge++;
-                    }
-                    while (p2 < n_in && last == n2) {
-                        STEPIN();
-                    }
+                last = (n1 <= n2) ? n1 : n2;
+                ADD_NEW_EDGE();
+                while (p1 < n_out && last == n1) {
+                    MERGE_INTO_CURRENT_EDGE(e1);
+                    STEPOUT();
                 }
+                while (p2 < n_in && last == n2) {
+                    MERGE_INTO_CURRENT_EDGE(e2);
+                    STEPIN();
+                }
+                actedge++;
             }
+
             while (p1 < n_out && n1 <= i) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, n1));
-                if (attr) {
-                    VECTOR(mergeinto)[e1] = actedge;
-                    actedge++;
+                last = n1;
+                ADD_NEW_EDGE();
+                while (p1 < n_out && last == n1) {
+                    MERGE_INTO_CURRENT_EDGE(e1);
+                    STEPOUT();
                 }
-                STEPOUT();
+                actedge++;
             }
+
             while (p2 < n_in && n2 <= i) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, n2));
-                if (attr) {
-                    VECTOR(mergeinto)[e2] = actedge;
-                    actedge++;
+                last = n2;
+                ADD_NEW_EDGE();
+                while (p2 < n_in && last == n2) {
+                    MERGE_INTO_CURRENT_EDGE(e2);
+                    STEPIN();
                 }
-                STEPIN();
+                actedge++;
             }
         }
 
+#undef MERGE_INTO_CURRENT_EDGE
+#undef ADD_NEW_EDGE
 #undef STEPOUT
 #undef STEPIN
 
