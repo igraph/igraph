@@ -34,6 +34,7 @@
 #include "igraph_vector.h"
 
 #include "core/interruption.h"
+#include "operators/subgraph.h"
 
 #include <limits.h>
 
@@ -539,6 +540,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     igraph_dqueue_t q;
     igraph_vector_t verts;
     igraph_vector_t neis;
+    igraph_vector_t vids_old2new;
     long int i;
     igraph_t *newg;
 
@@ -561,6 +563,11 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
     IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&vids_old2new, no_of_nodes);
+
+    /* vids_old2new would have been created internally in igraph_induced_subgraph(),
+       but it is slow if the graph is large and consists of many small components,
+       so we create it once here and then re-use it */
 
     /* add a node and its neighbors at once, recursively
        then switch to next node that has not been added already */
@@ -609,18 +616,26 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
             IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
         }
         IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
-        IGRAPH_CHECK(igraph_induced_subgraph(graph, newg,
-                                             igraph_vss_vector(&verts),
-                                             IGRAPH_SUBGRAPH_AUTO));
+        IGRAPH_CHECK(igraph_i_induced_subgraph_map(
+            graph, newg, igraph_vss_vector(&verts),
+            IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
+            /* invmap = */ 0, /* map_is_prepared = */ 1
+        ));
         resco++;
+
+        /* vids_old2new does not have to be cleaned up here; since we are doing
+         * weak decomposition, each vertex will appear in only one of the
+         * connected components so we won't ever touch an item in vids_old2new
+         * if it was already set to a non-zero value in a previous component */
 
     } /* for actstart++ */
 
+    igraph_vector_destroy(&vids_old2new);
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&verts);
     igraph_dqueue_destroy(&q);
     IGRAPH_FREE(already_added);
-    IGRAPH_FINALLY_CLEAN(5);  /* + components */
+    IGRAPH_FINALLY_CLEAN(6);  /* + components */
 
     return 0;
 }
@@ -647,6 +662,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     igraph_adjlist_t adjlist;
     igraph_vector_t verts;
+    igraph_vector_t vids_old2new;
     igraph_t *newg;
 
     if (maxcompno < 0) {
@@ -658,6 +674,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     /* The result */
 
+    IGRAPH_VECTOR_INIT_FINALLY(&vids_old2new, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&next_nei, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&out, 0);
@@ -669,6 +686,10 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+    /* vids_old2new would have been created internally in igraph_induced_subgraph(),
+       but it is slow if the graph is large and consists of many small components,
+       so we create it once here and then re-use it */
 
     /* number of components seen */
     num_seen = 0;
@@ -809,9 +830,21 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
             IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
         }
         IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
-        IGRAPH_CHECK(igraph_induced_subgraph(graph, newg,
-                                             igraph_vss_vector(&verts),
-                                             IGRAPH_SUBGRAPH_AUTO));
+        IGRAPH_CHECK(igraph_i_induced_subgraph_map(
+            graph, newg, igraph_vss_vector(&verts),
+            IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
+            /* invmap = */ 0, /* map_is_prepared = */ 1
+        ));
+
+        /* vids_old2new has to be cleaned up here because a vertex may appear
+         * in multiple strongly connected components. Simply calling
+         * igraph_vector_fill() would be an O(n) operation where n is the number
+         * of vertices in the large graph so we cannot do that; we have to
+         * iterate over 'verts' instead */
+        n = igraph_vector_size(&verts);
+        for (i = 0; i < n; i++) {
+            VECTOR(vids_old2new)[(igraph_integer_t) VECTOR(verts)[i]] = 0;
+        }
 
         no_of_clusters++;
     }
@@ -820,12 +853,13 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     /* Clean up, return */
 
+    igraph_vector_destroy(&vids_old2new);
     igraph_vector_destroy(&verts);
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_destroy(&out);
     igraph_dqueue_destroy(&q);
     igraph_vector_destroy(&next_nei);
-    IGRAPH_FINALLY_CLEAN(6);  /* + components */
+    IGRAPH_FINALLY_CLEAN(7);  /* + components */
 
     return 0;
 
