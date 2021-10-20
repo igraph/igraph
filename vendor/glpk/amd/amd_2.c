@@ -14,8 +14,6 @@
  * AMD_postorder routine.
  */
 
-#pragma clang diagnostic ignored "-Wconversion"
-
 #include "amd_internal.h"
 
 /* ========================================================================= */
@@ -548,7 +546,7 @@ GLOBAL void AMD_2
  * p1:          Pe [i] for some variable i (start of element list)
  * p2:          Pe [i] + Elen [i] -  1 for some variable i
  * p3:          index of first supervariable in clean list
- * p4:          
+ * p4:
  * pdst:        destination pointer, for compression
  * pend:        end of memory to compress
  * pj:          pointer into an element or variable
