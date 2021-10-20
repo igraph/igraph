@@ -16,7 +16,7 @@ add_library(
   api/prrngs.c api/prsol.c api/rdasn.c api/rdcc.c api/rdcnf.c api/rdipt.c
   api/rdmaxf.c api/rdmcf.c api/rdmip.c api/rdprob.c api/rdsol.c api/rmfgen.c
   api/strong.c api/topsort.c api/wcliqex.c api/weak.c api/wrasn.c api/wrcc.c
-  api/wrcnf.c api/wript.c api/wrmaxf.c api/wrmcf.c api/wrprob.c
+  api/wrcnf.c api/wript.c api/wrmaxf.c api/wrmcf.c api/wrmip.c api/wrprob.c
   api/wrsol.c
 
   bflib/btf.c bflib/btfint.c bflib/fhv.c bflib/fhvint.c bflib/ifu.c bflib/luf.c
@@ -31,7 +31,7 @@ add_library(
   draft/glpmat.c draft/glpscl.c draft/glpssx01.c draft/glpssx02.c draft/lux.c
 
   env/alloc.c env/dlsup.c env/env.c env/error.c env/stdc.c env/stdout.c
-  env/time.c env/tls.c
+  env/stream.c env/time.c env/tls.c
 
   intopt/cfg.c intopt/cfg1.c intopt/cfg2.c intopt/clqcut.c intopt/covgen.c
   intopt/fpump.c intopt/gmicut.c intopt/gmigen.c intopt/mirgen.c intopt/spv.c
@@ -57,8 +57,6 @@ add_library(
   simplex/spychuzr.c simplex/spydual.c
 
   # amd/amd_dump.c has no symbols
-  # env/stream.c excluded due to its dependence on zlib
-  # api/wrmip.c excluded due to its dependence on env/stream.c
 )
 
 target_include_directories(
