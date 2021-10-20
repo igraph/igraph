@@ -117,28 +117,8 @@ glp_file *glp_open(const char *name, const char *mode)
       }
       else
       {  char *ext = strrchr(name, '.');
-         if (ext == NULL || strcmp(ext, ".gz") != 0)
+         /* if (ext == NULL || strcmp(ext, ".gz") != 0) */
          {  file = fopen(name, mode);
-            if (file == NULL)
-#if 0 /* 29/I-2017 */
-            {  put_err_msg(strerror(errno));
-#else
-            {  put_err_msg(xstrerr(errno));
-#endif
-               return NULL;
-            }
-         }
-         else
-         {  flag |= IOGZIP;
-            if (strcmp(mode, "r") == 0)
-               mode = "rb";
-            else if (strcmp(mode, "w") == 0)
-               mode = "wb";
-#if 1 /* 08/V-2014; this mode seems not to work */
-            else if (strcmp(mode, "a") == 0)
-               mode = "ab";
-#endif
-            file = gzopen(name, mode);
             if (file == NULL)
 #if 0 /* 29/I-2017 */
             {  put_err_msg(strerror(errno));
@@ -240,7 +220,7 @@ int glp_read(glp_file *f, void *buf, int nnn)
          {  /* buffer is empty; fill it */
             if (f->flag & IONULL)
                cnt = 0;
-            else if (!(f->flag & IOGZIP))
+            else
             {  cnt = fread(f->base, 1, f->size, (FILE *)(f->file));
                if (ferror((FILE *)(f->file)))
                {  f->flag |= IOERR;
@@ -249,24 +229,6 @@ int glp_read(glp_file *f, void *buf, int nnn)
 #else
                   put_err_msg(xstrerr(errno));
 #endif
-                  return EOF;
-               }
-            }
-            else
-            {  int errnum;
-               const char *msg;
-               cnt = gzread((gzFile)(f->file), f->base, f->size);
-               if (cnt < 0)
-               {  f->flag |= IOERR;
-                  msg = gzerror((gzFile)(f->file), &errnum);
-                  if (errnum == Z_ERRNO)
-#if 0 /* 29/I-2017 */
-                     put_err_msg(strerror(errno));
-#else
-                     put_err_msg(xstrerr(errno));
-#endif
-                  else
-                     put_err_msg(msg);
                   return EOF;
                }
             }
@@ -332,7 +294,7 @@ static int do_flush(glp_file *f)
       if (f->cnt > 0)
       {  if (f->flag & IONULL)
             ;
-         else if (!(f->flag & IOGZIP))
+         else
          {  if ((int)fwrite(f->base, 1, f->cnt, (FILE *)(f->file))
                != f->cnt)
             {  f->flag |= IOERR;
@@ -341,23 +303,6 @@ static int do_flush(glp_file *f)
 #else
                put_err_msg(xstrerr(errno));
 #endif
-               return EOF;
-            }
-         }
-         else
-         {  int errnum;
-            const char *msg;
-            if (gzwrite((gzFile)(f->file), f->base, f->cnt) != f->cnt)
-            {  f->flag |= IOERR;
-               msg = gzerror((gzFile)(f->file), &errnum);
-               if (errnum == Z_ERRNO)
-#if 0 /* 29/I-2017 */
-                  put_err_msg(strerror(errno));
-#else
-                  put_err_msg(xstrerr(errno));
-#endif
-               else
-                  put_err_msg(msg);
                return EOF;
             }
          }
@@ -469,7 +414,7 @@ int glp_close(glp_file *f)
       }
       if (f->flag & (IONULL | IOSTD))
          ;
-      else if (!(f->flag & IOGZIP))
+      else
       {  if (fclose((FILE *)(f->file)) != 0)
          {  if (ret == 0)
 #if 0 /* 29/I-2017 */
@@ -480,32 +425,6 @@ int glp_close(glp_file *f)
                ret = EOF;
             }
          }
-      }
-      else
-      {  int errnum;
-         errnum = gzclose((gzFile)(f->file));
-         if (errnum == Z_OK)
-            ;
-         else if (errnum == Z_ERRNO)
-         {  if (ret == 0)
-#if 0 /* 29/I-2017 */
-            {  put_err_msg(strerror(errno));
-#else
-            {  put_err_msg(xstrerr(errno));
-#endif
-               ret = EOF;
-            }
-         }
-#if 1 /* FIXME */
-         else
-         {  if (ret == 0)
-            {  ENV *env = get_env_ptr();
-               sprintf(env->term_buf, "gzclose returned %d", errnum);
-               put_err_msg(env->term_buf);
-               ret = EOF;
-            }
-         }
-#endif
       }
       tfree(f->base);
       tfree(f);
