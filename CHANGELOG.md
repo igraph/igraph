@@ -508,6 +508,14 @@
    attribute handler, leading to problems when edge attributes were merged
    using an attribute combination (#1814).
 
+### Other
+
+ - `igraph_decompose()` is now much faster for large graphs containing many
+   isolates or small components (#960)
+
+ - `igraph_largest_cliques()` and `igraph_clique_number()` were re-written to
+   use `igraph_maximal_cliques_callback()` so they are much faster now (#804)
+
 ## [0.9.4] - 2021-05-31
 
 ### Changed
