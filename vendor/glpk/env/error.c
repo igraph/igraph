@@ -47,6 +47,8 @@ static void errfunc(const char *fmt, ...)
       env->term_out = GLP_ON;
       va_start(arg, fmt);
       igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
+      if (env->err_hook != NULL)
+         env->err_hook(env->err_info);
       /* no return */
 }
 
