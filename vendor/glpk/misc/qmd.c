@@ -21,7 +21,7 @@ void genqmd(int *neqns, int xadj[], int adjncy[], int perm[],
       xassert(nofsub == nofsub);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
 }
 
 void qmdrch(int *root, int xadj[], int adjncy[], int deg[],
@@ -39,7 +39,7 @@ void qmdrch(int *root, int xadj[], int adjncy[], int deg[],
       xassert(nbrhd == nbrhd);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
 }
 
 void qmdqt(int *root, int xadj[], int adjncy[], int marker[],
@@ -54,7 +54,7 @@ void qmdqt(int *root, int xadj[], int adjncy[], int marker[],
       xassert(nbrhd == nbrhd);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
 }
 
 void qmdupd(int xadj[], int adjncy[], int *nlist, int list[],
@@ -73,7 +73,7 @@ void qmdupd(int xadj[], int adjncy[], int *nlist, int list[],
       xassert(nbrhd == nbrhd);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
 }
 
 void qmdmrg(int xadj[], int adjncy[], int deg[], int qsize[],
@@ -93,7 +93,7 @@ void qmdmrg(int xadj[], int adjncy[], int deg[], int qsize[],
       xassert(ovrlp == ovrlp);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+     /*  abort(); */
 }
 
 /* eof */

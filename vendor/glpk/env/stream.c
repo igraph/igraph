@@ -103,6 +103,7 @@ glp_file *glp_open(const char *name, const char *mode)
       {  flag |= IONULL;
          file = NULL;
       }
+      /*
       else if (strcmp(name, "/dev/stdin") == 0)
       {  flag |= IOSTD;
          file = stdin;
@@ -115,6 +116,7 @@ glp_file *glp_open(const char *name, const char *mode)
       {  flag |= IOSTD;
          file = stderr;
       }
+      */
       else
       {  char *ext = strrchr(name, '.');
          /* if (ext == NULL || strcmp(ext, ".gz") != 0) */

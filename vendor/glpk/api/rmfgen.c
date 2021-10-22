@@ -13,7 +13,7 @@ int glp_rmfgen(glp_graph *G_, int *s_, int *t_, int a_cap_,
       xassert(parm == parm);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
       return -1;
 }
 
