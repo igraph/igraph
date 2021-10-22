@@ -813,6 +813,7 @@ add_benchmarks(
   igraph_cliques
   igraph_closeness_weighted
   igraph_coloring
+  igraph_decompose
   igraph_maximal_cliques
   igraph_pagerank
   igraph_pagerank_weighted

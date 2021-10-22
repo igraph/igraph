@@ -26,17 +26,18 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
-#include "graph/attributes.h"
 #include "core/interruption.h"
+#include "graph/attributes.h"
+#include "operators/subgraph.h"
 
 /**
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
-                                             const igraph_vs_t vids,
-                                             igraph_vector_t *map,
-                                             igraph_vector_t *invmap) {
+static int igraph_i_induced_subgraph_copy_and_delete(
+    const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
+    igraph_vector_t *map, igraph_vector_t *invmap
+) {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *remain;
@@ -86,12 +87,18 @@ static int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *re
 /**
  * Subgraph creation, new version: creates the new graph instead of
  * copying the old one.
+ *
+ * map_is_prepared is an indicator that the caller has already prepared the
+ * 'map' vector and that this function should not resize or clear it. This
+ * is used to spare an O(n) operation (where n is the number of vertices in
+ * the _original_ graph) in cases when induced_subgraph() is repeatedly
+ * called on the same graph; one example is igraph_decompose().
  */
-static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
-                                                 igraph_t *res,
-                                                 const igraph_vs_t vids,
-                                                 igraph_vector_t *map,
-                                                 igraph_vector_t *invmap) {
+static int igraph_i_induced_subgraph_create_from_scratch(
+    const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
+    igraph_vector_t *map, igraph_vector_t *invmap,
+    igraph_bool_t map_is_prepared
+) {
     igraph_bool_t directed = igraph_is_directed(graph);
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_new_nodes = 0;
@@ -119,8 +126,10 @@ static int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&nei_edges, 0);
     if (map) {
         my_vids_old2new = map;
-        IGRAPH_CHECK(igraph_vector_resize(map, no_of_nodes));
-        igraph_vector_null(map);
+        if (!map_is_prepared) {
+            IGRAPH_CHECK(igraph_vector_resize(map, no_of_nodes));
+            igraph_vector_null(map);
+        }
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&vids_old2new, no_of_nodes);
     }
@@ -323,11 +332,12 @@ static int igraph_i_induced_subgraph_suggest_implementation(
     return 0;
 }
 
-int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
-                                const igraph_vs_t vids,
-                                igraph_subgraph_implementation_t impl,
-                                igraph_vector_t *map,
-                                igraph_vector_t *invmap) {
+int igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+                                  const igraph_vs_t vids,
+                                  igraph_subgraph_implementation_t impl,
+                                  igraph_vector_t *map,
+                                  igraph_vector_t *invmap,
+                                  igraph_bool_t map_is_prepared) {
 
     if (impl == IGRAPH_SUBGRAPH_AUTO) {
         IGRAPH_CHECK(igraph_i_induced_subgraph_suggest_implementation(graph, vids, &impl));
@@ -335,15 +345,23 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 
     switch (impl) {
     case IGRAPH_SUBGRAPH_COPY_AND_DELETE:
-        return igraph_i_subgraph_copy_and_delete(graph, res, vids, map, invmap);
+        return igraph_i_induced_subgraph_copy_and_delete(graph, res, vids, map, invmap);
 
     case IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH:
-        return igraph_i_subgraph_create_from_scratch(graph, res, vids, map,
-                invmap);
+        return igraph_i_induced_subgraph_create_from_scratch(graph, res, vids, map,
+                invmap, /* map_is_prepared = */ map_is_prepared);
 
     default:
         IGRAPH_ERROR("unknown subgraph implementation type", IGRAPH_EINVAL);
     }
+}
+
+int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+                                const igraph_vs_t vids,
+                                igraph_subgraph_implementation_t impl,
+                                igraph_vector_t *map,
+                                igraph_vector_t *invmap) {
+    return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ 0);
 }
 
 /**
