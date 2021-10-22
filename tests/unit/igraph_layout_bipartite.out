@@ -35,7 +35,7 @@ No vertices:
          1        0 ]
 4 vertices, negative vgaps:
 [        0       -1
-         0       -0
+         0        0
          1       -1
-         1       -0 ]
+         1        0 ]
 4 vertices, negative hgaps, emits error.
