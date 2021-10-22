@@ -26,6 +26,8 @@
 #include "glpk.h"
 #include "env.h"
 
+#include "igraph_error.h"
+
 /***********************************************************************
 *  NAME
 *
@@ -141,19 +143,17 @@ ENV *get_env_ptr(void)
       {  /* not initialized yet; perform initialization */
          if (glp_init_env() != 0)
          {  /* initialization failed; display an error message */
-            fprintf(stderr, "GLPK initialization failed\n");
-            fflush(stderr);
-            /* and abnormally terminate the program */
-            abort();
+            IGRAPH_ERROR_NO_RETURN("GLPK initialization failed", IGRAPH_EGLP);
+            return 0;
          }
          /* initialization successful; retrieve the pointer */
          env = tls_get_ptr();
       }
       /* check if the environment block is valid */
       if (env->self != env)
-      {  fprintf(stderr, "Invalid GLPK environment\n");
-         fflush(stderr);
-         abort();
+      {
+         IGRAPH_ERROR_NO_RETURN("Invalid GLPK environment", IGRAPH_EGLP);
+         return 0;
       }
       return env;
 }
@@ -281,9 +281,9 @@ int glp_free_env(void)
          return 1;
       /* check if the environment block is valid */
       if (env->self != env)
-      {  fprintf(stderr, "Invalid GLPK environment\n");
-         fflush(stderr);
-         abort();
+      {
+         IGRAPH_ERROR_NO_RETURN("Invalid GLPK environment", IGRAPH_EGLP);
+         return 1;
       }
       /* close handles to shared libraries */
       if (env->h_odbc != NULL)

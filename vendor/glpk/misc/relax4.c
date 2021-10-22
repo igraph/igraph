@@ -8,7 +8,7 @@ int relax4(struct relax4_csa *csa)
       xassert(csa == csa);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
       return -1;
 }
 
@@ -17,7 +17,7 @@ void relax4_inidat(struct relax4_csa *csa)
       xassert(csa == csa);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
 }
 
 /* eof */

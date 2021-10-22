@@ -13,7 +13,7 @@ int glp_gridgen(glp_graph *G_, int v_rhs_, int a_cap_, int a_cost_,
       xassert(parm == parm);
       xerror("%s: sorry, this routine is temporarily disabled due to li"
          "censing problems\n", func);
-      abort();
+      /* abort(); */
       return -1;
 }
 
