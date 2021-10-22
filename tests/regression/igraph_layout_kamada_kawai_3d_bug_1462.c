@@ -23,7 +23,7 @@ int main() {
         return 4;
     }
 
-    igraph_matrix_printf(&layout, "%.2f");
+    print_matrix_format(&layout, stdout, "%.2f");
 
     igraph_matrix_destroy(&layout);
     igraph_destroy(&graph);
