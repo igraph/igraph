@@ -8,5 +8,3 @@
 /build
 /build-*
 /tools/**/*.pyc
-/cmake-build*
-.idea
