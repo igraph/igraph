@@ -47,7 +47,7 @@ following contents:
 
 <programlisting>
 cmake_minimum_required(VERSION 3.16)
-project(igraph_test C)
+project(igraph_test)
 
 find_package(igraph REQUIRED)
 
@@ -84,6 +84,14 @@ If configuration has succeeded, build the program using
 cmake --build .
 </programlisting>
 </para>
+
+<note><title>C++ has to be enabled in igraph projects</title>
+<para>Parts of igraph are implemented in C++; therefore, any CMake target that
+depends on igraph should use the C++ linker. Furthermore, OpenMP support in
+igraph works correctly only if C++ is enabled in the CMake project. The script
+that finds igraph on the host machine will throw an error if C++ support is
+not enabled in the CMake project.</para>
+</note>
 
 </section>
 
