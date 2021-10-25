@@ -120,8 +120,8 @@ unsigned long PottsModel::assign_initial_conf(int spin) {
     NNode *n_cur;
     NLink *l_cur;
     double sum_weight;
-    double av_k_squared = 0.0;
-    double av_k = 0.0;
+    //double av_k_squared = 0.0;
+    //double av_k = 0.0;
 //   printf("Assigning initial configuration...\n");
     // initialize colorfield
     for (unsigned int i = 0; i <= q; i++) {
@@ -146,8 +146,8 @@ unsigned long PottsModel::assign_initial_conf(int spin) {
         // we set the sum of the weights or the degree as the weight of the node, this way
         // we do not have to calculate it again.
         n_cur->Set_Weight(sum_weight);
-        av_k_squared += sum_weight * sum_weight;
-        av_k += sum_weight;
+        //av_k_squared += sum_weight * sum_weight;
+        //av_k += sum_weight;
 
         // in case we want all links to be contribute equally - parameter gamm=fixed
         if (operation_mode == 0) {
@@ -159,8 +159,8 @@ unsigned long PottsModel::assign_initial_conf(int spin) {
         total_degree_sum += sum_weight;
         n_cur = iter.Next();
     }
-    av_k_squared /= double(net->node_list->Size());
-    av_k /= double(net->node_list->Size());
+    //av_k_squared /= double(net->node_list->Size());
+    //av_k /= double(net->node_list->Size());
     // total_degree_sum-=av_k_squared/av_k;
 //   printf("Total Degree Sum=2M=%f\n",total_degree_sum);
     return net->node_list->Size();
