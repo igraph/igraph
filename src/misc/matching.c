@@ -519,12 +519,6 @@ static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
     return IGRAPH_SUCCESS;
 }
 
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-but-set-variable"
-#endif
-
 /**
  * Finding maximum bipartite matchings on bipartite graphs using the
  * Hungarian algorithm (a.k.a. Kuhn-Munkres algorithm).
@@ -559,6 +553,7 @@ static int igraph_i_maximum_bipartite_matching_weighted(
     long int smaller_set_size;        /* size of the smaller set */
     long int larger_set_size;         /* size of the larger set */
     igraph_real_t dual;               /* solution of the dual problem */
+    IGRAPH_UNUSED(dual);              /* We mark it as unused to prevent warnings about unused-but-set-variables. */
     igraph_adjlist_t tight_phantom_edges; /* adjacency list to manage tight phantom edges */
     igraph_integer_t alternating_path_endpoint;
     igraph_vector_int_t* neis;
@@ -1020,10 +1015,6 @@ static int igraph_i_maximum_bipartite_matching_weighted(
 
     return IGRAPH_SUCCESS;
 }
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
                             igraph_real_t* matching_weight, igraph_vector_long_t* matching,

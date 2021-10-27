@@ -198,6 +198,8 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_vector_int_t *neis;
     long int father;
     long int i, j, s;
+    long int motifs = 0;
+    IGRAPH_UNUSED(motifs);    /* We mark it as unused to prevent warnings about unused-but-set-variables. */
 
     igraph_vector_t vids;     /* this is G */
     igraph_vector_t adjverts; /* this is V_E */
@@ -308,6 +310,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
                     if (cp != 0 && RNG_UNIF01() < cp) {
                         continue;
                     }
+                    motifs += 1;
 
                     last = (long int) VECTOR(adjverts)[2 * i];
                     IGRAPH_CHECK(igraph_vector_push_back(&vids, last));
