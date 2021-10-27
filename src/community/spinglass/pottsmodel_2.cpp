@@ -122,6 +122,9 @@ unsigned long PottsModel::assign_initial_conf(int spin) {
     double sum_weight;
     double av_k_squared = 0.0;
     double av_k = 0.0;
+    IGRAPH_UNUSED(av_k_squared); /* We mark it as unused to prevent warnings about unused-but-set-variables. */
+    IGRAPH_UNUSED(av_k);         /* We mark it as unused to prevent warnings about unused-but-set-variables. */
+
 //   printf("Assigning initial configuration...\n");
     // initialize colorfield
     for (unsigned int i = 0; i <= q; i++) {
