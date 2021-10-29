@@ -300,7 +300,7 @@ igraph_static_power_law_game:
         PARAMS: OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges, \
                 REAL exponent_out, REAL exponent_in=-1, \
                 BOOLEAN loops=False, BOOLEAN multiple=False, \
-		BOOLEAN finite_size_correction=True
+                BOOLEAN finite_size_correction=True
         NAME-R: sample_fitness_pl
         GATTR-R: name IS Static power law model
         GATTR-PARAM-R: exponent_out, exponent_in, loops, multiple, \
@@ -588,7 +588,7 @@ igraph_path_length_hist:
 igraph_simplify:
         PARAMS: INOUT GRAPH graph, BOOLEAN remove_multiple=True, \
                 BOOLEAN remove_loops=True, \
-		EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
+                EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
         NAME-R: simplify
 
 igraph_transitivity_undirected:
@@ -639,7 +639,7 @@ igraph_neighborhood:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST res, \
                 VERTEXSET vids, INTEGER order, \
                 NEIMODE mode=ALL, INTEGER mindist=0
-        DEPS res ON graph, vids ON graph
+        DEPS: res ON graph, vids ON graph
         IGNORE: RR, RC
 
 igraph_neighborhood_graphs:
@@ -863,7 +863,7 @@ igraph_diversity:
 
 igraph_random_walk:
         PARAMS: GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode=OUT, \
-	        INTEGER steps, RWSTUCK stuck=RETURN
+                INTEGER steps, RWSTUCK stuck=RETURN
         DEPS: start ON graph, walk ON graph
         NAME-R: random_walk
         IGNORE: RR
@@ -1139,7 +1139,7 @@ igraph_layout_fruchterman_reingold_3d:
         PARAMS: GRAPH graph, INOUT MATRIX coords=NULL, \
                 BOOLEAN use_seed=False, INTEGER niter=500, \
                 REAL start_temp=sqrt(vcount(graph)), \
-		EDGEWEIGHTS weights=NULL, \
+                EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
                 VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
                 VECTOR_OR_0 minz=NULL, VECTOR_OR_0 maxz=NULL, \
@@ -1361,7 +1361,7 @@ igraph_community_leading_eigenvector:
 
 igraph_community_fluid_communities:
         PARAMS: GRAPH graph, INTEGER no_of_communities, \
-		            OUT VECTOR membership, OUT REALPTR modularity
+                OUT VECTOR membership, OUT REALPTR modularity
         NAME-R: cluster_fluid_communities
 
 igraph_community_label_propagation:
@@ -1376,7 +1376,7 @@ igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 REAL resolution=1.0, \
                 OUT VECTOR membership, \
-		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
+                OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
         NAME-R: cluster_louvain
         IGNORE: RR
@@ -1401,7 +1401,7 @@ igraph_community_leiden:
 
 igraph_split_join_distance:
         PARAMS: VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12, \
-		        OUT INTEGERPTR distance21
+                OUT INTEGERPTR distance21
         NAME-R: split.join.distance
         IGNORE: RR
 
@@ -1716,7 +1716,7 @@ igraph_maxflow:
                 OUT VERTEXSET_OR_0 partition2, VERTEX source, VERTEX target, \
                 EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
         DEPS: capacity ON graph, source ON graph, target ON graph, \
-	      partition1 ON graph, partition2 ON graph, flow ON graph, \
+              partition1 ON graph, partition2 ON graph, flow ON graph, \
               cut ON graph
         NAME-R: max_flow
 
@@ -1958,7 +1958,7 @@ igraph_scg_grouping:
         PARAMS: MATRIX V, OUT VECTORM1 groups, INTEGER nt, \
                 VECTOR_OR_0 nt_vec, SCGMAT mtype=Default, \
                 SCGALGO algo=Default, VECTOR_OR_0 p=NULL, \
-		INTEGER maxiter=100
+                INTEGER maxiter=100
         NAME-R: scg_group
         IGNORE: RR
 
