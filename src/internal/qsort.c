@@ -74,6 +74,16 @@ static inline void   swapfunc(char *, char *, size_t, int);
         } while (--i > 0);              \
     }
 
+
+/* Clang does not like SWAPINIT and will yield an error:
+ * performing pointer subtraction with a null pointer has undefined behavior [-Werror,-Wnull-pointer-subtraction]
+ * We therefore disable this warning */
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnull-pointer-subtraction"
+#endif
+
 #define SWAPINIT(a, es) swaptype = ((char *)a - (char *)0) % sizeof(long) || \
                                    es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;
 
@@ -208,3 +218,7 @@ loop:   SWAPINIT(a, es);
     }
     /*      qsort(pn - r, r / es, es, cmp);*/
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

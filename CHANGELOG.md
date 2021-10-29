@@ -508,6 +508,10 @@
    attribute handler, leading to problems when edge attributes were merged
    using an attribute combination (#1814).
 
+ - Fixed the behaviour of the `IGRAPH_ENABLE_LTO` option when it was set to
+   `AUTO`; earlier versions had a bug where `AUTO` simply checked whether LTO
+   is supported but then did not use LTO even if it was supported.
+
 ### Other
 
  - `igraph_decompose()` is now much faster for large graphs containing many

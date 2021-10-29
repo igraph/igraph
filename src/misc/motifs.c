@@ -193,6 +193,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_integer_t father;
     igraph_integer_t i, j, s;
     igraph_integer_t motifs = 0;
+    IGRAPH_UNUSED(motifs);    /* We mark it as unused to prevent warnings about unused-but-set-variables. */
 
     igraph_vector_int_t vids;     /* this is G */
     igraph_vector_int_t adjverts; /* this is V_E */

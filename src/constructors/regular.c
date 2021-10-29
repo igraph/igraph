@@ -278,23 +278,30 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 /**
  * \ingroup generators
  * \function igraph_ring
- * \brief Creates a \em ring graph, a one dimensional lattice.
+ * \brief Creates a \em cycle graph or a \em path graph.
  *
- * An undirected (circular) ring on n vertices is commonly known in graph
- * theory as the cycle graph C_n.
+ * A circular ring on \c n vertices is commonly known in graph
+ * theory as the cycle graph, and often denoted by <code>C_n</code>.
+ * Removing a single edge from the cycle graph <code>C_n</code> results
+ * in the path graph <code>P_n</code>. This function can generate both.
+ *
+ * </para><para>
+ * This function is a convenience wrapper for the one-dimensional case of
+ * \ref igraph_lattice().
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param n The number of vertices in the ring.
- * \param directed Logical, whether to create a directed ring.
- * \param mutual Logical, whether to create mutual edges in a directed
- *        ring. It is ignored for undirected graphs.
- * \param circular Logical, if false, the ring will be open (this is
- *        not a real \em ring actually).
+ * \param n The number of vertices in the graph.
+ * \param directed Logical, whether to create a directed graph.
+ *        All edges will be oriented in the same direction along
+ *        the cycle or path.
+ * \param mutual Logical, whether to create mutual edges in directed
+ *        graphs. It is ignored for undirected graphs.
+ * \param circular Logical, whether to create a closed ring (a cycle)
+ *        or an open path.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
  *
- * Time complexity: O(|V|), the
- * number of vertices in the graph.
+ * Time complexity: O(|V|), the number of vertices in the graph.
  *
  * \sa \ref igraph_lattice() for generating more general lattices.
  *
@@ -306,16 +313,17 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
-        IGRAPH_ERROR("negative number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 1);
     VECTOR(v)[0] = n;
 
     IGRAPH_CHECK(igraph_lattice(graph, &v, 1, directed, mutual, circular));
-    igraph_vector_int_destroy(&v);
 
+    igraph_vector_int_destroy(&v);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 

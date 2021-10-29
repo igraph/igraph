@@ -42,7 +42,9 @@ macro(use_all_warnings TARGET_NAME)
       # GCC-style compilers:
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
-        -Wall -Wextra -pedantic -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        -Wall -Wextra -pedantic
+        -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        -Wno-unknown-warning-option
       >
       $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
       # Intel compiler:

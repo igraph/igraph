@@ -553,6 +553,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     igraph_integer_t smaller_set_size;        /* size of the smaller set */
     igraph_integer_t larger_set_size;         /* size of the larger set */
     igraph_real_t dual;               /* solution of the dual problem */
+    IGRAPH_UNUSED(dual);              /* We mark it as unused to prevent warnings about unused-but-set-variables. */
     igraph_adjlist_t tight_phantom_edges; /* adjacency list to manage tight phantom edges */
     igraph_integer_t alternating_path_endpoint;
     igraph_vector_int_t* neis;

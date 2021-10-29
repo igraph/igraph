@@ -3,9 +3,16 @@
 
 #include "../unit/test_utilities.inc"
 
+void snap_to_zero(igraph_real_t* value) {
+    if (fabs(*value) < 1e-5) {
+        *value = 0.0;
+    }
+}
+
 int main() {
     igraph_t graph;
     igraph_matrix_t layout;
+    igraph_integer_t i;
 
     if (igraph_empty(&graph, 2, 0)) {
         return 1;
@@ -23,7 +30,14 @@ int main() {
         return 4;
     }
 
-    igraph_matrix_printf(&layout, "%.2f");
+    /* Snap numbers close to zero in the layout; there are false failures on
+     * MinGW if we don't do so */
+    for (i = 0; i < 2; i++) {
+        snap_to_zero(&MATRIX(layout, i, 0));
+        snap_to_zero(&MATRIX(layout, i, 1));
+        snap_to_zero(&MATRIX(layout, i, 2));
+    }
+    print_matrix_format(&layout, stdout, "%.2f");
 
     igraph_matrix_destroy(&layout);
     igraph_destroy(&graph);
