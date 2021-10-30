@@ -1785,7 +1785,7 @@ igraph_local_scan_0:
         NEIMODE mode=OUT
 
 igraph_local_scan_0_them:
-    DEPS: weights_us ON us, weights_them ON them
+    DEPS: weights_them ON them
     IGNORE: RR
     PARAMS: |-
         GRAPH us, GRAPH them, OUT VECTOR res,
@@ -1799,7 +1799,7 @@ igraph_local_scan_1_ecount:
         NEIMODE mode=OUT
 
 igraph_local_scan_1_ecount_them:
-    DEPS: weigths_them ON them, weights_them ON them
+    DEPS: weights_them ON them
     IGNORE: RR
     PARAMS: |-
         GRAPH us, GRAPH them, OUT VECTOR res,
