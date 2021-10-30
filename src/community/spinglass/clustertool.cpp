@@ -41,10 +41,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-    #include <config.h>
-#endif
-
 #include "NetDataTypes.h"
 #include "NetRoutines.h"
 #include "pottsmodel_2.h"
