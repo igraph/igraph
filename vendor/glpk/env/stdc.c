@@ -23,6 +23,8 @@
 #include <config.h>
 #endif
 
+#include "glpk_tls_config.h"
+
 /* portable ANSI C version ********************************************/
 
 #if !defined(TLS)
