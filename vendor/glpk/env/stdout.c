@@ -19,9 +19,13 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+/*
 #undef NDEBUG
 #include <assert.h>
+*/
 #include "env.h"
+
+#include "igraph_error.h" /* IGRAPH_ASSERT */
 
 /***********************************************************************
 *  NAME
@@ -79,7 +83,7 @@ void glp_printf(const char *fmt, ...)
       va_start(arg, fmt);
       vsprintf(env->term_buf, fmt, arg);
       /* (do not use xassert) */
-      assert(strlen(env->term_buf) < TBUF_SIZE);
+      IGRAPH_ASSERT(strlen(env->term_buf) < TBUF_SIZE);
       va_end(arg);
       /* write the formatted output on the terminal */
       glp_puts(env->term_buf);
@@ -109,7 +113,7 @@ void glp_vprintf(const char *fmt, va_list arg)
       /* format the output */
       vsprintf(env->term_buf, fmt, arg);
       /* (do not use xassert) */
-      assert(strlen(env->term_buf) < TBUF_SIZE);
+      IGRAPH_ASSERT(strlen(env->term_buf) < TBUF_SIZE);
       /* write the formatted output on the terminal */
       glp_puts(env->term_buf);
 skip: return;

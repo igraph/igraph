@@ -89,6 +89,12 @@ endif()
 # function as is (without visibility specification)
 target_compile_definitions(glpk_vendored PRIVATE IGRAPH_STATIC)
 
+# GLPK requires __WOE__ to be defined when using MSVC-style compilers
+# See w64/config_VC in the original GLPK distribution
+if (MSVC)
+  target_compile_definitions(glpk_vendored PRIVATE __WOE__=1)
+endif()
+
 if (MSVC)
   target_compile_options(glpk_vendored PRIVATE
     /wd4068
@@ -96,6 +102,6 @@ if (MSVC)
 else()
   target_compile_options(glpk_vendored PRIVATE
     $<$<C_COMPILER_ID:Intel>:-wd161 -Wno-return-type>
-    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-return-type -Wno-unused-value -Wno-dangling-else>
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-return-type -Wno-unused-value -Wno-dangling-else -Wno-logical-op-parentheses>
   )
 endif()

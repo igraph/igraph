@@ -46,7 +46,10 @@ static void errfunc(const char *fmt, ...)
 #endif
       env->term_out = GLP_ON;
       va_start(arg, fmt);
-      igraph_errorvf(fmt, env->err_file, env->err_line, IGRAPH_EGLP, arg);
+      xvprintf(fmt, arg);
+      va_end(arg);
+      xprintf("Error detected in file %s at line %d\n",
+         env->err_file, env->err_line);
       if (env->err_hook != NULL)
          env->err_hook(env->err_info);
       /* no return */

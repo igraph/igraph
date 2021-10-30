@@ -20,7 +20,7 @@
 ***********************************************************************/
 
 #include "env.h"
-#include "zlib.h"
+/*#include "zlib.h"*/
 
 struct glp_file
 {     /* sequential stream descriptor */
@@ -118,7 +118,7 @@ glp_file *glp_open(const char *name, const char *mode)
       }
       */
       else
-      {  char *ext = strrchr(name, '.');
+      {  /* char *ext = strrchr(name, '.'); */
          /* if (ext == NULL || strcmp(ext, ".gz") != 0) */
          {  file = fopen(name, mode);
             if (file == NULL)

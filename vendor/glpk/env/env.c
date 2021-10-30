@@ -23,6 +23,8 @@
 #include <config.h>
 #endif
 
+#include "glpk_tls_config.h"
+
 #include "glpk.h"
 #include "env.h"
 
@@ -143,8 +145,7 @@ ENV *get_env_ptr(void)
       {  /* not initialized yet; perform initialization */
          if (glp_init_env() != 0)
          {  /* initialization failed; display an error message */
-            IGRAPH_ERROR_NO_RETURN("GLPK initialization failed", IGRAPH_EGLP);
-            return 0;
+            IGRAPH_FATAL("GLPK initialization failed");
          }
          /* initialization successful; retrieve the pointer */
          env = tls_get_ptr();
@@ -152,8 +153,7 @@ ENV *get_env_ptr(void)
       /* check if the environment block is valid */
       if (env->self != env)
       {
-         IGRAPH_ERROR_NO_RETURN("Invalid GLPK environment", IGRAPH_EGLP);
-         return 0;
+         IGRAPH_FATAL("Invalid GLPK environment");
       }
       return env;
 }
@@ -282,8 +282,7 @@ int glp_free_env(void)
       /* check if the environment block is valid */
       if (env->self != env)
       {
-         IGRAPH_ERROR_NO_RETURN("Invalid GLPK environment", IGRAPH_EGLP);
-         return 1;
+         IGRAPH_FATAL("Invalid GLPK environment");
       }
       /* close handles to shared libraries */
       if (env->h_odbc != NULL)
