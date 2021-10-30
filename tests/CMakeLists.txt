@@ -831,4 +831,5 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_random_walk
   igraph_transitivity
+  inc_vs_adj
 )
