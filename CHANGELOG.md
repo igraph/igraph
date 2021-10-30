@@ -20,8 +20,8 @@
  - Fixed the behaviour of the `IGRAPH_ENABLE_LTO` option when it was set to
    `AUTO`; earlier versions had a bug where `AUTO` simply checked whether LTO
    is supported but then did not use LTO even if it was supported.
-   
- - When using igraph from a CMake project, it is now checked that the project has 
+
+ - When using igraph from a CMake project, it is now checked that the project has
    the C++ language enabled. This is necessary for linking to igraph with CMake.
 
 ### Other
@@ -31,7 +31,9 @@
 
  - `igraph_largest_cliques()` and `igraph_clique_number()` were re-written to
    use `igraph_maximal_cliques_callback()` so they are much faster now (#804).
-   
+
+ - The vendored GLPK has been upgraded to GLPK 5.0.
+
  - Documentation improvements.
 
 ## [0.9.4] - 2021-05-31
