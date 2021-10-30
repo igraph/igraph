@@ -1793,6 +1793,8 @@ int graph_molloy_opt::cycles(int v) {
 // }
 
 bool graph_molloy_opt::verify(int mode) {
+    IGRAPH_UNUSED(mode);
+#ifndef NDEBUG
     int i, j, k;
     assert(neigh[0] == links);
     // verify edges count
@@ -1824,6 +1826,7 @@ bool graph_molloy_opt::verify(int mode) {
                 }
             assert(nb > 0);
         }
+#endif
     return true;
 }
 
