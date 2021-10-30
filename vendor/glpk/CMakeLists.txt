@@ -89,6 +89,12 @@ endif()
 # function as is (without visibility specification)
 target_compile_definitions(glpk_vendored PRIVATE IGRAPH_STATIC)
 
+# GLPK requires __WOE__ to be defined when using MSVC-style compilers
+# See w64/config_VC in the original GLPK distribution
+if (MSVC)
+  target_compile_definitions(glpk_vendored PRIVATE __WOE__=1)
+endif()
+
 if (MSVC)
   target_compile_options(glpk_vendored PRIVATE
     /wd4068
