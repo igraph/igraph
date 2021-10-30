@@ -6,7 +6,7 @@
 #define AMD_INTERNAL_H
 
 /* AMD will be exceedingly slow when running in debug mode. */
-#if 1
+#ifndef NDEBUG
 #define NDEBUG
 #endif
 
