@@ -36,7 +36,7 @@ igraph_integer_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
 }
 
 
-igraph_integer_t test_inc(igraph_t *g, igraph_inclist_t *inc)
+igraph_integer_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
 {
     igraph_integer_t dummy = 0;
     for (int i = 0; i < igraph_vcount(g); i++) {
@@ -51,6 +51,20 @@ igraph_integer_t test_inc(igraph_t *g, igraph_inclist_t *inc)
     return dummy;
 }
 
+igraph_integer_t test_inc_to(igraph_t *g, igraph_inclist_t *inc)
+{
+    igraph_integer_t dummy = 0;
+    for (int i = 0; i < igraph_vcount(g); i++) {
+        igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
+        igraph_integer_t nneis = igraph_vector_int_size(neis);
+        for (int j = 0; j < nneis; j++) {
+            igraph_integer_t edge = VECTOR(*neis)[j];
+            igraph_integer_t neighbor = IGRAPH_TO(g, edge);
+            dummy += neighbor;
+        }
+    }
+    return dummy;
+}
 
 int main() {
     igraph_t g;
@@ -62,22 +76,25 @@ int main() {
 
     BENCH_INIT();
 
-    BENCH(" 1 initialize adjlist",
+    BENCH(" 1 initialize adjlist.",
             igraph_adjlist_init(&g, &adj, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
          );
 
-    BENCH(" 2 initialize inclist",
+    BENCH(" 2 initialize inclist.",
             igraph_inclist_init(&g, &inc, IGRAPH_ALL, IGRAPH_NO_LOOPS);
          );
 
-    BENCH(" 3 go over vertices (multiple times) using adjlist",
+    BENCH(" 3 go over vertices (multiple times) using adjlist.",
             result = test_adj(&g, &adj);
          );
 
-    BENCH(" 4 go over vertices (multiple times) using inclist",
-            result = test_inc(&g, &inc);
+    BENCH(" 4 go over vertices (multiple times) using inclist, IGRAPH_OTHER.",
+            result = test_inc_other(&g, &inc);
          );
 
+    BENCH(" 5 go over vertices (multiple times) using inclist, IGRAPH_TO.",
+            result = test_inc_to(&g, &inc);
+         );
     igraph_adjlist_destroy(&adj);
     igraph_inclist_destroy(&inc);
     return 0;
