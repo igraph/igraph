@@ -9,86 +9,61 @@
 #######################################
 
 igraph_empty:
-    IGNORE: RR
     PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=True
 
 igraph_add_edges:
-    IGNORE: RR, RC
-    NAME-R: add_edges
     PARAMS: INOUT GRAPH graph, VECTOR edges, ATTRIBUTES attr
 
 igraph_add_vertices:
-    IGNORE: RR, RC
-    NAME-R: add.vertices
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
 
 igraph_delete_edges:
-    DEPS: edges ON graph
-    IGNORE: RR, RC
-    NAME-R: delete.edges
     PARAMS: INOUT GRAPH graph, EDGESET edges
+    DEPS: edges ON graph
 
 igraph_delete_vertices:
-    DEPS: vertices ON graph
-    IGNORE: RR, RC
-    NAME-R: delete.vertices
     PARAMS: INOUT GRAPH graph, VERTEXSET vertices
+    DEPS: vertices ON graph
 
 igraph_vcount:
-    NAME-R: gorder
     PARAMS: GRAPH graph
     RETURN: INTEGER
 
 igraph_ecount:
-    IGNORE: RR, RC
-    NAME-R: ecount
     PARAMS: GRAPH graph
     RETURN: INTEGER
 
 igraph_neighbors:
-    IGNORE: RR, RC
-    NAME-R: neighbors
     PARAMS: GRAPH graph, OUT VECTOR neis, INTEGER vid, NEIMODE mode=ALL
 
 igraph_is_directed:
-    IGNORE: RR, RC
-    NAME-R: is_directed
     PARAMS: GRAPH graph
     RETURN: BOOLEAN
 
 igraph_degree:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
-    NAME-R: degree
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops
+    DEPS: vids ON graph
 
 igraph_edge:
-    IGNORE: RR, RC
-    NAME-R: get.edge
     PARAMS: GRAPH graph, INTEGER eid, OUT INTEGERPTR from, OUT INTEGERPTR to
 
 igraph_edges:
-    DEPS: eids ON graph
-    IGNORE: RR, RC
-    NAME-R: ends
     PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR edges
+    DEPS: eids ON graph
 
 igraph_get_eid:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT INTEGERPTR eid, INTEGER from,
         INTEGER to, BOOLEAN directed=True, BOOLEAN error=True
 
 igraph_get_eids:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VECTOR eids, VECTOR pairs,
         BOOLEAN directed=True, BOOLEAN error=True
 
 igraph_incident:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR eids, INTEGER vid, NEIMODE mode=ALL
 
 #######################################
@@ -96,90 +71,69 @@ igraph_incident:
 #######################################
 
 igraph_create:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, VECTOR edges, INTEGER n=0, BOOLEAN directed=True
 
 igraph_adjacency:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCYMODE mode=DIRECTED
 
 igraph_weighted_adjacency:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, MATRIX adjmatrix,
         ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight",
         BOOLEAN loops
 
 igraph_star:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER n, STARMODE mode=OUT, INTEGER center=0
 
 igraph_lattice:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, VECTOR dimvector, INTEGER nei=1,
         BOOLEAN directed=False, BOOLEAN mutual=False, BOOLEAN circular=False
 
 igraph_ring:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
         BOOLEAN circular=True
 
 igraph_tree:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREEMODE type=OUT
 
 igraph_full:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
 
 igraph_full_citation:
-    GATTR-R: name IS Full citation graph
-    IGNORE: RR
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
 
 igraph_atlas:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INT number=0
 
 igraph_extended_chordal_ring:
-    IGNORE: RR
     PARAMS: OUT GRAPH graph, INTEGER nodes, MATRIX W, BOOLEAN directed=False
 
 igraph_connect_neighborhood:
-    IGNORE: RR, RC
     PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
 
 igraph_linegraph:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT GRAPH linegraph
 
 igraph_de_bruijn:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
 
 igraph_kautz:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
 
 igraph_famous:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, CSTRING name=""
 
 igraph_lcf_vector:
-    GATTR-R: name IS LCF graph
-    NAME-R: graph_from_lcf
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats=1
 
 igraph_adjlist:
-    NAME-R: graph_from_adj_list
     PARAMS: |-
         OUT GRAPH graph, ADJLIST adjlist, NEIMODE mode=OUT,
         BOOLEAN duplicate=True
 
 igraph_full_bipartite:
-    IGNORE: RR
     PARAMS: |-
         OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, INTEGER n1,
         INTEGER n2, BOOLEAN directed=False, NEIMODE mode=ALL
@@ -189,7 +143,6 @@ igraph_full_bipartite:
 #######################################
 
 igraph_barabasi_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, INTEGER m=1, REAL power=1.0,
         VECTOR_OR_0 outseq, BOOLEAN outpref=False, REAL A=1.0,
@@ -197,27 +150,22 @@ igraph_barabasi_game:
         GRAPH_OR_0 start_from=0
 
 igraph_erdos_renyi_game_gnp:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
 
 igraph_erdos_renyi_game_gnm:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER n, REAL m, BOOLEAN directed=False, BOOLEAN loops=False
 
 igraph_degree_sequence_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, VECTOR out_deg, VECTOR_OR_0 in_deg,
         DEGSEQMODE method=SIMPLE
 
 igraph_growing_random_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, INTEGER m=1, BOOLEAN directed=False,
         BOOLEAN citation=False
 
 igraph_barabasi_aging_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER m=1, VECTOR_OR_0 outseq,
         BOOLEAN outpref=False, REAL pa_exp=1.0, REAL aging_exp=0.0, INTEGER aging_bin=1,
@@ -225,39 +173,33 @@ igraph_barabasi_aging_game:
         REAL age_coef=1.0, BOOLEAN directed=True
 
 igraph_recent_degree_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, REAL power=1.0, INTEGER window=1,
         INTEGER m=1, VECTOR_OR_0 outseq, BOOLEAN outpref=False,
         REAL zero_appeal=1.0, BOOLEAN directed=True
 
 igraph_recent_degree_aging_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER m=1, VECTOR_OR_0 outseq,
         BOOLEAN outpref=False, REAL pa_exp=1.0, REAL aging_exp=0.0, INTEGER aging_bin=1,
         INTEGER window=1, REAL zero_appeal=1.0, BOOLEAN directed=True
 
 igraph_callaway_traits_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types,
         INTEGER edges_per_step=1, VECTOR type_dist, MATRIX pref_matrix,
         BOOLEAN directed=False
 
 igraph_establishment_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types, INTEGER k=1,
         VECTOR type_dist, MATRIX pref_matrix, BOOLEAN directed=True
 
 igraph_grg_game:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False, VECTOR_OR_0
         x, VECTOR_OR_0 y
 
 igraph_preference_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types,
         VECTOR type_dist, BOOLEAN fixed_sizes=False,
@@ -265,7 +207,6 @@ igraph_preference_game:
         BOOLEAN directed=False, BOOLEAN loops=False
 
 igraph_asymmetric_preference_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types,
         MATRIX type_dist_matrix, MATRIX pref_matrix,
@@ -273,56 +214,41 @@ igraph_asymmetric_preference_game:
         BOOLEAN loops=False
 
 igraph_rewire_edges:
-    IGNORE: RR, RC
     PARAMS: INOUT GRAPH graph, REAL prob, BOOLEAN loops=False
 
 igraph_watts_strogatz_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei,
         REAL p, BOOLEAN loops=False, BOOLEAN multiple=False
 
 igraph_lastcit_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER edges_per_node=1,
         INTEGER agebins=1, VECTOR preference, BOOLEAN directed=True
 
 igraph_cited_type_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, VECTOR types, VECTOR pref,
         INTEGER edges_per_step=1, BOOLEAN directed=True
 
 igraph_citing_cited_type_game:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, VECTOR types, MATRIX pref,
         INTEGER edges_per_step=1, BOOLEAN directed=True
 
 igraph_forest_fire_game:
     FLAGS: PROGRESS
-    GATTR-PARAM-R: fw_prob, bw_factor, ambs
-    GATTR-R: name IS Forest fire model
-    NAME-R: sample_forestfire
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1,
         INTEGER ambs=1, BOOLEAN directed=True
 
 igraph_simple_interconnected_islands_game:
-    GATTR-PARAM-R: islands_n, islands_size, islands_pin, n_inter
-    GATTR-R: name IS Interconnected islands model
-    IGNORE: RC
-    NAME-R: sample_islands
     PARAMS: |-
         OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size,
         REAL islands_pin, INTEGER n_inter
 
 igraph_static_fitness_game:
     FLAGS: PROGRESS
-    GATTR-PARAM-R: loops, multiple
-    GATTR-R: name IS Static fitness model
-    NAME-R: sample_fitness
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
         VECTOR_OR_0 fitness_in=NULL, BOOLEAN loops=False,
@@ -330,11 +256,6 @@ igraph_static_fitness_game:
 
 igraph_static_power_law_game:
     FLAGS: PROGRESS
-    GATTR-PARAM-R: |-
-        exponent_out, exponent_in, loops, multiple,
-        finite_size_correction
-    GATTR-R: name IS Static power law model
-    NAME-R: sample_fitness_pl
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges,
         REAL exponent_out, REAL exponent_in=-1,
@@ -342,74 +263,53 @@ igraph_static_power_law_game:
         BOOLEAN finite_size_correction=True
 
 igraph_k_regular_game:
-    GATTR-PARAM-R: k
-    GATTR-R: name IS k-regular graph
-    NAME-R: sample_k_regular
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_nodes, INTEGER k,
         BOOLEAN directed=False, BOOLEAN multiple=False
 
 igraph_sbm_game:
-    GATTR-PARAM-R: loops
-    GATTR-R: name IS Stochastic block-model
-    NAME-R: sample_sbm
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, MATRIX pref_matrix,
         VECTOR_INT block_sizes, BOOLEAN directed=False,
         BOOLEAN loops=False
 
 igraph_hsbm_game:
-    GATTR-PARAM-R: m, rho, C, p
-    GATTR-R: name IS Hierarchical stochastic block model
-    INTERNAL: 'True'
-    NAME-R: hsbm.1.game
+    INTERNAL: true
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, INTEGER m,
         VECTOR rho, MATRIX C, REAL p
 
 igraph_hsbm_list_game:
-    GATTR-PARAM-R: p
-    GATTR-R: name IS Hierarchical stochastic block model
-    INTERNAL: 'True'
-    NAME-R: hsbm.list.game
+    INTERNAL: true
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, VECTOR_INT mlist,
         VECTORLIST rholist, MATRIXLIST Clist, REAL p
 
 igraph_correlated_game:
-    DEFAULT-R: p=old.graph$p
-    GATTR-PARAM-R: corr, p
-    GATTR-R: name IS Correlated random graph
-    NAME-R: sample_correlated_gnp
     PARAMS: |-
         GRAPH old_graph, OUT GRAPH new_graph,
         REAL corr, REAL p=old.graph$p, VECTORM1_OR_0 permutation=NULL
 
 igraph_correlated_pair_game:
-    NAME-R: sample_correlated_gnp_pair
     PARAMS: |-
         OUT GRAPH graph1, OUT GRAPH graph2, INT n, REAL corr,
         REAL p, BOOLEAN directed=False,
         VECTORM1_OR_0 permutation=NULL
 
 igraph_dot_product_game:
-    NAME-R: sample_dot_product
     PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
 
 igraph_sample_sphere_surface:
-    NAME-R: sample_sphere_surface
     PARAMS: |-
         INTEGER dim, INTEGER n=1, REAL radius=1,
         BOOLEAN positive=True, OUT MATRIX res
 
 igraph_sample_sphere_volume:
-    NAME-R: sample_sphere_volume
     PARAMS: |-
         INTEGER dim, INTEGER n=1, REAL radius=1,
         BOOLEAN positive=True, OUT MATRIX res
 
 igraph_sample_dirichlet:
-    NAME-R: sample_dirichlet
     PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
 
 #######################################
@@ -417,7 +317,6 @@ igraph_sample_dirichlet:
 #######################################
 
 igraph_are_connected:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, INTEGER v1, INTEGER v2, OUT BOOLEANPTR res
 
 #######################################
@@ -425,197 +324,162 @@ igraph_are_connected:
 #######################################
 
 igraph_diameter:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT REALPTR res, OUT INTEGERPTR from,
         OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True,
         BOOLEAN unconnected=True
 
 igraph_diameter_dijkstra:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         OUT REALPTR res, OUT INTEGERPTR from,
         OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True,
         BOOLEAN unconnected=True
+    DEPS: weights ON graph
 
 igraph_minimum_spanning_tree:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 igraph_minimum_spanning_tree_unweighted:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT GRAPH mst
 
 igraph_minimum_spanning_tree_prim:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT GRAPH mst, VECTOR weights
 
 igraph_closeness:
-    DEPS: vids ON graph, weights ON graph
-    IGNORE: RR
-    NAME-R: closeness
     PARAMS: |-
         GRAPH graph, OUT VECTOR res,
         OUT VECTOR_OR_0 reachable_count, OUT BOOLEANPTR_OR_0 all_reachable,
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False
+    DEPS: vids ON graph, weights ON graph
 
 igraph_closeness_cutoff:
-    DEPS: vids ON graph, weights ON graph, res ON graph vids
-    IGNORE: RR
-    NAME-R: estimate_closeness
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res,
         OUT VECTOR_OR_0 reachable_count, OUT BOOLEANPTR_OR_0 all_reachable,
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False, REAL cutoff
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_shortest_paths:
-    DEPS: from ON graph, to ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, NEIMODE mode=OUT
+    DEPS: from ON graph, to ON graph
 
 igraph_get_shortest_paths:
-    DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
         NEIMODE mode=OUT, OUT VECTOR_LONG_OR_0 predecessors=0,
         OUT VECTOR_LONG_OR_0 inbound_edges=0
+    DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
 
 igraph_get_all_shortest_paths:
-    DEPS: res ON graph, from ON graph, to ON graph
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo,
         VERTEX from, VERTEXSET to, NEIMODE mode=OUT
+    DEPS: res ON graph, from ON graph, to ON graph
 
 igraph_shortest_paths_dijkstra:
-    DEPS: from ON graph, to ON graph, weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+    DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_shortest_paths_dijkstra:
-    DEPS: |-
-        vertices ON graph, edges ON graph, from ON graph, to ON graph,
-        weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
         OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         OUT VECTOR_LONG_OR_0 predecessors=0,
         OUT VECTOR_LONG_OR_0 inbound_edges=0
+    DEPS: |-
+        vertices ON graph, edges ON graph, from ON graph, to ON graph,
+        weights ON graph
 
 igraph_get_shortest_paths_bellman_ford:
-    DEPS: |-
-        vertices ON graph, edges ON graph, from ON graph, to ON graph,
-        weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
         OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         OUT VECTOR_LONG_OR_0 predecessors=0,
         OUT VECTOR_LONG_OR_0 inbound_edges=0
+    DEPS: |-
+        vertices ON graph, edges ON graph, from ON graph, to ON graph,
+        weights ON graph
 
 igraph_get_all_shortest_paths_dijkstra:
-    DEPS: weights ON graph, to ON graph, res ON graph, from ON graph
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST res, OUT VECTOR nrgeo,
         VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights,
         NEIMODE mode=OUT
+    DEPS: weights ON graph, to ON graph, res ON graph, from ON graph
 
 igraph_shortest_paths_bellman_ford:
-    DEPS: from ON graph, to ON graph, weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+    DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_shortest_paths_johnson:
-    DEPS: from ON graph, to ON graph, weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights
+    DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_all_simple_paths:
-    DEPS: from ON graph, to ON graph, res ON graph
-    IGNORE: RR
-    NAME-R: all_simple_paths
     PARAMS: |-
         GRAPH graph, OUT VERTEXSET_INT res, VERTEX from,
         VERTEXSET to=ALL, INTEGER cutoff=-1, NEIMODE mode=OUT
-    PP-R: get.all.simple.paths.pp
+    DEPS: from ON graph, to ON graph, res ON graph
 
 igraph_subcomponent:
-    DEPS: vid ON graph, res ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
+    DEPS: vid ON graph, res ON graph
 
 igraph_betweenness:
-    DEPS: weights ON graph, vids ON graph
-    FLAGS: PROGRESS
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, vids ON graph
+    FLAGS: PROGRESS
 
 igraph_betweenness_cutoff:
-    DEPS: vids ON graph, weights ON graph, res ON graph vids
-    FLAGS: PROGRESS
-    IGNORE: RR
-    NAME-R: estimate_betweenness
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL,
         REAL cutoff
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
+    FLAGS: PROGRESS
 
 igraph_edge_betweenness:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: edge_betweenness
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, BOOLEAN directed=True,
         EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 igraph_edge_betweenness_cutoff:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: estimate_edge_betweenness
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, BOOLEAN directed=True,
         EDGEWEIGHTS weights=NULL, REAL cutoff
+    DEPS: weights ON graph
 
 igraph_pagerank:
-    DEPS: |-
-        vids ON graph, weights ON graph, vector ON graph vids,
-        options ON algo
-    IGNORE: RR, RC
-    NAME-R: page_rank
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         OUT VERTEXINDEX vector, OUT REALPTR value,
         VERTEXSET vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, EDGEWEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
-
-igraph_personalized_pagerank:
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,
         options ON algo
-    NAME-R: page_rank
+
+igraph_personalized_pagerank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         OUT VERTEXINDEX vector, OUT REALPTR value,
@@ -623,243 +487,196 @@ igraph_personalized_pagerank:
         REAL damping=0.85, VECTOR_OR_0 personalized=NULL,
         EDGEWEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
+    DEPS: |-
+        vids ON graph, weights ON graph, vector ON graph vids,
+        options ON algo
 
 igraph_rewire:
-    IGNORE: RR, RC
     PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRINGMODE mode=SIMPLE
 
 igraph_induced_subgraph:
-    DEPS: vids ON graph
-    IGNORE: RR
-    NAME-R: induced_subgraph
     PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl=AUTO
+    DEPS: vids ON graph
 
 igraph_subgraph_edges:
-    DEPS: eids ON graph
-    IGNORE: RR
-    NAME-R: subgraph.edges
     PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
+    DEPS: eids ON graph
 
 igraph_average_path_length:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT REALPTR res, OUT REALPTR unconn_pairs=NULL, BOOLEAN directed=True,
         BOOLEAN unconn=True
 
 igraph_path_length_hist:
-    FLAGS: PROGRESS
-    NAME-R: distance_table
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, OUT REALPTR unconnected,
         BOOLEAN directed=True
+    FLAGS: PROGRESS
 
 igraph_simplify:
-    NAME-R: simplify
     PARAMS: |-
         INOUT GRAPH graph, BOOLEAN remove_multiple=True,
         BOOLEAN remove_loops=True,
         EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
 
 igraph_transitivity_undirected:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT REALPTR res, TRANSITIVITYMODE mode=NAN
 
 igraph_transitivity_local_undirected:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, TRANSITIVITYMODE mode=NAN
 
 igraph_transitivity_avglocal_undirected:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT REALPTR res, TRANSITIVITYMODE mode=NAN
 
 igraph_transitivity_barrat:
-    DEPS: res ON graph, vids ON graph, weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
         EDGEWEIGHTS weights=NULL, TRANSITIVITYMODE mode=NAN
+    DEPS: res ON graph, vids ON graph, weights ON graph
 
 igraph_reciprocity:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT REALPTR res, BOOLEAN ignore_loops=True,
         RECIP mode=Default
 
 igraph_constraint:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, VECTOR_OR_0 weights
+    DEPS: vids ON graph
 
 igraph_maxdegree:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT INTEGERPTR res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=True
+    DEPS: vids ON graph
 
 igraph_density:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN loops=False
 
 igraph_neighborhood_size:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, VERTEXSET vids, INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
+    DEPS: vids ON graph
 
 igraph_neighborhood:
-    DEPS: res ON graph, vids ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST res,
         VERTEXSET vids, INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
+    DEPS: res ON graph, vids ON graph
 
 igraph_neighborhood_graphs:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids,
         INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
+    DEPS: vids ON graph
 
 igraph_topological_sorting:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR res, NEIMODE mode=OUT
 
 igraph_is_loop:
-    DEPS: es ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    DEPS: es ON graph
 
 igraph_is_dag:
-    NAME-R: is_dag
     PARAMS: GRAPH graph, OUT BOOLEANPTR res
 
 igraph_is_simple:
-    NAME-R: is_simple
     PARAMS: GRAPH graph, OUT BOOLEANPTR res
 
 igraph_is_multiple:
-    DEPS: es ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    DEPS: es ON graph
 
 igraph_has_multiple:
-    NAME-R: any_multiple
     PARAMS: GRAPH graph, OUT BOOLEANPTR res
 
 igraph_count_multiple:
-    DEPS: es ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR res, EDGESET es=ALL
+    DEPS: es ON graph
 
 igraph_girth:
-    DEPS: circle ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VERTEXSET circle
+    DEPS: circle ON graph
 
 igraph_add_edge:
-    IGNORE: RR, RC
     PARAMS: INOUT GRAPH graph, INTEGER from, INTEGER to
 
 igraph_eigenvector_centrality:
-    DEFAULT-R: options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
-    NAME-R: eigen_centrality
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value,
         BOOLEAN directed=False, BOOLEAN scale=True,
         EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
+    DEPS: weights ON graph, vector ON graph V(graph)
 
 igraph_hub_score:
-    DEFAULT-R: options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
-    NAME-R: hub_score
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
+    DEPS: weights ON graph, vector ON graph V(graph)
 
 igraph_authority_score:
-    DEFAULT-R: options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
-    NAME-R: authority_score
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
+    DEPS: weights ON graph, vector ON graph V(graph)
 
 igraph_arpack_rssolve:
-    DEFAULT-R: options=arpack_defaults
-    IGNORE: RR, RC
     PARAMS: |-
         ARPFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
         NULL storage, OUT VECTOR_OR_0 values,
         OUT MATRIX_OR_0 vectors
 
 igraph_arpack_rnsolve:
-    DEFAULT-R: options=arpack_defaults
-    IGNORE: RR, RC
     PARAMS: |-
         ARPFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
         NULL storage, OUT VECTOR_OR_0 values,
         OUT MATRIX_OR_0 vectors
 
 igraph_arpack_unpack_complex:
-    IGNORE: RR
-    NAME-R: arpack.unpack.complex
     PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
 
 igraph_unfold_tree:
-    IGNORE: RR
-    NAME-R: unfold_tree
     PARAMS: |-
         GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots,
         OUT VECTORM1_OR_0 vertex_index
 
 igraph_is_mutual:
-    DEPS: es ON graph
-    NAME-R: which_mutual
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    DEPS: es ON graph
 
 igraph_maximum_cardinality_search:
-    DEPS: alpha ON graph, alpham1 ON graph
-    NAME-R: max_cardinality
     PARAMS: GRAPH graph, OUT VERTEXSET alpha, OUT VECTORM1_OR_0 alpham1
+    DEPS: alpha ON graph, alpham1 ON graph
 
 igraph_is_chordal:
-    IGNORE: RR, RC
-    NAME-R: is_chordal
     PARAMS: |-
         GRAPH graph, VECTORM1_OR_0 alpha=NULL, VECTORM1_OR_0 alpham1=NULL,
         OUT BOOLEANPTR_OR_0 chordal, OUT VECTORM1_OR_0 fillin,
         OUT GRAPH_OR_0 newgraph
 
 igraph_avg_nearest_neighbor_degree:
-    DEPS: vids ON graph, weights ON graph, knn ON graph vids
-    NAME-R: knn
     PARAMS: |-
         GRAPH graph, VERTEXSET vids=ALL,
         NEIMODE mode=ALL, NEIMODE neighbor_degree_mode=ALL,
         OUT VERTEXINDEX_OR_0 knn, OUT VECTOR_OR_0 knnk,
         EDGEWEIGHTS weights=NULL
+    DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
 igraph_strength:
-    DEPS: vids ON graph, weights ON graph, res ON graph vids
-    NAME-R: strength
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         NEIMODE mode=ALL, BOOLEAN loops=True, EDGEWEIGHTS weights=NULL
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_centralization:
-    NAME-R: centralize
     PARAMS: VECTOR scores, REAL theoretical_max=0, BOOLEAN normalized=True
     RETURN: REAL
 
 igraph_centralization_degree:
-    NAME-R: centr_degree
     PARAMS: |-
         GRAPH graph, OUT VECTOR res,
         NEIMODE mode=ALL, BOOLEAN loops=True,
@@ -867,13 +684,11 @@ igraph_centralization_degree:
         BOOLEAN normalized=True
 
 igraph_centralization_degree_tmax:
-    NAME-R: centr_degree_tmax
     PARAMS: |-
         GRAPH_OR_0 graph=NULL, INTEGER nodes=0, NEIMODE mode=ALL,
         BOOLEAN loops=False, OUT REALPTR res
 
 igraph_centralization_betweenness:
-    NAME-R: centr_betw
     PARAMS: |-
         GRAPH graph, OUT VECTOR res,
         BOOLEAN directed=True,
@@ -882,13 +697,11 @@ igraph_centralization_betweenness:
         BOOLEAN normalized=True
 
 igraph_centralization_betweenness_tmax:
-    NAME-R: centr_betw_tmax
     PARAMS: |-
         GRAPH_OR_0 graph=NULL, INTEGER nodes=0,
         BOOLEAN directed=True, OUT REALPTR res
 
 igraph_centralization_closeness:
-    NAME-R: centr_clo
     PARAMS: |-
         GRAPH graph, OUT VECTOR res,
         NEIMODE mode=OUT, OUT REALPTR centralization,
@@ -896,13 +709,11 @@ igraph_centralization_closeness:
         BOOLEAN normalized=True
 
 igraph_centralization_closeness_tmax:
-    NAME-R: centr_clo_tmax
     PARAMS: |-
         GRAPH_OR_0 graph=NULL, INTEGER nodes=0,
         NEIMODE mode=OUT, OUT REALPTR res
 
 igraph_centralization_eigenvector_centrality:
-    NAME-R: centr_eigen
     PARAMS: |-
         GRAPH graph, OUT VECTOR vector, OUT REALPTR value,
         BOOLEAN directed=False, BOOLEAN scale=True,
@@ -911,70 +722,58 @@ igraph_centralization_eigenvector_centrality:
         BOOLEAN normalized=True
 
 igraph_centralization_eigenvector_centrality_tmax:
-    NAME-R: centr_eigen_tmax
     PARAMS: |-
         GRAPH_OR_0 graph=NULL, INTEGER nodes=0,
         BOOLEAN directed=False, BOOLEAN scale=True,
         OUT REALPTR res
 
 igraph_assortativity_nominal:
-    NAME-R: assortativity_nominal
     PARAMS: |-
         GRAPH graph, VECTORM1 types, OUT REALPTR res,
         BOOLEAN directed=True
 
 igraph_assortativity:
-    NAME-R: assortativity
     PARAMS: |-
         GRAPH graph, VECTOR types1, VECTOR_OR_0 types2=NULL,
         OUT REALPTR res, BOOLEAN directed=True
 
 igraph_assortativity_degree:
-    NAME-R: assortativity_degree
     PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True
 
 igraph_contract_vertices:
-    NAME-R: contract
     PARAMS: |-
         INOUT GRAPH graph, VECTORM1 mapping,
         VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
 
 igraph_eccentricity:
-    DEPS: vids ON graph, res ON graph vids
-    NAME-R: eccentricity
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         NEIMODE mode=ALL
+    DEPS: vids ON graph, res ON graph vids
 
 igraph_radius:
-    NAME-R: radius
     PARAMS: GRAPH graph, OUT REALPTR radius, NEIMODE mode=ALL
 
 igraph_diversity:
-    DEPS: weights ON graph, vids ON graph, res ON graph vids
-    NAME-R: diversity
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXINDEX res,
         VERTEXSET vids=ALL
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_random_walk:
-    DEPS: start ON graph, walk ON graph
-    IGNORE: RR
-    NAME-R: random_walk
     PARAMS: |-
         GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode=OUT,
         INTEGER steps, RWSTUCK stuck=RETURN
+    DEPS: start ON graph, walk ON graph
 
 #######################################
 # Degree sequences
 #######################################
 
 igraph_is_degree_sequence:
-    NAME-R: is_degseq
     PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
 
 igraph_is_graphical_degree_sequence:
-    NAME-R: is_graphical
     PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
 
 #######################################
@@ -982,7 +781,6 @@ igraph_is_graphical_degree_sequence:
 #######################################
 
 igraph_bfs:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, INTEGER root, VECTOR_OR_0 roots,
         NEIMODE mode=OUT, BOOLEAN unreachable,
@@ -993,7 +791,6 @@ igraph_bfs:
         OUT VECTOR_OR_0 dist, BFS_FUNC callback, NULL extra
 
 igraph_dfs:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, INTEGER root, NEIMODE mode=OUT,
         BOOLEAN unreachable,
@@ -1006,58 +803,47 @@ igraph_dfs:
 #######################################
 
 igraph_bipartite_projection_size:
-    DEPS: types ON graph
-    NAME-R: bipartite_projection_size
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL,
         OUT INTEGERPTR vcount1, OUT INTEGERPTR ecount1,
         OUT INTEGERPTR vcount2, OUT INTEGERPTR ecount2
+    DEPS: types ON graph
 
 igraph_bipartite_projection:
-    DEPS: types ON graph
-    IGNORE: RR, RC
-    NAME-R: bipartite.projection
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL,
         OUT GRAPH proj1, OUT GRAPH proj2,
         OUT VECTOR_OR_0 multiplicity1,
         OUT VECTOR_OR_0 multiplicity2, INTEGER probe1=-1
+    DEPS: types ON graph
 
 igraph_create_bipartite:
-    IGNORE: RR
-    NAME-R: make_bipartite_graph
     PARAMS: |-
         OUT GRAPH graph, IN VECTOR_BOOL types,
         VECTORM1 edges, BOOLEAN directed=False
 
 igraph_incidence:
-    IGNORE: RR
     PARAMS: |-
         OUT GRAPH graph, OUT VECTOR_BOOL types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
 igraph_get_incidence:
-    DEPS: types ON graph
-    IGNORE: RR
-    NAME-R: as_incidence_matrix
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         OUT VECTOR_OR_0 row_ids, OUT VECTOR_OR_0 col_ids
+    DEPS: types ON graph
 
 igraph_is_bipartite:
-    NAME-R: bipartite_mapping
     PARAMS: GRAPH graph, OUT BOOLEANPTR res, OUT VECTOR_BOOL_OR_0 type
 
 igraph_bipartite_game_gnp:
-    IGNORE: RR
     PARAMS: |-
         OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types,
         INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed,
         NEIMODE mode
 
 igraph_bipartite_game_gnm:
-    IGNORE: RR
     PARAMS: |-
         OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types,
         INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed,
@@ -1068,110 +854,90 @@ igraph_bipartite_game_gnm:
 #######################################
 
 igraph_laplacian:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
-    NAME-R: laplacian_matrix
     PARAMS: |-
         GRAPH graph, OUT MATRIX_OR_0 res,
         OUT SPARSEMAT_OR_0 sparseres, BOOLEAN normalized=False,
         EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 #######################################
 # Components
 #######################################
 
 igraph_clusters:
-    IGNORE: RR
-    NAME-R: clusters
     PARAMS: |-
         GRAPH graph, OUT VECTOR membership, OUT VECTOR csize,
         OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
 
 igraph_is_connected:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT BOOLEANPTR res, CONNECTEDNESS mode=WEAK
 
 igraph_decompose:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT GRAPHLIST components, CONNECTEDNESS mode=WEAK,
         LONGINT maxcompno=-1, LONGINT minelements=1
 
 igraph_articulation_points:
-    DEPS: res ON graph
-    NAME-R: articulation_points
     PARAMS: GRAPH graph, OUT VERTEXSET res
+    DEPS: res ON graph
 
 igraph_biconnected_components:
-    DEPS: |-
-        tree_edges ON graph, component_edges ON graph,
-        components ON graph, articulation_points ON graph
-    NAME-R: biconnected_components
     PARAMS: |-
         GRAPH graph, OUT INTEGERPTR no,
         OUT EDGESETLIST_OR_0 tree_edges,
         OUT EDGESETLIST_OR_0 component_edges,
         OUT VERTEXSETLIST_OR_0 components,
         OUT VERTEXSET articulation_points
+    DEPS: |-
+        tree_edges ON graph, component_edges ON graph,
+        components ON graph, articulation_points ON graph
 
 #######################################
 # Cliques
 #######################################
 
 igraph_cliques:
-    DEPS: res ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0,
         INTEGER max_size=0
+    DEPS: res ON graph
 
 igraph_largest_cliques:
-    DEPS: res ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    DEPS: res ON graph
 
 igraph_maximal_cliques:
-    DEPS: res ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    DEPS: res ON graph
 
 igraph_maximal_cliques_count:
-    IGNORE: RR, RC
-    NAME-R: count_max_cliques
     PARAMS: |-
         GRAPH graph, OUT INTEGERPTR no, INTEGER min_size=0,
         INTEGER max_size=0
 
 igraph_maximal_cliques_file:
-    IGNORE: RR, RC
-    NAME-R: maximal.cliques.file
     PARAMS: |-
         GRAPH graph, OUTFILE res, INTEGER min_size=0,
         INTEGER max_size=0
 
 igraph_clique_number:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR no
 
 igraph_independent_vertex_sets:
-    DEPS: res ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0,
         INTEGER max_size=0
+    DEPS: res ON graph
 
 igraph_largest_independent_vertex_sets:
-    DEPS: res ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    DEPS: res ON graph
 
 igraph_maximal_independent_vertex_sets:
-    DEPS: res ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    DEPS: res ON graph
 
 igraph_independence_number:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR no
 
 #######################################
@@ -1179,37 +945,25 @@ igraph_independence_number:
 #######################################
 
 igraph_layout_random:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res
 
 igraph_layout_circle:
-    DEPS: order ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET order=ALL
+    DEPS: order ON graph
 
 igraph_layout_star:
-    DEPS: center ON graph
-    IGNORE: RR
-    NAME-R: layout_as_star
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX center=V(graph)[1],
         VECTORM1_OR_0 order=NULL
+    DEPS: center ON graph
 
 igraph_layout_grid:
-    IGNORE: RR
-    NAME-R: layout.grid
     PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0
 
 igraph_layout_grid_3d:
-    IGNORE: RR
-    NAME-R: layout.grid.3d
     PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0, INTEGER height=0
 
 igraph_layout_fruchterman_reingold:
-    DEPS: weights ON graph
-    FLAGS: PROGRESS
-    IGNORE: RR, RC
-    NAME-R: layout.fruchterman.reingold
     PARAMS: |-
         GRAPH graph, INOUT MATRIX coords=NULL,
         BOOLEAN use_seed=False, INTEGER niter=500,
@@ -1219,45 +973,37 @@ igraph_layout_fruchterman_reingold:
         VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL,
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
+    DEPS: weights ON graph
+    FLAGS: PROGRESS
 
 igraph_layout_kamada_kawai:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
-    NAME-R: layout.kamada.kawai
     PARAMS: |-
         GRAPH graph, INOUT MATRIX coords, BOOLEAN use_seed=False,
         INTEGER maxiter=500, REAL epsilon=0.0,
         REAL kkconst=vcount(graph), EDGEWEIGHTS weights=NULL,
         VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL,
         VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL
+    DEPS: weights ON graph
 
 igraph_layout_lgl:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, INTEGER maxiter=150, REAL maxdelta=VCOUNT(graph),
         REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph),
         INTEGER root=-1
 
 igraph_layout_reingold_tilford:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, VECTOR roots
 
 igraph_layout_reingold_tilford_circular:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, VECTOR roots
 
 igraph_layout_random_3d:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res
 
 igraph_layout_sphere:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res
 
 igraph_layout_fruchterman_reingold_3d:
-    DEPS: weights ON graph
-    FLAGS: PROGRESS
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, INOUT MATRIX coords=NULL,
         BOOLEAN use_seed=False, INTEGER niter=500,
@@ -1268,10 +1014,10 @@ igraph_layout_fruchterman_reingold_3d:
         VECTOR_OR_0 minz=NULL, VECTOR_OR_0 maxz=NULL,
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
+    DEPS: weights ON graph
+    FLAGS: PROGRESS
 
 igraph_layout_kamada_kawai_3d:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, INOUT MATRIX coords, BOOLEAN use_seed=False,
         INTEGER maxiter=500, REAL epsilon=0.0,
@@ -1279,68 +1025,52 @@ igraph_layout_kamada_kawai_3d:
         VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL,
         VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL,
         VECTOR_OR_0 minz=NULL, VECTOR_OR_0 maxz=NULL
+    DEPS: weights ON graph
 
 igraph_layout_graphopt:
-    FLAGS: PROGRESS
-    IGNORE: RR, RC
-    NAME-R: layout.graphopt
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, INTEGER niter=500,
         REAL node_charge=0.001, REAL node_mass=30,
         INTEGER spring_length=0, REAL spring_constant=1,
         REAL max_sa_movement=5, NULL use_seed
+    FLAGS: PROGRESS
 
 igraph_layout_drl:
-    DEFAULT-R: options=drl_defaults$default
-    IGNORE: RR
-    NAME-R: layout.drl
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         DRL_OPTIONS options=drl_defaults$default, VECTOR_OR_0 weights=NULL,
         VECTOR_BOOL_OR_0 fixed=NULL
 
 igraph_layout_drl_3d:
-    DEFAULT-R: options=drl_defaults$default
-    IGNORE: RR
-    NAME-R: layout.drl
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         DRL_OPTIONS options=drl_defaults$default, VECTOR_OR_0 weights=NULL,
         VECTOR_BOOL_OR_0 fixed=NULL
 
 igraph_layout_merge_dla:
-    IGNORE: RR, RC
     PARAMS: GRAPHLIST graphs, MATRIXLIST coords, OUT MATRIX res
 
 igraph_layout_sugiyama:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: layout.sugiyama
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, OUT GRAPH_OR_0 extd_graph,
         OUT VECTORM1_OR_0 extd_to_orig_eids,
         VECTORM1_OR_0 layers=NULL,
         REAL hgap=1, REAL vgap=1, INTEGER maxiter=100,
         EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 igraph_layout_mds:
-    IGNORE: RR
-    NAME-R: layout.mds
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL,
         INTEGER dim=2, NULL options
 
 igraph_layout_bipartite:
-    DEPS: types ON graph
-    IGNORE: RR
-    NAME-R: layout_as_bipartite
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         REAL hgap=1, REAL vgap=1, INTEGER maxiter=100
+    DEPS: types ON graph
 
 igraph_layout_gem:
-    IGNORE: RR
-    NAME-R: layout.gem
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res=matrix(),
         BOOLEAN use_seed=False,
@@ -1349,8 +1079,6 @@ igraph_layout_gem:
         REAL temp_min=1/10, REAL temp_init=sqrt(vcount(graph))
 
 igraph_layout_davidson_harel:
-    IGNORE: RR
-    NAME-R: layout.davidson.harel
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res=matrix(),
         BOOLEAN use_seed=False, INTEGER maxiter=10,
@@ -1365,46 +1093,39 @@ igraph_layout_davidson_harel:
 #######################################
 
 igraph_cocitation:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+    DEPS: vids ON graph
 
 igraph_bibcoupling:
-    DEPS: vids ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+    DEPS: vids ON graph
 
 igraph_similarity_jaccard:
-    DEPS: vids ON graph res, mode ON vids
-    NAME-R: similarity.jaccard
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
+    DEPS: vids ON graph res, mode ON vids
 
 igraph_similarity_dice:
-    DEPS: vids ON graph
-    NAME-R: similarity.dice
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
+    DEPS: vids ON graph
 
 igraph_similarity_inverse_log_weighted:
-    DEPS: vids ON graph
-    NAME-R: similarity.invlogweighted
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL
+    DEPS: vids ON graph
 
 #######################################
 # Community structure
 #######################################
 
 igraph_compare_communities:
-    IGNORE: RR
     PARAMS: |-
         VECTOR comm1, VECTOR comm2, OUT REALPTR res,
         COMMCMP method=VI
 
 igraph_community_spinglass:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, VECTOR_OR_0 weights, OUT REALPTR modularity,
         OUT REALPTR temperature, OUT VECTOR membership, OUT VECTOR csize,
@@ -1413,7 +1134,6 @@ igraph_community_spinglass:
         REAL gamma_minus=0, REAL d_p=0, REAL d_n=0
 
 igraph_community_spinglass_single:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, VECTOR_OR_0 weights, INTEGER vertex, OUT VECTOR community,
         OUT REALPTR cohesion, OUT REALPTR adhesion,
@@ -1421,71 +1141,54 @@ igraph_community_spinglass_single:
         INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
 
 igraph_community_walktrap:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, VECTOR weights, INT steps=4, OUT MATRIX merges,
         OUT VECTOR modularity, OUT VECTOR membership
 
 igraph_community_edge_betweenness:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT VECTOR result, OUT VECTOR edge_betweenness,
         OUT MATRIX merges, OUT VECTOR bridges,
         OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 igraph_community_eb_get_merges:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, VECTOR edges, EDGEWEIGHTS weights=NULL,
         OUT MATRIX merges, OUT VECTOR bridges,
         OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership
+    DEPS: weights ON graph
 
 igraph_community_fastgreedy:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity,
         OUT VECTOR_OR_0 membership
 
 igraph_community_to_membership:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, MATRIX merges, INTEGER steps,
         OUT VECTOR membership, OUT VECTOR csize
 
 igraph_le_community_to_membership:
-    IGNORE: RR, RC
-    NAME-R: community.le.to.membership
     PARAMS: |-
         MATRIX merges, INTEGER steps, INOUT VECTOR membership,
         OUT VECTOR_OR_0 csize
 
 igraph_modularity:
-    IGNORE: RR
-    NAME-R: modularity.igraph
     PARAMS: OUT REALPTR modularity
 
 igraph_modularity_matrix:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: modularity_matrix
     PARAMS: |-
         GRAPH graph,
         EDGEWEIGHTS weights=NULL,
         REAL resolution=1.0,
         OUT MATRIX modmat
+    DEPS: weights ON graph
 
 igraph_reindex_membership:
-    IGNORE: RR, RC
-    NAME-R: reindex.membership
     PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
 
 igraph_community_leading_eigenvector:
-    CLASS-R: igraph.eigenc
-    DEFAULT-R: options=arpack_defaults
-    IGNORE: RR, RC
-    NAME-R: cluster_leading_eigen
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         OUT MATRIX merges, OUT VECTOR membership,
@@ -1498,162 +1201,124 @@ igraph_community_leading_eigenvector:
         LEVCFUNC callback, EXTRA callback_extra
 
 igraph_community_fluid_communities:
-    NAME-R: cluster_fluid_communities
     PARAMS: |-
         GRAPH graph, INTEGER no_of_communities,
         OUT VECTOR membership, OUT REALPTR modularity
 
 igraph_community_label_propagation:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: cluster_label_prop
     PARAMS: |-
         GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL,
         VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL,
         OUT REALPTR modularity
+    DEPS: weights ON graph
 
 igraph_community_multilevel:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: cluster_louvain
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         REAL resolution=1.0,
         OUT VECTOR membership,
         OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
+    DEPS: weights ON graph
 
 igraph_community_optimal_modularity:
-    DEPS: weights ON graph
-    IGNORE: RR
-    NAME-R: cluster_optimal
     PARAMS: |-
         GRAPH graph, OUT REALPTR modularity,
         OUT VECTOR_OR_0 membership,
         EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 igraph_community_leiden:
-    DEPS: weights ON graph, vertex_weights ON graph
-    IGNORE: RR
-    NAME-R: cluster_leiden
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         VERTEXWEIGHTS vertex_weights=NULL,
         REAL resolution_parameter, REAL beta,
         BOOLEAN start, INOUT VECTOR_OR_0 membership,
         OUT INTEGERPTR nb_clusters, OUT REALPTR quality
+    DEPS: weights ON graph, vertex_weights ON graph
 
 igraph_split_join_distance:
-    IGNORE: RR
-    NAME-R: split.join.distance
     PARAMS: |-
         VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12,
         OUT INTEGERPTR distance21
 
 igraph_hrg_fit:
-    CLASS-R: igraphHRG
-    IGNORE: RR
-    NAME-R: fit_hrg
     PARAMS: |-
         GRAPH graph, INOUT HRG hrg=Default, BOOLEAN start=False,
         INT steps=0
 
 igraph_hrg_game:
-    GATTR-R: name IS Hierarchical random graph model
-    NAME-R: sample_hrg
     PARAMS: OUT GRAPH graph, HRG hrg
 
 igraph_hrg_dendrogram:
-    NAME-R: hrg_tree
     PARAMS: OUT GRAPH graph, HRG hrg
 
 igraph_hrg_consensus:
-    NAME-R: consensus_tree
     PARAMS: |-
         GRAPH graph, OUT VECTOR parents, OUT VECTOR weights,
         INOUT HRG hrg=Default, BOOLEAN start=False,
         INT num_samples=10000
 
 igraph_hrg_predict:
-    DEPS: edges ON graph
-    IGNORE: RR
-    NAME-R: predict_edges
     PARAMS: |-
         GRAPH graph, OUT VERTEXSET edges, OUT VECTOR prob,
         INOUT HRG hrg=Default, BOOLEAN start=False,
         INT num_samples=10000, INT num_bins=25
+    DEPS: edges ON graph
 
 igraph_hrg_create:
-    CLASS-R: igraphHRG
-    DEPS: prob ON graph
-    NAME-R: hrg
     PARAMS: OUT HRG hrg, GRAPH graph, VECTOR prob
+    DEPS: prob ON graph
 
 igraph_community_infomap:
-    DEPS: e_weights ON graph, v_weights ON graph
-    IGNORE: RR
-    NAME-R: cluster_infomap
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS e_weights=NULL,
         VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10,
         OUT VECTOR membership, OUT REALPTR codelength
+    DEPS: e_weights ON graph, v_weights ON graph
 
 igraph_graphlets:
-    DEPS: weights ON graph, cliques ON graph
-    IGNORE: RC
-    NAME-R: graphlets
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         OUT VERTEXSETLIST cliques, OUT VECTOR Mu, INT niter=1000
+    DEPS: weights ON graph, cliques ON graph
 
 igraph_graphlets_candidate_basis:
-    DEPS: weights ON graph, cliques ON graph
-    IGNORE: RR, RC
-    NAME-R: graphlets.candidate.basis
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         OUT VERTEXSETLIST cliques, OUT VECTOR thresholds
+    DEPS: weights ON graph, cliques ON graph
 
 igraph_graphlets_project:
-    DEPS: weights ON graph
-    IGNORE: RR, RC
-    NAME-R: graphlets.project
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         VERTEXSETLIST cliques, INOUT VECTOR Muc,
         BOOLEAN startMu=False, INT niter=1000
+    DEPS: weights ON graph
 
 #######################################
 # Conversion
 #######################################
 
 igraph_get_adjacency:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH,
         BOOLEAN eids=False
 
 igraph_get_edgelist:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN bycol=False
 
 igraph_to_directed:
-    IGNORE: RR, RC
     PARAMS: INOUT GRAPH graph, TODIRECTED flags=MUTUAL
 
 igraph_to_undirected:
-    IGNORE: RR
-    NAME-R: as.undirected
     PARAMS: |-
         INOUT GRAPH graph, TOUNDIRECTED mode=COLLAPSE,
         EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
 
 igraph_get_stochastic:
-    IGNORE: RR
-    NAME-R: stochastic_matrix
     PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False
 
 igraph_get_stochastic_sparsemat:
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, OUT SPARSEMATPTR sparsemat,
         BOOLEAN column_wise=False
@@ -1663,85 +1328,67 @@ igraph_get_stochastic_sparsemat:
 #######################################
 
 igraph_read_graph_edgelist:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INFILE instream, INTEGER n=0, BOOLEAN directed=True
 
 igraph_read_graph_ncol:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INFILE instream, STRVECTOR_OR_0 predefnames,
         BOOLEAN names=True, ADD_WEIGHTS weights=True, BOOLEAN directed=True
 
 igraph_read_graph_lgl:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INFILE instream, BOOLEAN names=True,
         ADD_WEIGHTS weights=True, BOOLEAN directed=True
 
 igraph_read_graph_pajek:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INFILE instream
 
 igraph_read_graph_graphml:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INFILE instream, INT index=0
 
 igraph_read_graph_dimacs:
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH graph, INFILE instream, OUT INTEGERPTR source,
         OUT INTEGERPTR target, OUT VECTOR capacity, BOOLEAN directed=True
 
 igraph_read_graph_graphdb:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=False
 
 igraph_read_graph_gml:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INFILE instream
 
 igraph_read_graph_dl:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=True
 
 igraph_write_graph_edgelist:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream
 
 igraph_write_graph_ncol:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight"
 
 igraph_write_graph_lgl:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight",
         BOOLEAN isolates=True
 
 igraph_write_graph_leda:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight"
 
 igraph_write_graph_graphml:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream, BOOLEAN prefixattr=True
 
 igraph_write_graph_pajek:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream
 
 igraph_write_graph_dimacs:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUTFILE outstream, LONGINT source=0, LONGINT target=0,
         VECTOR capacity
 
 igraph_write_graph_gml:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream, VECTOR id, CSTRING creator="igraph"
 
 igraph_write_graph_dot:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUTFILE outstream
 
 #######################################
@@ -1749,129 +1396,106 @@ igraph_write_graph_dot:
 #######################################
 
 igraph_motifs_randesu:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR hist, INT size=3, VECTOR cut_prob
 
 igraph_motifs_randesu_estimate:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT INTEGERPTR est, INT size=3, VECTOR cut_prob,
         INTEGER sample_size, VECTOR_OR_0 sample
 
 igraph_motifs_randesu_no:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR no, INT size=3, VECTOR cut_prob
 
 igraph_dyad_census:
-    NAME-R: dyad_census
     PARAMS: GRAPH graph, OUT INTEGERPTR mut, OUT INTEGERPTR asym, OUT INTEGERPTR null
     RETURN: ERROR
 
 igraph_triad_census:
-    NAME-R: triad_census
     PARAMS: GRAPH graph, OUT VECTOR res
     RETURN: ERROR
 
 igraph_adjacent_triangles:
-    DEPS: vids ON graph
-    NAME-R: count_triangles
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
+    DEPS: vids ON graph
 
 igraph_local_scan_0:
-    DEPS: weights ON graph
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
         NEIMODE mode=OUT
+    DEPS: weights ON graph
 
 igraph_local_scan_0_them:
-    DEPS: weights_them ON them
-    IGNORE: RR
     PARAMS: |-
         GRAPH us, GRAPH them, OUT VECTOR res,
         EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+    DEPS: weights_them ON them
 
 igraph_local_scan_1_ecount:
-    DEPS: weights ON graph
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
         NEIMODE mode=OUT
+    DEPS: weights ON graph
 
 igraph_local_scan_1_ecount_them:
-    DEPS: weights_them ON them
-    IGNORE: RR
     PARAMS: |-
         GRAPH us, GRAPH them, OUT VECTOR res,
         EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+    DEPS: weights_them ON them
 
 igraph_local_scan_k_ecount:
-    DEPS: weights ON graph
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, INT k, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
         NEIMODE mode=OUT
+    DEPS: weights ON graph
 
 igraph_local_scan_k_ecount_them:
-    DEPS: weights_them ON them
-    IGNORE: RR
     PARAMS: |-
         GRAPH us, GRAPH them, INT k, OUT VECTOR res,
         EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+    DEPS: weights_them ON them
 
 igraph_local_scan_neighborhood_ecount:
-    DEPS: weights ON graph
-    IGNORE: RR
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
         VERTEXSETLIST_INT neighborhoods
+    DEPS: weights ON graph
 
 igraph_list_triangles:
-    DEPS: res ON graph
-    NAME-R: triangles
     PARAMS: GRAPH graph, OUT VERTEXSET_INT res
+    DEPS: res ON graph
 
 #######################################
 # Graph operators
 #######################################
 
 igraph_disjoint_union:
-    DEPS: edge_map_left ON left, edge_map_right ON right
-    IGNORE: RR, RC
     PARAMS: |-
         OUT GRAPH res, GRAPH left, GRAPH right,
         OUT EDGESET edge_map_left, OUT EDGESET edge_map_right
+    DEPS: edge_map_left ON left, edge_map_right ON right
 
 igraph_disjoint_union_many:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
 
 igraph_union:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
 
 igraph_union_many:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPHLIST graphs
 
 igraph_intersection:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
 
 igraph_intersection_many:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPHLIST graphs
 
 igraph_difference:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPH orig, GRAPH sub
 
 igraph_complementer:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPH graph, BOOLEAN loops=False
 
 igraph_compose:
-    IGNORE: RR, RC
     PARAMS: OUT GRAPH res, GRAPH g1, GRAPH g2
 
 #######################################
@@ -1879,77 +1503,64 @@ igraph_compose:
 #######################################
 
 igraph_maxflow:
-    DEPS: |-
-        capacity ON graph, source ON graph, target ON graph,
-        partition1 ON graph, partition2 ON graph, flow ON graph,
-        cut ON graph
-    NAME-R: max_flow
     PARAMS: |-
         GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow,
         OUT VECTORM1_OR_0 cut, OUT VERTEXSET_OR_0 partition1,
         OUT VERTEXSET_OR_0 partition2, VERTEX source, VERTEX target,
         EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
+    DEPS: |-
+        capacity ON graph, source ON graph, target ON graph,
+        partition1 ON graph, partition2 ON graph, flow ON graph,
+        cut ON graph
 
 igraph_maxflow_value:
-    DEPS: source ON graph, target ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT REALPTR value, VERTEX source, VERTEX target,
         VECTOR_OR_0 capacity, OUT MAXFLOW_STATS stats
+    DEPS: source ON graph, target ON graph
 
 igraph_mincut_value:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT REALPTR res, VECTOR_OR_0 capacity
 
 igraph_st_mincut_value:
-    DEPS: source ON graph, target ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT REALPTR res, VERTEX source, VERTEX target,
         VECTOR_OR_0 capacity
+    DEPS: source ON graph, target ON graph
 
 igraph_mincut:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT REALPTR value, OUT VECTORM1 partition1,
         OUT VECTORM1 partition2, OUT VECTORM1 cut, VECTOR_OR_0 capacity
 
 igraph_st_vertex_connectivity:
-    DEPS: source ON graph, target ON graph
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target,
         VCONNNEI neighbors=NUMBER_OF_NODES
+    DEPS: source ON graph, target ON graph
 
 igraph_vertex_connectivity:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
 
 igraph_st_edge_connectivity:
-    DEPS: source ON graph, target ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+    DEPS: source ON graph, target ON graph
 
 igraph_edge_connectivity:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
 
 igraph_edge_disjoint_paths:
-    DEPS: source ON graph, target ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+    DEPS: source ON graph, target ON graph
 
 igraph_vertex_disjoint_paths:
-    DEPS: source ON graph, target ON graph
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+    DEPS: source ON graph, target ON graph
 
 igraph_adhesion:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
 
 igraph_cohesion:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
 
 #######################################
@@ -1957,70 +1568,59 @@ igraph_cohesion:
 #######################################
 
 igraph_dominator_tree:
-    DEPS: root ON graph, dom ON graph, leftout ON graph
-    NAME-R: dominator_tree
     PARAMS: |-
         GRAPH graph, VERTEX root, OUT VERTEXSET dom,
         OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout,
         INOUTMODE mode=OUT
+    DEPS: root ON graph, dom ON graph, leftout ON graph
 
 igraph_all_st_cuts:
-    DEPS: |-
-        source ON graph, target ON graph, cuts ON graph,
-        partition1s ON graph
-    NAME-R: st_cuts
     PARAMS: |-
         GRAPH graph, OUT EDGESETLIST_OR_0 cuts,
         OUT VERTEXSETLIST_OR_0 partition1s,
         VERTEX source, VERTEX target
+    DEPS: |-
+        source ON graph, target ON graph, cuts ON graph,
+        partition1s ON graph
 
 igraph_all_st_mincuts:
-    DEPS: |-
-        capacity ON graph, source ON graph, target ON graph,
-        cuts ON graph, partition1s ON graph
-    NAME-R: st_min_cuts
     PARAMS: |-
         GRAPH graph, OUT REALPTR value,
         OUT EDGESETLIST_OR_0 cuts,
         OUT VERTEXSETLIST_OR_0 partition1s,
         VERTEX source, VERTEX target, EDGEWEIGHTS capacity=NULL
+    DEPS: |-
+        capacity ON graph, source ON graph, target ON graph,
+        cuts ON graph, partition1s ON graph
 
 igraph_is_separator:
-    DEPS: candidate ON graph
-    NAME-R: is_separator
     PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEANPTR res
+    DEPS: candidate ON graph
 
 igraph_is_minimal_separator:
-    DEPS: candidate ON graph
-    NAME-R: is_min_separator
     PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEANPTR res
+    DEPS: candidate ON graph
 
 igraph_all_minimal_st_separators:
-    DEPS: separators ON graph
-    NAME-R: min_st_separators
     PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+    DEPS: separators ON graph
 
 igraph_minimum_size_separators:
-    DEPS: separators ON graph
-    NAME-R: min_separators
     PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+    DEPS: separators ON graph
 
 igraph_cohesive_blocks:
-    CLASS-R: cohesiveBlocks
-    DEPS: blocks ON graph
-    IGNORE: RR, RC
-    NAME-R: cohesive.blocks
     PARAMS: |-
         GRAPH graph, OUT VERTEXSETLIST blocks,
         OUT VECTOR cohesion, OUT VECTORM1 parent,
         OUT GRAPH blockTree
+    DEPS: blocks ON graph
 
 #######################################
 # K-Cores
 #######################################
 
 igraph_coreness:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR cores, NEIMODE mode=ALL
 
 #######################################
@@ -2028,25 +1628,19 @@ igraph_coreness:
 #######################################
 
 igraph_isoclass:
-    NAME-R: graph.isoclass
     PARAMS: GRAPH graph, OUT INTEGERPTR isoclass
 
 igraph_isomorphic:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_isoclass_subgraph:
-    DEPS: vids ON graph
-    IGNORE: RR
     PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
+    DEPS: vids ON graph
 
 igraph_isoclass_create:
-    NAME-R: graph_from_isomorphism_class
     PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed=True
 
 igraph_isomorphic_vf2:
-    DEPS: |-
-        vertex_color1 ON graph1, vertex_color2 ON graph2,
-        edge_color1 ON graph1, edge_color2 ON graph2
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
@@ -2055,34 +1649,33 @@ igraph_isomorphic_vf2:
         OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21,
         NULL node_compat_fn, NULL edge_compat_fn,
         NULL extra
+    DEPS: |-
+        vertex_color1 ON graph1, vertex_color2 ON graph2,
+        edge_color1 ON graph1, edge_color2 ON graph2
 
 igraph_count_isomorphisms_vf2:
-    DEPS: |-
-        vertex_color1 ON graph1, vertex_color2 ON graph2,
-        edge_color1 ON graph1, edge_color2 ON graph2
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT INTEGERPTR count, NULL node_compat_fn,
         NULL edge_compat_fn, NULL extra
-
-igraph_get_isomorphisms_vf2:
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
-    IGNORE: RR
+
+igraph_get_isomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT VECTORLIST maps, NULL node_compat_fn,
         NULL edge_compat_fn, NULL extra
-
-igraph_subisomorphic_vf2:
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
+
+igraph_subisomorphic_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
@@ -2091,40 +1684,40 @@ igraph_subisomorphic_vf2:
         OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21,
         NULL node_compat_fn, NULL edge_compat_fn,
         NULL extra
-
-igraph_count_subisomorphisms_vf2:
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
+
+igraph_count_subisomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT INTEGERPTR count, NULL node_compat_fn,
         NULL edge_compat_fn, NULL extra
-
-igraph_get_subisomorphisms_vf2:
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
-    IGNORE: RR
+
+igraph_get_subisomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT VECTORLIST maps, NULL node_compat_fn,
         NULL edge_compat_fn, NULL extra
+    DEPS: |-
+        vertex_color1 ON graph1, vertex_color2 ON graph2,
+        edge_color1 ON graph1, edge_color2 ON graph2
 
 igraph_isomorphic_34:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_canonical_permutation:
-    NAME-R: canonical_permutation
     PARAMS: GRAPH graph, NULL colors, OUT VECTORM1 labeling, BLISSSH sh="fm", OUT
         BLISSINFO info
 
 igraph_permute_vertices:
-    NAME-R: permute
     PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
 
 igraph_isomorphic_bliss:
@@ -2135,11 +1728,9 @@ igraph_isomorphic_bliss:
         OUT BLISSINFO info1, OUT BLISSINFO info2
 
 igraph_automorphisms:
-    NAME-R: automorphisms
     PARAMS: GRAPH graph, NULL colors, BLISSSH sh="fm", OUT BLISSINFO info
 
 igraph_subisomorphic_lad:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH pattern, GRAPH target, VERTEXSETLIST_OR_0 domains,
         OUT BOOLEANPTR_OR_0 iso, OUT VECTOR_OR_0 map,
@@ -2150,8 +1741,6 @@ igraph_subisomorphic_lad:
 #######################################
 
 igraph_scg_grouping:
-    IGNORE: RR
-    NAME-R: scg_group
     PARAMS: |-
         MATRIX V, OUT VECTORM1 groups, INTEGER nt,
         VECTOR_OR_0 nt_vec, SCGMAT mtype=Default,
@@ -2159,8 +1748,6 @@ igraph_scg_grouping:
         INTEGER maxiter=100
 
 igraph_scg_semiprojectors:
-    IGNORE: RR, RC
-    NAME-R: scg_semi_proj
     PARAMS: |-
         VECTORM1 groups, SCGMAT mtype=Default,
         OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R,
@@ -2168,14 +1755,12 @@ igraph_scg_semiprojectors:
         VECTOR_OR_0 p=NULL, SCGNORM norm=Default
 
 igraph_scg_norm_eps:
-    NAME-R: scg_eps
     PARAMS: |-
         MATRIX V, VECTORM1 groups, OUT VECTOR eps,
         SCGMAT mtype=Default, VECTOR_OR_0 p=NULL,
         SCGNORM norm=Default
 
 igraph_scg_adjacency:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH_OR_0 graph, MATRIX_OR_0 matrix,
         SPARSEMAT_OR_0 sparsemat, VECTOR ev,
@@ -2189,7 +1774,6 @@ igraph_scg_adjacency:
         OUT SPARSEMATPTR_OR_0 Rsparse
 
 igraph_scg_stochastic:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH_OR_0 graph, MATRIX_OR_0 matrix,
         SPARSEMAT_OR_0 sparsemat, VECTOR ev,
@@ -2204,7 +1788,6 @@ igraph_scg_stochastic:
         OUT SPARSEMATPTR_OR_0 Rsparse
 
 igraph_scg_laplacian:
-    IGNORE: RR, RC
     PARAMS: |-
         GRAPH_OR_0 graph, MATRIX_OR_0 matrix,
         SPARSEMAT_OR_0 sparsemat, VECTOR ev,
@@ -2223,64 +1806,53 @@ igraph_scg_laplacian:
 #######################################
 
 igraph_is_matching:
-    DEPS: types ON graph, matching ON graph
-    IGNORE: RR
-    NAME-R: is_matching
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
         VECTOR_LONG_M1 matching, OUT BOOLEANPTR res
+    DEPS: types ON graph, matching ON graph
 
 igraph_is_maximal_matching:
-    DEPS: types ON graph
-    IGNORE: RR
-    NAME-R: is_max_matching
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
         VECTOR_LONG_M1 matching, OUT BOOLEANPTR res
+    DEPS: types ON graph
 
 igraph_maximum_bipartite_matching:
-    DEPS: types ON graph, weights ON graph
-    IGNORE: RR
-    NAME-R: max_bipartite_match
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
         OUT INTEGERPTR_OR_0 matching_size,
         OUT REALPTR_OR_0 matching_weight,
         OUT VECTOR_LONG_M1 matching,
         EDGEWEIGHTS weights=NULL, REAL eps=.Machine$double.eps
+    DEPS: types ON graph, weights ON graph
 
 #######################################
 # Embedding
 #######################################
 
 igraph_adjacency_spectral_embedding:
-    DEPS: weights ON graph, cvec ON graph
-    IGNORE: RC
-    NAME-R: embed_adjacency_matrix
     PARAMS: |-
         GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL,
         EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X,
         OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D,
         VECTOR cvec=AsmDefaultCvec,
         INOUT ARPACKOPT options=igraph.arpack.default
+    DEPS: weights ON graph, cvec ON graph
 
 igraph_laplacian_spectral_embedding:
-    DEPS: weights ON graph, type ON graph
-    IGNORE: RC
-    NAME-R: embed_laplacian_matrix
     PARAMS: |-
         GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL,
         EIGENWHICHPOS which=ASE, NEIMODE degmode=OUT,
         LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X,
         OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D,
         INOUT ARPACKOPT options=igraph.arpack.default
+    DEPS: weights ON graph, type ON graph
 
 #######################################
 # Eigensolvers
 #######################################
 
 igraph_eigen_adjacency:
-    NAME-R: spectrum
     PARAMS: |-
         GRAPH graph, EIGENALGO algorithm=ARPACK,
         EIGENWHICH which=Default,
@@ -2293,8 +1865,6 @@ igraph_eigen_adjacency:
 #######################################
 
 igraph_power_law_fit:
-    IGNORE: RR
-    NAME-R: power.law.fit.new
     PARAMS: |-
         VECTOR data, OUT PLFIT res, REAL xmin=-1,
         BOOLEAN force_continuous=False
@@ -2304,8 +1874,6 @@ igraph_power_law_fit:
 #######################################
 
 igraph_sir:
-    CLASS-R: sir
-    NAME-R: sir
     PARAMS: |-
         GRAPH graph, REAL beta, REAL gamma, INTEGER no_sim=100,
         OUT SIRLIST res
@@ -2315,19 +1883,15 @@ igraph_sir:
 #######################################
 
 igraph_running_mean:
-    IGNORE: RR, RC
     PARAMS: VECTOR data, OUT VECTOR res, INTEGER binwidth
 
 igraph_random_sample:
-    IGNORE: RR, RC
     PARAMS: OUT VECTOR res, INTEGER l, INTEGER h, INTEGER length
 
 igraph_convex_hull:
-    NAME-R: convex_hull
     PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
 
 igraph_dim_select:
-    NAME-R: dim_select
     PARAMS: VECTOR sv, OUT INTEGERPTR dim
 
 #######################################
@@ -2335,15 +1899,12 @@ igraph_dim_select:
 #######################################
 
 igraph_is_eulerian:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, BOOL has_path, BOOL has_cycle
 
 igraph_eulerian_path:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, VECTOR res
 
 igraph_eulerian_cycle:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, VECTOR res
 
 #######################################
@@ -2351,5 +1912,4 @@ igraph_eulerian_cycle:
 #######################################
 #
 igraph_convergence_degree:
-    IGNORE: RR, RC
     PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR in, OUT VECTOR out
