@@ -35,6 +35,22 @@ igraph_integer_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
     return dummy;
 }
 
+igraph_integer_t test_inc_adj(igraph_t *g, igraph_inclist_t *inc, igraph_adjlist_t *adj)
+{
+    igraph_integer_t dummy = 0;
+
+    for (int i = 0; i < igraph_vcount(g); i++) {
+        igraph_vector_int_t *adjs = igraph_adjlist_get(adj, i);
+        igraph_vector_int_t *incs = igraph_inclist_get(inc, i);
+        igraph_integer_t nneis = igraph_vector_int_size(adjs);
+        for (int j = 0; j < nneis; j++) {
+            igraph_integer_t edge = VECTOR(*incs)[j];
+            igraph_integer_t neighbor = VECTOR(*adjs)[j];
+            dummy += neighbor + edge;
+        }
+    }
+    return dummy;
+}
 
 igraph_integer_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
 {
@@ -61,6 +77,20 @@ igraph_integer_t test_inc_to(igraph_t *g, igraph_inclist_t *inc)
             igraph_integer_t edge = VECTOR(*neis)[j];
             igraph_integer_t neighbor = IGRAPH_TO(g, edge);
             dummy += neighbor;
+        }
+    }
+    return dummy;
+}
+
+igraph_integer_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
+{
+    igraph_integer_t dummy = 0;
+    for (int i = 0; i < igraph_vcount(g); i++) {
+        igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
+        igraph_integer_t nneis = igraph_vector_int_size(neis);
+        for (int j = 0; j < nneis; j++) {
+            igraph_integer_t edge = VECTOR(*neis)[j];
+            dummy += edge;
         }
     }
     return dummy;
@@ -95,6 +125,26 @@ int main() {
     BENCH(" 5 go over vertices (multiple times) using inclist, IGRAPH_TO.",
             result = test_inc_to(&g, &inc);
          );
+
+    BENCH(" 6 go over edges using inclist, don't retrieve vertex.",
+            result = test_inc_nop(&g, &inc);
+         );
+
+    BENCH(" 7 go over edges and vertices using adjlist and inclist.",
+            result = test_inc_adj(&g, &inc, &adj);
+         );
+
+    igraph_adjlist_destroy(&adj);
+    igraph_inclist_destroy(&inc);
+
+    BENCH(" 8 initialize adjlist, include loops and multiple (which aren't present).",
+            igraph_adjlist_init(&g, &adj, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+         );
+
+    BENCH(" 9 initialize inclist, include loops (which aren't present).",
+            igraph_inclist_init(&g, &inc, IGRAPH_ALL, IGRAPH_LOOPS);
+         );
+
     igraph_adjlist_destroy(&adj);
     igraph_inclist_destroy(&inc);
     return 0;
