@@ -103,49 +103,96 @@ int main() {
     volatile igraph_integer_t result;
 
     igraph_full(&g, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_rng_seed(igraph_rng_default(), 42);
 
     BENCH_INIT();
 
-    BENCH(" 1 initialize adjlist.",
+    printf("Full graph tests:\n");
+
+    BENCH(" fg - 1 initialize adjlist.",
             igraph_adjlist_init(&g, &adj, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
          );
 
-    BENCH(" 2 initialize inclist.",
+    BENCH(" fg - 2 initialize inclist.",
             igraph_inclist_init(&g, &inc, IGRAPH_ALL, IGRAPH_NO_LOOPS);
          );
 
-    BENCH(" 3 go over vertices (multiple times) using adjlist.",
+    BENCH(" fg - 3 go over vertices (multiple times) using adjlist.",
             result = test_adj(&g, &adj);
          );
 
-    BENCH(" 4 go over vertices (multiple times) using inclist, IGRAPH_OTHER.",
+    BENCH(" fg - 4 go over vertices (multiple times) using inclist, IGRAPH_OTHER.",
             result = test_inc_other(&g, &inc);
          );
 
-    BENCH(" 5 go over vertices (multiple times) using inclist, IGRAPH_TO.",
+    BENCH(" fg - 5 go over vertices (multiple times) using inclist, IGRAPH_TO.",
             result = test_inc_to(&g, &inc);
          );
 
-    BENCH(" 6 go over edges using inclist, don't retrieve vertex.",
+    BENCH(" fg - 6 go over edges using inclist, don't retrieve vertex.",
             result = test_inc_nop(&g, &inc);
          );
 
-    BENCH(" 7 go over edges and vertices using adjlist and inclist.",
+    BENCH(" fg - 7 go over edges and vertices using adjlist and inclist.",
             result = test_inc_adj(&g, &inc, &adj);
          );
 
     igraph_adjlist_destroy(&adj);
     igraph_inclist_destroy(&inc);
 
-    BENCH(" 8 initialize adjlist, include loops and multiple (which aren't present).",
+    BENCH(" fg - 8 initialize adjlist, include loops and multiple (which aren't present).",
             igraph_adjlist_init(&g, &adj, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
          );
 
-    BENCH(" 9 initialize inclist, include loops (which aren't present).",
+    BENCH(" fg - 9 initialize inclist, include loops (which aren't present).",
+            igraph_inclist_init(&g, &inc, IGRAPH_ALL, IGRAPH_LOOPS);
+         );
+
+    igraph_destroy(&g);
+    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 10000, 49994999, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+
+    printf("Random graph tests:\n");
+    BENCH(" rg - 1 initialize adjlist.",
+            igraph_adjlist_init(&g, &adj, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+         );
+
+    BENCH(" rg - 2 initialize inclist.",
+            igraph_inclist_init(&g, &inc, IGRAPH_ALL, IGRAPH_NO_LOOPS);
+         );
+
+    BENCH(" rg - 3 go over vertices (multiple times) using adjlist.",
+            result = test_adj(&g, &adj);
+         );
+
+    BENCH(" rg - 4 go over vertices (multiple times) using inclist, IGRAPH_OTHER.",
+            result = test_inc_other(&g, &inc);
+         );
+
+    BENCH(" rg - 5 go over vertices (multiple times) using inclist, IGRAPH_TO.",
+            result = test_inc_to(&g, &inc);
+         );
+
+    BENCH(" rg - 6 go over edges using inclist, don't retrieve vertex.",
+            result = test_inc_nop(&g, &inc);
+         );
+
+    BENCH(" rg - 7 go over edges and vertices using adjlist and inclist.",
+            result = test_inc_adj(&g, &inc, &adj);
+         );
+
+    igraph_adjlist_destroy(&adj);
+    igraph_inclist_destroy(&inc);
+
+    BENCH(" rg - 8 initialize adjlist, include loops and multiple (which aren't present).",
+            igraph_adjlist_init(&g, &adj, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+         );
+
+    BENCH(" rg - 9 initialize inclist, include loops (which aren't present).",
             igraph_inclist_init(&g, &inc, IGRAPH_ALL, IGRAPH_LOOPS);
          );
 
     igraph_adjlist_destroy(&adj);
     igraph_inclist_destroy(&inc);
+
     return 0;
 }
