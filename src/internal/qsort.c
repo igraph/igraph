@@ -29,11 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/types.h> /* ssize_t on *nix platforms */
-
 #include "igraph_qsort.h"
-
-#include "internal/hacks.h" /* ssize_t on Windows */
 
 #ifdef _MSC_VER
     /* MSVC does not have inline when compiling C source files */
@@ -186,7 +182,7 @@ loop:
 	 * expression, to avoid sign ambiguity in the implied comparison.  es
 	 * is safely within [0, SSIZE_MAX].
 	 */
-	d1 = MIN(pd - pc, pn - pd - (ssize_t)es);
+	d1 = MIN(pd - pc, pn - pd - (ptrdiff_t)es);
 	vecswap(pb, pn - d1, d1);
 
 	d1 = pb - pa;
