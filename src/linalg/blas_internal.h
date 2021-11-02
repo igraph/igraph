@@ -59,7 +59,9 @@
 
 #ifdef HAVE_GFORTRAN
 
-/* GFortran-specific calling conventions, used when compiling the R interface */
+/* GFortran-specific calling conventions, used when compiling the R interface.
+ * Derived with "gfortran -fc-prototypes-external", applied on the original
+ * Fortran sources of these functions. */
 
 void igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
                  igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,

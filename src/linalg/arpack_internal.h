@@ -126,7 +126,9 @@
 
 #ifdef HAVE_GFORTRAN
 
-/* GFortran-specific calling conventions, used when compiling the R interface */
+/* GFortran-specific calling conventions, used when compiling the R interface.
+ * Derived with "gfortran -fc-prototypes-external", applied on the original
+ * Fortran sources of these functions. */
 
 void igraphdsaupd_(int *ido, char *bmat, int *n,
                   char *which, int *nev, igraph_real_t *tol,
