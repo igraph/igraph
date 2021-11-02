@@ -29,7 +29,11 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/types.h> /* ssize_t on *nix platforms */
+
 #include "igraph_qsort.h"
+
+#include "internal/hacks.h" /* ssize_t on Windows */
 
 #ifdef _MSC_VER
     /* MSVC does not have inline when compiling C source files */
