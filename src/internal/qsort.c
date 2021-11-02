@@ -29,6 +29,14 @@
  * SUCH DAMAGE.
  */
 
+/* This file originates from the following URL:
+ *
+ * https://cgit.freebsd.org/src/commit/lib/libc/stdlib/qsort.c?id=7f8f79a5c444a565a32b0c6578b07f8d496f6c49
+ *
+ * Create a diff against the revision given above to see what we have changed
+ * to facilitate inclusion into igraph
+ */
+
 #include "igraph_qsort.h"
 
 #ifdef _MSC_VER
