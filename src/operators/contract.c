@@ -52,8 +52,10 @@ static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
  *        vertex in the original graph, it should contain
  *        its id in the new graph.
  * \param vertex_comb What to do with the vertex attributes.
- *        See the igraph manual section about attributes for
- *        details.
+ *        \c NULL means that vertex attributes are not kept
+ *        after the contraction (not even for unaffected
+ *        vertices). See the igraph manual section about attributes
+ *        for details.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number
