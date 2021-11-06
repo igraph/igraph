@@ -1220,8 +1220,12 @@ static igraph_error_t igraph_i_random_sample_alga_real(igraph_vector_t *res,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
-                         igraph_integer_t length) {
+igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
+                    igraph_real_t h, igraph_integer_t length) {
+/* This function is the 'real' version of igraph_random_sample, and was added
+ * so erdos_renyi_game can use a random sample of doubles instead of integers
+ * to prevent overflows on systems with 32-bits igraph_integer_t.
+ */
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
     igraph_error_t retval;

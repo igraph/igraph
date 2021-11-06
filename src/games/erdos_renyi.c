@@ -28,6 +28,8 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 
+#include "random/random_internal.h"
+
 /**
  * \section about_games
  *
