@@ -1029,7 +1029,7 @@ igraph_layout_kamada_kawai_3d:
 
 igraph_layout_graphopt:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, INTEGER niter=500,
+        GRAPH graph, INOUT MATRIX res, INTEGER niter=500,
         REAL node_charge=0.001, REAL node_mass=30,
         INTEGER spring_length=0, REAL spring_constant=1,
         REAL max_sa_movement=5, NULL use_seed
