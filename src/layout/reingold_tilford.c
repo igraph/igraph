@@ -646,6 +646,8 @@ int igraph_i_layout_reingold_tilford_select_roots(
  *   then the roots will be selected automatically. Currently, automatic root
  *   selection prefers low ecccentricity vertices in graphs with fewer than
  *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
+ *   The root selecton heuristic may change without notice. To ensure a consistent
+ *   output, please specify the roots manually.
  * \param rootlevel This argument can be useful when drawing forests which are
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
@@ -910,6 +912,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
  *   then the roots will be selected automatically. Currently, automatic root
  *   selection prefers low ecccentricity vertices in graphs with fewer than
  *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
+ *   The root selecton heuristic may change without notice. To ensure a consistent
+ *   output, please specify the roots manually.
  * \param rootlevel This argument can be useful when drawing forests which are
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
