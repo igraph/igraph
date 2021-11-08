@@ -490,7 +490,18 @@ int igraph_i_layout_reingold_tilford_cluster_degrees_directed(
     return IGRAPH_SUCCESS;
 }
 
-/* Heuristic method to choose "nice" roots for the Reingold-Tilford layout algorithm. */
+/* Heuristic method to choose "nice" roots for the Reingold-Tilford layout algorithm.
+ *
+ * The principle is to select a minimal set of roots so that all other vertices
+ * will be reachable from them.
+ *
+ * In the undirected case, one root is chosen from each connected component.
+ * In the directed case, one root is chosen from each strongly connected component
+ * that has no incoming (or outgoing) edges (depending on 'mode').
+ * When more than one root choice is possible, nodes are prioritized based on
+ * either lowest ecccentricity (if 'use_ecccentricity' is true) or based on
+ * highest degree (out- or in-degree in directed mode).
+ */
 int igraph_i_layout_reingold_tilford_select_roots(
         const igraph_t *graph,
         igraph_neimode_t mode,
@@ -628,13 +639,13 @@ int igraph_i_layout_reingold_tilford_select_roots(
  *   \c IGRAPH_ALL then all edges are used (this was the behavior in
  *   igraph 0.5 and before). This parameter also influences how the root
  *   vertices are calculated, if they are not given. See the \p roots parameter.
- * \param roots The index of the root vertex or root vertices.
- *   If this is a non-empty vector then the supplied vertex ids are used
- *   as the roots of the trees (or a single tree if the graph is connected).
- *   If it is a null pointer of a pointer to an empty vector, then the root
- *   vertices are automatically calculated based on topological sorting,
- *   performed with the opposite mode than the \p mode argument.
- *   After the vertices have been sorted, one is selected from each component.
+ * \param roots The index of the root vertex or root vertices. The set of roots
+ *   should be specified so that all vertices of the graph are reachable from them.
+ *   Simply put, in the udirected case, one root should be given from each
+ *   connected component. If \p roots is \c NULL or a pointer to an empty vector,
+ *   then the roots will be selected automatically. Currently, automatic root
+ *   selection prefers low ecccentricity vertices in graphs with fewer than
+ *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
  * \param rootlevel This argument can be useful when drawing forests which are
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
@@ -892,13 +903,13 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
  *   \c IGRAPH_ALL then all edges are used (this was the behavior in
  *   igraph 0.5 and before). This parameter also influences how the root
  *   vertices are calculated, if they are not given. See the \p roots parameter.
- * \param roots The index of the root vertex or root vertices.
- *   If this is a non-empty vector then the supplied vertex ids are used
- *   as the roots of the trees (or a single tree if the graph is connected).
- *   If it is a null pointer of a pointer to an empty vector, then the root
- *   vertices are automatically calculated based on topological sorting,
- *   performed with the opposite mode than the \p mode argument.
- *   After the vertices have been sorted, one is selected from each component.
+ * \param roots The index of the root vertex or root vertices. The set of roots
+ *   should be specified so that all vertices of the graph are reachable from them.
+ *   Simply put, in the udirected case, one root should be given from each
+ *   connected component. If \p roots is \c NULL or a pointer to an empty vector,
+ *   then the roots will be selected automatically. Currently, automatic root
+ *   selection prefers low ecccentricity vertices in graphs with fewer than
+ *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
  * \param rootlevel This argument can be useful when drawing forests which are
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
