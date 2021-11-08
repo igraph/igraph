@@ -31,7 +31,6 @@
 #include "igraph_paths.h"
 #include "igraph_progress.h"
 #include "igraph_structural.h"
-#include "igraph_topology.h"
 
 #include "core/math.h"
 
