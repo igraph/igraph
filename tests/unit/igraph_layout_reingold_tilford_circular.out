@@ -29,8 +29,8 @@ Two minitrees with rootlevel 10 and 20:
         11 -19.0526 ]
 Graph with just loops, triple edges and disconnected vertices:
 [        1        0
-  -0.209057  1.98904
   -0.104528 0.994522
+  -0.209057  1.98904
   -0.978148 -0.207912
   0.309017 -0.951057 ]
 Checking proper error handling:
