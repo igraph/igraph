@@ -36,8 +36,10 @@
  * \param graph The graph object.
  * \param multiple Logical, if true, multiple edges will be removed.
  * \param loops Logical, if true, loops (self edges) will be removed.
- * \param edge_comb What to do with the edge attributes. See the igraph
- *        manual section about attributes for details.
+ * \param edge_comb What to do with the edge attributes. \c NULL means to
+ *        discard the edge attributes after the operation, even for edges
+ *        that were unaffeccted. See the igraph manual section about attributes
+ *        for details.
  * \return Error code:
  *    \c IGRAPH_ENOMEM if we are out of memory.
  *

@@ -5,8 +5,7 @@
 #ifndef COLAMD_H
 #define COLAMD_H
 
-#define _GLPSTD_STDIO
-#include "glpenv.h"
+#include "env.h"
 
 #define COLAMD_DATE "Nov 1, 2007"
 #define COLAMD_VERSION_CODE(main, sub) ((main) * 1000 + (sub))

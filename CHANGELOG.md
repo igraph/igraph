@@ -512,13 +512,20 @@
    `AUTO`; earlier versions had a bug where `AUTO` simply checked whether LTO
    is supported but then did not use LTO even if it was supported.
 
+ - When using igraph from a CMake project, it is now checked that the project has
+   the C++ language enabled. This is necessary for linking to igraph with CMake.
+
 ### Other
 
  - `igraph_decompose()` is now much faster for large graphs containing many
-   isolates or small components (#960)
+   isolates or small components (#960).
 
  - `igraph_largest_cliques()` and `igraph_clique_number()` were re-written to
-   use `igraph_maximal_cliques_callback()` so they are much faster now (#804)
+   use `igraph_maximal_cliques_callback()` so they are much faster now (#804).
+
+ - The vendored GLPK has been upgraded to GLPK 5.0.
+
+ - Documentation improvements.
 
 ## [0.9.4] - 2021-05-31
 

@@ -460,6 +460,11 @@ typedef enum {
         return igraph_errno ; \
     } while (0)
 
+#define IGRAPH_ERROR_NO_RETURN(reason, igraph_errno) \
+    do { \
+        igraph_error (reason, IGRAPH_FILE_BASENAME, __LINE__, igraph_errno) ; \
+    } while (0)
+
 /**
  * \function igraph_error
  * \brief Triggers an error.

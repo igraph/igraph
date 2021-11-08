@@ -2,6 +2,7 @@
 # igraph.pc.in
 
 include(JoinPaths)
+include(CheckCXXSymbolExists)
 
 # Converts the name of a library file (or framework on macOS) into an
 # appropriate linker flag (-lsomething or -framework something.framework).
@@ -26,12 +27,14 @@ else()
   set(PKGCONFIG_LIBS_PRIVATE "")
 endif()
 
-if(APPLE)
-  # All recent macOS distributions use libc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
-elseif(NOT MSVC)
-  # Most Linux distributions and MSYS use libstdc++
-  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
+if(NOT MSVC)
+  check_cxx_symbol_exists(_LIBCPP_VERSION "vector" USING_LIBCXX)
+  check_cxx_symbol_exists(__GLIBCXX__ "vector" USING_LIBSTDCXX)
+  if(USING_LIBCXX)
+    set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
+  elseif(USING_LIBSTDCXX)
+    set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
+  endif()
 endif()
 
 if(IGRAPH_GRAPHML_SUPPORT)

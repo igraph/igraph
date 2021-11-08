@@ -436,6 +436,7 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
  *
  * </para><para>
  * If the supplied graph is undirected, this function does nothing.
+ *
  * \param graph The graph object to convert.
  * \param mode Constant, specifies the details of how exactly the
  *        conversion is done. Possible values: \c
@@ -450,7 +451,10 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
  *        Non-mutual edges are lost; loop edges are kept unconditionally.
  *        This mode might create multiple edges.
  * \param edge_comb What to do with the edge attributes. See the igraph
- *        manual section about attributes for details.
+ *        manual section about attributes for details. \c NULL means that
+ *        the edge attributes are lost during the conversion, \em except
+ *        when \c mode is \c IGRAPH_TO_UNDIRECTED_EACH, in which case the
+ *        edge attributes are kept intact.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number

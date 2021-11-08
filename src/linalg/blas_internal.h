@@ -57,6 +57,22 @@
     #define igraphdsyrk_    dsyrk_
 #endif
 
+#ifdef HAVE_GFORTRAN
+
+/* GFortran-specific calling conventions, used when compiling the R interface.
+ * Derived with "gfortran -fc-prototypes-external", applied on the original
+ * Fortran sources of these functions. */
+
+void igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
+                 igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
+                 igraph_real_t *beta, igraph_real_t *y, int *incy, long int trans_len);
+
+void igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
+                 double *alpha, double *a, int *lda, double *b, int *ldb,
+                 double *beta, double *c__, int *ldc, long int transa_len, long int transb_len);
+
+#else
+
 int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
                  igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
                  igraph_real_t *beta, igraph_real_t *y, int *incy);
@@ -64,6 +80,8 @@ int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
 int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
                  double *alpha, double *a, int *lda, double *b, int *ldb,
                  double *beta, double *c__, int *ldc);
+
+#endif
 
 double igraphdnrm2_(int *n, double *x, int *incx);
 

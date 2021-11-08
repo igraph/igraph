@@ -782,6 +782,8 @@ void graph_molloy_opt::sort() {
 // }
 
 bool graph_molloy_opt::verify(int mode) {
+    IGRAPH_UNUSED(mode);
+#ifndef NDEBUG
     igraph_integer_t i, j, k;
     assert(neigh[0] == links);
     // verify edges count
@@ -813,6 +815,7 @@ bool graph_molloy_opt::verify(int mode) {
                 }
             assert(nb > 0);
         }
+#endif
     return true;
 }
 
