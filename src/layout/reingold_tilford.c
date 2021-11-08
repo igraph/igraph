@@ -28,6 +28,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_paths.h"
 #include "igraph_progress.h"
 #include "igraph_structural.h"
 #include "igraph_topology.h"
@@ -446,6 +447,161 @@ static int igraph_i_layout_reingold_tilford_postorder(
     return 0;
 }
 
+/* This function computes the number of outgoing (or incoming) connections
+ * of clusters, represented as a membership vector. It only works with
+ * directed graphs. */
+int igraph_i_layout_reingold_tilford_cluster_degrees_directed(
+        const igraph_t *graph,
+        const igraph_vector_t *membership,
+        igraph_integer_t no_comps,
+        igraph_neimode_t mode,
+        igraph_vector_t *degrees) {
+
+    igraph_eit_t eit;
+
+    if (! igraph_is_directed(graph) || (mode != IGRAPH_OUT && mode != IGRAPH_IN)) {
+        IGRAPH_ERROR("Directed graph expected.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(igraph_vector_resize(degrees, no_comps));
+    igraph_vector_null(degrees);
+
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+    for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
+
+        igraph_integer_t from = IGRAPH_FROM(graph, eid);
+        igraph_integer_t to   = IGRAPH_TO(graph, eid);
+
+        igraph_integer_t from_cl = VECTOR(*membership)[from];
+        igraph_integer_t to_cl   = VECTOR(*membership)[to];
+
+        igraph_integer_t cl = mode == IGRAPH_OUT ? from_cl : to_cl;
+
+        if (from_cl != to_cl) {
+            VECTOR(*degrees)[cl] += 1;
+        }
+    }
+
+    igraph_eit_destroy(&eit);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/* Heuristic method to choose "nice" roots for the Reingold-Tilford layout algorithm. */
+int igraph_i_layout_reingold_tilford_select_roots(
+        const igraph_t *graph,
+        igraph_neimode_t mode,
+        igraph_vector_t *roots,
+        igraph_bool_t use_eccentricity) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_t order, membership;
+    igraph_integer_t no_comps;
+    long int i, j;
+
+    if (! igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    if (use_eccentricity) {
+        /* Sort vertices by decreasing eccenticity. */
+
+        igraph_vector_t ecc;
+
+        IGRAPH_VECTOR_INIT_FINALLY(&ecc, no_of_nodes);
+        IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(), mode));
+        IGRAPH_CHECK(igraph_vector_qsort_ind(&ecc, &order, /* descending= */ 0));
+
+        igraph_vector_destroy(&ecc);
+        IGRAPH_FINALLY_CLEAN(1);
+    } else {
+        /* Sort vertices by decreasing degree (out- or in-degree in directed case). */
+
+        IGRAPH_CHECK(igraph_sort_vertex_ids_by_degree(graph, &order,
+                     igraph_vss_all(), mode, 0, IGRAPH_DESCENDING, 0));
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);    
+    IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ NULL,
+                                 &no_comps, mode == IGRAPH_ALL ? IGRAPH_WEAK : IGRAPH_STRONG));
+
+    IGRAPH_CHECK(igraph_vector_resize(roots, no_comps));
+    igraph_vector_fill(roots, -1); /* -1 signifies a not-yet-determined root for a component */
+
+    if (mode != IGRAPH_ALL) {
+        /* Directed case:
+         *
+         * We break the graph into strongly-connected components and find those components
+         * which have no incoming (outgoing) edges. The largest out-degree (in-degree)
+         * nodes from these components will be chosen as roots. When the graph is a DAG,
+         * these will simply be the source (sink) nodes. */
+
+        igraph_vector_t cluster_degrees;
+
+        IGRAPH_VECTOR_INIT_FINALLY(&cluster_degrees, no_of_nodes);
+        IGRAPH_CHECK(igraph_i_layout_reingold_tilford_cluster_degrees_directed(
+                         graph, &membership, no_comps,
+                         mode == IGRAPH_OUT ? IGRAPH_IN : IGRAPH_OUT, /* reverse direction */
+                         &cluster_degrees));
+
+        /* Iterate through nodes in decreasing out-degree (or in-degree) order
+         * and record largest degree node in each strongly-connected component
+         * which has no incoming (outgoing) edges. */
+        for (i = 0; i < no_of_nodes; ++i) {
+            long int v  = (long int) VECTOR(order)[i];
+            long int cl = VECTOR(membership)[v];
+            if (VECTOR(cluster_degrees)[cl] == 0 && VECTOR(*roots)[cl] == -1) {
+                VECTOR(*roots)[cl] = v;
+            }
+        }
+
+        igraph_vector_destroy(&cluster_degrees);
+        IGRAPH_FINALLY_CLEAN(1);
+
+        /* Remove remaining -1 indices. These correspond to components that
+         * did have some incoming edges. */
+        for (i=0, j=0; i < no_comps; ++i) {
+            if (VECTOR(*roots)[i] == -1) {
+                continue;
+            }
+            VECTOR(*roots)[j++] = VECTOR(*roots)[i];
+        }
+        igraph_vector_resize(roots, j);
+
+    } else {
+        /* Undirected case:
+         *
+         * Select the highest degree node from each component.
+         */
+
+        long int no_seen = 0;
+
+        for (i=0; i < no_of_nodes; ++i) {
+            long int v  = VECTOR(order)[i];
+            long int cl = VECTOR(membership)[v];
+            if (VECTOR(*roots)[cl] == -1) {
+                no_seen += 1;
+                VECTOR(*roots)[cl] = v;
+            }
+            if (no_seen == no_comps) {
+                /* All components have roots now. */
+                break;
+            }
+        }
+    }
+
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&order);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_layout_reingold_tilford
  * \brief Reingold-Tilford layout for tree graphs
@@ -457,7 +613,8 @@ static int igraph_i_layout_reingold_tilford_postorder(
  *
  * </para><para>
  * Reingold, E and Tilford, J: Tidier drawing of trees.
- * IEEE Trans. Softw. Eng., SE-7(2):223--228, 1981
+ * IEEE Trans. Softw. Eng., SE-7(2):223--228, 1981.
+ * https://doi.org/10.1109/TSE.1981.234519
  *
  * </para><para>
  * If the given graph is not a tree, a breadth-first search is executed
@@ -505,7 +662,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     const igraph_t *pextended = graph;
     igraph_vector_t myroots;
     const igraph_vector_t *proots = roots;
-    igraph_neimode_t mode2;
+
     long int i;
     igraph_vector_t newedges;
 
@@ -528,58 +685,13 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     }
 
     /* ----------------------------------------------------------------------- */
-    /* If root vertices are not given, then do a topological sort and take
-       the last element from every component for directed graphs and mode == out,
-       or the first element from every component for directed graphs and mode ==
-       in,or select the vertex with the maximum degree from each component for
-       undirected graphs */
+    /* If root vertices are not given, perform automated root selection. */
 
     if (!roots || igraph_vector_size(roots) == 0) {
 
-        igraph_vector_t order, membership;
-        igraph_integer_t no_comps;
-        long int i, noseen = 0;
-
         IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
-        IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
-
-        if (mode != IGRAPH_ALL) {
-            /* look for roots by swimming against the stream */
-            mode2 = (mode == IGRAPH_IN) ? IGRAPH_OUT : IGRAPH_IN;
-
-            IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
-            IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0,
-                                         &no_comps, IGRAPH_WEAK));
-        } else {
-            IGRAPH_CHECK(igraph_sort_vertex_ids_by_degree(graph, &order,
-                         igraph_vss_all(), IGRAPH_ALL, 0, IGRAPH_ASCENDING, 0));
-            IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0,
-                                         &no_comps, IGRAPH_WEAK));
-        }
-
-        IGRAPH_CHECK(igraph_vector_resize(&myroots, no_comps));
-
-        /* go backwards and fill the roots vector with indices [1, no_of_nodes]
-           The index 0 is used to signal this root has not been found yet:
-           all indices are then decreased by one to [0, no_of_nodes - 1] */
-        igraph_vector_null(&myroots);
+        igraph_i_layout_reingold_tilford_select_roots(graph, mode, &myroots, no_of_nodes < 500);
         proots = &myroots;
-        for (i = no_of_nodes - 1; noseen < no_comps && i >= 0; i--) {
-            long int v = (long int) VECTOR(order)[i];
-            long int mem = (long int) VECTOR(membership)[v];
-            if (VECTOR(myroots)[mem] == 0) {
-                noseen += 1;
-                VECTOR(myroots)[mem] = v + 1;
-            }
-        }
-        for (i = 0; i < no_comps; i++) {
-            VECTOR(myroots)[i] -= 1;
-        }
-
-        igraph_vector_destroy(&membership);
-        igraph_vector_destroy(&order);
-        IGRAPH_FINALLY_CLEAN(2);
 
     } else if (rootlevel && igraph_vector_size(rootlevel) > 0 &&
                igraph_vector_size(roots) > 1) {
