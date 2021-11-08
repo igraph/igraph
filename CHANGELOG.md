@@ -517,6 +517,12 @@
 
 ### Other
 
+ - Improved the root selection method for disconnected graphs in the
+   Reingold-Tilford layout (#1836). The new root selection method provides
+   niceer results if the graph is not a tree, although it is still recommended
+   to use the Sugiyama layout instead, unless the input graph is _almost_ a
+   tree, in which case Reingold-Tilfold may still be preferred.
+
  - `igraph_decompose()` is now much faster for large graphs containing many
    isolates or small components (#960).
 
