@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: Install dependencies
-      run: sudo apt-get install ninja cmake libarpack2-dev libglpk-dev libgmp-dev
+      run: sudo apt-get install ninja-build cmake libarpack2-dev libglpk-dev libgmp-dev
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
