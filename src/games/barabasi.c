@@ -737,7 +737,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
         }
 
         /* aging */
-        for (k = 1; i - binwidth * k + 1 >= 1; k++) {
+        for (k = 1; binwidth * k <= i; k++) {
             long int shnode = i - binwidth * k;
             long int deg = (long int) VECTOR(degree)[shnode];
             long int age = (i - shnode) / binwidth;
