@@ -211,8 +211,11 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_nodes * dims +
-                                       mutual * directed * no_of_nodes * dims));
+    if (mutual && directed) {
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_nodes * dims));
+    } else {
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_nodes * dims));
+    }
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
