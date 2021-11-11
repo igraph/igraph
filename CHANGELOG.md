@@ -491,7 +491,7 @@
 
  - `igraph_version()` no longer returns an error code.
 
-## [0.9.5]
+## [0.9.5] - 2021-11-11
 
 ### Fixed
 
