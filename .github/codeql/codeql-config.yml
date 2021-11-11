@@ -1,0 +1,4 @@
+paths-ignore:
+  - build/CMakeFiles/CMakeTmp
+  - vendor/f2c
+  - vendor/glpk
