@@ -1063,8 +1063,7 @@ igraph_layout_sugiyama:
 
 igraph_layout_mds:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL,
-        INTEGER dim=2, NULL options
+        GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, INTEGER dim=2
 
 igraph_layout_bipartite:
     PARAMS: |-
@@ -1163,7 +1162,8 @@ igraph_community_eb_get_merges:
     DEPS: weights ON graph
 
 igraph_community_fastgreedy:
-    PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity,
+    PARAMS: |-
+        GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity,
         OUT VECTOR_OR_0 membership
 
 igraph_community_to_membership:
@@ -1177,14 +1177,17 @@ igraph_le_community_to_membership:
         OUT VECTOR_OR_0 csize
 
 igraph_modularity:
-    PARAMS: OUT REALPTR modularity
+    PARAMS: |-
+        GRAPH graph, VECTOR membership, IN VECTOR_OR_0 weights=NULL,
+        REAL resolution=1.0, BOOLEAN directed=True, OUT REALPTR modularity
 
 igraph_modularity_matrix:
     PARAMS: |-
         GRAPH graph,
         EDGEWEIGHTS weights=NULL,
         REAL resolution=1.0,
-        OUT MATRIX modmat
+        OUT MATRIX modmat,
+        BOOLEAN directed=True
     DEPS: weights ON graph
 
 igraph_reindex_membership:
@@ -1844,7 +1847,7 @@ igraph_adjacency_spectral_embedding:
 igraph_laplacian_spectral_embedding:
     PARAMS: |-
         GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL,
-        EIGENWHICHPOS which=ASE, NEIMODE degmode=OUT,
+        EIGENWHICHPOS which=ASE,
         LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X,
         OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D,
         INOUT ARPACKOPT options=igraph.arpack.default
