@@ -20,6 +20,26 @@
 
 #include "bench.h"
 
+igraph_integer_t test_direct(igraph_t *g)
+{
+    igraph_integer_t dummy = 0;
+
+    int ei = 0;
+    int eo = 0;
+    for (int i = 0; i < igraph_vcount(g); i++) {
+        while (VECTOR(g->from)[VECTOR(g->oi)[ei]] == i) {
+            igraph_integer_t neighbor = VECTOR(g->to)[VECTOR(g->oi)[ei]];
+            dummy += neighbor;
+            ei++;
+        }
+        while (VECTOR(g->to)[VECTOR(g->ii)[eo]] == i) {
+            igraph_integer_t neighbor = VECTOR(g->from)[VECTOR(g->ii)[eo]];
+            dummy += neighbor;
+            eo++;
+        }
+    }
+    return dummy;
+}
 igraph_integer_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
 {
     igraph_integer_t dummy = 0;
@@ -139,16 +159,24 @@ void do_benchmarks(char *name, igraph_t *g, int repeat) {
     igraph_adjlist_destroy(&adj);
     igraph_inclist_destroy(&inc);
 
+    printf("%s", name);
     BENCH("8 initialize adjlist, include loops and multiple (which aren't present).",
             REPEAT(igraph_adjlist_init(g, &adj, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE), repeat);
          );
 
+    printf("%s", name);
     BENCH("9 initialize inclist, include loops (which aren't present).",
             REPEAT(igraph_inclist_init(g, &inc, IGRAPH_ALL, IGRAPH_LOOPS), repeat);
          );
 
     igraph_adjlist_destroy(&adj);
     igraph_inclist_destroy(&inc);
+
+    printf("%s", name);
+    BENCH("10 go over edges and vertices using graph internals directly.",
+            REPEAT(result = test_direct(g), repeat);
+         );
+    //printf("result:%" IGRAPH_PRId "\n", result);
 }
 
 int main() {
