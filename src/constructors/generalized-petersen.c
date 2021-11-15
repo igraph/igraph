@@ -20,9 +20,26 @@
 
 #include "igraph_interface.h"
 
+
 int igraph_generalized_petersen(igraph_t *igraph, igraph_integer_t n, igraph_integer_t k) {
     /* This is a generalized Petersen graph constructor*/
+    igraph_vector_int_t edges;
 
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
+    if (n < 3) {
+        IGRAPH_ERROR("n must be greater than or equal to 3", IGRAPH_EINVAL);
+    }
+
+    if (k < 1 || k > (n-1)/2) {
+        IGRAPH_ERROR("k must be positive and less than (n-1)/2", IGRAPH_EINVAL);
+    }
+
+
+
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
     /* Return no error */
     return IGRAPH_SUCCESS;
 }
