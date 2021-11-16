@@ -772,11 +772,23 @@ igraph_random_walk:
 # Degree sequences
 #######################################
 
+igraph_is_bigraphical:
+    PARAMS: |-
+        VECTOR degrees1, VECTOR degrees2,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE, OUT BOOLEANPTR res
+
 igraph_is_degree_sequence:
     PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
+    FLAGS: DEPRECATED
+
+igraph_is_graphical:
+    PARAMS: |-
+        VECTOR out_deg, VECTOR_OR_0 in_deg=NULL,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE, OUT BOOLEANPTR res
 
 igraph_is_graphical_degree_sequence:
     PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
+    FLAGS: DEPRECATED
 
 #######################################
 # Visitors
