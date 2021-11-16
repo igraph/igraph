@@ -174,11 +174,36 @@ see also [Legal Stuff](#legal).
 <a name="branching"></a>
 ### Branching
 
-`igraph` is committed to [semantic versioning](https://semver.org/). We are currently still in the development release (0.x), which in principle is a mark that the public API is not yet stable. Regardless, we try to maintain semantic versioning also for the development releases. We do so as follows. Any released minor version (0.x.z) will be API backwards-compatible with any previous release of the *same* minor version (0.x.y, with y < z). This means that *if* there is an API incompatible change, we will increase the minor version. For example, release 0.8.1 is API backwards-compatible with release 0.8.0, while release 0.9.0 is API incompatible with version 0.8.1. Note that this only concerns the *public* API, internal functions may change also within a minor version.
+`igraph` is committed to [semantic versioning](https://semver.org/). We are
+currently still in the development release (0.x), which in principle is a mark
+that the public API is not yet stable. Regardless, we try to maintain semantic
+versioning also for the development releases. We do so as follows. Any released
+minor version (0.x.z) will be API backwards-compatible with any previous release
+of the *same* minor version (0.x.y, with y < z). This means that *if* there is
+an API incompatible change, we will increase the minor version. For example,
+release 0.8.1 is API backwards-compatible with release 0.8.0, while release
+0.9.0 is API incompatible with version 0.8.1. Note that this only concerns the *
+public* API, internal functions may change also within a minor version.
 
-There will always be two versions of `igraph`: the most recent released version, and the next upcoming minor release, which is by definition not yet released. The most recent release version is in the `master` branch, while the next upcoming minor release is in the `develop` branch. If you make a change that is API incompatible with the most recent release, it **must** be merged to the `develop` branch. If the change is API backwards-compatible, it **can** be merged to the `master` branch. It is possible that you build on recent improvements in the `develop` branch, in which case your change should of course target the `develop` branch. If you only add new functionality, but do not change anything of the existing API, this should be backwards-compatible, and can be merged in the `master` branch.
+There will always be two versions of `igraph`: the most recent released version,
+and the next upcoming minor release, which is by definition not yet released.
+The most recent release version is in the `master` branch, while the next
+upcoming minor release is in the `develop` branch. If you make a change that is
+API incompatible with the most recent release, it **must** be merged to
+the `develop` branch. If the change is API backwards-compatible, it **can** be
+merged to the `master` branch. It is possible that you build on recent
+improvements in the `develop` branch, in which case your change should of course
+target the `develop` branch. If you only add new functionality, but do not
+change anything of the existing API, this should be backwards-compatible, and
+can be merged in the `master` branch.
 
-When you make a new pull request, please specify the correct target branch. The maintainers of `igraph` may decide to retarget your pull request to the correct branch. Retargeting you pull request may result in merge conflicts, so it is always good to decide **before** starting to work on something whether you should start from the `master` branch or from the `develop` branch. In most cases, changes in the `master` branch will also be merged to the `develop` branch by the maintainers.
+When you make a new pull request, please specify the correct target branch. The
+maintainers of `igraph` may decide to retarget your pull request to the correct
+branch. Retargeting you pull request may result in merge conflicts, so it is
+always good to decide **before** starting to work on something whether you
+should start from the `master` branch or from the `develop` branch. In most
+cases, changes in the `master` branch will also be merged to the `develop`
+branch by the maintainers.
 
 <a name="tips"></a>
 ## Writing igraph Code
