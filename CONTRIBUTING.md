@@ -1,35 +1,41 @@
 # Contributing to this project
 
-Please take a moment to review this document in order to make the contribution
-process easy and effective for everyone involved.
+Thank you for being interested in contributing to `igraph`! We need the help of
+volunteers to keep the package going, so every help is welcome. You can help out
+the project in several different ways. This repository only hosts the C code of
+the `igraph` project. Even if you are not so experienced with C, you can
+contribute in a number of ways.
 
-Following these guidelines helps to communicate that you respect the time of
-the developers managing and developing this open source project. In return,
-they should reciprocate that respect in addressing your issue or assessing
-patches and features.
+You can contribute to `igraph` in various ways:
 
+1. Respond to user questions on
+   our [support forum](https://igraph.discourse.group/).
+2. Correct or improve our [documentation](https://igraph.org/c/html/latest/).
+3. Go over [open issues](https://github.com/igraph/igraph/issues):
+   - Are some older issues still a problem in the most recent version?
+   - Can you reproduce some of the bugs that are reported?
+   - Some [issues point out problem with documentation](https://github.com/igraph/igraph/labels/documentation), perhaps you could help correct this?
+   - Looking to contribute code? Take a look at
+     some [good first issues](https://github.com/igraph/igraph/labels/good%20first%20issue).
 
 ## Using the issue tracker
 
-The issue tracker is the preferred channel for [bug reports](#bugs),
+- The issue tracker is the preferred channel for [bug reports](#bugs),
 [features requests](#features) and [submitting pull
-requests](#pull-requests), but please respect the following restrictions:
+requests](#pull-requests).
 
-* Please **do not** use the issue tracker for personal support requests (use
-  our [igraph support forum](https://igraph.discourse.group)).
+- Do you have a support question? Please use
+  our [igraph support forum](https://igraph.discourse.group) for support
+  requests.
 
-* Please **do not** derail or troll issues. Keep the discussion on topic and
-  respect the opinions of others.
-
-Please also take a look at our [tips on writing igraph code](#tips) before
-getting your hands dirty.
-
+- Please keep the discussion on topic and respect the opinions of others, and
+  adhere to our [Code of Conduct](https://igraph.org/code-of-conduct.html).
 
 <a name="bugs"></a>
 ## Bug reports
 
 A bug is a _demonstrable problem_ that is caused by the code in the repository.
-Good bug reports are extremely helpful - thank you!
+Good bug reports are extremely helpful &mdash; thank you for reporting!
 
 Guidelines for bug reports:
 
@@ -52,10 +58,10 @@ Guidelines for bug reports:
 4. **Isolate the problem** &mdash; create a [short, self-contained, correct
    example](http://sscce.org/).
 
-A good bug report shouldn't leave others needing to chase you up for more
-information. Please try to be as detailed as possible in your report. What is
-your environment? What steps will reproduce the issue? What would you expect to
-be the outcome? All these details will help people to fix any potential bugs.
+Please try to be as detailed as possible in your report and provide all
+necessary information. What is your environment? What steps will reproduce the
+issue? What would you expect to be the outcome? All these details will help us
+to fix any potential bugs.
 
 Example:
 
@@ -79,18 +85,21 @@ Example:
 <a name="features"></a>
 ## Feature requests
 
-Feature requests are welcome. But take a moment to find out whether your idea
-fits with the scope and aims of the project. It's up to *you* to make a strong
-case to convince the project's developers of the merits of this feature. Please
-provide as much detail and context as possible.
-
+Feature requests are always welcome. But take a moment to find out whether your
+idea fits with the scope and aims of the project. Please provide as much detail
+and context as possible, and where possible, references to relevant literature.
+Having said that, implementing new features can be quite time consuming, and as
+such they might not be implemented quickly. In addition, the development team
+might decide not to implement a certain feature. It's up to you to make a case
+to convince the project's developers of the merits of this feature.
 
 <a name="pull-requests"></a>
 ## Pull requests
 
-Good pull requests - patches, improvements, new features - are a fantastic
-help. They should remain focused in scope and avoid containing unrelated
-commits.
+Good pull requests - patches, improvements, new features - are a fantastic help.
+They should remain focused in scope and avoid containing unrelated commits.
+Please also take a look at our [tips on writing igraph code](#tips) before
+getting your hands dirty.
 
 **Please ask first** before embarking on any significant pull request (e.g.
 implementing features, refactoring code, porting to a different language),
@@ -100,8 +109,7 @@ project's developers might not want to merge into the project.
 Please adhere to the coding conventions used throughout a project (indentation,
 accurate comments, etc.) and any other requirements (such as test coverage).
 
-Follow this process if you'd like your work considered for inclusion in the
-project:
+Follow the following steps if you would like to make a new pull request:
 
 1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork,
    and configure the remotes:
@@ -132,25 +140,25 @@ project:
    git checkout -b <topic-branch-name>
    ```
 
-4. Commit your changes in logical chunks. Please adhere to these [git commit
-   message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
-   or your code is unlikely be merged into the main project. Use Git's
-   [interactive rebase](https://help.github.com/articles/interactive-rebase)
-   feature to tidy up your commits before making them public.
+4. Please commit your changes in logical chunks, and try to provide clear commit
+   messages.
 
-5. We have a handy [checklist for new igraph
-   functions](https://github.com/igraph/igraph/wiki/Checklist-for-new-(and-old)-functions).
+5. We have a [checklist for new igraph functions](https://github.com/igraph/igraph/wiki/Checklist-for-new-(and-old)-functions).
    If you have added any new functions to igraph, please go through the
    checklist to ensure that your functions play nicely with the rest of the
    library.
 
-6. Locally merge (or rebase) the upstream development branch into your topic branch:
+6. Make sure that your PR is based off the latest code and locally merge (or
+   rebase) the upstream development branch into your topic branch:
 
    ```bash
    git pull [--rebase] upstream <dev-branch>
    ```
 
-7. Push your topic branch up to your fork:
+7. If necessary, you can use git's
+   [interactive rebase](https://help.github.com/articles/interactive-rebase)
+   feature to tidy up your commits before pushing them.
+   You can push your topic branch up to your fork:
 
    ```bash
    git push origin <topic-branch-name>
@@ -159,8 +167,9 @@ project:
 8. [Open a pull request](https://help.github.com/articles/using-pull-requests/)
     with a clear title and description.
 
-**IMPORTANT**: By submitting a pull request, you agree to allow the project owner to
-license your work under the same license as that used by the project.
+**IMPORTANT**: By submitting a pull request, you agree to allow the project
+owner to license your work under the same license as that used by the project,
+see also [Legal Stuff](#legal).
 
 <a name="branching"></a>
 ### Branching
@@ -182,16 +191,17 @@ In general, if you are not sure about something, please ask! You can
 open an issue on GitHub, open a thread in our
 [igraph support forum](https://igraph.discourse.group), or write to
 [@ntamas](https://github.com/ntamas), [@vtraag](https://github.com/vtraag),
-[@szhorvat](https://github.com/szhorvat) or
+[@szhorvat](https://github.com/szhorvat), [@iosonofabio](https://github.com/iosonofabio) or
 [@gaborcsardi](https://github.com/gaborcsardi).
-We prefer the igraph support forum, because then others can learn from it
+We prefer open communication channels, because then others can learn from it
 too.
 
+<a name="legal"></a>
 ## Legal Stuff
 
 This is a pain to deal with, but we can't avoid it, unfortunately.
 
-So, igraph is licensed under the "General Public License (GPL) version 2, or
+So, `igraph` is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
 License". By submitting a patch or pull request, you agree to allow the project
 owner to license your work under the same license as that used by the project.
