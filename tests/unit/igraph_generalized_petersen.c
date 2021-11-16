@@ -32,6 +32,14 @@ int main() {
     igraph_destroy(&graph);
     igraph_destroy(&graph_test);
 
+    /* Compares G(5,2) with Petersen Graph in igraph_famous */
+    IGRAPH_ASSERT(igraph_generalized_petersen(&graph, /* n */ 5, /* k */ 2) == IGRAPH_SUCCESS);
+    igraph_small(&graph_test, 10, IGRAPH_UNDIRECTED, 0, 1, 0, 4, 0, 5, 1, 2, 1, 6, 2, 3, 2, 7, 3, 4, 3, 8, 4, 9, 5, 7, 5, 8, 6, 8, 6, 9, 7, 9, -1);
+    IGRAPH_ASSERT(igraph_isomorphic(&graph, &graph_test, &iso) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(iso);
+    igraph_destroy(&graph);
+    igraph_destroy(&graph_test);
+    
     VERIFY_FINALLY_STACK();
     return 0;
 }
