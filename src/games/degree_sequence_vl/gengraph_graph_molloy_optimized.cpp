@@ -368,7 +368,7 @@ bool graph_molloy_opt::havelhakimi() {
              * level. Therefore, we report EINTERNAL, as triggering this
              * indicates a bug. */
             igraph_errorf("Error in graph_molloy_opt::havelhakimi(): "
-                          "Couldn't bind vertex %d entirely (%d edges remaining)",
+                          "Couldn't bind vertex %" IGRAPH_PRId " entirely (%" IGRAPH_PRId " edges remaining)",
                           IGRAPH_FILE_BASENAME, __LINE__,
                           IGRAPH_EINTERNAL, v, dv);
             return false;
@@ -722,7 +722,7 @@ igraph_integer_t *graph_molloy_opt::vertices_real(igraph_integer_t &nb_v) {
             *(yo++) = i;
         }
     if (yo != buff + nb_v) {
-        igraph_warningf("wrong #vertices in graph_molloy_opt::vertices_real(%d)",
+        igraph_warningf("wrong #vertices in graph_molloy_opt::vertices_real(%" IGRAPH_PRId ")",
                         IGRAPH_FILE_BASENAME, __LINE__, -1, nb_v);
         delete[] buff;
         return NULL;

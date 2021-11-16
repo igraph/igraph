@@ -411,7 +411,7 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
         igraph_status("*** Shuffle Monitor ***\n", 0);
         igraph_statusf(" - Average cost : %f / validated edge swap\n", 0,
                        double(cost) / double(nb_swaps));
-        igraph_statusf(" - Connectivity tests : %d (%d successes, %d failures)\n",
+        igraph_statusf(" - Connectivity tests : %" IGRAPH_PRId " (%" IGRAPH_PRId " successes, %" IGRAPH_PRId " failures)\n",
                        0, successes + failures, successes, failures);
         igraph_statusf(" - Average window : %" IGRAPH_PRId "\n", 0,
                        igraph_integer_t(avg_T / double(successes + failures)));
@@ -562,16 +562,16 @@ igraph_integer_t graph_molloy_hash::optimal_window() {
             min_cost = c;
             optimal_T = Tmax;
         }
-        igraph_statusf("Tmax = %d [%f]", 0, Tmax, min_cost);
+        igraph_statusf("Tmax = %" IGRAPH_PRId " [%f]", 0, Tmax, min_cost);
     }
     // on cree Tmin
     igraph_integer_t Tmin = igraph_integer_t(0.5 * double(a) / (min_cost - 1.0));
-    igraph_statusf("Optimal T is in [%d, %d]\n", 0, Tmin, Tmax);
+    igraph_statusf("Optimal T is in [%" IGRAPH_PRId ", %" IGRAPH_PRId "]\n", 0, Tmin, Tmax);
     // on cherche autour
     double span = 2.0;
     int try_again = 4;
     while (span > 1.05 && optimal_T <= 5 * a) {
-        igraph_statusf("Best T [cost]: %d [%f]", 0, optimal_T, min_cost);
+        igraph_statusf("Best T [cost]: %" IGRAPH_PRId " [%f]", 0, optimal_T, min_cost);
         igraph_integer_t T_low  = igraph_integer_t(double(optimal_T) / span);
         igraph_integer_t T_high = igraph_integer_t(double(optimal_T) * span);
         double c_low  = average_cost(T_low, back, min_cost);
@@ -582,7 +582,7 @@ igraph_integer_t graph_molloy_hash::optimal_window() {
             }
             {
                 igraph_status("Warning: when looking for optimal T,\n", 0);
-                igraph_statusf("Low: %d [%f]  Middle: %d [%f]  High: %d [%f]\n", 0,
+                igraph_statusf("Low: %" IGRAPH_PRId " [%f]  Middle: %" IGRAPH_PRId " [%f]  High: %" IGRAPH_PRId " [%f]\n", 0,
                                T_low, c_low, optimal_T, min_cost, T_high, c_high);
             }
             delete[] back;
