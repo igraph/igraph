@@ -57,8 +57,8 @@ igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_integer_t n, 
         IGRAPH_ERROR("n must be greater than or equal to 3", IGRAPH_EINVAL);
     }
 
-    if (k < 1 || k > ((n-1)/2)) {
-        IGRAPH_ERROR("k must be positive and less than (n-1)/2", IGRAPH_EINVAL);
+    if (k < 1 || k > (n-1)) {
+        IGRAPH_ERROR("k must be positive and less than n", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
