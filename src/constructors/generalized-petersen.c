@@ -26,9 +26,10 @@
  * \brief Generate the Generalized Petersen graph.
  * 
  * The generalized Petersen graph is a graph consisting of an inner 
- * star graph and an outer cycle graph, each with \c n vertices. The
- * cycle graph is defined by vertex \c i connecting to vertex \c i+i .
- * The star graph is defined by vertex \c j connecting to vertex \c j+k .
+ * cycle(s) graph and an outer cycle graph, each with \c n vertices. The
+ * outer cycle graph is defined by vertex \c i connecting to vertex \c i+i .
+ * The inner cycle(s) graph is defined by vertex \c j connecting to vertex \c j+k .
+ * In the case that \c gcd(k,n) is not 1, the inner graph will have \c gcd(k,n) cycles.
  * 
  * </para><para>
  * The generalized Petersen graph will have \c 3n edges and \c 2n vertices.
@@ -39,8 +40,9 @@
  * 
  * \param graph Pointer to an uninitialized graph object, the result will
  * be stored here.
- * \param n Integer, \c n is the number of vertices in the star and cycle graphs.
- * \param k Integer, \c k is the shift for the star graph.
+ * \param n Integer, \c n is the number of vertices in the inner and outer 
+ * cycle graphs.
+ * \param k Integer, \c k is the shift for the inner cycle graph.
  * \return Error code.
  * 
  * \sa \ref igraph_famous() for the original Petersen graph.
