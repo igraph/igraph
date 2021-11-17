@@ -1,7 +1,7 @@
 # Contributing to this project
 
 Thank you for being interested in contributing to `igraph`! We need the help of
-volunteers to keep the package going, so every contribution is welcome. You can help out
+volunteers to keep the package going, so every little bit is welcome. You can help out
 the project in several different ways.
 
 This repository only hosts the C code of the `igraph` project. Even if you are not so
