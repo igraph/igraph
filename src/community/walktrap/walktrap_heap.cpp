@@ -215,7 +215,7 @@ void Min_delta_sigma_heap::update(int community) {
 }
 
 long Min_delta_sigma_heap::memory() {
-    return (sizeof(Min_delta_sigma_heap) + long(max_size) * (2 * sizeof(int) + sizeof(float)));
+    return (sizeof(Min_delta_sigma_heap) + long(max_size) * (2 * sizeof(int) + sizeof(double)));
 }
 
 Min_delta_sigma_heap::Min_delta_sigma_heap(int max_s) {
@@ -223,7 +223,7 @@ Min_delta_sigma_heap::Min_delta_sigma_heap(int max_s) {
     size = 0;
     H = new int[max_s];
     I = new int[max_s];
-    delta_sigma = new float[max_s];
+    delta_sigma = new double[max_s];
     for (int i = 0; i < max_size; i++) {
         I[i] = -1;
         delta_sigma[i] = 1.;
