@@ -21,12 +21,10 @@ experienced with C, you can contribute in a number of ways:
 ## Using the issue tracker
 
 - The issue tracker is the preferred channel for [bug reports](#bugs),
-[feature requests](#features) and [submitting pull
-requests](#pull-requests).
+  [feature requests](#features) and [submitting pull requests](#pull-requests).
 
-- Do you have a support question? Please use
-  our [igraph support forum](https://igraph.discourse.group) for support
-  requests.
+- Do you have a question? Please use our [igraph support forum](https://igraph.discourse.group)
+  for support requests.
 
 - Please keep the discussion on topic and respect the opinions of others, and
   adhere to our [Code of Conduct](https://igraph.org/code-of-conduct.html).
@@ -141,7 +139,10 @@ Follow the following steps if you would like to make a new pull request:
    ```
 
 4. Please commit your changes in logical chunks, and try to provide clear commit
-   messages.
+   messages. It helps us during the review process if we can follow your thought
+   process during the implementation. If you hit a dead end, use `git revert`
+   to revert your commits or just go back to an earlier commit with `git checkout`
+   and continue your work from there.
 
 5. We have a [checklist for new igraph functions](https://github.com/igraph/igraph/wiki/Checklist-for-new-(and-old)-functions).
    If you have added any new functions to igraph, please go through the
@@ -154,11 +155,13 @@ Follow the following steps if you would like to make a new pull request:
    ```bash
    git pull [--rebase] upstream <dev-branch>
    ```
+   
+   Rebasing is preferable over merging as you do not need to deal with merge
+   conflicts; however, if you already have many commits, merging the upstream
+   development branch may be faster.
 
-7. If necessary, you can use git's
-   [interactive rebase](https://help.github.com/articles/interactive-rebase)
-   feature to tidy up your commits before pushing them.
-   You can push your topic branch up to your fork:
+7. WHen your topic branch is up-to-date with the upstream development branch, you can
+   push your topic branch up to your fork:
 
    ```bash
    git push origin <topic-branch-name>
