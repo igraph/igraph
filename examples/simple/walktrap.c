@@ -33,7 +33,7 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
-                 0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
+                 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
                  5, 6, 5, 7, 5, 8, 5, 9, 6, 7, 6, 8, 6, 9, 7, 8, 7, 9, 8, 9, 0, 5, -1);
     igraph_vector_init(&modularity, 0);
     igraph_matrix_int_init(&merges, 0, 0);
@@ -47,10 +47,8 @@ int main() {
     printf("Merges:\n");
     for (i = 0; i < igraph_matrix_int_nrow(&merges); i++) {
         printf("%2.1" IGRAPH_PRId " + %2." IGRAPH_PRId " -> %2." IGRAPH_PRId " (modularity %4.2f)\n",
-               (igraph_integer_t)MATRIX(merges, i, 0),
-               (igraph_integer_t)MATRIX(merges, i, 1),
-               no_of_nodes + i,
-               VECTOR(modularity)[i]);
+               MATRIX(merges, i, 0), MATRIX(merges, i, 1),
+               no_of_nodes + i, VECTOR(modularity)[i]);
     }
 
     igraph_destroy(&g);
