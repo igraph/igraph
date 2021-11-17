@@ -59,7 +59,7 @@ igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_integer_t n, 
         IGRAPH_ERROR("n must be at least 3.", IGRAPH_EINVAL);
     }
 
-    if (! (0 < k && k < n/2)) {
+    if (! (k > 0 && k < n/2)) {
         IGRAPH_ERROR("k must be positive and less than n/2.", IGRAPH_EINVAL);
     }
 
