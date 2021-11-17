@@ -1,27 +1,27 @@
 # Contributing to this project
 
 Thank you for being interested in contributing to `igraph`! We need the help of
-volunteers to keep the package going, so every help is welcome. You can help out
-the project in several different ways. This repository only hosts the C code of
-the `igraph` project. Even if you are not so experienced with C, you can
-contribute in a number of ways.
+volunteers to keep the package going, so every contribution is welcome. You can help out
+the project in several different ways.
 
-You can contribute to `igraph` in various ways:
+This repository only hosts the C code of the `igraph` project. Even if you are not so
+experienced with C, you can contribute in a number of ways:
 
-1. Respond to user questions on
-   our [support forum](https://igraph.discourse.group/).
+1. Respond to user questions on our [support forum](https://igraph.discourse.group/).
 2. Correct or improve our [documentation](https://igraph.org/c/html/latest/).
 3. Go over [open issues](https://github.com/igraph/igraph/issues):
-   - Are some older issues still a problem in the most recent version?
-   - Can you reproduce some of the bugs that are reported?
-   - Some [issues point out problem with documentation](https://github.com/igraph/igraph/labels/documentation), perhaps you could help correct this?
-   - Looking to contribute code? Take a look at
-     some [good first issues](https://github.com/igraph/igraph/labels/good%20first%20issue).
+   - Are some older issues still relevant in the most recent version? If not, write a
+     comment to the issue stating that you feel that the issue is not relevant any more.
+   - Can you reproduce some of the bugs that are reported? If so, write a comment to
+     the issue stating that this is still a problem in version X.
+   - Some [issues point out problems with the documentation](https://github.com/igraph/igraph/labels/documentation);
+     perhaps you could help correct these?
+   - Looking to contribute code? Take a look at some [good first issues](https://github.com/igraph/igraph/labels/good%20first%20issue).
 
 ## Using the issue tracker
 
 - The issue tracker is the preferred channel for [bug reports](#bugs),
-[features requests](#features) and [submitting pull
+[feature requests](#features) and [submitting pull
 requests](#pull-requests).
 
 - Do you have a support question? Please use
@@ -85,12 +85,12 @@ Example:
 <a name="features"></a>
 ## Feature requests
 
-Feature requests are always welcome. But take a moment to find out whether your
+Feature requests are always welcome. First, take a moment to find out whether your
 idea fits with the scope and aims of the project. Please provide as much detail
 and context as possible, and where possible, references to relevant literature.
 Having said that, implementing new features can be quite time consuming, and as
 such they might not be implemented quickly. In addition, the development team
-might decide not to implement a certain feature. It's up to you to make a case
+might decide not to implement a certain feature. It is up to you to make a case
 to convince the project's developers of the merits of this feature.
 
 <a name="pull-requests"></a>
@@ -182,8 +182,8 @@ minor version (0.x.z) will be API backwards-compatible with any previous release
 of the *same* minor version (0.x.y, with y < z). This means that *if* there is
 an API incompatible change, we will increase the minor version. For example,
 release 0.8.1 is API backwards-compatible with release 0.8.0, while release
-0.9.0 is API incompatible with version 0.8.1. Note that this only concerns the *
-public* API, internal functions may change also within a minor version.
+0.9.0 might be API incompatible with version 0.8.1. Note that this only concerns
+the *public* API, internal functions may change also within a minor version.
 
 There will always be two versions of `igraph`: the most recent released version,
 and the next upcoming minor release, which is by definition not yet released.
@@ -205,6 +205,10 @@ should start from the `master` branch or from the `develop` branch. In most
 cases, changes in the `master` branch will also be merged to the `develop`
 branch by the maintainers.
 
+If you are unsure about the branch to target, open an issue about your proposed
+feature and we can discuss the appropriate target branch in the issue before
+you send a PR.
+
 <a name="tips"></a>
 ## Writing igraph Code
 
@@ -218,7 +222,7 @@ open an issue on GitHub, open a thread in our
 [@ntamas](https://github.com/ntamas), [@vtraag](https://github.com/vtraag),
 [@szhorvat](https://github.com/szhorvat), [@iosonofabio](https://github.com/iosonofabio) or
 [@gaborcsardi](https://github.com/gaborcsardi).
-We prefer open communication channels, because then others can learn from it
+We prefer open communication channels, because others can then learn from it
 too.
 
 <a name="legal"></a>
@@ -226,7 +230,7 @@ too.
 
 This is a pain to deal with, but we can't avoid it, unfortunately.
 
-So, `igraph` is licensed under the "General Public License (GPL) version 2, or
+`igraph` is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
 License". By submitting a patch or pull request, you agree to allow the project
 owner to license your work under the same license as that used by the project.
