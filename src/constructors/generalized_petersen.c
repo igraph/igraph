@@ -23,26 +23,33 @@
 
 /**
  * \function igraph_generalized_petersen
- * \brief Generate the Generalized Petersen graph.
+ * \brief Creates a Generalized Petersen graph.
  * 
- * The generalized Petersen graph is a graph consisting of an inner 
- * cycle(s) graph and an outer cycle graph, each with \c n vertices. The
- * outer cycle graph is defined by vertex \c i connecting to vertex \c i+i .
- * The inner cycle(s) graph is defined by vertex \c j connecting to vertex \c j+k .
- * In the case that \c gcd(k,n) is not 1, the inner graph will have \c gcd(k,n) cycles.
- * 
- * </para><para>
- * The generalized Petersen graph will have \c 3n edges and \c 2n vertices.
+ * The generalized Petersen graph <code>G(n, k)</code> consists of \p n vertices
+ * \c v_0, ..., \c v_n forming an "outer" cycle graph, and \p n additional vertices
+ * \c u_0, ..., \c u_n forming an "inner" circulant graph where <code>u_i</code>
+ * is connected to <code>u_(i + k mod n)</code>. Additionally, all \c v_i are
+ * connected to \c u_i.
  * 
  * </para><para>
- * Generalized Petersen graphs have some interesting properties, please see 
- * another source, e.g. Wikipedia for details.
+ * <code>G(n, k)</code> has \c 2n vertices and \c 3n edges. The Petersen graph
+ * itself is <code>G(5, 2)</code>.
+ * 
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * M. E. Watkins,
+ * A Theorem on Tait Colorings with an Application to the Generalized Petersen Graphs,
+ * Journal of Combinatorial Theory 6, 152-164 (1969).
+ * https://doi.org/10.1016%2FS0021-9800%2869%2980116-X
  * 
  * \param graph Pointer to an uninitialized graph object, the result will
  * be stored here.
  * \param n Integer, \c n is the number of vertices in the inner and outer 
- * cycle graphs.
- * \param k Integer, \c k is the shift for the inner cycle graph.
+ * cycle/circulant graphs. It must be at least 3.
+ * \param k Integer, \c k is the shift of the circulant graph. It must be
+ * positive and less than <code>n/2</code>.
  * \return Error code.
  * 
  * \sa \ref igraph_famous() for the original Petersen graph.
@@ -56,11 +63,11 @@ igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_integer_t n, 
     igraph_integer_t i;
 
     if (n < 3) {
-        IGRAPH_ERROR("n must be at least 3.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("n = %" IGRAPH_PRId " must be at least 3.", IGRAPH_EINVAL, n);
     }
 
     if (! (k > 0 && 2*k < n)) {
-        IGRAPH_ERROR("k must be positive and less than n/2.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("k = %" IGRAPH_PRId " must be positive and less than n/2 with n = %" IGRAPH_PRId ".", IGRAPH_EINVAL, k, n);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
