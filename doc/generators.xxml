@@ -29,10 +29,11 @@
 <!-- doxrox-include igraph_atlas -->
 <!-- doxrox-include igraph_de_bruijn -->
 <!-- doxrox-include igraph_kautz -->
+<!-- doxrox-include igraph_generalized_petersen -->
 <!-- doxrox-include igraph_extended_chordal_ring -->
 </section>
 
-<section id="games-randomized-graph-generators"><title>Games: randomized graph generators</title>
+<section id="games-randomized-graph-generators"><title>Games: Randomized graph generators</title>
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->
