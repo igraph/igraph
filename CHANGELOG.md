@@ -486,6 +486,7 @@
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
+ - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou!)
 
 ### Changed
 
