@@ -24,6 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
@@ -83,6 +84,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_adjlist_t al;
     igraph_inclist_t il;
     igraph_bool_t running = 1;
+    igraph_bool_t unlabelled_left = 0;
 
     igraph_vector_t label_counters, dominant_labels, nonzero_labels, node_order;
 
@@ -274,6 +276,13 @@ int igraph_community_label_propagation(const igraph_t *graph,
         RNG_END();
     }
 
+    if (weights) {
+        igraph_inclist_destroy(&il);
+    } else {
+        igraph_adjlist_destroy(&al);
+    }
+    IGRAPH_FINALLY_CLEAN(1);
+
     /* Shift back the membership vector, permute labels in increasing order */
     /* We recycle label_counters here :) */
     igraph_vector_fill(&label_counters, -1);
@@ -291,16 +300,68 @@ int igraph_community_label_propagation(const igraph_t *graph,
             }
         } else {
             /* This is an unlabeled vertex */
+            unlabelled_left = 1;
         }
         VECTOR(*membership)[i] = k;
     }
 
-    if (weights) {
-        igraph_inclist_destroy(&il);
-    } else {
-        igraph_adjlist_destroy(&al);
+    /* From this point on, unlabelled nodes are represented with -1 (no longer 0). */
+
+    /* If any nodes are left unlabelled, we assign the remaining labels to them,
+     * as well as to all unlabelled nodes reachable from them.
+     *
+     * Note that only those nodes could remain unlabelled which were unreachable
+     * from any labelled ones. Thus, in the undirected case, fully unlabelled
+     * connected components remain unlabelled. Here we label each such component
+     * with the same label.
+     */
+    if (unlabelled_left) {
+        igraph_dqueue_t q;
+        igraph_vector_t neis;
+
+        /* In the directed case, the outcome depends on the node ordering, thus we
+         * shuffle nodes one more time. */
+        IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+
+        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+        IGRAPH_CHECK(igraph_dqueue_init(&q, 0));
+        IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
+
+        for (i=0; i < no_of_nodes; ++i) {
+            long int v = VECTOR(node_order)[i];
+
+            /* Is this node unlabelled? */
+            if (VECTOR(*membership)[v] < 0) {
+                /* If yes, we label it, and do a BFS to apply the same label
+                 * to all other unlabelled nodes reachable from it */
+                igraph_dqueue_push(&q, v);
+                VECTOR(*membership)[v] = j;
+                while (!igraph_dqueue_empty(&q)) {
+                    long int ni, num_neis;
+                    long int actnode = igraph_dqueue_pop(&q);
+
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_OUT));
+                    num_neis = igraph_vector_size(&neis);
+
+                    for (ni = 0; ni < num_neis; ++ni) {
+                        long int neighbor = VECTOR(neis)[ni];
+                        if (VECTOR(*membership)[neighbor] >= 0) {
+                            /* Skip labelled nodes */
+                            continue;
+                        }
+                        VECTOR(*membership)[neighbor] = j;
+                        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+                    }
+                }
+                j++;
+            }
+        }
+
+        igraph_vector_destroy(&neis);
+        igraph_dqueue_destroy(&q);
+        IGRAPH_FINALLY_CLEAN(2);
     }
-    IGRAPH_FINALLY_CLEAN(1);
 
     if (modularity) {
       IGRAPH_CHECK(igraph_modularity(graph, membership, weights,
