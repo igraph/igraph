@@ -20,15 +20,17 @@
 
 #include "bench.h"
 
-typedef struct igraph_incadjlist_t {
+typedef struct igraph_incadjlist_inter_t {
     igraph_integer_t length;
     igraph_vector_int_t *incadjs;
-} igraph_incadjlist_t;
+} igraph_incadjlist_inter_t;
 
-#define igraph_incadjlist_get(il,no) (&(il)->incadjs[(igraph_integer_t)(no)])
+#define igraph_incadjlist_inter_get(il,no) (&(il)->incadjs[(igraph_integer_t)(no)])
+#define igraph_incadjlist_sep_get_inc(il,no) (&(il)->incs[(igraph_integer_t)(no)])
+#define igraph_incadjlist_sep_get_adj(il,no) (&(il)->adjs[(igraph_integer_t)(no)])
 
-igraph_error_t igraph_incadjlist_init(const igraph_t *graph,
-                        igraph_incadjlist_t *il,
+igraph_error_t igraph_incadjlist_inter_init(const igraph_t *graph,
+                        igraph_incadjlist_inter_t *il,
                         igraph_neimode_t mode) {
     igraph_integer_t i, j, n;
     igraph_vector_int_t tmp;
@@ -62,6 +64,63 @@ igraph_error_t igraph_incadjlist_init(const igraph_t *graph,
         for (j = 0; j < n; j++) {
             VECTOR(il->incadjs[i])[j * 2] = VECTOR(tmp)[j];
             VECTOR(il->incadjs[i])[j * 2 + 1] =
+                IGRAPH_OTHER(graph, VECTOR(tmp)[j], i);
+        }
+
+    }
+
+    igraph_vector_int_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
+typedef struct igraph_incadjlist_sep_t {
+    igraph_integer_t length;
+    igraph_vector_int_t *incs;
+    igraph_vector_int_t *adjs;
+} igraph_incadjlist_sep_t;
+
+igraph_error_t igraph_incadjlist_sep_init(const igraph_t *graph,
+                        igraph_incadjlist_sep_t *il,
+                        igraph_neimode_t mode) {
+    igraph_integer_t i, j, n;
+    igraph_vector_int_t tmp;
+
+    if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_EINVMODE);
+    }
+
+    igraph_vector_int_init(&tmp, 0);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp);
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    il->length = igraph_vcount(graph);
+    il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
+    if (il->incs == 0) {
+        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
+    }
+
+    il->adjs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
+    if (il->adjs == 0) {
+        IGRAPH_ERROR("Cannot create adjacency list view", IGRAPH_ENOMEM);
+    }
+
+    //IGRAPH_FINALLY(igraph_inclist_destroy, il);
+    for (i = 0; i < il->length; i++) {
+        //IGRAPH_ALLOW_INTERRUPTION();
+
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));
+
+        n = igraph_vector_int_size(&tmp);
+        IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], n));
+        IGRAPH_CHECK(igraph_vector_int_init(&il->adjs[i], n));
+
+        for (j = 0; j < n; j++) {
+            VECTOR(il->incs[i])[j] = VECTOR(tmp)[j];
+            VECTOR(il->adjs[i])[j] =
                 IGRAPH_OTHER(graph, VECTOR(tmp)[j], i);
         }
 
@@ -140,11 +199,27 @@ igraph_integer_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
     return dummy;
 }
 
-igraph_integer_t test_incadj(igraph_t *g, igraph_incadjlist_t *inc)
+igraph_integer_t test_incadj_sep(igraph_t *g, igraph_incadjlist_sep_t *inc)
 {
     igraph_integer_t dummy = 0;
     for (int i = 0; i < igraph_vcount(g); i++) {
-        igraph_vector_int_t *ias = igraph_incadjlist_get(inc, i);
+        igraph_vector_int_t *incs = igraph_incadjlist_sep_get_inc(inc, i);
+        igraph_vector_int_t *adjs = igraph_incadjlist_sep_get_adj(inc, i);
+        igraph_integer_t nneis = igraph_vector_int_size(incs);
+        for (int j = 0; j < nneis; j++) {
+            igraph_integer_t edge = VECTOR(*incs)[j];
+            igraph_integer_t neighbor = VECTOR(*adjs)[j];
+            dummy += neighbor + edge;
+        }
+    }
+    return dummy;
+}
+
+igraph_integer_t test_incadj_inter(igraph_t *g, igraph_incadjlist_inter_t *inc)
+{
+    igraph_integer_t dummy = 0;
+    for (int i = 0; i < igraph_vcount(g); i++) {
+        igraph_vector_int_t *ias = igraph_incadjlist_inter_get(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(ias) / 2;
         for (int j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*ias)[j * 2];
@@ -187,7 +262,8 @@ igraph_integer_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
 void do_benchmarks(char *name, igraph_t *g, int repeat) {
     igraph_adjlist_t adj;
     igraph_inclist_t inc;
-    igraph_incadjlist_t incadj;
+    igraph_incadjlist_inter_t incadj_inter;
+    igraph_incadjlist_sep_t incadj_sep;
     volatile igraph_integer_t result;
 
     printf("%s", name);
@@ -247,13 +323,23 @@ void do_benchmarks(char *name, igraph_t *g, int repeat) {
          );
 
     printf("%s", name);
-    BENCH("11 initialize incadjlist.",
-            REPEAT(igraph_incadjlist_init(g, &incadj, IGRAPH_ALL), repeat);
+    BENCH("11 initialize interleaved incadjlist.",
+            REPEAT(igraph_incadjlist_inter_init(g, &incadj_inter, IGRAPH_ALL), repeat);
          );
 
     printf("%s", name);
-    BENCH("12 go over edges and vertices using incadjlist.",
-            REPEAT(result = test_incadj(g, &incadj), repeat);
+    BENCH("12 go over edges and vertices using interleaved incadjlist.",
+            REPEAT(result = test_incadj_inter(g, &incadj_inter), repeat);
+         );
+
+    printf("%s", name);
+    BENCH("13 initialize incadjlist with two vectors.",
+            REPEAT(igraph_incadjlist_sep_init(g, &incadj_sep, IGRAPH_ALL), repeat);
+         );
+
+    printf("%s", name);
+    BENCH("14 go over edges and vertices using incadjlist.",
+            REPEAT(result = test_incadj_sep(g, &incadj_sep), repeat);
          );
 }
 
