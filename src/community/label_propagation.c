@@ -33,12 +33,10 @@
  * \function igraph_community_label_propagation
  * \brief Community detection based on label propagation.
  *
- * This function implements the community detection method described in:
- * Raghavan, U.N. and Albert, R. and Kumara, S.: Near linear time algorithm
- * to detect community structures in large-scale networks. Phys Rev E
- * 76, 036106. (2007). This version extends the original method by
- * the ability to take edge weights into consideration and also
- * by allowing some labels to be fixed.
+ * This function implements the label propagation-based community detection
+ * algorithm described by Raghavan, Albert and Kumara. This version extends
+ * the original method by the ability to take edge weights into consideration
+ * and also by allowing some labels to be fixed.
  *
  * </para><para>
  * Weights are taken into account as follows: when the new label of node
@@ -48,15 +46,32 @@
  * labels). The new label of node \c i will then be the label whose edges
  * (among the ones incident on node \c i) have the highest total weight.
  *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Raghavan, U.N. and Albert, R. and Kumara, S.:
+ * Near linear time algorithm to detect community structures in large-scale networks.
+ * Phys Rev E 76, 036106. (2007).
+ * https://doi.org/10.1103/PhysRevE.76.036106
+ *
  * \param graph The input graph, should be undirected to make sense.
  * \param membership The membership vector, the result is returned here.
  *    For each vertex it gives the ID of its community (label).
  * \param weights The weight vector, it should contain a positive
  *    weight for all the edges.
- * \param initial The initial state. If NULL, every vertex will have
+ * \param initial The initial state. If \c NULL, every vertex will have
  *   a different label at the beginning. Otherwise it must be a vector
  *   with an entry for each vertex. Non-negative values denote different
- *   labels, negative entries denote vertices without labels.
+ *   labels, negative entries denote vertices without labels. Unlabeled
+ *   vertices which are not reachable from any labeled ones will remain
+ *   unlabeled at the end of the label propagation process, and will be
+ *   labeled in an additional step to avoid returning negative values in
+ *   \p membership. In undirected graphs, this happens when entire connected
+ *   components are unlabeled. Then, each unlabeled component will receive
+ *   its own separate label. In directed graphs, the outcome of the
+ *   additional labeling should be considered undefined and may change
+ *   in the future; please do not rely on it.
  * \param fixed Boolean vector denoting which labels are fixed. Of course
  *   this makes sense only if you provided an initial state, otherwise
  *   this element will be ignored. Also note that vertices without labels
