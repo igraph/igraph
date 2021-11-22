@@ -83,8 +83,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
     long int i, j, k;
     igraph_adjlist_t al;
     igraph_inclist_t il;
-    igraph_bool_t running = 1;
-    igraph_bool_t unlabelled_left = 0;
+    igraph_bool_t running;
+    igraph_bool_t unlabelled_left;
 
     igraph_vector_t label_counters, dominant_labels, nonzero_labels, node_order;
 
@@ -287,6 +287,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     /* We recycle label_counters here :) */
     igraph_vector_fill(&label_counters, -1);
     j = 0;
+    unlabelled_left = 0;
     for (i = 0; i < no_of_nodes; i++) {
         k = (long)VECTOR(*membership)[i] - 1;
         if (k >= 0) {
@@ -306,6 +307,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     }
 
     /* From this point on, unlabelled nodes are represented with -1 (no longer 0). */
+#define IS_UNLABELLED(x) (VECTOR(*membership)[x] < 0)
 
     /* If any nodes are left unlabelled, we assign the remaining labels to them,
      * as well as to all unlabelled nodes reachable from them.
@@ -332,7 +334,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
             long int v = VECTOR(node_order)[i];
 
             /* Is this node unlabelled? */
-            if (VECTOR(*membership)[v] < 0) {
+            if (IS_UNLABELLED(v)) {
                 /* If yes, we label it, and do a BFS to apply the same label
                  * to all other unlabelled nodes reachable from it */
                 igraph_dqueue_push(&q, v);
@@ -346,12 +348,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
                     for (ni = 0; ni < num_neis; ++ni) {
                         long int neighbor = VECTOR(neis)[ni];
-                        if (VECTOR(*membership)[neighbor] >= 0) {
-                            /* Skip labelled nodes */
-                            continue;
+                        if (IS_UNLABELLED(neighbor)) {
+                            VECTOR(*membership)[neighbor] = j;
+                            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                         }
-                        VECTOR(*membership)[neighbor] = j;
-                        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                     }
                 }
                 j++;
