@@ -492,6 +492,19 @@
 
  - `igraph_version()` no longer returns an error code.
 
+### Fixed
+
+ - Removed some uses of `abort()` from vendored libraries, which could unexpectedly
+   shut down the host language of igraph's high-level interfaces.
+ - `igraph_community_label_propagation()` no longer leaves any vertices unlabeled
+   when they were not reachable from any labeled ones, i.e. the returned membership
+   vector is guaranteed not to contain negative values (#1853).
+ - The Kamada-Kawai layout is now iterruptible.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.9.5] - 2021-11-11
 
 ### Fixed
