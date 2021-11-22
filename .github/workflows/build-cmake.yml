@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: ['i686', 'x86_64', 'ucrt-x86_64']
+        arch: ['i686', 'x86_64', 'ucrt-x86_64', 'clang-x86_64' ]
         shared_libs: ['ON', 'OFF']
         include:
           - arch: i686
@@ -24,6 +24,8 @@ jobs:
             msystem: MINGW64
           - arch: ucrt-x86_64
             msystem: UCRT64
+          - arch: clang-x86_64
+            msystem: CLANG64
 
     defaults:
       run:
