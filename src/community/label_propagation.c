@@ -147,9 +147,6 @@ int igraph_community_label_propagation(const igraph_t *graph,
         if (i > no_of_nodes) {
             IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1.", IGRAPH_EINVAL);
         }
-        if (i <= 0) {
-            IGRAPH_ERROR("At least one vertex must be labeled in the initial labeling.", IGRAPH_EINVAL);
-        }
     } else {
         for (i = 0; i < no_of_nodes; i++) {
             VECTOR(*membership)[i] = i + 1;
