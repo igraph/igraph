@@ -27,6 +27,8 @@
 #include "igraph_paths.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 /**
  * \ingroup layout
  * \function igraph_layout_kamada_kawai
@@ -245,6 +247,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t myD1, myD2, A, B, C;
         igraph_real_t max_delta, delta_x, delta_y;
         igraph_real_t old_x, old_y, new_x, new_y;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         myD1 = 0.0, myD2 = 0.0, A = 0.0, B = 0.0, C = 0.0;
 
@@ -572,6 +576,8 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t max_delta, delta_x, delta_y, delta_z;
         igraph_real_t old_x, old_y, old_z, new_x, new_y, new_z;
         igraph_real_t detnum;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         /* Select maximal delta */
         m = 0; max_delta = -1;
