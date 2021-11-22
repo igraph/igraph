@@ -521,6 +521,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   community_leiden
   community_label_propagation
+  community_label_propagation2
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
