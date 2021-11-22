@@ -9,6 +9,7 @@
  - `igraph_community_label_propagation()` no longer leaves any vertices unlabeled
    when they were not reachable from any labeled ones, i.e. the returned membership
    vector is guaranteed not to contain negative values (#1853).
+ - The Kamada-Kawai layout is now iterruptible.
    
 ### Other
 
