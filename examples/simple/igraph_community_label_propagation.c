@@ -35,7 +35,7 @@ int main() {
        an already initialized vector. */
     igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(
-                &graph, &membership,
+                &graph, &membership, /* mode = */ IGRAPH_ALL,
                 /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
                 &modularity);
 

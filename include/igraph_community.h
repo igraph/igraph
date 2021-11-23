@@ -216,6 +216,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_fluid_communities(const igraph_t *
 
 IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_int_t *membership,
+                                                     igraph_neimode_t mode,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_int_t *initial,
                                                      igraph_vector_bool_t *fixed,

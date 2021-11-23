@@ -47,7 +47,14 @@
  * (among the ones incident on node \c i) have the highest total weight.
  *
  * </para><para>
- * Reference:
+ * For directed graphs, it is important to know that labels can circulate
+ * freely only within the strongly connected components of the graphh and
+ * may propagate in only one direction \em between strongly connected
+ * components. You should treat directed edges as directed only if you are
+ * aware of the consequences.
+ *
+ * </para><para>
+ * References:
  *
  * </para><para>
  * Raghavan, U.N. and Albert, R. and Kumara, S.:
@@ -55,9 +62,26 @@
  * Phys Rev E 76, 036106. (2007).
  * https://doi.org/10.1103/PhysRevE.76.036106
  *
- * \param graph The input graph, should be undirected to make sense.
+ * </para><para>
+ * Šubelj, L.: Label propagation for clustering. Chapter in "Advances in
+ * Network Clustering and Blockmodeling" edited by P. Doreian, V. Batagelj
+ * &amp; A. Ferligoj (Wiley, New York, 2018).
+ * https://arxiv.org/abs/1709.05634
+ *
+ * \param graph The input graph. Note that the algorithm wsa originally
+ *    defined for undirected graphs. You are advised to set \c mode to
+ *    \c IGRAPH_ALL if you pass a directed graph here to treat it as
+ *    undirected.
  * \param membership The membership vector, the result is returned here.
  *    For each vertex it gives the ID of its community (label).
+ * \param mode Whether to consider edge directions for the label proppagation,
+ *    and if so, which direction the labels should propagate. Ignored for
+ *    undirected graphs. \c IGRAPH_ALL means to ignore edge directions (even
+ *    in directed graphs). \c IGRAPH_OUT means to propagate labels along the
+ *    natural direction of the edges. \c IGRAPH_IN means to propagate labels
+ *    \em backwards (i.e. from head to tail). It is advised to set this to
+ *    \c IGRAPH_ALL unless you are specifically interested in the effect of
+ *    edge directions.
  * \param weights The weight vector, it should contain a positive
  *    weight for all the edges.
  * \param initial The initial state. If \c NULL, every vertex will have
@@ -79,7 +103,9 @@
  *   make it consistent with \p initial.
  * \param modularity If not a null pointer, then it must be a pointer
  *   to a real number. The modularity score of the detected community
- *   structure is stored here.
+ *   structure is stored here. Note that igraph will calculate the
+ *   \em directed modularity if the input graph is directed, even if
+ *   you set \c mode to \c IGRAPH_ALL
  * \return Error code.
  *
  * Time complexity: O(m+n)
@@ -88,6 +114,7 @@
  */
 igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_int_t *membership,
+                                       igraph_neimode_t mode,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_int_t *initial,
                                        igraph_vector_bool_t *fixed,
@@ -100,6 +127,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_inclist_t il;
     igraph_bool_t running;
     igraph_bool_t unlabelled_left;
+    igraph_neimode_t reversed_mode;
 
     igraph_vector_int_t label_counters, dominant_labels, nonzero_labels, node_order;
 
@@ -168,14 +196,27 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         }
     }
 
+    switch (mode) {
+        case IGRAPH_OUT:
+            reversed_mode = IGRAPH_IN;
+            break;
+
+        case IGRAPH_IN:
+            reversed_mode = IGRAPH_OUT;
+            break;
+
+        default:
+            reversed_mode = IGRAPH_ALL;
+    }
+
     /* Create an adjacency/incidence list representation for efficiency.
      * For the unweighted case, the adjacency list is enough. For the
      * weighted case, we need the incidence list */
     if (weights) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &il, reversed_mode, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &il);
     } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, reversed_mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
     }
 
@@ -354,7 +395,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                     igraph_integer_t ni, num_neis;
                     igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_OUT));
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
                     num_neis = igraph_vector_int_size(&neis);
 
                     for (ni = 0; ni < num_neis; ++ni) {

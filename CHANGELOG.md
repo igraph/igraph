@@ -111,7 +111,9 @@
    IDs whose removal broke a single component into two.
 
  - `igraph_community_label_propagation()` now uses an `igraph_vector_int_t` for its
-   `initial` parameter.
+   `initial` parameter. It also takes a `mode` argument that specifies how
+   labels should be propagated along edges (forward, backward or ignoring edge
+   directions).
 
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
