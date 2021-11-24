@@ -48,10 +48,10 @@
  *
  * </para><para>
  * For directed graphs, it is important to know that labels can circulate
- * freely only within the strongly connected components of the graphh and
- * may propagate in only one direction \em between strongly connected
- * components. You should treat directed edges as directed only if you are
- * aware of the consequences.
+ * freely only within the strongly connected components of the graph and
+ * may propagate in only one direction (or not at all) \em between strongly
+ * connected components. You should treat directed edges as directed only
+ * if you are aware of the consequences.
  *
  * </para><para>
  * References:
@@ -59,17 +59,18 @@
  * </para><para>
  * Raghavan, U.N. and Albert, R. and Kumara, S.:
  * Near linear time algorithm to detect community structures in large-scale networks.
- * Phys Rev E 76, 036106. (2007).
+ * Phys Rev E 76, 036106 (2007).
  * https://doi.org/10.1103/PhysRevE.76.036106
  *
  * </para><para>
  * Šubelj, L.: Label propagation for clustering. Chapter in "Advances in
  * Network Clustering and Blockmodeling" edited by P. Doreian, V. Batagelj
  * &amp; A. Ferligoj (Wiley, New York, 2018).
+ * https://doi.org/10.1002/9781119483298.ch5
  * https://arxiv.org/abs/1709.05634
  *
  * \param graph The input graph. Note that the algorithm wsa originally
- *    defined for undirected graphs. You are advised to set \c mode to
+ *    defined for undirected graphs. You are advised to set \p mode to
  *    \c IGRAPH_ALL if you pass a directed graph here to treat it as
  *    undirected.
  * \param membership The membership vector, the result is returned here.
@@ -105,7 +106,7 @@
  *   to a real number. The modularity score of the detected community
  *   structure is stored here. Note that igraph will calculate the
  *   \em directed modularity if the input graph is directed, even if
- *   you set \c mode to \c IGRAPH_ALL
+ *   you set \p mode to \c IGRAPH_ALL
  * \return Error code.
  *
  * Time complexity: O(m+n)
