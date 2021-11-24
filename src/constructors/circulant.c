@@ -19,9 +19,49 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
-igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed) {
+// TODO: add documentation
 
-    // TODO: Add implementation
+igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed) {
+    
+    igraph_vector_int_t edges;
+    igraph_vector_bool_t offset_seen;
+    igraph_integer_t i, j;
+
+    if (n < 0) {
+        IGRAPH_ERRORF("n = %" IGRAPH_PRId " must be at least 1.", IGRAPH_EINVAL, n);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&offset_seen, n);
+
+    for (i = 0; i < igraph_vector_int_size(l); i++) {
+        /* simplify the offset */
+        igraph_integer_t offset = VECTOR(*l)[i] % n;
+        if (offset < 0) {
+            offset += n;
+        }
+        if (!directed) {
+            if (offset >= (n + 1) / 2) {
+                offset = n - offset;
+            }
+        }
+
+        /* only use offset if non-zero and we haven't seen it before */
+        if (offset != 0 && !VECTOR(offset_seen)[offset]) {
+            for (j = 0; j < n; j++) {
+                igraph_vector_int_push_back(&edges, j);
+                igraph_vector_int_push_back(&edges, (j + offset) % n);
+            }
+
+            VECTOR(offset_seen)[offset] = 1;
+        }      
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
+    igraph_vector_int_destroy(&edges);
+    igraph_vector_bool_destroy(&offset_seen);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

@@ -22,7 +22,15 @@
 
 int main() {
 
-    // TODO: Add a test
+    igraph_t graph;
+    igraph_vector_int_t l;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&l, 0);
+    igraph_vector_int_push_back(&l, 1);
+    igraph_vector_int_push_back(&l, 2);
+
+    IGRAPH_ASSERT(igraph_circulant(&graph, /* n */ 5, /* l */ &l, /* directed */ 1) == IGRAPH_SUCCESS);
+
+    // todo: add more tests
 
     return 0;
 }
