@@ -64,7 +64,7 @@ IGRAPH_EXPORT igraph_error_t igraph_extended_chordal_ring(igraph_t *graph, igrap
 IGRAPH_EXPORT igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);
 
 IGRAPH_EXPORT igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
-IGRAPH_EXPORT igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l);
+IGRAPH_EXPORT igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_integer_t n, igraph_integer_t k);
 IGRAPH_EXPORT igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
 IGRAPH_EXPORT igraph_error_t igraph_famous(igraph_t *graph, const char *name);

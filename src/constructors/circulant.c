@@ -19,7 +19,7 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
-igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l) {
+igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed) {
 
     // TODO: Add implementation
 
