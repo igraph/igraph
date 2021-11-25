@@ -1354,7 +1354,7 @@ igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN bycol=False
 
 igraph_to_directed:
-    PARAMS: INOUT GRAPH graph, TODIRECTED flags=MUTUAL
+    PARAMS: INOUT GRAPH graph, TODIRECTED mode=MUTUAL
 
 igraph_to_undirected:
     PARAMS: |-
