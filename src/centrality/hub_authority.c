@@ -142,7 +142,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \brief Kleinerg's hub and authority scores.
  *
  * The hub and authority scores of the vertices are defined as the principal
- * eigenvectors of <code>A*A^T</code> and <code>A^T*A</code>, respectively, 
+ * eigenvectors of <code>A*A^T</code> and <code>A^T*A</code>, respectively,
  * where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
  * </para><para>
@@ -153,9 +153,9 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
  * 1997.
  * \param graph The input graph. Can be directed and undirected.
- * \param hub_vector Pointer to an initialized vector, the hub scores are 
+ * \param hub_vector Pointer to an initialized vector, the hub scores are
  *    stored here. If a null pointer then it is ignored.
- * \param authority_vector Pointer to an initialized vector, the authority scores are 
+ * \param authority_vector Pointer to an initialized vector, the authority scores are
  *    stored here. If a null pointer then it is ignored.
  * \param value If not a null pointer then the eigenvalue
  *    corresponding to the calculated eigenvectors is stored here.
@@ -174,7 +174,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * the number of vertices.
  *
  * \sa \ref igraph_hub_score(), \ref igraph_authority_score()
- * for the separate calculations, 
+ * for the separate calculations,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
  * \ref igraph_eigenvector_centrality() for similar measures.
  */

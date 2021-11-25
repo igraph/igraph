@@ -155,7 +155,7 @@ Follow the following steps if you would like to make a new pull request:
    ```bash
    git pull [--rebase] upstream <dev-branch>
    ```
-   
+
    Rebasing is preferable over merging as you do not need to deal with merge
    conflicts; however, if you already have many commits, merging the upstream
    development branch may be faster.

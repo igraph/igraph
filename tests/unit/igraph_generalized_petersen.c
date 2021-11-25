@@ -34,7 +34,7 @@ int main() {
 
     /* Compares G(9,3) with expected small graph */
     IGRAPH_ASSERT(igraph_generalized_petersen(&graph, /* n */ 9, /* k */ 3) == IGRAPH_SUCCESS);
-    igraph_small(&graph_test, 18, IGRAPH_UNDIRECTED, 0, 3, 0, 6, 0, 9, 1, 4, 1, 7, 1, 10, 2, 5, 2, 
+    igraph_small(&graph_test, 18, IGRAPH_UNDIRECTED, 0, 3, 0, 6, 0, 9, 1, 4, 1, 7, 1, 10, 2, 5, 2,
             8, 2, 11, 3, 6, 3, 12, 4, 7, 4, 13, 5, 8, 5, 14, 6, 15, 7, 16, 8, 17, 9, 10, 9, 17, 10,
             11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, -1);
     IGRAPH_ASSERT(igraph_isomorphic(&graph, &graph_test, &iso) == IGRAPH_SUCCESS);
