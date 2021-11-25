@@ -29,6 +29,7 @@
 <!-- doxrox-include igraph_atlas -->
 <!-- doxrox-include igraph_de_bruijn -->
 <!-- doxrox-include igraph_kautz -->
+<!-- doxrox-include igraph_circulant -->
 <!-- doxrox-include igraph_generalized_petersen -->
 <!-- doxrox-include igraph_extended_chordal_ring -->
 </section>

@@ -22,7 +22,7 @@
 // TODO: add documentation
 
 igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed) {
-    
+
     igraph_vector_int_t edges;
     igraph_vector_bool_t offset_seen;
     igraph_integer_t i, j;
@@ -54,7 +54,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
             }
 
             VECTOR(offset_seen)[offset] = 1;
-        }      
+        }
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
