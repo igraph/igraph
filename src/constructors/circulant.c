@@ -34,7 +34,7 @@
  * \param graph Pointer to an uninitialized graph object, the result will
  * be stored here.
  * \param n Integer, \p n is the number of vertices in the circulant graph. It must
- * be at least 1.
+ * be at least 0.
  * \param l Integer vector, \p l is a list of the offsets within the circulant graph.
  * \param directed Boolean, \p directed determines whether the graph should be directed.
  * \return Error code.
@@ -52,8 +52,11 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     igraph_integer_t i, j;
     igraph_integer_t limit;
 
-    if (n <= 0) {
-        IGRAPH_ERRORF("number of nodes = %" IGRAPH_PRId " must be at least 1.", IGRAPH_EINVAL, n);
+    if (n < 0) {
+        IGRAPH_ERRORF("number of nodes = %" IGRAPH_PRId " must be non-negative.", IGRAPH_EINVAL, n);
+    }
+    if (n == 0) {
+        return igraph_empty(graph, 0, directed);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);

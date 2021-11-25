@@ -28,17 +28,23 @@ int main() {
     igraph_integer_t i;
 
     /* Testing invalid values */
-    /* n = 0, l = [1], undirected */
-    igraph_vector_int_init(&l, 0);
-    igraph_vector_int_push_back(&l, 1);
-    CHECK_ERROR(igraph_circulant(&graph, 0, &l, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
-    igraph_vector_int_destroy(&l);
 
     /* n = -3, l = [1], undirected */
     igraph_vector_int_init(&l, 0);
     igraph_vector_int_push_back(&l, 1);
     CHECK_ERROR(igraph_circulant(&graph, -3, &l, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
     igraph_vector_int_destroy(&l);
+
+    /* Testing n = 0 case */
+    /* n = 0, l = [1], undirected */
+
+    igraph_vector_int_init(&l, 0);
+    igraph_vector_int_push_back(&l, 1);
+    IGRAPH_ASSERT(igraph_circulant(&graph, 0, &l, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vcount(&graph) == 0);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == 0);
+    igraph_vector_int_destroy(&l);
+
 
     /* Testing n = 1 case */
     /* n = 1, l = [1], undirected */
