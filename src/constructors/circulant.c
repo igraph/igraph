@@ -25,7 +25,7 @@
  *
  * A circulant graph <code>G(n, l)</code> consists of \p n vertices \c v_0, ...,
  * \c v_(n-1) such that for each \c l_i in the list of offsets \p l, \c v_j is
- * connected to <code> v_(j + l_i mod n) </code> for all j.
+ * connected to <code> v_((j + l_i) mod n) </code> for all j.
  *
  * </para><para>
  * The function works with both directed and undirected graphs. Multiple edges are
@@ -35,7 +35,7 @@
  * be stored here.
  * \param n Integer, \p n is the number of vertices in the circulant graph. It must
  * be at least 1.
- * \param l Integer Vector, \p l is a list of the offsets within the circulant graph.
+ * \param l Integer vector, \p l is a list of the offsets within the circulant graph.
  * \param directed Boolean, \p directed determines whether the graph should be directed.
  * \return Error code.
  *
@@ -59,6 +59,8 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&offset_seen, n);
 
+    VECTOR(offset_seen)[0] = 1; /* do not allow self loops */
+
     for (i = 0; i < igraph_vector_int_size(l); i++) {
         /* simplify the offset */
         igraph_integer_t offset = VECTOR(*l)[i] % n;
@@ -72,7 +74,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
         }
 
         /* only use offset if non-zero and we haven't seen it before */
-        if (offset != 0 && !VECTOR(offset_seen)[offset]) {
+        if (!VECTOR(offset_seen)[offset]) {
             if (n % 2 == 0 && offset == n / 2 && !directed) {
                 limit = n / 2; /* this to avoid doubling up the n/2 offset for even n and undirected graph */
             } else {
