@@ -19,7 +19,31 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
-// TODO: add documentation
+/**
+ * \function igraph_circulant
+ * \brief Creates a circulant graph.
+ *
+ * A circulant graph <code>G(n, l)</code> consists of \p n vertices \c v_0, ...,
+ * \c v_(n-1) such that for each \c l_i in the list of offsets \p l, \c v_j is
+ * connected to <code> v_(j + l_i mod n) </code> for all j.
+ *
+ * </para><para>
+ * The function works with both directed and undirected graphs. Multiple edges are
+ * merged, and self loops are ignored. All offsets are taken modulo \p n, so values greater than n as well as negative offsets are permitted.
+ *
+ * \param graph Pointer to an uninitialized graph object, the result will
+ * be stored here.
+ * \param n Integer, \p n is the number of vertices in the circulant graph. It must
+ * be at least 1.
+ * \param l Integer Vector, \p l is a list of the offsets within the circulant graph.
+ * \param directed Boolean, \p directed determines whether the graph should be directed.
+ * \return Error code.
+ *
+ * \sa \ref igraph_ring(), \ref igraph_generalized_petersen().
+ *
+ * Time complexity: O(|V||L|), the number of vertices in the graph times the number
+ * of offsets.
+ */
 
 igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed) {
 
