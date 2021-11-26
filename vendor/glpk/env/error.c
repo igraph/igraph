@@ -52,6 +52,7 @@ static void errfunc(const char *fmt, ...)
          env->err_file, env->err_line);
       if (env->err_hook != NULL)
          env->err_hook(env->err_info);
+      IGRAPH_FATAL("Unexpected return from GLPK error hook.");
       /* no return */
 }
 
