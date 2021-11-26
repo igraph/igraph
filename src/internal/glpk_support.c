@@ -49,8 +49,7 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
         /* Copy the error messages into a buffer for later reporting */
         /* We must use glp_at_error() instead of igraph_i_glpk_error_info.is_error
          * to determine if a message is an error message, as the reporting function is
-         * called before the error function. The vendored old GLPK is patched to add support
-         * for glp_at_error(). New GLPK versions have this functions. */
+         * called before the error function. */
         const size_t n = sizeof(igraph_i_glpk_error_info.msg) / sizeof(char) - 1;
         while (*s != '\0' && igraph_i_glpk_error_info.msg_ptr < igraph_i_glpk_error_info.msg + n) {
             *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
