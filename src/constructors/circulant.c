@@ -52,6 +52,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     igraph_vector_bool_t shift_seen;
     igraph_integer_t i, j;
     igraph_integer_t limit;
+    igraph_integer_t shift_size = igraph_vector_int_size(shifts);
 
     if (n < 0) {
         IGRAPH_ERRORF("number of nodes = %" IGRAPH_PRId " must be non-negative.", IGRAPH_EINVAL, n);
@@ -61,11 +62,12 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&shift_seen, n);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * n * shift_size));
 
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&shift_seen, n);
     VECTOR(shift_seen)[0] = 1; /* do not allow self loops */
 
-    for (i = 0; i < igraph_vector_int_size(shifts); i++) {
+    for (i = 0; i < shift_size; i++) {
         /* simplify the shift */
         igraph_integer_t shift = VECTOR(*shifts)[i] % n;
         if (shift < 0) {
