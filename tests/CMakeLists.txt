@@ -185,6 +185,7 @@ add_legacy_tests(
   igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
   igraph_correlated_game

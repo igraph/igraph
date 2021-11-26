@@ -85,6 +85,7 @@ add_library(
   constructors/adjacency.c
   constructors/atlas.c
   constructors/basic_constructors.c
+  constructors/circulant.c
   constructors/de_bruijn.c
   constructors/famous.c
   constructors/full.c
