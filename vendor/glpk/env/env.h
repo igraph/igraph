@@ -24,6 +24,8 @@
 
 #include "stdc.h"
 
+#include "igraph_error.h" /* IGRAPH_FILE_BASENAME */
+
 typedef struct ENV ENV;
 typedef struct MBD MBD;
 
@@ -165,12 +167,12 @@ int glp_close_tee(void);
 typedef void (*glp_errfunc)(const char *fmt, ...);
 #endif
 
-#define xerror glp_error_(__FILE__, __LINE__)
+#define xerror glp_error_(IGRAPH_FILE_BASENAME, __LINE__)
 glp_errfunc glp_error_(const char *file, int line);
 /* display fatal error message and terminate execution */
 
 #define xassert(expr) \
-      ((void)((expr) || (glp_assert_(#expr, __FILE__, __LINE__), 1)))
+      ((void)((expr) || (glp_assert_(#expr, IGRAPH_FILE_BASENAME, __LINE__), 1)))
 void glp_assert_(const char *expr, const char *file, int line);
 /* check for logical condition */
 
