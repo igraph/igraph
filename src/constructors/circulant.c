@@ -24,23 +24,22 @@
  * \function igraph_circulant
  * \brief Creates a circulant graph.
  *
- * A circulant graph <code>G(n, shifts)</code> consists of \p n vertices \c v_0, ...,
- * \c v_(n-1) such that for each \c s_i in the list of offsets \p shifts, \c v_j is
- * connected to <code> v_((j + s_i) mod n) </code> for all j.
+ * A circulant graph <code>G(n, shifts)</code> consists of \p n vertices <code>v_0</code>, ...,
+ * <code>v_(n-1)</code> such that for each \c s_i in the list of offsets \p shifts, \c v_j is
+ * connected to <code>v_((j + s_i) mod n)</code> for all j.
  *
  * </para><para>
- * The function works with both directed and undirected graphs. Multiple edges are
- * merged, and self loops are ignored. All offsets are taken modulo \p n, so values greater than n as well as negative offsets are permitted.
+ * The function can generate either directed or undirected graphs. It does not generate
+ * multi-edges or self-loops.
  *
  * \param graph Pointer to an uninitialized graph object, the result will
- * be stored here.
- * \param n Integer, \p n is the number of vertices in the circulant graph. It must
- * be at least 0.
- * \param shifts Integer vector, \p shifts is a list of the offsets within the circulant graph.
- * \param directed Boolean, \p directed determines whether the graph should be directed.
+ *   be stored here.
+ * \param n Integer, the number of vertices in the circulant graph.
+ * \param shifts Integer vector, a list of the offsets within the circulant graph.
+ * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_generalized_petersen().
+ * \sa \ref igraph_ring(), \ref igraph_generalized_petersen(), \ref igraph_extended_chordal_ring()
  *
  * Time complexity: O(|V||shifts|), the number of vertices in the graph times the number
  * of shifts.
