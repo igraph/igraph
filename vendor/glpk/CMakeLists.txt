@@ -92,9 +92,10 @@ endif()
 # function as is (without visibility specification)
 target_compile_definitions(glpk_vendored PRIVATE IGRAPH_STATIC)
 
-# GLPK requires __WOE__ to be defined when using MSVC-style compilers
+# GLPK requires __WOE__ to be defined when building for Windows,
+# either with MSVC or with MinGW.
 # See w64/config_VC in the original GLPK distribution
-if (MSVC)
+if (WIN32)
   target_compile_definitions(glpk_vendored PRIVATE __WOE__=1)
 endif()
 

@@ -497,6 +497,7 @@
 
 ### Fixed
 
+ - igraph would not build with MinGW when using the vendored GLPK and enabling TLS.
  - Removed some uses of `abort()` from vendored libraries, which could unexpectedly
    shut down the host language of igraph's high-level interfaces.
  - `igraph_community_label_propagation()` no longer leaves any vertices unlabeled
