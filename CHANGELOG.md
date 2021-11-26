@@ -489,6 +489,7 @@
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
  - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou!)
+ - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
 
 ### Changed
 
