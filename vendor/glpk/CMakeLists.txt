@@ -81,6 +81,9 @@ target_include_directories(
   ${PROJECT_BINARY_DIR}/src # config.h for TLS
 )
 
+# We are using IGRAPH_FILE_BASENAME in glpk/env/env.h
+define_file_basename_for_sources(glpk_vendored)
+
 if (BUILD_SHARED_LIBS)
   set_property(TARGET glpk_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
