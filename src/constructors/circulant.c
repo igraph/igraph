@@ -23,9 +23,9 @@
  * \function igraph_circulant
  * \brief Creates a circulant graph.
  *
- * A circulant graph <code>G(n, l)</code> consists of \p n vertices \c v_0, ...,
- * \c v_(n-1) such that for each \c l_i in the list of offsets \p l, \c v_j is
- * connected to <code> v_((j + l_i) mod n) </code> for all j.
+ * A circulant graph <code>G(n, shifts)</code> consists of \p n vertices \c v_0, ...,
+ * \c v_(n-1) such that for each \c s_i in the list of offsets \p shifts, \c v_j is
+ * connected to <code> v_((j + s_i) mod n) </code> for all j.
  *
  * </para><para>
  * The function works with both directed and undirected graphs. Multiple edges are
@@ -35,20 +35,20 @@
  * be stored here.
  * \param n Integer, \p n is the number of vertices in the circulant graph. It must
  * be at least 0.
- * \param l Integer vector, \p l is a list of the offsets within the circulant graph.
+ * \param shifts Integer vector, \p shifts is a list of the offsets within the circulant graph.
  * \param directed Boolean, \p directed determines whether the graph should be directed.
  * \return Error code.
  *
  * \sa \ref igraph_ring(), \ref igraph_generalized_petersen().
  *
- * Time complexity: O(|V||L|), the number of vertices in the graph times the number
- * of offsets.
+ * Time complexity: O(|V||shifts|), the number of vertices in the graph times the number
+ * of shifts.
  */
 
-igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *l, igraph_bool_t directed) {
+igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *shifts, igraph_bool_t directed) {
 
     igraph_vector_int_t edges;
-    igraph_vector_bool_t offset_seen;
+    igraph_vector_bool_t shift_seen;
     igraph_integer_t i, j;
     igraph_integer_t limit;
 
@@ -60,42 +60,42 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&offset_seen, n);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&shift_seen, n);
 
-    VECTOR(offset_seen)[0] = 1; /* do not allow self loops */
+    VECTOR(shift_seen)[0] = 1; /* do not allow self loops */
 
-    for (i = 0; i < igraph_vector_int_size(l); i++) {
-        /* simplify the offset */
-        igraph_integer_t offset = VECTOR(*l)[i] % n;
-        if (offset < 0) {
-            offset += n;
+    for (i = 0; i < igraph_vector_int_size(shifts); i++) {
+        /* simplify the shift */
+        igraph_integer_t shift = VECTOR(*shifts)[i] % n;
+        if (shift < 0) {
+            shift += n;
         }
         if (!directed) {
-            if (offset >= (n + 1) / 2) {
-                offset = n - offset;
+            if (shift >= (n + 1) / 2) {
+                shift = n - shift;
             }
         }
 
-        /* only use offset if non-zero and we haven't seen it before */
-        if (!VECTOR(offset_seen)[offset]) {
-            if (n % 2 == 0 && offset == n / 2 && !directed) {
-                limit = n / 2; /* this to avoid doubling up the n/2 offset for even n and undirected graph */
+        /* only use shift if non-zero and we haven't seen it before */
+        if (!VECTOR(shift_seen)[shift]) {
+            if (n % 2 == 0 && shift == n / 2 && !directed) {
+                limit = n / 2; /* this to avoid doubling up the n/2 shift for even n and undirected graph */
             } else {
                 limit = n;
             }
             for (j = 0; j < limit; j++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, (j + offset) % n));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, (j + shift) % n));
             }
 
-            VECTOR(offset_seen)[offset] = 1;
+            VECTOR(shift_seen)[shift] = 1;
         }
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 
     igraph_vector_int_destroy(&edges);
-    igraph_vector_bool_destroy(&offset_seen);
+    igraph_vector_bool_destroy(&shift_seen);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
