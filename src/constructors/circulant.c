@@ -17,6 +17,7 @@
 */
 
 #include "igraph_constructors.h"
+
 #include "igraph_interface.h"
 
 /**
