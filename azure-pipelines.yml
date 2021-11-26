@@ -69,7 +69,7 @@ jobs:
     steps:
       # https://github.com/alpinelinux/alpine-chroot-install
       - bash: |
-          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.12.1/alpine-chroot-install && echo '5571ad4d17d14bb09ad23a75060f05553786e564  alpine-chroot-install' | sha1sum -c || exit 1
+          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.13.2/alpine-chroot-install && echo '60c7e0b5d82e21d1a549fc9a46ba3b36688c09dc  alpine-chroot-install' | sha1sum -c || exit 1
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
           sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'
           mkdir build && cd build
