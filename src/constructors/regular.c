@@ -411,7 +411,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 /**
  * \ingroup generators
  * \function igraph_symmetric_tree
- * \brief Creates a tree in which almost all vertices have the same number of children.
+ * \brief Creates a symmetric tree which has the same number of branchss at each level.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param vector Vector detailing the number of branches at each level
@@ -428,7 +428,6 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  *          undirected tree.
  *        \endclist
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid number of vertices.
  *         \c IGRAPH_INVMODE: invalid mode argument.
  *
  * Time complexity: O(|V|+|E|), the
@@ -505,9 +504,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *dimve
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;                
-
-                    return 0;
-                }
+}
 
 /**
  * \function igraph_extended_chordal_ring
