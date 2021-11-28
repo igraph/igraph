@@ -22,6 +22,7 @@ int main() {
     VECTOR(v)[2] = 5;
     VECTOR(v)[3] = 6;
 
+    IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_OUT) == IGRAPH_FAILURE);
     // todo: add more tests
 
     return 0;
