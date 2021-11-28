@@ -272,6 +272,7 @@ add_library(
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
+  misc/umap.c
 
   internal/glpk_support.c
   internal/hacks.c

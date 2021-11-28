@@ -136,6 +136,8 @@
 
   <xi:include href="embedding.xml"/>
 
+  <xi:include href="umap.xml"/>
+
   <xi:include href="operators.xml"/>
 
   <xi:include href="arpack.xml"/>

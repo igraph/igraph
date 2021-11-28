@@ -736,6 +736,12 @@ add_legacy_tests(
   igraph_adjacency_spectral_embedding
 )
 
+# umap.at
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_umap
+)
+
 # graphicality
 
 add_legacy_tests(
