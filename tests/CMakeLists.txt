@@ -175,6 +175,7 @@ add_examples(
   igraph_small
   igraph_star
   igraph_tree
+  igraph_symmetric_tree
   igraph_weighted_adjacency
 )
 
@@ -212,6 +213,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_static_power_law_game
   tree
+  symmetric_tree
   tree_game
   ring
   watts_strogatz_game

@@ -409,6 +409,45 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 }
 
 /**
+ * \ingroup generators
+ * \function igraph_symmetric_tree
+ * \brief Creates a tree in which almost all vertices have the same number of children.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param vector Vector detailing the number of branches at each level
+ * \param type Constant, gives whether to create a directed tree, and
+ *        if this is the case, also its orientation. Possible values:
+ *        \clist
+ *        \cli IGRAPH_TREE_OUT
+ *          directed tree, the edges point
+ *          from the parents to their children,
+ *        \cli IGRAPH_TREE_IN
+ *          directed tree, the edges point from
+ *          the children to their parents.
+ *        \cli IGRAPH_TREE_UNDIRECTED
+ *          undirected tree.
+ *        \endclist
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
+ *         \c IGRAPH_INVMODE: invalid mode argument.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating other regular
+ * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \ref igraph_tree_game() for uniform random sampling of trees.
+ *
+ * \example examples/simple/igraph_symmetric_tree.c
+ */
+
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+                igraph_tree_mode_t type) {
+                    // TODO: implement function
+                    return 0;
+                }
+
+/**
  * \function igraph_extended_chordal_ring
  * \brief Create an extended chordal ring.
  *
