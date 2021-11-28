@@ -441,9 +441,71 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * \example examples/simple/igraph_symmetric_tree.c
  */
 
-igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *dimvector,
                 igraph_tree_mode_t type) {
-                    // TODO: implement function
+    // TODO: implement function
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i, j, k, m;
+    igraph_integer_t idx = 0;
+    igraph_integer_t to = 1;
+    igraph_integer_t n = 1 + VECTOR(*dimvector)[0] + VECTOR(*dimvector)[0]*VECTOR(*dimvector)[1] + VECTOR(*dimvector)[0]*VECTOR(*dimvector)[1]*VECTOR(*dimvector)[2];
+
+    
+    if ( igraph_vector_int_empty(dimvector) || igraph_vector_int_min(dimvector) < 1) {
+        IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
+    }
+    if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
+        type != IGRAPH_TREE_UNDIRECTED) {
+        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+    }
+
+    
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
+
+    i = 0;
+    if (type == IGRAPH_TREE_OUT) {
+        //while (idx < 2 * (n - 1)) {
+            for (j = 0; j < VECTOR(*dimvector)[0] && idx < 2 * (n - 1); j++) {
+                VECTOR(edges)[idx++] = i;
+                VECTOR(edges)[idx++] = to++;
+            }
+            
+            i++;
+            for(k = 0; k < VECTOR(*dimvector)[0]; ++k) {
+		        for (j = 0; j < VECTOR(*dimvector)[1] && idx < 2 * (n - 1); ++j) {
+			        VECTOR(edges)[idx] = i;
+			        idx++;
+			        VECTOR(edges)[idx] = to;
+			        idx++;
+			        to++;
+		        }
+		        i++;
+	        }
+            
+            for(m = 0; m < VECTOR(*dimvector)[0]; ++m) {
+                for(k = 0; k < VECTOR(*dimvector)[1]; ++k) {
+                    for(j = 0; j < VECTOR(*dimvector)[2] && idx < 2 * (n - 1); ++j) {
+                        VECTOR(edges)[idx] = i;
+                        idx++;
+                        VECTOR(edges)[idx] = to;
+                        idx++;
+                        to++;
+                    }
+                    i++;
+                }
+            }
+            
+        //}
+    } else {
+        return -1;
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, type != IGRAPH_TREE_UNDIRECTED));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;                
+
                     return 0;
                 }
 
