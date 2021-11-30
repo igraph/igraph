@@ -411,7 +411,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 /**
  * \ingroup generators
  * \function igraph_symmetric_tree
- * \brief Creates a symmetric tree which has the same number of branchss at each level.
+ * \brief Creates a symmetric tree which has the same number of branches at each level.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param vector Vector detailing the number of branches at each level
@@ -433,26 +433,26 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating other regular
+ * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating regular
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
  * \example examples/simple/igraph_symmetric_tree.c
  */
 
-igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *dimvector,
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branch_level,
                 igraph_tree_mode_t type) {
     // TODO: implement function
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t i, j, k, m;
     igraph_integer_t idx = 0;
     igraph_integer_t to = 1;
-    igraph_integer_t n = 1 + VECTOR(*dimvector)[0] + VECTOR(*dimvector)[0]*VECTOR(*dimvector)[1] + VECTOR(*dimvector)[0]*VECTOR(*dimvector)[1]*VECTOR(*dimvector)[2];
+    igraph_integer_t n = 1 + VECTOR(*branch_level)[0] + VECTOR(*branch_level)[0]*VECTOR(*branch_level)[1] + VECTOR(*branch_level)[0]*VECTOR(*branch_level)[1]*VECTOR(*branch_level)[2];
 
-    
-    if ( igraph_vector_int_empty(dimvector) || igraph_vector_int_min(dimvector) < 1) {
+    // empty vector -> singleton graph
+    /*if ( igraph_vector_int_min(branch_level) < 1) {
         IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
-    }
+    }*/
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
         IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
@@ -464,14 +464,14 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *dimve
     i = 0;
     if (type == IGRAPH_TREE_OUT) {
         //while (idx < 2 * (n - 1)) {
-            for (j = 0; j < VECTOR(*dimvector)[0] && idx < 2 * (n - 1); j++) {
+            for (j = 0; j < VECTOR(*branch_level)[0] && idx < 2 * (n - 1); j++) {
                 VECTOR(edges)[idx++] = i;
                 VECTOR(edges)[idx++] = to++;
             }
             
             i++;
-            for(k = 0; k < VECTOR(*dimvector)[0]; ++k) {
-		        for (j = 0; j < VECTOR(*dimvector)[1] && idx < 2 * (n - 1); ++j) {
+            for(k = 0; k < VECTOR(*branch_level)[0]; ++k) {
+		        for (j = 0; j < VECTOR(*branch_level)[1] && idx < 2 * (n - 1); ++j) {
 			        VECTOR(edges)[idx] = i;
 			        idx++;
 			        VECTOR(edges)[idx] = to;
@@ -481,9 +481,9 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *dimve
 		        i++;
 	        }
             
-            for(m = 0; m < VECTOR(*dimvector)[0]; ++m) {
-                for(k = 0; k < VECTOR(*dimvector)[1]; ++k) {
-                    for(j = 0; j < VECTOR(*dimvector)[2] && idx < 2 * (n - 1); ++j) {
+            for(m = 0; m < VECTOR(*branch_level)[0]; ++m) {
+                for(k = 0; k < VECTOR(*branch_level)[1]; ++k) {
+                    for(j = 0; j < VECTOR(*branch_level)[2] && idx < 2 * (n - 1); ++j) {
                         VECTOR(edges)[idx] = i;
                         idx++;
                         VECTOR(edges)[idx] = to;
