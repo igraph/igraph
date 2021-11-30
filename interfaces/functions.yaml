@@ -1919,14 +1919,24 @@ igraph_is_eulerian:
     PARAMS: GRAPH graph, OUT BOOLEANPTR has_path, OUT BOOLEANPTR has_cycle
 
 igraph_eulerian_path:
-    PARAMS: GRAPH graph, OUT VECTOR edge_res, OUT VECTOR vertex_res
+    PARAMS: GRAPH graph, OUT EDGESET_OR_0 edge_res, OUT VERTEXSET_OR_0 vertex_res
+    DEPS: edge_res ON graph, vertex_res ON graph
 
 igraph_eulerian_cycle:
-    PARAMS: GRAPH graph, OUT VECTOR edge_res, OUT VECTOR vertex_res
+    PARAMS: GRAPH graph, OUT EDGESET_OR_0 edge_res, OUT VERTEXSET_OR_0 vertex_res
+    DEPS: edge_res ON graph, vertex_res ON graph
+
+#######################################
+# Trees
+#######################################
+
+igraph_is_tree:
+    PARAMS: GRAPH graph, PRIMARY OUT BOOLEANPTR res, OUT VERTEXPTR root, NEIMODE mode=ALL
+    DEPS: root ON graph
 
 #######################################
 # Other, (yet) undocumented functions
 #######################################
-#
+
 igraph_convergence_degree:
     PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR in, OUT VECTOR out
