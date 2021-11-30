@@ -457,6 +457,11 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_decompose_destroy
  * \brief Free the memory allocated by \ref igraph_decompose().
  *
+ * This function destroys and frees all <type>igraph_t</type>
+ * objects held in \p complist. However, it does not destroy
+ * \p complist itself, as it was not allocated by \ref igraph_decompose().
+ * Use \ref igraph_vector_ptr_destroy() to destroy \p complist.
+ *
  * \param complist The list of graph components, as returned by
  *        \ref igraph_decompose().
  *
