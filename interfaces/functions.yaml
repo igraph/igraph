@@ -1934,6 +1934,13 @@ igraph_is_tree:
     PARAMS: GRAPH graph, PRIMARY OUT BOOLEANPTR res, OUT VERTEXPTR root, NEIMODE mode=ALL
     DEPS: root ON graph
 
+igraph_from_prufer:
+    PARAMS: OUT GRAPH graph, VECTOR_INT prufer
+
+igraph_to_prufer:
+    PARAMS: GRAPH graph, OUT VERTEXSET_INT prufer
+    DEPS: prufer ON graph
+
 #######################################
 # Other, (yet) undocumented functions
 #######################################
