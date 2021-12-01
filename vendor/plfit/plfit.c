@@ -1166,16 +1166,26 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
     best_result.alpha = 1;
     best_n = 0;
 
+    /* Skip initial values from xs_copy until we get to a positive element or
+     * until we reach the end of the array */
+    px = xs_copy; end = px + n; end_xmin = end - 1;
+    while (px < end && *px < 1) {
+        px++;
+    }
+
     /* Make sure there are at least three distinct values if possible */
-    px = xs_copy; end = px + n; end_xmin = end - 1; m = 0;
+    m = px - xs_copy;
     prev_x = *end_xmin;
-    while (*end_xmin == prev_x && end_xmin > px)
+    while (end_xmin > px && *end_xmin == prev_x) {
         end_xmin--;
+    }
     prev_x = *end_xmin;
-    while (*end_xmin == prev_x && end_xmin > px)
+    while (end_xmin > px && *end_xmin == prev_x) {
         end_xmin--;
+    }
 
     prev_x = 0;
+    end_xmin++;
     while (px < end_xmin) {
         while (px < end_xmin && *px == prev_x) {
             px++; m++;
