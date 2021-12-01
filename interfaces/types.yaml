@@ -6,18 +6,73 @@
 #
 # See https://github.com/igraph/stimulus for more information
 
+###############################################################################
+## Core igraph data types
+###############################################################################
+
 INTEGER:
     # An ordinary igraph integer
     CTYPE: igraph_integer_t
+    FLAGS: PRIMITIVE
 
 REAL:
     # An ordinary igraph floating-point number
     CTYPE: igraph_real_t
+    FLAGS: PRIMITIVE
 
 BOOLEAN:
     # An ordinary igraph Boolean value
     CTYPE: igraph_bool_t
+    FLAGS: PRIMITIVE
 
 ERROR:
-    # Type representing an igraph error code
-    CTYPE: igraph_error_t
+    # An igraph error code
+    CTYPE: int
+    FLAGS: PRIMITIVE
+
+###############################################################################
+# Vectors, matrices and other template types
+###############################################################################
+
+VECTOR:
+    # A vector of floating-point numbers
+    CTYPE: igraph_vector_t*
+
+###############################################################################
+# Vertex and edge sequences
+###############################################################################
+
+EDGESET:
+    # An igraph edge sequence
+    CTYPE: igraph_es_t
+
+VERTEXSET:
+    # An igraph vertex sequence
+    CTYPE: igraph_vs_t
+
+###############################################################################
+# The main igraph graph type
+###############################################################################
+
+GRAPH:
+    # An igraph graph
+    CTYPE: igraph_t*
+
+###############################################################################
+# Enums
+###############################################################################
+
+NEIMODE:
+    # Enum that describes how a particular function should take into account
+    # the neighbors of vertices
+    CTYPE: igraph_neimode_t
+
+###############################################################################
+# Miscellaneous
+###############################################################################
+
+ATTRIBUTES:
+    # An opaque data structure that a high-level interface may use to pass
+    # information about graph/vertex/edge attributes to a low-level igraph
+    # C function
+    CTYPE: void*
