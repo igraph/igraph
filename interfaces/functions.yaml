@@ -1837,7 +1837,7 @@ igraph_is_maximal_matching:
 igraph_maximum_bipartite_matching:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
-        OUT INTEGER_OR_0 matching_size,
+        OUT INTEGER matching_size,
         OUT REALPTR_OR_0 matching_weight,
         OUT VECTOR_LONG_M1 matching,
         EDGEWEIGHTS weights=NULL, REAL eps=.Machine$double.eps
