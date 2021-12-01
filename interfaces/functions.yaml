@@ -1937,11 +1937,10 @@ igraph_is_tree:
     DEPS: root ON graph
 
 igraph_from_prufer:
-    PARAMS: OUT GRAPH graph, VECTOR_INT prufer
+    PARAMS: OUT GRAPH graph, INDEX_VECTOR prufer
 
 igraph_to_prufer:
-    PARAMS: GRAPH graph, OUT VERTEXSET_INT prufer
-    DEPS: prufer ON graph
+    PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
 
 #######################################
 # Other, (yet) undocumented functions
