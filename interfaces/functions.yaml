@@ -294,7 +294,7 @@ igraph_correlated_game:
 
 igraph_correlated_pair_game:
     PARAMS: |-
-        OUT GRAPH graph1, OUT GRAPH graph2, INT n, REAL corr,
+        OUT GRAPH graph1, OUT GRAPH graph2, INTEGER n, REAL corr,
         REAL p, BOOLEAN directed=False,
         VECTORM1_OR_0 permutation=NULL
 
@@ -352,7 +352,8 @@ igraph_minimum_spanning_tree_prim:
 igraph_closeness:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res,
-        OUT VECTOR_OR_0 reachable_count, OUT BOOLEAN all_reachable,
+        OUT VECTOR_OR_0 reachable_count,
+        OPTIONAL OUT BOOLEAN all_reachable,
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False
@@ -361,7 +362,8 @@ igraph_closeness:
 igraph_closeness_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res,
-        OUT VECTOR_OR_0 reachable_count, OUT BOOLEAN all_reachable,
+        OUT VECTOR_OR_0 reachable_count,
+        OPTIONAL OUT BOOLEAN all_reachable,
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False, REAL cutoff
@@ -657,14 +659,14 @@ igraph_maximum_cardinality_search:
 igraph_is_chordal:
     PARAMS: |-
         GRAPH graph, VECTORM1_OR_0 alpha=NULL, VECTORM1_OR_0 alpham1=NULL,
-        OUT BOOLEAN chordal, OUT VECTORM1_OR_0 fillin,
+        OPTIONAL OUT BOOLEAN chordal, OUT VECTORM1_OR_0 fillin,
         OUT GRAPH_OR_0 newgraph
 
 igraph_avg_nearest_neighbor_degree:
     PARAMS: |-
         GRAPH graph, VERTEXSET vids=ALL,
         NEIMODE mode=ALL, NEIMODE neighbor_degree_mode=ALL,
-        OUT VERTEXINDEX_OR_0 knn, OUT VECTOR_OR_0 knnk,
+        OPTIONAL OUT VERTEXINDEX knn, OUT VECTOR_OR_0 knnk,
         EDGEWEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
@@ -1349,7 +1351,7 @@ igraph_read_graph_edgelist:
 
 igraph_read_graph_ncol:
     PARAMS: |-
-        OUT GRAPH graph, INFILE instream, STRVECTOR_OR_0 predefnames,
+        OUT GRAPH graph, INFILE instream, OPTIONAL STRVECTOR predefnames,
         BOOLEAN names=True, ADD_WEIGHTS weights=True, BOOLEAN directed=True
 
 igraph_read_graph_lgl:
@@ -1750,8 +1752,8 @@ igraph_automorphisms:
 igraph_subisomorphic_lad:
     PARAMS: |-
         GRAPH pattern, GRAPH target, VERTEXSETLIST_OR_0 domains,
-        OUT BOOLEAN iso, OUT VECTOR_OR_0 map,
-        OUT VECTORLIST_OR_0 maps, BOOLEAN induced, INT time_limit
+        OPTIONAL OUT BOOLEAN iso, OUT VECTOR_OR_0 map,
+        OPTIONAL OUT VECTORLIST maps, BOOLEAN induced, INT time_limit
 
 #######################################
 # SCG
@@ -1837,8 +1839,8 @@ igraph_is_maximal_matching:
 igraph_maximum_bipartite_matching:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
-        OUT INTEGER matching_size,
-        OUT REAL matching_weight,
+        OPTIONAL OUT INTEGER matching_size,
+        OPTIONAL OUT REAL matching_weight,
         OUT VECTOR_LONG_M1 matching,
         EDGEWEIGHTS weights=NULL, REAL eps=.Machine$double.eps
     DEPS: types ON graph, weights ON graph
