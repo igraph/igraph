@@ -629,6 +629,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                 const size_t subdivision_length = 10;
                 size_t num_strata = num_uniques / subdivision_length;
                 double **strata = calloc(num_strata, sizeof(double*));
+                int error_code;
 
                 for (i = 0; i < num_strata; i++) {
                     strata[i] = uniques[i * subdivision_length];
@@ -636,7 +637,11 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
 
                 opt_data.probes = strata;
                 opt_data.num_probes = num_strata;
-                plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+                error_code = plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+                if (error_code != PLFIT_SUCCESS) {
+                    free(strata);
+                    return error_code;
+                }
 
                 opt_data.num_probes = 0;
                 for (i = 0; i < num_strata; i++) {
@@ -657,8 +662,11 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                 free(strata);
                 if (opt_data.num_probes > 0) {
                     /* Do a strict linear scan in the subrange determined above */
-                    plfit_i_continuous_xmin_opt_linear_scan(&opt_data,
-                            &best_result, &best_n);
+                    PLFIT_CHECK(
+                        plfit_i_continuous_xmin_opt_linear_scan(
+                            &opt_data, &best_result, &best_n
+                        )
+                    ); 
                     success = 1;
                 } else {
                     /* This should not happen, but we handle it anyway */
@@ -676,7 +684,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
         /* More advanced search methods failed or were skipped; try linear search */
         opt_data.probes = uniques;
         opt_data.num_probes = num_uniques;
-        plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+        PLFIT_CHECK(plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n));
         success = 1;
     }
 
@@ -1173,9 +1181,14 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
             px++; m++;
         }
 
-        plfit_i_estimate_alpha_discrete(px, n-m, *px, &curr_alpha, options,
-                /* sorted = */ 1);
-        plfit_i_ks_test_discrete(px, end, curr_alpha, *px, &curr_D);
+        PLFIT_CHECK(
+            plfit_i_estimate_alpha_discrete(
+                px, n-m, *px, &curr_alpha, options, /* sorted = */ 1
+            )
+        );
+        PLFIT_CHECK(
+            plfit_i_ks_test_discrete(px, end, curr_alpha, *px, &curr_D)
+        );
 
         if (curr_D < best_result.D) {
             best_result.alpha = curr_alpha;
