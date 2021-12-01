@@ -47,7 +47,7 @@ igraph_degree:
     DEPS: vids ON graph
 
 igraph_edge:
-    PARAMS: GRAPH graph, INTEGER eid, OUT INTEGERPTR from, OUT INTEGERPTR to
+    PARAMS: GRAPH graph, INTEGER eid, OUT INTEGER from, OUT INTEGER to
 
 igraph_edges:
     PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR edges
@@ -55,7 +55,7 @@ igraph_edges:
 
 igraph_get_eid:
     PARAMS: |-
-        GRAPH graph, OUT INTEGERPTR eid, INTEGER from,
+        GRAPH graph, OUT INTEGER eid, INTEGER from,
         INTEGER to, BOOLEAN directed=True, BOOLEAN error=True
 
 igraph_get_eids:
@@ -327,15 +327,15 @@ igraph_are_connected:
 
 igraph_diameter:
     PARAMS: |-
-        GRAPH graph, OUT REALPTR res, OUT INTEGERPTR from,
-        OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True,
+        GRAPH graph, OUT REALPTR res, OUT INTEGER from,
+        OUT INTEGER to, OUT VECTOR_OR_0 path, BOOLEAN directed=True,
         BOOLEAN unconnected=True
 
 igraph_diameter_dijkstra:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
-        OUT REALPTR res, OUT INTEGERPTR from,
-        OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True,
+        OUT REALPTR res, OUT INTEGER from,
+        OUT INTEGER to, OUT VECTOR_OR_0 path, BOOLEAN directed=True,
         BOOLEAN unconnected=True
     DEPS: weights ON graph
 
@@ -378,7 +378,7 @@ igraph_get_shortest_paths:
         OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
         NEIMODE mode=OUT, OUT VECTOR_LONG_OR_0 predecessors=0,
         OUT VECTOR_LONG_OR_0 inbound_edges=0
-    DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
+    DEPS: edges ON graph, from ON graph, to ON graph
 
 igraph_get_all_shortest_paths:
     PARAMS: |-
@@ -546,7 +546,7 @@ igraph_constraint:
 
 igraph_maxdegree:
     PARAMS: |-
-        GRAPH graph, OUT INTEGERPTR res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT INTEGER res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=True
     DEPS: vids ON graph
 
@@ -598,7 +598,7 @@ igraph_count_multiple:
     DEPS: es ON graph
 
 igraph_girth:
-    PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VERTEXSET circle
+    PARAMS: GRAPH graph, OUT INTEGER girth, OUT VERTEXSET circle
     DEPS: circle ON graph
 
 igraph_add_edge:
@@ -819,8 +819,8 @@ igraph_dfs:
 igraph_bipartite_projection_size:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL,
-        OUT INTEGERPTR vcount1, OUT INTEGERPTR ecount1,
-        OUT INTEGERPTR vcount2, OUT INTEGERPTR ecount2
+        OUT INTEGER vcount1, OUT INTEGER ecount1,
+        OUT INTEGER vcount2, OUT INTEGER ecount2
     DEPS: types ON graph
 
 igraph_bipartite_projection:
@@ -881,7 +881,7 @@ igraph_laplacian:
 igraph_clusters:
     PARAMS: |-
         GRAPH graph, OUT VECTOR membership, OUT VECTOR csize,
-        OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
+        OUT INTEGER no, CONNECTEDNESS mode=WEAK
 
 igraph_is_connected:
     PARAMS: GRAPH graph, OUT BOOLEANPTR res, CONNECTEDNESS mode=WEAK
@@ -897,7 +897,7 @@ igraph_articulation_points:
 
 igraph_biconnected_components:
     PARAMS: |-
-        GRAPH graph, OUT INTEGERPTR no,
+        GRAPH graph, OUT INTEGER no,
         OUT EDGESETLIST_OR_0 tree_edges,
         OUT EDGESETLIST_OR_0 component_edges,
         OUT VERTEXSETLIST_OR_0 components,
@@ -926,7 +926,7 @@ igraph_maximal_cliques:
 
 igraph_maximal_cliques_count:
     PARAMS: |-
-        GRAPH graph, OUT INTEGERPTR no, INTEGER min_size=0,
+        GRAPH graph, OUT INTEGER no, INTEGER min_size=0,
         INTEGER max_size=0
 
 igraph_maximal_cliques_file:
@@ -935,7 +935,7 @@ igraph_maximal_cliques_file:
         INTEGER max_size=0
 
 igraph_clique_number:
-    PARAMS: GRAPH graph, OUT INTEGERPTR no
+    PARAMS: GRAPH graph, OUT INTEGER no
 
 igraph_independent_vertex_sets:
     PARAMS: |-
@@ -952,7 +952,7 @@ igraph_maximal_independent_vertex_sets:
     DEPS: res ON graph
 
 igraph_independence_number:
-    PARAMS: GRAPH graph, OUT INTEGERPTR no
+    PARAMS: GRAPH graph, OUT INTEGER no
 
 #######################################
 # Layouts
@@ -1150,7 +1150,7 @@ igraph_community_spinglass_single:
     PARAMS: |-
         GRAPH graph, VECTOR_OR_0 weights, INTEGER vertex, OUT VECTOR community,
         OUT REALPTR cohesion, OUT REALPTR adhesion,
-        OUT INTEGERPTR inner_links, OUT INTEGERPTR outer_links,
+        OUT INTEGER inner_links, OUT INTEGER outer_links,
         INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
 
 igraph_community_walktrap:
@@ -1250,13 +1250,13 @@ igraph_community_leiden:
         VERTEXWEIGHTS vertex_weights=NULL,
         REAL resolution_parameter, REAL beta,
         BOOLEAN start, INOUT VECTOR_OR_0 membership,
-        OUT INTEGERPTR nb_clusters, OUT REALPTR quality
+        OUT INTEGER nb_clusters, OUT REALPTR quality
     DEPS: weights ON graph, vertex_weights ON graph
 
 igraph_split_join_distance:
     PARAMS: |-
-        VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12,
-        OUT INTEGERPTR distance21
+        VECTOR comm1, VECTOR comm2, OUT INTEGER distance12,
+        OUT INTEGER distance21
 
 igraph_hrg_fit:
     PARAMS: |-
@@ -1365,8 +1365,8 @@ igraph_read_graph_graphml:
 
 igraph_read_graph_dimacs:
     PARAMS: |-
-        OUT GRAPH graph, INFILE instream, OUT INTEGERPTR source,
-        OUT INTEGERPTR target, OUT VECTOR capacity, BOOLEAN directed=True
+        OUT GRAPH graph, INFILE instream, OUT INTEGER source,
+        OUT INTEGER target, OUT VECTOR capacity, BOOLEAN directed=True
 
 igraph_read_graph_graphdb:
     PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=False
@@ -1417,14 +1417,14 @@ igraph_motifs_randesu:
 
 igraph_motifs_randesu_estimate:
     PARAMS: |-
-        GRAPH graph, OUT INTEGERPTR est, INT size=3, VECTOR cut_prob,
+        GRAPH graph, OUT INTEGER est, INT size=3, VECTOR cut_prob,
         INTEGER sample_size, VECTOR_OR_0 sample
 
 igraph_motifs_randesu_no:
-    PARAMS: GRAPH graph, OUT INTEGERPTR no, INT size=3, VECTOR cut_prob
+    PARAMS: GRAPH graph, OUT INTEGER no, INT size=3, VECTOR cut_prob
 
 igraph_dyad_census:
-    PARAMS: GRAPH graph, OUT INTEGERPTR mut, OUT INTEGERPTR asym, OUT INTEGERPTR null
+    PARAMS: GRAPH graph, OUT INTEGER mut, OUT INTEGER asym, OUT INTEGER null
     RETURN: ERROR
 
 igraph_triad_census:
@@ -1552,33 +1552,33 @@ igraph_mincut:
 
 igraph_st_vertex_connectivity:
     PARAMS: |-
-        GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target,
+        GRAPH graph, OUT INTEGER res, VERTEX source, VERTEX target,
         VCONNNEI neighbors=NUMBER_OF_NODES
     DEPS: source ON graph, target ON graph
 
 igraph_vertex_connectivity:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+    PARAMS: GRAPH graph, OUT INTEGER res, BOOLEAN checks=True
 
 igraph_st_edge_connectivity:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+    PARAMS: GRAPH graph, OUT INTEGER res, VERTEX source, VERTEX target
     DEPS: source ON graph, target ON graph
 
 igraph_edge_connectivity:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+    PARAMS: GRAPH graph, OUT INTEGER res, BOOLEAN checks=True
 
 igraph_edge_disjoint_paths:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+    PARAMS: GRAPH graph, OUT INTEGER res, VERTEX source, VERTEX target
     DEPS: source ON graph, target ON graph
 
 igraph_vertex_disjoint_paths:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEX source, VERTEX target
+    PARAMS: GRAPH graph, OUT INTEGER res, VERTEX source, VERTEX target
     DEPS: source ON graph, target ON graph
 
 igraph_adhesion:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+    PARAMS: GRAPH graph, OUT INTEGER res, BOOLEAN checks=True
 
 igraph_cohesion:
-    PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+    PARAMS: GRAPH graph, OUT INTEGER res, BOOLEAN checks=True
 
 #######################################
 # Listing s-t cuts, separators
@@ -1645,13 +1645,13 @@ igraph_coreness:
 #######################################
 
 igraph_isoclass:
-    PARAMS: GRAPH graph, OUT INTEGERPTR isoclass
+    PARAMS: GRAPH graph, OUT INTEGER isoclass
 
 igraph_isomorphic:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_isoclass_subgraph:
-    PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
+    PARAMS: GRAPH graph, VECTOR vids, OUT INTEGER isoclass
     DEPS: vids ON graph
 
 igraph_isoclass_create:
@@ -1675,7 +1675,7 @@ igraph_count_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT INTEGERPTR count, NULL node_compat_fn,
+        OUT INTEGER count, NULL node_compat_fn,
         NULL edge_compat_fn, NULL extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -1710,7 +1710,7 @@ igraph_count_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT INTEGERPTR count, NULL node_compat_fn,
+        OUT INTEGER count, NULL node_compat_fn,
         NULL edge_compat_fn, NULL extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -1837,7 +1837,7 @@ igraph_is_maximal_matching:
 igraph_maximum_bipartite_matching:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
-        OUT INTEGERPTR_OR_0 matching_size,
+        OUT INTEGER_OR_0 matching_size,
         OUT REALPTR_OR_0 matching_weight,
         OUT VECTOR_LONG_M1 matching,
         EDGEWEIGHTS weights=NULL, REAL eps=.Machine$double.eps
@@ -1909,7 +1909,7 @@ igraph_convex_hull:
     PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
 
 igraph_dim_select:
-    PARAMS: VECTOR sv, OUT INTEGERPTR dim
+    PARAMS: VECTOR sv, OUT INTEGER dim
 
 #######################################
 # Eulerian functions
