@@ -1,3 +1,5 @@
+# vim:set ts=4 sw=4 sts=4 et:
+#
 # This file is a YAML representation of the signatures of most igraph
 # functions. They are currently used by some of the higher level interfaces to
 # generate code using our internal tool called Stimulus

@@ -1,0 +1,23 @@
+# vim:set ts=4 sw=4 sts=4 et:
+#
+# This file is a YAML representation of the types used in the functions.yaml
+# function specification file. It provides the meaning of each type in comments
+# and also specifies the C types correspnding to each abstract type.
+#
+# See https://github.com/igraph/stimulus for more information
+
+INTEGER:
+    # An ordinary igraph integer
+    CTYPE: igraph_integer_t
+
+REAL:
+    # An ordinary igraph floating-point number
+    CTYPE: igraph_real_t
+
+BOOLEAN:
+    # An ordinary igraph Boolean value
+    CTYPE: igraph_bool_t
+
+ERROR:
+    # Type representing an igraph error code
+    CTYPE: igraph_error_t
