@@ -226,18 +226,18 @@ IGRAPH_EXPORT int igraph_layout_drl_options_init(igraph_layout_drl_options_t *op
                                                  igraph_layout_drl_default_t templ);
 IGRAPH_EXPORT int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                                     igraph_bool_t use_seed,
-                                    igraph_layout_drl_options_t *options,
+                                    const igraph_layout_drl_options_t *options,
                                     const igraph_vector_t *weights,
                                     const igraph_vector_bool_t *fixed);
 
 IGRAPH_EXPORT int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
                                        igraph_bool_t use_seed,
-                                       igraph_layout_drl_options_t *options,
+                                       const igraph_layout_drl_options_t *options,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_bool_t *fixed);
 
-IGRAPH_EXPORT int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
-                                          igraph_vector_ptr_t *coords,
+IGRAPH_EXPORT int igraph_layout_merge_dla(const igraph_vector_ptr_t *graphs,
+                                          const igraph_vector_ptr_t *coords,
                                           igraph_matrix_t *res);
 
 IGRAPH_EXPORT int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,

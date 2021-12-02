@@ -100,7 +100,7 @@ using namespace drl3d;
 
 int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_bool_t use_seed,
-                         igraph_layout_drl_options_t *options,
+                         const igraph_layout_drl_options_t *options,
                          const igraph_vector_t *weights,
                          const igraph_vector_bool_t *fixed) {
     IGRAPH_HANDLE_EXCEPTIONS(

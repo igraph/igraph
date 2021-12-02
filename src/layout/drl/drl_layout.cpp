@@ -453,7 +453,7 @@ int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
 
 int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_bool_t use_seed,
-                      igraph_layout_drl_options_t *options,
+                      const igraph_layout_drl_options_t *options,
                       const igraph_vector_t *weights,
                       const igraph_vector_bool_t *fixed) {
     const char msg[] = "Damping multipliers cannot be negative, got %f.";

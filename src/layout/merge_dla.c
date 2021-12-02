@@ -40,7 +40,7 @@
  * largest graph is placed at the origin. Then the other layouts are
  * placed by the DLA algorithm, larger ones first and smaller ones
  * last.
- * \param thegraphs Pointer vector containing the graph object of
+ * \param thegraphs Pointer vector containing the graph objects of
  *        which the layouts will be merged.
  * \param coords Pointer vector containing matrix objects with the 2d
  *        layouts of the graphs in \p thegraphs.
@@ -54,8 +54,8 @@
  * Time complexity: TODO.
  */
 
-int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
-                            igraph_vector_ptr_t *coords,
+int igraph_layout_merge_dla(const igraph_vector_ptr_t *thegraphs,
+                            const igraph_vector_ptr_t *coords,
                             igraph_matrix_t *res) {
     long int graphs = igraph_vector_ptr_size(coords);
     igraph_vector_t sizes;
