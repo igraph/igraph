@@ -1761,6 +1761,8 @@ igraph_canonical_permutation:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors,
         PRIMARY OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
+    DEPS: |-
+        colors ON graph
 
 igraph_permute_vertices:
     PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
@@ -1772,10 +1774,14 @@ igraph_isomorphic_bliss:
         PRIMARY OUT BOOLEAN iso, OUT VECTORM1_OR_0 map12,
         OUT VECTORM1_OR_0 map21, BLISSSH sh="fm",
         OUT BLISSINFO info1, OUT BLISSINFO info2
+    DEPS: |-
+        colors1 ON graph1, colors2 ON graph2
 
 igraph_automorphisms:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors, BLISSSH sh="fm", OUT BLISSINFO info
+    DEPS: |-
+        colors ON graph
 
 igraph_subisomorphic_lad:
     PARAMS: |-
