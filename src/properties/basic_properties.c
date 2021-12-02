@@ -120,7 +120,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V|+|E|), linear.
  *
  */
-int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
     int no_of_nodes = igraph_vcount(graph);
