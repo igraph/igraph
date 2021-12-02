@@ -606,7 +606,7 @@ igraph_count_multiple:
     DEPS: es ON graph
 
 igraph_girth:
-    PARAMS: GRAPH graph, OUT INTEGER girth, OUT VERTEXSET circle
+    PARAMS: GRAPH graph, OUT INTEGER girth, OUT VERTEXSET_LEGACY circle
     DEPS: circle ON graph
 
 igraph_add_edge:
@@ -635,19 +635,23 @@ igraph_authority_score:
     DEPS: weights ON graph, vector ON graph V(graph)
 
 igraph_arpack_rssolve:
+    # TODO(ntamas): this should probably not be exposed to higher-level
+    # interfaces; igraph's goal is not to provide an ARPACK wrapper
     PARAMS: |-
-        ARPFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
-        NULL storage, OUT VECTOR_OR_0 values,
-        OUT MATRIX_OR_0 vectors
+        ARPACKFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
+        INOUT ARPACKSTORAGE storage, OPTIONAL OUT VECTOR values, OPTIONAL OUT MATRIX vectors
 
 igraph_arpack_rnsolve:
+    # TODO(ntamas): this should probably not be exposed to higher-level
+    # interfaces; igraph's goal is not to provide an ARPACK wrapper
     PARAMS: |-
-        ARPFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
-        NULL storage, OUT VECTOR_OR_0 values,
-        OUT MATRIX_OR_0 vectors
+        ARPACKFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
+        INOUT ARPACKSTORAGE storage, OPTIONAL OUT MATRIX values, OPTIONAL OUT MATRIX vectors
 
 igraph_arpack_unpack_complex:
-    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
+    # TODO(ntamas): this should probably not be exposed to higher-level
+    # interfaces; igraph's goal is not to provide an ARPACK wrapper
+    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, LONG nev
 
 igraph_unfold_tree:
     PARAMS: |-
@@ -810,7 +814,7 @@ igraph_bfs:
         OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 rank,
         OUT VECTOR_OR_0 father,
         OUT VECTOR_OR_0 pred, OUT VECTOR_OR_0 succ,
-        OUT VECTOR_OR_0 dist, BFS_FUNC callback, NULL extra
+        OUT VECTOR_OR_0 dist, BFS_FUNC callback, EXTRA extra
 
 igraph_dfs:
     PARAMS: |-
@@ -818,7 +822,7 @@ igraph_dfs:
         BOOLEAN unreachable,
         OUT VECTOR_OR_0 order, OUT VECTOR_OR_0 order_out,
         OUT VECTOR_OR_0 dist, DFS_FUNC in_callback,
-        DFS_FUNC out_callback, NULL extra
+        DFS_FUNC out_callback, EXTRA extra
 
 #######################################
 # Bipartite graphs
@@ -1673,7 +1677,7 @@ igraph_isomorphic_vf2:
         OUT BOOLEAN iso,
         OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21,
         NULL node_compat_fn, NULL edge_compat_fn,
-        NULL extra
+        EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1684,7 +1688,7 @@ igraph_count_isomorphisms_vf2:
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT INTEGER count, NULL node_compat_fn,
-        NULL edge_compat_fn, NULL extra
+        NULL edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1695,7 +1699,7 @@ igraph_get_isomorphisms_vf2:
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT VECTORLIST maps, NULL node_compat_fn,
-        NULL edge_compat_fn, NULL extra
+        NULL edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1708,7 +1712,7 @@ igraph_subisomorphic_vf2:
         OUT BOOLEAN iso,
         OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21,
         NULL node_compat_fn, NULL edge_compat_fn,
-        NULL extra
+        EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1719,7 +1723,7 @@ igraph_count_subisomorphisms_vf2:
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT INTEGER count, NULL node_compat_fn,
-        NULL edge_compat_fn, NULL extra
+        NULL edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1730,7 +1734,7 @@ igraph_get_subisomorphisms_vf2:
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT VECTORLIST maps, NULL node_compat_fn,
-        NULL edge_compat_fn, NULL extra
+        NULL edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1882,7 +1886,7 @@ igraph_eigen_adjacency:
         GRAPH graph, EIGENALGO algorithm=ARPACK,
         EIGENWHICH which=Default,
         INOUT ARPACKOPT options=arpack_defaults,
-        NULL storage, OUT VECTOR values, OUT MATRIX vectors,
+        INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors,
         NULL cmplxvalues, NULL cmplxvectors
 
 #######################################

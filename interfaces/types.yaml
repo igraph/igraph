@@ -34,6 +34,10 @@ INT:
     # A C integer
     CTYPE: int
 
+LONG:
+    # A C long integer
+    CTYPE: long int
+
 CSTRING:
     # A null-terminated immutable C string
     CTYPE: const char*
@@ -131,6 +135,12 @@ VERTEXSET_INT:
     # hence the entire vector is an igraph_vector_int_t.
     CTYPE: igraph_vector_int_t
 
+VERTEXSET_LEGACY:
+    # An igraph vertex sequence where each vertex is represented as an integer,
+    # but the entire vector is stored as an igraph_vector_t. This should be
+    # removed in igraph 0.10.
+    CTYPE: igraph_vector_t
+
 ###############################################################################
 # Specialized vectors with semantic meaning
 ###############################################################################
@@ -149,6 +159,11 @@ EDGESETLIST:
     # vector of igraph_es_t objects
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
+
+GRAPHLIST:
+    # A vector containing pointers to graph objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BYREF
 
 VERTEXINDEX:
     # A vector of floating-point numbers where each entry corresponds to
@@ -221,9 +236,31 @@ NEIMODE:
     # the neighbors of vertices
     CTYPE: igraph_neimode_t
 
+PAGERANKALGO:
+    # Enum that describes the various implementations of the PageRank algorithm
+    CTYPE: igraph_pagerank_algo_t
+
+RECIP:
+    # Enum that describes how the reciprocity of a graph should be calculated
+    CTYPE: igraph_reciprocity_t
+
+REWIRINGMODE:
+    # Enum for the rewiring modes of igraph_rewire()
+    CTYPE: igraph_rewiring_t
+
 STARMODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_star_mode_t
+
+SUBGRAPH_IMPL:
+    # Enum that describes how igraph should create an induced subgraph of a
+    # graph
+    CTYPE: igraph_subgraph_implementation_t
+
+TRANSITIVITYMODE:
+    # Enum that specifies how isolated vertices should be handled in transitivity
+    # calcuations
+    CTYPE: igraph_transitivity_mode_t
 
 TREEMODE:
     # Enum that describes how a tree graph should be constructed
@@ -233,9 +270,48 @@ TREEMODE:
 # Miscellaneous
 ###############################################################################
 
+ARPACKFUNC:
+    # ARPACK matrix multiplication function.
+    CTYPE: igraph_arpack_function_t
+
+ARPACKOPT:
+    # Structure that contains the options of the ARPACK eigensolver.
+    CTYPE: igraph_arpack_options_t
+    FLAGS: BY_REF
+
+ARPACKSTORAGE:
+    # Pointer to a general-purpose memory block that ARPACK-based algorithms
+    # may use as a working area.
+    CTYPE: igraph_arpack_storage_t
+    FLAGS: BY_REF
+
 ATTRIBUTES:
     # An opaque data structure that a high-level interface may use to pass
     # information about graph/vertex/edge attributes to a low-level igraph
     # C function
     CTYPE: void
+    FLAGS: BY_REF
+
+EDGE_ATTRIBUTE_COMBINATION:
+    # Structure specifying how the attributes of edges should be combined
+    # during graph operations that may merge multiple edges into a single one
+    CTYPE: igraph_attribute_combination_t
+    FLAGS: BY_REF
+
+EXTRA:
+    # Thunk argument that usually accompanies callback functions and can be used
+    # to provide user-specific data or context to the callback function
+    CTYPE: void
+    FLAGS: BY_REF
+
+PAGERANKOPT:
+    # Enum that describes the PageRank options pointer, which is used only if
+    # the PageRank implementation uses ARPACK
+    CTYPE: igraph_arpack_options_t
+    FLAGS: BY_REF
+
+VERTEX_ATTRIBUTE_COMBINATION:
+    # Structure specifying how the attributes of vertices should be combined
+    # during graph operations that may merge multiple vertices into a single one
+    CTYPE: igraph_attribute_combination_t
     FLAGS: BY_REF
