@@ -216,7 +216,7 @@ IGRAPH_EXPORT int igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_t *membership,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_t *initial,
-                                                     igraph_vector_bool_t *fixed,
+                                                     const igraph_vector_bool_t *fixed,
                                                      igraph_real_t *modularity);
 
 IGRAPH_EXPORT int igraph_community_multilevel(const igraph_t *graph,

@@ -26,6 +26,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
+#include "igraph_memory.h"
 #include "igraph_random.h"
 
 /**
@@ -90,7 +91,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,
-                                       igraph_vector_bool_t *fixed,
+                                       const igraph_vector_bool_t *fixed,
                                        igraph_real_t *modularity) {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -102,6 +103,11 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_bool_t unlabelled_left;
 
     igraph_vector_t label_counters, dominant_labels, nonzero_labels, node_order;
+
+    /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
+     * away the constness, and promise ourselves that we will make a proper
+     * copy of 'fixed' into 'fixed_copy' as soon as we start mutating it */
+    igraph_vector_bool_t* fixed_copy = (igraph_vector_bool_t*) fixed;
 
     /* The implementation uses a trick to avoid negative array indexing:
      * elements of the membership vector are increased by 1 at the start
@@ -150,7 +156,21 @@ int igraph_community_label_propagation(const igraph_t *graph,
                 if (VECTOR(*fixed)[i]) {
                     if (VECTOR(*membership)[i] == 0) {
                         IGRAPH_WARNING("Fixed nodes cannot be unlabeled, ignoring them.");
-                        VECTOR(*fixed)[i] = 0;
+
+                        /* We cannot modify 'fixed' because it is const, so we make a copy and
+                         * modify 'fixed_copy' instead */
+                        if (fixed_copy == fixed) {
+                            fixed_copy = igraph_Calloc(1, igraph_vector_bool_t);
+                            if (fixed_copy == 0) {
+                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM);
+                            }
+
+                            IGRAPH_FINALLY(igraph_free, fixed_copy);
+                            IGRAPH_CHECK(igraph_vector_bool_copy(fixed_copy, fixed));
+                            IGRAPH_FINALLY(igraph_vector_bool_destroy, fixed_copy);
+                        }
+
+                        VECTOR(*fixed_copy)[i] = 0;
                     } else {
                         no_of_not_fixed_nodes--;
                     }
@@ -167,6 +187,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
             VECTOR(*membership)[i] = i + 1;
         }
     }
+
+    /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
 
     /* Create an adjacency/incidence list representation for efficiency.
      * For the unweighted case, the adjacency list is enough. For the
@@ -186,10 +208,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, 2));
 
     /* Initialize node ordering vector with only the not fixed nodes */
-    if (fixed) {
+    if (fixed_copy) {
         IGRAPH_VECTOR_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
         for (i = 0, j = 0; i < no_of_nodes; i++) {
-            if (!VECTOR(*fixed)[i]) {
+            if (!VECTOR(*fixed_copy)[i]) {
                 VECTOR(node_order)[j] = i;
                 j++;
             }
@@ -386,6 +408,12 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_vector_destroy(&dominant_labels);
     igraph_vector_destroy(&nonzero_labels);
     IGRAPH_FINALLY_CLEAN(4);
+
+    if (fixed != fixed_copy) {
+        igraph_vector_bool_destroy(fixed_copy);
+        igraph_Free(fixed_copy);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
 
     return IGRAPH_SUCCESS;
 }
