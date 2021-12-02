@@ -308,7 +308,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
  * |E| is the number of edges in the graph.
  */
-igraph_error_t igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
+igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;
