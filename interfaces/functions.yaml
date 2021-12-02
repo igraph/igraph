@@ -448,7 +448,9 @@ igraph_get_all_simple_paths:
     DEPS: from ON graph, to ON graph, res ON graph
 
 igraph_subcomponent:
-    PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
+    # TODO(ntamas): vid is a double; this is correct but this is actually
+    # a mistake in 0.9.x. This should be fixed in 0.10.
+    PARAMS: GRAPH graph, OUT VERTEXSET res, REAL vid, NEIMODE mode=ALL
     DEPS: vid ON graph, res ON graph
 
 igraph_betweenness:
@@ -932,18 +934,16 @@ igraph_largest_cliques:
     DEPS: res ON graph
 
 igraph_maximal_cliques:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, INTEGER max_size=0
     DEPS: res ON graph
 
 igraph_maximal_cliques_count:
     PARAMS: |-
-        GRAPH graph, OUT INTEGER no, INTEGER min_size=0,
-        INTEGER max_size=0
+        GRAPH graph, OUT INTEGER no, INTEGER min_size=0, INTEGER max_size=0
 
 igraph_maximal_cliques_file:
     PARAMS: |-
-        GRAPH graph, OUTFILE res, INTEGER min_size=0,
-        INTEGER max_size=0
+        GRAPH graph, OUTFILE res, INTEGER min_size=0, INTEGER max_size=0
 
 igraph_clique_number:
     PARAMS: GRAPH graph, OUT INTEGER no
@@ -983,10 +983,10 @@ igraph_layout_star:
     DEPS: center ON graph
 
 igraph_layout_grid:
-    PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0
+    PARAMS: GRAPH graph, OUT MATRIX res, LONGINT width=0
 
 igraph_layout_grid_3d:
-    PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0, INTEGER height=0
+    PARAMS: GRAPH graph, OUT MATRIX res, LONGINT width=0, LONGINT height=0
 
 igraph_layout_fruchterman_reingold:
     PARAMS: |-
@@ -1017,10 +1017,14 @@ igraph_layout_lgl:
         INTEGER root=-1
 
 igraph_layout_reingold_tilford:
-    PARAMS: GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, VECTOR roots
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT,
+        OPTIONAL VECTOR roots, OPTIONAL VECTOR rootlevel
 
 igraph_layout_reingold_tilford_circular:
-    PARAMS: GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, VECTOR roots
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT,
+        OPTIONAL VECTOR roots, OPTIONAL VECTOR rootlevel
 
 igraph_layout_random_3d:
     PARAMS: GRAPH graph, OUT MATRIX res
@@ -1056,8 +1060,8 @@ igraph_layout_graphopt:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, INTEGER niter=500,
         REAL node_charge=0.001, REAL node_mass=30,
-        INTEGER spring_length=0, REAL spring_constant=1,
-        REAL max_sa_movement=5, NULL use_seed
+        REAL spring_length=0, REAL spring_constant=1,
+        REAL max_sa_movement=5, BOOLEAN use_seed=False
     FLAGS: PROGRESS
 
 igraph_layout_drl:
@@ -1080,18 +1084,18 @@ igraph_layout_sugiyama:
         GRAPH graph, OUT MATRIX res, OUT GRAPH_OR_0 extd_graph,
         OUT VECTORM1_OR_0 extd_to_orig_eids,
         VECTORM1_OR_0 layers=NULL,
-        REAL hgap=1, REAL vgap=1, INTEGER maxiter=100,
+        REAL hgap=1, REAL vgap=1, LONGINT maxiter=100,
         EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph
 
 igraph_layout_mds:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, INTEGER dim=2
+        GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, LONGINT dim=2
 
 igraph_layout_bipartite:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
-        REAL hgap=1, REAL vgap=1, INTEGER maxiter=100
+        REAL hgap=1, REAL vgap=1, LONGINT maxiter=100
     DEPS: types ON graph
 
 igraph_layout_gem:
@@ -1146,8 +1150,7 @@ igraph_similarity_inverse_log_weighted:
 
 igraph_compare_communities:
     PARAMS: |-
-        VECTOR comm1, VECTOR comm2, OUT REAL res,
-        COMMCMP method=VI
+        VECTOR comm1, VECTOR comm2, OUT REAL res, COMMCMP method=VI
 
 igraph_community_spinglass:
     PARAMS: |-
@@ -1155,7 +1158,7 @@ igraph_community_spinglass:
         OUT REAL temperature, OUT VECTOR membership, OUT VECTOR csize,
         INTEGER spins=25, BOOLEAN parupdate=False, REAL starttemp=1, REAL stoptemp=0.01,
         REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0,
-        REAL gamma_minus=0, REAL d_p=0, REAL d_n=0
+        SPINGLASS_IMPLEMENTATION implementation=ORIG, REAL lambda=1.0
 
 igraph_community_spinglass_single:
     PARAMS: |-
@@ -1179,7 +1182,7 @@ igraph_community_edge_betweenness:
 
 igraph_community_eb_get_merges:
     PARAMS: |-
-        GRAPH graph, VECTOR edges, EDGEWEIGHTS weights=NULL,
+        GRAPH graph, BOOLEAN directed, VECTOR edges, EDGEWEIGHTS weights=NULL,
         OUT MATRIX merges, OUT VECTOR bridges,
         OUT VECTOR_OR_0 modularity, OUT VECTOR_OR_0 membership
     DEPS: weights ON graph
@@ -1191,7 +1194,7 @@ igraph_community_fastgreedy:
 
 igraph_community_to_membership:
     PARAMS: |-
-        GRAPH graph, MATRIX merges, INTEGER steps,
+        MATRIX merges, INTEGER nodes, INTEGER steps,
         OUT VECTOR membership, OUT VECTOR csize
 
 igraph_le_community_to_membership:
@@ -1214,7 +1217,9 @@ igraph_modularity_matrix:
     DEPS: weights ON graph
 
 igraph_reindex_membership:
-    PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
+    PARAMS: |-
+        INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old,
+        OUT INTEGER nb_clusters
 
 igraph_community_leading_eigenvector:
     PARAMS: |-
@@ -1224,7 +1229,7 @@ igraph_community_leading_eigenvector:
         INOUT ARPACKOPT options=arpack_defaults,
         OUT REAL modularity, BOOLEAN start=False,
         OUT VECTOR_OR_0 eigenvalues,
-        OUT VECTOR_OR_0 eigenvectors,
+        OPTIONAL OUT VECTORLIST eigenvectors,
         OUT VECTOR_OR_0 history,
         LEVCFUNC callback, EXTRA callback_extra
 
@@ -1376,8 +1381,10 @@ igraph_read_graph_graphml:
 
 igraph_read_graph_dimacs:
     PARAMS: |-
-        OUT GRAPH graph, INFILE instream, OUT INTEGER source,
-        OUT INTEGER target, OUT VECTOR capacity, BOOLEAN directed=True
+        OUT GRAPH graph, INFILE instream,
+        OPTIONAL OUT STRVECTOR problem, OPTIONAL OUT VECTOR label,
+        OPTIONAL OUT INTEGER source, OPTIONAL OUT INTEGER target,
+        OPTIONAL OUT VECTOR capacity, BOOLEAN directed=True
 
 igraph_read_graph_graphdb:
     PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=False
@@ -1497,25 +1504,28 @@ igraph_list_triangles:
 #######################################
 
 igraph_disjoint_union:
-    PARAMS: |-
-        OUT GRAPH res, GRAPH left, GRAPH right,
-        OUT EDGESET edge_map_left, OUT EDGESET edge_map_right
-    DEPS: edge_map_left ON left, edge_map_right ON right
+    PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
 
 igraph_disjoint_union_many:
-    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
+    PARAMS: OUT GRAPH res, GRAPHLIST graphs
 
 igraph_union:
-    PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+    PARAMS: |-
+        OUT GRAPH res, GRAPH left, GRAPH right,
+        OUT VECTORM1 edge_map_left, OUT VECTORM1 edge_map_right
+    DEPS: edge_map_left ON left, edge_map_right ON right
 
 igraph_union_many:
-    PARAMS: OUT GRAPH res, GRAPHLIST graphs
+    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
 
 igraph_intersection:
-    PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+    PARAMS: |-
+        OUT GRAPH res, GRAPH left, GRAPH right,
+        OUT VECTORM1 edge_map_left, OUT VECTORM1 edge_map_right
+    DEPS: edge_map_left ON left, edge_map_right ON right
 
 igraph_intersection_many:
-    PARAMS: OUT GRAPH res, GRAPHLIST graphs
+    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
 
 igraph_difference:
     PARAMS: OUT GRAPH res, GRAPH orig, GRAPH sub
@@ -1524,7 +1534,10 @@ igraph_complementer:
     PARAMS: OUT GRAPH res, GRAPH graph, BOOLEAN loops=False
 
 igraph_compose:
-    PARAMS: OUT GRAPH res, GRAPH g1, GRAPH g2
+    PARAMS: |-
+        OUT GRAPH res, GRAPH g1, GRAPH g2,
+        OUT VECTORM1 edge_map_left, OUT VECTORM1 edge_map_right
+    DEPS: edge_map_left ON left, edge_map_right ON right
 
 #######################################
 # Maximum flows, minimum cuts
@@ -1533,8 +1546,8 @@ igraph_compose:
 igraph_maxflow:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OUT VECTOR_OR_0 flow,
-        OUT VECTORM1_OR_0 cut, OUT VERTEXSET_OR_0 partition1,
-        OUT VERTEXSET_OR_0 partition2, VERTEX source, VERTEX target,
+        OUT VECTORM1_OR_0 cut, OPTIONAL OUT VERTEXSET partition1,
+        OPTIONAL OUT VERTEXSET partition2, VERTEX source, VERTEX target,
         EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
     DEPS: |-
         capacity ON graph, source ON graph, target ON graph,
@@ -1599,7 +1612,7 @@ igraph_dominator_tree:
     PARAMS: |-
         GRAPH graph, VERTEX root, OUT VERTEXSET dom,
         OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout,
-        INOUTMODE mode=OUT
+        NEIMODE mode=OUT
     DEPS: root ON graph, dom ON graph, leftout ON graph
 
 igraph_all_st_cuts:
@@ -1671,11 +1684,14 @@ igraph_isoclass_create:
 igraph_isomorphic_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
-        VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
-        EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
+        OPTIONAL VERTEX_COLOR vertex_color1,
+        OPTIONAL VERTEX_COLOR vertex_color2,
+        OPTIONAL EDGE_COLOR edge_color1,
+        OPTIONAL EDGE_COLOR edge_color2,
         OUT BOOLEAN iso,
         OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21,
-        NULL node_compat_fn, NULL edge_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -1686,8 +1702,8 @@ igraph_count_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT INTEGER count, NULL node_compat_fn,
-        NULL edge_compat_fn, EXTRA extra
+        OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
+        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1697,8 +1713,8 @@ igraph_get_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT VECTORLIST maps, NULL node_compat_fn,
-        NULL edge_compat_fn, EXTRA extra
+        OUT VECTORLIST maps, ISOCOMPAT_FUNC node_compat_fn,
+        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1710,7 +1726,7 @@ igraph_subisomorphic_vf2:
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT BOOLEAN iso,
         OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21,
-        NULL node_compat_fn, NULL edge_compat_fn,
+        ISOCOMPAT_FUNC node_compat_fn, ISOCOMPAT_FUNC edge_compat_fn,
         EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -1721,8 +1737,8 @@ igraph_count_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT INTEGER count, NULL node_compat_fn,
-        NULL edge_compat_fn, EXTRA extra
+        OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
+        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1732,8 +1748,8 @@ igraph_get_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT VECTORLIST maps, NULL node_compat_fn,
-        NULL edge_compat_fn, EXTRA extra
+        OUT VECTORLIST maps, ISOCOMPAT_FUNC node_compat_fn,
+        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -1742,25 +1758,28 @@ igraph_isomorphic_34:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
 
 igraph_canonical_permutation:
-    PARAMS: GRAPH graph, NULL colors, OUT VECTORM1 labeling, BLISSSH sh="fm", OUT
-        BLISSINFO info
+    PARAMS: |-
+        GRAPH graph, OPTIONAL VERTEX_COLOR colors,
+        PRIMARY OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
 
 igraph_permute_vertices:
     PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
 
 igraph_isomorphic_bliss:
     PARAMS: |-
-        GRAPH graph1, GRAPH graph2, NULL colors1, NULL colors2,
-        OUT BOOLEAN iso, OUT VECTORM1_OR_0 map12,
+        GRAPH graph1, GRAPH graph2,
+        OPTIONAL VERTEX_COLOR colors1, OPTIONAL VERTEX_COLOR colors2,
+        PRIMARY OUT BOOLEAN iso, OUT VECTORM1_OR_0 map12,
         OUT VECTORM1_OR_0 map21, BLISSSH sh="fm",
         OUT BLISSINFO info1, OUT BLISSINFO info2
 
 igraph_automorphisms:
-    PARAMS: GRAPH graph, NULL colors, BLISSSH sh="fm", OUT BLISSINFO info
+    PARAMS: |-
+        GRAPH graph, OPTIONAL VERTEX_COLOR colors, BLISSSH sh="fm", OUT BLISSINFO info
 
 igraph_subisomorphic_lad:
     PARAMS: |-
-        GRAPH pattern, GRAPH target, VERTEXSETLIST_OR_0 domains,
+        GRAPH pattern, GRAPH target, OPTIONAL VERTEXSETLIST domains,
         OPTIONAL OUT BOOLEAN iso, OUT VECTOR_OR_0 map,
         OPTIONAL OUT VECTORLIST maps, BOOLEAN induced, INT time_limit
 
@@ -1779,7 +1798,7 @@ igraph_scg_semiprojectors:
     PARAMS: |-
         VECTORM1 groups, SCGMAT mtype=Default,
         OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R,
-        OUT SPARSEMATPTR_OR_0 Lsparse, OUT SPARSEMATPTR_OR_0 Rsparse,
+        OPTIONAL OUT SPARSEMATPTR Lsparse, OPTIONAL OUT SPARSEMATPTR Rsparse,
         VECTOR_OR_0 p=NULL, SCGNORM norm=Default
 
 igraph_scg_norm_eps:
@@ -1798,8 +1817,8 @@ igraph_scg_adjacency:
         BOOLEAN use_arpack=False, INTEGER maxiter,
         OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix,
         OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L,
-        OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse,
-        OUT SPARSEMATPTR_OR_0 Rsparse
+        OUT MATRIX_OR_0 R, OPTIONAL OUT SPARSEMATPTR Lsparse,
+        OPTIONAL OUT SPARSEMATPTR Rsparse
 
 igraph_scg_stochastic:
     PARAMS: |-
@@ -1807,13 +1826,14 @@ igraph_scg_stochastic:
         SPARSEMAT_OR_0 sparsemat, VECTOR ev,
         INTEGER nt, VECTOR_OR_0 nt_vec,
         SCGALGO algo, SCGNORM norm=Default,
-        INOUT CVECTOR_OR_0 values, INOUT CMATRIX_OR_0 vectors,
+        OPTIONAL INOUT VECTOR_COMPLEX values,
+        OPTIONAL INOUT MATRIX_COMPLEX vectors,
         INOUT VECTORM1_OR_0 groups, INOUT VECTOR_OR_0 p,
         BOOLEAN use_arpack=False, INTEGER maxiter,
         OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix,
         OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L,
-        OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse,
-        OUT SPARSEMATPTR_OR_0 Rsparse
+        OUT MATRIX_OR_0 R, OPTIONAL OUT SPARSEMATPTR Lsparse,
+        OPTIONAL OUT SPARSEMATPTR Rsparse
 
 igraph_scg_laplacian:
     PARAMS: |-
@@ -1821,13 +1841,15 @@ igraph_scg_laplacian:
         SPARSEMAT_OR_0 sparsemat, VECTOR ev,
         INTEGER nt, VECTOR_OR_0 nt_vec,
         SCGALGO algo, SCGNORM norm=Default,
-        SCGDIR direction=Default, INOUT CVECTOR_OR_0 values,
-        INOUT CMATRIX_OR_0 vectors, INOUT VECTORM1_OR_0 groups,
+        SCGDIR direction=Default,
+        OPTIONAL INOUT VECTOR_COMPLEX values,
+        OPTIONAL INOUT MATRIX_COMPLEX vectors,
+        INOUT VECTORM1_OR_0 groups,
         BOOLEAN use_arpack=False, INTEGER maxiter,
         OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix,
         OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L,
-        OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse,
-        OUT SPARSEMATPTR_OR_0 Rsparse
+        OUT MATRIX_OR_0 R, OPTIONAL OUT SPARSEMATPTR Lsparse,
+        OPTIONAL OUT SPARSEMATPTR Rsparse
 
 #######################################
 # Matching
@@ -1835,19 +1857,19 @@ igraph_scg_laplacian:
 
 igraph_is_matching:
     PARAMS: |-
-        GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
+        GRAPH graph, OPTIONAL BIPARTITE_TYPES types=NULL,
         VECTOR_LONG_M1 matching, OUT BOOLEAN res
     DEPS: types ON graph, matching ON graph
 
 igraph_is_maximal_matching:
     PARAMS: |-
-        GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
+        GRAPH graph, OPTIONAL BIPARTITE_TYPES types=NULL,
         VECTOR_LONG_M1 matching, OUT BOOLEAN res
     DEPS: types ON graph
 
 igraph_maximum_bipartite_matching:
     PARAMS: |-
-        GRAPH graph, BIPARTITE_TYPES_OR_0 types=NULL,
+        GRAPH graph, OPTIONAL BIPARTITE_TYPES types=NULL,
         OPTIONAL OUT INTEGER matching_size,
         OPTIONAL OUT REAL matching_weight,
         OUT VECTOR_LONG_M1 matching,
@@ -1886,7 +1908,7 @@ igraph_eigen_adjacency:
         EIGENWHICH which=Default,
         INOUT ARPACKOPT options=arpack_defaults,
         INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors,
-        NULL cmplxvalues, NULL cmplxvectors
+        OUT VECTOR_COMPLEX cmplxvalues, OUT MATRIX_COMPLEX cmplxvectors
 
 #######################################
 # Fitting power laws
@@ -1914,7 +1936,7 @@ igraph_running_mean:
     PARAMS: VECTOR data, OUT VECTOR res, INTEGER binwidth
 
 igraph_random_sample:
-    PARAMS: OUT VECTOR res, INTEGER l, INTEGER h, INTEGER length
+    PARAMS: OUT VECTOR res, REAL l, REAL h, INTEGER length
 
 igraph_convex_hull:
     PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
@@ -1930,11 +1952,11 @@ igraph_is_eulerian:
     PARAMS: GRAPH graph, OUT BOOLEAN has_path, OUT BOOLEAN has_cycle
 
 igraph_eulerian_path:
-    PARAMS: GRAPH graph, OUT EDGESET_OR_0 edge_res, OUT VERTEXSET_OR_0 vertex_res
+    PARAMS: GRAPH graph, OPTIONAL OUT EDGESET edge_res, OPTIONAL OUT VERTEXSET vertex_res
     DEPS: edge_res ON graph, vertex_res ON graph
 
 igraph_eulerian_cycle:
-    PARAMS: GRAPH graph, OUT EDGESET_OR_0 edge_res, OUT VERTEXSET_OR_0 vertex_res
+    PARAMS: GRAPH graph, OPTIONAL OUT EDGESET edge_res, OPTIONAL OUT VERTEXSET vertex_res
     DEPS: edge_res ON graph, vertex_res ON graph
 
 #######################################
@@ -1942,7 +1964,7 @@ igraph_eulerian_cycle:
 #######################################
 
 igraph_is_tree:
-    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OUT VERTEXPTR root, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEX root, NEIMODE mode=ALL
     DEPS: root ON graph
 
 igraph_from_prufer:
