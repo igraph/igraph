@@ -41,9 +41,9 @@ IGRAPH_EXPORT int igraph_create(igraph_t *graph, const igraph_vector_t *edges, i
                                 igraph_bool_t directed);
 IGRAPH_EXPORT int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                                ...);
-IGRAPH_EXPORT int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
+IGRAPH_EXPORT int igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
                                    igraph_adjacency_t mode);
-IGRAPH_EXPORT int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
+IGRAPH_EXPORT int igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
                                             igraph_adjacency_t mode, const char* attr,
                                             igraph_bool_t loops);
 IGRAPH_EXPORT int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
