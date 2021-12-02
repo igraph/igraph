@@ -41,7 +41,7 @@ __BEGIN_DECLS
 IGRAPH_EXPORT int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
                                              igraph_integer_t n, igraph_bool_t directed);
 IGRAPH_EXPORT int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
-                                         igraph_strvector_t *predefnames, igraph_bool_t names,
+                                         const igraph_strvector_t *predefnames, igraph_bool_t names,
                                          igraph_add_weights_t weights, igraph_bool_t directed);
 IGRAPH_EXPORT int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
                                         igraph_bool_t names, igraph_add_weights_t weights,

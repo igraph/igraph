@@ -736,7 +736,7 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * Time complexity: O((d+n)*n), d is the average degree in the network,
  * and n is the number of vertices in \c vids.
  */
-int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
+int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
                              igraph_integer_t *isoclass) {
     int nodes = (int) igraph_vector_size(vids);
     igraph_bool_t directed = igraph_is_directed(graph);
