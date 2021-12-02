@@ -429,6 +429,9 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
+ * Cannot create null graph with this function because the root vertice always gets created 
+ * since an empty vector creates a singleton graph not a null graph.
+ * 
  * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating regular
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
@@ -438,67 +441,66 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 
 igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branch_level,
                 igraph_tree_mode_t type) {
-    // TODO: implement function
+    
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j, k, m;
+    igraph_integer_t j, k;
     igraph_integer_t idx = 0;
     igraph_integer_t to = 1;
-    igraph_integer_t n = 1 + VECTOR(*branch_level)[0] + VECTOR(*branch_level)[0]*VECTOR(*branch_level)[1] + VECTOR(*branch_level)[0]*VECTOR(*branch_level)[1]*VECTOR(*branch_level)[2];
+    igraph_integer_t temp = 1;
+    igraph_integer_t vertices = 1;
+    igraph_integer_t current_vertice = 0;
+    igraph_integer_t vertice_nr = 0;
 
-    // empty vector -> singleton graph
-    /*if ( igraph_vector_int_min(branch_level) < 1) {
-        IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
-    }*/
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
         IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
     }
-
+    if (!igraph_vector_int_empty(branch_level) && igraph_vector_int_min(branch_level) <= 0) {
+        IGRAPH_ERROR("Invalid number of children", IGRAPH_EINVAL);
+    }
     
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
-
-    i = 0;
+    j = 1;
+    while (j <= igraph_vector_int_size(branch_level)) {
+        for (k = (igraph_vector_int_size(branch_level) - j); k >= 0; --k) {
+            temp *= VECTOR(*branch_level)[k];
+        }
+        vertices += temp;
+        temp = 1;
+        ++j;
+    }
+    
+    // 2* (vertices - 1) -> sum of degree of tree
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (vertices - 1));
+    
     if (type == IGRAPH_TREE_OUT) {
-        //while (idx < 2 * (n - 1)) {
-            for (j = 0; j < VECTOR(*branch_level)[0] && idx < 2 * (n - 1); j++) {
-                VECTOR(edges)[idx++] = i;
-                VECTOR(edges)[idx++] = to++;
-            }
-            
-            i++;
-            for(k = 0; k < VECTOR(*branch_level)[0]; ++k) {
-		        for (j = 0; j < VECTOR(*branch_level)[1] && idx < 2 * (n - 1); ++j) {
-			        VECTOR(edges)[idx] = i;
-			        idx++;
-			        VECTOR(edges)[idx] = to;
-			        idx++;
-			        to++;
-		        }
-		        i++;
-	        }
-            
-            for(m = 0; m < VECTOR(*branch_level)[0]; ++m) {
-                for(k = 0; k < VECTOR(*branch_level)[1]; ++k) {
-                    for(j = 0; j < VECTOR(*branch_level)[2] && idx < 2 * (n - 1); ++j) {
-                        VECTOR(edges)[idx] = i;
-                        idx++;
-                        VECTOR(edges)[idx] = to;
-                        idx++;
-                        to++;
-                    }
-                    i++;
+        for (k = 0; k < igraph_vector_int_size(branch_level); ++k) {
+            vertice_nr = to;
+            while(current_vertice < vertice_nr) {
+                for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
+                    VECTOR(edges)[idx++] = current_vertice;
+                    VECTOR(edges)[idx++] = to++;
                 }
+                current_vertice++;
             }
-            
-        //}
+        }
     } else {
-        return -1;
+        for (k = 0; k < igraph_vector_int_size(branch_level); ++k) {
+            vertice_nr = to;
+            while(current_vertice < vertice_nr) {
+                for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
+                    VECTOR(edges)[idx++] = to++;
+                    VECTOR(edges)[idx++] = current_vertice;
+                }
+                current_vertice++;
+            }
+        }
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, n, type != IGRAPH_TREE_UNDIRECTED));
+    IGRAPH_CHECK(igraph_create(graph, &edges, vertices, type != IGRAPH_TREE_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;                
 }
 
