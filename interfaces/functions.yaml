@@ -62,8 +62,8 @@ igraph_get_eid:
 
 igraph_get_eids:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR eids, VECTOR pairs,
-        BOOLEAN directed=True, BOOLEAN error=True
+        GRAPH graph, OUT VECTOR eids, OPTIONAL VECTOR pairs,
+        OPTIONAL VECTOR path, BOOLEAN directed=True, BOOLEAN error=True
 
 igraph_incident:
     PARAMS: GRAPH graph, OUT VECTOR eids, INTEGER vid, NEIMODE mode=ALL
@@ -146,7 +146,7 @@ igraph_full_bipartite:
 
 igraph_barabasi_game:
     PARAMS: |-
-        OUT GRAPH graph, INTEGER n, INTEGER m=1, REAL power=1.0,
+        OUT GRAPH graph, INTEGER n, REAL power=1.0, INTEGER m=1,
         VECTOR_OR_0 outseq, BOOLEAN outpref=False, REAL A=1.0,
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         GRAPH_OR_0 start_from=0

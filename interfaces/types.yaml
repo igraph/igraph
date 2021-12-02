@@ -13,22 +13,30 @@
 INTEGER:
     # An ordinary igraph integer
     CTYPE: igraph_integer_t
-    FLAGS: PRIMITIVE
 
 REAL:
     # An ordinary igraph floating-point number
     CTYPE: igraph_real_t
-    FLAGS: PRIMITIVE
 
 BOOLEAN:
     # An ordinary igraph Boolean value
     CTYPE: igraph_bool_t
-    FLAGS: PRIMITIVE
 
 ERROR:
     # An igraph error code
     CTYPE: int
-    FLAGS: PRIMITIVE
+
+###############################################################################
+## C data types
+###############################################################################
+
+INT:
+    # A C integer
+    CTYPE: int
+
+CSTRING:
+    # A null-terminated immutable C string
+    CTYPE: const char*
 
 ###############################################################################
 # Vectors, matrices and other template types
@@ -36,7 +44,31 @@ ERROR:
 
 VECTOR:
     # A vector of floating-point numbers
-    CTYPE: igraph_vector_t*
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+VECTOR_BOOL:
+    # A vector of Boolean values
+    CTYPE: igraph_vector_bool_t
+    FLAGS: BY_REF
+
+MATRIX:
+    # A matrix of floating-point numbers
+    CTYPE: igraph_matrix_t
+    FLAGS: BY_REF
+
+# SOMETHING_OR_0 variants -- these will be phased out in favour of the
+# OPTIONAL modifier
+
+VECTOR_OR_0:
+    # A vector of floating-point numbers values where a null pointer is also a valid value
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+VECTOR_BOOL_OR_0:
+    # A vector of Boolean values where a null pointer is also a valid value
+    CTYPE: igraph_vector_bool_t
+    FLAGS: BY_REF
 
 ###############################################################################
 # Vertex and edge sequences
@@ -51,21 +83,57 @@ VERTEXSET:
     CTYPE: igraph_vs_t
 
 ###############################################################################
-# The main igraph graph type
+# Graph representations
 ###############################################################################
 
 GRAPH:
     # An igraph graph
-    CTYPE: igraph_t*
+    CTYPE: igraph_t
+    FLAGS: BY_REF
+
+ADJLIST:
+    # A graph represented as an adjacency list
+    CTYPE: igraph_adjlist_t
+    FLAGS: BY_REF
+
+INCLIST:
+    # A graph represented as an incidence list
+    CTYPE: igraph_inclist_t
+    FLAGS: BY_REF
+
+# SOMETHING_OR_0 variants -- these will be phased out in favour of the
+# OPTIONAL modifier
+
+GRAPH_OR_0:
+    # An igraph graph where a null pointer is also a valid value
+    CTYPE: igraph_t
+    FLAGS: BY_REF
 
 ###############################################################################
 # Enums
 ###############################################################################
 
+ADJACENCYMODE:
+    # Enum that describes how an adjacency matrix should be constructed
+    CTYPE: igraph_adjacency_t
+
+BARABASI_ALGORITHM:
+    # Enum that describes the various implementations of the Barabasi model
+    # that igraph supports
+    CTYPE: igraph_barabasi_algorithm_t
+
 NEIMODE:
     # Enum that describes how a particular function should take into account
     # the neighbors of vertices
     CTYPE: igraph_neimode_t
+
+STARMODE:
+    # Enum that describes how a star graph should be constructed
+    CTYPE: igraph_star_mode_t
+
+TREEMODE:
+    # Enum that describes how a tree graph should be constructed
+    CTYPE: igraph_tree_mode_t
 
 ###############################################################################
 # Miscellaneous
@@ -75,4 +143,5 @@ ATTRIBUTES:
     # An opaque data structure that a high-level interface may use to pass
     # information about graph/vertex/edge attributes to a low-level igraph
     # C function
-    CTYPE: void*
+    CTYPE: void
+    FLAGS: BY_REF
