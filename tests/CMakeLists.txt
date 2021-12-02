@@ -522,6 +522,7 @@ add_legacy_tests(
   community_leiden
   community_label_propagation
   community_label_propagation2
+  community_label_propagation3
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
