@@ -190,16 +190,18 @@ igraph_callaway_traits_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types,
         INTEGER edges_per_step=1, VECTOR type_dist, MATRIX pref_matrix,
-        BOOLEAN directed=False
+        BOOLEAN directed=False, OPTIONAL OUT VECTOR node_type_vec
 
 igraph_establishment_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types, INTEGER k=1,
-        VECTOR type_dist, MATRIX pref_matrix, BOOLEAN directed=True
+        VECTOR type_dist, MATRIX pref_matrix, BOOLEAN directed=True,
+        OPTIONAL OUT VECTOR node_type_vec
 
 igraph_grg_game:
-    PARAMS: OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False, VECTOR_OR_0
-        x, VECTOR_OR_0 y
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False,
+        OPTIONAL OUT VECTOR x, OPTIONAL OUT VECTOR y
 
 igraph_preference_game:
     PARAMS: |-
@@ -210,7 +212,7 @@ igraph_preference_game:
 
 igraph_asymmetric_preference_game:
     PARAMS: |-
-        OUT GRAPH graph, INTEGER nodes, INTEGER types,
+        OUT GRAPH graph, INTEGER nodes, INTEGER out_types, INTEGER in_types,
         MATRIX type_dist_matrix, MATRIX pref_matrix,
         OUT VECTOR node_type_in_vec, OUT VECTOR node_type_out_vec,
         BOOLEAN loops=False
@@ -379,9 +381,11 @@ igraph_shortest_paths:
 
 igraph_get_shortest_paths:
     PARAMS: |-
-        OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
-        NEIMODE mode=OUT, OUT VECTOR_LONG_OR_0 predecessors=0,
-        OUT VECTOR_LONG_OR_0 inbound_edges=0
+        GRAPH graph,
+        OPTIONAL OUT VERTEXSETLIST vertices, OPTIONAL OUT EDGESETLIST edges,
+        VERTEX from, VERTEXSET to=ALL, NEIMODE mode=OUT,
+        OPTIONAL OUT VECTOR_LONG predecessors,
+        OPTIONAL OUT VECTOR_LONG inbound_edges
     DEPS: edges ON graph, from ON graph, to ON graph
 
 igraph_get_all_shortest_paths:
@@ -398,22 +402,22 @@ igraph_shortest_paths_dijkstra:
 
 igraph_get_shortest_paths_dijkstra:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
-        OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
+        GRAPH graph, OPTIONAL OUT VERTEXSETLIST vertices,
+        OPTIONAL OUT EDGESETLIST edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OUT VECTOR_LONG_OR_0 predecessors=0,
-        OUT VECTOR_LONG_OR_0 inbound_edges=0
+        OPTIONAL OUT VECTOR_LONG predecessors=0,
+        OPTIONAL OUT VECTOR_LONG inbound_edges=0
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
         weights ON graph
 
 igraph_get_shortest_paths_bellman_ford:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
-        OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL,
+        GRAPH graph, OPTIONAL OUT VERTEXSETLIST vertices,
+        OPTIONAL OUT EDGESETLIST edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OUT VECTOR_LONG_OR_0 predecessors=0,
-        OUT VECTOR_LONG_OR_0 inbound_edges=0
+        OPTIONAL OUT VECTOR_LONG predecessors=0,
+        OPTIONAL OUT VECTOR_LONG inbound_edges=0
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
         weights ON graph
@@ -902,9 +906,9 @@ igraph_articulation_points:
 igraph_biconnected_components:
     PARAMS: |-
         GRAPH graph, OUT INTEGER no,
-        OUT EDGESETLIST_OR_0 tree_edges,
-        OUT EDGESETLIST_OR_0 component_edges,
-        OUT VERTEXSETLIST_OR_0 components,
+        OPTIONAL OUT EDGESETLIST tree_edges,
+        OPTIONAL OUT EDGESETLIST component_edges,
+        OPTIONAL OUT VERTEXSETLIST components,
         OUT VERTEXSET articulation_points
     DEPS: |-
         tree_edges ON graph, component_edges ON graph,
@@ -1597,8 +1601,8 @@ igraph_dominator_tree:
 
 igraph_all_st_cuts:
     PARAMS: |-
-        GRAPH graph, OUT EDGESETLIST_OR_0 cuts,
-        OUT VERTEXSETLIST_OR_0 partition1s,
+        GRAPH graph, OPTIONAL OUT EDGESETLIST cuts,
+        OPTIONAL OUT VERTEXSETLIST partition1s,
         VERTEX source, VERTEX target
     DEPS: |-
         source ON graph, target ON graph, cuts ON graph,
@@ -1607,8 +1611,8 @@ igraph_all_st_cuts:
 igraph_all_st_mincuts:
     PARAMS: |-
         GRAPH graph, OUT REAL value,
-        OUT EDGESETLIST_OR_0 cuts,
-        OUT VERTEXSETLIST_OR_0 partition1s,
+        OPTIONAL OUT EDGESETLIST cuts,
+        OPTIONAL OUT VERTEXSETLIST partition1s,
         VERTEX source, VERTEX target, EDGEWEIGHTS capacity=NULL
     DEPS: |-
         capacity ON graph, source ON graph, target ON graph,

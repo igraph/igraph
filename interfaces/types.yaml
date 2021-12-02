@@ -47,14 +47,42 @@ VECTOR:
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
+VECTOR_INT:
+    # A vector of igraph integers
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+VECTOR_LONG:
+    # A vector of C long integers. Deprecated, will be removed in 0.10.
+    CTYPE: igraph_vector_long_t
+    FLAGS: BY_REF
+
 VECTOR_BOOL:
     # A vector of Boolean values
     CTYPE: igraph_vector_bool_t
     FLAGS: BY_REF
 
+VECTORLIST:
+    # A vector containing pointers to vectors of floating-point numbers
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VECTORM1:
+    # A vector of integer indices that should adapt to the conventions of the
+    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
+    # Python and similar).
+    # TODO(ntamas): should be replaced with INDEX_VECTOR
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
 MATRIX:
     # A matrix of floating-point numbers
     CTYPE: igraph_matrix_t
+    FLAGS: BY_REF
+
+MATRIXLIST:
+    # A vector containing pointers to matrices of floating-point numbers
+    CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
 # SOMETHING_OR_0 variants -- these will be phased out in favour of the
@@ -70,17 +98,78 @@ VECTOR_BOOL_OR_0:
     CTYPE: igraph_vector_bool_t
     FLAGS: BY_REF
 
+VECTORM1_OR_0:
+    # A vector of integer indices that should adapt to the conventions of the
+    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
+    # Python and similar). A null pointer is also a valid value here.
+    # TODO(ntamas): should be replaced with INDEX_VECTOR
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
 ###############################################################################
-# Vertex and edge sequences
+# Vertices, edges, vertex and edge sequences
 ###############################################################################
+
+EDGE:
+    # A single edge index
+    CTYPE: igraph_integer_t
 
 EDGESET:
     # An igraph edge sequence
     CTYPE: igraph_es_t
 
+VERTEX:
+    # A single vertex index
+    CTYPE: igraph_integer_t
+
 VERTEXSET:
     # An igraph vertex sequence
     CTYPE: igraph_vs_t
+
+VERTEXSET_INT:
+    # An igraph vertex sequence where each vertex is represented as an integer,
+    # hence the entire vector is an igraph_vector_int_t.
+    CTYPE: igraph_vector_int_t
+
+###############################################################################
+# Specialized vectors with semantic meaning
+###############################################################################
+
+EDGEWEIGHTS:
+    # A vector containing edge weights
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+EDGESETLIST:
+    # A vector containing vectors of floating-point numbers where each such
+    # vector represents a sequence of edge indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because EDGESET is
+    # the abstract type for igraph_es_t, but an EDGESETLIST is _not_ a
+    # vector of igraph_es_t objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VERTEXINDEX:
+    # A vector of floating-point numbers where each entry corresponds to
+    # one of the vertices in a graph. Higher-level interfaces may use this
+    # type to provide a "named vector" such that each entry can be indexed
+    # either by the vertex index or by the vertex name.
+    #
+    # TODO(ntamas): this is a misleading name; we should find a better name
+    # for this type
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+VERTEXSETLIST:
+    # A vector containing vectors of floating-point numbers where each such
+    # vector represents a sequence of vertex indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
+    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
+    # vector of igraph_vs_t objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
 
 ###############################################################################
 # Graph representations
@@ -121,6 +210,11 @@ BARABASI_ALGORITHM:
     # Enum that describes the various implementations of the Barabasi model
     # that igraph supports
     CTYPE: igraph_barabasi_algorithm_t
+
+DEGSEQMODE:
+    # Enum that describes the various implementations of generating a graph
+    # with an arbitrary degree sequence
+    CTYPE: igraph_degseq_t
 
 NEIMODE:
     # Enum that describes how a particular function should take into account
