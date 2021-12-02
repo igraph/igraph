@@ -34,7 +34,7 @@ INT:
     # A C integer
     CTYPE: int
 
-LONG:
+LONGINT:
     # A C long integer
     CTYPE: long int
 
@@ -89,6 +89,11 @@ MATRIXLIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
+SPARSEMAT:
+    # A sparse matrix of floating-point numbers
+    CTYPE: igraph_sparsemat_t
+    FLAGS: BY_REF
+
 # SOMETHING_OR_0 variants -- these will be phased out in favour of the
 # OPTIONAL modifier
 
@@ -110,6 +115,16 @@ VECTORM1_OR_0:
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
+MATRIX_OR_0:
+    # A matrix of floating-point numbers values where a null pointer is also a valid value
+    CTYPE: igraph_matrix_t
+    FLAGS: BY_REF
+
+SPARSEMAT_OR_0:
+    # A sparse matrix of floating-point numbers where a null pointer is also a valid value
+    CTYPE: igraph_sparsemat_t
+    FLAGS: BY_REF
+
 ###############################################################################
 # Vertices, edges, vertex and edge sequences
 ###############################################################################
@@ -127,23 +142,27 @@ VERTEX:
     CTYPE: igraph_integer_t
 
 VERTEXSET:
-    # An igraph vertex sequence
-    CTYPE: igraph_vs_t
+    # An igraph vertex sequence. This is an ugly hybrid type; when it is an
+    # IN argument in generated code, it is an igraph_vs_t, but when it is an
+    # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
+    CTYPE:
+        IN: igraph_vs_t
+        OUT: igraph_vector_t
 
 VERTEXSET_INT:
     # An igraph vertex sequence where each vertex is represented as an integer,
     # hence the entire vector is an igraph_vector_int_t.
     CTYPE: igraph_vector_int_t
 
-VERTEXSET_LEGACY:
-    # An igraph vertex sequence where each vertex is represented as an integer,
-    # but the entire vector is stored as an igraph_vector_t. This should be
-    # removed in igraph 0.10.
-    CTYPE: igraph_vector_t
-
 ###############################################################################
 # Specialized vectors with semantic meaning
 ###############################################################################
+
+BIPARTITE_TYPES:
+    # A vector containing Booleans that define the two partitions of a
+    # bipartite graph
+    CTYPE: igraph_vector_bool_t
+    FLAGS: BY_REF
 
 EDGEWEIGHTS:
     # A vector containing edge weights
@@ -226,6 +245,10 @@ BARABASI_ALGORITHM:
     # that igraph supports
     CTYPE: igraph_barabasi_algorithm_t
 
+CONNECTEDNESS:
+    # Enum that selects between weak and strong connectivity
+    CTYPE: igraph_connectedness_t
+
 DEGSEQMODE:
     # Enum that describes the various implementations of generating a graph
     # with an arbitrary degree sequence
@@ -248,6 +271,11 @@ REWIRINGMODE:
     # Enum for the rewiring modes of igraph_rewire()
     CTYPE: igraph_rewiring_t
 
+RWSTUCK:
+    # Enum that describes what igraph should do when a random walk gets stuck
+    # in a sink vertex
+    CTYPE: igraph_random_walk_stuck_t
+
 STARMODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_star_mode_t
@@ -265,6 +293,33 @@ TRANSITIVITYMODE:
 TREEMODE:
     # Enum that describes how a tree graph should be constructed
     CTYPE: igraph_tree_mode_t
+
+###############################################################################
+# Switches / flags
+###############################################################################
+
+EDGE_TYPE_SW:
+    # Flag bitfield that specifies what sort of edges are allowed in an
+    # algorithm
+    CTYPE: igraph_edge_type_sw_t
+
+###############################################################################
+# Callbacks
+###############################################################################
+
+ARPACKFUNC:
+    # ARPACK matrix multiplication function.
+    CTYPE: igraph_arpack_function_t
+
+BFS_FUNC:
+    # Callback function for igraph_bfs(). Called with every vertex that was
+    # visited during the BFS traversal.
+    CTYPE: igraph_bfshandler_t
+
+DFS_FUNC:
+    # Callback function for igraph_dfs(). Called with every vertex that was
+    # visited during the DFS traversal.
+    CTYPE: igraph_dfshandler_t
 
 ###############################################################################
 # Miscellaneous
