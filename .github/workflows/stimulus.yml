@@ -19,7 +19,7 @@ jobs:
         run: |
           cd interfaces
           python3 -m venv .venv
-          .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@{{ env.STIMULUS_VERSION }}#egg=stimulus'
+          .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@${{ env.STIMULUS_VERSION }}#egg=stimulus'
       - name: Validate functions.yaml
         run: |
           cd interfaces
