@@ -9,10 +9,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      #- name: Setup Python
-      #  uses: actions/setup-python@v2
-      - name: Install dependencies
-        run: sudo apt-get install python3-setuptools
       - name: Configure igraph
         run: |
           mkdir build && cd build
@@ -21,6 +17,6 @@ jobs:
         run: |
           cd interfaces
           python3 -m venv .venv
-          .venv/bin/pip install -e 'git://github.com/igraph/stimulus.git@0.8.0#egg=stimulus'
+          .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@0.8.0#egg=stimulus'
           .venv/bin/stimulus -f functions.yaml -t types.yaml -l ci:validate -o test.cpp
           c++ -std=c++14 -o test test.cpp -I ../include -I ../build/include -ferror-limit=1
