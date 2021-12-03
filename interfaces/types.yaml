@@ -75,11 +75,6 @@ VECTOR_INT:
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
-VECTOR_LONG:
-    # A vector of C long integers. Deprecated, will be removed in 0.10.
-    CTYPE: igraph_vector_long_t
-    FLAGS: BY_REF
-
 VECTOR_BOOL:
     # A vector of Boolean values
     CTYPE: igraph_vector_bool_t
@@ -114,6 +109,11 @@ MATRIX:
     CTYPE: igraph_matrix_t
     FLAGS: BY_REF
 
+MATRIX_INT:
+    # A matrix of igraph integers
+    CTYPE: igraph_matrix_int_t
+    FLAGS: BY_REF
+
 MATRIX_COMPLEX:
     # A matrix of igraph complex numbers
     CTYPE: igraph_matrix_complex_t
@@ -136,46 +136,6 @@ SPARSEMATPTR:
     CTYPE: igraph_sparsemat_t
     FLAGS: BY_REF
 
-# SOMETHING_OR_0 variants -- these will be phased out in favour of the
-# OPTIONAL modifier
-
-VECTOR_OR_0:
-    # A vector of floating-point numbers values where a null pointer is also a valid value
-    CTYPE: igraph_vector_t
-    FLAGS: BY_REF
-
-VECTOR_BOOL_OR_0:
-    # A vector of Boolean values where a null pointer is also a valid value
-    CTYPE: igraph_vector_bool_t
-    FLAGS: BY_REF
-
-VECTORM1_OR_0:
-    # A vector of integer indices that should adapt to the conventions of the
-    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
-    # Python and similar). A null pointer is also a valid value here.
-    # TODO(ntamas): should be replaced with INDEX_VECTOR
-    CTYPE: igraph_vector_t
-    FLAGS: BY_REF
-
-VECTOR_LONG_M1:
-    # A vector of integer indices (as C long ints) that should adapt to the
-    # conventions of the host language (i.e. 1-based for R, Mathematica, Octave
-    # etc, 0-based for Python and similar). Deprecated, will be removed in 0.10.
-    #
-    # TODO(ntamas): should be replaced with INDEX_VECTOR
-    CTYPE: igraph_vector_long_t
-    FLAGS: BY_REF
-
-MATRIX_OR_0:
-    # A matrix of floating-point numbers values where a null pointer is also a valid value
-    CTYPE: igraph_matrix_t
-    FLAGS: BY_REF
-
-SPARSEMAT_OR_0:
-    # A sparse matrix of floating-point numbers where a null pointer is also a valid value
-    CTYPE: igraph_sparsemat_t
-    FLAGS: BY_REF
-
 ###############################################################################
 # Vertices, edges, vertex and edge sequences
 ###############################################################################
@@ -184,17 +144,29 @@ EDGE:
     # A single edge index
     CTYPE: igraph_integer_t
 
+EDGE_INDICES:
+    # An integer vector containing edges indices. Consistent in its in- and
+    # out-type, unlike EDGESET
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
 EDGESET:
     # An igraph edge sequence. This is an ugly hybrid type; when it is an
     # IN argument in generated code, it is an igraph_es_t, but when it is an
     # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
     CTYPE:
         IN: igraph_es_t
-        OUT: igraph_vector_t
+        OUT: igraph_vector_int_t
 
 VERTEX:
     # A single vertex index
     CTYPE: igraph_integer_t
+
+VERTEX_INDICES:
+    # An integer vector containing vertex indices. Consistent in its in- and
+    # out-type, unlike VERTEXSET
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
 
 VERTEXSET:
     # An igraph vertex sequence. This is an ugly hybrid type; when it is an
@@ -202,12 +174,7 @@ VERTEXSET:
     # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
     CTYPE:
         IN: igraph_vs_t
-        OUT: igraph_vector_t
-
-VERTEXSET_INT:
-    # An igraph vertex sequence where each vertex is represented as an integer,
-    # hence the entire vector is an igraph_vector_int_t.
-    CTYPE: igraph_vector_int_t
+        OUT: igraph_vector_int_t
 
 ###############################################################################
 # Specialized vectors with semantic meaning
@@ -219,7 +186,7 @@ BIPARTITE_TYPES:
     CTYPE: igraph_vector_bool_t
     FLAGS: BY_REF
 
-EDGECAPACITY:
+EDGE_CAPACITY:
     # A vector containing edge capacities (typically for max-flow algorithms)
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
@@ -235,7 +202,7 @@ EDGEWEIGHTS:
     FLAGS: BY_REF
 
 EDGESETLIST:
-    # A vector containing vectors of floating-point numbers where each such
+    # A vector containing vectors of igraph integers where each such
     # vector represents a sequence of edge indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because EDGESET is
@@ -249,14 +216,12 @@ GRAPHLIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEXINDEX:
+VERTEX_QTY:
     # A vector of floating-point numbers where each entry corresponds to
-    # one of the vertices in a graph. Higher-level interfaces may use this
-    # type to provide a "named vector" such that each entry can be indexed
-    # either by the vertex index or by the vertex name.
-    #
-    # TODO(ntamas): this is a misleading name; we should find a better name
-    # for this type
+    # one of the vertices in a graph and its value represents some quantity
+    # associated to the vertex with the same index. Higher-level interfaces may
+    # use this type to provide a "named vector" such that each entry can be
+    # indexed either by the vertex index or by the vertex name.
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
@@ -266,18 +231,8 @@ SIRLIST:
     FLAGS: BY_REF
 
 VERTEXSETLIST:
-    # A vector containing vectors of floating-point numbers where each such
+    # A vector containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
-    #
-    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
-    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
-    # vector of igraph_vs_t objects
-    CTYPE: igraph_vector_ptr_t
-    FLAGS: BY_REF
-
-VERTEXSETLIST_INT:
-    # A vector containing vectors of igraph integers where each such vector
-    # represents a sequence of vertex indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
     # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
@@ -312,14 +267,6 @@ ADJLIST:
 INCLIST:
     # A graph represented as an incidence list
     CTYPE: igraph_inclist_t
-    FLAGS: BY_REF
-
-# SOMETHING_OR_0 variants -- these will be phased out in favour of the
-# OPTIONAL modifier
-
-GRAPH_OR_0:
-    # An igraph graph where a null pointer is also a valid value
-    CTYPE: igraph_t
     FLAGS: BY_REF
 
 ###############################################################################
@@ -403,24 +350,6 @@ RWSTUCK:
     # Enum that describes what igraph should do when a random walk gets stuck
     # in a sink vertex
     CTYPE: igraph_random_walk_stuck_t
-
-SCGALGO:
-    # Enum representing the algorithms that may be used for spectral coarse
-    # graining of graphs
-    CTYPE: igraph_scg_algorithm_t
-
-SCGDIR:
-    # Enum storing whether the spectral coarse graining algorithm should work
-    # with left or right eigenvectors
-    CTYPE: igraph_scg_direction_t
-
-SCGMAT:
-    # Enum representing the possible types of semiprojections used in the
-    # spectral coarse graining algorithm
-    CTYPE: igraph_scg_matrix_t
-
-SCGNORM:
-    CTYPE: igraph_scg_norm_t
 
 SPINCOMMUPDATE:
     # Enum containing update modes for the spinglass community detection
