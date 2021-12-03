@@ -13,10 +13,13 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ..
-      - name: Run verification
+      - name: Generate dummy interface
         run: |
           cd interfaces
           python3 -m venv .venv
           .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@0.8.0#egg=stimulus'
           .venv/bin/stimulus -f functions.yaml -t types.yaml -l ci:validate -o test.cpp
+      - name: Compile dummy interface
+        run: |
+          cd interfaces
           c++ -std=c++14 -c test.cpp -I ../include -I ../build/include
