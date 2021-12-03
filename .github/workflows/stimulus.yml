@@ -18,7 +18,7 @@ jobs:
       - name: Run verification
         run: |
           cd interfaces
-          python3 -m .venv venv
+          python3 -m venv .venv
           .venv/bin/pip install 'https://github.com/igraph/stimulus.git@0.8.0#egg=stimulus'
           .venv/bin/stimulus -f functions.yaml -t types.yaml -l ci:validate -o test.cpp
           c++ -std=c++14 -o test test.cpp -I ../include -I ../build/include -ferror-limit=1
