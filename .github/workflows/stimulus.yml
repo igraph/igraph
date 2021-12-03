@@ -1,5 +1,5 @@
 name: Stimulus
-on: pull_request
+on: [push, pull_request]
 
 jobs:
   ci:
@@ -9,8 +9,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      #- name: Setup Python
-      #  uses: actions/setup-python@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
       - name: Configure igraph
         run: |
           mkdir build && cd build
