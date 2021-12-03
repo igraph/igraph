@@ -1,0 +1,18 @@
+name: Stimulus
+on: pull_request
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-python@v2
+        #with:
+        #  python-version: 3.9
+      - uses: abatilo/actions-poetry@v2.0.0
+        #with:
+        #  poetry-version: ${{ matrix.poetry-version }}
+      - name: View poetry --help
+        run: poetry --help
