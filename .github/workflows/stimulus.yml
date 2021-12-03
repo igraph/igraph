@@ -1,0 +1,27 @@
+name: Stimulus
+on: [push, pull_request]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      STIMULUS_VERSION: "0.8.0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Configure igraph
+        run: |
+          mkdir build && cd build
+          cmake ..
+      - name: Install stimulus
+        run: |
+          cd interfaces
+          python3 -m venv .venv
+          .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@${{ env.STIMULUS_VERSION }}#egg=stimulus'
+      - name: Validate functions.yaml
+        run: |
+          cd interfaces
+          .venv/bin/stimulus -f functions.yaml -t types.yaml -l ci:validate -o test.cpp
+          c++ -std=c++14 -c test.cpp -I ../include -I ../build/include
