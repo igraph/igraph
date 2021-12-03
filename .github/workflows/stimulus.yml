@@ -4,6 +4,8 @@ on: [push, pull_request]
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      STIMULUS_VERSION: "0.8.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -17,7 +19,7 @@ jobs:
         run: |
           cd interfaces
           python3 -m venv .venv
-          .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@0.8.0#egg=stimulus'
+          .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@{{ env.STIMULUS_VERSION }}#egg=stimulus'
       - name: Validate functions.yaml
         run: |
           cd interfaces
