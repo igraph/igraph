@@ -9,15 +9,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      #- name: Setup Python
+      #  uses: actions/setup-python@v2
       - name: Configure igraph
         run: |
           mkdir build && cd build
           cmake ..
       - name: Run verification
         run: |
-          cd 
+          cd interfaces
           python3 -m .venv venv
           .venv/bin/pip install 'https://github.com/igraph/stimulus.git@0.8.0#egg=stimulus'
           .venv/bin/stimulus -f functions.yaml -t types.yaml -l ci:validate -o test.cpp
