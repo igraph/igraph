@@ -157,7 +157,7 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  *                  running time is O(km) where k is the value mentioned above.
  */
 igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanner,
-        igraph_real_t stretch, igraph_vector_t *weights) {
+        igraph_real_t stretch, const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
