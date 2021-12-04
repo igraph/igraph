@@ -52,7 +52,7 @@ static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
                 largest = VECTOR(*distances)[VECTOR(eids)[j]];
             }
         }
-        VECTOR(*open_set_decays)[i] = (largest - VECTOR(*open_set_sizes)[i]);
+        VECTOR(*open_set_decays)[i] = (largest - VECTOR(*open_set_sizes)[i]); /*TODO find a sensible decay, we could actually fit a function like we're supposed to */
 
     }
     igraph_vector_int_destroy(&eids);
@@ -61,9 +61,19 @@ static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
 }
 
 
-igraph_error_t igraph_umap_decay(igraph_real_t *weight, igraph_real_t distance, igraph_real_t open_set_size, igraph_real_t open_set_decay)
+igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t distance, igraph_real_t open_set_size, igraph_real_t open_set_decay)
 {
-    return (IGRAPH_SUCCESS);
+	/* TODO: implement. this should use the fuzzy ball and distance to find
+	 * the edge weight between two points, which should be between 0 and 1*/
+	if (distance < open_set_size) {
+		*probability = 1.;
+		return (IGRAPH_SUCCESS);
+	}
+	*probability = 1. - (distance - open_set_size) * open_set_decay;
+	if (distance < 0.) {
+		*probability = 0.;
+	}
+	return (IGRAPH_SUCCESS);
 }
 
 
@@ -71,13 +81,14 @@ igraph_error_t igraph_umap_decay(igraph_real_t *weight, igraph_real_t distance, 
 /* and then 1 + (distance - open_set_size) / (e ^ -(distance - open_set_size) * decay)? */
 /* which is 1 + (distance - open_set_size) * (e ^ (distance - open_set_size) * decay)? */
 /* just start with a linear decay */
-static igraph_error_t igraph_umap_edge_weights(igraph_matrix_t *data,
+/* TODO: don't use raw data, only knn graph */
+static igraph_error_t igraph_umap_edge_weights(igraph_t *knn_graph, igraph_vector_t *knn_weights,
         igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_vector_t *open_set_sizes,
         igraph_vector_t *open_set_decays) {
 
     /* we go over all the nodes, and then over all the nodes, and then add an edge with the weight dependent on the open set and decay*/
     /* and no edge if this weight would be 0 or lower */
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(data);
+    igraph_integer_t no_of_nodes = igraph_vcount(knn_graph);
     igraph_vector_int_t edges;
     igraph_vector_t data_row_i;
     igraph_vector_t data_row_j;
@@ -88,11 +99,9 @@ static igraph_error_t igraph_umap_edge_weights(igraph_matrix_t *data,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_matrix_get_row(data, &data_row_i, i);
         for (igraph_integer_t j = i; j < no_of_nodes; j++) {
-            igraph_matrix_get_row(data, &data_row_j, j);
-            igraph_vector_sub(&data_row_j, &data_row_i);
-            distance = igraph_vector_sumsq(&data_row_j);
+            distance = ?; /*TODO just the knn_weight if the edge is there?
+							but then you can just use the old edges */
             IGRAPH_CHECK(igraph_umap_decay(&weight_a,  distance, VECTOR(*open_set_sizes)[i], VECTOR(*open_set_decays)[i]));
             IGRAPH_CHECK(igraph_umap_decay(&weight_b, distance, VECTOR(*open_set_sizes)[j], VECTOR(*open_set_decays)[j]));
             if (weight_a <= 0 || weight_b <= 0)
@@ -112,6 +121,7 @@ static igraph_error_t igraph_umap_edge_weights(igraph_matrix_t *data,
 
 static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
 {
+	/*TODO use cross entropy, */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
@@ -164,6 +174,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *weights, igr
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t knn_distances;
     igraph_vector_t umap_weights;
+	igraph_t umap_graph;
 
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_sizes, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_decays, no_of_nodes);
@@ -173,7 +184,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *weights, igr
 
     IGRAPH_CHECK(igraph_umap_find_open_sets(graph, weights, &open_set_sizes,
                 &open_set_decays));
-    IGRAPH_CHECK(igraph_umap_edge_weights(data, &umap_graph, &umap_weights, &open_set_sizes,
+    IGRAPH_CHECK(igraph_umap_edge_weights(graph, weights, &umap_graph, &umap_weights, &open_set_sizes,
                 &open_set_decays));
     IGRAPH_CHECK(igraph_umap_layout(&umap_graph, &umap_weights, layout));
 
