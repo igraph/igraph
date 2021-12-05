@@ -82,7 +82,7 @@ igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t dista
 /* which is 1 + (distance - open_set_size) * (e ^ (distance - open_set_size) * decay)? */
 /* just start with a linear decay */
 /* TODO: don't use raw data, only knn graph */
-static igraph_error_t igraph_umap_edge_weights(igraph_t *knn_graph, igraph_vector_t *knn_weights,
+static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t *knn_weights,
         igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_vector_t *open_set_sizes,
         igraph_vector_t *open_set_decays) {
 
@@ -119,7 +119,16 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *knn_graph, igraph_vecto
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
+/*Gives the partial derivative to with respect to b */
+typedef igraph_error_t igraph_partial_derivative_2d(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative);
+
+static igraph_error_t igraph_cross_entropy_derivative(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative)
+{
+	*derivative = (b - a) / (b * (1 - b));
+	return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_partial_derivative_2d grad)
 {
 	/*TODO use cross entropy, */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
@@ -139,9 +148,10 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             igraph_real_t x_diff = (x - other_x);
             igraph_real_t y_diff = (y - other_y);
             igraph_real_t distance = (x_diff * x_diff + y_diff * y_diff);
-            igraph_real_t weight_diff = -VECTOR(*umap_weights)[j] - 1 / distance;
-            igraph_real_t gradient_x = weight_diff * x_diff / distance;
-            igraph_real_t gradient_y = weight_diff * y_diff / distance;
+			igraph_real_t d;
+			IGRAPH_CHECK(grad(distance, VECTOR(*umap_weights)[j], &d));
+            igraph_real_t gradient_x = d * x_diff / distance;
+            igraph_real_t gradient_y = d * y_diff / distance;
             MATRIX(*gradient, i, 0) += gradient_x;
             MATRIX(*gradient, i, 1) += gradient_y;
         }
@@ -158,7 +168,7 @@ static igraph_error_t igraph_umap_layout(igraph_t *umap_graph, igraph_vector_t *
 
     igraph_layout_random(umap_graph, layout);
     for (igraph_integer_t e = 0; e < epochs; e++) {
-        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights);
+        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, igraph_cross_entropy_derivative);
         igraph_matrix_scale(&gradient, learning_rate);
         igraph_matrix_sub(layout, &gradient);
     }
