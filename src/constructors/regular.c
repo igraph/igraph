@@ -333,6 +333,16 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * \function igraph_tree
  * \brief Creates a tree in which almost all vertices have the same number of children.
  *
+ * To obtain a completely symmetric tree with \c l layers, where each
+ * vertex has precisely \p children descendants, use
+ * <code>n = (children^(l+1) - 1) / (children - 1)</code>.
+ * Such trees are often called <code>k<code>-ary trees, where \c k refers
+ * to the number of children.
+ *
+ * </para><para>
+ * Note that for <code>n=0</code>, the null graph is returned,
+ * which is not considered to be a tree by \ref igraph_is_tree().
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.
  * \param children Integer, the number of children of a vertex in the

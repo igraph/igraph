@@ -154,6 +154,10 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  * This function samples uniformly from the set of labelled trees,
  * i.e. it generates each labelled tree with the same probability.
  *
+ * </para><para>
+ * Note that for <code>n=0</code>, the null graph is returned,
+ * which is not considered to be a tree by \ref igraph_is_tree().
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of nodes in the tree.
  * \param directed Whether to create a directed tree. The edges are oriented away from the root.
