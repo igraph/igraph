@@ -75,7 +75,7 @@
  *        (not including that vertex).
  * \param all_reachable Pointer to a Boolean. If not \c NULL, it indicates if all
  *        vertices of the graph were reachable from each vertex in \p vids.
- *        If false, the graph is non-connected If true, and the graph is undirected,
+ *        If false, the graph is non-connected. If true, and the graph is undirected,
  *        or if the graph is directed and \p vids contains all vertices, then the
  *        graph is connected.
  * \param vids The vertices for which the closeness centrality will be computed.
