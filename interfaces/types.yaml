@@ -391,6 +391,11 @@ PAGERANKALGO:
     # Enum that describes the various implementations of the PageRank algorithm
     CTYPE: igraph_pagerank_algo_t
 
+RANDOM_TREE_METHOD:
+    # Enum that describes the various implementation of the uniform random tree
+    # sampling method
+    CTYPE: igraph_random_tree_t
+
 RECIP:
     # Enum that describes how the reciprocity of a graph should be calculated
     CTYPE: igraph_reciprocity_t
