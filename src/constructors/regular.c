@@ -336,7 +336,7 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * To obtain a completely symmetric tree with \c l layers, where each
  * vertex has precisely \p children descendants, use
  * <code>n = (children^(l+1) - 1) / (children - 1)</code>.
- * Such trees are often called <code>k<code>-ary trees, where \c k refers
+ * Such trees are often called <code>k</code>-ary trees, where \c k refers
  * to the number of children.
  *
  * </para><para>
