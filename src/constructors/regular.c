@@ -476,8 +476,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
             vertex_nr = to;
             while(current_vertex < vertex_nr) {
                 for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
-                    VECTOR(edges)[idx++] = current_vertex
-            ;
+                    VECTOR(edges)[idx++] = current_vertex;
                     VECTOR(edges)[idx++] = to++;
                 }
                 current_vertex
@@ -487,15 +486,12 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     } else {
         for (k = 0; k < igraph_vector_int_size(branch_level); ++k) {
             vertex_nr = to;
-            while(current_vertex
-     < vertex_nr) {
+            while(current_vertex < vertex_nr) {
                 for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
                     VECTOR(edges)[idx++] = to++;
-                    VECTOR(edges)[idx++] = current_vertex
-            ;
+                    VECTOR(edges)[idx++] = current_vertex;
                 }
-                current_vertex
-        ++;
+                current_vertex++;
             }
         }
     }
