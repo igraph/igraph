@@ -1980,7 +1980,7 @@ igraph_to_prufer:
     PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
 
 igraph_tree_game:
-    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, RANDOM_TREE_METHOD method=PRUFER
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, RANDOM_TREE_METHOD method=LERW
 
 #######################################
 # Other, (yet) undocumented functions
