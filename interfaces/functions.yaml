@@ -345,16 +345,6 @@ igraph_diameter_dijkstra:
         BOOLEAN directed=True, BOOLEAN unconnected=True
     DEPS: weights ON graph
 
-igraph_minimum_spanning_tree:
-    PARAMS: GRAPH graph, OUT EDGESET res, EDGEWEIGHTS weights=NULL
-    DEPS: res ON graph, weights ON graph
-
-igraph_minimum_spanning_tree_unweighted:
-    PARAMS: GRAPH graph, OUT GRAPH mst
-
-igraph_minimum_spanning_tree_prim:
-    PARAMS: GRAPH graph, OUT GRAPH mst, EDGEWEIGHTS weights
-
 igraph_closeness:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res,
@@ -819,6 +809,12 @@ igraph_random_walk:
         GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode=OUT,
         INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, walk ON graph
+
+igraph_random_edge_walk:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT EDGESET edgewalk,
+        VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
+    DEPS: start ON graph, weights ON graph, edgewalk ON graph
 
 #######################################
 # Degree sequences
@@ -1937,6 +1933,23 @@ igraph_from_prufer:
 
 igraph_to_prufer:
     PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
+
+igraph_minimum_spanning_tree:
+    PARAMS: GRAPH graph, OUT EDGESET res, EDGEWEIGHTS weights=NULL
+    DEPS: res ON graph, weights ON graph
+
+igraph_minimum_spanning_tree_unweighted:
+    PARAMS: GRAPH graph, OUT GRAPH mst
+
+igraph_minimum_spanning_tree_prim:
+    PARAMS: GRAPH graph, OUT GRAPH mst, EDGEWEIGHTS weights
+
+igraph_random_spanning_tree:
+    PARAMS: GRAPH graph, OUT EDGESET res, OPTIONAL VERTEX vid=-1
+    DEPS: res ON graph, vid ON graph
+
+igraph_tree_game:
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, RANDOM_TREE_METHOD method=LERW
 
 #######################################
 # Other, (yet) undocumented functions
