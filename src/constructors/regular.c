@@ -2,14 +2,17 @@
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -409,8 +412,11 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * \function igraph_symmetric_tree
  * \brief Creates a symmetric tree which has the same number of branches at each level.
  *
+ * Cannot create null graph with this function because the root vertex always gets created 
+ * since an empty vector creates a singleton graph not a null graph.
+ *
  * \param graph Pointer to an uninitialized graph object.
- * \param vector Vector detailing the number of branches at each level
+ * \param vector Vector detailing the number of branches at each level.
  * \param type Constant, gives whether to create a directed tree, and
  *        if this is the case, also its orientation. Possible values:
  *        \clist
@@ -425,12 +431,10 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  *        \endclist
  * \return Error code:
  *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVAL: invalid number of children.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
- *
- * Cannot create null graph with this function because the root vertice always gets created 
- * since an empty vector creates a singleton graph not a null graph.
  * 
  * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating regular
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
@@ -448,8 +452,8 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     igraph_integer_t to = 1;
     igraph_integer_t temp = 1;
     igraph_integer_t vertices = 1;
-    igraph_integer_t current_vertice = 0;
-    igraph_integer_t vertice_nr = 0;
+    igraph_integer_t current_vertex = 0;
+    igraph_integer_t vertex_nr = 0;
 
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
@@ -459,14 +463,9 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
         IGRAPH_ERROR("Invalid number of children", IGRAPH_EINVAL);
     }
     
-    j = 1;
-    while (j <= igraph_vector_int_size(branch_level)) {
-        for (k = (igraph_vector_int_size(branch_level) - j); k >= 0; --k) {
-            temp *= VECTOR(*branch_level)[k];
-        }
+    for(j = 0; j < igraph_vector_int_size(branch_level); ++j) {
+        temp *= VECTOR(*branch_level)[j];
         vertices += temp;
-        temp = 1;
-        ++j;
     }
     
     // 2* (vertices - 1) -> sum of degree of tree
@@ -474,24 +473,29 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     
     if (type == IGRAPH_TREE_OUT) {
         for (k = 0; k < igraph_vector_int_size(branch_level); ++k) {
-            vertice_nr = to;
-            while(current_vertice < vertice_nr) {
+            vertex_nr = to;
+            while(current_vertex < vertex_nr) {
                 for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
-                    VECTOR(edges)[idx++] = current_vertice;
+                    VECTOR(edges)[idx++] = current_vertex
+            ;
                     VECTOR(edges)[idx++] = to++;
                 }
-                current_vertice++;
+                current_vertex
+        ++;
             }
         }
     } else {
         for (k = 0; k < igraph_vector_int_size(branch_level); ++k) {
-            vertice_nr = to;
-            while(current_vertice < vertice_nr) {
+            vertex_nr = to;
+            while(current_vertex
+     < vertex_nr) {
                 for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
                     VECTOR(edges)[idx++] = to++;
-                    VECTOR(edges)[idx++] = current_vertice;
+                    VECTOR(edges)[idx++] = current_vertex
+            ;
                 }
-                current_vertice++;
+                current_vertex
+        ++;
             }
         }
     }
