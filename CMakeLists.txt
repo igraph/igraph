@@ -126,6 +126,7 @@ endif()
 # src/CMakeLists.txt depends on targets in vendor/
 add_subdirectory(vendor)
 add_subdirectory(src)
+add_subdirectory(interfaces)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()
