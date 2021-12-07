@@ -21,14 +21,18 @@
 #include "test_utilities.inc"
 
 int main() {
-	igraph_matrix_t data;
-	igraph_matrix_t layout;
-	igraph_real_t data_arr[] = {0, 1, 1, 0};
+    igraph_t graph;
+    igraph_vector_t distances;
+    igraph_matrix_t layout;
 
-	matrix_init_real_row_major(&data, 2, 2, data_arr);
-	igraph_matrix_init(&layout, 0, 0);
+    igraph_small(&graph, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+    igraph_vector_init(&distances, 5);
 
-    IGRAPH_ASSERT(igraph_umap(&data, &layout) == IGRAPH_SUCCESS);
+    igraph_matrix_init(&layout, 0, 0);
+
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout) == IGRAPH_SUCCESS);
+
+    print_matrix(&layout);
 
     VERIFY_FINALLY_STACK();
     return 0;

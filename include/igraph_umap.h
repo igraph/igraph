@@ -25,11 +25,13 @@
 #define IGRAPH_UMAP_H
 
 #include "igraph_matrix.h"
+#include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_umap(igraph_matrix_t *data,
-                                         igraph_matrix_t *layout);
+IGRAPH_EXPORT igraph_error_t igraph_layout_umap(igraph_t *graph,
+                                                igraph_vector_t *distances,
+                                                igraph_matrix_t *layout);
 
 __END_DECLS
 

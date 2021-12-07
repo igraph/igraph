@@ -344,6 +344,7 @@ add_legacy_tests(
   igraph_layout_reingold_tilford_extended
   igraph_layout_star
   igraph_layout_sugiyama
+  igraph_layout_umap
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES
@@ -734,12 +735,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_adjacency_spectral_embedding
-)
-
-# umap.at
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  igraph_umap
 )
 
 # graphicality

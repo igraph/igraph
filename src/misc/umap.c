@@ -151,9 +151,9 @@ static igraph_error_t igraph_umap_layout(igraph_t *umap_graph, igraph_vector_t *
     igraph_integer_t epochs = 100;
     igraph_real_t learning_rate = 0.1;
     igraph_matrix_t gradient;
+    igraph_layout_random(umap_graph, layout);
     igraph_matrix_init(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
-    igraph_layout_random(umap_graph, layout);
     for (igraph_integer_t e = 0; e < epochs; e++) {
         igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, igraph_cross_entropy_derivative);
         igraph_matrix_scale(&gradient, learning_rate);
