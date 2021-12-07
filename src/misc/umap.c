@@ -66,10 +66,10 @@ igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t dista
     /* TODO: implement. this should use the fuzzy ball and distance to find
      * the edge weight between two points, which should be between 0 and 1*/
     if (distance < open_set_size) {
-        *probability = 1.;
+        *probability = .99;
         return (IGRAPH_SUCCESS);
     }
-    *probability = 1. - (distance - open_set_size) * open_set_decay;
+    *probability = .99 - (distance - open_set_size) * open_set_decay;
     if (distance < 0.) {
         *probability = 0.;
     }
@@ -125,7 +125,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
         igraph_incident(umap_graph, &eids, i, IGRAPH_ALL);
         MATRIX(*gradient, i, 0) = 0;
         MATRIX(*gradient, i, 1) = 0;
-        for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
+        for (igraph_integer_t j = 0; j < igraph_vector_int_size(&eids); j++) {
             igraph_integer_t eid = VECTOR(eids)[j];
             igraph_real_t x = MATRIX(*layout, i, 0);
             igraph_real_t y = MATRIX(*layout, i, 1);
@@ -135,33 +135,42 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             igraph_real_t x_diff = (x - other_x);
             igraph_real_t y_diff = (y - other_y);
             igraph_real_t distance = (x_diff * x_diff + y_diff * y_diff);
+            igraph_real_t weight_2d = 1 / distance;
             igraph_real_t d;
-            IGRAPH_CHECK(grad(distance, VECTOR(*umap_weights)[j], &d));
+            IGRAPH_CHECK(grad(weight_2d, VECTOR(*umap_weights)[j], &d));
             igraph_real_t gradient_x = d * x_diff / distance;
             igraph_real_t gradient_y = d * y_diff / distance;
             MATRIX(*gradient, i, 0) += gradient_x;
             MATRIX(*gradient, i, 1) += gradient_y;
         }
     }
+    igraph_vector_int_destroy(&eids);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_umap_layout(igraph_t *umap_graph, igraph_vector_t *umap_weights,
         igraph_matrix_t *layout) {
-    igraph_integer_t epochs = 100;
-    igraph_real_t learning_rate = 0.1;
+    igraph_integer_t epochs = 5000;
+    igraph_real_t learning_rate = 0.001;
     igraph_matrix_t gradient;
     igraph_layout_random(umap_graph, layout);
-    igraph_matrix_init(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
+    IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
         igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, igraph_cross_entropy_derivative);
+        //printf("gradient:\n");
+        //igraph_matrix_print(&gradient);
+        //printf("\n");
         igraph_matrix_scale(&gradient, learning_rate);
         igraph_matrix_sub(layout, &gradient);
+        //printf("layout:\n");
+        //igraph_matrix_print(layout);
+        //printf("\n");
     }
 
+    igraph_matrix_destroy(&gradient);
     IGRAPH_FINALLY_CLEAN(1);
-
     return (IGRAPH_SUCCESS);
 }
 
@@ -169,25 +178,21 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_vector_t open_set_sizes;
     igraph_vector_t open_set_decays;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t knn_distances;
     igraph_vector_t umap_weights;
-    igraph_t umap_graph;
 
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_sizes, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_decays, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&umap_weights, 0);
-    IGRAPH_CHECK(igraph_matrix_resize(layout, no_of_nodes, 2));
 
     IGRAPH_CHECK(igraph_umap_find_open_sets(graph, distances, &open_set_sizes,
                 &open_set_decays));
     IGRAPH_CHECK(igraph_umap_edge_weights(graph, distances, &umap_weights, &open_set_sizes,
                 &open_set_decays));
-    IGRAPH_CHECK(igraph_umap_layout(&umap_graph, &umap_weights, layout));
+    IGRAPH_CHECK(igraph_umap_layout(graph, &umap_weights, layout));
 
     igraph_vector_destroy(&open_set_sizes);
     igraph_vector_destroy(&open_set_decays);
-    igraph_vector_destroy(&knn_distances);
     igraph_vector_destroy(&umap_weights);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(3);
     return (IGRAPH_SUCCESS);
 }
