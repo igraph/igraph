@@ -16,6 +16,8 @@ experienced with C, you can contribute in a number of ways:
      the issue stating that this is still a problem in version X.
    - Some [issues point out problems with the documentation](https://github.com/igraph/igraph/labels/documentation);
      perhaps you could help correct these?
+   - Some [issues require clarifying a mathematical problem, or some literature research](https://github.com/igraph/igraph/labels/theory),
+     before any programming can begin. Can you contribute through your theoretical expertise?
    - Looking to contribute code? Take a look at some [good first issues](https://github.com/igraph/igraph/labels/good%20first%20issue).
 
 ## Using the issue tracker

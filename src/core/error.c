@@ -235,8 +235,12 @@ IGRAPH_THREAD_LOCAL struct igraph_i_protectedPtr igraph_i_finally_stack[100];
 
 void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
     int no = igraph_i_finally_stack[0].all;
-    IGRAPH_ASSERT(no < 100);
-    IGRAPH_ASSERT(no >= 0);
+    if (no < 0) {
+        IGRAPH_FATALF("Corrupt finally stack: it contains %d elements.", no);
+    }
+    if (no >= 100) {
+        IGRAPH_FATALF("Finally stack too large: it contains %d elements.", no);
+    }
     igraph_i_finally_stack[no].ptr = ptr;
     igraph_i_finally_stack[no].func = func;
     igraph_i_finally_stack[0].all ++;

@@ -97,7 +97,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
 igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
-                           igraph_strvector_t *predefnames,
+                           const igraph_strvector_t *predefnames,
                            igraph_bool_t names,
                            igraph_add_weights_t weights,
                            igraph_bool_t directed) {
