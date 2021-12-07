@@ -63,17 +63,17 @@ static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
 
 igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t distance, igraph_real_t open_set_size, igraph_real_t open_set_decay)
 {
-	/* TODO: implement. this should use the fuzzy ball and distance to find
-	 * the edge weight between two points, which should be between 0 and 1*/
-	if (distance < open_set_size) {
-		*probability = 1.;
-		return (IGRAPH_SUCCESS);
-	}
-	*probability = 1. - (distance - open_set_size) * open_set_decay;
-	if (distance < 0.) {
-		*probability = 0.;
-	}
-	return (IGRAPH_SUCCESS);
+    /* TODO: implement. this should use the fuzzy ball and distance to find
+     * the edge weight between two points, which should be between 0 and 1*/
+    if (distance < open_set_size) {
+        *probability = 1.;
+        return (IGRAPH_SUCCESS);
+    }
+    *probability = 1. - (distance - open_set_size) * open_set_decay;
+    if (distance < 0.) {
+        *probability = 0.;
+    }
+    return (IGRAPH_SUCCESS);
 }
 
 
@@ -86,24 +86,22 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
         igraph_vector_t *umap_weights, igraph_vector_t *open_set_sizes,
         igraph_vector_t *open_set_decays) {
 
-    /* we go over all the nodes, and then over all the nodes, and then add an edge with the weight dependent on the open set and decay*/
-    /* and no edge if this weight would be 0 or lower */
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t weight;
     igraph_real_t weight_previous;
 
-	igraph_vector_resize(umap_weights, igraph_vector_size(distances));
-	igraph_vector_null(umap_weights);
+    igraph_vector_resize(umap_weights, igraph_vector_size(distances));
+    igraph_vector_null(umap_weights);
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {
-		IGRAPH_CHECK(igraph_umap_decay(&weight,  VECTOR(*distances)[i],  VECTOR(*open_set_sizes)[i], VECTOR(*open_set_decays)[i]));
-		weight_previous = VECTOR(*umap_weights)[i];
-		if (weight_previous > 0)
-			weight = weight + weight_previous - weight * weight_previous;
-		if (weight > 0)
-			VECTOR(*umap_weights)[i] = weight;
-		else
-			VECTOR(*umap_weights)[i] = 0;
-	}
+        IGRAPH_CHECK(igraph_umap_decay(&weight,  VECTOR(*distances)[i],  VECTOR(*open_set_sizes)[i], VECTOR(*open_set_decays)[i]));
+        weight_previous = VECTOR(*umap_weights)[i];
+        if (weight_previous > 0)
+            weight = weight + weight_previous - weight * weight_previous;
+        if (weight > 0)
+            VECTOR(*umap_weights)[i] = weight;
+        else
+            VECTOR(*umap_weights)[i] = 0;
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -113,13 +111,13 @@ typedef igraph_error_t igraph_partial_derivative_2d(igraph_real_t a, igraph_real
 
 static igraph_error_t igraph_cross_entropy_derivative(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative)
 {
-	*derivative = (b - a) / (b * (1 - b));
-	return IGRAPH_SUCCESS;
+    *derivative = (b - a) / (b * (1 - b));
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_partial_derivative_2d grad)
 {
-	/*TODO use cross entropy, */
+    /*TODO use cross entropy, */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
@@ -137,8 +135,8 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             igraph_real_t x_diff = (x - other_x);
             igraph_real_t y_diff = (y - other_y);
             igraph_real_t distance = (x_diff * x_diff + y_diff * y_diff);
-			igraph_real_t d;
-			IGRAPH_CHECK(grad(distance, VECTOR(*umap_weights)[j], &d));
+            igraph_real_t d;
+            IGRAPH_CHECK(grad(distance, VECTOR(*umap_weights)[j], &d));
             igraph_real_t gradient_x = d * x_diff / distance;
             igraph_real_t gradient_y = d * y_diff / distance;
             MATRIX(*gradient, i, 0) += gradient_x;
@@ -173,7 +171,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t knn_distances;
     igraph_vector_t umap_weights;
-	igraph_t umap_graph;
+    igraph_t umap_graph;
 
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_sizes, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_decays, no_of_nodes);
