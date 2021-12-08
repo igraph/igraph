@@ -53,7 +53,7 @@
     </listitem>
     <listitem>
       <para>
-        <ulink url="https://www.gnu.org/software/glpk/">GLPK</ulink>
+        <ulink url="https://www.gnu.org/software/glpk/">GLPK</ulink> (version 4.57 or later)
       </para>
     </listitem>
     <listitem>
@@ -251,7 +251,7 @@ cmake --build . --target check --config Release
       <section id="igraph-Installation-msys2">
       <title>MSYS2</title>
       <para>
-        MSYS2 can be installed from www.msys2.org. After installing MSYS2,
+        MSYS2 can be installed from <ulink url="https://www.msys2.org/">msys2.org</ulink>. After installing MSYS2,
         ensure that it is up to date by opening a terminal and running
         <literal>pacman -Syuu</literal>.
       </para>

@@ -7,9 +7,12 @@ include(CheckSymbolExists)
 include(FindThreads)
 
 macro(find_dependencies)
-  # Declare the list of dependencies that _may_ be vendored and those that may not
+  # Declare the list of dependencies that _may_ be vendored
   set(VENDORABLE_DEPENDENCIES BLAS GLPK LAPACK ARPACK GMP)
-  set(NONVENDORABLE_DEPENDENCIES GLPK OpenMP)
+
+  # Declare optional dependencies associated with IGRAPH_..._SUPPORT flags
+  # Note that GLPK is both vendorable and optional
+  set(OPTIONAL_DEPENDENCIES GLPK OpenMP)
 
   # Declare configuration options for dependencies
   tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
@@ -23,13 +26,16 @@ macro(find_dependencies)
   set(OPTIONAL_DEPENDENCIES FLEX BISON OpenMP)
   set(VENDORED_DEPENDENCIES "")
 
+  # Declare minimum supported version for some dependencies
+  set(GLPK_VERSION_MIN "4.57") # 4.57 is the firt version providing glp_on_error()
+
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
-      find_package(${DEPENDENCY})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} OFF)
       else()
@@ -44,13 +50,13 @@ macro(find_dependencies)
     endif()
   endforeach()
 
-  # For nonvendorable dependencies, figure out whether we should attempt to
+  # For optional dependencies, figure out whether we should attempt to
   # link to them based on the value of the IGRAPH_..._SUPPORT option
-  foreach(DEPENDENCY ${NONVENDORABLE_DEPENDENCIES})
+  foreach(DEPENDENCY ${OPTIONAL_DEPENDENCIES})
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
-      find_package(${DEPENDENCY})
+    find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_${LIBNAME_UPPER}_SUPPORT ON)
       else()
@@ -103,7 +109,7 @@ macro(find_dependencies)
     endif()
 
     if(NEED_THIS_DEPENDENCY AND NOT DEFINED ${DEPENDENCY}_FOUND)
-      find_package(${DEPENDENCY})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
     endif()
   endforeach()
 
