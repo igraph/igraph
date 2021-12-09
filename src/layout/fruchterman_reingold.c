@@ -584,6 +584,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
 
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* calculate repulsive forces, we have a special version
            for unconnected graphs */
         igraph_vector_float_null(&dispx);
