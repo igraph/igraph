@@ -34,16 +34,16 @@
  *
  * \param graph Pointer to an uninitialized graph object, this will
  *        be the result.
- * \param n Integer constant, the number of nr_of_nodes in the graph.
+ * \param n Integer constant, the number of vertices in the graph.
  * \param mode Constant, gives the type of the star graph to
  *        create. Possible values:
  *        \clist
  *        \cli IGRAPH_STAR_OUT
  *          directed star graph, edges point
- *          \em from the center to the other nr_of_nodes.
+ *          \em from the center to the other vertices.
  *        \cli IGRAPH_STAR_IN
  *          directed star graph, edges point
- *          \em to the center from the other nr_of_nodes.
+ *          \em to the center from the other vertices.
  *        \cli IGRAPH_STAR_MUTUAL
  *          directed star graph with mutual edges.
  *        \cli IGRAPH_STAR_UNDIRECTED
@@ -55,7 +55,7 @@
  * \return Error code:
  *         \clist
  *         \cli IGRAPH_EINVVID
- *           invalid number of nr_of_nodes.
+ *           invalid number of vertices.
  *         \cli IGRAPH_EINVAL
  *           invalid center vertex.
  *         \cli IGRAPH_EINVMODE
@@ -63,7 +63,7 @@
  *         \endclist
  *
  * Time complexity: O(|V|), the
- * number of nr_of_nodes in the graph.
+ * number of vertices in the graph.
  *
  * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_tree()
  * for creating other regular structures.
@@ -77,7 +77,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
     igraph_integer_t i;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of nr_of_nodes", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVVID);
     }
     if (center < 0 || center > n - 1) {
         IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
@@ -147,7 +147,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  * In the zero-dimensional case, the singleton graph is returned.
  *
  * </para><para>
- * The nr_of_nodes of the resulting graph are ordered such that the
+ * The vertices of the resulting graph are ordered such that the
  * index of the vertex at position <code>(i_0, i_1, i_2, ..., i_d)</code>
  * in a lattice of size <code>(n_0, n_1, ..., n_d)</code> will be
  * <code>i_0 + n_0 * i_1 + n_0 * n_1 * i_2 + ...</code>.
@@ -157,10 +157,10 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  *        its dimensions. The dimension of the lattice will be the
  *        same as the length of this vector.
  * \param nei Integer value giving the distance (number of steps)
- *        within which two nr_of_nodes will be connected.
+ *        within which two vertices will be connected.
  * \param directed Boolean, whether to create a directed graph.
  *        If the \c mutual and \c circular arguments are not set to true,
- *        edges will be directed from lower-index nr_of_nodes towards
+ *        edges will be directed from lower-index vertices towards
  *        higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
  *        to create all connections as mutual.
@@ -171,7 +171,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  *         dimension vector.
  *
  * Time complexity: If \p nei is less than two then it is O(|V|+|E|) (as
- * far as I remember), |V| and |E| are the number of nr_of_nodes
+ * far as I remember), |V| and |E| are the number of vertices
  * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
  * is the average degree of the graph, k is the \p nei argument.
  */
@@ -282,7 +282,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
  * \function igraph_ring
  * \brief Creates a \em cycle graph or a \em path graph.
  *
- * A circular ring on \c n nr_of_nodes is commonly known in graph
+ * A circular ring on \c n vertices is commonly known in graph
  * theory as the cycle graph, and often denoted by <code>C_n</code>.
  * Removing a single edge from the cycle graph <code>C_n</code> results
  * in the path graph <code>P_n</code>. This function can generate both.
@@ -292,7 +292,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
  * \ref igraph_lattice().
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param n The number of nr_of_nodes in the graph.
+ * \param n The number of vertices in the graph.
  * \param directed Logical, whether to create a directed graph.
  *        All edges will be oriented in the same direction along
  *        the cycle or path.
@@ -301,9 +301,9 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
  * \param circular Logical, whether to create a closed ring (a cycle)
  *        or an open path.
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid number of nr_of_nodes.
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
  *
- * Time complexity: O(|V|), the number of nr_of_nodes in the graph.
+ * Time complexity: O(|V|), the number of vertices in the graph.
  *
  * \sa \ref igraph_lattice() for generating more general lattices.
  *
@@ -315,7 +315,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
-        IGRAPH_ERRORF("The number of nr_of_nodes must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 1);
@@ -332,10 +332,10 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 /**
  * \ingroup generators
  * \function igraph_tree
- * \brief Creates a tree in which almost all nr_of_nodes have the same number of children.
+ * \brief Creates a tree in which almost all vertices have the same number of children.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param n Integer, the number of nr_of_nodes in the graph.
+ * \param n Integer, the number of vertices in the graph.
  * \param children Integer, the number of children of a vertex in the
  *        tree.
  * \param type Constant, gives whether to create a directed tree, and
@@ -351,11 +351,11 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  *          undirected tree.
  *        \endclist
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid number of nr_of_nodes.
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
  *         \c IGRAPH_INVMODE: invalid mode argument.
  *
  * Time complexity: O(|V|+|E|), the
- * number of nr_of_nodes plus the number of edges in the graph.
+ * number of vertices plus the number of edges in the graph.
  *
  * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
@@ -372,7 +372,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
     igraph_integer_t to = 1;
 
     if (n < 0 || children <= 0) {
-        IGRAPH_ERROR("Invalid number of nr_of_nodes or children", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
     }
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
@@ -434,7 +434,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  *         \c IGRAPH_EINVAL: invalid number of children.
  *
  * Time complexity: O(|V|+|E|), the
- * number of nr_of_nodes plus the number of edges in the graph.
+ * number of vertices plus the number of edges in the graph.
  * 
  * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating regular
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
@@ -479,7 +479,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     // in the first for-loop our parent is the root vertex 
     // the next iteration will have the root vertex' 1st child as parent and so on
     parent = 0;
-    // how many nr_of_nodes there are at this moment
+    // how many vertices there are at this moment
     // if root vertex has 3 children, then vertex_nr will become 4 = 1 (root vertex) + 3 (children)
     // if those 3 will have each 4 children, vertex_nr will become 16 = 1 ((root vertex)) + 3 (1st level children) + 12 (2nd level children)
     vertex_nr = 0;
@@ -513,7 +513,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
  * \brief Create an extended chordal ring.
  *
  * An extended chordal ring is a cycle graph with additional chords
- * connecting its nr_of_nodes.
+ * connecting its vertices.
  *
  * Each row \c L of the matrix \p W specifies a set of chords to be
  * inserted, in the following way: vertex \c i will connect to a vertex
@@ -534,17 +534,17 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
  *
  * \param graph Pointer to an uninitialized graph object, the result
  *   will be stored here.
- * \param nodes Integer constant, the number of nr_of_nodes in the
+ * \param nodes Integer constant, the number of vertices in the
  *   graph. It must be at least 3.
  * \param W The matrix specifying the extra edges. The number of
- *   columns should divide the number of total nr_of_nodes. The elements
+ *   columns should divide the number of total vertices. The elements
  *   are allowed to be negative.
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
  * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector().
  *
- * Time complexity: O(|V|+|E|), the number of nr_of_nodes plus the number
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
 igraph_error_t igraph_extended_chordal_ring(
