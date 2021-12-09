@@ -34,7 +34,7 @@ int main() {
     igraph_vector_int_init_int(&v, 0);
     // test
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);
-    // root vertice always gets created, cannot create null graph with this function
+    // root vertex always gets created, cannot create null graph with this function
     PRINT_DESTROY("Singleton graph");
 
     igraph_vector_int_init_int(&v, 0);
