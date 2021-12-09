@@ -345,7 +345,7 @@ igraph_diameter_dijkstra:
 
 igraph_closeness:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res,
+        GRAPH graph, OUT VERTEXINDEX res,
         OUT VECTOR_OR_0 reachable_count,
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEXSET vids=ALL,
@@ -445,7 +445,7 @@ igraph_subcomponent:
 
 igraph_betweenness:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph, vids ON graph
     FLAGS: PROGRESS
@@ -469,6 +469,21 @@ igraph_edge_betweenness_cutoff:
         GRAPH graph, OUT VECTOR res, BOOLEAN directed=True,
         EDGEWEIGHTS weights=NULL, REAL cutoff
     DEPS: weights ON graph
+
+igraph_harmonic_centrality:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
+        NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False
+    DEPS: weights ON graph, vids ON graph
+    FLAGS: PROGRESS
+
+igraph_harmonic_centrality_cutoff:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
+        NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False,
+        REAL cutoff
+    DEPS: vids ON graph, weights ON graph, res ON graph
+    FLAGS: PROGRESS
 
 igraph_pagerank:
     PARAMS: |-
