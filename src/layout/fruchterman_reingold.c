@@ -28,6 +28,7 @@
 #include "igraph_components.h"
 
 #include "core/grid.h"
+#include "core/interruption.h"
 
 static int igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,
@@ -88,6 +89,8 @@ static int igraph_layout_i_fr(const igraph_t *graph,
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         /* calculate repulsive forces, we have a special version
            for unconnected graphs */
@@ -251,6 +254,8 @@ static int igraph_layout_i_grid_fr(
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         igraph_vector_float_null(&dispx);
         igraph_vector_float_null(&dispy);
