@@ -1945,7 +1945,7 @@ igraph_minimum_spanning_tree_prim:
     PARAMS: GRAPH graph, OUT GRAPH mst, EDGEWEIGHTS weights
 
 igraph_random_spanning_tree:
-    PARAMS: GRAPH graph, OUT EDGESET res, OPTIONAL VERTEX vid=-1
+    PARAMS: GRAPH graph, OUT EDGESET res, OPTIONAL VERTEX vid
     DEPS: res ON graph, vid ON graph
 
 igraph_tree_game:
