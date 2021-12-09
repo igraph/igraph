@@ -243,7 +243,6 @@ igraph_citing_cited_type_game:
         INTEGER edges_per_step=1, BOOLEAN directed=True
 
 igraph_forest_fire_game:
-    FLAGS: PROGRESS
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1,
         INTEGER ambs=1, BOOLEAN directed=True
@@ -254,14 +253,12 @@ igraph_simple_interconnected_islands_game:
         REAL islands_pin, INTEGER n_inter
 
 igraph_static_fitness_game:
-    FLAGS: PROGRESS
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
         OPTIONAL VECTOR fitness_in, BOOLEAN loops=False,
         BOOLEAN multiple=False
 
 igraph_static_power_law_game:
-    FLAGS: PROGRESS
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges,
         REAL exponent_out, REAL exponent_in=-1,
@@ -347,7 +344,7 @@ igraph_diameter_dijkstra:
 
 igraph_closeness:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res,
+        GRAPH graph, OUT VERTEX_QTY res,
         OPTIONAL OUT VECTOR_INT reachable_count,
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEXSET vids=ALL,
@@ -455,10 +452,9 @@ igraph_subcomponent:
 
 igraph_betweenness:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph, vids ON graph
-    FLAGS: PROGRESS
 
 igraph_betweenness_cutoff:
     PARAMS: |-
@@ -466,7 +462,6 @@ igraph_betweenness_cutoff:
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL,
         REAL cutoff
     DEPS: vids ON graph, weights ON graph, res ON graph
-    FLAGS: PROGRESS
 
 igraph_betweenness_subset:
     PARAMS: |-
@@ -475,7 +470,6 @@ igraph_betweenness_subset:
         EDGEWEIGHTS weights=NULL
     DEPS: |-
         vids ON graph, weights ON graph, res ON graph, sources ON graph, targets ON graph
-    FLAGS: PROGRESS
 
 igraph_edge_betweenness:
     PARAMS: |-
@@ -491,12 +485,24 @@ igraph_edge_betweenness_cutoff:
 
 igraph_edge_betweenness_subset:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res, EDGESET eids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, EDGESET eids=ALL,
         BOOLEAN directed=True, VERTEXSET sources=ALL, VERTEXSET targets=ALL,
         EDGEWEIGHTS weights=NULL
     DEPS: |-
         eids ON graph, weights ON graph, res ON graph, sources ON graph, targets ON graph
-    FLAGS: PROGRESS
+
+igraph_harmonic_centrality:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False
+    DEPS: weights ON graph, vids ON graph
+
+igraph_harmonic_centrality_cutoff:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False,
+        REAL cutoff
+    DEPS: vids ON graph, weights ON graph, res ON graph
 
 igraph_pagerank:
     PARAMS: |-
@@ -540,7 +546,6 @@ igraph_path_length_hist:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, OUT REAL unconnected,
         BOOLEAN directed=True
-    FLAGS: PROGRESS
 
 igraph_simplify:
     PARAMS: |-
@@ -1025,7 +1030,6 @@ igraph_layout_fruchterman_reingold:
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
     DEPS: weights ON graph
-    FLAGS: PROGRESS
 
 igraph_layout_kamada_kawai:
     PARAMS: |-
@@ -1070,7 +1074,6 @@ igraph_layout_fruchterman_reingold_3d:
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
     DEPS: weights ON graph
-    FLAGS: PROGRESS
 
 igraph_layout_kamada_kawai_3d:
     PARAMS: |-
@@ -1088,7 +1091,6 @@ igraph_layout_graphopt:
         REAL node_charge=0.001, REAL node_mass=30,
         REAL spring_length=0, REAL spring_constant=1,
         REAL max_sa_movement=5, BOOLEAN use_seed=False
-    FLAGS: PROGRESS
 
 igraph_layout_drl:
     PARAMS: |-
