@@ -11,9 +11,11 @@
    when they were not reachable from any labeled ones, i.e. the returned membership
    vector is guaranteed not to contain negative values (#1853).
  - The Kamada-Kawai layout is now iterruptible.
+ - The Fruchterman-Reingold layout is now interruptible.
    
 ### Other
 
+ - The build system now checks that GLPK is of a ccompatbile version (4.57 or later).
  - Documentation improvements.
 
 ## [0.9.5] - 2021-11-11
