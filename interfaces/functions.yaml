@@ -243,7 +243,6 @@ igraph_citing_cited_type_game:
         INTEGER edges_per_step=1, BOOLEAN directed=True
 
 igraph_forest_fire_game:
-    FLAGS: PROGRESS
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1,
         INTEGER ambs=1, BOOLEAN directed=True
@@ -254,14 +253,12 @@ igraph_simple_interconnected_islands_game:
         REAL islands_pin, INTEGER n_inter
 
 igraph_static_fitness_game:
-    FLAGS: PROGRESS
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
         VECTOR_OR_0 fitness_in=NULL, BOOLEAN loops=False,
         BOOLEAN multiple=False
 
 igraph_static_power_law_game:
-    FLAGS: PROGRESS
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges,
         REAL exponent_out, REAL exponent_in=-1,
@@ -351,7 +348,7 @@ igraph_closeness:
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False
-    DEPS: vids ON graph, weights ON graph
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_closeness_cutoff:
     PARAMS: |-
@@ -447,8 +444,7 @@ igraph_betweenness:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
-    DEPS: weights ON graph, vids ON graph
-    FLAGS: PROGRESS
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_betweenness_cutoff:
     PARAMS: |-
@@ -456,7 +452,6 @@ igraph_betweenness_cutoff:
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL,
         REAL cutoff
     DEPS: vids ON graph, weights ON graph, res ON graph vids
-    FLAGS: PROGRESS
 
 igraph_edge_betweenness:
     PARAMS: |-
@@ -474,16 +469,14 @@ igraph_harmonic_centrality:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False
-    DEPS: weights ON graph, vids ON graph
-    FLAGS: PROGRESS
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_harmonic_centrality_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False,
         REAL cutoff
-    DEPS: vids ON graph, weights ON graph, res ON graph
-    FLAGS: PROGRESS
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_pagerank:
     PARAMS: |-
@@ -527,7 +520,6 @@ igraph_path_length_hist:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, OUT REAL unconnected,
         BOOLEAN directed=True
-    FLAGS: PROGRESS
 
 igraph_simplify:
     PARAMS: |-
@@ -625,21 +617,21 @@ igraph_eigenvector_centrality:
         BOOLEAN directed=False, BOOLEAN scale=True,
         EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
+    DEPS: weights ON graph, vector ON graph
 
 igraph_hub_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
+    DEPS: weights ON graph, vector ON graph
 
 igraph_authority_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
+    DEPS: weights ON graph, vector ON graph
 
 igraph_arpack_rssolve:
     # TODO(ntamas): this should probably not be exposed to higher-level
@@ -1010,7 +1002,6 @@ igraph_layout_fruchterman_reingold:
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
     DEPS: weights ON graph
-    FLAGS: PROGRESS
 
 igraph_layout_kamada_kawai:
     PARAMS: |-
@@ -1055,7 +1046,6 @@ igraph_layout_fruchterman_reingold_3d:
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
     DEPS: weights ON graph
-    FLAGS: PROGRESS
 
 igraph_layout_kamada_kawai_3d:
     PARAMS: |-
@@ -1073,7 +1063,6 @@ igraph_layout_graphopt:
         REAL node_charge=0.001, REAL node_mass=30,
         REAL spring_length=0, REAL spring_constant=1,
         REAL max_sa_movement=5, BOOLEAN use_seed=False
-    FLAGS: PROGRESS
 
 igraph_layout_drl:
     PARAMS: |-
@@ -1547,8 +1536,8 @@ igraph_complementer:
 igraph_compose:
     PARAMS: |-
         OUT GRAPH res, GRAPH g1, GRAPH g2,
-        OUT VECTORM1 edge_map_left, OUT VECTORM1 edge_map_right
-    DEPS: edge_map_left ON left, edge_map_right ON right
+        OUT VECTORM1 edge_map1, OUT VECTORM1 edge_map2
+    DEPS: edge_map1 ON g1, edge_map2 ON g2
 
 #######################################
 # Maximum flows, minimum cuts
