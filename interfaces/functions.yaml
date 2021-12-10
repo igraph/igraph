@@ -357,7 +357,7 @@ igraph_closeness_cutoff:
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
-        BOOLEAN normalized=False, REAL cutoff
+        BOOLEAN normalized=False, REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_shortest_paths:
@@ -450,7 +450,7 @@ igraph_betweenness_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL,
-        REAL cutoff
+        REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_edge_betweenness:
@@ -462,7 +462,7 @@ igraph_edge_betweenness:
 igraph_edge_betweenness_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, BOOLEAN directed=True,
-        EDGEWEIGHTS weights=NULL, REAL cutoff
+        EDGEWEIGHTS weights=NULL, REAL cutoff=-1
     DEPS: weights ON graph
 
 igraph_harmonic_centrality:
@@ -475,7 +475,7 @@ igraph_harmonic_centrality_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False,
-        REAL cutoff
+        REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_pagerank:
