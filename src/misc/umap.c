@@ -26,62 +26,50 @@
 /*open set size is just the size of the distance to the closest neighbor*/
 /*the decay depends on the rest of the neighbors */
 
-/*now to calculate the decay*/
-/*we could curve fit an offset exponential.*/
-/*for now we can do somehting simpler which doesn't use all the k points*/
-
-/*this picks the largest distance and calculates the decay from that. Just a basic experiment*/
+/*open set size is rho in the paper, the decay is sigma*/
 static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
         igraph_vector_t *distances, igraph_vector_t *open_set_sizes,
-        igraph_vector_t *open_set_decays) {
-    igraph_integer_t no_of_nodes = igraph_vcount(knn_graph);
-    igraph_vector_int_t eids;
-    igraph_real_t largest;
+		igraph_vector_t *open_set_decays) {
+	igraph_integer_t no_of_nodes = igraph_vcount(knn_graph);
+	igraph_vector_int_t eids;
+	igraph_real_t l2k;
+	igraph_integer_t k;
+	igraph_real_t sum;
 
-    /*this picks the shortest distance*/
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_incident(knn_graph, &eids, i, IGRAPH_ALL);
-        VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[0]];
-        largest = -1;
-        for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
-            if (VECTOR(*distances)[VECTOR(eids)[j]] < VECTOR(*open_set_sizes)[i]) {
-                VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[j]];
-            }
-            if (VECTOR(*distances)[VECTOR(eids)[j]] > largest) {
-                largest = VECTOR(*distances)[VECTOR(eids)[j]];
-            }
-        }
-        VECTOR(*open_set_decays)[i] = (largest - VECTOR(*open_set_sizes)[i]); /*TODO find a sensible decay, we could actually fit a function like we're supposed to */
+	k = igraph_vector_size(open_set_sizes);
+	l2k = log(k) / log(2);
 
-    }
-    igraph_vector_int_destroy(&eids);
-    IGRAPH_FINALLY_CLEAN(1);
-    return (IGRAPH_SUCCESS);
+	IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
+	for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+		igraph_incident(knn_graph, &eids, i, IGRAPH_ALL);
+		VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[0]];
+		sum = 0;
+		for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
+			if (VECTOR(*distances)[VECTOR(eids)[j]] < VECTOR(*open_set_sizes)[i]) {
+				VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[j]];
+			}
+		}
+		for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
+			sum += exp(VECTOR(*open_set_sizes)[i] - VECTOR(*distances)[VECTOR(eids)[j]]);
+		}
+		VECTOR(*open_set_decays)[i] = log(sum / l2k);
+	}
+	igraph_vector_int_destroy(&eids);
+	IGRAPH_FINALLY_CLEAN(1);
+	return (IGRAPH_SUCCESS);
 }
 
 
 igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t distance, igraph_real_t open_set_size, igraph_real_t open_set_decay)
 {
-    /* TODO: implement. this should use the fuzzy ball and distance to find
-     * the edge weight between two points, which should be between 0 and 1*/
-    if (distance < open_set_size) {
-        *probability = .99;
-        return (IGRAPH_SUCCESS);
-    }
-    *probability = .99 - (distance - open_set_size) * open_set_decay;
-    if (distance < 0.) {
-        *probability = 0.;
-    }
+	if (distance < open_set_size) {
+		*probability = 1.0;
+		return (IGRAPH_SUCCESS);
+	}
+	*probability = exp(open_set_size - distance / open_set_decay);
     return (IGRAPH_SUCCESS);
 }
 
-
-/*a point within the open_set_size gets distance of 1, they can't be actually in it....they're also not really 'open' disks btw.*/
-/* and then 1 + (distance - open_set_size) / (e ^ -(distance - open_set_size) * decay)? */
-/* which is 1 + (distance - open_set_size) * (e ^ (distance - open_set_size) * decay)? */
-/* just start with a linear decay */
-/* TODO: don't use raw data, only knn graph */
 static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t *distances,
         igraph_vector_t *umap_weights, igraph_vector_t *open_set_sizes,
         igraph_vector_t *open_set_decays) {
