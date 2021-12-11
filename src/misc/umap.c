@@ -83,12 +83,8 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         IGRAPH_CHECK(igraph_umap_decay(&weight,  VECTOR(*distances)[i],  VECTOR(*open_set_sizes)[i], VECTOR(*open_set_decays)[i]));
         weight_previous = VECTOR(*umap_weights)[i];
-        if (weight_previous > 0)
-            weight = weight + weight_previous - weight * weight_previous;
-        if (weight > 0)
-            VECTOR(*umap_weights)[i] = weight;
-        else
-            VECTOR(*umap_weights)[i] = 0;
+		weight = weight + weight_previous - weight * weight_previous;
+		VECTOR(*umap_weights)[i] = weight;
     }
 
     return IGRAPH_SUCCESS;
@@ -97,9 +93,26 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
 /*Gives the partial derivative to with respect to b */
 typedef igraph_error_t igraph_partial_derivative_2d(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative);
 
+/*this function assumes a and b are both weights*/
 static igraph_error_t igraph_cross_entropy_derivative(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative)
 {
     *derivative = (b - a) / (b * (1 - b));
+    return IGRAPH_SUCCESS;
+}
+
+/*d is a distance, w is a weight */
+/*calculating x and y components is done somwere else */
+static igraph_error_t igraph_paper_derivative(igraph_real_t d, igraph_real_t w, igraph_real_t *derivative)
+{
+	igraph_real_t attract;
+	igraph_real_t repulse;
+	igraph_real_t a = 1; //hyperparameter
+	igraph_real_t b = 1; //hyperparameter
+	igraph_real_t epsilon = 0.0001;
+
+	attract = (- 2 * a * b * d * pow(d, b) * w) / (1 + d * d);
+	repulse = ((- 2 * b * d) * (1 - w)) / ((epsilon + d * d) * (1 + a * pow(d, b)));
+	*derivative = attract - repulse;
     return IGRAPH_SUCCESS;
 }
 
