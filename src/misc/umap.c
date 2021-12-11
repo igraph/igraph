@@ -29,44 +29,44 @@
 /*open set size is rho in the paper, the decay is sigma*/
 static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
         igraph_vector_t *distances, igraph_vector_t *open_set_sizes,
-		igraph_vector_t *open_set_decays) {
-	igraph_integer_t no_of_nodes = igraph_vcount(knn_graph);
-	igraph_vector_int_t eids;
-	igraph_real_t l2k;
-	igraph_integer_t k;
-	igraph_real_t sum;
+        igraph_vector_t *open_set_decays) {
+    igraph_integer_t no_of_nodes = igraph_vcount(knn_graph);
+    igraph_vector_int_t eids;
+    igraph_real_t l2k;
+    igraph_integer_t k;
+    igraph_real_t sum;
 
-	k = igraph_vector_size(open_set_sizes);
-	l2k = log(k) / log(2);
+    k = igraph_vector_size(open_set_sizes);
+    l2k = log(k) / log(2);
 
-	IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-	for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-		igraph_incident(knn_graph, &eids, i, IGRAPH_ALL);
-		VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[0]];
-		sum = 0;
-		for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
-			if (VECTOR(*distances)[VECTOR(eids)[j]] < VECTOR(*open_set_sizes)[i]) {
-				VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[j]];
-			}
-		}
-		for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
-			sum += exp(VECTOR(*open_set_sizes)[i] - VECTOR(*distances)[VECTOR(eids)[j]]);
-		}
-		VECTOR(*open_set_decays)[i] = log(sum / l2k);
-	}
-	igraph_vector_int_destroy(&eids);
-	IGRAPH_FINALLY_CLEAN(1);
-	return (IGRAPH_SUCCESS);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        igraph_incident(knn_graph, &eids, i, IGRAPH_ALL);
+        VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[0]];
+        sum = 0;
+        for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
+            if (VECTOR(*distances)[VECTOR(eids)[j]] < VECTOR(*open_set_sizes)[i]) {
+                VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[j]];
+            }
+        }
+        for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
+            sum += exp(VECTOR(*open_set_sizes)[i] - VECTOR(*distances)[VECTOR(eids)[j]]);
+        }
+        VECTOR(*open_set_decays)[i] = log(sum / l2k);
+    }
+    igraph_vector_int_destroy(&eids);
+    IGRAPH_FINALLY_CLEAN(1);
+    return (IGRAPH_SUCCESS);
 }
 
 
 igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t distance, igraph_real_t open_set_size, igraph_real_t open_set_decay)
 {
-	if (distance < open_set_size) {
-		*probability = 1.0;
-		return (IGRAPH_SUCCESS);
-	}
-	*probability = exp(open_set_size - distance / open_set_decay);
+    if (distance < open_set_size) {
+        *probability = 1.0;
+        return (IGRAPH_SUCCESS);
+    }
+    *probability = exp(open_set_size - distance / open_set_decay);
     return (IGRAPH_SUCCESS);
 }
 
@@ -83,44 +83,52 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         IGRAPH_CHECK(igraph_umap_decay(&weight,  VECTOR(*distances)[i],  VECTOR(*open_set_sizes)[i], VECTOR(*open_set_decays)[i]));
         weight_previous = VECTOR(*umap_weights)[i];
-		weight = weight + weight_previous - weight * weight_previous;
-		VECTOR(*umap_weights)[i] = weight;
+        weight = weight + weight_previous - weight * weight_previous;
+        VECTOR(*umap_weights)[i] = weight;
     }
 
     return IGRAPH_SUCCESS;
 }
 
-/*Gives the partial derivative to with respect to b */
-typedef igraph_error_t igraph_partial_derivative_2d(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative);
-
-/*this function assumes a and b are both weights*/
-static igraph_error_t igraph_cross_entropy_derivative(igraph_real_t a, igraph_real_t b, igraph_real_t *derivative)
-{
-    *derivative = (b - a) / (b * (1 - b));
-    return IGRAPH_SUCCESS;
-}
-
-/*d is a distance, w is a weight */
+/*xd is difference in x direction, w is a weight */
 /*calculating x and y components is done somwere else */
-static igraph_error_t igraph_paper_derivative(igraph_real_t d, igraph_real_t w, igraph_real_t *derivative)
+static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
 {
-	igraph_real_t attract;
-	igraph_real_t repulse;
-	igraph_real_t a = 1; //hyperparameter
-	igraph_real_t b = 1; //hyperparameter
-	igraph_real_t epsilon = 0.0001;
+    igraph_real_t a = 1; //hyperparameter
+    igraph_real_t b = 1; //hyperparameter
+    igraph_real_t dsq;
+    igraph_real_t force;
 
-	attract = (- 2 * a * b * d * pow(d, b) * w) / (1 + d * d);
-	repulse = ((- 2 * b * d) * (1 - w)) / ((epsilon + d * d) * (1 + a * pow(d, b)));
-	*derivative = attract - repulse;
+    dsq = xd * xd + yd * yd;
+    force = (- 2 * a * b * pow(dsq, (b - 1)) * w) / (1 + dsq);
+    *force_x = force * xd;
+    *force_y = force * yd;
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_partial_derivative_2d grad)
+/*xd is difference in x direction, w is a weight */
+/*calculating x and y components is done somwere else */
+static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
+{
+    igraph_real_t a = 1; //hyperparameter
+    igraph_real_t b = 1; //hyperparameter
+    igraph_real_t dsq;
+    igraph_real_t force;
+    igraph_real_t epsilon = 0.001;
+
+    dsq = xd * xd + yd * yd;
+    force = ((-2 * b) * (1 - w)) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
+    *force_x = force * xd;
+    *force_y = force * yd;
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
 {
     /*TODO use cross entropy, */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
+    igraph_real_t fax, fay, frx, fry;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_incident(umap_graph, &eids, i, IGRAPH_ALL);
@@ -135,14 +143,10 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             igraph_real_t other_y = MATRIX(*layout, other, 1) ;
             igraph_real_t x_diff = (x - other_x);
             igraph_real_t y_diff = (y - other_y);
-            igraph_real_t distance = (x_diff * x_diff + y_diff * y_diff);
-            igraph_real_t weight_2d = 1 / distance;
-            igraph_real_t d;
-            IGRAPH_CHECK(grad(weight_2d, VECTOR(*umap_weights)[j], &d));
-            igraph_real_t gradient_x = d * x_diff / distance;
-            igraph_real_t gradient_y = d * y_diff / distance;
-            MATRIX(*gradient, i, 0) += gradient_x;
-            MATRIX(*gradient, i, 1) += gradient_y;
+            IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], &fax, &fay));
+            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, VECTOR(*umap_weights)[j], &frx, &fry));
+            MATRIX(*gradient, i, 0) += fax - frx;
+            MATRIX(*gradient, i, 1) += fay - fry;
         }
     }
     igraph_vector_int_destroy(&eids);
@@ -159,7 +163,7 @@ static igraph_error_t igraph_umap_layout(igraph_t *umap_graph, igraph_vector_t *
     IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
-        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, igraph_cross_entropy_derivative);
+        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights);
         //printf("gradient:\n");
         //igraph_matrix_print(&gradient);
         //printf("\n");
