@@ -380,12 +380,15 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
     long int idx = 0;
     long int to = 1;
 
-    if (n < 0 || children <= 0) {
-        IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
+    if (n < 0) {
+        IGRAPH_ERROR("Number of vertices cannot be negative.", IGRAPH_EINVAL);
+    }
+    if (children <= 0) {
+        IGRAPH_ERROR("Number of children must be positive.", IGRAPH_EINVAL);
     }
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
