@@ -410,13 +410,13 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 /**
  * \ingroup generators
  * \function igraph_symmetric_tree
- * \brief Creates a symmetric tree which has the same number of branches at each level.
+ * \brief Creates a symmetric tree with the specified number of branches at each level.
  *
- * Cannot create null graph with this function because the root vertex always gets created 
- * since an empty vector creates a singleton graph not a null graph.
+ * This function creates a tree in which all vertices at distance \c d from the
+ * root have \p branching_counts[d] children.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param vector Vector detailing the number of branches at each level.
+ * \param branching_counts Vector detailing the number of branches at each level.
  * \param type Constant, gives whether to create a directed tree, and
  *        if this is the case, also its orientation. Possible values:
  *        \clist
@@ -436,71 +436,62 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  * 
- * \sa \ref igraph_tree() \ref igraph_lattice(), \ref igraph_star() for creating regular
+ * \sa \ref igraph_tree() and \ref igraph_star() for creating regular tree
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
  * \example examples/simple/igraph_symmetric_tree.c
  */
 
-igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branch_level,
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branching_counts,
                 igraph_tree_mode_t type) {
     
-    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t j, k, temp, nr_of_nodes, idx, parent, child, vertex_nr;
-    igraph_integer_t branch_level_size = igraph_vector_int_size(branch_level);
-
-    // TODO: add integer overflow check
+    igraph_vector_int_t edges;
+    igraph_integer_t j, k, temp, vertex_count, idx, parent, child, level_end;
+    igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
 
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN && type != IGRAPH_TREE_UNDIRECTED) {
-        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
-    if (!igraph_vector_int_empty(branch_level) && igraph_vector_int_min(branch_level) <= 0) {
-        IGRAPH_ERROR("Invalid number of children.", IGRAPH_EINVAL);
+    if (!igraph_vector_int_empty(branching_counts) && igraph_vector_int_min(branching_counts) <= 0) {
+        IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
     }
     
-    nr_of_nodes = 1;
+    /* Compute the number of vertices in the tree.
+     * TODO: add integer overflow check. */
+    vertex_count = 1;
     temp = 1;
-    for(j = 0; j < branch_level_size; ++j) {
-        temp *= VECTOR(*branch_level)[j];
-        nr_of_nodes += temp;
+    for(j = 0; j < branching_counts_size; ++j) {
+        temp *= VECTOR(*branching_counts)[j];
+        vertex_count += temp;
     }
     
-    // 2* (nr_of_nodes - 1) -> sum of degree of tree
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (nr_of_nodes - 1));
+    /* Trees have precisely |E| = |V| - 1 edges. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (vertex_count - 1));
     
-    // index in vector edges
-    // edges has the form: [0,1, 0,2, 0,3, 1,4, 1,5, 1,6, 1,7, 2,8, 2,9, 2,10, 2,11, 3,12, ...]
-    // this would result in the root vertex having 3 children, each of these children having 4 children in turn
     idx = 0;
-    // to which vertex (child) the edge is pointing next
+
+    /* Current parent and child vertex ids.
+     * parent -> child edges will be added. */
     child = 1;    
-    // which vertex is the parent at any given moment
-    // in the first for-loop our parent is the root vertex 
-    // the next iteration will have the root vertex' 1st child as parent and so on
     parent = 0;
-    // how many vertices there are at this moment
-    // if root vertex has 3 children, then vertex_nr will become 4 = 1 (root vertex) + 3 (children)
-    // if those 3 will have each 4 children, vertex_nr will become 16 = 1 ((root vertex)) + 3 (1st level children) + 12 (2nd level children)
-    vertex_nr = 0;
-    
-    for (k = 0; k < branch_level_size; ++k) {
-        vertex_nr = child;
-        while(parent < vertex_nr) {
-            for (j = 0; j < VECTOR(*branch_level)[k]; j++) {
-                if (type == IGRAPH_TREE_OUT) {
-                    VECTOR(edges)[idx++] = parent;
+    for (k = 0; k < branching_counts_size; ++k) {
+        level_end = child; /* points to one past the last vertex of the current level of parents */
+        while(parent < level_end) {
+            for (j = 0; j < VECTOR(*branching_counts)[k]; j++) {
+                if (type == IGRAPH_TREE_IN) {
                     VECTOR(edges)[idx++] = child++;
+                    VECTOR(edges)[idx++] = parent;
                 } else {
-                    VECTOR(edges)[idx++] = child++;
                     VECTOR(edges)[idx++] = parent;
+                    VECTOR(edges)[idx++] = child++;
                 }
             }
             parent++;
         }
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, nr_of_nodes, type != IGRAPH_TREE_UNDIRECTED));
+    IGRAPH_CHECK(igraph_create(graph, &edges, vertex_count, type != IGRAPH_TREE_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
