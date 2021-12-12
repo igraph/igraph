@@ -22,6 +22,7 @@
 #include "igraph_umap.h"
 #include "igraph_constructors.h"
 #include "igraph_layout.h"
+#include "igraph_random.h"
 
 /*open set size is just the size of the distance to the closest neighbor*/
 /*the decay depends on the rest of the neighbors */
@@ -91,7 +92,6 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
 }
 
 /*xd is difference in x direction, w is a weight */
-/*calculating x and y components is done somwere else */
 static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t a = 1; //hyperparameter
@@ -107,7 +107,6 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
 }
 
 /*xd is difference in x direction, w is a weight */
-/*calculating x and y components is done somwere else */
 static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t a = 1; //hyperparameter
@@ -125,28 +124,46 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
 
 static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
 {
-    /*TODO use cross entropy, */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
-    igraph_real_t fax, fay, frx, fry;
+    igraph_real_t fx, fy;
+    igraph_integer_t n_random_verices = sqrt(no_of_nodes);
+    igraph_integer_t other;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_incident(umap_graph, &eids, i, IGRAPH_ALL);
         MATRIX(*gradient, i, 0) = 0;
         MATRIX(*gradient, i, 1) = 0;
+        igraph_real_t x = MATRIX(*layout, i, 0);
+        igraph_real_t y = MATRIX(*layout, i, 1);
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(&eids); j++) {
             igraph_integer_t eid = VECTOR(eids)[j];
-            igraph_real_t x = MATRIX(*layout, i, 0);
-            igraph_real_t y = MATRIX(*layout, i, 1);
-            igraph_integer_t other = IGRAPH_OTHER(umap_graph, eid, i);
+            other = IGRAPH_OTHER(umap_graph, eid, i);
             igraph_real_t other_x = MATRIX(*layout, other, 0) ;
             igraph_real_t other_y = MATRIX(*layout, other, 1) ;
             igraph_real_t x_diff = (x - other_x);
             igraph_real_t y_diff = (y - other_y);
-            IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], &fax, &fay));
-            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, VECTOR(*umap_weights)[j], &frx, &fry));
-            MATRIX(*gradient, i, 0) += fax - frx;
-            MATRIX(*gradient, i, 1) += fay - fry;
+            IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], &fx, &fy));
+            MATRIX(*gradient, i, 0) += fx;
+            MATRIX(*gradient, i, 1) += fy;
+        }
+        for (igraph_integer_t j = 0; j < n_random_verices; j++) {
+            other = RNG_INTEGER(0, no_of_nodes - 1);
+            igraph_real_t other_x = MATRIX(*layout, other, 0) ;
+            igraph_real_t other_y = MATRIX(*layout, other, 1) ;
+            igraph_real_t x_diff = (x - other_x);
+            igraph_real_t y_diff = (y - other_y);
+            igraph_integer_t eid;
+            igraph_real_t weight;
+            IGRAPH_CHECK(igraph_get_eid(umap_graph, &eid, i, j, 0, 0));
+            if (eid == -1) {
+                weight = 0;
+            } else {
+                weight = VECTOR(*umap_weights)[j];
+            }
+            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, weight, &fx, &fy));
+            MATRIX(*gradient, i, 0) -= fx;
+            MATRIX(*gradient, i, 1) -= fy;
         }
     }
     igraph_vector_int_destroy(&eids);
@@ -185,6 +202,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t umap_weights;
 
+    RNG_BEGIN();
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_sizes, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_decays, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&umap_weights, 0);
@@ -199,5 +217,6 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_vector_destroy(&open_set_decays);
     igraph_vector_destroy(&umap_weights);
     IGRAPH_FINALLY_CLEAN(3);
+    RNG_END();
     return (IGRAPH_SUCCESS);
 }
