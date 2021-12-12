@@ -350,7 +350,7 @@ igraph_closeness:
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False
-    DEPS: vids ON graph, weights ON graph
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_closeness_cutoff:
     PARAMS: |-
@@ -359,7 +359,7 @@ igraph_closeness_cutoff:
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
-        BOOLEAN normalized=False, REAL cutoff
+        BOOLEAN normalized=False, REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_shortest_paths:
@@ -454,14 +454,14 @@ igraph_betweenness:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
-    DEPS: weights ON graph, vids ON graph
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_betweenness_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL,
-        REAL cutoff
-    DEPS: vids ON graph, weights ON graph, res ON graph
+        REAL cutoff=-1
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_betweenness_subset:
     PARAMS: |-
@@ -480,7 +480,7 @@ igraph_edge_betweenness:
 igraph_edge_betweenness_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, BOOLEAN directed=True,
-        EDGEWEIGHTS weights=NULL, REAL cutoff
+        EDGEWEIGHTS weights=NULL, REAL cutoff=-1
     DEPS: weights ON graph
 
 igraph_edge_betweenness_subset:
@@ -495,14 +495,14 @@ igraph_harmonic_centrality:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False
-    DEPS: weights ON graph, vids ON graph
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_harmonic_centrality_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False,
-        REAL cutoff
-    DEPS: vids ON graph, weights ON graph, res ON graph
+        REAL cutoff=-1
+    DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_pagerank:
     PARAMS: |-
@@ -646,21 +646,21 @@ igraph_eigenvector_centrality:
         BOOLEAN directed=False, BOOLEAN scale=True,
         EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
+    DEPS: weights ON graph, vector ON graph
 
 igraph_hub_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
+    DEPS: weights ON graph, vector ON graph
 
 igraph_authority_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
-    DEPS: weights ON graph, vector ON graph V(graph)
+    DEPS: weights ON graph, vector ON graph
 
 igraph_arpack_rssolve:
     # TODO(ntamas): this should probably not be exposed to higher-level
@@ -1561,8 +1561,8 @@ igraph_complementer:
 igraph_compose:
     PARAMS: |-
         OUT GRAPH res, GRAPH g1, GRAPH g2,
-        OUT INDEX_VECTOR edge_map_left, OUT INDEX_VECTOR edge_map_right
-    DEPS: edge_map_left ON left, edge_map_right ON right
+        OUT INDEX_VECTOR edge_map1, OUT INDEX_VECTOR edge_map2
+    DEPS: edge_map1 ON g1, edge_map2 ON g2
 
 #######################################
 # Maximum flows, minimum cuts

@@ -381,12 +381,15 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
     igraph_integer_t idx = 0;
     igraph_integer_t to = 1;
 
-    if (n < 0 || children <= 0) {
-        IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
+    if (n < 0) {
+        IGRAPH_ERROR("Number of vertices cannot be negative.", IGRAPH_EINVAL);
+    }
+    if (children <= 0) {
+        IGRAPH_ERROR("Number of children must be positive.", IGRAPH_EINVAL);
     }
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
@@ -445,7 +448,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
- * 
+ *
  * \sa \ref igraph_tree() and \ref igraph_star() for creating regular tree
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
@@ -455,7 +458,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 
 igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branching_counts,
                 igraph_tree_mode_t type) {
-    
+
     igraph_vector_int_t edges;
     igraph_integer_t j, k, temp, vertex_count, idx, parent, child, level_end;
     igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
@@ -466,7 +469,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     if (!igraph_vector_int_empty(branching_counts) && igraph_vector_int_min(branching_counts) <= 0) {
         IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
     }
-    
+
     /* Compute the number of vertices in the tree.
      * TODO: add integer overflow check. */
     vertex_count = 1;
@@ -475,15 +478,15 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
         temp *= VECTOR(*branching_counts)[j];
         vertex_count += temp;
     }
-    
+
     /* Trees have precisely |E| = |V| - 1 edges. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (vertex_count - 1));
-    
+
     idx = 0;
 
     /* Current parent and child vertex ids.
      * parent -> child edges will be added. */
-    child = 1;    
+    child = 1;
     parent = 0;
     for (k = 0; k < branching_counts_size; ++k) {
         level_end = child; /* points to one past the last vertex of the current level of parents */
@@ -506,7 +509,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return IGRAPH_SUCCESS;                
+    return IGRAPH_SUCCESS;
 }
 
 /**
