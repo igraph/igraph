@@ -50,6 +50,8 @@ static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
                 VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[j]];
             }
         }
+        /* TODO: according to the paper finding the decay (signma ) should be
+         * done with a binary search? */
         for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
             sum += exp(VECTOR(*open_set_sizes)[i] - VECTOR(*distances)[VECTOR(eids)[j]]);
         }
@@ -94,6 +96,7 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
 /*xd is difference in x direction, w is a weight */
 static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
 {
+    /* TODO: the paper says we should do non-linear least squares fitting for a and b */
     igraph_real_t a = 1; //hyperparameter
     igraph_real_t b = 1; //hyperparameter
     igraph_real_t dsq;
@@ -124,9 +127,12 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
 
 static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
 {
+    /* TODO: we can also sample the edges ranomly, instead of taking them all */
+    /* TODO: we can scale the learning rate with the epochs, so it goes from 1 to zero */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
     igraph_real_t fx, fy;
+    /* TODO: what should we use for the number of random vertices? */
     igraph_integer_t n_random_verices = sqrt(no_of_nodes);
     igraph_integer_t other;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
@@ -149,6 +155,9 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
         }
         for (igraph_integer_t j = 0; j < n_random_verices; j++) {
             other = RNG_INTEGER(0, no_of_nodes - 1);
+            if (other == i) {
+                continue;
+            }
             igraph_real_t other_x = MATRIX(*layout, other, 0) ;
             igraph_real_t other_y = MATRIX(*layout, other, 1) ;
             igraph_real_t x_diff = (x - other_x);
