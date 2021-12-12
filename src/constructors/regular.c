@@ -17,7 +17,6 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 #include "igraph_constructors.h"
@@ -416,6 +415,98 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_symmetric_tree
+ * \brief Creates a symmetric tree with the specified number of branches at each level.
+ *
+ * This function creates a tree in which all vertices at distance \c d from the
+ * root have \p branching_counts[d] children.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param branching_counts Vector detailing the number of branches at each level.
+ * \param type Constant, gives whether to create a directed tree, and
+ *        if this is the case, also its orientation. Possible values:
+ *        \clist
+ *        \cli IGRAPH_TREE_OUT
+ *          directed tree, the edges point
+ *          from the parents to their children,
+ *        \cli IGRAPH_TREE_IN
+ *          directed tree, the edges point from
+ *          the children to their parents.
+ *        \cli IGRAPH_TREE_UNDIRECTED
+ *          undirected tree.
+ *        \endclist
+ * \return Error code:
+ *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVAL: invalid number of children.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ * 
+ * \sa \ref igraph_tree() and \ref igraph_star() for creating regular tree
+ * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \ref igraph_tree_game() for uniform random sampling of trees.
+ *
+ * \example examples/simple/igraph_symmetric_tree.c
+ */
+
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branching_counts,
+                igraph_tree_mode_t type) {
+    
+    igraph_vector_int_t edges;
+    igraph_integer_t j, k, temp, vertex_count, idx, parent, child, level_end;
+    igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
+
+    if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN && type != IGRAPH_TREE_UNDIRECTED) {
+        IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
+    }
+    if (!igraph_vector_int_empty(branching_counts) && igraph_vector_int_min(branching_counts) <= 0) {
+        IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
+    }
+    
+    /* Compute the number of vertices in the tree.
+     * TODO: add integer overflow check. */
+    vertex_count = 1;
+    temp = 1;
+    for(j = 0; j < branching_counts_size; ++j) {
+        temp *= VECTOR(*branching_counts)[j];
+        vertex_count += temp;
+    }
+    
+    /* Trees have precisely |E| = |V| - 1 edges. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (vertex_count - 1));
+    
+    idx = 0;
+
+    /* Current parent and child vertex ids.
+     * parent -> child edges will be added. */
+    child = 1;    
+    parent = 0;
+    for (k = 0; k < branching_counts_size; ++k) {
+        level_end = child; /* points to one past the last vertex of the current level of parents */
+        while(parent < level_end) {
+            for (j = 0; j < VECTOR(*branching_counts)[k]; j++) {
+                if (type == IGRAPH_TREE_IN) {
+                    VECTOR(edges)[idx++] = child++;
+                    VECTOR(edges)[idx++] = parent;
+                } else {
+                    VECTOR(edges)[idx++] = parent;
+                    VECTOR(edges)[idx++] = child++;
+                }
+            }
+            parent++;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, vertex_count, type != IGRAPH_TREE_UNDIRECTED));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;                
 }
 
 /**

@@ -54,6 +54,8 @@ IGRAPH_EXPORT igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, ig
                               igraph_bool_t mutual, igraph_bool_t circular);
 IGRAPH_EXPORT igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
                               igraph_tree_mode_t type);
+IGRAPH_EXPORT igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branch_level,
+                              igraph_tree_mode_t type);                              
 IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer);
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
