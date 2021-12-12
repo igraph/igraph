@@ -408,45 +408,10 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \ingroup generators
- * \function igraph_tree
- * \brief Creates a tree in which almost all vertices have the same number of children.
- *
- * \param graph Pointer to an uninitialized graph object.
- * \param n Integer, the number of vertices in the graph.
- * \param children Integer, the number of children of a vertex in the
- *        tree.
- * \param type Constant, gives whether to create a directed tree, and
- *        if this is the case, also its orientation. Possible values:
- *        \clist
- *        \cli IGRAPH_TREE_OUT
- *          directed tree, the edges point
- *          from the parents to their children,
- *        \cli IGRAPH_TREE_IN
- *          directed tree, the edges point from
- *          the children to their parents.
- *        \cli IGRAPH_TREE_UNDIRECTED
- *          undirected tree.
- *        \endclist
- * \return Error code:
- *         \c IGRAPH_EINVAL: invalid number of vertices.
- *         \c IGRAPH_INVMODE: invalid mode argument.
- *
- * Time complexity: O(|V|+|E|), the
- * number of vertices plus the number of edges in the graph.
- *
- * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
- * structures; \ref igraph_from_prufer() for creating arbitrary trees;
- * \ref igraph_tree_game() for uniform random sampling of trees.
- *
- * \example examples/simple/igraph_tree.c
- */
 igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, igraph_vector_int_t* parentvec,
                 igraph_tree_mode_t type) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
     igraph_integer_t idx = 0;
     igraph_integer_t to = 1;
 
@@ -460,18 +425,15 @@ igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, igraph_vector_int
     igraph_integer_t n = igraph_vector_int_size(parentvec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
 
-    i = 1;
     if (type == IGRAPH_TREE_OUT) {
         while (idx < 2 * (n - 1)) {
-          VECTOR(edges)[idx++] = VECTOR(*parentvec)[i];
-          VECTOR(edges)[idx++] = i;
-          i++;
+          VECTOR(edges)[idx++] = VECTOR(*parentvec)[to];
+          VECTOR(edges)[idx++] = to++;
         }
     } else {
         while (idx < 2 * (n - 1)) {
-          VECTOR(edges)[idx++] = i;
-          VECTOR(edges)[idx++] = VECTOR(*parentvec)[i];
-          i++;
+          VECTOR(edges)[idx++] = to;
+          VECTOR(edges)[idx++] = VECTOR(*parentvec)[to++];
       }
     }
 
