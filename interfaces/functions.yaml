@@ -513,8 +513,12 @@ igraph_subgraph_edges:
     DEPS: eids ON graph
 
 igraph_average_path_length:
-    PARAMS: GRAPH graph, OUT REAL res, OUT REAL unconn_pairs=NULL, BOOLEAN directed=True,
-        BOOLEAN unconn=True
+    PARAMS: GRAPH graph, PRIMARY OUT REAL res, OUT REAL unconn_pairs=NULL,
+        BOOLEAN directed=True, BOOLEAN unconn=True
+
+igraph_average_path_length_dijkstra:
+    PARAMS: GRAPH graph, PRIMARY OUT REAL res, OUT REAL unconn_pairs=NULL,
+        EDGEWEIGHTS weights=NULL, BOOLEAN directed=True, BOOLEAN unconn=True
 
 igraph_path_length_hist:
     PARAMS: |-
