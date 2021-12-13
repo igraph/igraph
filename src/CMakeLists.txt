@@ -240,6 +240,7 @@ add_library(
   properties/neighborhood.c
   properties/spectral.c
   properties/trees.c
+  properties/forest.c
   properties/triangles.c
 
   scg/scg_approximate_methods.c

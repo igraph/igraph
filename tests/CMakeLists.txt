@@ -274,6 +274,7 @@ add_legacy_tests(
   igraph_is_chordal
   igraph_is_mutual
   igraph_is_tree
+  igraph_is_forest
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_transitivity
