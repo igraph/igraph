@@ -26,7 +26,7 @@ int main() {
 
     igraph_destroy(&g);
 
-    /*  4-cycle, not a tree */
+    /* undirected 4-cycle, not a tree */
     igraph_small(&g, 4, 0,
                  0, 1, 1, 2, 2, 3, 3, 0, -1);
 
