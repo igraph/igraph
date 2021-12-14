@@ -217,18 +217,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         }
     }
 
-    switch (mode) {
-        case IGRAPH_OUT:
-            reversed_mode = IGRAPH_IN;
-            break;
-
-        case IGRAPH_IN:
-            reversed_mode = IGRAPH_OUT;
-            break;
-
-        default:
-            reversed_mode = IGRAPH_ALL;
-    }
+    reversed_mode = IGRAPH_REVERSE_MODE(mode);
 
     /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
 

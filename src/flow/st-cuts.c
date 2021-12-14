@@ -435,7 +435,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     igraph_vector_int_t ancestor;
     igraph_vector_int_t label;
 
-    igraph_neimode_t invmode = mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN;
+    igraph_neimode_t invmode = IGRAPH_REVERSE_MODE(mode);
 
     igraph_integer_t i;
 
