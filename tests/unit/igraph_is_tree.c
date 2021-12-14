@@ -44,6 +44,18 @@ int main() {
 
     igraph_destroy(&g);
 
+    /* disjoint union of an out-tree and two cycles, with the same number
+     * of edges as a tree would have, and the same in-degrees as an out-tree
+     * would have */
+    igraph_small(&g, 11, IGRAPH_DIRECTED,
+                 10, 0, 0, 2, 0, 6, 9, 1, 1, 8, 8, 4, 4, 9, 3, 7, 7, 5, 5, 3,
+                 -1);
+
+    igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
+    IGRAPH_ASSERT(! res);
+
+    igraph_destroy(&g);
+
     /* 3-star, tree */
     igraph_small(&g, 4, 0,
                  0, 1, 0, 2, 0, 3, -1);

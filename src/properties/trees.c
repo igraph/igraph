@@ -306,13 +306,25 @@ int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *
 
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, /* loops = */ 1));
 
-        for (i = 0; i < vcount; ++i)
+        for (i = 0; i < vcount; ++i) {
             if (VECTOR(degree)[i] == 0) {
                 break;
             }
+            if (VECTOR(degree)[i] > 1) {
+                /* In an out-tree, all vertices have in-degree 1, except for the root,
+                 * which has in-degree 0. Thus, if we encounter a larger in-degree,
+                 * the graph cannot be an out-tree.
+                 * We could perform this check for all degrees, but that would not
+                 * improve performance when the graph is indeed a tree, persumably
+                 * the most common case. Thus we only check until finding the root.
+                 */
+                *res = 0;
+                break;
+            }
+        }
 
-        /* if no suitable root is found, the graph is not a tree */
-        if (i == vcount) {
+        /* If no suitable root is found, the graph is not a tree. */
+        if (*res && i == vcount) {
             *res = 0;
         } else {
             iroot = i;
@@ -324,7 +336,7 @@ int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *
 
     break;
     default:
-        IGRAPH_ERROR("Invalid mode", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode,", IGRAPH_EINVMODE);
     }
 
     /* if no suitable root was found, skip visiting vertices */
