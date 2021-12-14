@@ -121,18 +121,20 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
 
-    /* A forest can have maximum vcount-1 edges. */
+    /*By convention, a zero-vertex graph will be considered a forest.*/
+    if (vcount == 0) {
+        *res = 1;
+        return IGRAPH_SUCCESS;
+    }
+    // A forest can have maximum vcount-1 edges. 
     if (ecount > vcount - 1) {
         *res = 0;
         return IGRAPH_SUCCESS;
     }
-    /*By convention, the zero-vertex graph will be considered a forest.
-    A single-vertex graph is a forest, provided it has no edges (checked in the previous if (..)) */
-    if (vcount <= 1) {
+    /*A single-vertex graph is a forest, provided it has no edges (checked in the previous if (..)) */
+    if (vcount == 1) {
         *res = 1;
-        if(vcount==1){
-            igraph_vector_push_back(roots,0);
-        }
+        igraph_vector_push_back(roots,0);
         return IGRAPH_SUCCESS;
     }
     /* Ignore mode for undirected graphs. */
