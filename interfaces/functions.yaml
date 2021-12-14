@@ -955,6 +955,10 @@ igraph_biconnected_components:
         tree_edges ON graph, component_edges ON graph,
         components ON graph, articulation_points ON graph
 
+igraph_bridges:
+    PARAMS: GRAPH graph, OUT EDGESET res
+    DEPS: res ON graph
+
 #######################################
 # Cliques
 #######################################
@@ -1957,6 +1961,14 @@ igraph_random_spanning_tree:
 
 igraph_tree_game:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, RANDOM_TREE_METHOD method=LERW
+
+#######################################
+# Coloring
+#######################################
+
+igraph_vertex_coloring_greedy:
+    PARAMS: GRAPH graph, OUT VERTEX_COLOR colors, GREEDY_COLORING_HEURISTIC heuristic=NEIGHBORS
+    DEPS: colors ON graph
 
 #######################################
 # Other, (yet) undocumented functions

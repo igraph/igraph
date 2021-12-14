@@ -318,6 +318,10 @@ GETADJACENCY:
     # Enum storing how to retrieve the adjacency matrix from a graph
     CTYPE: igraph_get_adjacency_t
 
+GREEDY_COLORING_HEURISTIC:
+    # Enum representing different heuristics for a greedy vertex coloring
+    CTYPE: igraph_coloring_greedy_t
+
 LAYOUT_GRID:
     # Whether to use the fast (but less accurate) grid-based version of a
     # layout algorithm that supports it (typically the Fruchterman-Reingold
