@@ -142,6 +142,10 @@
 <!-- doxrox-include igraph_to_prufer -->
 </section>
 
+<section id="forest"><title>Forest</title>
+<!-- doxrox-include igraph_is_forest -->
+</section>
+
 <section id="transitivity-or-clustering-coefficient"><title>Transitivity or clustering coefficient</title>
 <!-- doxrox-include igraph_transitivity_undirected -->
 <!-- doxrox-include igraph_transitivity_local_undirected -->
