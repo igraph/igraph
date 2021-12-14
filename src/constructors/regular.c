@@ -420,6 +420,81 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
     return IGRAPH_SUCCESS;
 }
 
+igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, igraph_vector_int_t* parents,
+                igraph_tree_mode_t type) {
+
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t visited = IGRAPH_VECTOR_NULL;
+    igraph_integer_t idx = 0;
+    igraph_integer_t to = 1;
+
+    if (igraph_vector_int_empty(parents)) {
+        IGRAPH_ERROR("Parent vector is empty", IGRAPH_EINVAL);
+    }
+    if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&  type != IGRAPH_TREE_UNDIRECTED) {
+        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+    }
+
+    igraph_integer_t n = igraph_vector_int_size(parents);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
+
+    // check if parents contains any cycles
+    igraph_integer_t child_node, parent_node, v;
+    for (int v=n-1; v>=0; --v) {
+      child_node = v;
+
+      if (!VECTOR(visited)[child_node]) {
+        VECTOR(visited)[child_node] = 1;
+        continue;
+      }
+
+      parent_node = VECTOR(*parents)[v];
+      if (parent_node>= n) {
+        IGRAPH_ERROR("Invalid entry in parents", IGRAPH_EINVAL);
+      } else if (parent_node == child_node) {
+        IGRAPH_ERROR("Cannot create a tree, parents contain cycles", IGRAPH_EINVAL);
+      } else if (parent_node < 0) {
+        continue;
+      }
+
+      while (child_node != parent_node) {
+        child_node = parent_node;
+        parent_node = VECTOR(*parents)[child_node];
+
+        if (parent_node>= n) {
+          IGRAPH_ERROR("Invalid entry in parents", IGRAPH_EINVAL);
+        } else if (parent_node == child_node) {
+          IGRAPH_ERROR("Cannot create a tree, parents contain cycles", IGRAPH_EINVAL);
+        } else if (parent_node < 0) {
+          VECTOR(visited)[child_node] = 1;
+          break;
+        }
+
+        VECTOR(visited)[child_node] = 1;
+      }
+    }
+
+    // create edge listfrom parents
+    if (type == IGRAPH_TREE_OUT) {
+        while (idx < 2 * (n - 1)) {
+          VECTOR(edges)[idx++] = VECTOR(*parents)[to];
+          VECTOR(edges)[idx++] = to++;
+        }
+    } else {
+        while (idx < 2 * (n - 1)) {
+          VECTOR(edges)[idx++] = to;
+          VECTOR(edges)[idx++] = VECTOR(*parents)[to++];
+      }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, type != IGRAPH_TREE_UNDIRECTED));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \ingroup generators
  * \function igraph_symmetric_tree
