@@ -157,13 +157,15 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 /* igraph_is_tree -- check if a graph is a tree */
 
 /* count the number of vertices reachable from the root */
-static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
+static int igraph_i_is_tree_visitor(const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode, igraph_integer_t *visited_count) {
     igraph_stack_int_t stack;
     igraph_vector_bool_t visited;
+    igraph_vector_t neighbors;
     long i;
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&visited, igraph_adjlist_size(al)));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
+    IGRAPH_VECTOR_INIT_FINALLY(&neighbors, 0);
+
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, igraph_vcount(graph));
 
     IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
@@ -175,7 +177,6 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
 
     while (! igraph_stack_int_empty(&stack)) {
         igraph_integer_t u;
-        igraph_vector_int_t *neighbors;
         long ncount;
 
         /* take a vertex from the stack, mark it as visited */
@@ -186,19 +187,20 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
         }
 
         /* register all its yet-unvisited neighbours for future processing */
-        neighbors = igraph_adjlist_get(al, u);
-        ncount = igraph_vector_int_size(neighbors);
+        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, u, mode));
+        ncount = igraph_vector_size(&neighbors);
         for (i = 0; i < ncount; ++i) {
-            igraph_integer_t v = VECTOR(*neighbors)[i];
+            igraph_integer_t v = VECTOR(neighbors)[i];
             if (! VECTOR(visited)[v]) {
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
             }
         }
     }
 
+    igraph_vector_destroy(&neighbors);
     igraph_stack_int_destroy(&stack);
     igraph_vector_bool_destroy(&visited);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
@@ -244,7 +246,6 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
  * \example examples/simple/igraph_tree.c
  */
 int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
-    igraph_adjlist_t al;
     igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;
     igraph_integer_t vcount, ecount;
@@ -275,9 +276,6 @@ int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *
     if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
-
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     /* The main algorithm:
      * We find a root and check that all other vertices are reachable from it.
@@ -341,16 +339,13 @@ int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *
 
     /* if no suitable root was found, skip visiting vertices */
     if (*res) {
-        IGRAPH_CHECK(igraph_i_is_tree_visitor(iroot, &al, &visited_count));
+        IGRAPH_CHECK(igraph_i_is_tree_visitor(graph, iroot, mode, &visited_count));
         *res = visited_count == vcount;
     }
 
     if (root) {
         *root = iroot;
     }
-
-    igraph_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
