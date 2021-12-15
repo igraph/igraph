@@ -38,12 +38,12 @@ static  igraph_integer_t igraph_i_is_forest_visitor(igraph_integer_t root,igraph
         igraph_integer_t u;
         igraph_vector_int_t *neighbors;
         igraph_integer_t ncount;
-        u = igraph_stack_int_pop(&stack);
 
         /* Take a vertex from stack and check if it is already visited
          * if yes, then graph is not a forest
          * else add it to the visited vector
          */
+        u = igraph_stack_int_pop(&stack);
         if (IGRAPH_LIKELY(! VECTOR(*visited)[u])) {
             VECTOR(*visited)[u] = 1;
             *visited_count += 1;
@@ -155,6 +155,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
 
     IGRAPH_CHECK(igraph_vector_resize(&visited,vcount));
     igraph_integer_t i;
+
     for(i =0; i<vcount;++i){
         VECTOR(visited)[i]=0;
     }
