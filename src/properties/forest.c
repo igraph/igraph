@@ -1,14 +1,17 @@
 /*
    IGraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -21,10 +24,11 @@
 #include "igraph_stack.h"
 
 /* count the number of vertices reachable from the root */
-static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *visited, const igraph_adjlist_t *al, igraph_integer_t *visited_count,igraph_integer_t *res,  igraph_neimode_t mode){
+static  igraph_integer_t igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *visited, const igraph_adjlist_t *al, igraph_integer_t *visited_count,igraph_integer_t *res,  igraph_neimode_t mode){
 
     igraph_stack_int_t stack;
     igraph_integer_t i;
+
     IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
     /* push the root into the stack */
@@ -54,6 +58,7 @@ static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *vis
 
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(*neighbors)[i];
+            
             if(mode==IGRAPH_ALL){
                 if (IGRAPH_LIKELY(!VECTOR(*visited)[v])){
                     IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
@@ -83,8 +88,8 @@ static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *vis
  * An undirected graph is a forest if it has no cycles.
  * </para><para>
  *
- * In the directed case, a possible additional requirement is that two
- * different trees should not have common vertex. Also, edges in each
+ * In the directed case, a possible additional requirement is that a vertex 
+ * should not have more than one parent. Also, edges in each
  * tree are oriented away from the root (out-tree or arborescence) or all edges
  * are oriented towards the root (in-tree or anti-arborescence).
  * This test can be controlled using the \p mode parameter.
@@ -106,13 +111,13 @@ static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *vis
  *        \c IGRAPH_OUT, \c IGRAPH_IN, \c IGRAPH_ALL. This argument is
  *        ignored for undirected graphs.
  * \return Error code:
- *        \c IGRAPH_EINVAL: invalid mode argument.
+ *        \c IGRAPH_EINVMODE: invalid mode argument.
  *
  * Time complexity: At most O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
  */
-int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *roots , igraph_neimode_t mode) {
+igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *roots , igraph_neimode_t mode) {
     igraph_adjlist_t al;
     igraph_vector_t visited;
     igraph_integer_t visited_count=0;

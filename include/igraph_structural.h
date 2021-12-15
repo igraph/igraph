@@ -56,7 +56,7 @@ IGRAPH_EXPORT int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t
                                      igraph_es_t es);
 IGRAPH_EXPORT int igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
 IGRAPH_EXPORT int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
 IGRAPH_EXPORT int igraph_is_forest(const igraph_t *graph, igraph_bool_t *res, igraph_vector_t *roots, igraph_neimode_t mode);
 IGRAPH_EXPORT int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
