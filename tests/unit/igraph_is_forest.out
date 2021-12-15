@@ -1,5 +1,24 @@
-0 1
-0 1 2 3 4
-0 3
-0 3
-0 3
+Empty Graph
+Root nodes: 0 1
+
+Graph with 0 edges
+Root nodes: 0 1 2 3 4
+
+Undirected Graph
+Root nodes: 0 3
+
+Directed Graph out trees
+Root nodes: 0 3
+
+Directed Graph in trees
+Not a forest
+
+Undirected Graph with cycle
+Not a forest
+
+Undirected Graph self loop
+Not a forest
+
+Directed Multigraph
+Not a forest
+

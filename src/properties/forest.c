@@ -22,9 +22,9 @@
 
 /* count the number of vertices reachable from the root */
 static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *visited, const igraph_adjlist_t *al, igraph_integer_t *visited_count,igraph_integer_t *res,  igraph_neimode_t mode){
-    
+
     igraph_stack_int_t stack;
-    long i;
+    igraph_integer_t i;
     IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
     /* push the root into the stack */
@@ -33,13 +33,13 @@ static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *vis
     while (! igraph_stack_int_empty(&stack)) {
         igraph_integer_t u;
         igraph_vector_int_t *neighbors;
-        long ncount;
+        igraph_integer_t ncount;
         u = igraph_stack_int_pop(&stack);
 
         /* Take a vertex from stack and check if it is already visited
          * if yes, then graph is not a forest
          * else add it to the visited vector
-         */ 
+         */
         if (IGRAPH_LIKELY(! VECTOR(*visited)[u])) {
             VECTOR(*visited)[u] = 1;
             *visited_count += 1;
@@ -51,7 +51,7 @@ static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *vis
         /* register all its neighbours (except its parent) for future processing */
         neighbors = igraph_adjlist_get(al, u);
         ncount = igraph_vector_int_size(neighbors);
-        
+
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(*neighbors)[i];
             if(mode==IGRAPH_ALL){
@@ -96,8 +96,8 @@ static int igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *vis
  * \param res Pointer to a logical variable, the result will be stored
  *        here.
  * \param roots A vector in which the root nodes will be stored. When \p mode
- *        is \c IGRAPH_ALL or the graph is undirected, any 1 vertex from each component 
- *        can be the root. When \p mode is \c IGRAPH_OUT
+ *        is \c IGRAPH_ALL or the graph is undirected, any 1 vertex from each
+ *        component can be the root. When \p mode is \c IGRAPH_OUT
  *        or \c IGRAPH_IN, all the vertices with zero in- or out-degree,
  *        respectively are considered as root nodes.
  * \param mode For a directed graph this specifies whether to test for an
@@ -117,7 +117,7 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
     igraph_vector_t visited;
     igraph_integer_t visited_count=0;
     igraph_integer_t vcount, ecount;
-    
+
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
 
@@ -126,7 +126,7 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
         *res = 1;
         return IGRAPH_SUCCESS;
     }
-    // A forest can have maximum vcount-1 edges. 
+    // A forest can have maximum vcount-1 edges.
     if (ecount > vcount - 1) {
         *res = 0;
         return IGRAPH_SUCCESS;
@@ -143,7 +143,7 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
     }
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-    
+
     *res = 1; /* assume success */
     IGRAPH_CHECK(igraph_vector_init(&visited, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &visited);
@@ -155,14 +155,14 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
     }
 
     /* The main algorithm:
-     * Undirected Graph:- We add each unvisited vertex to the roots vector, and 
+     * Undirected Graph:- We add each unvisited vertex to the roots vector, and
      * mark all other vertices that are reachable from it as visited.
      *
-     * Directed Graph:- For each tree, the root is the node with no 
-     * incoming/outgoing connections, depending on 'mode'. We add each vertex 
-     * with zero degree to the roots vector and mark all other vertices that are reachable 
-     * from it as visited. 
-     * 
+     * Directed Graph:- For each tree, the root is the node with no
+     * incoming/outgoing connections, depending on 'mode'. We add each vertex
+     * with zero degree to the roots vector and mark all other vertices that are
+     * reachable from it as visited.
+     *
      * If all the vertices are visited exactly once, then the graph is a forest.
      */
 
@@ -173,7 +173,7 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
             if (!VECTOR(visited)[i]) {
                 igraph_vector_push_back(roots,i);
                 IGRAPH_CHECK(igraph_i_is_forest_visitor(i,&visited, &al, &visited_count,res,mode));
-            } 
+            }
         }
         break;
     }
@@ -184,7 +184,7 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
         IGRAPH_CHECK(igraph_vector_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_destroy, &degree);
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, /* loops = */ 1));
-        
+
         for (i = 0; i < vcount; ++i){
             if (VECTOR(degree)[i] == 0) {
                 igraph_vector_push_back(roots,i);
@@ -193,6 +193,7 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
         }
 
         igraph_vector_destroy(&degree);
+        IGRAPH_FINALLY_CLEAN(1);
         break;
     }
     default:
@@ -201,14 +202,14 @@ int igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph_vector_t *
     if(*res){
         *res= visited_count==vcount;
     }
-    /*If the graph is not a forest the the root vector will be empty*/
+    /*If the graph is not a forest then the root vector will be empty*/
     if(!*res){
         IGRAPH_CHECK(igraph_vector_resize(roots,0));
     }
 
     igraph_vector_destroy(&visited);
     igraph_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
