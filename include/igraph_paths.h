@@ -197,6 +197,42 @@ IGRAPH_EXPORT igraph_error_t igraph_spanner(const igraph_t *graph,
                                 igraph_real_t stretch,
                                 const igraph_vector_t *weights);
 
+IGRAPH_EXPORT igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
+                                             igraph_vector_ptr_t *vertices,
+                                             igraph_vector_ptr_t *edges,
+                                             igraph_integer_t from,
+                                             igraph_vs_t to,
+                                             const igraph_vector_t *weights,
+                                             igraph_neimode_t mode,
+                                             igraph_vector_int_t *predecessors,
+                                             igraph_vector_int_t *inbound_edges);
+IGRAPH_EXPORT igraph_error_t igraph_get_widest_path(const igraph_t *graph,
+                                             igraph_vector_int_t *vertices,
+                                             igraph_vector_int_t *edges,
+                                             igraph_integer_t from,
+                                             igraph_integer_t to,
+                                             const igraph_vector_t *weights,
+                                             igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
+                                                   igraph_vector_ptr_t *vertices,
+                                                   igraph_vector_ptr_t *edges,
+                                                   igraph_vector_int_t *nrgeo,
+                                                   igraph_integer_t from, igraph_vs_t to,
+                                                   const igraph_vector_t *weights,
+                                                   igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_widest_paths_floyd_warshalls(const igraph_t *graph,
+                                                   igraph_matrix_t *res,
+                                                   const igraph_vs_t from,
+                                                   const igraph_vs_t to,
+                                                   const igraph_vector_t *weights,
+                                                   igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
+                                             igraph_matrix_t *res,
+                                             const igraph_vs_t from,
+                                             const igraph_vs_t to,
+                                             const igraph_vector_t *weights,
+                                             igraph_neimode_t mode);
+
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
 
 __END_DECLS

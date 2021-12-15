@@ -250,6 +250,7 @@ add_examples(
   igraph_simplify
   igraph_topological_sorting
   igraph_transitivity
+  igraph_widest_paths
 )
 
 add_legacy_tests(
