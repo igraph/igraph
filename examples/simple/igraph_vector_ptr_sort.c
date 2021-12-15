@@ -5,7 +5,7 @@
 int main() {
     igraph_t graph;
     igraph_vector_ptr_t cliques;
-    long int i, n;
+    igraph_integer_t i, n;
 
     /* Set a random seed to make the program deterministic */
     igraph_rng_seed(igraph_rng_default(), 31415);

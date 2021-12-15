@@ -22,35 +22,35 @@
 
 int main() {
     igraph_t graph;
-    long int n_vertices = 10;
+    igraph_integer_t n_vertices = 10;
 
     /* Create an undirected complete graph. */
     /* Use IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS instead of 1/TRUE and 0/FALSE for better readability. */
     igraph_full(&graph, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    printf("The undirected complete graph on %ld vertices has %ld edges.\n",
-           (long int) igraph_vcount(&graph), (long int) igraph_ecount(&graph));
+    printf("The undirected complete graph on %" IGRAPH_PRId " vertices has %" IGRAPH_PRId " edges.\n",
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     /* Remember to destroy the object at the end. */
     igraph_destroy(&graph);
 
     /* Create a directed complete graph. */
     igraph_full(&graph, n_vertices, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    printf("The directed complete graph on %ld vertices has %ld edges.\n",
-           (long int) igraph_vcount(&graph), (long int) igraph_ecount(&graph));
+    printf("The directed complete graph on %" IGRAPH_PRId " vertices has %" IGRAPH_PRId " edges.\n",
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     igraph_destroy(&graph);
 
     /* Create an undirected complete graph with self-loops. */
     igraph_full(&graph, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    printf("The undirected complete graph on %ld vertices with self-loops has %ld edges.\n",
-           (long int) igraph_vcount(&graph), (long int) igraph_ecount(&graph));
+    printf("The undirected complete graph on %" IGRAPH_PRId " vertices with self-loops has %" IGRAPH_PRId " edges.\n",
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     igraph_destroy(&graph);
 
     /* Create a directed graph with self-loops. */
     igraph_full(&graph, n_vertices, IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    printf("The directed complete graph on %ld vertices with self-loops has %ld edges.\n",
-           (long int) igraph_vcount(&graph), (long int) igraph_ecount(&graph));
+    printf("The directed complete graph on %" IGRAPH_PRId " vertices with self-loops has %" IGRAPH_PRId " edges.\n",
+          igraph_vcount(&graph), igraph_ecount(&graph));
 
     igraph_destroy(&graph);
 

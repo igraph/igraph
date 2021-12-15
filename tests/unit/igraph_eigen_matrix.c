@@ -27,7 +27,7 @@
 
 int main() {
 
-    int nodes = 10;
+    igraph_integer_t nodes = 10;
     igraph_real_t triplets[] = { 1, 0, 1 / 4.0,       0, 1, 1 / 3.0,
                                  2, 0, 1 / 4.0,       0, 2, 1 / 3.0,
                                  3, 0, 1.0,         0, 3, 1 / 3.0,
@@ -40,7 +40,7 @@ int main() {
                                };
 
     igraph_sparsemat_t mat;
-    int i, n = sizeof(triplets) / sizeof(igraph_real_t);
+    igraph_integer_t i, j, n = sizeof(triplets) / sizeof(triplets[0]);
     igraph_eigen_which_t which;
     igraph_vector_complex_t values, values2;
     igraph_matrix_complex_t vectors, vectors2;
@@ -76,7 +76,6 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_matrix_init(&mat2, nodes, nodes);
     for (i = 0; i < nodes; i++) {
-        int j;
         for (j = 0; j < nodes; j++) {
             MATRIX(mat2, i, j) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         }
@@ -97,12 +96,12 @@ int main() {
                         /*options=*/ 0, /*storage=*/ 0, &values2, &vectors2);
 
 #define DUMP() do {             \
+        printf("Element-wise difference of the following two vectors is too large:\n"); \
         igraph_vector_complex_print(&values);   \
         igraph_vector_complex_print(&values2);  \
     } while(0)
 
     for (i = 0; i < nodes; i++) {
-        int j;
         igraph_real_t d =
             igraph_complex_abs(igraph_complex_sub(VECTOR(values)[i],
                                VECTOR(values2)[nodes - i - 1]));

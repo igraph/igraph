@@ -2,9 +2,10 @@
 
 int main() {
   igraph_t graph;
-  igraph_vector_t v;
-  igraph_vector_t result;
-  igraph_real_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
+  igraph_vector_int_t v;
+  igraph_vector_int_t result;
+  igraph_vector_t result_real;
+  igraph_integer_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
                             0,10, 0,11, 0,12, 0,13, 0,17, 0,19, 0,21, 0,31,
                             1, 2, 1, 3, 1, 7, 1,13, 1,17, 1,19, 1,21, 1,30,
                             2, 3, 2, 7, 2,27, 2,28, 2,32, 2, 9, 2, 8, 2,13,
@@ -17,26 +18,28 @@ int main() {
                            32,33
   };
 
-  igraph_vector_view(&v, edges, sizeof(edges) / sizeof(double));
+  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0]));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
-  igraph_vector_init(&result, 0);
+  igraph_vector_int_init(&result, 0);
+  igraph_vector_init(&result_real, 0);
 
   igraph_degree(&graph, &result, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
   printf("Maximum degree is      %10i, vertex %2i.\n",
-         (int) igraph_vector_max(&result), (int) igraph_vector_which_max(&result));
+         (int) igraph_vector_int_max(&result), (int) igraph_vector_int_which_max(&result));
 
-  igraph_closeness(&graph, &result, NULL, NULL, igraph_vss_all(), IGRAPH_ALL,
+  igraph_closeness(&graph, &result_real, NULL, NULL, igraph_vss_all(), IGRAPH_ALL,
                    /*weights=*/ NULL, /*normalized=*/ 0);
   printf("Maximum closeness is   %10g, vertex %2i.\n",
-          (double) igraph_vector_max(&result), (int) igraph_vector_which_max(&result));
+          (double) igraph_vector_max(&result_real), (int) igraph_vector_which_max(&result_real));
 
-  igraph_betweenness(&graph, &result, igraph_vss_all(),
+  igraph_betweenness(&graph, &result_real, igraph_vss_all(),
                      IGRAPH_UNDIRECTED, /*weights=*/ NULL);
   printf("Maximum betweenness is %10g, vertex %2i.\n",
-          (double) igraph_vector_max(&result), (int) igraph_vector_which_max(&result));
+          (double) igraph_vector_max(&result_real), (int) igraph_vector_which_max(&result_real));
 
-  igraph_vector_destroy(&result);
+  igraph_vector_int_destroy(&result);
+  igraph_vector_destroy(&result_real);
   igraph_destroy(&graph);
 
   return 0;

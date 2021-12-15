@@ -27,12 +27,16 @@
 
 void igraph_warnings_ignore(const char *reason, const char *file,
                             int line, int igraph_errno) {
+    IGRAPH_UNUSED(reason);
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
+    IGRAPH_UNUSED(igraph_errno);
     /* Do nothing */
 }
 
 int main() {
     igraph_t g;
-    igraph_vector_t vpath, epath;
+    igraph_vector_int_t vpath, epath;
     igraph_vector_t w;
 
     /* Unweighted */
@@ -40,25 +44,25 @@ int main() {
     igraph_small(&g, 5, IGRAPH_DIRECTED,
                  0, 1, 1, 2, 2, 3, 3, 4, 0, 3,
                  -1);
-    igraph_vector_init(&vpath, 0);
-    igraph_vector_init(&epath, 0);
+    igraph_vector_int_init(&vpath, 0);
+    igraph_vector_int_init(&epath, 0);
     igraph_get_shortest_path(&g, &vpath, &epath, 0, 4, IGRAPH_OUT);
-    igraph_vector_print(&vpath);
-    igraph_vector_print(&epath);
+    igraph_vector_int_print(&vpath);
+    igraph_vector_int_print(&epath);
 
     igraph_get_shortest_path(&g, &vpath, &epath, 0, 0, IGRAPH_OUT);
-    igraph_vector_print(&vpath);
-    igraph_vector_print(&epath);
+    igraph_vector_int_print(&vpath);
+    igraph_vector_int_print(&epath);
 
     igraph_set_warning_handler(igraph_warnings_ignore);
     igraph_get_shortest_path(&g, &vpath, &epath, 4, 0, IGRAPH_OUT);
-    igraph_vector_print(&vpath);
-    igraph_vector_print(&epath);
+    igraph_vector_int_print(&vpath);
+    igraph_vector_int_print(&epath);
     igraph_set_warning_handler(igraph_warning_handler_print);
 
     igraph_get_shortest_path(&g, &vpath, &epath, 4, 0, IGRAPH_ALL);
-    igraph_vector_print(&vpath);
-    igraph_vector_print(&epath);
+    igraph_vector_int_print(&vpath);
+    igraph_vector_int_print(&epath);
 
     /* Weighted */
 
@@ -70,12 +74,12 @@ int main() {
     VECTOR(w)[4] = 3.1;
 
     igraph_get_shortest_path_dijkstra(&g, &vpath, &epath, 0, 4, &w, IGRAPH_OUT);
-    igraph_vector_print(&vpath);
-    igraph_vector_print(&epath);
+    igraph_vector_int_print(&vpath);
+    igraph_vector_int_print(&epath);
 
     igraph_vector_destroy(&w);
-    igraph_vector_destroy(&epath);
-    igraph_vector_destroy(&vpath);
+    igraph_vector_int_destroy(&epath);
+    igraph_vector_int_destroy(&vpath);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

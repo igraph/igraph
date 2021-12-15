@@ -39,12 +39,6 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_dqueue_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
-
 #define BASE_CHAR
 #include "igraph_pmt.h"
 #include "igraph_dqueue_pmt.h"
@@ -67,6 +61,9 @@ __BEGIN_DECLS
 #define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
         IGRAPH_FINALLY(igraph_dqueue_destroy, v); } while (0)
+#define IGRAPH_DQUEUE_INT_INIT_FINALLY(v, size) \
+    do { IGRAPH_CHECK(igraph_dqueue_int_init(v, size)); \
+        IGRAPH_FINALLY(igraph_dqueue_int_destroy, v); } while (0)
 
 __END_DECLS
 

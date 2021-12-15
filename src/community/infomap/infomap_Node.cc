@@ -32,7 +32,7 @@ Node::Node() {
     selfLink = 0.0;
 }
 
-Node::Node(int nodenr, double tpweight) {
+Node::Node(igraph_integer_t nodenr, double tpweight) {
     teleportWeight = tpweight;
     exit = 0.0;
     size = 0.0;
@@ -46,24 +46,24 @@ void cpyNode(Node *newNode, Node *oldNode) {
     newNode->teleportWeight = oldNode->teleportWeight;
     newNode->danglingSize   = oldNode->danglingSize;
 
-    int Nmembers = oldNode->members.size();
-    newNode->members = vector<int>(Nmembers);
-    for (int i = 0; i < Nmembers; i++) {
+    size_t Nmembers = oldNode->members.size();
+    newNode->members = vector<igraph_integer_t>(Nmembers);
+    for (size_t i = 0; i < Nmembers; i++) {
         newNode->members[i] = oldNode->members[i];
     }
 
     newNode->selfLink = oldNode->selfLink;
 
-    int NoutLinks = oldNode->outLinks.size();
-    newNode->outLinks = vector<pair<int, double> >(NoutLinks);
-    for (int i = 0; i < NoutLinks; i++) {
+    size_t NoutLinks = oldNode->outLinks.size();
+    newNode->outLinks = vector<pair<igraph_integer_t, double> >(NoutLinks);
+    for (size_t i = 0; i < NoutLinks; i++) {
         newNode->outLinks[i].first = oldNode->outLinks[i].first;
         newNode->outLinks[i].second = oldNode->outLinks[i].second;
     }
 
-    int NinLinks = oldNode->inLinks.size();
-    newNode->inLinks = vector<pair<int, double> >(NinLinks);
-    for (int i = 0; i < NinLinks; i++) {
+    size_t NinLinks = oldNode->inLinks.size();
+    newNode->inLinks = vector<pair<igraph_integer_t, double> >(NinLinks);
+    for (size_t i = 0; i < NinLinks; i++) {
         newNode->inLinks[i].first = oldNode->inLinks[i].first;
         newNode->inLinks[i].second = oldNode->inLinks[i].second;
     }

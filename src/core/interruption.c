@@ -27,7 +27,7 @@
 IGRAPH_THREAD_LOCAL igraph_interruption_handler_t
 *igraph_i_interruption_handler = 0;
 
-int igraph_allow_interruption(void* data) {
+igraph_error_t igraph_allow_interruption(void* data) {
     if (igraph_i_interruption_handler) {
         return igraph_i_interruption_handler(data);
     }

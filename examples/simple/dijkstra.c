@@ -24,13 +24,13 @@
 #include <igraph.h>
 
 int print_matrix(const igraph_matrix_t *m) {
-    long int nrow = igraph_matrix_nrow(m);
-    long int ncol = igraph_matrix_ncol(m);
-    long int i, j;
+    igraph_integer_t nrow = igraph_matrix_nrow(m);
+    igraph_integer_t ncol = igraph_matrix_ncol(m);
+    igraph_integer_t i, j;
     igraph_real_t val;
 
     for (i = 0; i < nrow; i++) {
-        printf("%li:", i);
+        printf("%" IGRAPH_PRId ":", i);
         for (j = 0; j < ncol; j++) {
             val = MATRIX(*m, i, j);
             if (igraph_is_inf(val)) {
@@ -65,7 +65,7 @@ int main() {
                  -1);
 
     igraph_vector_view(&weights, weights_data,
-                       sizeof(weights_data) / sizeof(igraph_real_t));
+                       sizeof(weights_data) / sizeof(weights_data[0]));
 
     igraph_matrix_init(&res, 0, 0);
     igraph_shortest_paths_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(),

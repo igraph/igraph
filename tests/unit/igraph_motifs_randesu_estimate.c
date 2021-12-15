@@ -20,7 +20,7 @@
 #include "test_utilities.inc"
 
 void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
-                    igraph_integer_t sample_size, igraph_vector_t *parsample) {
+                    igraph_integer_t sample_size, igraph_vector_int_t *parsample) {
     igraph_integer_t estimate;
     IGRAPH_ASSERT(igraph_motifs_randesu_estimate(graph, &estimate, size, cut_prob, sample_size, parsample) == IGRAPH_SUCCESS);
     printf("Estimate: %" IGRAPH_PRId "\n\n", estimate);
@@ -32,13 +32,13 @@ int main() {
     igraph_vector_t cut_prob_0_3;
     igraph_vector_t cut_prob_0_4;
     igraph_vector_t cut_prob_01;
-    igraph_vector_t parsample;
+    igraph_vector_int_t parsample;
     igraph_integer_t estimate;
 
     igraph_vector_init_real(&cut_prob_0_3, 3, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_0_4, 4, 0.0, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
-    igraph_vector_init_seq(&parsample, 0, 40);
+    igraph_vector_int_init_seq(&parsample, 0, 40);
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -90,7 +90,7 @@ int main() {
     igraph_vector_destroy(&cut_prob_0_3);
     igraph_vector_destroy(&cut_prob_0_4);
     igraph_vector_destroy(&cut_prob_01);
-    igraph_vector_destroy(&parsample);
+    igraph_vector_int_destroy(&parsample);
 
     VERIFY_FINALLY_STACK();
     return 0;

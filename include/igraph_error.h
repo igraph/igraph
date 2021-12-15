@@ -211,6 +211,15 @@ __BEGIN_DECLS
  */
 
 /**
+ * \typedef igraph_error_t
+ * \brief Type alias for integers to indicate that the integer value is an error code.
+ *
+ * This type is used as the return type of igraph functions that return an
+ * error code.
+ */
+typedef int igraph_error_t;
+
+/**
  * \typedef igraph_error_handler_t
  * \brief The type of error handler functions.
  *
@@ -223,7 +232,7 @@ __BEGIN_DECLS
  */
 
 typedef void igraph_error_handler_t (const char * reason, const char * file,
-                                     int line, int igraph_errno);
+                                     int line, igraph_error_t igraph_errno);
 
 /**
  * \var igraph_error_handler_abort
@@ -288,9 +297,9 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
  *    number was specified as the number of vertices.
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
- * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex ids. A vertex id
+ * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex IDs. A vertex ID
  *    is either negative or bigger than the number of vertices minus one.
- * \enumval IGRAPH_EINVVID Invalid vertex id, negative or too big.
+ * \enumval IGRAPH_EINVVID Invalid vertex ID, negative or too big.
  * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
  *    square matrix was expected.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
@@ -409,7 +418,7 @@ typedef enum {
     IGRAPH_STOP              = 60  /* undocumented, used internally */
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
- * igraph_i_error_strings[] in igraph_error.c
+ * igraph_i_error_strings[] in core/error.c
  *
  * Information on undocumented codes:
  *  - IGRAPH_STOP signals a request to stop in functions like igraph_i_maximal_cliques_bk()
@@ -475,8 +484,8 @@ typedef enum {
  * \sa igraph_errorf().
  */
 
-IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
-                               int igraph_errno);
+IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, int line,
+                               igraph_error_t igraph_errno);
 
 /**
  * \define IGRAPH_ERRORF
@@ -523,11 +532,11 @@ IGRAPH_EXPORT int igraph_error(const char *reason, const char *file, int line,
  * \sa igraph_error().
  */
 
-IGRAPH_EXPORT int igraph_errorf(const char *reason, const char *file, int line,
-                                int igraph_errno, ...);
+IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
+                                igraph_error_t igraph_errno, ...);
 
-IGRAPH_EXPORT int igraph_errorvf(const char *reason, const char *file, int line,
-                                 int igraph_errno, va_list ap);
+IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file, int line,
+                                 igraph_error_t igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror
@@ -540,7 +549,7 @@ IGRAPH_EXPORT int igraph_errorvf(const char *reason, const char *file, int line,
  * \return pointer to the textual description of the error code.
  */
 
-IGRAPH_EXPORT const char* igraph_strerror(const int igraph_errno);
+IGRAPH_EXPORT const char* igraph_strerror(const igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -666,7 +675,8 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * \define IGRAPH_CHECK
  * \brief Checks the return value of a function call.
  *
- * \param a An expression, usually a function call.
+ * \param expr An expression, usually a function call. It is guaranteed to
+ * be evaluated only once.
  *
  * Executes the expression and checks its value. If this is not
  * \c IGRAPH_SUCCESS, it calls \ref IGRAPH_ERROR with
@@ -684,14 +694,49 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */
-#define IGRAPH_CHECK(a) do { \
-        int igraph_i_ret=(a); \
-        if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+#define IGRAPH_CHECK(expr) \
+    do { \
+        igraph_error_t igraph_i_ret = (expr); \
+        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) {\
             IGRAPH_ERROR("", igraph_i_ret); \
-        } } while (0)
+        } \
+    } while (0)
 #endif
 
-
+/**
+ * \define IGRAPH_CHECK_CALLBACK
+ * \brief Checks the return value of a callback.
+ *
+ * \param expr An expression, usually a call to a user-defined callback function.
+ * It is guaranteed to be evaluated only once.
+ * \param code Pointer to an optional variable of type \c igraph_error_t; the
+ * value of this variable will be set to the error code if it is not a null
+ * pointer.
+ *
+ * Identical to \ref IGRAPH_CHECK, but treats \c IGRAPH_STOP as a normal
+ * (non-erroneous) return code. This macro is used in some igraph functions
+ * that allow the user to hook into a long-running calculation with a callback
+ * function. When the user-defined callback function returns \c IGRAPH_SUCCESS,
+ * the calculation will proceed normally. Returning \c IGRAPH_STOP from the
+ * callback will terminate the calculation without reporting an error. Returning
+ * any other value from the callback is treated as an error code, and igraph
+ * will trigger the necessary cleanup functions before exiting the function.
+ *
+ * </para><para>
+ * Note that \c IGRAPH_CHECK_CALLBACK does not handle \c IGRAPH_STOP by any
+ * means except returning it in the variable pointed to by \c code. It is the
+ * responsibility of the caller to handle \c IGRAPH_STOP accordingly.
+ */
+#define IGRAPH_CHECK_CALLBACK(expr, code) \
+    do { \
+        igraph_error_t igraph_i_ret = (expr); \
+        if (code) { \
+            *code = igraph_i_ret; \
+        } \
+        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS && igraph_i_ret != IGRAPH_STOP)) { \
+            IGRAPH_ERROR("", igraph_i_ret); \
+        } \
+    } while (0)
 
 /**
  * \section about_igraph_warnings Warning messages
@@ -761,8 +806,8 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
-                                 int igraph_errno);
+IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file, int line,
+                                 igraph_error_t igraph_errno);
 
 /**
  * \define IGRAPH_WARNINGF
@@ -805,8 +850,8 @@ IGRAPH_EXPORT int igraph_warning(const char *reason, const char *file, int line,
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT int igraph_warningf(const char *reason, const char *file, int line,
-                                  int igraph_errno, ...);
+IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
+                                  igraph_error_t igraph_errno, ...);
 
 /**
  * \define IGRAPH_WARNING

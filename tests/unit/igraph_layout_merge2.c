@@ -30,7 +30,7 @@ int main() {
     igraph_matrix_t small_coords, big_coords, merged_coords;
     igraph_vector_ptr_t graph_ptr, coords_ptr;
     igraph_arpack_options_t arpack_opts;
-    long int i, j, nrow, ncol;
+    igraph_integer_t i, j, nrow, ncol;
 
     /* To make things reproducible */
     igraph_rng_seed(igraph_rng_default(), 42);

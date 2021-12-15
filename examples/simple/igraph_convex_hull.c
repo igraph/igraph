@@ -24,21 +24,21 @@
 #include <igraph.h>
 
 int check_convex_hull(igraph_matrix_t* coords) {
-    igraph_vector_t result;
+    igraph_vector_int_t result;
     igraph_matrix_t resmat;
-    long int i;
+    igraph_integer_t i;
 
     /* Testing with index output mode */
-    igraph_vector_init(&result, 1);
+    igraph_vector_int_init(&result, 1);
     if (igraph_convex_hull(coords, &result, 0)) {
         return 1;
     }
 
-    for (i = 0; i < igraph_vector_size(&result); i++) {
-        printf("%ld ", (long)VECTOR(result)[i]);
+    for (i = 0; i < igraph_vector_int_size(&result); i++) {
+        printf("%" IGRAPH_PRId " ", VECTOR(result)[i]);
     }
     printf("\n");
-    igraph_vector_destroy(&result);
+    igraph_vector_int_destroy(&result);
 
     /* Testing with coordinate output mode */
     igraph_matrix_init(&resmat, 0, 0);

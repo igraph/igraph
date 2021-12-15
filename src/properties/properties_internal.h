@@ -25,7 +25,7 @@
 #include "igraph_iterators.h"
 #include "igraph_types.h"
 
-int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_int_t *rank);
 
 #endif

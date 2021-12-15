@@ -28,8 +28,9 @@
 
 int main() {
     igraph_t karate;
-    igraph_vector_t edges, prob;
-    long int i, n;
+    igraph_vector_int_t edges;
+    igraph_vector_t prob;
+    igraph_integer_t i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -63,18 +64,18 @@ int main() {
                  32, 33,
                  -1);
 
-    igraph_vector_init(&edges, 0);
+    igraph_vector_int_init(&edges, 0);
     igraph_vector_init(&prob, 0);
     igraph_hrg_predict(&karate, &edges, &prob, /* hrg= */ 0, /* start= */ 0,
                        /* num_samples= */ 100, /* num_bins= */ 25);
 
     /* We do some simple validity tests on the resolts only; the exact results
      * are different on i386 vs other platforms due to numerical inaccuracies */
-    n = igraph_vector_size(&edges);
+    n = igraph_vector_int_size(&edges);
     for (i = 0; i < n; i++) {
         if (VECTOR(edges)[i] < 0 || VECTOR(edges)[i] >= igraph_vcount(&karate)) {
             printf("Invalid edges vector:\n");
-            igraph_vector_print(&edges);
+            igraph_vector_int_print(&edges);
             return 1;
         }
     }
@@ -88,7 +89,7 @@ int main() {
     }
 
     igraph_vector_destroy(&prob);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
 
     igraph_destroy(&karate);
 

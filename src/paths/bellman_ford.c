@@ -44,12 +44,12 @@
  * \param res The result, a matrix. A pointer to an initialized matrix
  *    should be passed here, the matrix will be resized if needed.
  *    Each row contains the distances from a single source, to all
- *    vertices in the graph, in the order of vertex ids. For unreachable
+ *    vertices in the graph, in the order of vertex IDs. For unreachable
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
- * \param weights The edge weights. There mustn't be any closed loop in
+ * \param weights The edge weights. There must not be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
  *    vertex of this loop infinitely). Additionally, no edge weight may
@@ -71,20 +71,20 @@
  *
  * \example examples/simple/bellman_ford.c
  */
-int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        const igraph_vs_t from,
                                        const igraph_vs_t to,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_lazy_inclist_t inclist;
-    long int i, j, k;
-    long int no_of_from, no_of_to;
-    igraph_dqueue_t Q;
-    igraph_vector_t clean_vertices;
-    igraph_vector_t num_queued;
+    igraph_integer_t i, j, k;
+    igraph_integer_t no_of_from, no_of_to;
+    igraph_dqueue_int_t Q;
+    igraph_vector_int_t clean_vertices;
+    igraph_vector_int_t num_queued;
     igraph_vit_t fromvit, tovit;
     igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_bool_t all_to;
@@ -113,9 +113,9 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
     no_of_from = IGRAPH_VIT_SIZE(fromvit);
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&clean_vertices, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&num_queued, no_of_nodes);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&clean_vertices, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num_queued, no_of_nodes);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
@@ -134,23 +134,23 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
          IGRAPH_VIT_NEXT(fromvit), i++) {
-        long int source = IGRAPH_VIT_GET(fromvit);
+        igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
 
         igraph_vector_fill(&dist, my_infinity);
         VECTOR(dist)[source] = 0;
-        igraph_vector_null(&clean_vertices);
-        igraph_vector_null(&num_queued);
+        igraph_vector_int_null(&clean_vertices);
+        igraph_vector_int_null(&num_queued);
 
         /* Fill the queue with vertices to be checked */
         for (j = 0; j < no_of_nodes; j++) {
-            IGRAPH_CHECK(igraph_dqueue_push(&Q, j));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&Q, j));
         }
 
-        while (!igraph_dqueue_empty(&Q)) {
+        while (!igraph_dqueue_int_empty(&Q)) {
             igraph_vector_int_t *neis;
-            long int nlen;
+            igraph_integer_t nlen;
 
-            j = (long int) igraph_dqueue_pop(&Q);
+            j = igraph_dqueue_int_pop(&Q);
             VECTOR(clean_vertices)[j] = 1;
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
@@ -163,18 +163,18 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
                 continue;
             }
 
-            neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) j);
+            neis = igraph_lazy_inclist_get(&inclist, j);
             nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
-                long int nei = (long int) VECTOR(*neis)[k];
-                long int target = IGRAPH_OTHER(graph, nei, j);
+                igraph_integer_t nei = VECTOR(*neis)[k];
+                igraph_integer_t target = IGRAPH_OTHER(graph, nei, j);
                 if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
                     /* relax the edge */
                     VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
                     if (VECTOR(clean_vertices)[target]) {
                         VECTOR(clean_vertices)[target] = 0;
-                        IGRAPH_CHECK(igraph_dqueue_push(&Q, target));
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
                     }
                 }
             }
@@ -186,7 +186,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
         } else {
             for (IGRAPH_VIT_RESET(tovit), j = 0; !IGRAPH_VIT_END(tovit);
                  IGRAPH_VIT_NEXT(tovit), j++) {
-                long int v = IGRAPH_VIT_GET(tovit);
+                igraph_integer_t v = IGRAPH_VIT_GET(tovit);
                 MATRIX(*res, i, j) = VECTOR(dist)[v];
             }
         }
@@ -201,13 +201,13 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     igraph_vit_destroy(&fromvit);
-    igraph_dqueue_destroy(&Q);
-    igraph_vector_destroy(&clean_vertices);
-    igraph_vector_destroy(&num_queued);
+    igraph_dqueue_int_destroy(&Q);
+    igraph_vector_int_destroy(&clean_vertices);
+    igraph_vector_int_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -224,30 +224,30 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \ref igraph_get_shortest_paths_dijkstra() .
  *
  * \param graph The input graph, can be directed.
- * \param vertices The result, the ids of the vertices along the paths.
+ * \param vertices The result, the IDs of the vertices along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors. Normally, either this argument, or the \c
  *        edges should be non-null, but no error or warning is given
  *        if they are both null pointers.
- * \param edges The result, the ids of the edges along the paths.
+ * \param edges The result, the IDs of the edges along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors. Normally, either this argument, or the \c
  *        vertices should be non-null, but no error or warning is given
  *        if they are both null pointers.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param weights The edge weights. There mustn't be any closed loop in
+ * \param weights The edge weights. There must not be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
  *    vertex of this loop infinitely). If this is a null pointer, then the
@@ -280,7 +280,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *         \cli IGRAPH_EINVAL
  *           The weight vector doesn't math the number of edges.
  *         \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
+ *           \p from is invalid vertex ID, or the length of \p to is
  *           not the same as the length of \p vertices or \p edges.
  *         \cli IGRAPH_ENEGLOOP
  *           Bellman-ford algorithm encounted a negative loop.
@@ -294,23 +294,23 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * edge weights.
  */
 
-int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                         igraph_vector_ptr_t *vertices,
                                         igraph_vector_ptr_t *edges,
                                         igraph_integer_t from,
                                         igraph_vs_t to,
                                         const igraph_vector_t *weights,
                                         igraph_neimode_t mode,
-                                        igraph_vector_long_t *predecessors,
-                                        igraph_vector_long_t *inbound_edges) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int *parents;
+                                        igraph_vector_int_t *predecessors,
+                                        igraph_vector_int_t *inbound_edges) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t *parents;
     igraph_lazy_inclist_t inclist;
-    long int i, j, k;
-    igraph_dqueue_t Q;
-    igraph_vector_t clean_vertices;
-    igraph_vector_t num_queued;
+    igraph_integer_t i, j, k;
+    igraph_dqueue_int_t Q;
+    igraph_vector_int_t clean_vertices;
+    igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
     igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_vector_t dist;
@@ -324,9 +324,9 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&clean_vertices, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&num_queued, no_of_nodes);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&clean_vertices, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num_queued, no_of_nodes);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
@@ -340,7 +340,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
     }
 
-    parents = IGRAPH_CALLOC(no_of_nodes, long int);
+    parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parents == 0) {
         IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM);
     }
@@ -349,19 +349,19 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     igraph_vector_fill(&dist, my_infinity);
     VECTOR(dist)[from] = 0;
-    igraph_vector_null(&clean_vertices);
-    igraph_vector_null(&num_queued);
+    igraph_vector_int_null(&clean_vertices);
+    igraph_vector_int_null(&num_queued);
 
     /* Fill the queue with vertices to be checked */
     for (j = 0; j < no_of_nodes; j++) {
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, j));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, j));
     }
 
-    while (!igraph_dqueue_empty(&Q)) {
+    while (!igraph_dqueue_int_empty(&Q)) {
         igraph_vector_int_t *neis;
-        long int nlen;
+        igraph_integer_t nlen;
 
-        j = (long int) igraph_dqueue_pop(&Q);
+        j = igraph_dqueue_int_pop(&Q);
         VECTOR(clean_vertices)[j] = 1;
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
@@ -374,19 +374,19 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             continue;
         }
 
-        neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) j);
+        neis = igraph_lazy_inclist_get(&inclist, j);
         nlen = igraph_vector_int_size(neis);
 
         for (k = 0; k < nlen; k++) {
-            long int nei = (long int) VECTOR(*neis)[k];
-            long int target = IGRAPH_OTHER(graph, nei, j);
+            igraph_integer_t nei = VECTOR(*neis)[k];
+            igraph_integer_t target = IGRAPH_OTHER(graph, nei, j);
             if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
                 /* relax the edge */
                 VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
                 parents[target] = nei + 1;
                 if (VECTOR(clean_vertices)[target]) {
                     VECTOR(clean_vertices)[target] = 0;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, target));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
                 }
             }
         }
@@ -394,7 +394,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     /* Create `predecessors' if needed */
     if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (i == from) {
@@ -412,7 +412,7 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     /* Create `inbound_edges' if needed */
     if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (parents[i] <= 0) {
@@ -428,16 +428,16 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         for (IGRAPH_VIT_RESET(tovit), i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), i++) {
-            long int node = IGRAPH_VIT_GET(tovit);
-            long int size, act, edge;
-            igraph_vector_t *vvec = 0, *evec = 0;
+            igraph_integer_t node = IGRAPH_VIT_GET(tovit);
+            igraph_integer_t size, act, edge;
+            igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
                 vvec = VECTOR(*vertices)[i];
-                igraph_vector_clear(vvec);
+                igraph_vector_int_clear(vvec);
             }
             if (edges) {
                 evec = VECTOR(*edges)[i];
-                igraph_vector_clear(evec);
+                igraph_vector_int_clear(evec);
             }
 
             IGRAPH_ALLOW_INTERRUPTION();
@@ -450,11 +450,11 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                 act = IGRAPH_OTHER(graph, edge, act);
             }
             if (vvec && (size > 0 || node == from)) {
-                IGRAPH_CHECK(igraph_vector_resize(vvec, size + 1));
+                IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
                 VECTOR(*vvec)[size] = node;
             }
             if (evec) {
-                IGRAPH_CHECK(igraph_vector_resize(evec, size));
+                IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
             }
             act = node;
             while (parents[act]) {
@@ -478,9 +478,9 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_FREE(parents);
-    igraph_dqueue_destroy(&Q);
-    igraph_vector_destroy(&clean_vertices);
-    igraph_vector_destroy(&num_queued);
+    igraph_dqueue_int_destroy(&Q);
+    igraph_vector_int_destroy(&clean_vertices);
+    igraph_vector_int_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
 
@@ -500,15 +500,15 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex ids along
+ *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
  * \param edges Pointer to an uninitialized vector or a null
- *        pointer. If not a null pointer, then the edge ids along the
+ *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.
- * \param weights The edge weights. There mustn't be any closed loop in
+ * \param weights The edge weights. There must not be any closed loop in
  *        the graph that has a negative total weight (since this would allow
  *        us to decrease the weight of any path containing at least a single
  *        vertex of this loop infinitely). If this is a null pointer, then the
@@ -527,9 +527,9 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
  * more target vertices.
  */
 
-int igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
-                                          igraph_vector_t *vertices,
-                                          igraph_vector_t *edges,
+igraph_error_t igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
+                                          igraph_vector_int_t *vertices,
+                                          igraph_vector_int_t *edges,
                                           igraph_integer_t from,
                                           igraph_integer_t to,
                                           const igraph_vector_t *weights,

@@ -30,8 +30,8 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
                        const igraph_matrix_t *vectors, igraph_real_t tol) {
     igraph_vector_t v, y;
     int i, j;
-    int m = igraph_matrix_ncol(vectors);
-    int n = igraph_matrix_nrow(A);
+    igraph_integer_t m = igraph_matrix_ncol(vectors);
+    igraph_integer_t n = igraph_matrix_nrow(A);
 
     if (igraph_matrix_ncol(A) != n)       {
         return 1;

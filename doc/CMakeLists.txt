@@ -44,10 +44,9 @@ set(
   progress.xxml
   psumtree.xxml
   random.xxml
-  scg.xxml
   separators.xxml
   sparsemat.xxml
-  sparsematrix.xxml
+  spmatrix.xxml
   spatialgames.xxml
   stack.xxml
   status.xxml
@@ -63,7 +62,6 @@ file(
   GLOB_RECURSE IGRAPH_SOURCES_FOR_DOXROX
   LIST_DIRECTORIES FALSE
   ${CMAKE_SOURCE_DIR}/include/*.h
-  ${CMAKE_SOURCE_DIR}/include/*.h.in
   ${CMAKE_BINARY_DIR}/include/*.h
   ${CMAKE_SOURCE_DIR}/src/*.c
   ${CMAKE_SOURCE_DIR}/src/*.cc

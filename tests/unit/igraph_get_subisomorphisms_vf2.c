@@ -43,10 +43,10 @@ igraph_bool_t compat_not_arg(const igraph_t *graph1,
 }
 
 void print_and_destroy_maps(igraph_vector_ptr_t *vp) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < igraph_vector_ptr_size(vp); i++) {
-        print_vector(VECTOR(*vp)[i]);
-        igraph_vector_destroy(VECTOR(*vp)[i]);
+        print_vector_int(VECTOR(*vp)[i]);
+        igraph_vector_int_destroy(VECTOR(*vp)[i]);
         igraph_free(VECTOR(*vp)[i]);
     }
     igraph_vector_ptr_destroy(vp);

@@ -28,7 +28,7 @@ void chop_print_destroy(igraph_matrix_t *result) {
 int main() {
     igraph_t g;
     igraph_matrix_t result;
-    igraph_vector_t roots, rootlevel;
+    igraph_vector_int_t roots, rootlevel;
 
     printf("Empty graph check:\n");
     igraph_small(&g, 0, 0, -1);
@@ -47,11 +47,11 @@ int main() {
     printf("Star graph check with given root:\n");
     igraph_small(&g, 5, 1, 0,1, 0,2, 0,3, 0,4, -1);
     igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init_int(&roots, 1, 1);
+    igraph_vector_int_init_int(&roots, 1, 1);
     IGRAPH_ASSERT(igraph_layout_reingold_tilford_circular(&g, &result, IGRAPH_OUT, &roots, /*rootlevel*/ NULL) == IGRAPH_SUCCESS);
     chop_print_destroy(&result);
     igraph_destroy(&g);
-    igraph_vector_destroy(&roots);
+    igraph_vector_int_destroy(&roots);
 
     printf("Star graph check with root found by topological sort:\n");
     igraph_small(&g, 5, 1, 1,0, 2,0, 3,0, 4,0, -1);
@@ -63,22 +63,22 @@ int main() {
     printf("Two minitrees without rootlevel:\n");
     igraph_small(&g, 6, 1, 0,1, 0,2, 3,4, 3,5, -1);
     igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init_int(&roots, 2, 0, 3);
+    igraph_vector_int_init_int(&roots, 2, 0, 3);
     IGRAPH_ASSERT(igraph_layout_reingold_tilford_circular(&g, &result, IGRAPH_OUT, &roots, NULL) == IGRAPH_SUCCESS);
     chop_print_destroy(&result);
     igraph_destroy(&g);
-    igraph_vector_destroy(&roots);
+    igraph_vector_int_destroy(&roots);
 
     printf("Two minitrees with rootlevel 10 and 20:\n");
     igraph_small(&g, 6, 1, 0,1, 0,2, 3,4, 3,5, -1);
     igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init_int(&roots, 2, 0, 3);
-    igraph_vector_init_int(&rootlevel, 2, 10, 20);
+    igraph_vector_int_init_int(&roots, 2, 0, 3);
+    igraph_vector_int_init_int(&rootlevel, 2, 10, 20);
     IGRAPH_ASSERT(igraph_layout_reingold_tilford_circular(&g, &result, IGRAPH_OUT, &roots, &rootlevel) == IGRAPH_SUCCESS);
     chop_print_destroy(&result);
     igraph_destroy(&g);
-    igraph_vector_destroy(&roots);
-    igraph_vector_destroy(&rootlevel);
+    igraph_vector_int_destroy(&roots);
+    igraph_vector_int_destroy(&rootlevel);
 
     printf("Graph with just loops, triple edges and disconnected vertices:\n");
     igraph_small(&g, 5, 1, 0,0, 0,0, 0,0, 1,2, 1,2, 1,2, -1);
@@ -94,22 +94,22 @@ int main() {
     printf("Giving negative root.\n");
     igraph_small(&g, 5, 1, 0,1, 0,2, 0,3, 0,4, -1);
     igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init_int(&roots, 1, -1);
+    igraph_vector_int_init_int(&roots, 1, -1);
     IGRAPH_ASSERT(igraph_layout_reingold_tilford_circular(&g, &result, IGRAPH_OUT, &roots, /*rootlevel*/ NULL) == IGRAPH_EINVVID);
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);
-    igraph_vector_destroy(&roots);
+    igraph_vector_int_destroy(&roots);
 
     printf("Giving negative rootlevel.\n");
     igraph_small(&g, 6, 1, 0,1, 0,2, 3,4, 3,5, -1);
     igraph_matrix_init(&result, 0, 0);
-    igraph_vector_init_int(&roots, 2, 0, 3);
-    igraph_vector_init_int(&rootlevel, 2, -10, -20);
+    igraph_vector_int_init_int(&roots, 2, 0, 3);
+    igraph_vector_int_init_int(&rootlevel, 2, -10, -20);
     IGRAPH_ASSERT(igraph_layout_reingold_tilford_circular(&g, &result, IGRAPH_OUT, &roots, &rootlevel) == IGRAPH_EINVAL);
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);
-    igraph_vector_destroy(&roots);
-    igraph_vector_destroy(&rootlevel);
+    igraph_vector_int_destroy(&roots);
+    igraph_vector_int_destroy(&rootlevel);
 
     VERIFY_FINALLY_STACK();
     return 0;

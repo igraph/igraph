@@ -24,26 +24,15 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
-    }
-    printf("\n");
-}
-
-void warning_handler_ignore(const char* reason, const char* file, int line, int e) {
-}
-
 int main() {
 
     igraph_t g;
     igraph_vector_ptr_t result;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_integer_t alpha;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
-    igraph_set_warning_handler(warning_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
     igraph_vector_ptr_init(&result, 0);
 
     igraph_tree(&g, 5, 2, IGRAPH_TREE_OUT);
@@ -54,12 +43,12 @@ int main() {
             igraph_largest_independent_vertex_sets(&g, &result);
         }
         n = igraph_vector_ptr_size(&result);
-        printf("%ld independent sets found\n", (long)n);
+        printf("%" IGRAPH_PRId " independent sets found\n", n);
         for (i = 0; i < n; i++) {
-            igraph_vector_t* v;
+            igraph_vector_int_t* v;
             v = igraph_vector_ptr_e(&result, i);
-            print_vector((igraph_vector_t*)v);
-            igraph_vector_destroy(v);
+            igraph_vector_int_print(v);
+            igraph_vector_int_destroy(v);
             igraph_free(v);
         }
     }
@@ -68,18 +57,18 @@ int main() {
     igraph_tree(&g, 10, 2, IGRAPH_TREE_OUT);
     igraph_maximal_independent_vertex_sets(&g, &result);
     n = igraph_vector_ptr_size(&result);
-    printf("%ld maximal independent sets found\n", (long)n);
+    printf("%" IGRAPH_PRId " maximal independent sets found\n", n);
     for (i = 0; i < n; i++) {
-        igraph_vector_t* v;
+        igraph_vector_int_t* v;
         v = igraph_vector_ptr_e(&result, i);
-        print_vector((igraph_vector_t*)v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
     igraph_vector_ptr_destroy(&result);
 
     igraph_independence_number(&g, &alpha);
-    printf("alpha=%ld\n", (long)alpha);
+    printf("alpha=%" IGRAPH_PRId "\n", alpha);
 
     igraph_destroy(&g);
 

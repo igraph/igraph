@@ -19,22 +19,23 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void sort_and_print(igraph_vector_t *vec) {
-    igraph_vector_sort(vec);
-    print_vector_round(vec);
+void sort_and_print(igraph_vector_int_t *vec) {
+    igraph_vector_int_sort(vec);
+    print_vector_int(vec);
 }
 
 int main() {
 
     igraph_t g;
-    igraph_vector_t cut, partition, partition2, capacity;
+    igraph_vector_int_t cut, partition, partition2;
+    igraph_vector_t capacity;
     igraph_real_t value;
     int source = 0;
     int target = 4;
 
-    igraph_vector_init(&partition, 0);
-    igraph_vector_init(&partition2, 0);
-    igraph_vector_init(&cut, 0);
+    igraph_vector_int_init(&partition, 0);
+    igraph_vector_int_init(&partition2, 0);
+    igraph_vector_int_init(&cut, 0);
 
     igraph_small(&g, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, -1);
     igraph_vector_init_int_end(&capacity, -1, 8, 2, 3, 3, 2, -1);
@@ -44,8 +45,8 @@ int main() {
     igraph_st_mincut(&g, &value, &cut, &partition, &partition2, source, target, /*capacity*/ NULL);
 
     /* cut and partition should have only one element */
-    print_vector_round(&cut);
-    print_vector_round(&partition);
+    print_vector_int(&cut);
+    print_vector_int(&partition);
     sort_and_print(&partition2);
 
     /*    test with capacity    */
@@ -58,9 +59,9 @@ int main() {
 
     /*     cleanup     */
 
-    igraph_vector_destroy(&cut);
-    igraph_vector_destroy(&partition);
-    igraph_vector_destroy(&partition2);
+    igraph_vector_int_destroy(&cut);
+    igraph_vector_int_destroy(&partition);
+    igraph_vector_int_destroy(&partition2);
     igraph_vector_destroy(&capacity);
     igraph_destroy(&g);
 

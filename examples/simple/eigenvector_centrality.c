@@ -29,7 +29,7 @@ int main() {
 
     igraph_t g;
     igraph_vector_t v, weights;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t value;
     igraph_arpack_options_t options;
 

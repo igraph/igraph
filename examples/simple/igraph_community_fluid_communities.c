@@ -29,30 +29,30 @@
 int main() {
     igraph_t g;
     igraph_integer_t k;
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_real_t modularity;
 
     igraph_rng_seed(igraph_rng_default(), 247);
 
     /* Empty graph */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
-    igraph_vector_init(&membership, 0);
-    igraph_vector_push_back(&membership, 1);
+    igraph_vector_int_init(&membership, 0);
+    igraph_vector_int_push_back(&membership, 1);
     igraph_community_fluid_communities(&g, 2, &membership, &modularity);
-    if (!igraph_is_nan(modularity) || igraph_vector_size(&membership) != 0) {
+    if (!igraph_is_nan(modularity) || igraph_vector_int_size(&membership) != 0) {
         return 2;
     }
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_destroy(&g);
 
     /* Graph with one vertex only */
     igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1);
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_community_fluid_communities(&g, 2, &membership, &modularity);
-    if (!igraph_is_nan(modularity) || igraph_vector_size(&membership) != 1 || VECTOR(membership)[0] != 0) {
+    if (!igraph_is_nan(modularity) || igraph_vector_int_size(&membership) != 1 || VECTOR(membership)[0] != 0) {
         return 3;
     }
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_destroy(&g);
 
     /* Zachary Karate club -- this is just a quick smoke test */
@@ -75,18 +75,18 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     k = 2;
     igraph_community_fluid_communities(&g, k, &membership,
                                        /*modularity=*/ 0);
-    if (!igraph_vector_contains(&membership, 0) || !igraph_vector_contains(&membership, 1)) {
+    if (!igraph_vector_int_contains(&membership, 0) || !igraph_vector_int_contains(&membership, 1)) {
         printf("Resulting graph does not have exactly 2 communities as expected.\n");
-        igraph_vector_print(&membership);
+        igraph_vector_int_print(&membership);
         return 1;
     }
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
 
     VERIFY_FINALLY_STACK();
 

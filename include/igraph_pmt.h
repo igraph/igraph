@@ -81,6 +81,14 @@
     #define ONE 1
     #define MULTIPLICITY 1
 
+#elif defined(BASE_FORTRAN_INT)
+    #define BASE int
+    #define SHORT fortran_int
+    #define OUT_FORMAT "%d"
+    #define ZERO 0
+    #define ONE 1
+    #define MULTIPLICITY 1
+
 #elif defined(BASE_PTR)
     #define BASE void*
     #define SHORT ptr

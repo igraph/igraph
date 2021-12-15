@@ -142,8 +142,8 @@ static int set_bit_count[256] = {
  * Create a new set that can hold values in the range 0,...,size-1.
  */
 UNUSED_FUNCTION
-static set_t set_new(int size) {
-	int n;
+static set_t set_new(size_t size) {
+	size_t n;
 	set_t s;
 
 	ASSERT(size>0);
@@ -270,7 +270,7 @@ static void set_empty(set_t s) {
  */
 UNUSED_FUNCTION INLINE
 static set_t set_intersection(set_t res,set_t a,set_t b) {
-	int i,max;
+	size_t i, max;
 
 	if (res==NULL) {
 		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
@@ -303,7 +303,7 @@ static set_t set_intersection(set_t res,set_t a,set_t b) {
  */
 UNUSED_FUNCTION INLINE
 static set_t set_union(set_t res,set_t a,set_t b) {
-	int i,max;
+	size_t i, max;
 
 	if (res==NULL) {
 		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));

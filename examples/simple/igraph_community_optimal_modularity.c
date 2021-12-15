@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void prepare_weights_vector(igraph_vector_t* weights, const igraph_t* graph) {
-    int i, n = igraph_ecount(graph);
+    igraph_integer_t i, n = igraph_ecount(graph);
     igraph_vector_resize(weights, n);
     for (i = 0; i < n; i++) {
         VECTOR(*weights)[i] = i % 5;
@@ -34,8 +34,8 @@ void prepare_weights_vector(igraph_vector_t* weights, const igraph_t* graph) {
 int main() {
     igraph_t graph;
 
-    igraph_vector_t v;
-    igraph_real_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
+    igraph_vector_int_t v;
+    igraph_integer_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
                               0, 10, 0, 11, 0, 12, 0, 13, 0, 17, 0, 19, 0, 21, 0, 31,
                               1, 2, 1, 3, 1, 7, 1, 13, 1, 17, 1, 19, 1, 21, 1, 30,
                               2, 3, 2, 7, 2, 27, 2, 28, 2, 32, 2, 9, 2, 8, 2, 13,
@@ -48,13 +48,13 @@ int main() {
                               32, 33
                             };
 
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_vector_t weights;
     igraph_real_t modularity;
     igraph_bool_t simple;
-    int retval;
+    igraph_error_t retval;
 
-    igraph_vector_view(&v, edges, sizeof(edges) / sizeof(double));
+    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0]));
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
     igraph_vector_init(&weights, 0);
@@ -64,7 +64,7 @@ int main() {
         return 1;
     }
 
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
 
     igraph_set_error_handler(&igraph_error_handler_printignore);
 
@@ -103,7 +103,7 @@ int main() {
     }
     igraph_destroy(&graph);
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&weights);
 
     return 0;

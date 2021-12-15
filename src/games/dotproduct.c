@@ -56,16 +56,16 @@
  * for functions to generate the latent vectors.
  */
 
-int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
+igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                             igraph_bool_t directed) {
 
     igraph_integer_t nrow = igraph_matrix_nrow(vecs);
     igraph_integer_t ncol = igraph_matrix_ncol(vecs);
     int i, j;
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     igraph_bool_t warned_neg = 0, warned_big = 0;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     RNG_BEGIN();
 
@@ -89,11 +89,11 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                 warned_big = 1;
                 IGRAPH_WARNING("Greater than 1 connection probability in "
                                "dot-product graph");
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             } else if (RNG_UNIF01() < prob) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             }
         }
     }
@@ -101,10 +101,10 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
     RNG_END();
 
     igraph_create(graph, &edges, ncol, directed);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -130,7 +130,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
  * igraph_sample_dirichlet() for other similar samplers.
  */
 
-int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
+igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
                                  igraph_real_t radius,
                                  igraph_bool_t positive,
                                  igraph_matrix_t *res) {
@@ -171,7 +171,7 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -198,7 +198,7 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
  */
 
 
-int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
                                 igraph_real_t radius,
                                 igraph_bool_t positive,
                                 igraph_matrix_t *res) {
@@ -221,7 +221,7 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -245,7 +245,7 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
  * latent vectors.
  */
 
-int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
+igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
                             igraph_matrix_t *res) {
 
     igraph_integer_t len = igraph_vector_size(alpha);
@@ -276,5 +276,5 @@ int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

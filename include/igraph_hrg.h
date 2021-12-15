@@ -65,48 +65,52 @@ __BEGIN_DECLS
  */
 
 typedef struct igraph_hrg_t {
-    igraph_vector_t left, right, prob, edges, vertices;
+    igraph_vector_int_t left;
+    igraph_vector_int_t right;
+    igraph_vector_t prob;
+    igraph_vector_int_t vertices;
+    igraph_vector_int_t edges;
 } igraph_hrg_t;
 
-IGRAPH_EXPORT int igraph_hrg_init(igraph_hrg_t *hrg, int n);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n);
 IGRAPH_EXPORT void igraph_hrg_destroy(igraph_hrg_t *hrg);
-IGRAPH_EXPORT int igraph_hrg_size(const igraph_hrg_t *hrg);
-IGRAPH_EXPORT int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);
+IGRAPH_EXPORT igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize);
 
-IGRAPH_EXPORT int igraph_hrg_fit(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                                  igraph_hrg_t *hrg,
                                  igraph_bool_t start,
-                                 int steps);
+                                 igraph_integer_t steps);
 
-IGRAPH_EXPORT int igraph_hrg_sample(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_sample(const igraph_t *graph,
                                     igraph_t *sample,
                                     igraph_vector_ptr_t *samples,
                                     igraph_integer_t no_samples,
                                     igraph_hrg_t *hrg,
                                     igraph_bool_t start);
 
-IGRAPH_EXPORT int igraph_hrg_game(igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_game(igraph_t *graph,
                                   const igraph_hrg_t *hrg);
 
-IGRAPH_EXPORT int igraph_hrg_dendrogram(igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
                                         const igraph_hrg_t *hrg);
 
-IGRAPH_EXPORT int igraph_hrg_consensus(const igraph_t *graph,
-                                       igraph_vector_t *parents,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
+                                       igraph_vector_int_t *parents,
                                        igraph_vector_t *weights,
                                        igraph_hrg_t *hrg,
                                        igraph_bool_t start,
-                                       int num_samples);
+                                       igraph_integer_t num_samples);
 
-IGRAPH_EXPORT int igraph_hrg_predict(const igraph_t *graph,
-                                     igraph_vector_t *edges,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_predict(const igraph_t *graph,
+                                     igraph_vector_int_t *edges,
                                      igraph_vector_t *prob,
                                      igraph_hrg_t *hrg,
                                      igraph_bool_t start,
-                                     int num_samples,
-                                     int num_bins);
+                                     igraph_integer_t num_samples,
+                                     igraph_integer_t num_bins);
 
-IGRAPH_EXPORT int igraph_hrg_create(igraph_hrg_t *hrg,
+IGRAPH_EXPORT igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                                     const igraph_t *graph,
                                     const igraph_vector_t *prob);
 

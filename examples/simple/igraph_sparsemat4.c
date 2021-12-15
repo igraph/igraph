@@ -30,16 +30,16 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
                              const igraph_vector_t *x,
                              const igraph_vector_t *b) {
 
-    long int dim = igraph_vector_size(x);
+    igraph_integer_t dim = igraph_vector_size(x);
     igraph_vector_t res;
-    int j, p;
+    igraph_integer_t j, p;
     igraph_real_t min, max;
 
     igraph_vector_copy(&res, b);
 
     for (j = 0; j < dim; j++) {
         for (p = A->cs->p[j]; p < A->cs->p[j + 1]; p++) {
-            long int from = A->cs->i[p];
+            igraph_integer_t from = A->cs->i[p];
             igraph_real_t value = A->cs->x[p];
             VECTOR(res)[from] -= VECTOR(*x)[j] * value;
         }
@@ -55,7 +55,7 @@ int main() {
 
     igraph_sparsemat_t A, B, C;
     igraph_vector_t b, x;
-    long int i;
+    igraph_integer_t i;
 
     /* lsolve */
 
@@ -66,8 +66,8 @@ int main() {
         igraph_sparsemat_entry(&A, i, i, RNG_INTEGER(1, 3));
     }
     for (i = 0; i < EDGES; i++) {
-        long int r = RNG_INTEGER(0, DIM - 1);
-        long int c = RNG_INTEGER(0, r);
+        igraph_integer_t r = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t c = RNG_INTEGER(0, r);
         igraph_real_t value = RNG_INTEGER(1, 5);
         igraph_sparsemat_entry(&A, r, c, value);
     }
@@ -103,8 +103,8 @@ int main() {
         igraph_sparsemat_entry(&A, i, i, RNG_INTEGER(1, 3));
     }
     for (i = 0; i < EDGES; i++) {
-        long int r = RNG_INTEGER(0, DIM - 1);
-        long int c = RNG_INTEGER(0, r);
+        igraph_integer_t r = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t c = RNG_INTEGER(0, r);
         igraph_real_t value = RNG_INTEGER(1, 5);
         igraph_sparsemat_entry(&A, r, c, value);
     }
@@ -142,8 +142,8 @@ int main() {
         igraph_sparsemat_entry(&A, i, i, RNG_INTEGER(1, 3));
     }
     for (i = 0; i < EDGES; i++) {
-        long int r = RNG_INTEGER(0, DIM - 1);
-        long int c = RNG_INTEGER(0, r);
+        igraph_integer_t r = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t c = RNG_INTEGER(0, r);
         igraph_real_t value = RNG_INTEGER(1, 5);
         igraph_sparsemat_entry(&A, r, c, value);
     }
@@ -181,8 +181,8 @@ int main() {
         igraph_sparsemat_entry(&A, i, i, RNG_INTEGER(1, 3));
     }
     for (i = 0; i < EDGES; i++) {
-        long int r = RNG_INTEGER(0, DIM - 1);
-        long int c = RNG_INTEGER(0, r);
+        igraph_integer_t r = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t c = RNG_INTEGER(0, r);
         igraph_real_t value = RNG_INTEGER(1, 5);
         igraph_sparsemat_entry(&A, r, c, value);
     }
@@ -225,8 +225,8 @@ int main() {
         igraph_sparsemat_entry(&A, i, i, RNG_INTEGER(1, 3));
     }
     for (i = 0; i < EDGES; i++) {
-        long int from = RNG_INTEGER(0, DIM - 1);
-        long int to = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t from = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t to = RNG_INTEGER(0, DIM - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         igraph_sparsemat_entry(&A, from, to, value);
     }
@@ -266,8 +266,8 @@ int main() {
         igraph_sparsemat_entry(&A, i, i, RNG_INTEGER(1, 3));
     }
     for (i = 0; i < EDGES; i++) {
-        long int from = RNG_INTEGER(0, DIM - 1);
-        long int to = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t from = RNG_INTEGER(0, DIM - 1);
+        igraph_integer_t to = RNG_INTEGER(0, DIM - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         igraph_sparsemat_entry(&A, from, to, value);
     }

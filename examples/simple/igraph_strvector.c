@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void strvector_print(const igraph_strvector_t *sv) {
-    long int i, s = igraph_strvector_size(sv);
+    igraph_integer_t i, s = igraph_strvector_size(sv);
     for (i = 0; i < s; i++) {
         printf("---%s---\n", STR(*sv, i));
     }
@@ -124,7 +124,6 @@ int main() {
     }
 
     /* TODO: igraph_strvector_permdelete */
-    /* TODO: igraph_strvector_remove_negidx */
 
     igraph_strvector_destroy(&sv1);
 

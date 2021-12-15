@@ -48,10 +48,12 @@
  * \param ncol The number of columns in the matrix.
  * \return Error code.
  *
+ * \deprecated-by igraph_sparsemat_init 0.10.0
+ *
  * Time complexity: operating system dependent.
  */
 
-int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol) {
+igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&m->ridx, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&m->cidx, ncol + 1);
@@ -59,7 +61,7 @@ int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol) {
     IGRAPH_FINALLY_CLEAN(3);
     m->nrow = nrow;
     m->ncol = ncol;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -72,6 +74,8 @@ int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol) {
  * object. The destroyed object needs to be reinitialized before using
  * it again.
  * \param m The matrix to destroy.
+ *
+ * \deprecated-by igraph_sparsemat_destroy 0.10.0
  *
  * Time complexity: operating system dependent.
  */
@@ -97,9 +101,11 @@ void igraph_spmatrix_destroy(igraph_spmatrix_t *m) {
  *
  * Time complexity: O(n), the number
  * of elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_copy 0.10.0
  */
 
-int igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
+igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(to != NULL);
     to->nrow = from->nrow;
@@ -107,7 +113,7 @@ int igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
     IGRAPH_CHECK(igraph_vector_copy(&to->ridx, &from->ridx));
     IGRAPH_CHECK(igraph_vector_copy(&to->cidx, &from->cidx));
     IGRAPH_CHECK(igraph_vector_copy(&to->data, &from->data));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -126,10 +132,12 @@ int igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
  *
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
+ *
+ * \deprecated-by igraph_sparsemat_index 0.10.0
  */
 igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
-                                long int row, long int col) {
-    long int start, end;
+                                igraph_integer_t row, igraph_integer_t col) {
+    igraph_integer_t start, end;
 
     IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
@@ -141,7 +149,7 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
     /* Elements residing in column col are between m->data[start] and
      * m->data[end], inclusive, ordered by row index */
     while (start < end - 1) {
-        long int mid = (start + end) / 2;
+        igraph_integer_t mid = (start + end) / 2;
         if (VECTOR(m->ridx)[mid] > row) {
             end = mid;
         } else if (VECTOR(m->ridx)[mid] < row) {
@@ -175,10 +183,12 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
  *
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
+ *
+ * \deprecated-by igraph_sparsemat_entry 0.10.0
  */
-int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
+igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, igraph_integer_t row, igraph_integer_t col,
                         igraph_real_t value) {
-    long int start, end;
+    igraph_integer_t start, end;
 
     IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
@@ -187,20 +197,20 @@ int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
     if (end < start) {
         /* First element in the column */
         if (value == 0.0) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         IGRAPH_CHECK(igraph_vector_insert(&m->ridx, start, row));
         IGRAPH_CHECK(igraph_vector_insert(&m->data, start, value));
         for (start = col + 1; start < m->ncol + 1; start++) {
             VECTOR(m->cidx)[start]++;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Elements residing in column col are between m->data[start] and
      * m->data[end], inclusive, ordered by row index */
     while (start < end - 1) {
-        long int mid = (start + end) / 2;
+        igraph_integer_t mid = (start + end) / 2;
         if (VECTOR(m->ridx)[mid] > row) {
             end = mid;
         } else if (VECTOR(m->ridx)[mid] < row) {
@@ -222,7 +232,7 @@ int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
         } else {
             VECTOR(m->data)[start] = value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (VECTOR(m->ridx)[end] == row) {
         /* Overwriting a value - or deleting it if it has been overwritten by zero */
         if (value == 0) {
@@ -234,7 +244,7 @@ int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
         } else {
             VECTOR(m->data)[end] = value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* New element has to be inserted, but only if not a zero is
@@ -254,7 +264,7 @@ int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
             VECTOR(m->cidx)[start]++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -274,10 +284,12 @@ int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
  *
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
+ *
+ * \deprecated-by igraph_sparsemat_entry 0.10.0
  */
-int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
+igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_integer_t row, igraph_integer_t col,
                           igraph_real_t value) {
-    long int start, end;
+    igraph_integer_t start, end;
 
     IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
@@ -286,20 +298,20 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
     if (end < start) {
         /* First element in the column */
         if (value == 0.0) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
         IGRAPH_CHECK(igraph_vector_insert(&m->ridx, start, row));
         IGRAPH_CHECK(igraph_vector_insert(&m->data, start, value));
         for (start = col + 1; start < m->ncol + 1; start++) {
             VECTOR(m->cidx)[start]++;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Elements residing in column col are between m->data[start] and
      * m->data[end], inclusive, ordered by row index */
     while (start < end - 1) {
-        long int mid = (start + end) / 2;
+        igraph_integer_t mid = (start + end) / 2;
         if (VECTOR(m->ridx)[mid] > row) {
             end = mid;
         } else if (VECTOR(m->ridx)[mid] < row) {
@@ -321,7 +333,7 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
         } else {
             VECTOR(m->data)[start] += value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     } else if (VECTOR(m->ridx)[end] == row) {
         /* Overwriting a value */
         if (VECTOR(m->data)[end] == -1) {
@@ -333,7 +345,7 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
         } else {
             VECTOR(m->data)[end] += value;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* New element has to be inserted, but only if not a zero is
@@ -353,7 +365,7 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
             VECTOR(m->cidx)[start]++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -363,9 +375,11 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
  * \param to The index of the column to be added to.
  * \param from The index of the column to be added.
  * \return Error code.
+ *
+ * \deprecated 0.10.0
  */
-int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from) {
-    long int i;
+igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, igraph_integer_t to, igraph_integer_t from) {
+    igraph_integer_t i;
     if (to < 0 || to >= m->ncol) {
        IGRAPH_ERROR("The 'to' column does not exist.", IGRAPH_EINVAL);
     }
@@ -374,8 +388,8 @@ int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int f
     }
     /* TODO: I think this implementation could be speeded up if I don't use
      * igraph_spmatrix_add_e directly -- but maybe it's not worth the fuss */
-    for (i = (long int) VECTOR(m->cidx)[from]; i < VECTOR(m->cidx)[from + 1]; i++) {
-        IGRAPH_CHECK(igraph_spmatrix_add_e(m, (long int) VECTOR(m->ridx)[i],
+    for (i = VECTOR(m->cidx)[from]; i < VECTOR(m->cidx)[from + 1]; i++) {
+        IGRAPH_CHECK(igraph_spmatrix_add_e(m, (igraph_integer_t) VECTOR(m->ridx)[i],
                                            to, VECTOR(m->data)[i]));
     }
 
@@ -399,10 +413,12 @@ int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int f
  *
  * Time complexity: O(n).
  * n is the number of elements in the old matrix.
+ *
+ * \deprecated-by igraph_sparsemat_resize 0.10.0
  */
 
-int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
-    long int i, j, ci, ei, mincol;
+igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_integer_t nrow, igraph_integer_t ncol) {
+    igraph_integer_t i, j, ci, ei, mincol;
     IGRAPH_ASSERT(m != NULL);
     /* Iterating through the matrix data and deleting unnecessary data. */
     /* At the same time, we create the new indices as well */
@@ -430,7 +446,7 @@ int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
     }
     m->nrow = nrow;
     m->ncol = ncol;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -442,9 +458,11 @@ int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
  * \return The size of the matrix.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_count_nonzero 0.10.0
  */
 
-long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return igraph_vector_size(&m->data);
 }
@@ -461,7 +479,7 @@ long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
  * Time complexity: O(1).
  */
 
-long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_size(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return (m->nrow) * (m->ncol);
 }
@@ -475,9 +493,11 @@ long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
  * \return The number of rows in the matrix.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_nrow 0.10.0
  */
 
-long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return m->nrow;
 }
@@ -491,9 +511,11 @@ long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
  * \return The number of columns in the sparse matrix.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_ncol 0.10.0
  */
 
-long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
+igraph_integer_t igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return m->ncol;
 }
@@ -511,21 +533,21 @@ long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
  * \param to Pointer to a C array, the place to copy the data to.
  * \return Error code.
  *
- * Time complexity: O(n),
- * n is the number of
- * elements in the matrix.
+ * Time complexity: O(n), n is the number of elements in the matrix.
+ *
+ * \deprecated 0.10.0
  */
 
-int igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
-    long int c, dest_idx, idx;
+igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
+    igraph_integer_t c, dest_idx, idx;
 
     memset(to, 0, sizeof(igraph_real_t) * (size_t) igraph_spmatrix_size(m));
     for (c = 0, dest_idx = 0; c < m->ncol; c++, dest_idx += m->nrow) {
-        for (idx = (long int) VECTOR(m->cidx)[c]; idx < VECTOR(m->cidx)[c + 1]; idx++) {
+        for (idx = VECTOR(m->cidx)[c]; idx < VECTOR(m->cidx)[c + 1]; idx++) {
             to[dest_idx + (long)VECTOR(m->ridx)[idx]] = VECTOR(m->data)[idx];
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -537,14 +559,16 @@ int igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
  *
  * Time complexity: O(n),
  * n is the number of columns in the matrix
+ *
+ * \deprecated-by igraph_sparsemat_droptol 0.10.0
  */
 
-int igraph_spmatrix_null(igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     igraph_vector_clear(&m->data);
     igraph_vector_clear(&m->ridx);
     igraph_vector_null(&m->cidx);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -556,11 +580,13 @@ int igraph_spmatrix_null(igraph_spmatrix_t *m) {
  * \return Error code.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_add_cols 0.10.0
  */
 
-int igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
+igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, igraph_integer_t n) {
     igraph_spmatrix_resize(m, m->nrow, m->ncol + n);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -572,11 +598,13 @@ int igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n) {
  * \return Error code.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_add_rows 0.10.0
  */
 
-int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
+igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, igraph_integer_t n) {
     igraph_spmatrix_resize(m, m->nrow + n, m->ncol);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -587,19 +615,21 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
  * \return Error code.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_scale_rows 0.10.0
  */
 
-int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
+igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, igraph_integer_t row) {
     if (row < 0 || row >= m->nrow) {
        IGRAPH_ERROR("The row does not exist.", IGRAPH_EINVAL);
     }
-    long int ci, ei, i, j, nremove = 0, nremove_old = 0;
-    igraph_vector_t permvec;
+    igraph_integer_t ci, ei, i, j, nremove = 0, nremove_old = 0;
+    igraph_vector_int_t permvec;
 
     IGRAPH_ASSERT(m != NULL);
-    IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
-        for (ei = (long int) VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
+        for (ei = VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
             if (VECTOR(m->ridx)[ei] == row) {
                 /* this element will be deleted, so all elements in cidx from the
                  * column index of this element will have to be decreased by one */
@@ -619,15 +649,15 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     VECTOR(m->cidx)[m->ncol] -= nremove;
     igraph_vector_permdelete(&m->ridx, &permvec, nremove);
     igraph_vector_permdelete(&m->data, &permvec, nremove);
-    igraph_vector_destroy(&permvec);
+    igraph_vector_int_destroy(&permvec);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
 /* Unused local functions---temporarily disabled */
 #if 0
-static int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
-    long int ei, n;
+static igraph_error_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, igraph_integer_t row) {
+    igraph_integer_t ei, n;
 
     IGRAPH_ASSERT(m != NULL);
     n = igraph_vector_size(&m->data);
@@ -636,17 +666,17 @@ static int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) 
             VECTOR(m->data)[ei] = 0.0;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
-    long int ci, ei, i, j, nremove = 0, nremove_old = 0;
+static igraph_error_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
+    igraph_integer_t ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
-        for (ei = (long int) VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
+        for (ei = VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
             if (VECTOR(m->data)[ei] == 0.0) {
                 /* this element will be deleted, so all elements in cidx from the
                  * column index of this element will have to be decreased by one */
@@ -668,7 +698,7 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     igraph_vector_permdelete(&m->data, &permvec, nremove);
     igraph_vector_destroy(&permvec);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
@@ -680,22 +710,24 @@ static int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
  * \return Error code.
  *
  * Time complexity: TODO
+ *
+ * \deprecated-by igraph_sparsemat_scale_cols 0.10.0
  */
 
-int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
+igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, igraph_integer_t col) {
     if (col < 0 || col >= m->ncol) {
        IGRAPH_ERROR("The column does not exist.", IGRAPH_EINVAL);
     }
-    long int i, n;
+    igraph_integer_t i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (long)VECTOR(m->cidx)[col + 1] - (long)VECTOR(m->cidx)[col];
     if (n == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
-    igraph_vector_remove_section(&m->ridx, (long int) VECTOR(m->cidx)[col],
-                                 (long int) VECTOR(m->cidx)[col + 1]);
-    igraph_vector_remove_section(&m->data, (long int) VECTOR(m->cidx)[col],
-                                 (long int) VECTOR(m->cidx)[col + 1]);
+    igraph_vector_remove_section(&m->ridx, (igraph_integer_t) VECTOR(m->cidx)[col],
+                                 (igraph_integer_t) VECTOR(m->cidx)[col + 1]);
+    igraph_vector_remove_section(&m->data, (igraph_integer_t) VECTOR(m->cidx)[col],
+                                 (igraph_integer_t) VECTOR(m->cidx)[col + 1]);
     for (i = col + 1; i <= m->ncol; i++) {
         VECTOR(m->cidx)[i] -= n;
     }
@@ -709,6 +741,8 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
  * \param by The constant.
  *
  * Time complexity: O(n), the number of elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_scale 0.10.0
  */
 
 void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
@@ -724,19 +758,21 @@ void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
  *   The vector will be resized as needed.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_colsums 0.10.0
  */
 
-int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
-    long int i, c;
+igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
+    igraph_integer_t i, c;
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_CHECK(igraph_vector_resize(res, m->ncol));
     igraph_vector_null(res);
     for (c = 0; c < m->ncol; c++) {
-        for (i = (long int) VECTOR(m->cidx)[c]; i < VECTOR(m->cidx)[c + 1]; i++) {
+        for (i = VECTOR(m->cidx)[c]; i < VECTOR(m->cidx)[c + 1]; i++) {
             VECTOR(*res)[c] += VECTOR(m->data)[i];
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -747,19 +783,21 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
  *   The vector will be resized as needed.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated-by igraph_sparsemat_rowsums 0.10.0
  */
 
-int igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
-    long int i, n;
+igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
+    igraph_integer_t i, n;
     IGRAPH_ASSERT(m != NULL);
 
     IGRAPH_CHECK(igraph_vector_resize(res, m->nrow));
     n = igraph_vector_size(&m->data);
     igraph_vector_null(res);
     for (i = 0; i < n; i++) {
-        VECTOR(*res)[(long int)VECTOR(m->ridx)[i]] += VECTOR(m->data)[i];
+        VECTOR(*res)[(igraph_integer_t)VECTOR(m->ridx)[i]] += VECTOR(m->data)[i];
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -772,11 +810,13 @@ int igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
  * \param cidx the column index of the maximum element if not \c NULL.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated 0.10.0
  */
 igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
         igraph_real_t *ridx, igraph_real_t *cidx) {
     igraph_real_t res;
-    long int i, n, maxidx;
+    igraph_integer_t i, n, maxidx;
 
     IGRAPH_ASSERT(m != NULL);
     n = igraph_vector_size(&m->data);
@@ -819,11 +859,13 @@ igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
  * \param cidx the column index of the maximum element if not \c NULL.
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
+ *
+ * \deprecated 0.10.0
  */
 igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
                                   igraph_real_t *ridx, igraph_real_t *cidx) {
     igraph_real_t res;
-    long int i, j, k, maxidx;
+    igraph_integer_t i, j, k, maxidx;
 
     IGRAPH_ASSERT(m != NULL);
     i = igraph_vector_size(&m->data);
@@ -858,7 +900,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
                     *cidx = i;
                 }
                 if (ridx != 0) {
-                    for (j = (long int) VECTOR(m->cidx)[i], k = 0;
+                    for (j = VECTOR(m->cidx)[i], k = 0;
                          j < VECTOR(m->cidx)[i + 1]; j++, k++) {
                         if (VECTOR(m->ridx)[j] != k) {
                             *ridx = k;
@@ -877,18 +919,18 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
 
 /* Unused function, temporarily disabled */
 /*
-static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
-                                                     igraph_vector_t *res, long int col) {
-    long int i, n;
+static igraph_error_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
+                                                     igraph_vector_t *res, igraph_integer_t col) {
+    igraph_integer_t i, n;
     IGRAPH_ASSERT(m != NULL);
-    n = (long int) (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
+    n = (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    for (i = (long int) VECTOR(m->cidx)[col], n = 0;
+    for (i = VECTOR(m->cidx)[col], n = 0;
          i < VECTOR(m->cidx)[col + 1]; i++, n++)
         if (VECTOR(m->data)[i] != 0.0) {
             VECTOR(*res)[n] = VECTOR(m->ridx)[i];
         }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 */
 
@@ -916,11 +958,13 @@ static int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
  * \return  Error code. The current implementation is always successful.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_init 0.10.0
  */
-int igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
     mit->m = m;
     IGRAPH_CHECK(igraph_spmatrix_iter_reset(mit));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -934,14 +978,16 @@ int igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatr
  * \return  Error code. The current implementation is always successful.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_reset 0.10.0
  */
-int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
+igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
     IGRAPH_ASSERT(mit->m);
 
     if (igraph_spmatrix_count_nonzero(mit->m) == 0) {
         mit->pos = mit->ri = mit->ci = -1L;
         mit->value = -1;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     mit->ci = 0;
@@ -949,7 +995,7 @@ int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
 
     IGRAPH_CHECK(igraph_spmatrix_iter_next(mit));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -964,22 +1010,24 @@ int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
  * \return  Error code. The current implementation is always successful.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_next 0.10.0
  */
-int igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
+igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
     mit->pos++;
 
     if (igraph_spmatrix_iter_end(mit)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
-    mit->ri = (long int)VECTOR(mit->m->ridx)[mit->pos];
+    mit->ri = VECTOR(mit->m->ridx)[mit->pos];
     mit->value = VECTOR(mit->m->data)[mit->pos];
 
     while (VECTOR(mit->m->cidx)[mit->ci + 1] <= mit->pos) {
         mit->ci++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -995,6 +1043,8 @@ int igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
  *           FALSE (0) otherwise.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by igraph_sparsemat_iterator_end 0.10.0
  */
 igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
     return mit->pos >= igraph_spmatrix_count_nonzero(mit->m);
@@ -1015,6 +1065,8 @@ igraph_bool_t igraph_spmatrix_iter_end(igraph_spmatrix_iter_t *mit) {
  * \param  mit  pointer to the matrix iterator being destroyed
  *
  * Time complexity: O(1).
+ *
+ * \deprecated 0.10.0
  */
 void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
     IGRAPH_UNUSED(mit);
@@ -1032,8 +1084,10 @@ void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
  * \return Error code.
  *
  * Time complexity: O(n), the number of non-zero elements.
+ *
+ * \deprecated-by igraph_sparsemat_print 0.10.0
  */
-int igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
+igraph_error_t igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
     return igraph_spmatrix_fprint(matrix, stdout);
 }
 #endif
@@ -1048,19 +1102,21 @@ int igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
  * \return Error code.
  *
  * Time complexity: O(n), the number of non-zero elements.
+ *
+ * \deprecated-by igraph_sparsemat_print 0.10.0
  */
-int igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
+igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
     igraph_spmatrix_iter_t mit;
 
     IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, matrix));
     IGRAPH_FINALLY(igraph_spmatrix_iter_destroy, &mit);
     while (!igraph_spmatrix_iter_end(&mit)) {
-        fprintf(file, "[%ld, %ld] = %.4f\n", (long int)mit.ri,
-                (long int)mit.ci, mit.value);
+        fprintf(file, "[%" IGRAPH_PRId ", %" IGRAPH_PRId "] = %.4f\n", mit.ri,
+                mit.ci, mit.value);
         igraph_spmatrix_iter_next(&mit);
     }
     igraph_spmatrix_iter_destroy(&mit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -78,7 +78,7 @@ int intersect() {
 
 int distance() {
 
-    float configs[][7] = {
+    igraph_real_t configs[][7] = {
         { 1, 1, 2, 0, 2, 3, 1.0 }, /* 1 */
         { 1, 1, 1, 0, 1, 3, 0.0 }, /* 2 */
         { 1, 1, 0, 1, 1, 0, 0.5 }, /* 3 */
@@ -88,14 +88,13 @@ int distance() {
         { 0, 3, 1, 1, 1, 2, 2.0 }  /* 7 */
     };
 
-    int no = sizeof(configs) / sizeof(float) / 8;
+    int no = sizeof(configs) / sizeof(igraph_real_t) / 8;
     int i;
 
     for (i = 0; i < no; i++) {
-        float *co = configs[i];
-        float res = igraph_i_layout_point_segment_dist2(co[0], co[1],
-                    co[2], co[3], co[4], co[5]);
-        if (fabsf(res - co[6]) > 1e-12) {
+        igraph_real_t *co = configs[i];
+        igraph_real_t res = igraph_i_layout_point_segment_dist2(co[0], co[1], co[2], co[3], co[4], co[5]);
+        if (fabs(res - co[6]) > 1e-12) {
             printf("%g\n", (double) res);
             return i + 1;
         }

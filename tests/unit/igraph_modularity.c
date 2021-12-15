@@ -28,7 +28,7 @@
 int main() {
     igraph_t graph;
     igraph_vector_t weights;
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_real_t modularity, resolution;
     igraph_attribute_combination_t comb;
 
@@ -43,7 +43,7 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 0);
 
     /* Null graph */
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
     if (!igraph_is_nan(modularity)) {
@@ -58,7 +58,7 @@ int main() {
     /* Should not crash if we omit 'modularity' */
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, /* modularity = */ 0);
     igraph_destroy(&graph);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
 
     /* Simple unweighted graph */
     igraph_small(&graph, 10, IGRAPH_UNDIRECTED,
@@ -72,7 +72,7 @@ int main() {
     SETEANV(&graph, "weight", &weights);
 
     /* Set membership */
-    igraph_vector_init(&membership, igraph_vcount(&graph));
+    igraph_vector_int_init(&membership, igraph_vcount(&graph));
     VECTOR(membership)[0] = 0;
     VECTOR(membership)[1] = 0;
     VECTOR(membership)[2] = 0;
@@ -106,11 +106,11 @@ int main() {
 
     /* Recalculate modularity on contracted graph */
     igraph_contract_vertices(&graph, &membership, NULL);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
 
     igraph_simplify(&graph, /* multiple */ 1, /* loops */ 0, &comb);
 
-    igraph_vector_init_seq(&membership, 0, igraph_vcount(&graph) - 1);
+    igraph_vector_int_init_seq(&membership, 0, igraph_vcount(&graph) - 1);
     EANV(&graph, "weight", &weights);
     for (resolution = 0.5; resolution <= 1.5; resolution += 0.5)
     {
@@ -120,7 +120,7 @@ int main() {
         printf("Modularity (resolution %.2f) is %f after aggregation.\n", resolution, modularity);
     }
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
     igraph_attribute_combination_destroy(&comb);

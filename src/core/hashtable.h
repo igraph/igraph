@@ -39,19 +39,19 @@ typedef struct igraph_hashtable_t {
     igraph_strvector_t defaults;
 } igraph_hashtable_t;
 
-IGRAPH_PRIVATE_EXPORT int igraph_hashtable_init(igraph_hashtable_t *ht);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_init(igraph_hashtable_t *ht);
 IGRAPH_PRIVATE_EXPORT void igraph_hashtable_destroy(igraph_hashtable_t *ht);
-IGRAPH_PRIVATE_EXPORT int igraph_hashtable_addset(igraph_hashtable_t *ht,
-                                                  const char *key, const char *def,
-                                                  const char *elem);
-IGRAPH_PRIVATE_EXPORT int igraph_hashtable_addset2(igraph_hashtable_t *ht,
-                                                   const char *key, const char *def,
-                                                   const char *elem, int elemlen);
-IGRAPH_PRIVATE_EXPORT int igraph_hashtable_get(igraph_hashtable_t *ht,
-                                               const char *key, char **elem);
-IGRAPH_PRIVATE_EXPORT int igraph_hashtable_getkeys(igraph_hashtable_t *ht,
-                                                   const igraph_strvector_t **sv);
-IGRAPH_PRIVATE_EXPORT int igraph_hashtable_reset(igraph_hashtable_t *ht);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
+                                                             const char *key, const char *def,
+                                                             const char *elem);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
+                                                              const char *key, const char *def,
+                                                              const char *elem, size_t elemlen);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
+                                                              const char *key, char **elem);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
+                                                              const igraph_strvector_t **sv);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_reset(igraph_hashtable_t *ht);
 
 __END_DECLS
 

@@ -26,8 +26,9 @@
 int main() {
 
     igraph_t g, tree;
-    igraph_vector_t eb, edges;
-    long int i;
+    igraph_vector_t eb;
+    igraph_vector_int_t edges;
+    igraph_integer_t i;
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0,  1,  0,  2,  0,  3,  0,  4,  0,  5,
@@ -57,10 +58,10 @@ int main() {
     igraph_minimum_spanning_tree_prim(&g, &tree, &eb);
     igraph_write_graph_edgelist(&tree, stdout);
 
-    igraph_vector_init(&edges, 0);
+    igraph_vector_int_init(&edges, 0);
     igraph_minimum_spanning_tree(&g, &edges, &eb);
-    igraph_vector_print(&edges);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_print(&edges);
+    igraph_vector_int_destroy(&edges);
 
     igraph_destroy(&tree);
     igraph_destroy(&g);

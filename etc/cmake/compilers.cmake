@@ -15,6 +15,17 @@ set(
   "Treat warnings as errors with GCC-like compilers"
 )
 
+option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+if(FORCE_COLORED_OUTPUT)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   add_compile_options(-fdiagnostics-color=always)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+   add_compile_options(-fcolor-diagnostics)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+   add_compile_options(-fcolor-diagnostics)
+  endif()
+endif()
+
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE

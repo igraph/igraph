@@ -30,7 +30,7 @@ typedef struct {
     int eof;
     char errmsg[300];
     int has_weights;
-    igraph_vector_t *vector;
+    igraph_vector_int_t *vector;
     igraph_vector_t *weights;
     igraph_trie_t *trie;
 } igraph_i_ncol_parsedata_t;

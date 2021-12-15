@@ -31,10 +31,10 @@
 #include "test_utilities.inc"
 
 int test_all_st_cuts(const igraph_t *graph,
-                     long int source,
-                     long int target) {
+                     igraph_integer_t source,
+                     igraph_integer_t target) {
     igraph_vector_ptr_t cuts, partition1s;
-    long int n, i;
+    igraph_integer_t n, i;
 
     igraph_vector_ptr_init(&cuts, 0);
     igraph_vector_ptr_init(&partition1s, 0);
@@ -44,15 +44,15 @@ int test_all_st_cuts(const igraph_t *graph,
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -64,12 +64,12 @@ int test_all_st_cuts(const igraph_t *graph,
 int main() {
     igraph_t g;
     igraph_vector_ptr_t cuts, partition1s;
-    long int i, n;
+    igraph_integer_t i, n;
 
-    igraph_marked_queue_t S;
+    igraph_marked_queue_int_t S;
     igraph_estack_t T;
-    long int v;
-    igraph_vector_t Isv;
+    igraph_integer_t v;
+    igraph_vector_int_t Isv;
 
     /* ----------------------------------------------------------- */
     /* This is the example from the Provan-Shier paper,
@@ -92,27 +92,27 @@ int main() {
                  -1);
 
     /* S={s,a} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_start_batch(&S);
-    igraph_marked_queue_push(&S, 10);
-    igraph_marked_queue_push(&S, 0);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_start_batch(&S);
+    igraph_marked_queue_int_push(&S, 10);
+    igraph_marked_queue_int_push(&S, 0);
 
     /* T={t} */
     igraph_estack_init(&T, igraph_vcount(&g), 1);
     igraph_estack_push(&T, 11);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 10, /*target=*/ 11,
                                &v, &Isv, NULL);
 
     /* Expected result: v=c, Isv={c,d,e,i} */
-    printf("%li; ", v);
-    igraph_vector_print(&Isv);
+    printf("%" IGRAPH_PRId "; ", v);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -122,19 +122,19 @@ int main() {
                  -1);
 
     /* S={}, T={} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
-    igraph_vector_print(&Isv);
+    printf("%" IGRAPH_PRId "; ", v);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -144,21 +144,21 @@ int main() {
                  -1);
 
     /* S={}, T={0} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
     igraph_estack_push(&T, 0);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
-    igraph_vector_print(&Isv);
+    printf("%" IGRAPH_PRId "; ", v);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -168,21 +168,21 @@ int main() {
                  -1);
 
     /* S={0}, T={} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_push(&S, 0);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_push(&S, 0);
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
-    igraph_vector_print(&Isv);
+    printf("%" IGRAPH_PRId "; ", v);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -192,22 +192,22 @@ int main() {
                  -1);
 
     /* S={0}, T={1} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_push(&S, 0);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_push(&S, 0);
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
     igraph_estack_push(&T, 1);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
-    igraph_vector_print(&Isv);
+    printf("%" IGRAPH_PRId "; ", v);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -217,22 +217,22 @@ int main() {
                  -1);
 
     /* S={0,1}, T={} */
-    igraph_marked_queue_init(&S, igraph_vcount(&g));
-    igraph_marked_queue_push(&S, 0);
-    igraph_marked_queue_push(&S, 1);
+    igraph_marked_queue_int_init(&S, igraph_vcount(&g));
+    igraph_marked_queue_int_push(&S, 0);
+    igraph_marked_queue_int_push(&S, 1);
 
     igraph_estack_init(&T, igraph_vcount(&g), 3);
 
-    igraph_vector_init(&Isv, 0);
+    igraph_vector_int_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
                                &v, &Isv, NULL);
-    printf("%li; ", v);
-    igraph_vector_print(&Isv);
+    printf("%" IGRAPH_PRId "; ", v);
+    igraph_vector_int_print(&Isv);
 
-    igraph_vector_destroy(&Isv);
+    igraph_vector_int_destroy(&Isv);
     igraph_estack_destroy(&T);
-    igraph_marked_queue_destroy(&S);
+    igraph_marked_queue_int_destroy(&S);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -247,9 +247,9 @@ int main() {
 
     n = igraph_vector_ptr_size(&partition1s);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -268,9 +268,9 @@ int main() {
 
     n = igraph_vector_ptr_size(&partition1s);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -291,15 +291,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -321,15 +321,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -351,15 +351,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -383,15 +383,15 @@ int main() {
     n = igraph_vector_ptr_size(&partition1s);
     printf("Partitions and cuts:\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(partition1s)[i];
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v = VECTOR(partition1s)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("P: ");
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
+        igraph_vector_int_print(v);
+        igraph_vector_int_destroy(v);
         igraph_free(v);
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);
@@ -406,10 +406,10 @@ int main() {
     n = igraph_vector_ptr_size(&cuts);
     printf("Cuts only (no partitions):\n");
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v2 = VECTOR(cuts)[i];
+        igraph_vector_int_t *v2 = VECTOR(cuts)[i];
         printf("C: ");
-        igraph_vector_print(v2);
-        igraph_vector_destroy(v2);
+        igraph_vector_int_print(v2);
+        igraph_vector_int_destroy(v2);
         igraph_free(v2);
     }
     igraph_vector_ptr_destroy(&partition1s);

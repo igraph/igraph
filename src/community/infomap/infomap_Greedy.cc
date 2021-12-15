@@ -36,14 +36,14 @@ Greedy::Greedy(FlowGraph * fgraph) {
     beta = 1.0 - alpha;  // probability to take normal step
 
     Nempty = 0;
-    vector<int>(Nnode).swap(mod_empty);
+    vector<igraph_integer_t>(Nnode).swap(mod_empty);
 
-    vector<int>(Nnode).swap(node_index);
+    vector<igraph_integer_t>(Nnode).swap(node_index);
     vector<double>(Nnode).swap(mod_exit);
     vector<double>(Nnode).swap(mod_size);
     vector<double>(Nnode).swap(mod_danglingSize);
     vector<double>(Nnode).swap(mod_teleportWeight);
-    vector<int>(Nnode).swap(mod_members);
+    vector<size_t>(Nnode).swap(mod_members);
 
     nodeSize_log_nodeSize = graph->nodeSize_log_nodeSize;
     exit_log_exit         = graph->exit_log_exit;
@@ -51,7 +51,7 @@ Greedy::Greedy(FlowGraph * fgraph) {
     exitFlow              = graph->exitFlow;
 
     Node ** node = graph->node;
-    for (int i = 0; i < Nnode; i++) { // For each module
+    for (igraph_integer_t i = 0; i < Nnode; i++) { // For each module
         node_index[i]         = i;
         mod_exit[i]           = node[i]->exit;
         mod_size[i]           = node[i]->size;
@@ -85,41 +85,41 @@ bool Greedy::optimize() {
     RNG_BEGIN();
 
     // Generate random enumeration of nodes
-    vector<int> randomOrder(Nnode);
-    for (int i = 0; i < Nnode; i++) {
+    vector<igraph_integer_t> randomOrder(Nnode);
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         randomOrder[i] = i;
     }
 
-    for (int i = 0; i < Nnode - 1; i++) {
+    for (igraph_integer_t i = 0; i < Nnode - 1; i++) {
         //int randPos = i ; //XXX
-        int randPos = RNG_INTEGER(i, Nnode - 1);
+        igraph_integer_t randPos = static_cast<igraph_integer_t>(RNG_INTEGER(i, Nnode - 1));
         // swap i & randPos
-        int tmp              = randomOrder[i];
+        igraph_integer_t tmp = randomOrder[i];
         randomOrder[i]       = randomOrder[randPos];
         randomOrder[randPos] = tmp;
     }
 
-    unsigned int offset = 1;
-    vector<unsigned int> redirect(Nnode, 0);
-    vector<pair<int, pair<double, double> > > flowNtoM(Nnode);
+    igraph_integer_t offset = 1;
+    vector<igraph_integer_t> redirect(Nnode, 0);
+    vector<pair<igraph_integer_t, pair<double, double> > > flowNtoM(Nnode);
 
-    for (int k = 0; k < Nnode; k++) {
+    for (igraph_integer_t k = 0; k < Nnode; k++) {
 
         // Pick nodes in random order
-        int flip = randomOrder[k];
-        int oldM = node_index[flip];
+        igraph_integer_t flip = randomOrder[k];
+        igraph_integer_t oldM = node_index[flip];
 
-        // Reset offset when int overflows
-        if (offset > INT_MAX) {
-            for (int j = 0; j < Nnode; j++) {
+        // Reset offset when igraph_integer_t overflows
+        if (offset > IGRAPH_INTEGER_MAX) {
+            for (igraph_integer_t j = 0; j < Nnode; j++) {
                 redirect[j] = 0;
             }
             offset = 1;
         }
         // Size of vector with module links
-        int NmodLinks = 0;
+        igraph_integer_t NmodLinks = 0;
         // For all outLinks
-        int NoutLinks = node[flip]->outLinks.size();
+        size_t NoutLinks = node[flip]->outLinks.size();
         if (NoutLinks == 0) { //dangling node, add node to calculate flow below
             redirect[oldM] = offset + NmodLinks;
             flowNtoM[NmodLinks].first = oldM;
@@ -127,8 +127,8 @@ bool Greedy::optimize() {
             flowNtoM[NmodLinks].second.second = 0.0;
             NmodLinks++;
         } else {
-            for (int j = 0; j < NoutLinks; j++) {
-                int nb_M       = node_index[node[flip]->outLinks[j].first];
+            for (size_t j = 0; j < NoutLinks; j++) {
+                igraph_integer_t nb_M = node_index[node[flip]->outLinks[j].first];
                 // index destination du lien
                 double nb_flow = node[flip]->outLinks[j].second;
                 // wgt du lien
@@ -144,9 +144,9 @@ bool Greedy::optimize() {
             }
         }
         // For all inLinks
-        int NinLinks = node[flip]->inLinks.size();
-        for (int j = 0; j < NinLinks; j++) {
-            int nb_M = node_index[node[flip]->inLinks[j].first];
+        size_t NinLinks = node[flip]->inLinks.size();
+        for (size_t j = 0; j < NinLinks; j++) {
+            igraph_integer_t nb_M = node_index[node[flip]->inLinks[j].first];
             double nb_flow = node[flip]->inLinks[j].second;
 
             if (redirect[nb_M] >= offset) {
@@ -161,8 +161,8 @@ bool Greedy::optimize() {
         }
 
         // For teleportation and dangling nodes
-        for (int j = 0; j < NmodLinks; j++) {
-            int newM = flowNtoM[j].first;
+        for (igraph_integer_t j = 0; j < NmodLinks; j++) {
+            igraph_integer_t newM = flowNtoM[j].first;
             if (newM == oldM) {
                 flowNtoM[j].second.first  +=
                     (alpha * node[flip]->size + beta * node[flip]->danglingSize) *
@@ -196,7 +196,7 @@ bool Greedy::optimize() {
         }
 
         // Option to move to empty module (if node not already alone)
-        if (mod_members[oldM] > static_cast<int>(node[flip]->members.size())) {
+        if (mod_members[oldM] > node[flip]->members.size()) {
             if (Nempty > 0) {
                 flowNtoM[NmodLinks].first = mod_empty[Nempty - 1];
                 flowNtoM[NmodLinks].second.first = 0.0;
@@ -206,10 +206,10 @@ bool Greedy::optimize() {
         }
 
         // Randomize link order for optimized search
-        for (int j = 0; j < NmodLinks - 1; j++) {
+        for (igraph_integer_t j = 0; j < NmodLinks - 1; j++) {
             //int randPos = j ; // XXX
-            int randPos = RNG_INTEGER(j, NmodLinks - 1);
-            int tmp_M = flowNtoM[j].first;
+            igraph_integer_t randPos = static_cast<igraph_integer_t>(RNG_INTEGER(j, NmodLinks - 1));
+            igraph_integer_t tmp_M = flowNtoM[j].first;
             double tmp_outFlow = flowNtoM[j].second.first;
             double tmp_inFlow = flowNtoM[j].second.second;
             flowNtoM[j].first = flowNtoM[randPos].first;
@@ -220,15 +220,15 @@ bool Greedy::optimize() {
             flowNtoM[randPos].second.second = tmp_inFlow;
         }
 
-        int bestM = oldM;
+        igraph_integer_t bestM = oldM;
         double best_outFlow = 0.0;
         double best_inFlow = 0.0;
         double best_delta = 0.0;
 
         // Find the move that minimizes the description length
-        for (int j = 0; j < NmodLinks; j++) {
+        for (igraph_integer_t j = 0; j < NmodLinks; j++) {
 
-            int newM = flowNtoM[j].first;
+            igraph_integer_t newM = flowNtoM[j].first;
             double outFlowNewM = flowNtoM[j].second.first;
             double inFlowNewM  = flowNtoM[j].second.second;
 
@@ -268,7 +268,7 @@ bool Greedy::optimize() {
             if (mod_members[bestM] == 0) {
                 Nempty--;
             }
-            if (mod_members[oldM] == static_cast<int>(node[flip]->members.size())) {
+            if (mod_members[oldM] == node[flip]->members.size()) {
                 mod_empty[Nempty] = oldM;
                 Nempty++;
             }
@@ -324,22 +324,22 @@ void Greedy::apply(bool sort) {
 //void Greedy::level(Node ***node_tmp, bool sort) {
 
     //old fct prepare(sort)
-    vector<int> modSnode;  // will give ids of no-empty modules (nodes)
-    int Nmod = 0;
+    vector<igraph_integer_t> modSnode;  // will give IDs of no-empty modules (nodes)
+    igraph_integer_t Nmod = 0;
     if (sort) {
-        multimap<double, int> Msize;
-        for (int i = 0; i < Nnode; i++) {
+        multimap<double, igraph_integer_t> Msize;
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             if (mod_members[i] > 0) {
                 Nmod++;
-                Msize.insert(pair<const double, int>(mod_size[i], i));
+                Msize.insert(pair<const double, igraph_integer_t>(mod_size[i], i));
             }
         }
-        for (multimap<double, int>::reverse_iterator it = Msize.rbegin();
+        for (multimap<double, igraph_integer_t>::reverse_iterator it = Msize.rbegin();
              it != Msize.rend(); it++) {
             modSnode.push_back(it->second);
         }
     } else {
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             if (mod_members[i] > 0) {
                 Nmod++;
                 modSnode.push_back(i);
@@ -355,12 +355,12 @@ void Greedy::apply(bool sort) {
 
     Node ** node = graph->node;
 
-    vector<int> nodeInMod = vector<int>(Nnode);
+    vector<igraph_integer_t> nodeInMod = vector<igraph_integer_t>(Nnode);
 
     // creation of new nodes
-    for (int i = 0; i < Nmod; i++) {
+    for (igraph_integer_t i = 0; i < Nmod; i++) {
         //node_tmp[i] = new Node();
-        vector<int>().swap(node_tmp[i]->members); // clear membership
+        vector<igraph_integer_t>().swap(node_tmp[i]->members); // clear membership
         node_tmp[i]->exit           =           mod_exit[modSnode[i]];
         node_tmp[i]->size           =           mod_size[modSnode[i]];
         node_tmp[i]->danglingSize   =   mod_danglingSize[modSnode[i]];
@@ -371,19 +371,19 @@ void Greedy::apply(bool sort) {
     //nodeInMode[id_in_mod_tbl] = id_when_no_empty_node
 
     // Calculate outflow of links to different modules
-    vector<map<int, double> > outFlowNtoM(Nmod);
-    map<int, double>::iterator it_M;
+    vector<map<igraph_integer_t, double> > outFlowNtoM(Nmod);
+    map<igraph_integer_t, double>::iterator it_M;
 
-    for (int i = 0; i < Nnode; i++) {
-        int i_M = nodeInMod[node_index[i]]; //final id of the module of the node i
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
+        igraph_integer_t i_M = nodeInMod[node_index[i]]; //final id of the module of the node i
         // add node members to the module
         copy( node[i]->members.begin(), node[i]->members.end(),
               back_inserter( node_tmp[i_M]->members ) );
 
-        int NoutLinks = node[i]->outLinks.size();
-        for (int j = 0; j < NoutLinks; j++) {
-            int nb         = node[i]->outLinks[j].first;
-            int nb_M       = nodeInMod[node_index[nb]];
+        size_t NoutLinks = node[i]->outLinks.size();
+        for (size_t j = 0; j < NoutLinks; j++) {
+            igraph_integer_t nb         = node[i]->outLinks[j].first;
+            igraph_integer_t nb_M       = nodeInMod[node_index[nb]];
             double nb_flow = node[i]->outLinks[j].second;
             if (nb != i) {
                 it_M = outFlowNtoM[i_M].find(nb_M);
@@ -397,7 +397,7 @@ void Greedy::apply(bool sort) {
     }
 
     // Create outLinks at new level
-    for (int i = 0; i < Nmod; i++) {
+    for (igraph_integer_t i = 0; i < Nmod; i++) {
         for (it_M = outFlowNtoM[i].begin(); it_M != outFlowNtoM[i].end(); it_M++) {
             if (it_M->first != i) {
                 node_tmp[i]->outLinks.push_back(make_pair(it_M->first, it_M->second));
@@ -406,14 +406,14 @@ void Greedy::apply(bool sort) {
     }
 
     // Calculate inflow of links from different modules
-    vector<map<int, double> > inFlowNtoM(Nmod);
+    vector<map<igraph_integer_t, double> > inFlowNtoM(Nmod);
 
-    for (int i = 0; i < Nnode; i++) {
-        int i_M = nodeInMod[node_index[i]];
-        int NinLinks = node[i]->inLinks.size();
-        for (int j = 0; j < NinLinks; j++) {
-            int nb         = node[i]->inLinks[j].first;
-            int nb_M       = nodeInMod[node_index[nb]];
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
+        igraph_integer_t i_M = nodeInMod[node_index[i]];
+        size_t NinLinks = node[i]->inLinks.size();
+        for (size_t j = 0; j < NinLinks; j++) {
+            igraph_integer_t nb         = node[i]->inLinks[j].first;
+            igraph_integer_t nb_M       = nodeInMod[node_index[nb]];
             double nb_flow = node[i]->inLinks[j].second;
             if (nb != i) {
                 it_M = inFlowNtoM[i_M].find(nb_M);
@@ -427,7 +427,7 @@ void Greedy::apply(bool sort) {
     }
 
     // Create inLinks at new level
-    for (int i = 0; i < Nmod; i++) {
+    for (igraph_integer_t i = 0; i < Nmod; i++) {
         for (it_M = inFlowNtoM[i].begin(); it_M != inFlowNtoM[i].end(); it_M++) {
             if (it_M->first != i) {
                 node_tmp[i]->inLinks.push_back(make_pair(it_M->first, it_M->second));
@@ -436,7 +436,7 @@ void Greedy::apply(bool sort) {
     }
 
     // Option to move to empty module
-    vector<int>().swap(mod_empty);
+    vector<igraph_integer_t>().swap(mod_empty);
     Nempty = 0;
 
     //swap node between tmp_graph and graph, then destroy tmp_fgraph
@@ -469,7 +469,7 @@ void Greedy::tune(void) {
     size_log_size = 0.0;
     exitFlow = 0.0;
 
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         mod_exit[i] = 0.0;
         mod_size[i] = 0.0;
         mod_danglingSize[i] = 0.0;
@@ -479,19 +479,19 @@ void Greedy::tune(void) {
 
     Node ** node = graph->node;
     // Update all values except contribution from teleportation
-    for (int i = 0; i < Nnode; i++) {
-        int i_M = node_index[i]; // module id of node i
-        int Nlinks = node[i]->outLinks.size();
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
+        igraph_integer_t i_M = node_index[i]; // module id of node i
+        size_t Nlinks = node[i]->outLinks.size();
 
         mod_size[i_M]           += node[i]->size;
         mod_danglingSize[i_M]   += node[i]->danglingSize;
         mod_teleportWeight[i_M] += node[i]->teleportWeight;
         mod_members[i_M]++;
 
-        for (int j = 0; j < Nlinks; j++) {
-            int neighbor      = node[i]->outLinks[j].first;
+        for (size_t j = 0; j < Nlinks; j++) {
+            igraph_integer_t neighbor = node[i]->outLinks[j].first;
             double neighbor_w = node[i]->outLinks[j].second;
-            int neighbor_M    = node_index[neighbor];
+            igraph_integer_t neighbor_M = node_index[neighbor];
             if (i_M != neighbor_M) { // neighbor in an other module
                 mod_exit[i_M] += neighbor_w;
             }
@@ -499,12 +499,12 @@ void Greedy::tune(void) {
     }
 
     // Update contribution from teleportation
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         mod_exit[i] += (alpha * mod_size[i] + beta * mod_danglingSize[i]) *
                        (1.0 - mod_teleportWeight[i]);
     }
 
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         exit_log_exit += plogp(mod_exit[i]);
         size_log_size += plogp(mod_exit[i] + mod_size[i]);
         exitFlow += mod_exit[i];
@@ -518,13 +518,13 @@ void Greedy::tune(void) {
 
 /* Compute the new CodeSize if modules are merged as indicated by moveTo
  */
-void Greedy::setMove(int *moveTo) {
+void Greedy::setMove(igraph_integer_t *moveTo) {
     //void Greedy::determMove(int *moveTo) {
     Node ** node = graph->node;
     //printf("setMove nNode:%d \n", Nnode);
-    for (int i = 0 ; i < Nnode ; i++) { // pour chaque module
-        int oldM = i;
-        int newM = moveTo[i];
+    for (igraph_integer_t i = 0 ; i < Nnode ; i++) { // pour chaque module
+        igraph_integer_t oldM = i;
+        igraph_integer_t newM = moveTo[i];
         //printf("old -> new : %d -> %d \n", oldM, newM);
         if (newM != oldM) {
 
@@ -544,9 +544,9 @@ void Greedy::setMove(int *moveTo) {
                                  node[i]->teleportWeight;
 
             // For all outLinks
-            int NoutLinks = node[i]->outLinks.size();
-            for (int j = 0; j < NoutLinks; j++) {
-                int nb_M = node_index[node[i]->outLinks[j].first];
+            size_t NoutLinks = node[i]->outLinks.size();
+            for (size_t j = 0; j < NoutLinks; j++) {
+                igraph_integer_t nb_M = node_index[node[i]->outLinks[j].first];
                 double nb_flow = node[i]->outLinks[j].second;
                 if (nb_M == oldM) {
                     outFlowOldM += nb_flow;
@@ -556,9 +556,9 @@ void Greedy::setMove(int *moveTo) {
             }
 
             // For all inLinks
-            int NinLinks = node[i]->inLinks.size();
-            for (int j = 0; j < NinLinks; j++) {
-                int nb_M = node_index[node[i]->inLinks[j].first];
+            size_t NinLinks = node[i]->inLinks.size();
+            for (size_t j = 0; j < NinLinks; j++) {
+                igraph_integer_t nb_M = node_index[node[i]->inLinks[j].first];
                 double nb_flow = node[i]->inLinks[j].second;
                 if (nb_M == oldM) {
                     inFlowOldM += nb_flow;
@@ -573,7 +573,7 @@ void Greedy::setMove(int *moveTo) {
                 // si le nouveau etait vide, on a un vide de moins...
                 Nempty--;
             }
-            if (mod_members[oldM] == static_cast<int>(node[i]->members.size())) {
+            if (mod_members[oldM] == node[i]->members.size()) {
                 // si l'ancien avait la taille de celui qui bouge, un vide de plus
                 mod_empty[Nempty] = oldM;
                 Nempty++;

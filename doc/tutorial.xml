@@ -226,8 +226,8 @@ as in the example).
 The <link
 linkend="igraph_add_edges"><function>igraph_add_edges()</function></link>
 function simply takes a graph and a vector of
-vertex ids defining the new edges. The first edge is between the first
-two vertex ids in the vector, the second edge is between the second
+vertex IDs defining the new edges. The first edge is between the first
+two vertex IDs in the vector, the second edge is between the second
 two, etc. This way we add ten random edges to the lattice.
 </para>
 

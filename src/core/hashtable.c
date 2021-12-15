@@ -29,7 +29,7 @@
 
 #include <string.h>
 
-int igraph_hashtable_init(igraph_hashtable_t *ht) {
+igraph_error_t igraph_hashtable_init(igraph_hashtable_t *ht) {
     IGRAPH_CHECK(igraph_trie_init(&ht->keys, 1));
     IGRAPH_FINALLY(igraph_trie_destroy, &ht->keys);
     IGRAPH_CHECK(igraph_strvector_init(&ht->elements, 0));
@@ -37,7 +37,7 @@ int igraph_hashtable_init(igraph_hashtable_t *ht) {
     IGRAPH_CHECK(igraph_strvector_init(&ht->defaults, 0));
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
@@ -52,11 +52,11 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
    than the keys trie, but the data is always retrieved based on the trie
 */
 
-int igraph_hashtable_addset(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                             const char *key, const char *def,
                             const char *elem) {
-    long int size = igraph_trie_size(&ht->keys);
-    long int newid;
+    igraph_integer_t size = igraph_trie_size(&ht->keys);
+    igraph_integer_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     if (newid == size) {
@@ -70,16 +70,16 @@ int igraph_hashtable_addset(igraph_hashtable_t *ht,
         IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, elem));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Previous comment also applies here */
 
-int igraph_hashtable_addset2(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
                              const char *key, const char *def,
-                             const char *elem, int elemlen) {
-    long int size = igraph_trie_size(&ht->keys);
-    long int newid;
+                             const char *elem, size_t elemlen) {
+    igraph_integer_t size = igraph_trie_size(&ht->keys);
+    igraph_integer_t newid;
     char *tmp;
 
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
@@ -104,26 +104,26 @@ int igraph_hashtable_addset2(igraph_hashtable_t *ht,
     IGRAPH_FREE(tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_hashtable_get(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
                          const char *key, char **elem) {
-    long int newid;
+    igraph_integer_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     igraph_strvector_get(&ht->elements, newid, elem);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_hashtable_reset(igraph_hashtable_t *ht) {
+igraph_error_t igraph_hashtable_reset(igraph_hashtable_t *ht) {
     igraph_strvector_destroy(&ht->elements);
     IGRAPH_CHECK(igraph_strvector_copy(&ht->elements, &ht->defaults));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_hashtable_getkeys(igraph_hashtable_t *ht,
-                             const igraph_strvector_t **sv) {
+igraph_error_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
+                                        const igraph_strvector_t **sv) {
     return igraph_trie_getkeys(&ht->keys, sv);
 }

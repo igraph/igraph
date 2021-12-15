@@ -22,19 +22,19 @@
 
 int main() {
     igraph_vector_t from;
-    igraph_vector_long_t to;
+    igraph_vector_int_t to;
 
     igraph_vector_init_real(&from, 9, -0.6, -0.5, -0.4, -0.0, 0.0, 0.4, 0.5, 0.6, 1.1);
-    igraph_vector_long_init(&to, 0);
+    igraph_vector_int_init(&to, 0);
 
     printf("From:\n");
     igraph_vector_print(&from);
     IGRAPH_ASSERT(igraph_vector_floor(&from, &to) == IGRAPH_SUCCESS);
 
     printf("To:\n");
-    igraph_vector_long_print(&to);
+    igraph_vector_int_print(&to);
 
-    igraph_vector_long_destroy(&to);
+    igraph_vector_int_destroy(&to);
     igraph_vector_destroy(&from);
     VERIFY_FINALLY_STACK();
     return 0;

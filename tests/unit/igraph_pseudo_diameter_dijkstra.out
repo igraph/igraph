@@ -1,0 +1,128 @@
+Null graph without explicit start vertex:
+result: NaN, from -1 to -1
+
+1 vertex:
+result: 0, from 0 to 0
+
+2 vertices unconn = true:
+result: 0, from 0 to 0
+
+2 vertices unconn = false:
+result: Inf, from -1 to -1
+
+2 vertices, directed, unconn = true:
+result: 0, from 0 to 0
+
+2 vertices, directed, unconn = false:
+result: Inf, from -1 to -1
+
+Undirected disconnected graph with loops and multiple edges, all weights equal.
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 2, from 2 to 1
+
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 0, from 5 to 5
+
+Undirected disconnected graph with loops and multiple edges, NULL weights.
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 3, from 4 to 0
+
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 0, from 5 to 5
+
+Same graph, directed, direction ignored.
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 2, from 2 to 1
+
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 0, from 5 to 5
+
+Same graph, direction not ignored.
+result: 3, from 0 to 4
+
+result: 2, from 2 to 1
+
+result: 3, from 0 to 4
+
+result: 3, from 0 to 4
+
+result: 3, from 0 to 4
+
+result: 0, from 5 to 5
+
+Same graph, weighted.
+result: 11, from 2 to 4
+
+result: 11, from 2 to 4
+
+result: 11, from 2 to 4
+
+result: 11, from 2 to 4
+
+result: 11, from 2 to 4
+
+result: 0, from 5 to 5
+
+Same graph, weighted, directions ignored.
+result: 10, from 4 to 2
+
+result: 10, from 4 to 2
+
+result: 10, from 2 to 4
+
+result: 10, from 4 to 2
+
+result: 10, from 4 to 2
+
+result: 0, from 5 to 5
+
+Directed graph, weighted, pointing outward from 2.
+result: 5, from 2 to 4
+
+result: 5, from 2 to 4
+
+result: 5, from 2 to 4
+
+result: 5, from 2 to 4
+
+result: 5, from 2 to 4
+
+Same graph, random starting vertex.
+result: 5, from 2 to 4
+
+Same graph, unconn = false.
+result: Inf, from -1 to -1
+
+Same graph, direction ignored.
+result: 6, from 0 to 4
+
+result: 6, from 1 to 4
+
+result: 6, from 4 to 0
+
+result: 6, from 0 to 4
+
+result: 6, from 4 to 0
+
+Weight vector size too small.
+Starting vertex ID too large.
+Negative weight.
+NaN weight.

@@ -23,19 +23,13 @@
 
 __BEGIN_DECLS
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_neighbors(const igraph_t *graph,
-                       igraph_vector_t *neis,
-                       igraph_integer_t pnode,
-                       igraph_neimode_t mode,
-                       igraph_loops_t loops,
-                       igraph_multiple_t multiple);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_neighbors(
+   const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
+   igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple);
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_incident(const igraph_t *graph,
-                       igraph_vector_t *eids,
-                       igraph_integer_t pnode,
-                       igraph_neimode_t mode,
-                       igraph_loops_t loops,
-                       igraph_multiple_t multiple);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_incident(
+   const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
+   igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple);
 
 __END_DECLS
 

@@ -24,8 +24,8 @@
 int main() {
     igraph_t g;
     igraph_real_t  modularity, temperature;
-    igraph_vector_t membership, csize;
-    /* long int i; */
+    igraph_vector_int_t membership, csize;
+    /* igraph_integer_t i; */
     igraph_real_t cohesion, adhesion;
     igraph_integer_t inner_links;
     igraph_integer_t outer_links;
@@ -36,8 +36,8 @@ int main() {
     igraph_small(&g, 10, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
                  5, 6, 5, 7, 5, 8, 5, 9, 6, 7, 6, 8, 6, 9, 7, 8, 7, 9, 8, 9, 0, 5, -1);
-    igraph_vector_init(&membership, 0);
-    igraph_vector_init(&csize, 0);
+    igraph_vector_int_init(&membership, 0);
+    igraph_vector_int_init(&csize, 0);
 
     printf("\nOriginal implementation.\n");
     igraph_community_spinglass(&g,
@@ -56,13 +56,13 @@ int main() {
                                IGRAPH_SPINCOMM_IMP_ORIG,
                                /*gamma_minus =*/ 0);
 
-    IGRAPH_ASSERT(igraph_vector_size(&membership) == igraph_vcount(&g));
-    IGRAPH_ASSERT(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_int_size(&csize) == igraph_vector_int_max(&membership) + 1);
 
     /* The following depend on the random seed, however, for this graph,
        the result is almost always the same (i.e. two clusters). */
     printf("Modularity: %g\n", modularity);
-    print_vector_round(&membership);
+    print_vector_int(&membership);
 
     printf("\nOriginal implementation, parallel updating.\n");
     igraph_community_spinglass(&g,
@@ -81,13 +81,13 @@ int main() {
                                IGRAPH_SPINCOMM_IMP_ORIG,
                                /*gamma_minus =*/ 0);
 
-    IGRAPH_ASSERT(igraph_vector_size(&membership) == igraph_vcount(&g));
-    IGRAPH_ASSERT(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_int_size(&csize) == igraph_vector_int_max(&membership) + 1);
 
     /* The following depend on the random seed, however, for this graph,
        the result is almost always the same (i.e. two clusters). */
     printf("Modularity: %g\n", modularity);
-    print_vector_round(&membership);
+    print_vector_int(&membership);
 
     printf("\nNegative implementation.\n");
     igraph_community_spinglass(&g,
@@ -106,13 +106,13 @@ int main() {
                                IGRAPH_SPINCOMM_IMP_NEG,
                                /*gamma_minus =*/ 0);
 
-    IGRAPH_ASSERT(igraph_vector_size(&membership) == igraph_vcount(&g));
-    IGRAPH_ASSERT(igraph_vector_size(&csize) == igraph_vector_max(&membership) + 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_int_size(&csize) == igraph_vector_int_max(&membership) + 1);
 
     /* The following depend on the random seed, however, for this graph,
        the result is almost always the same (i.e. two clusters). */
     printf("Modularity: %g\n", modularity);
-    print_vector_round(&membership);
+    print_vector_int(&membership);
 
     /* Try to call this as well, we don't check the results currently.... */
 
@@ -129,8 +129,8 @@ int main() {
                                       /*gamma=       */ 1.0);
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&membership);
-    igraph_vector_destroy(&csize);
+    igraph_vector_int_destroy(&membership);
+    igraph_vector_int_destroy(&csize);
 
     VERIFY_FINALLY_STACK();
     return 0;

@@ -29,98 +29,94 @@
 /* Note to self: tried using adjacency lists instead of igraph_incident queries,
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
-static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
-    long int no_of_edges = igraph_ecount(graph);
-    long int i, j, n;
-    igraph_vector_t adjedges, adjedges2;
-    igraph_vector_t edges;
-    long int prev = -1;
+static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i, j, n;
+    igraph_vector_int_t adjedges, adjedges2;
+    igraph_vector_int_t edges;
+    igraph_integer_t prev = -1;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&adjedges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&adjedges2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges2, 0);
 
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (from != prev) {
-            IGRAPH_CHECK(igraph_incident(graph, &adjedges, (igraph_integer_t) from,
-                                         IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL));
         }
-        n = igraph_vector_size(&adjedges);
+        n = igraph_vector_int_size(&adjedges);
         for (j = 0; j < n; j++) {
-            long int e = (long int) VECTOR(adjedges)[j];
+            igraph_integer_t e = VECTOR(adjedges)[j];
             if (e < i) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e));
             }
         }
 
-        IGRAPH_CHECK(igraph_incident(graph, &adjedges2, (igraph_integer_t) to,
-                                     IGRAPH_ALL));
-        n = igraph_vector_size(&adjedges2);
+        IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL));
+        n = igraph_vector_int_size(&adjedges2);
         for (j = 0; j < n; j++) {
-            long int e = (long int) VECTOR(adjedges2)[j];
+            igraph_integer_t e = VECTOR(adjedges2)[j];
             if (e < i) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e));
             }
         }
 
         prev = from;
     }
 
-    igraph_vector_destroy(&adjedges);
-    igraph_vector_destroy(&adjedges2);
+    igraph_vector_int_destroy(&adjedges);
+    igraph_vector_int_destroy(&adjedges2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    igraph_create(linegraph, &edges, (igraph_integer_t) no_of_edges,
-                  igraph_is_directed(graph));
-    igraph_vector_destroy(&edges);
+    igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
-    long int no_of_edges = igraph_ecount(graph);
-    long int i, j, n;
-    igraph_vector_t adjedges;
-    igraph_vector_t edges;
-    long int prev = -1;
+static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i, j, n;
+    igraph_vector_int_t adjedges;
+    igraph_vector_int_t edges;
+    igraph_integer_t prev = -1;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&adjedges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges, 0);
 
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (from != prev) {
-            IGRAPH_CHECK(igraph_incident(graph, &adjedges, (igraph_integer_t) from,
-                                         IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_IN));
         }
-        n = igraph_vector_size(&adjedges);
+        n = igraph_vector_int_size(&adjedges);
         for (j = 0; j < n; j++) {
-            long int e = (long int) VECTOR(adjedges)[j];
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, e));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+            igraph_integer_t e = VECTOR(adjedges)[j];
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
         }
 
         prev = from;
     }
 
-    igraph_vector_destroy(&adjedges);
+    igraph_vector_int_destroy(&adjedges);
     IGRAPH_FINALLY_CLEAN(1);
-    igraph_create(linegraph, &edges, (igraph_integer_t) no_of_edges, igraph_is_directed(graph));
-    igraph_vector_destroy(&edges);
+    igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -154,7 +150,7 @@ static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegrap
  * Time complexity: O(|V|+|E|), the number of edges plus the number of vertices.
  */
 
-int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
+igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
 
     if (igraph_is_directed(graph)) {
         return igraph_i_linegraph_directed(graph, linegraph);

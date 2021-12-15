@@ -35,8 +35,8 @@ int main() {
 
     igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
     n = igraph_vcount(&g);
-    igraph_vector_init(&v, (long int)n);
-    igraph_vector_init(&v2, (long int)n);
+    igraph_vector_init(&v, n);
+    igraph_vector_init(&v2, n);
     igraph_avg_nearest_neighbor_degree(&g, igraph_vss_all(),
                                        mode, neighbour_degree_mode,
                                        &v, &v2, /*weights=*/ 0);
@@ -45,8 +45,8 @@ int main() {
     igraph_vector_init(&weights, igraph_ecount(&g));
     igraph_vector_fill(&weights, 2.0);
 
-    igraph_vector_init(&v_weighted, (long int)n);
-    igraph_vector_init(&v2_weighted, (long int)n);
+    igraph_vector_init(&v_weighted, n);
+    igraph_vector_init(&v2_weighted, n);
     igraph_avg_nearest_neighbor_degree(&g, igraph_vss_all(),
                                        mode, neighbour_degree_mode,
                                        &v_weighted, &v2_weighted, &weights);

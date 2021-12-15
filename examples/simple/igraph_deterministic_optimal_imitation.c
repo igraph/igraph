@@ -28,24 +28,26 @@ typedef struct {
     igraph_integer_t vertex;
     igraph_optimal_t optimality;
     igraph_vector_t *quantities;
-    igraph_vector_t *strategies;
+    igraph_vector_int_t *strategies;
     igraph_neimode_t mode;
-    int retval;
+    igraph_error_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-int error_tests() {
+igraph_error_t error_tests() {
     igraph_t g, h;
-    igraph_vector_t quant, strat;
-    int i, n, ret;
+    igraph_vector_t quant;
+    igraph_vector_int_t strat;
+    igraph_integer_t i, n;
+    igraph_error_t ret;
     strategy_test_t *test;
 
     /* nonempty graph */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
     igraph_empty(&h, 0, 0);         /* empty graph */
     igraph_vector_init(&quant, 1);  /* quantities vector */
-    igraph_vector_init(&strat, 2);  /* strategies vector */
+    igraph_vector_int_init(&strat, 2);  /* strategies vector */
 
     {
         /* test parameters */
@@ -94,7 +96,7 @@ int error_tests() {
                     test->strategies,
                     test->mode);
             if (ret != test->retval) {
-                printf("Error test no. %d failed.\n", (int)(i + 1));
+                printf("Error test no. %" IGRAPH_PRId " failed.\n", i + 1);
                 return IGRAPH_FAILURE;
             }
             i++;
@@ -104,7 +106,7 @@ int error_tests() {
     igraph_destroy(&g);
     igraph_destroy(&h);
     igraph_vector_destroy(&quant);
-    igraph_vector_destroy(&strat);
+    igraph_vector_int_destroy(&strat);
 
     return IGRAPH_SUCCESS;
 }
@@ -112,10 +114,12 @@ int error_tests() {
 /* Updating the strategy of an isolated vertex. In this case, the strategies
  * vector should not change at all.
  */
-int isolated_vertex_test() {
+igraph_error_t isolated_vertex_test() {
     igraph_t g;
-    igraph_vector_t quant, strat, v;
-    int i, ret;
+    igraph_vector_t quant;
+    igraph_vector_int_t strat, v;
+    igraph_integer_t i;
+    igraph_error_t ret;
 
     /* graph with one isolated vertex */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
@@ -123,9 +127,9 @@ int isolated_vertex_test() {
     /* quantities vector: all vertices have the same fitness */
     igraph_vector_init_real(&quant, 4, 0.25, 0.25, 0.25, 0.25);
     /* strategies vector: 0 means aggressive strategy; 1 means passive */
-    igraph_vector_init_real(&strat, 4, 1., 0., 1., 0.);
+    igraph_vector_int_init_int(&strat, 4, 1, 0, 1, 0);
     /* make a copy of the original strategies vector for comparison later on */
-    igraph_vector_copy(&v, &strat);
+    igraph_vector_int_copy(&v, &strat);
     /* Now update strategy of vertex 3. Since this vertex is isolated, no */
     /* strategy update would take place. The resulting strategies vector */
     /* would be the same as it was originally. */
@@ -139,7 +143,7 @@ int isolated_vertex_test() {
         printf("Isolated vertex test failed.\n");
         return IGRAPH_FAILURE;
     }
-    for (i = 0; i < igraph_vector_size(&strat); i++) {
+    for (i = 0; i < igraph_vector_int_size(&strat); i++) {
         if (VECTOR(strat)[i] != VECTOR(v)[i]) {
             printf("Isolated vertex test failed.\n");
             return IGRAPH_FAILURE;
@@ -148,8 +152,8 @@ int isolated_vertex_test() {
     /* clean up */
     igraph_destroy(&g);
     igraph_vector_destroy(&quant);
-    igraph_vector_destroy(&strat);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&strat);
+    igraph_vector_int_destroy(&v);
 
     return IGRAPH_SUCCESS;
 }
@@ -163,10 +167,11 @@ int isolated_vertex_test() {
  * result vector, we reset the strategies vector to its default state and
  * repeat the game with another vertex.
  */
-int petersen_game_test() {
+igraph_error_t petersen_game_test() {
     igraph_t g;
-    igraph_vector_t known_max_v, known_min_v, quant, strat, stratcopy;
-    int i, nvert;
+    igraph_vector_t quant;
+    igraph_vector_int_t known_max_v, known_min_v, strat, stratcopy;
+    igraph_integer_t i, nvert;
 
     /* the Petersen graph */
     igraph_small(&g, /*n=*/ 0, IGRAPH_UNDIRECTED,
@@ -175,9 +180,7 @@ int petersen_game_test() {
     nvert = igraph_vcount(&g);
     /* Strategies vector, one strategy for each vertex. Thus vec[i] is the */
     /* strategy of vertex i. The strategy space is: {0, 1, 2, 3}. */
-    igraph_vector_init_real(&strat, nvert,
-                            1., 1., 2., 2., 0.,
-                            0., 0., 1., 2., 3.);
+    igraph_vector_int_init_int(&strat, nvert, 1, 1, 2, 2, 0, 0, 0, 1, 2, 3);
     /* Quantities vector, one quantity per vertex. Thus vec[i] is the */
     /* quantity for vertex i. */
     igraph_vector_init_real(&quant, nvert,
@@ -187,54 +190,50 @@ int petersen_game_test() {
     /* game i where we revise the strategy of vertex i, the strategy */
     /* vec[i] would be adopted by i. */
     /*maximum deterministic imitation*/
-    igraph_vector_init_real(&known_max_v, nvert,
-                            1., 1., 1., 2., 2.,
-                            0., 1., 0., 2., 0.);
+    igraph_vector_int_init_int(&known_max_v, nvert, 1, 1, 1, 2, 2, 0, 1, 0, 2, 0);
     /*minimum deterministic imitation*/
-    igraph_vector_init_real(&known_min_v, nvert,
-                            1., 1., 1., 2., 1.,
-                            1., 0., 1., 0., 1.);
+    igraph_vector_int_init_int(&known_min_v, nvert, 1, 1, 1, 2, 1, 1, 0, 1, 0, 1);
     /* play game and compare resulting updated strategies */
     for (i = 0; i < nvert; i++) {
         /* maximum deterministic imitation */
-        igraph_vector_copy(&stratcopy, &strat);
+        igraph_vector_int_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
-                /*vertex*/ (igraph_integer_t)i,
+                /*vertex*/ i,
                 /*optimality*/ IGRAPH_MAXIMUM,
                 /*quantities*/ &quant,
                 /*strategies*/ &stratcopy,
                 /*neighbours*/ IGRAPH_ALL);
         if (VECTOR(stratcopy)[i] != VECTOR(known_max_v)[i]) {
-            printf("Maximum deterministic imitation failed for vertex %d.\n", i);
+            printf("Maximum deterministic imitation failed for vertex %" IGRAPH_PRId ".\n", i);
             return IGRAPH_FAILURE;
         }
-        igraph_vector_destroy(&stratcopy);
+        igraph_vector_int_destroy(&stratcopy);
         /* minimum deterministic imitation */
-        igraph_vector_copy(&stratcopy, &strat);
+        igraph_vector_int_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
-                /*vertex*/ (igraph_integer_t)i,
+                /*vertex*/ i,
                 /*optimality*/ IGRAPH_MINIMUM,
                 /*quantities*/ &quant,
                 /*strategies*/ &stratcopy,
                 /*neighbours*/ IGRAPH_ALL);
         if (VECTOR(stratcopy)[i] != VECTOR(known_min_v)[i]) {
-            printf("Minimum deterministic imitation failed for vertex %d.\n", i);
+            printf("Minimum deterministic imitation failed for vertex %" IGRAPH_PRId ".\n", i);
             return IGRAPH_FAILURE;
         }
-        igraph_vector_destroy(&stratcopy);
+        igraph_vector_int_destroy(&stratcopy);
     }
     /* clean up */
     igraph_destroy(&g);
-    igraph_vector_destroy(&known_max_v);
-    igraph_vector_destroy(&known_min_v);
+    igraph_vector_int_destroy(&known_max_v);
+    igraph_vector_int_destroy(&known_min_v);
     igraph_vector_destroy(&quant);
-    igraph_vector_destroy(&strat);
+    igraph_vector_int_destroy(&strat);
 
     return IGRAPH_SUCCESS;
 }
 
 int main() {
-    int ret;
+    igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 648);
 

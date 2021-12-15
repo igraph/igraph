@@ -31,12 +31,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "stack.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
-
 #define BASE_INT
 #include "igraph_pmt.h"
 #include "stack.pmt"

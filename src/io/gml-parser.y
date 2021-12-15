@@ -61,15 +61,15 @@
 
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
                        const char *s);
-void igraph_i_gml_get_keyword(char *s, int len, void *res);
-void igraph_i_gml_get_string(char *s, int len, void *res);
-double igraph_i_gml_get_real(char *s, int len);
-igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value);
-igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
-                                              char *v, int vlen);
-igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
-                                            char *value, int valuelen);
-igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len,
+void igraph_i_gml_get_keyword(char *s, size_t len, void *res);
+void igraph_i_gml_get_string(char *s, size_t len, void *res);
+double igraph_i_gml_get_real(char *s, size_t len);
+igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, size_t len, double value);
+igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, size_t len,
+                                              char *v, size_t vlen);
+igraph_gml_tree_t *igraph_i_gml_make_string(char* s, size_t len,
+                                            char *value, size_t valuelen);
+igraph_gml_tree_t *igraph_i_gml_make_list(char* s, size_t len,
                                           igraph_gml_tree_t *list);
 igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
 
@@ -91,7 +91,7 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 %union {
    struct {
       char *s;
-      int len;
+      size_t len;
    } str;
    void *tree;
    double real;
@@ -153,8 +153,8 @@ int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
   return 0;
 }
 
-void igraph_i_gml_get_keyword(char *s, int len, void *res) {
-  struct { char *s; int len; } *p=res;
+void igraph_i_gml_get_keyword(char *s, size_t len, void *res) {
+  struct { char *s; size_t len; } *p=res;
   p->s=IGRAPH_CALLOC(len+1, char);
   if (!p->s) {
     igraph_error("Cannot read GML file", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
@@ -164,8 +164,8 @@ void igraph_i_gml_get_keyword(char *s, int len, void *res) {
   p->len=len;
 }
 
-void igraph_i_gml_get_string(char *s, int len, void *res) {
-  struct { char *s; int len; } *p=res;
+void igraph_i_gml_get_string(char *s, size_t len, void *res) {
+  struct { char *s; size_t len; } *p=res;
   p->s=IGRAPH_CALLOC(len-1, char);
   if (!p->s) {
     igraph_error("Cannot read GML file", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
@@ -175,7 +175,7 @@ void igraph_i_gml_get_string(char *s, int len, void *res) {
   p->len=len-2;
 }
 
-double igraph_i_gml_get_real(char *s, int len) {
+double igraph_i_gml_get_real(char *s, size_t len) {
   igraph_real_t num;
   char tmp=s[len];
   s[len]='\0';
@@ -184,7 +184,7 @@ double igraph_i_gml_get_real(char *s, int len) {
   return num;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
+igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, size_t len, double value) {
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
   if (!t) {
@@ -207,8 +207,8 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
   return t;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
-                                              char* v, int vlen) {
+igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, size_t len,
+                                              char* v, size_t vlen) {
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
   char tmp = v[vlen];
 
@@ -249,8 +249,8 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
   return t;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
-                                            char *value, int valuelen) {
+igraph_gml_tree_t *igraph_i_gml_make_string(char* s, size_t len,
+                                            char *value, size_t valuelen) {
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
 
   if (!t) {
@@ -270,7 +270,7 @@ igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len,
   return t;
 }
 
-igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len,
+igraph_gml_tree_t *igraph_i_gml_make_list(char* s, size_t len,
                                           igraph_gml_tree_t *list) {
 
   igraph_gml_tree_t *t=IGRAPH_CALLOC(1, igraph_gml_tree_t);

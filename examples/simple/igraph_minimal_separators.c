@@ -28,7 +28,7 @@ int main() {
 
     igraph_t graph;
     igraph_vector_ptr_t separators;
-    long int i, n;
+    igraph_integer_t i, n;
 
     igraph_famous(&graph, "zachary");
     igraph_vector_ptr_init(&separators, 0);
@@ -37,11 +37,12 @@ int main() {
     n = igraph_vector_ptr_size(&separators);
     for (i = 0; i < n; i++) {
         igraph_bool_t res;
-        igraph_vector_t *sep = VECTOR(separators)[i];
+        igraph_vector_int_t *sep = VECTOR(separators)[i];
+
         igraph_is_separator(&graph, igraph_vss_vector(sep), &res);
         if (!res) {
-            printf("Vertex set %li is not a separator!\n", i);
-            igraph_vector_print(sep);
+            printf("Vertex set %" IGRAPH_PRId " is not a separator!\n", i);
+            igraph_vector_int_print(sep);
             return 1;
         }
     }

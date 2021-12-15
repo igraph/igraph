@@ -39,9 +39,9 @@ int main() {
 
     n = igraph_vector_ptr_size(&separators);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *sep = VECTOR(separators)[i];
-        igraph_vector_print(sep);
-        igraph_vector_destroy(sep);
+        igraph_vector_int_t *sep = VECTOR(separators)[i];
+        igraph_vector_int_print(sep);
+        igraph_vector_int_destroy(sep);
         igraph_free(sep);
     }
 

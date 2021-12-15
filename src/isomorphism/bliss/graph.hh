@@ -514,7 +514,9 @@ protected:
 
     unsigned int color;
     std::vector<unsigned int> edges;
-    unsigned int nof_edges() const {return edges.size(); }
+    unsigned int nof_edges() const {
+      return static_cast<unsigned int>(edges.size());
+    }
   };
   std::vector<Vertex> vertices;
   void sort_edges();
@@ -610,7 +612,9 @@ public:
   /**
    * Return the number of vertices in the graph.
    */
-  unsigned int get_nof_vertices() const {return vertices.size(); }
+  unsigned int get_nof_vertices() const {
+    return static_cast<unsigned int>(vertices.size());
+  }
 
   /**
    * \copydoc AbstractGraph::permute(const unsigned int* const perm) const
@@ -712,8 +716,8 @@ protected:
     unsigned int color;
     std::vector<unsigned int> edges_out;
     std::vector<unsigned int> edges_in;
-    unsigned int nof_edges_in() const {return edges_in.size(); }
-    unsigned int nof_edges_out() const {return edges_out.size(); }
+    unsigned int nof_edges_in() const { return static_cast<unsigned int>(edges_in.size()); }
+    unsigned int nof_edges_out() const { return static_cast<unsigned int>(edges_out.size()); }
   };
   std::vector<Vertex> vertices;
   void remove_duplicate_edges();
@@ -819,7 +823,7 @@ public:
   /**
    * Return the number of vertices in the graph.
    */
-  unsigned int get_nof_vertices() const {return vertices.size(); }
+  unsigned int get_nof_vertices() const { return static_cast<unsigned int>(vertices.size()); }
 
   /**
    * Add a new vertex with color 'color' in the graph and return its index.

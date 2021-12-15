@@ -34,14 +34,20 @@ int cause_fatal() {
 }
 
 void error_handler(const char *reason, const char *file, int line, int igraph_errno) {
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
     printf("Error. Reason: %s\nErrno: %d\n", reason, igraph_errno);
 }
 
 void warning_handler(const char *reason, const char *file, int line, int igraph_errno) {
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
     printf("Warning. Reason: %s\nErrno: %d\n", reason, igraph_errno);
 }
 
 void fatal_handler(const char *reason, const char *file, int line) {
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
     printf("Fatal. Reason: %s\n", reason);
     exit(0);
 }

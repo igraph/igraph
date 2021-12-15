@@ -27,7 +27,7 @@
 #include "test_utilities.inc"
 
 void free_complist(igraph_vector_ptr_t *complist) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < igraph_vector_ptr_size(complist); i++) {
         igraph_destroy(VECTOR(*complist)[i]);
         igraph_free(VECTOR(*complist)[i]);
@@ -38,7 +38,7 @@ int main() {
 
     igraph_t ring, g;
     igraph_vector_ptr_t complist;
-    long int i;
+    igraph_integer_t i;
 
     /* A directed ring, a single strongly connected component */
     igraph_ring(&ring, 10, IGRAPH_DIRECTED, 0, 1);

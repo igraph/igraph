@@ -90,7 +90,7 @@
  * graph.
  */
 
-int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
                                igraph_bool_t use_seed, igraph_integer_t maxiter,
                                igraph_real_t epsilon, igraph_real_t kkconst,
                                const igraph_vector_t *weights,
@@ -174,7 +174,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (no_nodes <= 1) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -235,7 +235,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
             }
             dx = MATRIX(*res, m, 0) - MATRIX(*res, i, 0);
             dy = MATRIX(*res, m, 1) - MATRIX(*res, i, 1);
-            mi_dist = sqrt(dx * dx + dy * dy);
+            mi_dist = hypot(dx, dy);
             myD1 += MATRIX(kij, m, i) * (dx - MATRIX(lij, m, i) * dx / mi_dist);
             myD2 += MATRIX(kij, m, i) * (dy - MATRIX(lij, m, i) * dy / mi_dist);
         }
@@ -275,7 +275,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
             }
             dx = old_x - MATRIX(*res, i, 0);
             dy = old_y - MATRIX(*res, i, 1);
-            dist = sqrt(dx * dx + dy * dy);
+            dist = hypot(dx, dy);
             den = dist * (dx * dx + dy * dy);
             A += MATRIX(kij, m, i) * (1 - MATRIX(lij, m, i) * dy * dy / den);
             B += MATRIX(kij, m, i) * MATRIX(lij, m, i) * dx * dy / den;
@@ -314,10 +314,10 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
             }
             old_dx = old_x - MATRIX(*res, i, 0);
             old_dy = old_y - MATRIX(*res, i, 1);
-            old_mi_dist = sqrt(old_dx * old_dx + old_dy * old_dy);
+            old_mi_dist = hypot(old_dx, old_dy);
             new_dx = new_x - MATRIX(*res, i, 0);
             new_dy = new_y - MATRIX(*res, i, 1);
-            new_mi_dist = sqrt(new_dx * new_dx + new_dy * new_dy);
+            new_mi_dist = hypot(new_dx, new_dy);
 
             VECTOR(D1)[i] -= MATRIX(kij, m, i) *
                              (-old_dx + MATRIX(lij, m, i) * old_dx / old_mi_dist);
@@ -346,7 +346,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     igraph_matrix_destroy(&dij);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -401,7 +401,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * graph.
  */
 
-int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
                                   igraph_bool_t use_seed, igraph_integer_t maxiter,
                                   igraph_real_t epsilon, igraph_real_t kkconst,
                                   const igraph_vector_t *weights,
@@ -504,7 +504,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (no_nodes <= 1) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -714,5 +714,5 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
     igraph_matrix_destroy(&dij);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

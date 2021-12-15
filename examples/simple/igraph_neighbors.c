@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+void print_vector(igraph_vector_int_t *v, FILE *f) {
+    igraph_integer_t i;
+    for (i = 0; i < igraph_vector_int_size(v); i++) {
+        fprintf(f, " %" IGRAPH_PRId "", VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
@@ -34,10 +34,10 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
 
     igraph_t g;
-    igraph_vector_t v;
-    int ret;
+    igraph_vector_int_t v;
+    igraph_error_t ret;
 
-    igraph_vector_init(&v, 8);
+    igraph_vector_int_init(&v, 8);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 1;
@@ -49,15 +49,15 @@ int main() {
     igraph_create(&g, &v, 0, 1);
 
     igraph_neighbors(&g, &v, 2, IGRAPH_OUT);
-    igraph_vector_sort(&v);
+    igraph_vector_int_sort(&v);
     print_vector(&v, stdout);
 
     igraph_neighbors(&g, &v, 2, IGRAPH_IN);
-    igraph_vector_sort(&v);
+    igraph_vector_int_sort(&v);
     print_vector(&v, stdout);
 
     igraph_neighbors(&g, &v, 2, IGRAPH_ALL);
-    igraph_vector_sort(&v);
+    igraph_vector_int_sort(&v);
     print_vector(&v, stdout);
 
     /* Errors */
@@ -72,7 +72,7 @@ int main() {
         return 2;
     }
 
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
     return 0;
 }

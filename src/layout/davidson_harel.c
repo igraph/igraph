@@ -138,7 +138,7 @@ float igraph_i_layout_point_segment_dist2(float v_x, float v_y,
  *
  */
 
-int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                                  igraph_bool_t use_seed, igraph_integer_t maxiter,
                                  igraph_integer_t fineiter, igraph_real_t cool_fact,
                                  igraph_real_t weight_node_dist, igraph_real_t weight_border,
@@ -152,11 +152,11 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_int_t perm;
     igraph_bool_t fine_tuning = 0;
     igraph_integer_t round, i;
-    igraph_vector_float_t try_x, try_y;
+    igraph_vector_t try_x, try_y;
     igraph_vector_int_t try_idx;
     float move_radius = width / 2;
     float fine_tuning_factor = 0.01f;
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
     float min_x = width / 2, max_x = -width / 2, min_y = height / 2, max_y = -height / 2;
 
     igraph_integer_t no_tries = 30;
@@ -185,18 +185,16 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (no_nodes == 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
-    IGRAPH_CHECK(igraph_vector_float_init(&try_x, no_tries));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &try_x);
-    IGRAPH_CHECK(igraph_vector_float_init(&try_y, no_tries));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &try_y);
+    IGRAPH_VECTOR_INIT_FINALLY(&try_x, no_tries);
+    IGRAPH_VECTOR_INIT_FINALLY(&try_y, no_tries);
     IGRAPH_CHECK(igraph_vector_int_init_seq(&try_idx, 0, no_tries - 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &try_idx);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 100);
 
     RNG_BEGIN();
 
@@ -237,7 +235,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     for (i = 0; i < no_tries; i++) {
-        float phi = 2 * M_PI / no_tries * i;
+        double phi = 2 * M_PI / no_tries * i;
         VECTOR(try_x)[i] = cos(phi);
         VECTOR(try_y)[i] = sin(phi);
     }
@@ -262,13 +260,13 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
 
             for (t = 0; t < no_tries; t++) {
                 float diff_energy = 0.0;
-                int ti = VECTOR(try_idx)[t];
+                igraph_integer_t ti = VECTOR(try_idx)[t];
 
                 /* Try moving it */
-                float old_x = MATRIX(*res, v, 0);
-                float old_y = MATRIX(*res, v, 1);
-                float new_x = old_x + move_radius * VECTOR(try_x)[ti];
-                float new_y = old_y + move_radius * VECTOR(try_y)[ti];
+                igraph_real_t old_x = MATRIX(*res, v, 0);
+                igraph_real_t old_y = MATRIX(*res, v, 1);
+                igraph_real_t new_x = old_x + move_radius * VECTOR(try_x)[ti];
+                igraph_real_t new_y = old_y + move_radius * VECTOR(try_y)[ti];
 
                 if (new_x < -width / 2) {
                     new_x = -width / 2 - 1e-6;
@@ -336,7 +334,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                 if (w_edge_lengths != 0) {
                     igraph_integer_t len, j;
                     igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
-                    len = igraph_vector_size(&neis);
+                    len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
                         float odx = old_x - MATRIX(*res, u, 0);
@@ -352,7 +350,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                 if (w_edge_crossings != 0) {
                     igraph_integer_t len, j, no = 0;
                     igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
-                    len = igraph_vector_size(&neis);
+                    len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
                         float u_x = MATRIX(*res, u, 0);
@@ -403,7 +401,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
 
                     /* All other nodes from all of v's incident edges */
                     igraph_incident(graph, &neis, v, IGRAPH_ALL);
-                    no = igraph_vector_size(&neis);
+                    no = igraph_vector_int_size(&neis);
                     for (e = 0; e < no; e++) {
                         igraph_integer_t mye = VECTOR(neis)[e];
                         igraph_integer_t u = IGRAPH_OTHER(graph, mye, v);
@@ -453,12 +451,12 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
 
     RNG_END();
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&try_idx);
-    igraph_vector_float_destroy(&try_x);
-    igraph_vector_float_destroy(&try_y);
+    igraph_vector_destroy(&try_x);
+    igraph_vector_destroy(&try_y);
     igraph_vector_int_destroy(&perm);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

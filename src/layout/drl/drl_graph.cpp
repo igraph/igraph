@@ -175,11 +175,11 @@ graph::graph(const igraph_t *igraph,
     // scan .int file for node info
     highest_sim = 1.0;
     num_nodes = igraph_vcount(igraph);
-    long int no_of_edges = igraph_ecount(igraph);
-    for (long int i = 0; i < num_nodes; i++) {
+    igraph_integer_t no_of_edges = igraph_ecount(igraph);
+    for (igraph_integer_t i = 0; i < num_nodes; i++) {
         id_catalog[i] = 1;
     }
-    map< int, int>::iterator cat_iter;
+    map<igraph_integer_t, igraph_integer_t>::iterator cat_iter;
     for ( cat_iter = id_catalog.begin();
           cat_iter != id_catalog.end(); cat_iter++) {
         cat_iter->second = cat_iter->first;
@@ -194,9 +194,9 @@ graph::graph(const igraph_t *igraph,
     }
 
     // read .int file for graph info
-    long int node_1, node_2;
-    double weight;
-    for (long int i = 0; i < no_of_edges; i++) {
+    igraph_integer_t node_1, node_2;
+    igraph_real_t weight;
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         node_1 = IGRAPH_FROM(igraph, i);
         node_2 = IGRAPH_TO(igraph, i);
         weight = weights ? VECTOR(*weights)[i] : 1.0 ;
@@ -395,17 +395,17 @@ void graph::init_parms ( int rand_seed, float edge_cut, float real_parm ) {
     cut_rate = ( cut_length_start - cut_length_end ) / 400.0;
 
     // finally set the number of iterations to leave .real coords fixed
-    int full_comp_iters;
+    igraph_integer_t full_comp_iters;
     full_comp_iters = liquid.iterations + expansion.iterations +
                       cooldown.iterations + crunch.iterations + 3;
 
     // adjust real parm to iterations (do not enter simmer halfway)
     if ( real_parm < 0 ) {
-        real_iterations = (int)real_parm;
+        real_iterations = (igraph_integer_t)real_parm;
     } else if ( real_parm == 1) {
         real_iterations = full_comp_iters + simmer.iterations + 100;
     } else {
-        real_iterations = (int)(real_parm * full_comp_iters);
+        real_iterations = (igraph_integer_t)(real_parm * full_comp_iters);
     }
 
     tot_iterations = 0;
@@ -490,8 +490,8 @@ void graph::init_parms(const igraph_layout_drl_options_t *options) {
 
 int graph::read_real ( const igraph_matrix_t *real_mat,
                        const igraph_vector_bool_t *fixed) {
-    long int n = igraph_matrix_nrow(real_mat);
-    for (long int i = 0; i < n; i++) {
+    igraph_integer_t n = igraph_matrix_nrow(real_mat);
+    for (igraph_integer_t i = 0; i < n; i++) {
         positions[id_catalog[i]].x = MATRIX(*real_mat, i, 0);
         positions[id_catalog[i]].y = MATRIX(*real_mat, i, 1);
         positions[id_catalog[i]].fixed = fixed ? VECTOR(*fixed)[i] : false;
@@ -819,7 +819,7 @@ int graph::ReCompute( ) {
 
 void graph::update_nodes ( ) {
 
-    vector<int> node_indices;           // node list of nodes currently being updated
+    vector<igraph_integer_t> node_indices;           // node list of nodes currently being updated
     float old_positions[2 * MAX_PROCS]; // positions before update
     float new_positions[2 * MAX_PROCS]; // positions after update
 
@@ -832,9 +832,9 @@ void graph::update_nodes ( ) {
 
     // next we calculate the number of nodes there would be if the
     // num_nodes by num_procs schedule grid were perfectly square
-    int square_num_nodes = (int)(num_procs + num_procs * floor ((float)(num_nodes - 1) / (float)num_procs ));
+    igraph_integer_t square_num_nodes = (igraph_integer_t)(num_procs + num_procs * floor ((float)(num_nodes - 1) / (float)num_procs ));
 
-    for ( int i = myid; i < square_num_nodes; i += num_procs ) {
+    for ( igraph_integer_t i = myid; i < square_num_nodes; i += num_procs ) {
 
         // get old positions
         get_positions ( node_indices, old_positions );
@@ -845,7 +845,7 @@ void graph::update_nodes ( ) {
         if ( i < num_nodes ) {
 
             // advance random sequence according to myid
-            for ( int j = 0; j < 2 * myid; j++ ) {
+            for ( size_t j = 0; j < 2 * myid; j++ ) {
                 RNG_UNIF01();
             }
             // rand();
@@ -856,7 +856,7 @@ void graph::update_nodes ( ) {
             }
 
             // advance random sequence for next iteration
-            for ( unsigned int j = 2 * myid; j < 2 * (node_indices.size() - 1); j++ ) {
+            for ( size_t j = 2 * myid; j < 2 * (node_indices.size() - 1); j++ ) {
                 RNG_UNIF01();
             }
             // rand();
@@ -864,7 +864,7 @@ void graph::update_nodes ( ) {
         } else {
             // advance random sequence according to use by
             // the other processors
-            for ( unsigned int j = 0; j < 2 * (node_indices.size()); j++ ) {
+            for ( size_t j = 0; j < 2 * (node_indices.size()); j++ ) {
                 RNG_UNIF01();
             }
             //rand();
@@ -872,7 +872,7 @@ void graph::update_nodes ( ) {
 
         // check if anything was actually updated (e.g. everything was fixed)
         all_fixed = true;
-        for ( unsigned int j = 0; j < node_indices.size (); j++ )
+        for ( size_t j = 0; j < node_indices.size (); j++ )
             if ( !(positions [ node_indices[j] ].fixed && real_fixed) ) {
                 all_fixed = false;
             }
@@ -899,7 +899,7 @@ void graph::update_nodes ( ) {
         */
 
         // compute node list for next update
-        for ( unsigned int j = 0; j < node_indices.size(); j++ ) {
+        for ( size_t j = 0; j < node_indices.size(); j++ ) {
             node_indices [j] += num_procs;
         }
 
@@ -920,11 +920,11 @@ void graph::update_nodes ( ) {
 // The get_positions function takes the node_indices list
 // and returns the corresponding positions in an array.
 
-void graph::get_positions ( vector<int> &node_indices,
+void graph::get_positions ( vector<igraph_integer_t> &node_indices,
                             float return_positions[2 * MAX_PROCS]  ) {
 
     // fill positions
-    for (unsigned int i = 0; i < node_indices.size(); i++) {
+    for (size_t i = 0; i < node_indices.size(); i++) {
         return_positions[2 * i] = positions[ node_indices[i] ].x;
         return_positions[2 * i + 1] = positions[ node_indices[i] ].y;
     }
@@ -936,7 +936,7 @@ void graph::get_positions ( vector<int> &node_indices,
 // of active processes at this level for use by the random number
 // generators.
 
-void graph::update_node_pos ( int node_ind,
+void graph::update_node_pos ( igraph_integer_t node_ind,
                               float old_positions[2 * MAX_PROCS],
                               float new_positions[2 * MAX_PROCS] ) {
 
@@ -1008,13 +1008,13 @@ void graph::update_node_pos ( int node_ind,
 // updates the positions by subtracting the old positions and adding the
 // new positions to the density grid.
 
-void graph::update_density ( vector<int> &node_indices,
+void graph::update_density ( vector<igraph_integer_t> &node_indices,
                              float old_positions[2 * MAX_PROCS],
                              float new_positions[2 * MAX_PROCS] ) {
 
     // go through each node and subtract old position from
     // density grid before adding new position
-    for ( unsigned int i = 0; i < node_indices.size(); i++ ) {
+    for ( size_t i = 0; i < node_indices.size(); i++ ) {
         positions[node_indices[i]].x = old_positions[2 * i];
         positions[node_indices[i]].y = old_positions[2 * i + 1];
         density_server.Subtract ( positions[node_indices[i]],
@@ -1034,13 +1034,13 @@ void graph::update_density ( vector<int> &node_indices,
 * original code by B. Wylie.                *
 *********************************************/
 
-float graph::Compute_Node_Energy( int node_ind ) {
+float graph::Compute_Node_Energy( igraph_integer_t node_ind ) {
 
     /* Want to expand 4th power range of attraction */
     float attraction_factor = attraction * attraction *
                               attraction * attraction * 2e-2;
 
-    map <int, float>::iterator EI;
+    map <igraph_integer_t, float>::iterator EI;
     float x_dis, y_dis;
     float energy_distance, weight;
     float node_energy = 0;
@@ -1091,9 +1091,9 @@ float graph::Compute_Node_Energy( int node_ind ) {
 * originally written by B. Wylie             *
 *********************************************/
 
-void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y ) {
+void graph::Solve_Analytic( igraph_integer_t node_ind, float &pos_x, float &pos_y ) {
 
-    map <int, float>::iterator EI;
+    map <igraph_integer_t, float>::iterator EI;
     float total_weight = 0;
     float x_dis, y_dis, x_cen = 0, y_cen = 0;
     float x = 0, y = 0, dis;
@@ -1134,7 +1134,7 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y ) {
     float num_connections = sqrt((double)neighbors[node_ind].size());
     float maxLength = 0;
 
-    map<int, float>::iterator maxIndex;
+    map<igraph_integer_t, float>::iterator maxIndex;
 
     // Go through nodes edges... cutting if necessary
     for (EI = maxIndex = neighbors[node_ind].begin();
@@ -1294,9 +1294,9 @@ int graph::draw_graph(igraph_matrix_t *res) {
         IGRAPH_ALLOW_INTERRUPTION();
         count_iter++;
     }
-    long int n = positions.size();
+    igraph_integer_t n = positions.size();
     IGRAPH_CHECK(igraph_matrix_resize(res, n, 2));
-    for (long int i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
         MATRIX(*res, i, 0) = positions[i].x;
         MATRIX(*res, i, 1) = positions[i].y;
     }
