@@ -47,5 +47,9 @@ int main() {
     igraph_write_graph_edgelist(&graph, stdout);
     igraph_destroy(&graph);
 
+    igraph_ring(&graph,2,IGRAPH_DIRECTED,0,1);
+    printf("\n2-cycle graph:\n");
+    igraph_write_graph_edgelist(&graph,stdout);
+    igraph_destroy(&graph);
     return 0;
 }
