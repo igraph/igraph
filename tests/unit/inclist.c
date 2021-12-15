@@ -148,11 +148,57 @@ int test_loop_elimination_for_directed_graph() {
     return 0;
 }
 
+int test_adjlist_from_inclist() {
+    igraph_t g;
+    igraph_inclist_t inclist;
+    igraph_adjlist_t adjlist;
+
+    igraph_small(
+        &g, 5, /* directed = */ 1,
+        /* edge 0 */ 0, 1,
+        /* edge 1 */ 0, 3,
+        /* edge 2 */ 1, 2,
+        /* edge 3 */ 2, 2,
+        /* edge 4 */ 2, 3,
+        /* edge 5 */ 3, 0,
+        /* edge 6 */ 3, 4,
+        /* edge 7 */ 4, 0,
+        /* edge 8 */ 4, 4,
+        /* edge 9 */ 4, 5,
+        /* edge 10 */ 4, 6,
+        /* edge 11 */ 4, 4,
+        /* edge 12 */ 6, 5,
+        -1
+    );
+
+    printf("Testing incidence to adjacency list conversion\n\n");
+
+    igraph_inclist_init(&g, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+    igraph_adjlist_init_from_inclist(&g, &adjlist, &inclist);
+
+    printf("Incidence list: ");
+    print_inclist(&inclist);
+    printf("\nCorresponding adjacency list: ");
+    print_adjlist(&adjlist);
+    printf("\n");
+
+    igraph_adjlist_destroy(&adjlist);
+    igraph_inclist_destroy(&inclist);
+
+    printf("============================================================\n\n");
+
+    igraph_destroy(&g);
+
+    return 0;
+}
+
 int main() {
     int retval;
 
     RUN_TEST(test_loop_elimination_for_undirected_graph);
     RUN_TEST(test_loop_elimination_for_directed_graph);
+
+    RUN_TEST(test_adjlist_from_inclist);
 
     VERIFY_FINALLY_STACK();
 

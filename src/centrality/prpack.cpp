@@ -32,12 +32,12 @@ using namespace std;
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
+igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
                                           igraph_real_t *value, const igraph_vs_t vids,
                                           igraph_bool_t directed, igraph_real_t damping,
                                           const igraph_vector_t *reset,
                                           const igraph_vector_t *weights) {
-    long int i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
     igraph_vit_t vit;
     double *u = nullptr;
     double *v = nullptr;
@@ -109,7 +109,7 @@ int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t
     IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), i++) {
-        VECTOR(*vector)[i] = res->x[(long int)IGRAPH_VIT_GET(vit)];
+        VECTOR(*vector)[i] = res->x[IGRAPH_VIT_GET(vit)];
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);

@@ -41,18 +41,18 @@ void free_result(igraph_vector_ptr_t *res) {
 int main() {
 
     igraph_t g;
-    igraph_real_t toremovev[] = {  2609,  2098, 14517,  7540, 19560,  8855,
-                                   5939, 14947,   441, 16976, 19642,  4188,
-                                   15447, 11837,  2333,  7309, 18539, 14099,
-                                   14264,  9240
-                                };
-    igraph_vector_t toremove;
+    igraph_integer_t toremovev[] = {
+        2609,  2098, 14517,  7540, 19560,  8855,
+        5939, 14947,   441, 16976, 19642,  4188,
+        15447, 11837,  2333,  7309, 18539, 14099,
+        14264,  9240
+    };
+    igraph_vector_int_t toremove;
     igraph_vector_ptr_t res;
 
     BENCH_INIT();
 
-    igraph_vector_view(&toremove, toremovev,
-                       sizeof(toremovev) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&toremove, toremovev, sizeof(toremovev) / sizeof(toremovev[0]));
     igraph_full(&g, 200, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_delete_edges(&g, igraph_ess_vector(&toremove));
 

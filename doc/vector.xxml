@@ -49,6 +49,7 @@
 <!-- doxrox-include igraph_vector_swap_elements -->
 <!-- doxrox-include igraph_vector_reverse -->
 <!-- doxrox-include igraph_vector_shuffle -->
+<!-- doxrox-include igraph_vector_permute -->
 </section>
 
 <section id="vector-operations"><title>Vector operations</title>
@@ -88,7 +89,6 @@
 <!-- doxrox-include igraph_vector_prod -->
 <!-- doxrox-include igraph_vector_isininterval -->
 <!-- doxrox-include igraph_vector_maxdifference -->
-<!-- doxrox-include igraph_vector_order -->
 <!-- doxrox-include igraph_vector_is_nan -->
 <!-- doxrox-include igraph_vector_is_any_nan -->
 </section>
@@ -116,6 +116,7 @@
 <section id="vector-sorting"><title>Sorting</title>
 <!-- doxrox-include igraph_vector_sort -->
 <!-- doxrox-include igraph_vector_reverse_sort -->
+<!-- doxrox-include igraph_vector_qsort_ind -->
 </section>
 
 <section id="set-operations-on-sorted-vectors"><title>Set operations on sorted vectors</title>
@@ -138,6 +139,8 @@
 <!-- doxrox-include igraph_vector_ptr_set -->
 <!-- doxrox-include igraph_vector_ptr_resize -->
 <!-- doxrox-include igraph_vector_ptr_sort -->
+<!-- doxrox-include igraph_vector_ptr_sort_ind -->
+<!-- doxrox-include igraph_vector_ptr_permute -->
 <!-- doxrox-include igraph_vector_ptr_get_item_destructor -->
 <!-- doxrox-include igraph_vector_ptr_set_item_destructor -->
 <!-- doxrox-include IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR -->

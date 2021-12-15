@@ -39,7 +39,7 @@ So, to summarize, a directed graph can be imagined like this:
   )
 </programlisting>
 </informalexample>
-Here the edges are ordered pairs or vertex ids, and the graph is a multiset
+Here the edges are ordered pairs or vertex IDs, and the graph is a multiset
 of edges plus some meta-data.
 </para>
 
@@ -61,7 +61,7 @@ An undirected graph is like this:
   )
 </programlisting>
 </informalexample>
-Here an edge is a set of one or two vertex ids, two for most of the
+Here an edge is a set of one or two vertex IDs, two for most of the
 time, except for loop edges. A graph is a multiset of edges plus meta data,
 just like in the directed case.
 </para>

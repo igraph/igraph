@@ -33,10 +33,10 @@
 #define RIGHTCHILD(x) (((x)+1)*2)
 
 /* Declare internal functions */
-static void FUNCTION(igraph_heap, i_build)(BASE* arr, long int size, long int head);
-static void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem);
-static void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head);
-static void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2);
+static void FUNCTION(igraph_heap, i_build)(BASE* arr, igraph_integer_t size, igraph_integer_t head);
+static void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, igraph_integer_t size, igraph_integer_t elem);
+static void FUNCTION(igraph_heap, i_sink)(BASE* arr, igraph_integer_t size, igraph_integer_t head);
+static void FUNCTION(igraph_heap, i_switch)(BASE* arr, igraph_integer_t e1, igraph_integer_t e2);
 
 /**
  * \ingroup heap
@@ -52,7 +52,7 @@ static void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2)
  * linear operation.
  */
 
-int FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, long int alloc_size) {
+igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
@@ -64,7 +64,7 @@ int FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, long int alloc_size) {
     h->end = h->stor_begin;
     h->destroy = 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -82,7 +82,7 @@ int FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, long int alloc_size) {
  * Time complexity: O(n), the number of elements in the heap.
  */
 
-int FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, long int len) {
+igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, igraph_integer_t len) {
     h->stor_begin = IGRAPH_CALLOC(len, BASE);
     if (h->stor_begin == 0) {
         IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
@@ -95,7 +95,7 @@ int FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, long int
 
     FUNCTION(igraph_heap, i_build) (h->stor_begin, h->end - h->stor_begin, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -136,6 +136,26 @@ igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
 
 /**
  * \ingroup heap
+ * \function igraph_heap_clear
+ * \brief Removes all elements from a heap.
+ *
+ * </para><para>
+ * This function simply sets the size of the heap to zero, it does
+ * not free any allocated memory. For that you have to call
+ * \ref igraph_heap_destroy().
+ * \param h The heap object.
+ *
+ * Time complexity: O(1).
+ */
+
+void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h) {
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    h->end = h->stor_begin;
+}
+
+/**
+ * \ingroup heap
  * \function igraph_heap_push
  * \brief Add an element.
  *
@@ -149,13 +169,13 @@ igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
  * that n push operations are performed in O(n log n) time.
  */
 
-int FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
+igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        long int new_size = FUNCTION(igraph_heap, size)(h) * 2;
+        igraph_integer_t new_size = FUNCTION(igraph_heap, size)(h) * 2;
         if (new_size == 0) {
             new_size = 1;
         }
@@ -169,7 +189,7 @@ int FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
     FUNCTION(igraph_heap, i_shift_up)(h->stor_begin, FUNCTION(igraph_heap, size)(h),
                                       FUNCTION(igraph_heap, size)(h) - 1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -233,7 +253,7 @@ BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h) {
  * Time complexity: O(1).
  */
 
-long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
+igraph_integer_t FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->end - h->stor_begin;
@@ -255,14 +275,14 @@ long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
  * number of elements. O(1) otherwise.
  */
 
-int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size) {
-    long int actual_size = FUNCTION(igraph_heap, size)(h);
+igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t size) {
+    igraph_integer_t actual_size = FUNCTION(igraph_heap, size)(h);
     BASE *tmp;
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(h->stor_begin, (size_t) size, BASE);
@@ -273,7 +293,7 @@ int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size) {
     h->stor_end = h->stor_begin + size;
     h->end = h->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -282,7 +302,7 @@ int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size) {
  */
 
 void FUNCTION(igraph_heap, i_build)(BASE* arr,
-                                    long int size, long int head) {
+                                    igraph_integer_t size, igraph_integer_t head) {
 
     if (RIGHTCHILD(head) < size) {
         /* both subtrees */
@@ -304,7 +324,7 @@ void FUNCTION(igraph_heap, i_build)(BASE* arr,
  * called directly.
  */
 
-void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem) {
+void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, igraph_integer_t size, igraph_integer_t elem) {
 
     if (elem == 0 || arr[elem] HEAPLESS arr[PARENT(elem)]) {
         /* at the top */
@@ -320,7 +340,7 @@ void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem) 
  * called directly.
  */
 
-void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head) {
+void FUNCTION(igraph_heap, i_sink)(BASE* arr, igraph_integer_t size, igraph_integer_t head) {
 
     if (LEFTCHILD(head) >= size) {
         /* no subtrees */
@@ -346,7 +366,7 @@ void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head) {
  * called directly.
  */
 
-void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2) {
+void FUNCTION(igraph_heap, i_switch)(BASE* arr, igraph_integer_t e1, igraph_integer_t e2) {
     if (e1 != e2) {
         BASE tmp = arr[e1];
         arr[e1] = arr[e2];

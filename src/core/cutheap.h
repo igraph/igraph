@@ -42,21 +42,21 @@ __BEGIN_DECLS
 
 typedef struct igraph_i_cutheap_t {
     igraph_vector_t heap;
-    igraph_vector_t index;
+    igraph_vector_int_t index;
     igraph_vector_t hptr;
-    long int dnodes;
+    igraph_integer_t dnodes;
 } igraph_i_cutheap_t;
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes);
 IGRAPH_PRIVATE_EXPORT void igraph_i_cutheap_destroy(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_cutheap_empty(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
-IGRAPH_PRIVATE_EXPORT int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
-                                                  igraph_real_t add);
-IGRAPH_PRIVATE_EXPORT int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_update(
+    igraph_i_cutheap_t *ch, igraph_integer_t index, igraph_real_t add);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_integer_t vertex);
 
 __END_DECLS
 

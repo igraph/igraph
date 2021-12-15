@@ -13,7 +13,6 @@ add_custom_target(
 add_dependencies(check build_tests)
 
 # Add a custom target for benchmarks and another one for building them
-# TODO(ntamas)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
@@ -83,22 +82,22 @@ add_legacy_tests(
   igraph_sparsemat_iterator_idx
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
+  igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
-  igraph_spmatrix_add_col_values
   igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
-  spmatrix
-  spmatrix_clear
   stack
   strvector_set2_remove_print
   vector
   vector2
   vector3
   vector_ptr
+  vector_ptr_sort_ind
+  vector_qsort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
@@ -176,6 +175,7 @@ add_examples(
   igraph_small
   igraph_star
   igraph_tree
+  igraph_symmetric_tree
   igraph_weighted_adjacency
 )
 
@@ -186,6 +186,7 @@ add_legacy_tests(
   igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
   igraph_correlated_game
@@ -195,6 +196,7 @@ add_legacy_tests(
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
   igraph_k_regular_game
@@ -203,6 +205,7 @@ add_legacy_tests(
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
+  igraph_perfect
   igraph_realize_degree_sequence
   igraph_recent_degree_aging_game
   igraph_recent_degree_game
@@ -210,9 +213,11 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_static_power_law_game
   tree
+  symmetric_tree
   tree_game
   ring
   watts_strogatz_game
+  truss
 )
 
 # structural_properties.at
@@ -255,11 +260,13 @@ add_legacy_tests(
   all_shortest_paths
   efficiency
   global_transitivity
+  hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
   igraph_average_path_length
   igraph_average_path_length_dijkstra
   igraph_betweenness
+  igraph_betweenness_subset
   igraph_closeness
   igraph_convergence_degree
   igraph_count_multiple
@@ -267,6 +274,7 @@ add_legacy_tests(
   igraph_diversity
   igraph_eccentricity
   igraph_edge_betweenness
+  igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
@@ -277,11 +285,15 @@ add_legacy_tests(
   igraph_is_forest
   igraph_list_triangles
   igraph_local_scan_k_ecount
+  igraph_local_scan_k_ecount_them
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_pseudo_diameter
+  igraph_pseudo_diameter_dijkstra
+  igraph_random_walk
   igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
@@ -290,6 +302,7 @@ add_legacy_tests(
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
+  igraph_spanner
 )
 
 add_legacy_tests(
@@ -359,7 +372,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bfs
   bfs_simple
-  igraph_random_walk
+  igraph_random_edge_walk
 )
 
 # topology.at
@@ -465,7 +478,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
-  igraph_get_adjacency_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist
@@ -691,25 +703,6 @@ if(CMAKE_USE_PTHREADS_INIT)
     )
   endif()
 endif()
-
-# scg.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_scg_grouping
-  igraph_scg_grouping2
-  igraph_scg_grouping3
-  igraph_scg_grouping4
-  igraph_scg_semiprojectors
-  igraph_scg_semiprojectors2
-  igraph_scg_semiprojectors3
-  scg
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  scg2
-  scg3
-)
 
 # random.at
 add_examples(

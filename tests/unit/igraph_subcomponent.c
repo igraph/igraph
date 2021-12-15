@@ -19,21 +19,21 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void call_and_print(igraph_t *graph, igraph_real_t vertex, igraph_neimode_t mode) {
-    igraph_vector_t result;
-    igraph_vector_init(&result, 0);
+void call_and_print(igraph_t *graph, igraph_integer_t vertex, igraph_neimode_t mode) {
+    igraph_vector_int_t result;
+    igraph_vector_int_init(&result, 0);
     IGRAPH_ASSERT(igraph_subcomponent(graph, &result, vertex, mode) == IGRAPH_SUCCESS);
-    igraph_vector_sort(&result);
-    igraph_vector_print(&result);
-    igraph_vector_destroy(&result);
+    igraph_vector_int_sort(&result);
+    igraph_vector_int_print(&result);
+    igraph_vector_int_destroy(&result);
     printf("\n");
 }
 
 
 int main() {
     igraph_t g_0, g_1, g_lm, g_lmu;
-    igraph_vector_t result;
-    igraph_vector_init(&result, 0);
+    igraph_vector_int_t result;
+    igraph_vector_int_init(&result, 0);
     int i;
 
     igraph_small(&g_0, 0, 0, -1);
@@ -74,7 +74,7 @@ int main() {
     igraph_destroy(&g_1);
     igraph_destroy(&g_lm);
     igraph_destroy(&g_lmu);
-    igraph_vector_destroy(&result);
+    igraph_vector_int_destroy(&result);
 
     VERIFY_FINALLY_STACK();
     return 0;

@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+void print_vector(igraph_vector_int_t *v, FILE *f) {
+    igraph_integer_t i;
+    for (i = 0; i < igraph_vector_int_size(v); i++) {
+        fprintf(f, " %" IGRAPH_PRId "", VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
@@ -34,23 +34,24 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
 
     igraph_t g;
-    igraph_vector_t v, seq;
-    int ret;
-    igraph_integer_t mdeg, nedges;
-    long int i;
-    long int ndeg;
+    igraph_vector_int_t v;
+    igraph_vector_int_t v2;
+    igraph_vector_int_t seq;
+    igraph_error_t ret;
+    igraph_integer_t i, mdeg, ndeg, nedges;
 
     /* Create graph */
-    igraph_vector_init(&v, 8);
-    VECTOR(v)[0] = 0;
-    VECTOR(v)[1] = 1;
-    VECTOR(v)[2] = 1;
-    VECTOR(v)[3] = 2;
-    VECTOR(v)[4] = 2;
-    VECTOR(v)[5] = 3;
-    VECTOR(v)[6] = 2;
-    VECTOR(v)[7] = 2;
-    igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
+    igraph_vector_int_init(&v, 8);
+    igraph_vector_int_init(&v2, 8);
+    VECTOR(v2)[0] = 0;
+    VECTOR(v2)[1] = 1;
+    VECTOR(v2)[2] = 1;
+    VECTOR(v2)[3] = 2;
+    VECTOR(v2)[4] = 2;
+    VECTOR(v2)[5] = 3;
+    VECTOR(v2)[6] = 2;
+    VECTOR(v2)[7] = 2;
+    igraph_create(&g, &v2, 0, IGRAPH_DIRECTED);
 
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
     print_vector(&v, stdout);
@@ -76,8 +77,8 @@ int main() {
     /* If d is the sum of all vertex degrees, then d = 2|E|. */
     ndeg = 0;
     nedges = igraph_ecount(&g);
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+    for (i = 0; i < igraph_vector_int_size(&v); i++) {
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 1;
@@ -85,16 +86,16 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_vector_resize(&v, 8);
-    VECTOR(v)[0] = 0;
-    VECTOR(v)[1] = 1;
-    VECTOR(v)[2] = 1;
-    VECTOR(v)[3] = 2;
-    VECTOR(v)[4] = 2;
-    VECTOR(v)[5] = 3;
-    VECTOR(v)[6] = 2;
-    VECTOR(v)[7] = 2;
-    igraph_create(&g, &v, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_int_resize(&v2, 8);
+    VECTOR(v2)[0] = 0;
+    VECTOR(v2)[1] = 1;
+    VECTOR(v2)[2] = 1;
+    VECTOR(v2)[3] = 2;
+    VECTOR(v2)[4] = 2;
+    VECTOR(v2)[5] = 3;
+    VECTOR(v2)[6] = 2;
+    VECTOR(v2)[7] = 2;
+    igraph_create(&g, &v2, 0, IGRAPH_UNDIRECTED);
 
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
     print_vector(&v, stdout);
@@ -118,8 +119,8 @@ int main() {
     /* If d is the sum of all vertex degrees, then d = 2|E|. */
     ndeg = 0;
     nedges = igraph_ecount(&g);
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+    for (i = 0; i < igraph_vector_int_size(&v); i++) {
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 2;
@@ -127,7 +128,7 @@ int main() {
 
     /* Degree of the same vertex multiple times */
 
-    igraph_vector_init(&seq, 3);
+    igraph_vector_int_init(&seq, 3);
     VECTOR(seq)[0] = 2;
     VECTOR(seq)[1] = 0;
     VECTOR(seq)[2] = 2;
@@ -148,7 +149,7 @@ int main() {
     }
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&seq);
+    igraph_vector_int_destroy(&seq);
 
     /* Maximum degree */
 
@@ -162,8 +163,8 @@ int main() {
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
     ndeg = 0;
     nedges = igraph_ecount(&g);
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+    for (i = 0; i < igraph_vector_int_size(&v); i++) {
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 6;
@@ -180,8 +181,8 @@ int main() {
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
     ndeg = 0;
     nedges = igraph_ecount(&g);
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+    for (i = 0; i < igraph_vector_int_size(&v); i++) {
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 8;
@@ -206,15 +207,16 @@ int main() {
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
     ndeg = 0;
     nedges = igraph_ecount(&g);
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+    for (i = 0; i < igraph_vector_int_size(&v); i++) {
+        ndeg += VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 12;
     }
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
+    igraph_vector_int_destroy(&v2);
 
     return 0;
 }

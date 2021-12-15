@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
+    igraph_integer_t i, n = igraph_vector_size(v);
     igraph_real_t sum = 0.0;
     for (i = 0; i < n; i++) {
         if (!igraph_is_nan(VECTOR(*v)[i])) {
@@ -38,10 +38,10 @@ void print_vector(igraph_vector_t *v) {
     printf("\n");
 }
 
-igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
+igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
                           int isoclass, void* extra) {
     printf("Class %d: ", isoclass);
-    igraph_vector_print(vids);
+    igraph_vector_int_print(vids);
     return 0;
 }
 

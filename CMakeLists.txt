@@ -113,6 +113,10 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.h
 )
 configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_config.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_config.h
+)
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_threading.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_threading.h
 )

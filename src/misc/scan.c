@@ -24,7 +24,6 @@
 #include "igraph_scan.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_arpack.h"
 #include "igraph_centrality.h"
 #include "igraph_dqueue.h"
 #include "igraph_eigen.h"
@@ -66,45 +65,40 @@
  *
  */
 
-int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                         const igraph_vector_t *weights,
                         igraph_neimode_t mode) {
-    if (weights) {
-        igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
-                        weights);
-    } else {
-        igraph_degree(graph, res, igraph_vss_all(), mode, /*loops=*/ 1);
-    }
-    return 0;
+    return igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
+                    weights);
 }
 
 /* This removes loop, multiple edges and edges that point
    "backwards" according to the rank vector. It works on
    edge lists */
 
-static int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
+static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
                                        const igraph_vector_int_t *rank) {
 
-    long int i;
-    long int n = il->length;
+    igraph_integer_t i;
+    igraph_integer_t n = il->length;
     igraph_vector_int_t mark;
-    igraph_vector_int_init(&mark, n);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, n);
 
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &il->incs[i];
-        int j, l = igraph_vector_int_size(v);
-        int irank = VECTOR(*rank)[i];
+        igraph_integer_t j, l = igraph_vector_int_size(v);
+        igraph_integer_t irank = VECTOR(*rank)[i];
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            long int edge = (long int) VECTOR(*v)[j];
-            long int e = IGRAPH_OTHER(graph, edge, i);
+            igraph_integer_t edge = VECTOR(*v)[j];
+            igraph_integer_t e = IGRAPH_OTHER(graph, edge, i);
             if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
                 j++;
             } else {
                 VECTOR(*v)[j] = igraph_vector_int_tail(v);
-                igraph_vector_int_pop_back(v);
+                IGRAPH_CHECK(igraph_vector_int_pop_back(v));
                 l--;
             }
         }
@@ -112,43 +106,42 @@ static int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *
 
     igraph_vector_int_destroy(&mark);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
 /* This one handles both weighted and unweighted cases */
 
-static int igraph_i_local_scan_1_directed(const igraph_t *graph,
+static igraph_error_t igraph_i_local_scan_1_directed(const igraph_t *graph,
                                           igraph_vector_t *res,
                                           const igraph_vector_t *weights,
                                           igraph_neimode_t mode) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
-    int i, node;
+    igraph_integer_t i, node;
 
     igraph_vector_int_t neis;
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &incs, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
-    igraph_vector_int_init(&neis, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, no_of_nodes);
 
-    igraph_vector_resize(res, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
     igraph_vector_null(res);
 
     for (node = 0; node < no_of_nodes; node++) {
         igraph_vector_int_t *edges1 = igraph_inclist_get(&incs, node);
-        int edgeslen1 = igraph_vector_int_size(edges1);
+        igraph_integer_t edgeslen1 = igraph_vector_int_size(edges1);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Mark neighbors and self*/
         VECTOR(neis)[node] = node + 1;
         for (i = 0; i < edgeslen1; i++) {
-            int e = VECTOR(*edges1)[i];
-            int nei = IGRAPH_OTHER(graph, e, node);
+            igraph_integer_t e = VECTOR(*edges1)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(graph, e, node);
             igraph_real_t w = weights ? VECTOR(*weights)[e] : 1;
             VECTOR(neis)[nei] = node + 1;
             VECTOR(*res)[node] += w;
@@ -156,16 +149,16 @@ static int igraph_i_local_scan_1_directed(const igraph_t *graph,
 
         /* Crawl neighbors */
         for (i = 0; i < edgeslen1; i++) {
-            int e2 = VECTOR(*edges1)[i];
-            int nei = IGRAPH_OTHER(graph, e2, node);
+            igraph_integer_t e2 = VECTOR(*edges1)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(graph, e2, node);
             if (nei == node) {
                 break;
             }
             igraph_vector_int_t *edges2 = igraph_inclist_get(&incs, nei);
-            int j, edgeslen2 = igraph_vector_int_size(edges2);
+            igraph_integer_t j, edgeslen2 = igraph_vector_int_size(edges2);
             for (j = 0; j < edgeslen2; j++) {
-                int e2 = VECTOR(*edges2)[j];
-                int nei2 = IGRAPH_OTHER(graph, e2, nei);
+                igraph_integer_t e2 = VECTOR(*edges2)[j];
+                igraph_integer_t nei2 = IGRAPH_OTHER(graph, e2, nei);
                 igraph_real_t w2 = weights ? VECTOR(*weights)[e2] : 1;
                 if (VECTOR(neis)[nei2] == node + 1) {
                     VECTOR(*res)[node] += w2;
@@ -179,31 +172,30 @@ static int igraph_i_local_scan_1_directed(const igraph_t *graph,
     igraph_inclist_destroy(&incs);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
+static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
                                               igraph_vector_t *res,
                                               const igraph_vector_t *weights) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
-    int i, node;
+    igraph_integer_t i, node;
 
     igraph_vector_int_t neis;
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
-    igraph_vector_int_init(&neis, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, no_of_nodes);
 
-    igraph_vector_resize(res, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
     igraph_vector_null(res);
 
     for (node = 0; node < no_of_nodes; node++) {
         igraph_vector_int_t *edges1 = igraph_inclist_get(&incs, node);
-        int edgeslen1 = igraph_vector_int_size(edges1);
+        igraph_integer_t edgeslen1 = igraph_vector_int_size(edges1);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -212,8 +204,8 @@ static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
            double count its incident edges later, when we are going over the
            incident edges of ego's neighbors. */
         for (i = 0; i < edgeslen1; i++) {
-            int e = VECTOR(*edges1)[i];
-            int nei = IGRAPH_OTHER(graph, e, node);
+            igraph_integer_t e = VECTOR(*edges1)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(graph, e, node);
             igraph_real_t w = weights ? VECTOR(*weights)[e] : 1;
             VECTOR(neis)[nei] = node + 1;
             VECTOR(*res)[node] += w;
@@ -223,18 +215,18 @@ static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
            only crawed once. We count all qualifying edges of ego, and
            then unmark ego to avoid double counting. */
         for (i = 0; i < edgeslen1; i++) {
-            int e2 = VECTOR(*edges1)[i];
-            int nei = IGRAPH_OTHER(graph, e2, node);
+            igraph_integer_t e2 = VECTOR(*edges1)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(graph, e2, node);
             igraph_vector_int_t *edges2;
-            int j, edgeslen2;
+            igraph_integer_t j, edgeslen2;
             if (VECTOR(neis)[nei] != node + 1) {
                 continue;
             }
             edges2 = igraph_inclist_get(&incs, nei);
             edgeslen2 = igraph_vector_int_size(edges2);
             for (j = 0; j < edgeslen2; j++) {
-                int e2 = VECTOR(*edges2)[j];
-                int nei2 = IGRAPH_OTHER(graph, e2, nei);
+                igraph_integer_t e2 = VECTOR(*edges2)[j];
+                igraph_integer_t nei2 = IGRAPH_OTHER(graph, e2, nei);
                 igraph_real_t w2 = weights ? VECTOR(*weights)[e2] : 1;
                 if (VECTOR(neis)[nei2] == node + 1) {
                     VECTOR(*res)[node] += w2;
@@ -249,39 +241,37 @@ static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
     igraph_inclist_destroy(&incs);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
+static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
                                             igraph_vector_t *res,
                                             const igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int node, i, j, nn;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t node, i, j, nn;
     igraph_inclist_t allinc;
     igraph_vector_int_t *neis1, *neis2;
-    long int neilen1, neilen2;
-    long int *neis;
-    long int maxdegree;
+    igraph_integer_t neilen1, neilen2;
+    igraph_integer_t *neis;
+    igraph_integer_t maxdegree;
 
     igraph_vector_int_t order;
     igraph_vector_int_t rank;
-    igraph_vector_t degree, *edge1 = &degree; /* reuse degree as edge1 */
+    igraph_vector_int_t degree, *edge1 = &degree; /* reuse degree as edge1 */
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
 
-    igraph_vector_int_init(&order, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
-    maxdegree = (long int) igraph_vector_max(&degree) + 1;
-    igraph_vector_order1_int(&degree, &order, maxdegree);
-    igraph_vector_int_init(&rank, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
+    maxdegree = igraph_vector_int_max(&degree) + 1;
+    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
@@ -290,7 +280,7 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_inclist_destroy, &allinc);
     IGRAPH_CHECK(igraph_i_trans4_il_simplify(graph, &allinc, &rank));
 
-    neis = IGRAPH_CALLOC(no_of_nodes, long int);
+    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
         IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
     }
@@ -309,21 +299,21 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
         /* Mark the neighbors of the node */
         for (i = 0; i < neilen1; i++) {
-            int edge = VECTOR(*neis1)[i];
-            int nei = IGRAPH_OTHER(graph, edge, node);
+            igraph_integer_t edge = VECTOR(*neis1)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
             VECTOR(*edge1)[nei] = VECTOR(*weights)[edge];
             neis[nei] = node + 1;
         }
 
         for (i = 0; i < neilen1; i++) {
-            long int edge = VECTOR(*neis1)[i];
-            long int nei = IGRAPH_OTHER(graph, edge, node);
+            igraph_integer_t edge = VECTOR(*neis1)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
             igraph_real_t w = VECTOR(*weights)[edge];
             neis2 = igraph_inclist_get(&allinc, nei);
             neilen2 = igraph_vector_int_size(neis2);
             for (j = 0; j < neilen2; j++) {
-                long int edge2 = VECTOR(*neis2)[j];
-                long int nei2 = IGRAPH_OTHER(graph, edge2, nei);
+                igraph_integer_t edge2 = VECTOR(*neis2)[j];
+                igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge2, nei);
                 igraph_real_t w2 = VECTOR(*weights)[edge2];
                 if (neis[nei2] == node + 1) {
                     VECTOR(*res)[node] += w2;
@@ -337,11 +327,11 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
     igraph_free(neis);
     igraph_inclist_destroy(&allinc);
     igraph_vector_int_destroy(&rank);
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -361,7 +351,7 @@ static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
  *
  */
 
-int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
 
@@ -379,17 +369,18 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
+static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
                                         igraph_vector_t *res,
                                         const igraph_vector_t *weights_them,
                                         igraph_neimode_t mode) {
 
     igraph_t is;
-    igraph_vector_t map2;
-    int i, m;
+    igraph_vector_int_t map2;
+    igraph_vector_t weights;
+    igraph_integer_t i, m;
 
     if (!weights_them) {
         IGRAPH_ERROR("Edge weights not given for weighted scan-0",
@@ -399,24 +390,26 @@ static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them
         IGRAPH_ERROR("Invalid weights length for scan-0", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&map2, 0);
-    igraph_intersection(&is, us, them, /*map1=*/ 0, &map2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&map2, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&weights, 0);
+    IGRAPH_CHECK(igraph_intersection(&is, us, them, /*map1=*/ 0, &map2));
     IGRAPH_FINALLY(igraph_destroy, &is);
 
     /* Rewrite the map as edge weights */
-    m = igraph_vector_size(&map2);
+    m = igraph_vector_int_size(&map2);
     for (i = 0; i < m; i++) {
-        VECTOR(map2)[i] = VECTOR(*weights_them)[ (int) VECTOR(map2)[i] ];
+        VECTOR(weights)[i] = VECTOR(*weights_them)[ VECTOR(map2)[i] ];
     }
 
-    igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS,
-                    /*weights=*/ &map2);
+    IGRAPH_CHECK(igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS,
+                    /*weights=*/ &weights));
 
     igraph_destroy(&is);
-    igraph_vector_destroy(&map2);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_int_destroy(&map2);
+    igraph_vector_destroy(&weights);
+    IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -438,7 +431,7 @@ static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them
  *
  */
 
-int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
                              igraph_vector_t *res,
                              const igraph_vector_t *weights_them,
                              igraph_neimode_t mode) {
@@ -456,15 +449,15 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
         return igraph_i_local_scan_0_them_w(us, them, res, weights_them, mode);
     }
 
-    igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0);
+    IGRAPH_CHECK(igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0));
     IGRAPH_FINALLY(igraph_destroy, &is);
 
-    igraph_degree(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS);
+    IGRAPH_CHECK(igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS, /* weights = */ 0));
 
     igraph_destroy(&is);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -485,16 +478,16 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
  * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
  */
 
-int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
                                     igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
 
-    int no_of_nodes = igraph_vcount(us);
+    igraph_integer_t no_of_nodes = igraph_vcount(us);
     igraph_adjlist_t adj_us;
     igraph_inclist_t incs_them;
     igraph_vector_int_t neis;
-    int node;
+    igraph_integer_t node;
 
     if (igraph_vcount(them) != no_of_nodes) {
         IGRAPH_ERROR("Number of vertices must match in scan-1", IGRAPH_EINVAL);
@@ -515,8 +508,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
     IGRAPH_CHECK(igraph_inclist_init(them, &incs_them, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs_them);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&neis, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
     igraph_vector_null(res);
@@ -524,23 +516,23 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
     for (node = 0; node < no_of_nodes; node++) {
         igraph_vector_int_t *neis_us = igraph_adjlist_get(&adj_us, node);
         igraph_vector_int_t *edges1_them = igraph_inclist_get(&incs_them, node);
-        int len1_us = igraph_vector_int_size(neis_us);
-        int len1_them = igraph_vector_int_size(edges1_them);
-        int i;
+        igraph_integer_t len1_us = igraph_vector_int_size(neis_us);
+        igraph_integer_t len1_them = igraph_vector_int_size(edges1_them);
+        igraph_integer_t i;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Mark neighbors and self in us */
         VECTOR(neis)[node] = node + 1;
         for (i = 0; i < len1_us; i++) {
-            int nei = VECTOR(*neis_us)[i];
+            igraph_integer_t nei = VECTOR(*neis_us)[i];
             VECTOR(neis)[nei] = node + 1;
         }
 
         /* Crawl neighbors in them, first ego */
         for (i = 0; i < len1_them; i++) {
-            int e = VECTOR(*edges1_them)[i];
-            int nei = IGRAPH_OTHER(them, e, node);
+            igraph_integer_t e = VECTOR(*edges1_them)[i];
+            igraph_integer_t nei = IGRAPH_OTHER(them, e, node);
             if (VECTOR(neis)[nei] == node + 1) {
                 igraph_real_t w = weights_them ? VECTOR(*weights_them)[e] : 1;
                 VECTOR(*res)[node] += w;
@@ -548,12 +540,12 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
         }
         /* Then the rest */
         for (i = 0; i < len1_us; i++) {
-            int nei = VECTOR(*neis_us)[i];
+            igraph_integer_t nei = VECTOR(*neis_us)[i];
             igraph_vector_int_t *edges2_them = igraph_inclist_get(&incs_them, nei);
-            int j, len2_them = igraph_vector_int_size(edges2_them);
+            igraph_integer_t j, len2_them = igraph_vector_int_size(edges2_them);
             for (j = 0; j < len2_them; j++) {
-                int e2 = VECTOR(*edges2_them)[j];
-                int nei2 = IGRAPH_OTHER(them, e2, nei);
+                igraph_integer_t e2 = VECTOR(*edges2_them)[j];
+                igraph_integer_t nei2 = IGRAPH_OTHER(them, e2, nei);
                 if (VECTOR(neis)[nei2] == node + 1) {
                     igraph_real_t w = weights_them ? VECTOR(*weights_them)[e2] : 1;
                     VECTOR(*res)[node] += w;
@@ -573,7 +565,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
     igraph_adjlist_destroy(&adj_us);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -592,13 +584,13 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
  *
  */
 
-int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
+igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_t k,
                                igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
 
-    int no_of_nodes = igraph_vcount(graph);
-    int node;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t node;
     igraph_dqueue_int_t Q;
     igraph_vector_int_t marked;
     igraph_inclist_t incs;
@@ -625,8 +617,7 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
 
     IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
-    IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
     IGRAPH_CHECK(igraph_inclist_init(graph, &incs, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
@@ -634,17 +625,17 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
     igraph_vector_null(res);
 
     for (node = 0 ; node < no_of_nodes ; node++) {
-        igraph_dqueue_int_push(&Q, node);
-        igraph_dqueue_int_push(&Q, 0);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, node));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
         VECTOR(marked)[node] = node + 1;
         while (!igraph_dqueue_int_empty(&Q)) {
-            int act = igraph_dqueue_int_pop(&Q);
-            int dist = igraph_dqueue_int_pop(&Q) + 1;
+            igraph_integer_t act = igraph_dqueue_int_pop(&Q);
+            igraph_integer_t dist = igraph_dqueue_int_pop(&Q) + 1;
             igraph_vector_int_t *edges = igraph_inclist_get(&incs, act);
-            int i, edgeslen = igraph_vector_int_size(edges);
+            igraph_integer_t i, edgeslen = igraph_vector_int_size(edges);
             for (i = 0; i < edgeslen; i++) {
-                int edge = VECTOR(*edges)[i];
-                int nei = IGRAPH_OTHER(graph, edge, act);
+                igraph_integer_t edge = VECTOR(*edges)[i];
+                igraph_integer_t nei = IGRAPH_OTHER(graph, edge, act);
                 if (dist <= k || VECTOR(marked)[nei] == node + 1) {
                     igraph_real_t w = weights ? VECTOR(*weights)[edge] : 1;
                     VECTOR(*res)[node] += w;
@@ -673,7 +664,7 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
 
 /**
  * \function igraph_local_scan_k_ecount_them
- * Local THEM scan-statistics, general function, edge count and sum of weights
+ * \brief Local THEM scan-statistics, edge count or sum of weights.
  *
  * Count the number of edges or the sum the edge weights in the
  * k-neighborhood of vertices.
@@ -691,31 +682,37 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
  * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
  */
 
-int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
-                                    int k, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
+                                    igraph_integer_t k, igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
 
-    int no_of_nodes = igraph_vcount(us);
-    int node;
+    igraph_integer_t no_of_nodes = igraph_vcount(us);
+    igraph_integer_t node;
     igraph_dqueue_int_t Q;
     igraph_vector_int_t marked;
     igraph_stack_int_t ST;
     igraph_inclist_t incs_us, incs_them;
 
     if (igraph_vcount(them) != no_of_nodes) {
-        IGRAPH_ERROR("Number of vertices must match in scan-k", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of vertices in the two graphs must "
+                "match in scan-k.",
+                IGRAPH_EINVAL);
     }
     if (igraph_is_directed(us) != igraph_is_directed(them)) {
-        IGRAPH_ERROR("Directedness must match in scan-k", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Directedness in the two graphs must match "
+                "in scan-k", IGRAPH_EINVAL);
     }
     if (k < 0) {
-        IGRAPH_ERROR("k must be non-negative in k-scan", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("k must be non-negative in k-scan, got %" IGRAPH_PRId
+                ".", IGRAPH_EINVAL, k);
     }
     if (weights_them &&
         igraph_vector_size(weights_them) != igraph_ecount(them)) {
-        IGRAPH_ERROR("Invalid weight vector length in k-scan (them)",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The weight vector length (%" IGRAPH_PRId
+            ") must be equal to the number of edges (%" IGRAPH_PRId
+            ").", IGRAPH_EINVAL, igraph_vector_size(weights_them),
+            igraph_ecount(them));
     }
 
     if (k == 0) {
@@ -730,8 +727,7 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
 
     IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
-    IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
     IGRAPH_CHECK(igraph_inclist_init(us, &incs_us, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs_us);
     IGRAPH_CHECK(igraph_inclist_init(them, &incs_them, mode, IGRAPH_LOOPS));
@@ -750,30 +746,30 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
         IGRAPH_CHECK(igraph_stack_int_push(&ST, node));
         VECTOR(marked)[node] = node + 1;
         while (!igraph_dqueue_int_empty(&Q)) {
-            int act = igraph_dqueue_int_pop(&Q);
-            int dist = igraph_dqueue_int_pop(&Q) + 1;
+            igraph_integer_t act = igraph_dqueue_int_pop(&Q);
+            igraph_integer_t dist = igraph_dqueue_int_pop(&Q) + 1;
             igraph_vector_int_t *edges = igraph_inclist_get(&incs_us, act);
-            int i, edgeslen = igraph_vector_int_size(edges);
+            igraph_integer_t i, edgeslen = igraph_vector_int_size(edges);
             for (i = 0; i < edgeslen; i++) {
-                int edge = VECTOR(*edges)[i];
-                int nei = IGRAPH_OTHER(us, edge, act);
+                igraph_integer_t edge = VECTOR(*edges)[i];
+                igraph_integer_t nei = IGRAPH_OTHER(us, edge, act);
                 if (dist <= k && VECTOR(marked)[nei] != node + 1) {
-                    igraph_dqueue_int_push(&Q, nei);
-                    igraph_dqueue_int_push(&Q, dist);
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, dist));
                     VECTOR(marked)[nei] = node + 1;
-                    igraph_stack_int_push(&ST, nei);
+                    IGRAPH_CHECK(igraph_stack_int_push(&ST, nei));
                 }
             }
         }
 
         /* Now check the edges of all nodes in THEM */
         while (!igraph_stack_int_empty(&ST)) {
-            int act = igraph_stack_int_pop(&ST);
+            igraph_integer_t act = igraph_stack_int_pop(&ST);
             igraph_vector_int_t *edges = igraph_inclist_get(&incs_them, act);
-            int i, edgeslen = igraph_vector_int_size(edges);
+            igraph_integer_t i, edgeslen = igraph_vector_int_size(edges);
             for (i = 0; i < edgeslen; i++) {
-                int edge = VECTOR(*edges)[i];
-                int nei = IGRAPH_OTHER(them, edge, act);
+                igraph_integer_t edge = VECTOR(*edges)[i];
+                igraph_integer_t nei = IGRAPH_OTHER(them, edge, act);
                 if (VECTOR(marked)[nei] == node + 1) {
                     igraph_real_t w = weights_them ? VECTOR(*weights_them)[edge] : 1;
                     VECTOR(*res)[node] += w;
@@ -794,7 +790,7 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
     igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -814,12 +810,12 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
  * \return Error code.
  */
 
-int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
         const igraph_vector_ptr_t *neighborhoods) {
 
-    int node, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t node, no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
     igraph_vector_int_t marked;
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -832,8 +828,7 @@ int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
     IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
@@ -842,24 +837,24 @@ int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
 
     for (node = 0; node < no_of_nodes; node++) {
         igraph_vector_int_t *nei = VECTOR(*neighborhoods)[node];
-        int i, neilen = igraph_vector_int_size(nei);
+        igraph_integer_t i, neilen = igraph_vector_int_size(nei);
         VECTOR(marked)[node] = node + 1;
         for (i = 0; i < neilen; i++) {
-            int vertex = VECTOR(*nei)[i];
+            igraph_integer_t vertex = VECTOR(*nei)[i];
             if (vertex < 0 || vertex >= no_of_nodes) {
-                IGRAPH_ERROR("Invalid vertex id in neighborhood list in local scan",
+                IGRAPH_ERROR("Invalid vertex ID in neighborhood list in local scan",
                              IGRAPH_EINVAL);
             }
             VECTOR(marked)[vertex] = node + 1;
         }
 
         for (i = 0; i < neilen; i++) {
-            int vertex = VECTOR(*nei)[i];
+            igraph_integer_t vertex = VECTOR(*nei)[i];
             igraph_vector_int_t *edges = igraph_inclist_get(&incs, vertex);
-            int j, edgeslen = igraph_vector_int_size(edges);
+            igraph_integer_t j, edgeslen = igraph_vector_int_size(edges);
             for (j = 0; j < edgeslen; j++) {
-                int edge = VECTOR(*edges)[j];
-                int nei2 = IGRAPH_OTHER(graph, edge, vertex);
+                igraph_integer_t edge = VECTOR(*edges)[j];
+                igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge, vertex);
                 if (VECTOR(marked)[nei2] == node + 1) {
                     igraph_real_t w = weights ? VECTOR(*weights)[edge] : 1;
                     VECTOR(*res)[node] += w;
@@ -875,5 +870,5 @@ int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
     igraph_vector_int_destroy(&marked);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

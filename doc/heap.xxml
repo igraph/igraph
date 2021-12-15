@@ -10,6 +10,7 @@
 <!-- doxrox-include igraph_heap_init -->
 <!-- doxrox-include igraph_heap_init_array -->
 <!-- doxrox-include igraph_heap_destroy -->
+<!-- doxrox-include igraph_heap_clear -->
 <!-- doxrox-include igraph_heap_empty -->
 <!-- doxrox-include igraph_heap_push -->
 <!-- doxrox-include igraph_heap_top -->

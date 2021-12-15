@@ -62,8 +62,6 @@ target_include_directories(
   PRIVATE
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}/include
-  PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 if (BUILD_SHARED_LIBS)
@@ -73,7 +71,7 @@ endif()
 # Disable complex number support for CXSparse because:
 #   - It is necessary to compile with MSVC
 #   - igraph does not need complex number support from CXSparse on any platform
-target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
+target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX CS_LONG)
 
 # Since these are included as object files, they should call the
 # function as is (without a visibility specification)

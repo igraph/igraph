@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void print_and_destroy(igraph_t *g, igraph_integer_t center, igraph_vector_t *order, igraph_error_type_t error) {
+void print_and_destroy(igraph_t *g, igraph_integer_t center, igraph_vector_int_t *order, igraph_error_t error) {
     igraph_matrix_t result;
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_star(g, &result, center, order) == error);
@@ -31,14 +31,14 @@ void print_and_destroy(igraph_t *g, igraph_integer_t center, igraph_vector_t *or
     igraph_matrix_destroy(&result);
     igraph_destroy(g);
     if(order) {
-        igraph_vector_destroy(order);
+        igraph_vector_int_destroy(order);
     }
 
 }
 
 int main() {
     igraph_t g;
-    igraph_vector_t order;
+    igraph_vector_int_t order;
 
     printf("Star of 8 points and a center:\n");
     igraph_small(&g, 9, 0, -1);
@@ -46,7 +46,7 @@ int main() {
 
     printf("Star of 8 points and a center in reverse:\n");
     igraph_small(&g, 9, 0, -1);
-    igraph_vector_init_int(&order, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+    igraph_vector_int_init_int(&order, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
     print_and_destroy(&g, 0, &order, IGRAPH_SUCCESS);
 
     VERIFY_FINALLY_STACK();
@@ -58,7 +58,7 @@ int main() {
 
     printf("Checking if order out of range fails nicely.\n");
     igraph_small(&g, 9, 0, -1);
-    igraph_vector_init_int(&order, 9, -1, -1, -1, 10, 10, 10, 2, 1, 0);
+    igraph_vector_int_init_int(&order, 9, -1, -1, -1, 10, 10, 10, 2, 1, 0);
     print_and_destroy(&g, 0, &order, IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();

@@ -22,7 +22,7 @@
 int main() {
     igraph_t g;
     igraph_bool_t tree;
-    igraph_vector_t outseq;
+    igraph_vector_int_t outseq;
     igraph_rng_seed(igraph_rng_default(), 42);
 
     printf("No vertices:\n");
@@ -47,7 +47,7 @@ int main() {
     igraph_destroy(&g);
 
     printf("Prefer older edges to make a star:\n");
-    igraph_vector_init_int(&outseq, 7, 1, 2, 1, 2, 1, 2, 1);
+    igraph_vector_int_init_int(&outseq, 7, 1, 2, 1, 2, 1, 2, 1);
     IGRAPH_ASSERT(igraph_recent_degree_aging_game(&g, /*nodes*/7, /*edges per step(m)*/ 0, &outseq,
                   /*outpref?*/ 0, /*pa_exp*/ 0, /*aging_exp*/ 20, /*aging_bins*/ 8, /*time_window*/ 100, /*zero appeal*/ 1,
                   /*directed?*/ 0) == IGRAPH_SUCCESS);
@@ -61,7 +61,7 @@ int main() {
     igraph_is_tree(&g, &tree, NULL, IGRAPH_ALL);
     IGRAPH_ASSERT(tree);
     igraph_destroy(&g);
-    igraph_vector_destroy(&outseq);
+    igraph_vector_int_destroy(&outseq);
 
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);

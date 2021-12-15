@@ -98,7 +98,7 @@ using namespace drl3d;
  * \sa \ref igraph_layout_drl() for the standard 2d version.
  */
 
-int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_bool_t use_seed,
                          const igraph_layout_drl_options_t *options,
                          const igraph_vector_t *weights,
@@ -117,5 +117,5 @@ int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
         RNG_END();
     );
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

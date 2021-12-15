@@ -26,7 +26,8 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t v, v2;
+    igraph_vector_int_t v;
+    igraph_vector_int_t v2, v3;
     int i, ret;
 
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 0, /*A=*/ 1, 1,
@@ -41,52 +42,43 @@ int main() {
         return 3;
     }
 
-    igraph_vector_init(&v, 0);
+    igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
     for (i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
             return 4;
         }
     }
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 
     /* out-degree sequence */
-    igraph_vector_resize(&v, 10);
-    VECTOR(v)[0] = 0;
-    VECTOR(v)[1] = 1;
-    VECTOR(v)[2] = 3;
-    VECTOR(v)[3] = 3;
-    VECTOR(v)[4] = 4;
-    VECTOR(v)[5] = 5;
-    VECTOR(v)[6] = 6;
-    VECTOR(v)[7] = 7;
-    VECTOR(v)[8] = 8;
-    VECTOR(v)[9] = 9;
+    igraph_vector_int_init_int(&v3, 10, 0, 1, 3, 3, 4, 5, 6, 7, 8, 9);
 
-    igraph_barabasi_game(&g, 10, /*power=*/ 1, 0, &v, 0, /*A=*/ 1, 1,
+    igraph_barabasi_game(&g, 10, /*power=*/ 1, 0, &v3, 0, /*A=*/ 1, 1,
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
-    if (igraph_ecount(&g) != igraph_vector_sum(&v)) {
+    if (igraph_ecount(&g) != igraph_vector_int_sum(&v3)) {
         return 5;
     }
-    igraph_vector_init(&v2, 0);
+    igraph_vector_int_init(&v2, 0);
     igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, 1);
     for (i = 0; i < igraph_vcount(&g); i++) {
-        if (VECTOR(v)[i] != VECTOR(v2)[i]) {
-            igraph_vector_print(&v);
+        if (VECTOR(v3)[i] != VECTOR(v2)[i]) {
+            igraph_vector_int_print(&v3);
             printf("\n");
-            igraph_vector_print(&v2);
+            igraph_vector_int_print(&v2);
             return 6;
         }
     }
-    igraph_vector_destroy(&v);
-    igraph_vector_destroy(&v2);
+    igraph_vector_int_destroy(&v3);
+    igraph_vector_int_destroy(&v2);
     igraph_destroy(&g);
 
     /* outpref, we cannot really test this quantitatively,
        would need to set random seed */
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 1, /*A=*/ 1, 1,
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
-    igraph_vector_init(&v, 0);
+    igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
     for (i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
@@ -96,7 +88,7 @@ int main() {
     if (!igraph_is_directed(&g)) {
         return 8;
     }
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 
     /* Error tests */
@@ -111,13 +103,13 @@ int main() {
     if (ret != IGRAPH_EINVAL) {
         return 10;
     }
-    igraph_vector_init(&v, 9);
-    ret = igraph_barabasi_game(&g, 10, /*power=*/ 1, 0, &v, 0, /*A=*/ 1, 0,
+    igraph_vector_int_init(&v3, 9);
+    ret = igraph_barabasi_game(&g, 10, /*power=*/ 1, 0, &v3, 0, /*A=*/ 1, 0,
                                IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
     if (ret != IGRAPH_EINVAL) {
         return 11;
     }
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v3);
 
     return 0;
 }

@@ -25,28 +25,28 @@
 #include <stdarg.h>
 
 void print(igraph_t *g) {
-    igraph_vector_t el;
-    long int i, j, n;
+    igraph_vector_int_t el;
+    igraph_integer_t i, j, n;
     char ch = igraph_is_directed(g) ? '>' : '-';
 
-    igraph_vector_init(&el, 0);
+    igraph_vector_int_init(&el, 0);
     igraph_get_edgelist(g, &el, 0);
     n = igraph_ecount(g);
 
     for (i = 0, j = 0; i < n; i++, j += 2) {
-        printf("%ld --%c %ld: %ld\n",
-               (long)VECTOR(el)[j], ch, (long)VECTOR(el)[j + 1], (long)EAN(g, "weight", i));
+        printf("%" IGRAPH_PRId " --%c %" IGRAPH_PRId ": %" IGRAPH_PRId "\n",
+               VECTOR(el)[j], ch, VECTOR(el)[j + 1], (igraph_integer_t)EAN(g, "weight", i));
     }
     printf("\n");
 
-    igraph_vector_destroy(&el);
+    igraph_vector_int_destroy(&el);
 }
 
 int main() {
     igraph_t g;
     igraph_matrix_t mat;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 } };
-    long int i, j;
+    igraph_integer_t i, j;
 
     igraph_matrix_init(&mat, 4, 4);
     for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {

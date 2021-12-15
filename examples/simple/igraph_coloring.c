@@ -19,13 +19,13 @@ int main() {
 
     /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
     {
-        long int i;
+        igraph_integer_t i;
         /* Store the edge count to avoid the overhead from igraph_ecount in the for loop. */
-        long int no_of_edges = igraph_ecount(&graph);
+        igraph_integer_t no_of_edges = igraph_ecount(&graph);
         for (i = 0; i < no_of_edges; ++i) {
             if ( VECTOR(colors)[ IGRAPH_FROM(&graph, i) ] == VECTOR(colors)[ IGRAPH_TO(&graph, i) ]  ) {
-                printf("Inconsistent coloring! Vertices %ld and %ld are adjacent but have the same color.\n",
-                       (long) IGRAPH_FROM(&graph, i), (long) IGRAPH_TO(&graph, i));
+                printf("Inconsistent coloring! Vertices %" IGRAPH_PRId " and %" IGRAPH_PRId " are adjacent but have the same color.\n",
+                       IGRAPH_FROM(&graph, i), IGRAPH_TO(&graph, i));
                 abort();
             }
         }

@@ -45,12 +45,6 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_INT
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_matrix_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
-
 #define BASE_CHAR
 #include "igraph_pmt.h"
 #include "igraph_matrix_pmt.h"
@@ -93,7 +87,7 @@ IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
                                                     const igraph_matrix_t *rhs,
                                                     igraph_real_t tol);
 
-IGRAPH_EXPORT int igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
+IGRAPH_EXPORT igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
 
 __END_DECLS
 

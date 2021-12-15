@@ -32,34 +32,34 @@
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                                       const igraph_vector_t *weights, igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
                                            igraph_vector_t *res,
                                            const igraph_vector_t *weigths_them,
                                            igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
                                                   igraph_vector_t *res,
                                                   const igraph_vector_t *weights,
                                                   igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_t k,
                                              igraph_vector_t *res,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
-                                                  int k, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
+                                                  igraph_integer_t k, igraph_vector_t *res,
                                                   const igraph_vector_t *weights_them,
                                                   igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
                                                         igraph_vector_t *res,
                                                         const igraph_vector_t *weights,
                                                         const igraph_vector_ptr_t *neighborhoods);

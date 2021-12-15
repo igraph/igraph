@@ -43,39 +43,39 @@ typedef struct igraph_gml_tree_t {
     igraph_vector_ptr_t children;
 } igraph_gml_tree_t;
 
-int igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
-                                 const char *name, int namelen,
+igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
+                                 const char *name, size_t namelen,
                                  igraph_integer_t value);
-int igraph_gml_tree_init_real(igraph_gml_tree_t *t,
-                              const char *name, int namelen,
+igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
+                              const char *name, size_t namelen,
                               igraph_real_t value);
-int igraph_gml_tree_init_string(igraph_gml_tree_t *t,
-                                const char *name, int namelen,
-                                const char *value, int valuelen);
-int igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
-                              const char *name, int namelen,
+igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
+                                const char *name, size_t namelen,
+                                const char *value, size_t valuelen);
+igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
+                              const char *name, size_t namelen,
                               igraph_gml_tree_t *value);
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t);
 
-void igraph_gml_tree_delete(igraph_gml_tree_t *t, long int pos);
-int igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_t *t2);
+void igraph_gml_tree_delete(igraph_gml_tree_t *t, igraph_integer_t pos);
+igraph_error_t igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_t *t2);
 
-long int igraph_gml_tree_length(const igraph_gml_tree_t *t);
-long int igraph_gml_tree_find(const igraph_gml_tree_t *t,
-                              const char *name, long int from);
-long int igraph_gml_tree_findback(const igraph_gml_tree_t *t,
-                                  const char *name, long int from);
-int igraph_gml_tree_type(const igraph_gml_tree_t *t, long int pos);
-const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, long int pos);
+igraph_integer_t igraph_gml_tree_length(const igraph_gml_tree_t *t);
+igraph_integer_t igraph_gml_tree_find(const igraph_gml_tree_t *t,
+                              const char *name, igraph_integer_t from);
+igraph_integer_t igraph_gml_tree_findback(const igraph_gml_tree_t *t,
+                                  const char *name, igraph_integer_t from);
+igraph_i_gml_tree_type_t igraph_gml_tree_type(const igraph_gml_tree_t *t, igraph_integer_t pos);
+const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, igraph_integer_t pos);
 igraph_integer_t igraph_gml_tree_get_integer(const igraph_gml_tree_t *t,
-        long int pos);
+        igraph_integer_t pos);
 igraph_real_t igraph_gml_tree_get_real(const igraph_gml_tree_t *t,
-                                       long int pos);
+                                       igraph_integer_t pos);
 const char *igraph_gml_tree_get_string(const igraph_gml_tree_t *t,
-                                       long int pos);
+                                       igraph_integer_t pos);
 
 igraph_gml_tree_t *igraph_gml_tree_get_tree(const igraph_gml_tree_t *t,
-        long int pos);
+        igraph_integer_t pos);
 
 __END_DECLS
 

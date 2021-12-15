@@ -30,9 +30,10 @@ int igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
 
 void test_unweighted() {
     igraph_t g;
-    igraph_vector_t edges, eb;
-    long int i;
-    long int no_of_edges;
+    igraph_vector_int_t edges;
+    igraph_vector_t eb;
+    igraph_integer_t i;
+    igraph_integer_t no_of_edges;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -54,7 +55,7 @@ void test_unweighted() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_vector_init(&edges, 0);
+    igraph_vector_int_init(&edges, 0);
     igraph_vector_init(&eb, 0);
     igraph_community_edge_betweenness(&g, &edges, &eb, 0 /*merges */,
                                       0 /*bridges */, /*modularity=*/ 0,
@@ -64,7 +65,7 @@ void test_unweighted() {
 
     no_of_edges = igraph_ecount(&g);
     for (i = 0; i < no_of_edges; i++) {
-        printf("%li ", (long int)VECTOR(edges)[i]);
+        printf("%" IGRAPH_PRId " ", VECTOR(edges)[i]);
     }
     printf("\n");
 
@@ -85,7 +86,7 @@ void test_unweighted() {
     printf("\n");
 
     igraph_vector_destroy(&eb);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_destroy(&g);
 }
 
@@ -93,33 +94,33 @@ void test_unweighted() {
 
 void test_weighted() {
     igraph_t g;
-    igraph_vector_t edges, eb, weights;
+    igraph_vector_int_t edges;
+    igraph_vector_t eb, weights;
     igraph_real_t weights_array[] = { 4, 1, 3, 2, 5, 8, 6, 7 };
 
-    igraph_real_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };
-    igraph_real_t edges_array2[] = { 2, 3, 6, 5, 0, 1, 4, 7 };
+    igraph_integer_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };
+    igraph_integer_t edges_array2[] = { 2, 3, 6, 5, 0, 1, 4, 7 };
     igraph_real_t eb_array1_lo[] = { 4, 5, 3 + 1 / 3.0 - EPS, 4, 2.5, 4, 1, 1 };
     igraph_real_t eb_array1_hi[] = { 4, 5, 3 + 1 / 3.0 + EPS, 4, 2.5, 4, 1, 1 };
     igraph_real_t eb_array2_lo[] = { 4, 5, 3 + 1 / 3.0 - EPS, 6, 1.5, 2, 1, 1 };
     igraph_real_t eb_array2_hi[] = { 4, 5, 3 + 1 / 3.0 + EPS, 6, 1.5, 2, 1, 1 };
 
-    igraph_vector_t edges_sol1, edges_sol2, eb_sol1_lo, eb_sol1_hi, eb_sol2_lo, eb_sol2_hi;
+    igraph_vector_int_t edges_sol1, edges_sol2;
+    igraph_vector_t eb_sol1_lo, eb_sol1_hi, eb_sol2_lo, eb_sol2_hi;
 
-    igraph_vector_view(&edges_sol1, edges_array1,
-                       sizeof(edges_array1) / sizeof(double));
-    igraph_vector_view(&edges_sol2, edges_array2,
-                       sizeof(edges_array2) / sizeof(double));
-    igraph_vector_view(&eb_sol1_lo, eb_array1_lo, sizeof(eb_array1_lo) / sizeof(double));
-    igraph_vector_view(&eb_sol2_lo, eb_array2_lo, sizeof(eb_array2_lo) / sizeof(double));
-    igraph_vector_view(&eb_sol1_hi, eb_array1_hi, sizeof(eb_array1_hi) / sizeof(double));
-    igraph_vector_view(&eb_sol2_hi, eb_array2_hi, sizeof(eb_array2_hi) / sizeof(double));
+    igraph_vector_int_view(&edges_sol1, edges_array1, sizeof(edges_array1) / sizeof(edges_array1[0]));
+    igraph_vector_int_view(&edges_sol2, edges_array2, sizeof(edges_array2) / sizeof(edges_array2[0]));
+    igraph_vector_view(&eb_sol1_lo, eb_array1_lo, sizeof(eb_array1_lo) / sizeof(eb_array1_lo[0]));
+    igraph_vector_view(&eb_sol2_lo, eb_array2_lo, sizeof(eb_array2_lo) / sizeof(eb_array2_lo[0]));
+    igraph_vector_view(&eb_sol1_hi, eb_array1_hi, sizeof(eb_array1_hi) / sizeof(eb_array1_hi[0]));
+    igraph_vector_view(&eb_sol2_hi, eb_array2_hi, sizeof(eb_array2_hi) / sizeof(eb_array2_hi[0]));
 
     /* Small graph as follows: A--B--C--A, A--D--E--A, B--D, C--E */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 2, 4, 3, 4, -1);
     igraph_vector_view(&weights, weights_array, igraph_ecount(&g));
 
-    igraph_vector_init(&edges, 0);
+    igraph_vector_int_init(&edges, 0);
     igraph_vector_init(&eb, 0);
     igraph_community_edge_betweenness(&g, &edges, &eb, 0 /*merges */,
                                       0 /*bridges */, /*modularity=*/ 0,
@@ -127,10 +128,10 @@ void test_weighted() {
                                       IGRAPH_UNDIRECTED,
                                       &weights);
 
-    if (!igraph_vector_all_e(&edges_sol1, &edges) &&
-        !igraph_vector_all_e(&edges_sol2, &edges)) {
+    if (!igraph_vector_int_all_e(&edges_sol1, &edges) &&
+        !igraph_vector_int_all_e(&edges_sol2, &edges)) {
         printf("Error, edges vector was: \n");
-        igraph_vector_print(&edges);
+        igraph_vector_int_print(&edges);
         exit(2);
     }
     if (!igraph_vector_between(&eb, &eb_sol1_lo, &eb_sol1_hi) &&
@@ -155,17 +156,17 @@ void test_weighted() {
     }
 
     igraph_vector_destroy(&eb);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_destroy(&g);
 }
 
 void test_zero_edge_graph() {
     igraph_t g;
     igraph_vector_t eb;
-    igraph_vector_t res;
+    igraph_vector_int_t res;
 
     igraph_full(&g, 1, 0, 0);
-    igraph_vector_init(&res, igraph_ecount(&g));
+    igraph_vector_int_init(&res, igraph_ecount(&g));
     igraph_vector_init(&eb, igraph_ecount(&g));
 
     igraph_community_edge_betweenness(&g,
@@ -181,7 +182,7 @@ void test_zero_edge_graph() {
 
     igraph_vector_destroy(&eb);
     printf("No crash\n");
-    igraph_vector_destroy(&res);
+    igraph_vector_int_destroy(&res);
     igraph_destroy(&g);
 }
 

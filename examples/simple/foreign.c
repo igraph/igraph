@@ -36,9 +36,9 @@ int main() {
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     printf("The graph:\n");
-    printf("Vertices: %li\n", (long int) igraph_vcount(&g));
-    printf("Edges: %li\n", (long int) igraph_ecount(&g));
-    printf("Directed: %i\n", (int) igraph_is_directed(&g));
+    printf("Vertices: %" IGRAPH_PRId "\n", igraph_vcount(&g));
+    printf("Edges: %" IGRAPH_PRId "\n", igraph_ecount(&g));
+    printf("Directed: %i\n", igraph_is_directed(&g) ? 1 : 0);
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
 

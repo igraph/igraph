@@ -23,12 +23,12 @@
 
 #include <igraph.h>
 
-void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
-                  igraph_vector_t *membership, FILE* f) {
-    long int i = 0;
-    igraph_vector_t our_membership;
+void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_int_t *merges,
+                  igraph_vector_int_t *membership, FILE* f) {
+    igraph_integer_t i = 0;
+    igraph_vector_int_t our_membership;
 
-    igraph_vector_init(&our_membership, 0);
+    igraph_vector_int_init(&our_membership, 0);
 
     if (mod != 0) {
         i = igraph_vector_which_max(mod);
@@ -38,29 +38,30 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
     }
 
     if (membership != 0) {
-        igraph_vector_update(&our_membership, membership);
+        igraph_vector_int_update(&our_membership, membership);
     } else if (merges != 0) {
         igraph_community_to_membership(merges, igraph_vcount(g), i, &our_membership, 0);
     }
 
     printf("Membership: ");
-    for (i = 0; i < igraph_vector_size(&our_membership); i++) {
-        printf("%li ", (long int)VECTOR(our_membership)[i]);
+    for (i = 0; i < igraph_vector_int_size(&our_membership); i++) {
+        printf("%" IGRAPH_PRId " ", VECTOR(our_membership)[i]);
     }
     printf("\n");
 
-    igraph_vector_destroy(&our_membership);
+    igraph_vector_int_destroy(&our_membership);
 }
 
 int main() {
     igraph_t g;
-    igraph_vector_t modularity, weights, membership;
-    igraph_matrix_t merges;
+    igraph_vector_t modularity, weights;
+    igraph_vector_int_t membership;
+    igraph_matrix_int_t merges;
 
     igraph_vector_init(&modularity, 0);
-    igraph_matrix_init(&merges, 0, 0);
+    igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_init(&weights, 0);
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
 
     /* Simple unweighted graph */
     igraph_small(&g, 10, IGRAPH_UNDIRECTED,
@@ -177,10 +178,10 @@ int main() {
     show_results(&g, 0, 0, &membership, stdout);
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&modularity);
     igraph_vector_destroy(&weights);
-    igraph_matrix_destroy(&merges);
+    igraph_matrix_int_destroy(&merges);
 
     return 0;
 }

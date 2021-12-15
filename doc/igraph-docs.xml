@@ -86,8 +86,8 @@
     <xi:include href="pmt.xml"/>
     <xi:include href="vector.xml"/>
     <xi:include href="matrix.xml"/>
-    <xi:include href="sparsematrix.xml"/>
     <xi:include href="sparsemat.xml"/>
+    <xi:include href="spmatrix.xml"/>
     <xi:include href="stack.xml"/>
     <xi:include href="dqueue.xml"/>
     <xi:include href="heap.xml"/>
@@ -133,8 +133,6 @@
   <xi:include href="graphlets.xml"/>
 
   <xi:include href="hrg.xml"/>
-
-  <xi:include href="scg.xml"/>
 
   <xi:include href="embedding.xml"/>
 

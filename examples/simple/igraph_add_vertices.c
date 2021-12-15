@@ -26,11 +26,11 @@
 int main() {
 
     igraph_t g1;
-    igraph_vector_t v1;
+    igraph_vector_int_t v1;
     int ret;
 
     /* Create a graph */
-    igraph_vector_init(&v1, 8);
+    igraph_vector_int_init(&v1, 8);
     VECTOR(v1)[0] = 0;
     VECTOR(v1)[1] = 1;
     VECTOR(v1)[2] = 1;
@@ -40,7 +40,7 @@ int main() {
     VECTOR(v1)[6] = 2;
     VECTOR(v1)[7] = 2;
     igraph_create(&g1, &v1, 0, 0);
-    igraph_vector_destroy(&v1);
+    igraph_vector_int_destroy(&v1);
 
     /* Add more vertices */
     igraph_add_vertices(&g1, 10, 0);

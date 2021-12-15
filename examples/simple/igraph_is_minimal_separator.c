@@ -29,7 +29,7 @@
 int main() {
 
     igraph_t graph;
-    igraph_vector_t sep;
+    igraph_vector_int_t sep;
     igraph_bool_t result;
 
     /* Simple star graph, remove the center */
@@ -48,15 +48,15 @@ int main() {
 
     /* Karate club */
     igraph_famous(&graph, "zachary");
-    igraph_vector_init(&sep, 0);
-    igraph_vector_push_back(&sep, 32);
-    igraph_vector_push_back(&sep, 33);
+    igraph_vector_int_init(&sep, 0);
+    igraph_vector_int_push_back(&sep, 32);
+    igraph_vector_int_push_back(&sep, 33);
     igraph_is_minimal_separator(&graph, igraph_vss_vector(&sep), &result);
     if (!result) {
         FAIL("Karate network (32,33) failed", 3);
     }
 
-    igraph_vector_resize(&sep, 5);
+    igraph_vector_int_resize(&sep, 5);
     VECTOR(sep)[0] = 8;
     VECTOR(sep)[1] = 9;
     VECTOR(sep)[2] = 19;
@@ -68,7 +68,7 @@ int main() {
     }
 
     igraph_destroy(&graph);
-    igraph_vector_destroy(&sep);
+    igraph_vector_int_destroy(&sep);
 
     return 0;
 }

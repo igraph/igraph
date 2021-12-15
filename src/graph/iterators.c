@@ -85,15 +85,15 @@
  * \sa \ref igraph_vss_all(), \ref igraph_vs_destroy()
  *
  * This selector includes all vertices of a given graph in
- * increasing vertex id order.
+ * increasing vertex ID order.
  *
  * </para><para>
  * Time complexity: O(1).
  */
 
-int igraph_vs_all(igraph_vs_t *vs) {
+igraph_error_t igraph_vs_all(igraph_vs_t *vs) {
     vs->type = IGRAPH_VS_ALL;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -148,12 +148,12 @@ igraph_vs_t igraph_vss_all(void) {
  * Time complexity: O(1).
  */
 
-int igraph_vs_adj(igraph_vs_t *vs,
+igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
                   igraph_integer_t vid, igraph_neimode_t mode) {
     vs->type = IGRAPH_VS_ADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -193,12 +193,12 @@ int igraph_vs_adj(igraph_vs_t *vs,
  * \example examples/simple/igraph_vs_nonadj.c
  */
 
-int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
+igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
                      igraph_neimode_t mode) {
     vs->type = IGRAPH_VS_NONADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -214,9 +214,9 @@ int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
  * Time complexity: O(1).
  */
 
-int igraph_vs_none(igraph_vs_t *vs) {
+igraph_error_t igraph_vs_none(igraph_vs_t *vs) {
     vs->type = IGRAPH_VS_NONE;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -244,17 +244,17 @@ igraph_vs_t igraph_vss_none(void) {
  * This vertex selector selects a single vertex.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param vid The vertex id to be selected.
+ * \param vid The vertex ID to be selected.
  * \return Error Code.
  * \sa \ref igraph_vss_1(), \ref igraph_vs_destroy()
  *
  * Time complexity: O(1).
  */
 
-int igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
+igraph_error_t igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
     vs->type = IGRAPH_VS_1;
     vs->data.vid = vid;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -290,7 +290,7 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * might get strange behavior.
  *
  * \param vs Pointer to an uninitialized vertex selector.
- * \param v Pointer to a \type igraph_vector_t object.
+ * \param v Pointer to a \type igraph_vector_int_t object.
  * \return Error code.
  * \sa \ref igraph_vss_vector(), \ref igraph_vs_destroy()
  *
@@ -299,11 +299,11 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * \example examples/simple/igraph_vs_vector.c
  */
 
-int igraph_vs_vector(igraph_vs_t *vs,
-                     const igraph_vector_t *v) {
+igraph_error_t igraph_vs_vector(igraph_vs_t *vs,
+                     const igraph_vector_int_t *v) {
     vs->type = IGRAPH_VS_VECTORPTR;
     vs->data.vecptr = v;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -312,7 +312,7 @@ int igraph_vs_vector(igraph_vs_t *vs,
  *
  * This is the immediate version of \ref igraph_vs_vector.
  *
- * \param v Pointer to a \type igraph_vector_t object.
+ * \param v Pointer to a \type igraph_vector_int_t object.
  * \return A vertex selector object containing the vertices in the
  *         vector.
  * \sa \ref igraph_vs_vector()
@@ -320,7 +320,7 @@ int igraph_vs_vector(igraph_vs_t *vs,
  * Time complexity: O(1).
  */
 
-igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
+igraph_vs_t igraph_vss_vector(const igraph_vector_int_t *v) {
     igraph_vs_t vecvs;
     vecvs.type = IGRAPH_VS_VECTORPTR;
     vecvs.data.vecptr = v;
@@ -333,33 +333,34 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
  *
  * This function can be used to create a vertex selector with a couple
  * of vertices. Do not forget to include a <code>-1</code> after the
- * last vertex id. The behavior of the function is undefined if you
+ * last vertex ID. The behavior of the function is undefined if you
  * don't use a <code>-1</code> properly.
  *
  * </para><para>
- * Note that the vertex ids supplied will be parsed as
+ * Note that the vertex IDs supplied will be parsed as
  * <code>int</code>'s so you cannot supply arbitrarily large (too
- * large for int) vertex ids here.
+ * large for int) vertex IDs here.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param ... Additional parameters, these will be the vertex ids to
+ * \param ... Additional parameters, these will be the vertex IDs to
  *        be included in the vertex selector. Supply a <code>-1</code>
- *        after the last vertex id.
+ *        after the last vertex ID.
  * \return Error code.
  * \sa \ref igraph_vs_destroy()
  *
- * Time complexity: O(n), the number of vertex ids supplied.
+ * Time complexity: O(n), the number of vertex IDs supplied.
  */
 
-int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
+igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
     va_list ap;
-    long int i, n = 0;
-    vs->type = IGRAPH_VS_VECTOR;
-    vs->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (vs->data.vecptr == 0) {
+    igraph_integer_t i, n = 0;
+    igraph_vector_int_t* vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create vertex selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)vs->data.vecptr);
+    IGRAPH_FINALLY(igraph_free, vec);
 
     va_start(ap, vs);
     while (1) {
@@ -371,16 +372,20 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
     }
     va_end(ap);
 
-    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)vs->data.vecptr, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
     va_start(ap, vs);
     for (i = 0; i < n; i++) {
-        VECTOR(*vs->data.vecptr)[i] = (igraph_real_t) va_arg(ap, int);
+        VECTOR(*vec)[i] = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    vs->type = IGRAPH_VS_VECTOR;
+    vs->data.vecptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -395,38 +400,42 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
  * responsible for deleting the copy made by itself.
  *
  * \param vs Pointer to an uninitialized vertex selector.
- * \param v Pointer to a \type igraph_vector_t object.
+ * \param v Pointer to a \type igraph_vector_int_t object.
  * \return Error code.
  * \sa \ref igraph_vs_destroy()
  *
  * Time complexity: O(1).
  */
 
-int igraph_vs_vector_copy(igraph_vs_t *vs,
-                          const igraph_vector_t *v) {
-    vs->type = IGRAPH_VS_VECTOR;
-    vs->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (vs->data.vecptr == 0) {
+igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs, const igraph_vector_int_t *v) {
+    igraph_vector_int_t* vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create vertex selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)vs->data.vecptr);
-    IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)vs->data.vecptr, v));
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    vs->type = IGRAPH_VS_VECTOR;
+    vs->data.vecptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_vs_seq
  * \brief Vertex set, an interval of vertices.
  *
- * Creates a vertex selector containing all vertices with vertex id
+ * Creates a vertex selector containing all vertices with vertex ID
  * equal to or bigger than \c from and equal to or smaller than \c
  * to.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
- * \param from The first vertex id to be included in the vertex
+ * \param from The first vertex ID to be included in the vertex
  *        selector.
- * \param to The last vertex id to be included in the vertex
+ * \param to The last vertex ID to be included in the vertex
  *        selector.
  * \return Error code.
  * \sa \ref igraph_vss_seq(), \ref igraph_vs_destroy()
@@ -436,12 +445,12 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
  * \example examples/simple/igraph_vs_seq.c
  */
 
-int igraph_vs_seq(igraph_vs_t *vs,
+igraph_error_t igraph_vs_seq(igraph_vs_t *vs,
                   igraph_integer_t from, igraph_integer_t to) {
     vs->type = IGRAPH_VS_SEQ;
     vs->data.seq.from = from;
     vs->data.seq.to = to + 1;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -450,9 +459,9 @@ int igraph_vs_seq(igraph_vs_t *vs,
  *
  * The immediate version of \ref igraph_vs_seq().
  *
- * \param from The first vertex id to be included in the vertex
+ * \param from The first vertex ID to be included in the vertex
  *        selector.
- * \param to The last vertex id to be included in the vertex
+ * \param to The last vertex ID to be included in the vertex
  *        selector.
  * \return Error code.
  * \sa \ref igraph_vs_seq()
@@ -494,7 +503,7 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
     case IGRAPH_VS_NONADJ:
         break;
     case IGRAPH_VS_VECTOR:
-        igraph_vector_destroy((igraph_vector_t*)vs->data.vecptr);
+        igraph_vector_int_destroy((igraph_vector_int_t*) vs->data.vecptr);
         IGRAPH_FREE(vs->data.vecptr);
         break;
     default:
@@ -523,8 +532,8 @@ igraph_bool_t igraph_vs_is_all(const igraph_vs_t *vs) {
     return vs->type == IGRAPH_VS_ALL;
 }
 
-int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
-                        igraph_vector_t *v) {
+igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
+                        igraph_vector_int_t *v) {
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vs, &vit));
@@ -533,7 +542,7 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -542,26 +551,32 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
  * \param src The selector being copied.
  * \param dest An uninitialized selector that will contain the copy.
  */
-int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
+igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
+    igraph_vector_int_t *vec;
+
     memcpy(dest, src, sizeof(igraph_vs_t));
+
     switch (dest->type) {
     case IGRAPH_VS_VECTOR:
-        dest->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (!dest->data.vecptr) {
+        vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        if (!vec) {
             IGRAPH_ERROR("Cannot copy vertex selector", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)dest->data.vecptr,
-                                        (igraph_vector_t*)src->data.vecptr));
+        IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.vecptr));
+        dest->data.vecptr = vec;
+        break;
+    default:
         break;
     }
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_vs_type
  * \brief Returns the type of the vertex selector.
  */
-int igraph_vs_type(const igraph_vs_t *vs) {
+igraph_vs_type_t igraph_vs_type(const igraph_vs_t *vs) {
     return vs->type;
 }
 
@@ -575,40 +590,40 @@ int igraph_vs_type(const igraph_vs_t *vs) {
  * \param graph The graph over which we will iterate.
  * \param result The result will be returned here.
  */
-int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
+igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
                    igraph_integer_t *result) {
-    igraph_vector_t vec;
+    igraph_vector_int_t vec;
     igraph_bool_t *seen;
     long i;
 
     switch (vs->type) {
     case IGRAPH_VS_NONE:
-        *result = 0; return 0;
+        *result = 0; return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_1:
         *result = 0;
         if (vs->data.vid < igraph_vcount(graph) && vs->data.vid >= 0) {
             *result = 1;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_SEQ:
         *result = vs->data.seq.to - vs->data.seq.from;
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_ALL:
-        *result = igraph_vcount(graph); return 0;
+        *result = igraph_vcount(graph); return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_ADJ:
-        IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
         IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
-        *result = (igraph_integer_t) igraph_vector_size(&vec);
-        igraph_vector_destroy(&vec);
+        *result = igraph_vector_int_size(&vec);
+        igraph_vector_int_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_NONADJ:
-        IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
         IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
         *result = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(*result, igraph_bool_t);
@@ -616,21 +631,21 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
             IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, seen);
-        for (i = 0; i < igraph_vector_size(&vec); i++) {
-            if (!seen[(long int)VECTOR(vec)[i]]) {
+        for (i = 0; i < igraph_vector_int_size(&vec); i++) {
+            if (!seen[ VECTOR(vec)[i] ]) {
                 (*result)--;
-                seen[(long int)VECTOR(vec)[i]] = 1;
+                seen[ VECTOR(vec)[i] ] = 1;
             }
         }
         igraph_free(seen);
-        igraph_vector_destroy(&vec);
+        igraph_vector_int_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(2);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_VECTOR:
     case IGRAPH_VS_VECTORPTR:
-        *result = (igraph_integer_t) igraph_vector_size((igraph_vector_t*)vs->data.vecptr);
-        return 0;
+        *result = igraph_vector_int_size(vs->data.vecptr);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
@@ -644,12 +659,12 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * \brief Creates a vertex iterator from a vertex selector.
  *
  * This function instantiates a vertex selector object with a given
- * graph. This is the step when the actual vertex ids are created from
+ * graph. This is the step when the actual vertex IDs are created from
  * the \em logical notion of the vertex selector based on the graph.
  * E.g. a vertex selector created with \ref igraph_vs_all() contains
  * knowledge that \em all vertices are included in a (yet indefinite)
  * graph. When instantiating it a vertex iterator object is created,
- * this contains the actual vertex ids in the graph supplied as a
+ * this contains the actual vertex IDs in the graph supplied as a
  * parameter.
  *
  * </para><para>
@@ -667,15 +682,16 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * igraph_vs_none(), \ref igraph_vs_1, \ref igraph_vs_vector, \ref
  * igraph_vs_seq(), \ref igraph_vs_vector(), \ref
  * igraph_vs_vector_small(). O(d) for \ref igraph_vs_adj(), d is the
- * number of vertex ids to be included in the iterator. O(|V|) for
+ * number of vertex IDs to be included in the iterator. O(|V|) for
  * \ref igraph_vs_nonadj(), |V| is the number of vertices in the graph.
  */
 
-int igraph_vit_create(const igraph_t *graph,
+igraph_error_t igraph_vit_create(const igraph_t *graph,
                       igraph_vs_t vs, igraph_vit_t *vit) {
-    igraph_vector_t vec;
+    igraph_vector_int_t vec;
+    igraph_vector_int_t *vec_int;
     igraph_bool_t *seen;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
 
     switch (vs.type) {
     case IGRAPH_VS_ALL:
@@ -685,56 +701,67 @@ int igraph_vit_create(const igraph_t *graph,
         vit->end = igraph_vcount(graph);
         break;
     case IGRAPH_VS_ADJ:
+        vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        if (vec_int == 0) {
+            IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
+        }
+        IGRAPH_FINALLY(igraph_free, vec_int);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
+        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
+        n = igraph_vector_int_size(&vec);
+        IGRAPH_CHECK(igraph_vector_int_resize(vec_int, n));
+        for (i = 0; i < n; i++) {
+            VECTOR(*vec_int)[i] = VECTOR(vec)[i];
+        }
+
+        igraph_vector_int_destroy(&vec);
+        IGRAPH_FINALLY_CLEAN(3);
+
         vit->type = IGRAPH_VIT_VECTOR;
         vit->pos = 0;
         vit->start = 0;
-        vit->vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (vit->vec == 0) {
-            IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) vit->vec);
-        IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)vit->vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, (igraph_vector_t*)vit->vec,
-                                      vs.data.adj.vid, vs.data.adj.mode));
-        vit->end = igraph_vector_size(vit->vec);
-        IGRAPH_FINALLY_CLEAN(2);
+        vit->vec = vec_int;
+        vit->end = n;
+
         break;
     case IGRAPH_VS_NONADJ:
-        vit->type = IGRAPH_VIT_VECTOR;
-        vit->pos = 0;
-        vit->start = 0;
-        vit->vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (vit->vec == 0) {
+        vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        if (vec_int == 0) {
             IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) vit->vec);
-        IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t *) vit->vec, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec,
-                                      vs.data.adj.vid, vs.data.adj.mode));
+        IGRAPH_FINALLY(igraph_free, vec_int);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
+        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
         n = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(n, igraph_bool_t);
         if (seen == 0) {
             IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, seen);
-        for (i = 0; i < igraph_vector_size(&vec); i++) {
-            if (! seen [ (long int) VECTOR(vec)[i] ] ) {
+        for (i = 0; i < igraph_vector_int_size(&vec); i++) {
+            if (! seen [ VECTOR(vec)[i] ] ) {
                 n--;
-                seen[ (long int) VECTOR(vec)[i] ] = 1;
+                seen[ VECTOR(vec)[i] ] = 1;
             }
         }
-        IGRAPH_CHECK(igraph_vector_resize((igraph_vector_t*)vit->vec, n));
+        IGRAPH_CHECK(igraph_vector_int_resize(vec_int, n));
         for (i = 0, j = 0; j < n; i++) {
             if (!seen[i]) {
-                VECTOR(*vit->vec)[j++] = i;
+                VECTOR(*vec_int)[j++] = i;
             }
         }
 
         IGRAPH_FREE(seen);
-        igraph_vector_destroy(&vec);
-        vit->end = n;
+        igraph_vector_int_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(4);
+
+        vit->type = IGRAPH_VIT_VECTOR;
+        vit->pos = 0;
+        vit->start = 0;
+        vit->vec = vec_int;
+        vit->end = n;
         break;
     case IGRAPH_VS_NONE:
         vit->type = IGRAPH_VIT_SEQ;
@@ -748,7 +775,7 @@ int igraph_vit_create(const igraph_t *graph,
         vit->start = vs.data.vid;
         vit->end = vs.data.vid + 1;
         if (vit->pos >= igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex id", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID", IGRAPH_EINVVID);
         }
         break;
     case IGRAPH_VS_VECTORPTR:
@@ -757,9 +784,9 @@ int igraph_vit_create(const igraph_t *graph,
         vit->pos = 0;
         vit->start = 0;
         vit->vec = vs.data.vecptr;
-        vit->end = igraph_vector_size(vit->vec);
-        if (!igraph_vector_isininterval(vit->vec, 0, igraph_vcount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex id", IGRAPH_EINVVID);
+        vit->end = igraph_vector_int_size(vit->vec);
+        if (!igraph_vector_int_isininterval(vit->vec, 0, igraph_vcount(graph) - 1)) {
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID", IGRAPH_EINVVID);
         }
         break;
     case IGRAPH_VS_SEQ:
@@ -772,7 +799,7 @@ int igraph_vit_create(const igraph_t *graph,
         IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -794,8 +821,8 @@ void igraph_vit_destroy(const igraph_vit_t *vit) {
     case IGRAPH_VIT_VECTORPTR:
         break;
     case IGRAPH_VIT_VECTOR:
-        igraph_vector_destroy((igraph_vector_t*)vit->vec);
-        igraph_free((igraph_vector_t*)vit->vec);
+        igraph_vector_int_destroy((igraph_vector_int_t*) vit->vec);
+        igraph_free((igraph_vector_int_t*) vit->vec);
         break;
     default:
         /*     IGRAPH_ERROR("Cannot destroy iterator, unknown type", IGRAPH_EINVAL); */
@@ -803,11 +830,10 @@ void igraph_vit_destroy(const igraph_vit_t *vit) {
     }
 }
 
-int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
+igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t *v) {
+    igraph_integer_t i;
 
-    long int i;
-
-    IGRAPH_CHECK(igraph_vector_resize(v, IGRAPH_VIT_SIZE(*vit)));
+    IGRAPH_CHECK(igraph_vector_int_resize(v, IGRAPH_VIT_SIZE(*vit)));
 
     switch (vit->type) {
     case IGRAPH_VIT_SEQ:
@@ -827,7 +853,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
         break;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /*******************************************************/
@@ -839,11 +865,11 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
  * \param es Pointer to an uninitialized edge selector object.
  * \param order Constant giving the order in which the edges will be
  *        included in the selector. Possible values:
- *        \c IGRAPH_EDGEORDER_ID, edge id order.
- *        \c IGRAPH_EDGEORDER_FROM, vertex id order, the id of the
+ *        \c IGRAPH_EDGEORDER_ID, edge ID order.
+ *        \c IGRAPH_EDGEORDER_FROM, vertex ID order, the id of the
  *           \em source vertex counts for directed graphs. The order
  *           of the incident edges of a given vertex is arbitrary.
- *        \c IGRAPH_EDGEORDER_TO, vertex id order, the id of the \em
+ *        \c IGRAPH_EDGEORDER_TO, vertex ID order, the id of the \em
  *           target vertex counts for directed graphs. The order
  *           of the incident edges of a given vertex is arbitrary.
  *        For undirected graph the latter two is the same.
@@ -853,7 +879,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
  * Time complexity: O(1).
  */
 
-int igraph_es_all(igraph_es_t *es,
+igraph_error_t igraph_es_all(igraph_es_t *es,
                   igraph_edgeorder_type_t order) {
     switch (order) {
     case IGRAPH_EDGEORDER_ID:
@@ -869,7 +895,7 @@ int igraph_es_all(igraph_es_t *es,
         IGRAPH_ERROR("Invalid edge order, cannot create selector", IGRAPH_EINVAL);
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -910,12 +936,12 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  * Time complexity: O(1).
  */
 
-int igraph_es_incident(igraph_es_t *es,
+igraph_error_t igraph_es_incident(igraph_es_t *es,
                        igraph_integer_t vid, igraph_neimode_t mode) {
     es->type = IGRAPH_ES_INCIDENT;
     es->data.incident.vid = vid;
     es->data.incident.mode = mode;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -930,9 +956,9 @@ int igraph_es_incident(igraph_es_t *es,
  * Time complexity: O(1).
  */
 
-int igraph_es_none(igraph_es_t *es) {
+igraph_error_t igraph_es_none(igraph_es_t *es) {
     es->type = IGRAPH_ES_NONE;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -966,10 +992,10 @@ igraph_es_t igraph_ess_none(void) {
  * Time complexity: O(1).
  */
 
-int igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
+igraph_error_t igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
     es->type = IGRAPH_ES_1;
     es->data.eid = eid;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -996,32 +1022,30 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  *
  * </para><para>
  * Creates an edge selector which serves as a view to a vector
- * containing edge ids. Do not destroy the vector before destroying
+ * containing edge IDs. Do not destroy the vector before destroying
  * the view.
  *
  * Many views can be created to the same vector.
  *
  * \param es Pointer to an uninitialized edge selector.
- * \param v Vector containing edge ids.
+ * \param v Vector containing edge IDs.
  * \return Error code.
  * \sa \ref igraph_ess_vector(), \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
  */
 
-int igraph_es_vector(igraph_es_t *es,
-                     const igraph_vector_t *v) {
+igraph_error_t igraph_es_vector(igraph_es_t *es, const igraph_vector_int_t *v) {
     es->type = IGRAPH_ES_VECTORPTR;
     es->data.vecptr = v;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_es_vector_copy
  * \brief Edge set, based on a vector, with copying.
  *
- *
- * This function makes it possible to handle a \type vector_t
+ * This function makes it possible to handle a \type vector_int_t
  * permanently as an edge selector. The edge selector creates a
  * copy of the original vector, so the vector can safely be destroyed
  * after creating the edge selector. Changing the original vector
@@ -1029,23 +1053,28 @@ int igraph_es_vector(igraph_es_t *es,
  * responsible for deleting the copy made by itself.
  *
  * \param es Pointer to an uninitialized edge selector.
- * \param v Pointer to a \type igraph_vector_t object.
+ * \param v Pointer to a \type igraph_vector_int_t object.
  * \return Error code.
  * \sa \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
  */
 
-int igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v) {
-    es->type = IGRAPH_ES_VECTOR;
-    es->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (es->data.vecptr == 0) {
+igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t *v) {
+    igraph_vector_int_t* vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.vecptr);
-    IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)es->data.vecptr, v));
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    es->type = IGRAPH_ES_VECTOR;
+    es->data.vecptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1053,17 +1082,17 @@ int igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v) {
  * \brief Immediate vector view edge selector.
  *
  * </para><para>
- * This is the immediate version of the vector of edge ids edge
+ * This is the immediate version of the vector of edge IDs edge
  * selector.
  *
- * \param v The vector of edge ids.
+ * \param v The vector of edge IDs.
  * \return Edge selector, initialized.
  * \sa \ref igraph_es_vector()
  *
  * Time complexity: O(1).
  */
 
-igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
+igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
     igraph_es_t es;
     es.type = IGRAPH_ES_VECTORPTR;
     es.data.vecptr = v;
@@ -1088,9 +1117,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * Time complexity: O(1).
  */
 
-int igraph_es_fromto(igraph_es_t *es,
-                     igraph_vs_t from, igraph_vs_t to) {
-
+igraph_error_t igraph_es_fromto(igraph_es_t *es, igraph_vs_t from, igraph_vs_t to) {
     IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
     IGRAPH_ERROR("igraph_es_fromto not implemented yet", IGRAPH_UNIMPLEMENTED);
     /* TODO */
@@ -1098,35 +1125,34 @@ int igraph_es_fromto(igraph_es_t *es,
 
 /**
  * \function igraph_es_seq
- * \brief Edge selector, a sequence of edge ids.
+ * \brief Edge selector, a sequence of edge IDs.
  *
- * All edge ids between <code>from</code> and <code>to</code> will be
+ * All edge IDs between <code>from</code> and <code>to</code> will be
  * included in the edge selection. This includes <code>from</code> and
  * excludes <code>to</code>.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param from The first edge id to be included.
- * \param to The last edge id to be included.
+ * \param from The first edge ID to be included.
+ * \param to The last edge ID to be included.
  * \return Error code.
  * \sa \ref igraph_ess_seq(), \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
  */
 
-int igraph_es_seq(igraph_es_t *es,
-                  igraph_integer_t from, igraph_integer_t to) {
+igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to) {
     es->type = IGRAPH_ES_SEQ;
     es->data.seq.from = from;
     es->data.seq.to = to;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_ess_seq
  * \brief Immediate version of the sequence edge selector.
  *
- * \param from The first edge id to include.
- * \param to The last edge id to include.
+ * \param from The first edge ID to include.
+ * \param to The last edge ID to include.
  * \return The initialized edge selector.
  * \sa \ref igraph_es_seq()
  *
@@ -1163,20 +1189,23 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
  * \example examples/simple/igraph_es_pairs.c
  */
 
-int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
+igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
                     igraph_bool_t directed) {
-    es->type = IGRAPH_ES_PAIRS;
-    es->data.path.mode = directed;
-    es->data.path.ptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (es->data.path.ptr == 0) {
+    igraph_vector_int_t* vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
-
-    IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
-
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    es->type = IGRAPH_ES_PAIRS;
+    es->data.path.mode = directed;
+    es->data.path.ptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1190,6 +1219,11 @@ int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
  * is the first vertex of the second edge and so on. The last element of the
  * argument list must be -1 to denote the end of the argument list.
  *
+ * </para><para>
+ * Note that the vertex IDs supplied will be parsed as
+ * <code>int</code>'s so you cannot supply arbitrarily large (too
+ * large for int) vertex IDs here.
+ *
  * \param es Pointer to an uninitialized edge selector object.
  * \param directed Whether the graph is directed or not.
  * \return Error code.
@@ -1198,16 +1232,16 @@ int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
  * Time complexity: O(n), the number of edges being selected.
  */
 
-int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     va_list ap;
-    long int i, n = 0;
-    es->type = IGRAPH_ES_PAIRS;
-    es->data.path.mode = directed;
-    es->data.path.ptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (es->data.path.ptr == 0) {
+    igraph_integer_t i, n = 0;
+    igraph_vector_int_t *vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.path.ptr);
+    IGRAPH_FINALLY(igraph_free, vec);
 
     va_start(ap, directed);
     while (1) {
@@ -1219,37 +1253,45 @@ int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     }
     va_end(ap);
 
-    IGRAPH_VECTOR_INIT_FINALLY( (igraph_vector_t*) es->data.path.ptr, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
     va_start(ap, directed);
     for (i = 0; i < n; i++) {
-        VECTOR(*es->data.path.ptr)[i] = (igraph_real_t) va_arg(ap, int);
+        VECTOR(*vec)[i] = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    es->type = IGRAPH_ES_PAIRS;
+    es->data.path.mode = directed;
+    es->data.path.ptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
+igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_int_t *v,
                          igraph_bool_t directed) {
-    es->type = IGRAPH_ES_MULTIPAIRS;
-    es->data.path.mode = directed;
-    es->data.path.ptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (es->data.path.ptr == 0) {
+    igraph_vector_int_t *vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
-
-    IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
-
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    es->type = IGRAPH_ES_MULTIPAIRS;
+    es->data.path.mode = directed;
+    es->data.path.ptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_es_path
- * \brief Edge selector, edge ids on a path.
+ * \brief Edge selector, edge IDs on a path.
  *
  * This function takes a vector of vertices and creates a selector of
  * edges between those vertices. Vector {0, 3, 4, 7} will select edges
@@ -1257,7 +1299,7 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
  * to create an iterator using this selector will fail.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param v Pointer to a vector of vertex id's along the path.
+ * \param v Pointer to a vector of vertex ID's along the path.
  * \param directed If edge directions should be taken into account. This
  *                 will be ignored if the graph to select from is undirected.
  * \return Error code.
@@ -1265,32 +1307,35 @@ int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
  *
  * Time complexity: O(n), the number of vertices.
  */
-int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v,
+igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
                    igraph_bool_t directed) {
-    es->type = IGRAPH_ES_PATH;
-    es->data.path.mode = directed;
-    es->data.path.ptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (es->data.path.ptr == 0) {
+    igraph_vector_int_t *vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
-
-    IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
-
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    es->type = IGRAPH_ES_PATH;
+    es->data.path.mode = directed;
+    es->data.path.ptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     va_list ap;
-    long int i, n = 0;
-    es->type = IGRAPH_ES_PATH;
-    es->data.path.mode = directed;
-    es->data.path.ptr = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (es->data.path.ptr == 0) {
+    igraph_integer_t i, n = 0;
+    igraph_vector_int_t *vec;
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.path.ptr);
+    IGRAPH_FINALLY(igraph_free, vec);
 
     va_start(ap, directed);
     while (1) {
@@ -1302,16 +1347,21 @@ int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
     }
     va_end(ap);
 
-    IGRAPH_VECTOR_INIT_FINALLY( (igraph_vector_t*) es->data.path.ptr, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
     va_start(ap, directed);
     for (i = 0; i < n; i++) {
-        VECTOR(*es->data.path.ptr)[i] = (igraph_real_t) va_arg(ap, int);
+        VECTOR(*vec)[i] = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    es->type = IGRAPH_ES_PATH;
+    es->data.path.mode = directed;
+    es->data.path.ptr = vec;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1340,13 +1390,13 @@ void igraph_es_destroy(igraph_es_t *es) {
     case IGRAPH_ES_SEQ:
         break;
     case IGRAPH_ES_VECTOR:
-        igraph_vector_destroy((igraph_vector_t*)es->data.vecptr);
+        igraph_vector_int_destroy((igraph_vector_int_t*)es->data.vecptr);
         IGRAPH_FREE(es->data.vecptr);
         break;
     case IGRAPH_ES_PAIRS:
     case IGRAPH_ES_PATH:
     case IGRAPH_ES_MULTIPAIRS:
-        igraph_vector_destroy((igraph_vector_t*)es->data.path.ptr);
+        igraph_vector_int_destroy((igraph_vector_int_t*)es->data.path.ptr);
         IGRAPH_FREE(es->data.path.ptr);
         break;
     default:
@@ -1376,29 +1426,33 @@ igraph_bool_t igraph_es_is_all(const igraph_es_t *es) {
  * \param dest An uninitialized selector that will contain the copy.
  * \sa \ref igraph_es_destroy()
  */
-int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
+igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
+    igraph_vector_int_t *vec;
+
     memcpy(dest, src, sizeof(igraph_es_t));
     switch (dest->type) {
     case IGRAPH_ES_VECTOR:
-        dest->data.vecptr = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (!dest->data.vecptr) {
+        vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        if (!vec) {
             IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)dest->data.vecptr,
-                                        (igraph_vector_t*)src->data.vecptr));
+        IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.vecptr));
+        dest->data.vecptr = vec;
         break;
     case IGRAPH_ES_PATH:
     case IGRAPH_ES_PAIRS:
     case IGRAPH_ES_MULTIPAIRS:
-        dest->data.path.ptr = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (!dest->data.path.ptr) {
+        vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        if (!vec) {
             IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)dest->data.path.ptr,
-                                        (igraph_vector_t*)src->data.path.ptr));
+        IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.path.ptr));
+        dest->data.path.ptr = vec;
+        break;
+    default:
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1416,8 +1470,8 @@ int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
  *
  * Time complexity: O(n), the number of edges in the selector.
  */
-int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
-                        igraph_vector_t *v) {
+igraph_error_t igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
+                        igraph_vector_int_t *v) {
     igraph_eit_t eit;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -1426,22 +1480,22 @@ int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
 
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_es_type
  * \brief Returns the type of the edge selector.
  */
-int igraph_es_type(const igraph_es_t *es) {
+igraph_es_type_t igraph_es_type(const igraph_es_t *es) {
     return es->type;
 }
 
-static int igraph_i_es_pairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
                                   const igraph_es_t *es, igraph_integer_t *result);
-static int igraph_i_es_path_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_path_size(const igraph_t *graph,
                                  const igraph_es_t *es, igraph_integer_t *result);
-static int igraph_i_es_multipairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_multipairs_size(const igraph_t *graph,
                                        const igraph_es_t *es, igraph_integer_t *result);
 
 /**
@@ -1454,35 +1508,35 @@ static int igraph_i_es_multipairs_size(const igraph_t *graph,
  * \param graph The graph over which we will iterate.
  * \param result The result will be returned here.
  */
-int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
+igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
                    igraph_integer_t *result) {
-    igraph_vector_t v;
+    igraph_vector_int_t v;
 
     switch (es->type) {
     case IGRAPH_ES_ALL:
         *result = igraph_ecount(graph);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_ALLFROM:
         *result = igraph_ecount(graph);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_ALLTO:
         *result = igraph_ecount(graph);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_INCIDENT:
-        IGRAPH_VECTOR_INIT_FINALLY(&v, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 0);
         IGRAPH_CHECK(igraph_incident(graph, &v,
                                      es->data.incident.vid, es->data.incident.mode));
-        *result = (igraph_integer_t) igraph_vector_size(&v);
-        igraph_vector_destroy(&v);
+        *result = igraph_vector_int_size(&v);
+        igraph_vector_int_destroy(&v);
         IGRAPH_FINALLY_CLEAN(1);
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_NONE:
         *result = 0;
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_1:
         if (es->data.eid < igraph_ecount(graph) && es->data.eid >= 0) {
@@ -1490,28 +1544,28 @@ int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         } else {
             *result = 0;
         }
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_VECTOR:
     case IGRAPH_ES_VECTORPTR:
-        *result = (igraph_integer_t) igraph_vector_size((igraph_vector_t*)es->data.vecptr);
-        return 0;
+        *result = igraph_vector_int_size(es->data.vecptr);
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_SEQ:
         *result = es->data.seq.to - es->data.seq.from;
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_PAIRS:
         IGRAPH_CHECK(igraph_i_es_pairs_size(graph, es, result));
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_PATH:
         IGRAPH_CHECK(igraph_i_es_path_size(graph, es, result));
-        return 0;
+        return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_MULTIPAIRS:
         IGRAPH_CHECK(igraph_i_es_multipairs_size(graph, es, result));
-        return 0;
+        return IGRAPH_SUCCESS;
 
     default:
         IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
@@ -1519,62 +1573,58 @@ int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
     }
 }
 
-static int igraph_i_es_pairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
                                   const igraph_es_t *es, igraph_integer_t *result) {
-    long int n = igraph_vector_size(es->data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t i, n = igraph_vector_int_size(es->data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (n % 2 != 0) {
         IGRAPH_ERROR("Cannot calculate edge selector length from odd number of vertices",
                      IGRAPH_EINVAL);
     }
-    if (!igraph_vector_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_EINVVID);
     }
 
-    *result = (igraph_integer_t) (n / 2);
+    *result = n / 2;
     /* Check for the existence of all edges */
     for (i = 0; i < *result; i++) {
-        long int from = (long int) VECTOR(*es->data.path.ptr)[2 * i];
-        long int to = (long int) VECTOR(*es->data.path.ptr)[2 * i + 1];
+        igraph_integer_t from = VECTOR(*es->data.path.ptr)[2 * i];
+        igraph_integer_t to = VECTOR(*es->data.path.ptr)[2 * i + 1];
         igraph_integer_t eid;
-        IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
-                                    (igraph_integer_t) to, es->data.path.mode,
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode,
                                     /*error=*/ 1));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_es_path_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_path_size(const igraph_t *graph,
                                  const igraph_es_t *es, igraph_integer_t *result) {
-    long int n = igraph_vector_size(es->data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t i, n = igraph_vector_int_size(es->data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    if (!igraph_vector_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_EINVVID);
     }
 
     if (n <= 1) {
         *result = 0;
     } else {
-        *result = (igraph_integer_t) (n - 1);
+        *result = n - 1;
     }
     for (i = 0; i < *result; i++) {
-        long int from = (long int) VECTOR(*es->data.path.ptr)[i];
-        long int to = (long int) VECTOR(*es->data.path.ptr)[i + 1];
+        igraph_integer_t from = VECTOR(*es->data.path.ptr)[i];
+        igraph_integer_t to = VECTOR(*es->data.path.ptr)[i + 1];
         igraph_integer_t eid;
-        IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
-                                    (igraph_integer_t) to, es->data.path.mode,
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode,
                                     /*error=*/ 1));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_es_multipairs_size(const igraph_t *graph,
+static igraph_error_t igraph_i_es_multipairs_size(const igraph_t *graph,
                                        const igraph_es_t *es, igraph_integer_t *result) {
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(es); IGRAPH_UNUSED(result);
     IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_UNIMPLEMENTED);
@@ -1582,63 +1632,65 @@ static int igraph_i_es_multipairs_size(const igraph_t *graph,
 
 /**************************************************/
 
-static int igraph_i_eit_create_allfromto(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
                                          igraph_eit_t *eit,
                                          igraph_neimode_t mode);
-static int igraph_i_eit_pairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_create_incident(const igraph_t* graph,
                               igraph_es_t es, igraph_eit_t *eit);
-static int igraph_i_eit_multipairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
+                              igraph_es_t es, igraph_eit_t *eit);
+static igraph_error_t igraph_i_eit_multipairs(const igraph_t *graph,
                                    igraph_es_t es, igraph_eit_t *eit);
-static int igraph_i_eit_path(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_path(const igraph_t *graph,
                              igraph_es_t es, igraph_eit_t *eit);
 
-static int igraph_i_eit_create_allfromto(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
                                          igraph_eit_t *eit,
                                          igraph_neimode_t mode) {
-    igraph_vector_t *vec;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int i;
+    igraph_vector_int_t *vec;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i, j, length;
 
-    vec = IGRAPH_CALLOC(1, igraph_vector_t);
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vec);
-    IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(vec, no_of_edges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(vec, no_of_edges));
 
     if (igraph_is_directed(graph)) {
-        igraph_vector_t adj;
-        IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+        igraph_vector_int_t adj;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_incident(graph, &adj, (igraph_integer_t) i, mode);
-            igraph_vector_append(vec, &adj);
+            igraph_incident(graph, &adj, i, mode);
+            igraph_vector_int_append(vec, &adj);
         }
-        igraph_vector_destroy(&adj);
+        igraph_vector_int_destroy(&adj);
         IGRAPH_FINALLY_CLEAN(1);
 
     } else {
 
-        igraph_vector_t adj;
+        igraph_vector_int_t adj;
         igraph_bool_t *added;
-        long int j;
-        IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         added = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
         if (added == 0) {
             IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, added);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_incident(graph, &adj, (igraph_integer_t) i, IGRAPH_ALL);
-            for (j = 0; j < igraph_vector_size(&adj); j++) {
-                if (!added[ (long int)VECTOR(adj)[j] ]) {
-                    igraph_vector_push_back(vec, VECTOR(adj)[j]);
-                    added[ (long int)VECTOR(adj)[j] ] += 1;
+            igraph_incident(graph, &adj, i, IGRAPH_ALL);
+            length = igraph_vector_int_size(&adj);
+            for (j = 0; j < length; j++) {
+                if (!added[ VECTOR(adj)[j] ]) {
+                    igraph_vector_int_push_back(vec, VECTOR(adj)[j]);
+                    added[ VECTOR(adj)[j] ] += 1;
                 }
             }
         }
-        igraph_vector_destroy(&adj);
+        igraph_vector_int_destroy(&adj);
         IGRAPH_FREE(added);
         IGRAPH_FINALLY_CLEAN(2);
     }
@@ -1647,90 +1699,131 @@ static int igraph_i_eit_create_allfromto(const igraph_t *graph,
     eit->pos = 0;
     eit->start = 0;
     eit->vec = vec;
-    eit->end = igraph_vector_size(eit->vec);
+    eit->end = igraph_vector_int_size(eit->vec);
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eit_pairs(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_create_incident(const igraph_t* graph,
                               igraph_es_t es, igraph_eit_t *eit) {
-    long int n = igraph_vector_size(es.data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_vector_int_t vec;
+    igraph_vector_int_t* vec_int;
+    igraph_integer_t i, n;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
+    IGRAPH_CHECK(igraph_incident(graph, &vec, es.data.incident.vid, es.data.incident.mode));
+
+    vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec_int == 0) {
+        IGRAPH_ERROR("Cannot create iterator.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vec_int);
+
+    n = igraph_vector_int_size(&vec);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, n);
+
+    for (i = 0; i < n; i++) {
+        VECTOR(*vec_int)[i] = VECTOR(vec)[i];
+    }
+
+    igraph_vector_int_destroy(&vec);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    eit->type = IGRAPH_EIT_VECTOR;
+    eit->pos = 0;
+    eit->start = 0;
+    eit->vec = vec_int;
+    eit->end = igraph_vector_int_size(vec_int);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
+                              igraph_es_t es, igraph_eit_t *eit) {
+    igraph_integer_t n = igraph_vector_int_size(es.data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i;
+    igraph_vector_int_t* vec;
 
     if (n % 2 != 0) {
         IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
                      IGRAPH_EINVAL);
     }
-    if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
     }
 
-    eit->type = IGRAPH_EIT_VECTOR;
-    eit->pos = 0;
-    eit->start = 0;
-    eit->end = n / 2;
-    eit->vec = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (eit->vec == 0) {
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
-    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, n / 2);
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n / 2);
 
-    for (i = 0; i < igraph_vector_size(eit->vec); i++) {
-        long int from = (long int) VECTOR(*es.data.path.ptr)[2 * i];
-        long int to = (long int) VECTOR(*es.data.path.ptr)[2 * i + 1];
+    for (i = 0; i < igraph_vector_int_size(vec); i++) {
+        igraph_integer_t from = VECTOR(*es.data.path.ptr)[2 * i];
+        igraph_integer_t to = VECTOR(*es.data.path.ptr)[2 * i + 1];
         igraph_integer_t eid;
-        IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
-                                    (igraph_integer_t) to, es.data.path.mode,
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode,
                                     /*error=*/ 1));
-        VECTOR(*eit->vec)[i] = eid;
+        VECTOR(*vec)[i] = eid;
     }
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
-}
-
-static int igraph_i_eit_multipairs(const igraph_t *graph,
-                                   igraph_es_t es, igraph_eit_t *eit) {
-    long int n = igraph_vector_size(es.data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
-
-    if (n % 2 != 0) {
-        IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
-                     IGRAPH_EINVAL);
-    }
-    if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
-    }
 
     eit->type = IGRAPH_EIT_VECTOR;
     eit->pos = 0;
     eit->start = 0;
     eit->end = n / 2;
-    eit->vec = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (eit->vec == 0) {
+    eit->vec = vec;
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_eit_multipairs(const igraph_t *graph,
+                                   igraph_es_t es, igraph_eit_t *eit) {
+    igraph_integer_t n = igraph_vector_int_size(es.data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t* vec;
+
+    if (n % 2 != 0) {
+        IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
+                     IGRAPH_EINVAL);
+    }
+    if (!igraph_vector_int_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
+        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
+    }
+
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
         IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
-    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, n / 2);
+    IGRAPH_FINALLY(igraph_free, vec);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n / 2);
 
-    IGRAPH_CHECK(igraph_get_eids_multi(graph, (igraph_vector_t *) eit->vec,
+    IGRAPH_CHECK(igraph_get_eids_multi(graph, vec,
                                        /*pairs=*/ es.data.path.ptr, /*path=*/ 0,
                                        es.data.path.mode, /*error=*/ 1));
 
+    eit->type = IGRAPH_EIT_VECTOR;
+    eit->pos = 0;
+    eit->start = 0;
+    eit->end = n / 2;
+    eit->vec = vec;
+
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_eit_path(const igraph_t *graph,
+static igraph_error_t igraph_i_eit_path(const igraph_t *graph,
                              igraph_es_t es, igraph_eit_t *eit) {
-    long int n = igraph_vector_size(es.data.path.ptr);
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i, len;
+    igraph_integer_t n = igraph_vector_int_size(es.data.path.ptr);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, len;
+    igraph_vector_int_t* vec;
 
-    if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
+    if (!igraph_vector_int_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
         IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_EINVVID);
     }
 
@@ -1740,30 +1833,32 @@ static int igraph_i_eit_path(const igraph_t *graph,
         len = n - 1;
     }
 
+    vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    if (vec == 0) {
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vec);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(vec, len);
+
+    for (i = 0; i < len; i++) {
+        igraph_integer_t from = VECTOR(*es.data.path.ptr)[i];
+        igraph_integer_t to = VECTOR(*es.data.path.ptr)[i + 1];
+        igraph_integer_t eid;
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode,
+                                    /*error=*/ 1));
+        VECTOR(*vec)[i] = eid;
+    }
+
+    IGRAPH_FINALLY_CLEAN(2);
+
     eit->type = IGRAPH_EIT_VECTOR;
     eit->pos = 0;
     eit->start = 0;
     eit->end = len;
-    eit->vec = IGRAPH_CALLOC(1, igraph_vector_t);
-    if (eit->vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
+    eit->vec = vec;
 
-    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t *)eit->vec, len);
-
-    for (i = 0; i < len; i++) {
-        long int from = (long int) VECTOR(*es.data.path.ptr)[i];
-        long int to = (long int) VECTOR(*es.data.path.ptr)[i + 1];
-        igraph_integer_t eid;
-        IGRAPH_CHECK(igraph_get_eid(graph, &eid, (igraph_integer_t) from,
-                                    (igraph_integer_t) to, es.data.path.mode,
-                                    /*error=*/ 1));
-        VECTOR(*eit->vec)[i] = eid;
-    }
-
-    IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1792,7 +1887,7 @@ static int igraph_i_eit_path(const igraph_t *graph,
  * incident edges of the vertex.
  */
 
-int igraph_eit_create(const igraph_t *graph,
+igraph_error_t igraph_eit_create(const igraph_t *graph,
                       igraph_es_t es, igraph_eit_t *eit) {
     switch (es.type) {
     case IGRAPH_ES_ALL:
@@ -1808,19 +1903,7 @@ int igraph_eit_create(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_eit_create_allfromto(graph, eit, IGRAPH_IN));
         break;
     case IGRAPH_ES_INCIDENT:
-        eit->type = IGRAPH_EIT_VECTOR;
-        eit->pos = 0;
-        eit->start = 0;
-        eit->vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (eit->vec == 0) {
-            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) eit->vec);
-        IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, 0);
-        IGRAPH_CHECK(igraph_incident(graph, (igraph_vector_t*)eit->vec,
-                                     es.data.incident.vid, es.data.incident.mode));
-        eit->end = igraph_vector_size(eit->vec);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_CHECK(igraph_i_eit_create_incident(graph, es, eit));
         break;
     case IGRAPH_ES_NONE:
         eit->type = IGRAPH_EIT_SEQ;
@@ -1834,7 +1917,7 @@ int igraph_eit_create(const igraph_t *graph,
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
         if (eit->pos >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_ES_VECTOR:
@@ -1843,9 +1926,9 @@ int igraph_eit_create(const igraph_t *graph,
         eit->pos = 0;
         eit->start = 0;
         eit->vec = es.data.vecptr;
-        eit->end = igraph_vector_size(eit->vec);
-        if (!igraph_vector_isininterval(eit->vec, 0, igraph_ecount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+        eit->end = igraph_vector_int_size(eit->vec);
+        if (!igraph_vector_int_isininterval(eit->vec, 0, igraph_ecount(graph) - 1)) {
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_ES_SEQ:
@@ -1854,10 +1937,10 @@ int igraph_eit_create(const igraph_t *graph,
         eit->start = es.data.seq.from;
         eit->end = es.data.seq.to;
         if (eit->start < 0) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         if (eit->end < 0) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge id.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         if (eit->start >= igraph_ecount(graph)) {
             IGRAPH_ERROR("Cannot create iterator, starting edge greater than number of edges.", IGRAPH_EINVAL);
@@ -1876,7 +1959,7 @@ int igraph_eit_create(const igraph_t *graph,
         IGRAPH_ERROR("Cannot create iterator, invalid selector.", IGRAPH_EINVAL);
         break;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1895,8 +1978,8 @@ void igraph_eit_destroy(const igraph_eit_t *eit) {
     case IGRAPH_EIT_VECTORPTR:
         break;
     case IGRAPH_EIT_VECTOR:
-        igraph_vector_destroy((igraph_vector_t*)eit->vec);
-        igraph_free((igraph_vector_t*)eit->vec);
+        igraph_vector_int_destroy((igraph_vector_int_t*)eit->vec);
+        igraph_free((igraph_vector_int_t*)eit->vec);
         break;
     default:
         /*     IGRAPH_ERROR("Cannot destroy iterator, unknown type", IGRAPH_EINVAL); */
@@ -1904,11 +1987,11 @@ void igraph_eit_destroy(const igraph_eit_t *eit) {
     }
 }
 
-int igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v) {
+igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_int_t *v) {
 
-    long int i;
+    igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_resize(v, IGRAPH_EIT_SIZE(*eit)));
+    IGRAPH_CHECK(igraph_vector_int_resize(v, IGRAPH_EIT_SIZE(*eit)));
 
     switch (eit->type) {
     case IGRAPH_EIT_SEQ:
@@ -1928,5 +2011,5 @@ int igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v) {
         break;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

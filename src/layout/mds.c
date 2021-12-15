@@ -33,32 +33,42 @@
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
-static int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+#include <limits.h>
+
+static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
                                     int n, void *extra);
 
-static int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                                      igraph_matrix_t *dist, long int dim);
+static igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+                                      igraph_matrix_t *dist, igraph_integer_t dim);
 
-static int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
                                     int n, void *extra) {
     igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
     IGRAPH_UNUSED(n);
-    igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
-    return 0;
+    IGRAPH_CHECK(igraph_blas_dgemv_array(0, 1, matrix, from, 0, to));
+    return IGRAPH_SUCCESS;
 }
 
 /* MDS layout for a connected graph, with no error checking on the
  * input parameters. The distance matrix will be modified in-place. */
-int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                               igraph_matrix_t *dist, long int dim) {
+igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+                               igraph_matrix_t *dist, igraph_integer_t dim) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int nev = dim;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t nev = dim;
     igraph_matrix_t vectors;
     igraph_vector_t values, row_means;
     igraph_real_t grand_mean;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_eigen_which_t which;
+
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for eigenvector calculations", IGRAPH_EOVERFLOW);
+    }
+
+    if (nev > INT_MAX) {
+        IGRAPH_ERROR("Dimensionality too large for eigenvector calculations", IGRAPH_EOVERFLOW);
+    }
 
     /* Handle the trivial cases */
     if (no_of_nodes == 1) {
@@ -90,7 +100,7 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
     /* Double centering of the distance matrix */
     IGRAPH_VECTOR_INIT_FINALLY(&row_means, no_of_nodes);
     igraph_vector_fill(&values, 1.0 / no_of_nodes);
-    igraph_blas_dgemv(0, 1, dist, &values, 0, &row_means);
+    IGRAPH_CHECK(igraph_blas_dgemv(0, 1, dist, &values, 0, &row_means));
     grand_mean = igraph_vector_sum(&row_means) / no_of_nodes;
     igraph_matrix_add_constant(dist, grand_mean);
     for (i = 0; i < no_of_nodes; i++) {
@@ -178,9 +188,9 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  * Time complexity: usually around O(|V|^2 dim).
  */
 
-int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
-                      const igraph_matrix_t *dist, long int dim) {
-    long int i, no_of_nodes = igraph_vcount(graph);
+igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
+                      const igraph_matrix_t *dist, igraph_integer_t dim) {
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;
     igraph_bool_t conn;
 
@@ -223,15 +233,16 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
     } else {
         /* The graph is not connected, lay out the components one by one */
         igraph_vector_ptr_t layouts;
-        igraph_vector_t comp, vertex_order;
+        igraph_vector_int_t vertex_order;
+        igraph_vector_int_t comp;
         igraph_t subgraph;
         igraph_matrix_t *layout;
         igraph_matrix_t dist_submatrix;
         igraph_bool_t *seen_vertices;
-        long int j, n, processed_vertex_count = 0;
+        igraph_integer_t j, n, processed_vertex_count = 0;
 
-        IGRAPH_VECTOR_INIT_FINALLY(&comp, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&vertex_order, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&comp, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_order, no_of_nodes);
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&layouts, 0));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layouts);
@@ -258,8 +269,7 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
                                                  IGRAPH_SUBGRAPH_AUTO));
             IGRAPH_FINALLY(igraph_destroy, &subgraph);
             /* Calculate the submatrix of the distances */
-            IGRAPH_CHECK(igraph_matrix_select_rows_cols(&m, &dist_submatrix,
-                         &comp, &comp));
+            IGRAPH_CHECK(igraph_matrix_select_rows_cols(&m, &dist_submatrix, &comp, &comp));
             /* Allocate a new matrix for storing the layout */
             layout = IGRAPH_CALLOC(1, igraph_matrix_t);
             if (layout == 0) {
@@ -277,10 +287,10 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
             igraph_destroy(&subgraph);
             IGRAPH_FINALLY_CLEAN(1);
             /* Mark all the vertices in the component as visited */
-            n = igraph_vector_size(&comp);
+            n = igraph_vector_int_size(&comp);
             for (j = 0; j < n; j++) {
-                seen_vertices[(long int)VECTOR(comp)[j]] = 1;
-                VECTOR(vertex_order)[(long int)VECTOR(comp)[j]] = processed_vertex_count++;
+                seen_vertices[VECTOR(comp)[j]] = 1;
+                VECTOR(vertex_order)[VECTOR(comp)[j]] = processed_vertex_count++;
             }
         }
         /* Merge the layouts - reusing dist_submatrix here */
@@ -291,8 +301,8 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
         igraph_free(seen_vertices);
         igraph_matrix_destroy(&dist_submatrix);
         igraph_vector_ptr_destroy_all(&layouts);
-        igraph_vector_destroy(&vertex_order);
-        igraph_vector_destroy(&comp);
+        igraph_vector_int_destroy(&vertex_order);
+        igraph_vector_int_destroy(&comp);
         IGRAPH_FINALLY_CLEAN(5);
     }
 

@@ -26,19 +26,22 @@
 
 void custom_warning_handler (const char *reason, const char *file,
                              int line, int igraph_errno) {
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
+    IGRAPH_UNUSED(igraph_errno);
     printf("Warning: %s\n", reason);
 }
 
 void dump_graph(const char* header, const igraph_t* g) {
     fputs(header, stdout);
-    printf("Vertices: %li\n", (long int) igraph_vcount(g));
-    printf("Edges: %li\n", (long int) igraph_ecount(g));
-    printf("Directed: %i\n", (int) igraph_is_directed(g));
+    printf("Vertices: %" IGRAPH_PRId "\n", igraph_vcount(g));
+    printf("Edges: %" IGRAPH_PRId "\n", igraph_ecount(g));
+    printf("Directed: %i\n", igraph_is_directed(g) ? 1 : 0);
     igraph_write_graph_edgelist(g, stdout);
 }
 
 void dump_vertex_attribute_bool(const char* name, const igraph_t* g) {
-    long int i, n = igraph_vcount(g);
+    igraph_integer_t i, n = igraph_vcount(g);
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {
@@ -48,7 +51,7 @@ void dump_vertex_attribute_bool(const char* name, const igraph_t* g) {
 }
 
 void dump_vertex_attribute_numeric(const char* name, const igraph_t* g) {
-    long int i, n = igraph_vcount(g);
+    igraph_integer_t i, n = igraph_vcount(g);
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {
@@ -58,7 +61,7 @@ void dump_vertex_attribute_numeric(const char* name, const igraph_t* g) {
 }
 
 void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
-    long int i, n = igraph_vcount(g);
+    igraph_integer_t i, n = igraph_vcount(g);
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {

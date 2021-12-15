@@ -89,7 +89,7 @@ using namespace igraph::walktrap;
  * \param steps Integer constant, the length of the random walks.
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not NULL). Each merge is a
- *     row in a two-column matrix and contains the ids of the merged
+ *     row in a two-column matrix and contains the IDs of the merged
  *     clusters. Clusters are numbered from zero and cluster numbers
  *     smaller than the number of nodes in the network belong to the
  *     individual vertices as singleton clusters. In each step a new
@@ -116,14 +116,14 @@ using namespace igraph::walktrap;
  * \example examples/simple/walktrap.c
  */
 
-int igraph_community_walktrap(const igraph_t *graph,
+igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
                               int steps,
-                              igraph_matrix_t *merges,
+                              igraph_matrix_int_t *merges,
                               igraph_vector_t *modularity,
-                              igraph_vector_t *membership) {
+                              igraph_vector_int_t *membership) {
 
-    long int no_of_nodes = (long int)igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     int length = steps;
     long max_memory = -1;
 
@@ -141,7 +141,7 @@ int igraph_community_walktrap(const igraph_t *graph,
         igraph_integer_t no;
         IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
                                      &no, IGRAPH_WEAK));
-        IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - no, 2));
+        IGRAPH_CHECK(igraph_matrix_int_resize(merges, no_of_nodes - no, 2));
     }
     if (modularity) {
         IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
@@ -155,7 +155,7 @@ int igraph_community_walktrap(const igraph_t *graph,
     }
 
     if (membership) {
-        long int m;
+        igraph_integer_t m;
         m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
         IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
                      /*steps=*/ m,

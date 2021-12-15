@@ -9,6 +9,7 @@ static clock_t start;
 
 /* Wait for at least a second before attempting interruption */
 int interruption_handler(void *data) {
+    IGRAPH_UNUSED(data);
     if ( ((double) (clock() - start)) / CLOCKS_PER_SEC > 1.0 ) {
         IGRAPH_FINALLY_FREE();
         return IGRAPH_INTERRUPTED;
@@ -19,17 +20,17 @@ int interruption_handler(void *data) {
 
 int main() {
     igraph_t graph;
-    igraph_vector_t res;
+    igraph_vector_int_t res;
     igraph_error_handler_t *ehandler;
 
-    igraph_vector_init(&res, 0);
+    igraph_vector_int_init(&res, 0);
 
     /* Skip test when igraph does not have GLPK support. */
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1, -1);
     ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
     if (igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP) == IGRAPH_UNIMPLEMENTED) {
         igraph_destroy(&graph);
-        igraph_vector_destroy(&res);
+        igraph_vector_int_destroy(&res);
         return 77;
     }
     igraph_set_error_handler(ehandler);
@@ -46,13 +47,13 @@ int main() {
     igraph_set_error_handler(ehandler);
 
     igraph_destroy(&graph);
-    igraph_vector_destroy(&res);
+    igraph_vector_int_destroy(&res);
 
     VERIFY_FINALLY_STACK();
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    igraph_vector_init(&res, 0);
+    igraph_vector_int_init(&res, 0);
     igraph_erdos_renyi_game(
                       &graph, IGRAPH_ERDOS_RENYI_GNM,
                       100, 200,
@@ -67,7 +68,7 @@ int main() {
 
     igraph_destroy(&graph);
 
-    igraph_vector_destroy(&res);
+    igraph_vector_int_destroy(&res);
 
     VERIFY_FINALLY_STACK();
 

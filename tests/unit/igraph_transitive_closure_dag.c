@@ -28,7 +28,7 @@
 int main() {
 
     igraph_t g, g2;
-    igraph_vector_t deg;
+    igraph_vector_int_t deg;
 
     igraph_small(&g, 9, IGRAPH_DIRECTED,
                  8, 7, 7, 6, 6, 3, 6, 0, 3, 2, 3, 1, 5, 0, 4, 1,
@@ -42,13 +42,13 @@ int main() {
         return 1;
     }
 
-    igraph_vector_init(&deg, 0);
+    igraph_vector_int_init(&deg, 0);
     igraph_degree(&g2, &deg, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
-    igraph_vector_print(&deg);
+    igraph_vector_int_print(&deg);
     igraph_degree(&g2, &deg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
-    igraph_vector_print(&deg);
+    igraph_vector_int_print(&deg);
 
-    igraph_vector_destroy(&deg);
+    igraph_vector_int_destroy(&deg);
     igraph_destroy(&g2);
     igraph_destroy(&g);
 

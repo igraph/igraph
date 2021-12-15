@@ -671,10 +671,10 @@ const unsigned int igraph_i_classedges_4u[] = { 2, 3, 1, 3, 0, 3, 1, 2, 0, 2, 0,
  * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
  */
-int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
-    long int e;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
+    igraph_integer_t e;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t from, to;
     unsigned char idx, mul;
     const unsigned int *arr_idx, *arr_code;
@@ -708,13 +708,13 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
     }
 
     for (e = 0; e < no_of_edges; e++) {
-        igraph_edge(graph, (igraph_integer_t) e, &from, &to);
+        igraph_edge(graph, e, &from, &to);
         idx = (unsigned char) (mul * from + to);
         code |= arr_idx[idx];
     }
 
-    *isoclass = (igraph_integer_t) arr_code[code];
-    return 0;
+    *isoclass = arr_code[code];
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -725,8 +725,8 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * This function is only implemented for subgraphs with three or four
  * vertices.
  * \param graph The graph object.
- * \param vids A vector containing the vertex ids to be considered as
- *        a subgraph. Each vertex id should be included at most once.
+ * \param vids A vector containing the vertex IDs to be considered as
+ *        a subgraph. Each vertex ID should be included at most once.
  * \param isoclass Pointer to an integer, this will be set to the
  *        isomorphism class.
  * \return Error code.
@@ -736,24 +736,24 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * Time complexity: O((d+n)*n), d is the average degree in the network,
  * and n is the number of vertices in \c vids.
  */
-int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
+igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
                              igraph_integer_t *isoclass) {
-    int nodes = (int) igraph_vector_size(vids);
+    igraph_integer_t nodes = igraph_vector_int_size(vids);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_vector_t neis;
+    igraph_vector_int_t neis;
 
     unsigned char mul, idx;
     const unsigned int *arr_idx, *arr_code;
     int code = 0;
 
-    long int i, j, s;
+    igraph_integer_t i, j, s;
 
     if (nodes < 3 || nodes > 4) {
         IGRAPH_ERROR("Only for three- or four-vertex subgraphs",
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     if (directed) {
         if (nodes == 3) {
@@ -778,22 +778,22 @@ int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
     }
 
     for (i = 0; i < nodes; i++) {
-        long int from = (long int) VECTOR(*vids)[i];
-        igraph_neighbors(graph, &neis, (igraph_integer_t) from, IGRAPH_OUT);
-        s = igraph_vector_size(&neis);
+        igraph_integer_t from = VECTOR(*vids)[i];
+        igraph_neighbors(graph, &neis, from, IGRAPH_OUT);
+        s = igraph_vector_int_size(&neis);
         for (j = 0; j < s; j++) {
-            long int nei = (long int) VECTOR(neis)[j], to;
-            if (igraph_vector_search(vids, 0, nei, &to)) {
+            igraph_integer_t nei = VECTOR(neis)[j], to;
+            if (igraph_vector_int_search(vids, 0, nei, &to)) {
                 idx = (unsigned char) (mul * i + to);
                 code |= arr_idx[idx];
             }
         }
     }
 
-    *isoclass = (igraph_integer_t) arr_code[code];
-    igraph_vector_destroy(&neis);
+    *isoclass = arr_code[code];
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -816,41 +816,41 @@ int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph to create.
  */
-int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
+igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                            igraph_integer_t number, igraph_bool_t directed) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     const unsigned int *classedges;
-    long int power;
-    long int code;
-    long int pos;
+    igraph_integer_t power;
+    igraph_integer_t code;
+    igraph_integer_t pos;
 
     if (size < 3 || size > 4) {
         IGRAPH_ERROR("Only for graphs with three of four vertices",
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (directed) {
         if (size == 3) {
             classedges = igraph_i_classedges_3;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_3) / sizeof(unsigned int))) {
+                number >= (sizeof(igraph_i_isographs_3) / sizeof(igraph_i_isographs_3[0]))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
 
-            code = igraph_i_isographs_3[ (long int) number];
+            code = igraph_i_isographs_3[ number];
             power = 32;
         } else {
             classedges = igraph_i_classedges_4;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_4) / sizeof(unsigned int))) {
+                number >= (sizeof(igraph_i_isographs_4) / sizeof(igraph_i_isographs_4[0]))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
 
-            code = igraph_i_isographs_4[ (long int) number];
+            code = igraph_i_isographs_4[ number];
             power = 2048;
         }
     } else {
@@ -858,23 +858,21 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             classedges = igraph_i_classedges_3u;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_3u) /
-                                sizeof(unsigned int))) {
+                number >= (sizeof(igraph_i_isographs_3u) / sizeof(igraph_i_isographs_3u[0]))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
 
-            code = igraph_i_isographs_3u[ (long int) number];
+            code = igraph_i_isographs_3u[ number];
             power = 4;
         } else {
             classedges = igraph_i_classedges_4u;
 
             if (number < 0 ||
-                number >= (int)(sizeof(igraph_i_isographs_4u) /
-                                sizeof(unsigned int))) {
+                number >= (sizeof(igraph_i_isographs_4u) / sizeof(igraph_i_isographs_4u[0]))) {
                 IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
             }
 
-            code = igraph_i_isographs_4u[ (long int) number];
+            code = igraph_i_isographs_4u[ number];
             power = 32;
         }
     }
@@ -882,8 +880,8 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     pos = 0;
     while (code > 0) {
         if (code >= power) {
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2 * pos]));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2 * pos + 1]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, classedges[2 * pos]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, classedges[2 * pos + 1]));
             code -= power;
         }
         power /= 2;
@@ -891,7 +889,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, size, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -66,8 +66,8 @@ namespace walktrap {
 
 IGRAPH_THREAD_LOCAL int Probabilities::length = 0;
 IGRAPH_THREAD_LOCAL Communities* Probabilities::C = 0;
-IGRAPH_THREAD_LOCAL float* Probabilities::tmp_vector1 = 0;
-IGRAPH_THREAD_LOCAL float* Probabilities::tmp_vector2 = 0;
+IGRAPH_THREAD_LOCAL double* Probabilities::tmp_vector1 = 0;
+IGRAPH_THREAD_LOCAL double* Probabilities::tmp_vector2 = 0;
 IGRAPH_THREAD_LOCAL int* Probabilities::id = 0;
 IGRAPH_THREAD_LOCAL int* Probabilities::vertices1 = 0;
 IGRAPH_THREAD_LOCAL int* Probabilities::vertices2 = 0;
@@ -97,7 +97,7 @@ Probabilities::Probabilities(int community) {
     int nb_vertices1 = 0;
     int nb_vertices2 = 0;
 
-    float initial_proba = 1. / float(C->communities[community].size);
+    double initial_proba = 1. / static_cast<double>(C->communities[community].size);
     int last =  C->members[C->communities[community].last_member];
     for (int m = C->communities[community].first_member; m != last; m = C->members[m]) {
         tmp_vector1[m] = initial_proba;
@@ -113,7 +113,7 @@ Probabilities::Probabilities(int community) {
             }
             if (nb_vertices1 == G->nb_vertices) {
                 for (int i = 0; i < G->nb_vertices; i++) {
-                    float proba = tmp_vector1[i] / G->vertices[i].total_weight;
+                    double proba = tmp_vector1[i] / G->vertices[i].total_weight;
                     for (int j = 0; j < G->vertices[i].degree; j++) {
                         tmp_vector2[G->vertices[i].edges[j].neighbor] += proba * G->vertices[i].edges[j].weight;
                     }
@@ -121,7 +121,7 @@ Probabilities::Probabilities(int community) {
             } else {
                 for (int i = 0; i < nb_vertices1; i++) {
                     int v1 = vertices1[i];
-                    float proba = tmp_vector1[v1] / G->vertices[v1].total_weight;
+                    double proba = tmp_vector1[v1] / G->vertices[v1].total_weight;
                     for (int j = 0; j < G->vertices[v1].degree; j++) {
                         tmp_vector2[G->vertices[v1].edges[j].neighbor] += proba * G->vertices[v1].edges[j].weight;
                     }
@@ -131,7 +131,7 @@ Probabilities::Probabilities(int community) {
             nb_vertices2 = 0;
             for (int i = 0; i < nb_vertices1; i++) {
                 int v1 = vertices1[i];
-                float proba = tmp_vector1[v1] / G->vertices[v1].total_weight;
+                double proba = tmp_vector1[v1] / G->vertices[v1].total_weight;
                 for (int j = 0; j < G->vertices[v1].degree; j++) {
                     int v2 = G->vertices[v1].edges[j].neighbor;
                     if (id[v2] == current_id) {
@@ -144,7 +144,7 @@ Probabilities::Probabilities(int community) {
                 }
             }
         }
-        float* tmp = tmp_vector2;
+        double* tmp = tmp_vector2;
         tmp_vector2 = tmp_vector1;
         tmp_vector1 = tmp;
 
@@ -156,7 +156,7 @@ Probabilities::Probabilities(int community) {
     }
 
     if (nb_vertices1 > (G->nb_vertices / 2)) {
-        P = new float[G->nb_vertices];
+        P = new double[G->nb_vertices];
         size = G->nb_vertices;
         vertices = 0;
         if (nb_vertices1 == G->nb_vertices) {
@@ -172,7 +172,7 @@ Probabilities::Probabilities(int community) {
             }
         }
     } else {
-        P = new float[nb_vertices1];
+        P = new double[nb_vertices1];
         size = nb_vertices1;
         vertices = new int[nb_vertices1];
         int j = 0;
@@ -193,12 +193,12 @@ Probabilities::Probabilities(int community1, int community2) {
     Probabilities* P1 = C->communities[community1].P;
     Probabilities* P2 = C->communities[community2].P;
 
-    float w1 = float(C->communities[community1].size) / float(C->communities[community1].size + C->communities[community2].size);
-    float w2 = float(C->communities[community2].size) / float(C->communities[community1].size + C->communities[community2].size);
+    double w1 = C->communities[community1].size / static_cast<double>(C->communities[community1].size + C->communities[community2].size);
+    double w2 = C->communities[community2].size / static_cast<double>(C->communities[community1].size + C->communities[community2].size);
 
 
     if (P1->size == C->G->nb_vertices) {
-        P = new float[C->G->nb_vertices];
+        P = new double[C->G->nb_vertices];
         size = C->G->nb_vertices;
         vertices = 0;
 
@@ -221,7 +221,7 @@ Probabilities::Probabilities(int community1, int community2) {
         }
     } else {
         if (P2->size == C->G->nb_vertices) { // P1 partial vector, P2 full vector
-            P = new float[C->G->nb_vertices];
+            P = new double[C->G->nb_vertices];
             size = C->G->nb_vertices;
             vertices = 0;
 
@@ -271,7 +271,7 @@ Probabilities::Probabilities(int community1, int community2) {
             }
 
             if (nb_vertices1 > (C->G->nb_vertices / 2)) {
-                P = new float[C->G->nb_vertices];
+                P = new double[C->G->nb_vertices];
                 size = C->G->nb_vertices;
                 vertices = 0;
                 for (int i = 0; i < C->G->nb_vertices; i++) {
@@ -281,7 +281,7 @@ Probabilities::Probabilities(int community1, int community2) {
                     P[vertices1[i]] = tmp_vector1[vertices1[i]];
                 }
             } else {
-                P = new float[nb_vertices1];
+                P = new double[nb_vertices1];
                 size = nb_vertices1;
                 vertices = new int[nb_vertices1];
                 for (int i = 0; i < nb_vertices1; i++) {
@@ -296,7 +296,7 @@ Probabilities::Probabilities(int community1, int community2) {
 }
 
 double Probabilities::compute_distance(const Probabilities* P2) const {
-    double r = 0.;
+    double r = 0.0;
     if (vertices) {
         if (P2->vertices) { // two partial vectors
             int i = 0;
@@ -363,9 +363,9 @@ double Probabilities::compute_distance(const Probabilities* P2) const {
 
 long Probabilities::memory() {
     if (vertices) {
-        return (sizeof(Probabilities) + long(size) * (sizeof(float) + sizeof(int)));
+        return (sizeof(Probabilities) + long(size) * (sizeof(double) + sizeof(int)));
     } else {
-        return (sizeof(Probabilities) + long(size) * sizeof(float));
+        return (sizeof(Probabilities) + long(size) * sizeof(double));
     }
 }
 
@@ -389,7 +389,7 @@ Community::~Community() {
 
 
 Communities::Communities(Graph* graph, int random_walks_length,
-                         long m, igraph_matrix_t *pmerges,
+                         long m, igraph_matrix_int_t *pmerges,
                          igraph_vector_t *pmodularity) {
     max_memory = m;
     memory_used = 0;
@@ -400,8 +400,8 @@ Communities::Communities(Graph* graph, int random_walks_length,
 
     Probabilities::C = this;
     Probabilities::length = random_walks_length;
-    Probabilities::tmp_vector1 = new float[G->nb_vertices];
-    Probabilities::tmp_vector2 = new float[G->nb_vertices];
+    Probabilities::tmp_vector1 = new double[G->nb_vertices];
+    Probabilities::tmp_vector2 = new double[G->nb_vertices];
     Probabilities::id = new int[G->nb_vertices];
     for (int i = 0; i < G->nb_vertices; i++) {
         Probabilities::id[i] = 0;
@@ -455,7 +455,7 @@ Communities::Communities(Graph* graph, int random_walks_length,
     if (max_memory != -1) {
         memory_used += min_delta_sigma->memory();
         memory_used += 2 * long(G->nb_vertices) * sizeof(Community);
-        memory_used += long(G->nb_vertices) * (2 * sizeof(float) + 3 * sizeof(int)); // the static data of Probabilities class
+        memory_used += long(G->nb_vertices) * (2 * sizeof(double) + 3 * sizeof(int)); // the static data of Probabilities class
         memory_used += H->memory() + long(G->nb_edges) * sizeof(Neighbor);
         memory_used += G->memory();
     }
@@ -499,8 +499,8 @@ Communities::~Communities() {
     delete[] Probabilities::vertices2;
 }
 
-float Community::min_delta_sigma() {
-    float r = 1.;
+double Community::min_delta_sigma() {
+    double r = 1.0;
     for (Neighbor* N = first_neighbor; N != 0;) {
         if (N->delta_sigma < r) {
             r = N->delta_sigma;
@@ -623,7 +623,7 @@ void Communities::add_neighbor(Neighbor* N) {
     }
 }
 
-void Communities::update_neighbor(Neighbor* N, float new_delta_sigma) {
+void Communities::update_neighbor(Neighbor* N, double new_delta_sigma) {
     if (max_memory != -1) {
         if (new_delta_sigma < min_delta_sigma->delta_sigma[N->community1]) {
             min_delta_sigma->delta_sigma[N->community1] = new_delta_sigma;
@@ -639,7 +639,7 @@ void Communities::update_neighbor(Neighbor* N, float new_delta_sigma) {
             }
         }
 
-        float old_delta_sigma = N->delta_sigma;
+        double old_delta_sigma = N->delta_sigma;
         N->delta_sigma = new_delta_sigma;
         H->update(N);
 
@@ -894,7 +894,7 @@ double Communities::merge_nearest_communities() {
     }
 
     if (modularity) {
-        float Q = 0.;
+        double Q = 0.;
         for (int i = 0; i < nb_communities; i++) {
             if (communities[i].sub_community_of == 0) {
                 Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight) / G->total_weight;

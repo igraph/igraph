@@ -29,7 +29,7 @@ int main() {
 
     igraph_t g;
     igraph_vector_t result;
-    long i;
+    igraph_integer_t i;
 
     igraph_vector_init(&result, 0);
 

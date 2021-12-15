@@ -27,18 +27,18 @@
 
 int main() {
     igraph_t g, sub;
-    igraph_vector_t keep;
+    igraph_vector_int_t keep;
 
     /* test with a simple directed graph, copy-and-delete implementation */
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,
                  -1);
-    igraph_vector_init_int_end(&keep, -1, 0, 1, 2, 4, -1);
+    igraph_vector_int_init_int_end(&keep, -1, 0, 1, 2, 4, -1);
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_COPY_AND_DELETE);
     igraph_write_graph_edgelist(&sub, stdout);
-    igraph_vector_destroy(&keep);
+    igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
 
@@ -48,12 +48,12 @@ int main() {
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,
                  -1);
-    igraph_vector_init_int_end(&keep, -1, 0, 1, 2, 4, -1);
+    igraph_vector_int_init_int_end(&keep, -1, 0, 1, 2, 4, -1);
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
     igraph_write_graph_edgelist(&sub, stdout);
-    igraph_vector_destroy(&keep);
+    igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
 
@@ -61,12 +61,12 @@ int main() {
 
     /* test with a graph that has loop edges, copy-and-delete implementation */
     igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 1, -1);
-    igraph_vector_init_int_end(&keep, -1, 0, 1, -1);
+    igraph_vector_int_init_int_end(&keep, -1, 0, 1, -1);
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_COPY_AND_DELETE);
     igraph_write_graph_edgelist(&sub, stdout);
-    igraph_vector_destroy(&keep);
+    igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
 
@@ -74,12 +74,12 @@ int main() {
 
     /* test with a graph that has loop edges, create-from-scratch implementation */
     igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 1, -1);
-    igraph_vector_init_int_end(&keep, -1, 0, 1, -1);
+    igraph_vector_int_init_int_end(&keep, -1, 0, 1, -1);
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
     igraph_write_graph_edgelist(&sub, stdout);
-    igraph_vector_destroy(&keep);
+    igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
 

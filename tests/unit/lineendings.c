@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../../tests/unit/test_utilities.inc"
+
 int main() {
 
     igraph_t g;
@@ -66,6 +68,8 @@ int main() {
     fclose(ifile);
     igraph_write_graph_pajek(&g, stdout);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

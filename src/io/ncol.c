@@ -62,11 +62,11 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
  * \param predefnames Pointer to the symbolic names of the vertices in
- *        the file. If \c NULL is given here then vertex ids will be
+ *        the file. If \c NULL is given here then vertex IDs will be
  *        assigned to vertex names in the order of their appearance in
  *        the \c .ncol file. If it is not \c NULL and some unknown
  *        vertex names are found in the \c .ncol file then new vertex
- *        ids will be assigned to them.
+ *        IDs will be assigned to them.
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
@@ -96,16 +96,17 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
-int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                            const igraph_strvector_t *predefnames,
                            igraph_bool_t names,
                            igraph_add_weights_t weights,
                            igraph_bool_t directed) {
 
-    igraph_vector_t edges, ws;
+    igraph_vector_int_t edges;
+    igraph_vector_t ws;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
     igraph_integer_t no_of_nodes;
-    long int no_predefined = 0;
+    igraph_integer_t no_predefined = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
     igraph_attribute_record_t namerec, weightrec;
@@ -114,14 +115,14 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     IGRAPH_CHECK(igraph_empty(graph, 0, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
     IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
 
     /* Add the predefined names, if any */
     if (predefnames != 0) {
-        long int i, id, n;
+        igraph_integer_t i, id, n;
         char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
@@ -179,10 +180,10 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
-    if (igraph_vector_empty(&edges)) {
+    if (igraph_vector_int_empty(&edges)) {
         no_of_nodes = 0;
     } else {
-        no_of_nodes = igraph_vector_max(&edges) + 1;
+        no_of_nodes = igraph_vector_int_max(&edges) + 1;
     }
 
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, pname));
@@ -196,11 +197,11 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     }
     igraph_vector_destroy(&ws);
     igraph_trie_destroy(&trie);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_ncol_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -234,7 +235,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  *
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
  */
-int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                             const char *names, const char *weights) {
     igraph_eit_t it;
     igraph_attribute_type_t nametype, weighttype;
@@ -279,9 +280,7 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t from, to;
             int ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-            ret = fprintf(outstream, "%li %li\n",
-                          (long int) from,
-                          (long int) to);
+            ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n", from, to);
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
@@ -323,9 +322,8 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t from, to;
             int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
-            ret1 = fprintf(outstream, "%li %li ",
-                           (long int)from, (long int)to);
-            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret1 = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " ", from, to);
+            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret3 = fputc('\n', outstream);
             if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -359,7 +357,7 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
-            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret2 = fputc('\n', outstream);
             if (ret < 0 || ret2 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -373,5 +371,5 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

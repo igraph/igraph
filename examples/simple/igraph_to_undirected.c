@@ -25,17 +25,17 @@
 
 int main() {
 
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     igraph_t g;
 
-    igraph_vector_init_int(&v, 2, 5, 5);
+    igraph_vector_int_init_int(&v, 2, 5, 5);
     igraph_lattice(&g, &v, 1, IGRAPH_DIRECTED, 1 /*mutual*/, 0 /*circular*/);
     igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_COLLAPSE,
                          /*edge_comb=*/ 0);
     igraph_write_graph_edgelist(&g, stdout);
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     printf("---\n");
 

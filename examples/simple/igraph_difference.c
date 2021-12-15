@@ -26,13 +26,13 @@
 int main() {
 
     igraph_t orig, sub, diff;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
 
     /* Subtract from itself */
     printf("subtract itself\n");
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, -1);
     igraph_create(&orig, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &orig);
     igraph_write_graph_edgelist(&diff, stdout);
@@ -46,13 +46,13 @@ int main() {
 
     /* Same for undirected graph */
     printf("subtract itself, undirected\n");
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, -1);
     igraph_create(&orig, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 1, 0, 1, 2, 2, 1, 4, 5, -1);
+    igraph_vector_int_init_int_end(&v, -1, 1, 0, 1, 2, 2, 1, 4, 5, -1);
     igraph_create(&sub, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
     igraph_write_graph_edgelist(&diff, stdout);
@@ -67,9 +67,9 @@ int main() {
 
     /* Subtract the empty graph */
     printf("subtract empty\n");
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, -1);
     igraph_create(&orig, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_empty(&sub, 3, IGRAPH_DIRECTED);
     igraph_difference(&diff, &orig, &sub);
@@ -85,13 +85,13 @@ int main() {
 
     /* A `real' example */
     printf("real example\n");
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, 8, 9, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, 8, 9, -1);
     igraph_create(&orig, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 5, 4, 2, 1, 6, 7, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 5, 4, 2, 1, 6, 7, -1);
     igraph_create(&sub, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
     igraph_write_graph_edgelist(&diff, stdout);
@@ -102,13 +102,13 @@ int main() {
 
     /* undirected version */
     printf("real example, undirected\n");
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, 8, 9, 8, 10, 8, 13, 8, 11, 8, 12, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 1, 4, 5, 8, 9, 8, 10, 8, 13, 8, 11, 8, 12, -1);
     igraph_create(&orig, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 5, 4, 2, 1, 6, 7, 8, 10, 8, 13, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 5, 4, 2, 1, 6, 7, 8, 10, 8, 13, -1);
     igraph_create(&sub, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
     igraph_write_graph_edgelist(&diff, stdout);
@@ -119,13 +119,13 @@ int main() {
 
     /* undirected version with loop edge, tests Github issue #597 */
     printf("Github issue #597, undirected\n");
-    igraph_vector_init_int_end(&v, -1, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 0, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 0, -1);
     igraph_create(&orig, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, -1);
     igraph_create(&sub, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
     igraph_write_graph_edgelist(&diff, stdout);

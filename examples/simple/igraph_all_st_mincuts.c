@@ -27,16 +27,16 @@ int print_and_destroy(igraph_t *g,
                       igraph_real_t value,
                       igraph_vector_ptr_t *partitions,
                       igraph_vector_ptr_t *cuts) {
-    long int i, e, m, n = igraph_vector_ptr_size(partitions);
-    printf("Found %li cuts, value: %g\n", n, value);
+    igraph_integer_t i, e, m, n = igraph_vector_ptr_size(partitions);
+    printf("Found %" IGRAPH_PRId " cuts, value: %g\n", n, value);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *vec = VECTOR(*partitions)[i];
-        igraph_vector_t *vec2 = cuts ? VECTOR(*cuts)[i] : 0;
-        printf("Partition %li: ", i);
-        igraph_vector_print(vec);
+        igraph_vector_int_t *vec = VECTOR(*partitions)[i];
+        igraph_vector_int_t *vec2 = cuts ? VECTOR(*cuts)[i] : 0;
+        printf("Partition %" IGRAPH_PRId ": ", i);
+        igraph_vector_int_print(vec);
         if (vec2) {
-            printf("Cut %li:\n", i);
-            m = igraph_vector_size(vec2);
+            printf("Cut %" IGRAPH_PRId ":\n", i);
+            m = igraph_vector_int_size(vec2);
             for (e = 0; e < m; e++) {
                 igraph_integer_t from, to;
                 igraph_edge(g, VECTOR(*vec2)[e], &from, &to);
@@ -48,9 +48,9 @@ int print_and_destroy(igraph_t *g,
             }
         }
 
-        igraph_vector_destroy(vec);
+        igraph_vector_int_destroy(vec);
         if (vec2) {
-            igraph_vector_destroy(vec2);
+            igraph_vector_int_destroy(vec2);
         }
         igraph_free(vec);
         if (vec2) {

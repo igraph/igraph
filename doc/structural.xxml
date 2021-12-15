@@ -13,6 +13,10 @@
 <!-- doxrox-include igraph_are_connected -->
 </section>
 
+<section id="Sparsifiers"><title>Sparsifiers</title>
+<!-- doxrox-include igraph_spanner -->
+</section>
+
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
 <!-- doxrox-include igraph_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
@@ -35,6 +39,7 @@
 <!-- doxrox-include igraph_girth -->
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_radius -->
+<!-- doxrox-include igraph_pseudo_diameter -->
 </section>
 
 <section id="efficiency-measures"><title>Efficiency measures</title>
@@ -80,8 +85,6 @@
 <section id="degree-sequences"><title>Degree sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
-<!-- doxrox-include igraph_is_degree_sequence -->
-<!-- doxrox-include igraph_is_graphical_degree_sequence -->
 </section>
 
 <section id="centrality-measures"><title>Centrality measures</title>
@@ -107,6 +110,11 @@
 <!-- doxrox-include igraph_harmonic_centrality_cutoff -->
 <!-- doxrox-include igraph_betweenness_cutoff -->
 <!-- doxrox-include igraph_edge_betweenness_cutoff -->
+</section>
+
+<section id="subset-limited-centrality-measures"><title>Subset-limited Centrality Measures</title>
+<!-- doxrox-include igraph_betweenness_subset-->
+<!-- doxrox-include igraph_edge_betweenness_subset-->
 </section>
 
 <section id="centralization"><title>Centralization</title>
@@ -176,8 +184,9 @@
 <!-- doxrox-include igraph_assortativity_degree -->
 </section>
 
-<section id="k-cores"><title>K-Cores</title>
+<section id="k-cores"><title>K-Cores and K-Trusses</title>
 <!-- doxrox-include igraph_coreness -->
+<!-- doxrox-include igraph_trussness -->
 </section>
 
 <section id="topological-sorting-directed-acyclic-graphs"><title>Topological sorting, directed acyclic graphs</title>
@@ -208,6 +217,7 @@
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_get_adjacency -->
+<!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_edgelist -->

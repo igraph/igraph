@@ -57,10 +57,10 @@
  *
  * Time complexity: O(|V|+|E|) if \c multiple is true, otherwise not known.
  */
-int igraph_k_regular_game(igraph_t *graph,
+igraph_error_t igraph_k_regular_game(igraph_t *graph,
                           igraph_integer_t no_of_nodes, igraph_integer_t k,
                           igraph_bool_t directed, igraph_bool_t multiple) {
-    igraph_vector_t degseq;
+    igraph_vector_int_t degseq;
     igraph_degseq_t mode = multiple ? IGRAPH_DEGSEQ_SIMPLE : IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE;
 
     /* Note to self: we are not using IGRAPH_DEGSEQ_VL when multiple = false
@@ -74,11 +74,11 @@ int igraph_k_regular_game(igraph_t *graph,
         IGRAPH_ERROR("degree must be non-negative", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&degseq, no_of_nodes);
-    igraph_vector_fill(&degseq, k);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degseq, no_of_nodes);
+    igraph_vector_int_fill(&degseq, k);
     IGRAPH_CHECK(igraph_degree_sequence_game(graph, &degseq, directed ? &degseq : 0, mode));
 
-    igraph_vector_destroy(&degseq);
+    igraph_vector_int_destroy(&degseq);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

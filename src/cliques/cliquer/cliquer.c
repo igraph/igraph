@@ -289,7 +289,7 @@ static boolean sub_unweighted_single(int *table, int size, int min_size,
 			}
 		}
 
-		/* Avoid unneccessary loops (next size == p1-newtable) */
+		/* Avoid unnecessary loops (next size == p1-newtable) */
 		if (p1-newtable < min_size-1)
 			continue;
 		/* Now p1-newtable >= min_size-1 >= 2-1 == 1, so we can use
@@ -333,7 +333,7 @@ static boolean sub_unweighted_single(int *table, int size, int min_size,
  * clique_size[] must be defined and correct for all values of
  * table[0], ..., table[start-1].
  *
- * Returns the number of cliques stored (not neccessarily number of cliques
+ * Returns the number of cliques stored (not necessarily number of cliques
  * in graph, if user/time_function aborts).
  */
 static CLIQUER_LARGE_INT unweighted_clique_search_all(int *table, int start,
@@ -488,7 +488,7 @@ static CLIQUER_LARGE_INT sub_unweighted_all(int *table, int size, int min_size, 
 			}
 		}
 
-		/* Avoid unneccessary loops (next size == p1-newtable) */
+		/* Avoid unnecessary loops (next size == p1-newtable) */
 		if (p1-newtable < min_size-1) {
 			continue;
 		}
@@ -694,7 +694,7 @@ static int weighted_clique_search_single(int *table, int min_weight,
  * clique_size[] must be defined and correct for all values of
  * table[0], ..., table[start-1].
  *
- * Returns the number of cliques stored (not neccessarily number of cliques
+ * Returns the number of cliques stored (not necessarily number of cliques
  * in graph, if user/time_function aborts).
  */
 static int weighted_clique_search_all(int *table, int start,
@@ -884,7 +884,7 @@ static int sub_weighted_all(int *table, int size, int weight,
 
 		w=g->weights[v];
 		weight-=w;
-		/* Avoid a few unneccessary loops */
+		/* Avoid a few unnecessary loops */
 		if (current_weight+w+newweight <= prune_low) {
 			continue;
 		}

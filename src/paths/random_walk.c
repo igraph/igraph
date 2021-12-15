@@ -31,7 +31,7 @@
 
 /**
  * \function igraph_random_walk
- * Perform a random walk on a graph
+ * \brief Perform a random walk on a graph.
  *
  * Performs a random walk with a given length on a graph, from the given
  * start vertex. Edge directions are (potentially) considered, depending on
@@ -39,11 +39,13 @@
  *
  * \param graph The input graph, it can be directed or undirected.
  *   Multiple edges are respected, so are loop edges.
- * \param walk An allocated vector, the result is stored here.
+ * \param walk An allocated vector, the result is stored here as
+ *   a list of vertex IDs.
  *   It will be resized as needed.
  * \param start The start vertex for the walk.
  * \param steps The number of steps to take. If the random walk gets
- *   stuck, then the \p stuck argument specifies what happens.
+ *   stuck, then the \p stuck argument specifies what happens. The
+ *   starting vertex counts as one step.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
@@ -60,7 +62,7 @@
  */
 
 
-int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *walk,
                        igraph_integer_t start, igraph_neimode_t mode,
                        igraph_integer_t steps,
                        igraph_random_walk_stuck_t stuck) {
@@ -75,16 +77,20 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
     igraph_integer_t i;
 
     if (start < 0 || start >= vc) {
-        IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Starting vertex must be between 0 and the "
+                      "number of vertices in the graph (%" IGRAPH_PRId
+                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVAL,
+                      vc, start);
     }
     if (steps < 0) {
-        IGRAPH_ERROR("Invalid number of steps", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of steps should be non-negative, got %"
+                      IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
     }
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
-    IGRAPH_CHECK(igraph_vector_resize(walk, steps));
+    IGRAPH_CHECK(igraph_vector_int_resize(walk, steps));
 
     RNG_BEGIN();
 
@@ -96,11 +102,11 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
         nn = igraph_vector_int_size(neis);
 
         if (IGRAPH_UNLIKELY(nn == 0)) {
-            igraph_vector_resize(walk, i);
+            igraph_vector_int_resize(walk, i);
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
-                IGRAPH_ERROR("Random walk got stuck", IGRAPH_ERWSTUCK);
+                IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
         start = VECTOR(*walk)[i] = VECTOR(*neis)[ RNG_INTEGER(0, nn - 1) ];
@@ -111,7 +117,7 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
     igraph_lazy_adjlist_destroy(&adj);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -156,9 +162,9 @@ static void vec_destr(igraph_vector_t *vec) {
  * \return Error code.
  *
  */
-int igraph_random_edge_walk(const igraph_t *graph,
+igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
                             const igraph_vector_t *weights,
-                            igraph_vector_t *edgewalk,
+                            igraph_vector_int_t *edgewalk,
                             igraph_integer_t start, igraph_neimode_t mode,
                             igraph_integer_t steps,
                             igraph_random_walk_stuck_t stuck) {
@@ -202,7 +208,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_resize(edgewalk, steps));
+    IGRAPH_CHECK(igraph_vector_int_resize(edgewalk, steps));
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
@@ -220,14 +226,14 @@ int igraph_random_edge_walk(const igraph_t *graph,
     RNG_BEGIN();
 
     for (i = 0; i < steps; ++i) {
-        long degree, edge, idx;
+        igraph_integer_t degree, edge, idx;
         igraph_vector_int_t *edges = igraph_inclist_get(&il, start);
 
         degree = igraph_vector_int_size(edges);
 
         /* are we stuck? */
         if (IGRAPH_UNLIKELY(degree == 0)) {
-            igraph_vector_resize(edgewalk, i); /* can't fail since size is reduced, skip IGRAPH_CHECK */
+            igraph_vector_int_resize(edgewalk, i); /* can't fail since size is reduced, skip IGRAPH_CHECK */
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
@@ -241,7 +247,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
 
             /* compute out-edge cdf for this node if not already done */
             if (IGRAPH_UNLIKELY(! *cd)) {
-                long j;
+                igraph_integer_t j;
 
                 *cd = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (*cd == NULL) {

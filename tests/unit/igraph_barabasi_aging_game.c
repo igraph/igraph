@@ -21,7 +21,7 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t outseq;
+    igraph_vector_int_t outseq;
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_bool_t tree;
 
@@ -85,7 +85,7 @@ int main() {
     igraph_destroy(&g);
 
     printf("Increasing thickness of the line using outseq:\n");
-    igraph_vector_init_int(&outseq, 5, 1, 2, 3, 4, 5);
+    igraph_vector_int_init_int(&outseq, 5, 1, 2, 3, 4, 5);
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ &outseq, /*outpref*/ 0,
@@ -94,7 +94,7 @@ int main() {
         /*age_coef */ 10, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
-    igraph_vector_destroy(&outseq);
+    igraph_vector_int_destroy(&outseq);
 
     printf("Prefer more edges to make a star:\n");
     IGRAPH_ASSERT(igraph_barabasi_aging_game(

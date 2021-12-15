@@ -52,6 +52,10 @@ typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3,
                IGRAPH_TOTAL = 3
              } igraph_neimode_t;
 
+/* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
+#define IGRAPH_REVERSE_MODE(mode) \
+    ((mode) == IGRAPH_IN ? IGRAPH_OUT : ((mode) == IGRAPH_OUT ? IGRAPH_IN : (mode)))
+
 typedef enum { IGRAPH_WEAK = 1, IGRAPH_STRONG = 2 } igraph_connectedness_t;
 
 typedef enum { IGRAPH_RECIPROCITY_DEFAULT = 0,

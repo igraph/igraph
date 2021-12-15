@@ -33,7 +33,7 @@
  * them to trees.
  */
 
-static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+static igraph_error_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_int_t prufer;
     long i;
 
@@ -74,13 +74,13 @@ static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph
         VECTOR(vec)[j] = temp; \
     }
 
-static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
-    igraph_vector_t edges;
+static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+    igraph_vector_int_t edges;
     igraph_vector_int_t vertices;
     igraph_vector_bool_t visited;
-    long i, j, k;
+    igraph_integer_t i, j, k;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
@@ -138,7 +138,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
 
     igraph_vector_int_destroy(&vertices);
     igraph_vector_bool_destroy(&visited);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -179,7 +179,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  *
  */
 
-int igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
+igraph_error_t igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
     if (n < 2) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
         return IGRAPH_SUCCESS;

@@ -28,7 +28,7 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t membership, initial;
+    igraph_vector_int_t membership, initial;
     igraph_vector_bool_t fixed;
     long int i;
 
@@ -40,16 +40,16 @@ int main() {
     igraph_famous(&g, "zachary");
 
 
-    igraph_vector_init(&initial, igraph_vcount(&g));
-    igraph_vector_fill(&initial, -1);
+    igraph_vector_int_init(&initial, igraph_vcount(&g));
+    igraph_vector_int_fill(&initial, -1);
     igraph_vector_bool_init(&fixed, igraph_vcount(&g));
     igraph_vector_bool_fill(&fixed, 0);
     VECTOR(fixed)[7] = 1;
     VECTOR(fixed)[13] = 1;
 
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
 
-    igraph_community_label_propagation(&g, &membership, 0, &initial, &fixed,
+    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, 0, &initial, &fixed,
                                        /*modularity=*/ 0);
 
     for (i = 0; i < igraph_vcount(&g); i++) {
@@ -71,8 +71,8 @@ int main() {
     }
 
     igraph_vector_bool_destroy(&fixed);
-    igraph_vector_destroy(&initial);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&initial);
+    igraph_vector_int_destroy(&membership);
 
     igraph_destroy(&g);
 

@@ -32,17 +32,44 @@ __BEGIN_DECLS
     #define _GNU_SOURCE 1
 #endif
 
+#ifdef __cplusplus
+    #define __STDC_FORMAT_MACROS   /* needed for PRId32 and PRId64 from inttypes.h on Linux */
+#endif
+
+#include "igraph_config.h"
 #include "igraph_error.h"
+
+#include <inttypes.h>
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>
 
-typedef int    igraph_integer_t;
+#if !defined(IGRAPH_INTEGER_SIZE)
+#  error "igraph integer size not defined; check the value of IGRAPH_INTEGER_SIZE when compiling"
+#elif IGRAPH_INTEGER_SIZE == 64
+typedef int64_t igraph_integer_t;
+#elif IGRAPH_INTEGER_SIZE == 32
+typedef int32_t igraph_integer_t;
+#else
+#  error "Invalid igraph integer size; check the value of IGRAPH_INTEGER_SIZE when compiling"
+#endif
+
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 
 /* printf format specifier for igraph_integer_t */
-#define IGRAPH_PRId "d"
+#if IGRAPH_INTEGER_SIZE == 64
+#  define IGRAPH_PRId PRId64
+#else
+#  define IGRAPH_PRId PRId32
+#endif
+
+/* maximum allowed value for igraph_integer_t */
+#if IGRAPH_INTEGER_SIZE == 64
+#  define IGRAPH_INTEGER_MAX INT64_MAX
+#else
+#  define IGRAPH_INTEGER_MAX INT32_MAX
+#endif
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */

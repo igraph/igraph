@@ -69,8 +69,8 @@ namespace walktrap {
 class Communities;
 class Probabilities {
 public:
-    static IGRAPH_THREAD_LOCAL float* tmp_vector1;    //
-    static IGRAPH_THREAD_LOCAL float* tmp_vector2;    //
+    static IGRAPH_THREAD_LOCAL double* tmp_vector1;    //
+    static IGRAPH_THREAD_LOCAL double* tmp_vector2;    //
     static IGRAPH_THREAD_LOCAL int* id;       //
     static IGRAPH_THREAD_LOCAL int* vertices1;    //
     static IGRAPH_THREAD_LOCAL int* vertices2;    //
@@ -82,7 +82,7 @@ public:
 
     int size;                         // number of probabilities stored
     int* vertices;                        // the vertices corresponding to the stored probabilities, 0 if all the probabilities are stored
-    float* P;                         // the probabilities
+    double* P;                         // the probabilities
 
     long memory();                        // the memory (in Bytes) used by the object
     double compute_distance(const Probabilities* P2) const;   // compute the squared distance r^2 between this probability vector and P2
@@ -107,9 +107,9 @@ public:
     Probabilities* P;     // the probability vector, 0 if not stored.
 
 
-    float sigma;          // sigma(C) of the community
-    float internal_weight;    // sum of the weight of the internal edges
-    float total_weight;       // sum of the weight of all the edges of the community (an edge between two communities is a half-edge for each community)
+    double sigma;          // sigma(C) of the community
+    double internal_weight;    // sum of the weight of the internal edges
+    double total_weight;       // sum of the weight of all the edges of the community (an edge between two communities is a half-edge for each community)
 
     int sub_communities[2];   // the two sub sommunities, -1 if no sub communities;
     int sub_community_of;     // number of the community in which this community has been merged
@@ -119,7 +119,7 @@ public:
     void merge(Community &C1, Community &C2); // create a new community by merging C1 an C2
     void add_neighbor(Neighbor* N);
     void remove_neighbor(Neighbor* N);
-    float min_delta_sigma();          // compute the minimal delta sigma among all the neighbors of this community
+    double min_delta_sigma();          // compute the minimal delta sigma among all the neighbors of this community
 
     Community();          // create an empty community
     ~Community();         // destructor
@@ -128,8 +128,8 @@ public:
 class Communities {
 private:
     long max_memory;  // size in Byte of maximal memory usage, -1 for no limit
-    igraph_matrix_t *merges;
-    long int mergeidx;
+    igraph_matrix_int_t *merges;
+    igraph_integer_t mergeidx;
     igraph_vector_t *modularity;
 
 public:
@@ -150,7 +150,7 @@ public:
     int nb_active_communities;    // number of active communities
 
     Communities(Graph* G, int random_walks_length = 3,
-                long max_memory = -1, igraph_matrix_t *merges = 0,
+                long max_memory = -1, igraph_matrix_int_t *merges = 0,
                 igraph_vector_t *modularity = 0);  // Constructor
     ~Communities();                   // Destructor
 
@@ -163,7 +163,7 @@ public:
 
     void remove_neighbor(Neighbor* N);
     void add_neighbor(Neighbor* N);
-    void update_neighbor(Neighbor* N, float new_delta_sigma);
+    void update_neighbor(Neighbor* N, double new_delta_sigma);
 
     void manage_memory();
 

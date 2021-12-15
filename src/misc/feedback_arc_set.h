@@ -29,10 +29,17 @@
 
 __BEGIN_DECLS
 
-int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
-        const igraph_vector_t *weights, igraph_vector_t *layering);
-int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
-                                    const igraph_vector_t *weights, igraph_vector_t *layering);
+igraph_error_t igraph_i_feedback_arc_set_eades(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights, igraph_vector_int_t *layering
+);
+igraph_error_t igraph_i_feedback_arc_set_ip(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights);
+igraph_error_t igraph_i_feedback_arc_set_undirected(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights, igraph_vector_int_t *layering
+);
 
 __END_DECLS
 

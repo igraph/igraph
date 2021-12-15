@@ -47,20 +47,20 @@
  *
  * Time complexity: O(|V|+|E|).
  */
-int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
-    long int vc = igraph_vcount(graph);
-    long int ec = igraph_ecount(graph);
+igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
+    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_integer_t ec = igraph_ecount(graph);
 
     if (vc == 0 || ec == 0) {
         *res = 1;
     } else {
-        igraph_vector_t neis;
-        long int i, j, n;
+        igraph_vector_int_t neis;
+        igraph_integer_t i, j, n;
         igraph_bool_t found = 0;
-        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc; i++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, IGRAPH_OUT));
-            n = igraph_vector_size(&neis);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+            n = igraph_vector_int_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
                     found = 1; break;
@@ -71,11 +71,11 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
             }
         }
         *res = !found;
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -99,22 +99,22 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  *
  * \example examples/simple/igraph_has_multiple.c
  */
-int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
-    long int vc = igraph_vcount(graph);
-    long int ec = igraph_ecount(graph);
+igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
+    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_integer_t ec = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (vc == 0 || ec == 0) {
         *res = 0;
     } else {
-        igraph_vector_t neis;
-        long int i, j, n;
+        igraph_vector_int_t neis;
+        igraph_integer_t i, j, n;
         igraph_bool_t found = 0;
-        IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc && !found; i++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
                                           IGRAPH_OUT));
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
             for (j = 1; j < n; j++) {
                 if (VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
                     /* If the graph is undirected, loop edges appear twice in the neighbor
@@ -133,11 +133,11 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
             }
         }
         *res = found;
-        igraph_vector_destroy(&neis);
+        igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -166,10 +166,10 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  *
  * \example examples/simple/igraph_is_multiple.c
  */
-int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
+igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                        igraph_es_t es) {
     igraph_eit_t eit;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -181,11 +181,11 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
     IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
 
     for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
-        long int e = IGRAPH_EIT_GET(eit);
-        long int from = IGRAPH_FROM(graph, e);
-        long int to = IGRAPH_TO(graph, e);
+        igraph_integer_t e = IGRAPH_EIT_GET(eit);
+        igraph_integer_t from = IGRAPH_FROM(graph, e);
+        igraph_integer_t to = IGRAPH_TO(graph, e);
         igraph_vector_int_t *neis =
-            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+            igraph_lazy_inclist_get(&inclist, from);
 
         if (neis == 0) {
             /* Most likely out of memory */
@@ -196,8 +196,8 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            long int e2 = (long int) VECTOR(*neis)[j];
-            long int to2 = IGRAPH_OTHER(graph, e2, from);
+            igraph_integer_t e2 = VECTOR(*neis)[j];
+            igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to && e2 < e) {
                 VECTOR(*res)[i] = 1;
             }
@@ -207,7 +207,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
     igraph_lazy_inclist_destroy(&inclist);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -235,9 +235,9 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  * average degree (out-degree in directed graphs) of the vertices at the
  * tail of the edges.
  */
-int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es) {
     igraph_eit_t eit;
-    long int i, j, n;
+    igraph_integer_t i, j, n;
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -245,14 +245,14 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+    IGRAPH_CHECK(igraph_vector_int_resize(res, IGRAPH_EIT_SIZE(eit)));
 
     for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
-        long int e = IGRAPH_EIT_GET(eit);
-        long int from = IGRAPH_FROM(graph, e);
-        long int to = IGRAPH_TO(graph, e);
+        igraph_integer_t e = IGRAPH_EIT_GET(eit);
+        igraph_integer_t from = IGRAPH_FROM(graph, e);
+        igraph_integer_t to = IGRAPH_TO(graph, e);
         igraph_vector_int_t *neis =
-            igraph_lazy_inclist_get(&inclist, (igraph_integer_t) from);
+            igraph_lazy_inclist_get(&inclist, from);
 
         if (neis == 0) {
             /* Most likely out of memory */
@@ -263,10 +263,10 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            long int e2 = (long int) VECTOR(*neis)[j];
-            long int to2 = IGRAPH_OTHER(graph, e2, from);
+            igraph_integer_t e2 = VECTOR(*neis)[j];
+            igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to) {
-                VECTOR(*res)[i] += 1;
+                VECTOR(*res)[i]++;
             }
         }
     }
@@ -308,11 +308,11 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
  * |E| is the number of edges in the graph.
  */
-int igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
+igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;
-    long int i;
+    igraph_integer_t i;
 
     /* How many edges do we have? */
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -332,15 +332,15 @@ int igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     for (i = 0; ! IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
-        long int edge = IGRAPH_EIT_GET(eit);
-        long int from = IGRAPH_FROM(graph, edge);
-        long int to = IGRAPH_TO(graph, edge);
+        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to = IGRAPH_TO(graph, edge);
 
         /* Check whether there is a to->from edge, search for from in the
            out-list of to. We don't search an empty vector, because
            vector_binsearch seems to have a bug with this. */
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                (igraph_integer_t) to);
+                                to);
         if (igraph_vector_int_empty(neis)) {
             VECTOR(*res)[i] = 0;
         } else {

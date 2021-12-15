@@ -30,7 +30,7 @@ int test_graph_from_leda_tutorial() {
      */
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_integer_t matching_size;
     igraph_real_t matching_weight;
     igraph_bool_t is_matching;
@@ -50,26 +50,26 @@ int test_graph_from_leda_tutorial() {
     for (i = 0; i < 15; i++) {
         VECTOR(types)[i] = (i >= 8);
     }
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, 0, 0);
     if (matching_size != 6) {
-        printf("matching_size is %ld, expected: 6\n", (long)matching_size);
+        printf("matching_size is %" IGRAPH_PRId ", expected: 6\n", matching_size);
         return 1;
     }
     if (matching_weight != 6) {
-        printf("matching_weight is %ld, expected: 6\n", (long)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 6\n", (igraph_integer_t) matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
     if (!is_matching) {
         printf("not a matching: ");
-        igraph_vector_long_print(&matching);
+        igraph_vector_int_print(&matching);
         return 3;
     }
 
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&graph);
 
@@ -82,7 +82,7 @@ int test_weighted_graph_from_mit_notes() {
      */
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_vector_t weights;
     igraph_integer_t matching_size;
     igraph_real_t matching_weight;
@@ -105,29 +105,29 @@ int test_weighted_graph_from_mit_notes() {
     for (i = 0; i < 10; i++) {
         VECTOR(types)[i] = (i >= 5);
     }
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
     igraph_vector_init_copy(&weights, weight_array,
                             sizeof(weight_array) / sizeof(weight_array[0]));
 
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_size != 4) {
-        printf("matching_size is %ld, expected: 4\n", (long)matching_size);
+        printf("matching_size is %" IGRAPH_PRId ", expected: 4\n", matching_size);
         return 1;
     }
     if (matching_weight != 19) {
-        printf("matching_weight is %ld, expected: 19\n", (long)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 19\n", (igraph_integer_t) matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
     if (!is_matching) {
         printf("not a matching: ");
-        igraph_vector_long_print(&matching);
+        igraph_vector_int_print(&matching);
         return 3;
     }
 
     igraph_vector_destroy(&weights);
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&graph);
 
@@ -138,7 +138,7 @@ int test_weighted_graph_generated() {
     /* Several randomly generated small test graphs */
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
     igraph_vector_t weights;
     igraph_integer_t matching_size;
     igraph_real_t matching_weight;
@@ -150,7 +150,7 @@ int test_weighted_graph_generated() {
     for (i = 0; i < 10; i++) {
         VECTOR(types)[i] = (i >= 5);
     }
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     /* Case 1 */
 
@@ -160,7 +160,7 @@ int test_weighted_graph_generated() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 43) {
-        printf("matching_weight is %ld, expected: 43\n", (long)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 43\n", (igraph_integer_t)matching_weight);
         return 2;
     }
     igraph_vector_destroy(&weights);
@@ -174,60 +174,14 @@ int test_weighted_graph_generated() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 41) {
-        printf("matching_weight is %ld, expected: 41\n", (long)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 41\n", (igraph_integer_t)matching_weight);
         return 2;
     }
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
     igraph_vector_bool_destroy(&types);
-
-    return 0;
-}
-
-int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_weight) {
-    igraph_t graph;
-    igraph_vector_bool_t types;
-    igraph_vector_long_t matching;
-    igraph_vector_t weights;
-    igraph_real_t matching_weight;
-    FILE* f;
-    int i, n;
-
-    f = fopen(fname, "r");
-    if (!f) {
-        fprintf(stderr, "No such file: %s\n", fname);
-        return 1;
-    }
-    igraph_read_graph_ncol(&graph, f, 0, 1, IGRAPH_ADD_WEIGHTS_YES, 0);
-    fclose(f);
-
-    n = igraph_vcount(&graph);
-    igraph_vector_bool_init(&types, n);
-    for (i = 0; i < n; i++) {
-        VECTOR(types)[i] = (i >= type1_count);
-    }
-
-    igraph_vector_long_init(&matching, 0);
-
-    igraph_vector_init(&weights, 0);
-    EANV(&graph, "weight", &weights);
-    igraph_maximum_bipartite_matching(&graph, &types, 0, &matching_weight,
-                                      &matching, &weights, 0);
-    igraph_vector_destroy(&weights);
-
-    igraph_vector_long_print(&matching);
-    if (matching_weight != exp_weight) {
-        printf("matching_weight is %ld, expected: %ld\n", (long)matching_weight,
-               (long)exp_weight);
-        return 2;
-    }
-
-    igraph_vector_destroy(&weights);
-    igraph_vector_long_destroy(&matching);
-    igraph_vector_bool_destroy(&types);
-    igraph_destroy(&graph);
 
     return 0;
 }
@@ -243,7 +197,7 @@ int test_incorrect_types() {
     igraph_integer_t matching_size;
     igraph_real_t weighted_size;
 
-    igraph_vector_long_t matching;
+    igraph_vector_int_t matching;
 
     igraph_error_type_t err;
 
@@ -258,7 +212,7 @@ int test_incorrect_types() {
     VECTOR(types)[2] = 0;
     VECTOR(types)[3] = 1;
 
-    igraph_vector_long_init(&matching, 0);
+    igraph_vector_int_init(&matching, 0);
 
     igraph_vector_init(&weights, igraph_vcount(&g));
     igraph_vector_fill(&weights, 1.0);
@@ -293,7 +247,7 @@ int test_incorrect_types() {
     }
 
     igraph_vector_destroy(&weights);
-    igraph_vector_long_destroy(&matching);
+    igraph_vector_int_destroy(&matching);
 
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&g);

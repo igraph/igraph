@@ -55,11 +55,11 @@
  * fields: the source vertex, the target vertex and the edge capacity.
  *
  * </para><para>
- * Vertex ids are numbered from 1.
+ * Vertex IDs are numbered from 1.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The file to read from.
  * \param source Pointer to an integer, the id of the source node will
- *    be stored here. (The igraph vertex id, which is one less than
+ *    be stored here. (The igraph vertex ID, which is one less than
  *    the actual number in the file.) It is ignored if
  *    <code>NULL</code>.
  * \param target Pointer to an integer, the (igraph) id of the target
@@ -74,19 +74,19 @@
  *
  * \sa \ref igraph_write_graph_dimacs()
  */
-int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                              igraph_strvector_t *problem,
-                             igraph_vector_t *label,
+                             igraph_vector_int_t *label,
                              igraph_integer_t *source,
                              igraph_integer_t *target,
                              igraph_vector_t *capacity,
                              igraph_bool_t directed) {
 
-    igraph_vector_t edges;
-    long int no_of_nodes = -1;
-    long int no_of_edges = -1;
-    long int tsource = -1;
-    long int ttarget = -1;
+    igraph_vector_int_t edges;
+    igraph_integer_t no_of_nodes = -1;
+    igraph_integer_t no_of_edges = -1;
+    igraph_integer_t tsource = -1;
+    igraph_integer_t ttarget = -1;
     char prob[21];
     char c;
     int problem_type = 0;
@@ -94,7 +94,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 #define PROBLEM_EDGE  1
 #define PROBLEM_MAX   2
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     if (capacity) {
         igraph_vector_clear(capacity);
     }
@@ -113,8 +113,8 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
             IGRAPH_ERROR("parsing dimacs file failed", IGRAPH_PARSEERROR);
         }
         switch (str[0]) {
-            long int tmp, tmp2;
-            long int from, to;
+            igraph_integer_t tmp, tmp2;
+            igraph_integer_t from, to;
             igraph_real_t cap;
 
         case 'c':
@@ -126,7 +126,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 IGRAPH_ERROR("reading dimacs file failed, double 'p' line",
                              IGRAPH_PARSEERROR);
             }
-            read = fscanf(instream, "%20s %li %li", prob,
+            read = fscanf(instream, "%20s %" IGRAPH_PRId " %" IGRAPH_PRId "", prob,
                           &no_of_nodes, &no_of_edges);
             if (read != 3) {
                 IGRAPH_ERROR("reading dimacs file failed", IGRAPH_PARSEERROR);
@@ -135,8 +135,8 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 /* edge list */
                 problem_type = PROBLEM_EDGE;
                 if (label) {
-                    long int i;
-                    IGRAPH_CHECK(igraph_vector_resize(label, no_of_nodes));
+                    igraph_integer_t i;
+                    IGRAPH_CHECK(igraph_vector_int_resize(label, no_of_nodes));
                     for (i = 0; i < no_of_nodes; i++) {
                         VECTOR(*label)[i] = i + 1;
                     }
@@ -155,7 +155,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 igraph_strvector_clear(problem);
                 IGRAPH_CHECK(igraph_strvector_add(problem, prob));
             }
-            IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
             break;
 
         case 'n':
@@ -163,7 +163,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
             for EDGE this is a vertex label */
             if (problem_type == PROBLEM_MAX) {
                 str[0] = 'x';
-                read = fscanf(instream, "%li %1s", &tmp, str);
+                read = fscanf(instream, "%" IGRAPH_PRId " %1s", &tmp, str);
                 if (str[0] == 's') {
                     if (tsource != -1) {
                         IGRAPH_ERROR("reading dimacsfile: multiple source vertex line",
@@ -183,7 +183,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                                  IGRAPH_PARSEERROR);
                 }
             } else {
-                read = fscanf(instream, "%li %li", &tmp, &tmp2);
+                read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId "", &tmp, &tmp2);
                 if (label) {
                     VECTOR(*label)[tmp] = tmp2;
                 }
@@ -197,12 +197,12 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 IGRAPH_ERROR("'a' lines are allowed only in MAX problem files",
                              IGRAPH_PARSEERROR);
             }
-            read = fscanf(instream, "%li %li %lf", &from, &to, &cap);
+            read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId " %lf", &from, &to, &cap);
             if (read != 3) {
                 IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from - 1));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - 1));
             if (capacity) {
                 IGRAPH_CHECK(igraph_vector_push_back(capacity, cap));
             }
@@ -214,12 +214,12 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 IGRAPH_ERROR("'e' lines are allowed only in EDGE problem files",
                              IGRAPH_PARSEERROR);
             }
-            read = fscanf(instream, "%li %li", &from, &to);
+            read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId "", &from, &to);
             if (read != 2) {
                 IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
             }
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from - 1));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - 1));
             break;
 
         default:
@@ -231,19 +231,18 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
     }
 
     if (source) {
-        *source = (igraph_integer_t) tsource - 1;
+        *source = tsource - 1;
     }
     if (target) {
-        *target = (igraph_integer_t) ttarget - 1;
+        *target = ttarget - 1;
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
-    igraph_vector_destroy(&edges);
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    igraph_vector_int_destroy(&edges);
 
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -271,14 +270,14 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * \sa igraph_read_graph_dimacs()
  */
-int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
-                              long int source, long int target,
+igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+                              igraph_integer_t source, igraph_integer_t target,
                               const igraph_vector_t *capacity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
-    long int i = 0;
+    igraph_integer_t i = 0;
     int ret, ret1, ret2, ret3;
 
     if (igraph_vector_size(capacity) != no_of_edges) {
@@ -290,7 +289,7 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
 
     ret = fprintf(outstream,
-                  "c created by igraph\np max %li %li\nn %li s\nn %li t\n",
+                  "c created by igraph\np max %" IGRAPH_PRId " %" IGRAPH_PRId "\nn %" IGRAPH_PRId " s\nn %" IGRAPH_PRId " t\n",
                   no_of_nodes, no_of_edges, source + 1, target + 1);
     if (ret < 0) {
         IGRAPH_ERROR("Write error", IGRAPH_EFILE);
@@ -302,8 +301,8 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
         igraph_real_t cap;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
         cap = VECTOR(*capacity)[i++];
-        ret1 = fprintf(outstream, "a %li %li ",
-                       (long int) from + 1, (long int) to + 1);
+        ret1 = fprintf(outstream, "a %" IGRAPH_PRId " %" IGRAPH_PRId " ",
+                       from + 1, to + 1);
         ret2 = igraph_real_fprintf_precise(outstream, cap);
         ret3 = fputc('\n', outstream);
         if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
@@ -314,5 +313,5 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

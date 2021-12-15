@@ -26,7 +26,7 @@ int main() {
     igraph_heap_min_t h_min;
     igraph_integer_t i;
     igraph_real_t list[] = {-2, -9.999, 0, 6, 235, -2, -1000, -1, 4, 2000, 6, 0.5, 1, -9, 10};
-    const igraph_integer_t l_size = sizeof(list) / sizeof(igraph_real_t);
+    const igraph_integer_t l_size = sizeof(list) / sizeof(list[0]);
 
     /* max heap init & destroy*/
     printf("Create empty max heap & destroy\n");

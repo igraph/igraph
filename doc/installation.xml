@@ -63,16 +63,10 @@
     </listitem>
     <listitem>
       <para>
-        CXSparse from
-        <ulink url="https://people.engr.tamu.edu/davis/suitesparse.html">SuiteSparse</ulink>
-      </para>
-    </listitem>
-    <listitem>
-      <para>
         A library providing a
         <ulink url="https://www.netlib.org/blas/">BLAS</ulink> API
         (available by default on macOS;
-        <ulink url="https://openblas.net">OpenBLAS</ulink> is one
+        <ulink url="https://www.openblas.net">OpenBLAS</ulink> is one
         option on other systems)
       </para>
     </listitem>
@@ -490,8 +484,8 @@ $ cmake --build . --target html
       each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> option
       described above. Additionally, set <literal>BLA_VENDOR</literal> to
       use the BLAS and LAPACK implementations of your choice. This should
-      be the same BLAS and LAPACK library that igraph's other dependencies,
-      such as ARPACK and CXSparse are linked against.
+      be the same BLAS and LAPACK library that igraph's other dependencies
+      (e.g., ARPACK) are linked against.
     </para>
     <para>
       For example, to force igraph to use external versions of all
@@ -504,7 +498,6 @@ $ cmake .. \
     -DIGRAPH_USE_INTERNAL_LAPACK=OFF \
     -DIGRAPH_USE_INTERNAL_ARPACK=OFF \
     -DIGRAPH_USE_INTERNAL_GLPK=OFF \
-    -DIGRAPH_USE_INTERNAL_CXSPARSE=OFF \
     -DIGRAPH_USE_INTERNAL_GMP=OFF \
     -DBLA_VENDOR=OpenBLAS \
     -DIGRAPH_GRAPHML_SUPPORT=ON

@@ -110,24 +110,24 @@
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-int igraph_modularity(const igraph_t *graph,
-                      const igraph_vector_t *membership,
+igraph_error_t igraph_modularity(const igraph_t *graph,
+                      const igraph_vector_int_t *membership,
                       const igraph_vector_t *weights,
                       const igraph_real_t resolution,
                       const igraph_bool_t directed,
                       igraph_real_t *modularity) {
 
     igraph_vector_t e, k_out, k_in;
-    long int types;
-    long int no_of_edges = igraph_ecount(graph);
-    long int i;
+    igraph_integer_t types;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i;
     igraph_real_t m;
-    long int c1, c2;
+    igraph_integer_t c1, c2;
     /* Only consider the graph as directed if it actually is directed */
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_real_t directed_multiplier = (use_directed ? 1 : 2);
 
-    if (igraph_vector_size(membership) != igraph_vcount(graph)) {
+    if (igraph_vector_int_size(membership) != igraph_vcount(graph)) {
         IGRAPH_ERROR("Membership vector size differs from number of vertices.",
                      IGRAPH_EINVAL);
     }
@@ -147,9 +147,9 @@ int igraph_modularity(const igraph_t *graph,
     /* At this point, the 'membership' vector does not have length zero,
        thus it is safe to call igraph_vector_max() and min(). */
 
-    types = (long int) igraph_vector_max(membership) + 1;
+    types = igraph_vector_int_max(membership) + 1;
 
-    if (igraph_vector_min(membership) < 0) {
+    if (igraph_vector_int_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
     }
 
@@ -167,8 +167,8 @@ int igraph_modularity(const igraph_t *graph,
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
             }
-            c1 = (long int) VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
-            c2 = (long int) VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
+            c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 VECTOR(e)[c1] += directed_multiplier * w;
             }
@@ -179,8 +179,8 @@ int igraph_modularity(const igraph_t *graph,
     } else {
         m = no_of_edges;
         for (i = 0; i < no_of_edges; i++) {
-            c1 = (long int) VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
-            c2 = (long int) VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
+            c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 VECTOR(e)[c1] += directed_multiplier;
             }
@@ -216,12 +216,12 @@ int igraph_modularity(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_modularity_matrix_get_adjacency(
+static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
            const igraph_t *graph, igraph_matrix_t *res,
            const igraph_vector_t *weights, igraph_bool_t directed) {
     /* Specifically used to handle weights and/or ignore direction */
     igraph_eit_t edgeit;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t from, to;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
@@ -296,17 +296,18 @@ static int igraph_i_modularity_matrix_get_adjacency(
  *
  * \sa \ref igraph_modularity()
  */
-int igraph_modularity_matrix(const igraph_t *graph,
+igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              const igraph_real_t resolution,
                              igraph_matrix_t *modmat,
                              igraph_bool_t directed) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
     igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
-    long int i, j;
+    igraph_vector_int_t deg_int, in_deg_int, out_deg_int;
+    igraph_integer_t i, j;
     igraph_real_t scaling_factor;
     if (weights && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
@@ -325,10 +326,19 @@ int igraph_modularity_matrix(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&in_deg, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&out_deg, no_of_nodes);
         if (!weights) {
-            IGRAPH_CHECK(igraph_degree(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&in_deg_int, no_of_nodes);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&out_deg_int, no_of_nodes);
+            IGRAPH_CHECK(igraph_degree(graph, &in_deg_int, igraph_vss_all(), IGRAPH_IN,
                                        IGRAPH_LOOPS));
-            IGRAPH_CHECK(igraph_degree(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
+            IGRAPH_CHECK(igraph_degree(graph, &out_deg_int, igraph_vss_all(), IGRAPH_OUT,
                                        IGRAPH_LOOPS));
+            for (i = 0; i < no_of_nodes; i++) {
+                VECTOR(in_deg)[i] = VECTOR(in_deg_int)[i];
+                VECTOR(out_deg)[i] = VECTOR(out_deg_int)[i];
+            }
+            igraph_vector_int_destroy(&in_deg_int);
+            igraph_vector_int_destroy(&out_deg_int);
+            IGRAPH_FINALLY_CLEAN(2);
         } else {
             IGRAPH_CHECK(igraph_strength(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
                                          IGRAPH_LOOPS, weights));
@@ -350,8 +360,14 @@ int igraph_modularity_matrix(const igraph_t *graph,
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
         if (!weights) {
-            IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_int, no_of_nodes);
+            IGRAPH_CHECK(igraph_degree(graph, &deg_int, igraph_vss_all(), IGRAPH_ALL,
                                        IGRAPH_LOOPS));
+            for (i = 0; i < no_of_nodes; i++) {
+                VECTOR(deg)[i] = VECTOR(deg_int)[i];
+            }
+            igraph_vector_int_destroy(&deg_int);
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
                                          IGRAPH_LOOPS, weights));

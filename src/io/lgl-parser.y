@@ -60,7 +60,7 @@
 
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
                        const char *s);
-igraph_real_t igraph_lgl_get_number(const char *str, long int len);
+igraph_real_t igraph_lgl_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
 %}
@@ -76,7 +76,7 @@ igraph_real_t igraph_lgl_get_number(const char *str, long int len);
 %lex-param { void *scanner }
 
 %union {
-  long int edgenum;
+  igraph_integer_t edgenum;
   double weightnum;
 }
 
@@ -102,23 +102,28 @@ vertexdef : HASH edgeid NEWLINE       { context->actvertex=$2; } ;
 edges :   /* empty */ | edges edge ;
 
 edge :   edgeid NEWLINE             {
-             igraph_vector_push_back(context->vector, context->actvertex);
-             igraph_vector_push_back(context->vector, $1);
+             igraph_vector_int_push_back(context->vector, context->actvertex);
+             igraph_vector_int_push_back(context->vector, $1);
              igraph_vector_push_back(context->weights, 0);
            }
        | edgeid weight NEWLINE      {
-             igraph_vector_push_back(context->vector, context->actvertex);
-             igraph_vector_push_back(context->vector, $1);
+             igraph_vector_int_push_back(context->vector, context->actvertex);
+             igraph_vector_int_push_back(context->vector, $1);
              igraph_vector_push_back(context->weights, $2);
              context->has_weights = 1;
            }
 ;
 
 
-edgeid : ALNUM  { igraph_trie_get2(context->trie,
-                                   igraph_lgl_yyget_text(scanner),
-                                   igraph_lgl_yyget_leng(scanner),
-                                   &$$); };
+edgeid : ALNUM  {
+  igraph_integer_t trie_id;
+  igraph_trie_get2(context->trie,
+    igraph_lgl_yyget_text(scanner),
+    igraph_lgl_yyget_leng(scanner),
+    &trie_id
+  );
+  $$ = (long) trie_id;
+};
 
 weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yyget_text(scanner),
                                            igraph_lgl_yyget_leng(scanner)); } ;
@@ -133,7 +138,7 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
   return 0;
 }
 
-igraph_real_t igraph_lgl_get_number(const char *str, long int length) {
+igraph_real_t igraph_lgl_get_number(const char *str, yy_size_t length) {
   igraph_real_t num;
   char *tmp=IGRAPH_CALLOC(length+1, char);
 

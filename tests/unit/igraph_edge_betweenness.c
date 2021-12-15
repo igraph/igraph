@@ -30,7 +30,7 @@ void test_bug950() {
     igraph_vector_t eb;
     igraph_vector_t weights;
     igraph_integer_t from, to;
-    long int no_of_edges, i;
+    igraph_integer_t no_of_edges, i;
 
     igraph_full(&g, 6, 0, 0);
     no_of_edges = igraph_ecount(&g);
@@ -120,53 +120,29 @@ int main() {
 
     igraph_vector_destroy(&eb);
 
-    {
-        /* We use igraph_create() instead of igraph_small() as some MSVC versions
-           will choke on an overlong argument list with "internal error C1001". */
-        igraph_real_t edge_array[] = {
-            0,  1,  0,  2,  0,  3,  0,  4,  0,  5,
-            0,  6,  0,  7,  0,  8,  0, 10,  0, 11,
-            0, 12,  0, 13,  0, 17,  0, 19,  0, 21,
-            0, 31,  1,  2,  1,  3,  1,  7,  1, 13,
-            1, 17,  1, 19,  1, 21,  1, 30,  2,  3,
-            2,  7,  2,  8,  2,  9,  2, 13,  2, 27,
-            2, 28,  2, 32,  3,  7,  3, 12,  3, 13,
-            4,  6,  4, 10,  5,  6,  5, 10,  5, 16,
-            6, 16,  8, 30,  8, 32,  8, 33,  9, 33,
-            13, 33, 14, 32, 14, 33, 15, 32, 15, 33,
-            18, 32, 18, 33, 19, 33, 20, 32, 20, 33,
-            22, 32, 22, 33, 23, 25, 23, 27, 23, 29,
-            23, 32, 23, 33, 24, 25, 24, 27, 24, 31,
-            25, 31, 26, 29, 26, 33, 27, 33, 28, 31,
-            28, 33, 29, 32, 29, 33, 30, 32, 30, 33,
-            31, 32, 31, 33, 32, 33
-        };
-        igraph_vector_t edges;
+    printf("\nNo cutoff, undirected, unweighted\n");
+    igraph_famous(&g, "zachary");
+    igraph_vector_init(&eb, 0);
+    igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
+    print_vector(&eb);
 
-        printf("\nNo cutoff, undirected, unweighted\n");
-        igraph_create(&g, igraph_vector_view(&edges, edge_array, sizeof(edge_array) / sizeof(igraph_real_t)), 0, IGRAPH_UNDIRECTED);
-        igraph_vector_init(&eb, 0);
-        igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
-        print_vector(&eb);
+    printf("\nNo cutoff, undirected, unit weighted\n");
+    igraph_vector_init(&eb2, 0);
+    igraph_vector_init(&weights, igraph_ecount(&g));
+    igraph_vector_fill(&weights, 1.0);
+    igraph_edge_betweenness(&g, &eb2, IGRAPH_UNDIRECTED, &weights);
+    print_vector(&eb2);
 
-        printf("\nNo cutoff, undirected, unit weighted\n");
-        igraph_vector_init(&eb2, 0);
-        igraph_vector_init(&weights, igraph_ecount(&g));
-        igraph_vector_fill(&weights, 1.0);
-        igraph_edge_betweenness(&g, &eb2, IGRAPH_UNDIRECTED, &weights);
-        print_vector(&eb2);
+    /* check that weighted and unweighted calculations give the same result */
+    igraph_vector_scale(&eb2, -1);
+    igraph_vector_add(&eb, &eb2);
+    igraph_vector_abs(&eb);
+    IGRAPH_ASSERT(igraph_vector_max(&eb) < 1e-13);
 
-        /* check that weighted and unweighted calculations give the same result */
-        igraph_vector_scale(&eb2, -1);
-        igraph_vector_add(&eb, &eb2);
-        igraph_vector_abs(&eb);
-        IGRAPH_ASSERT(igraph_vector_max(&eb) < 1e-13);
-
-        igraph_vector_destroy(&weights);
-        igraph_vector_destroy(&eb2);
-        igraph_vector_destroy(&eb);
-        igraph_destroy(&g);
-    }
+    igraph_vector_destroy(&weights);
+    igraph_vector_destroy(&eb2);
+    igraph_vector_destroy(&eb);
+    igraph_destroy(&g);
 
     printf("\nSmall directed graph, unweighted\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED,
@@ -193,6 +169,17 @@ int main() {
                  6, 7, 7, 8, -1);
     igraph_vector_init(&eb, 0);
     igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
+    print_vector(&eb);
+    igraph_vector_destroy(&eb);
+    igraph_destroy(&g);
+
+    printf("\nSmall undirected graph 3, unweighted, with multiple and loop edges\n");
+    igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 1, 2, 1, 1, 2, 3, 3, 0, 3, 3, -1);
+    igraph_vector_init(&eb, 0);
+    igraph_edge_betweenness(/* graph=     */ &g,
+            /* res=       */ &eb,
+            /* directed = */ IGRAPH_UNDIRECTED,
+            /* weights=   */ 0);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);

@@ -28,7 +28,7 @@
 int main() {
     igraph_t g;
     igraph_vector_int_t res, res_all;
-    long int i;
+    igraph_integer_t i;
 
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 2, 5,
@@ -41,7 +41,7 @@ int main() {
     for (i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);
 
-        printf("Paths for cutoff %li:\n", i);
+        printf("Paths for cutoff %" IGRAPH_PRId ":\n", i);
         igraph_vector_int_print(&res);
     }
 

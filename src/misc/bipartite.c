@@ -67,13 +67,17 @@
  * \param graph The input graph.
  * \param types Boolean vector giving the vertex types of the graph.
  * \param vcount1 Pointer to an \c igraph_integer_t, the number of
- *     vertices in the first projection is stored here.
+ *     vertices in the first projection is stored here. May be \c NULL
+ *     if not needed.
  * \param ecount1 Pointer to an \c igraph_integer_t, the number of
- *     edges in the first projection is stored here.
+ *     edges in the first projection is stored here. May be \c NULL
+ *     if not needed.
  * \param vcount2 Pointer to an \c igraph_integer_t, the number of
- *     vertices in the second projection is stored here.
+ *     vertices in the second projection is stored here. May be \c NULL
+ *     if not needed.
  * \param ecount2 Pointer to an \c igraph_integer_t, the number of
- *     edges in the second projection is stored here.
+ *     edges in the second projection is stored here. May be \c NULL
+ *     if not needed.
  * \return Error code.
  *
  * \sa \ref igraph_bipartite_projection() to calculate the actual
@@ -86,29 +90,29 @@
  * \example examples/simple/igraph_bipartite_projection.c
  */
 
-int igraph_bipartite_projection_size(const igraph_t *graph,
+igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
                                      const igraph_vector_bool_t *types,
                                      igraph_integer_t *vcount1,
                                      igraph_integer_t *ecount1,
                                      igraph_integer_t *vcount2,
                                      igraph_integer_t *ecount2) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int vc1 = 0, ec1 = 0, vc2 = 0, ec2 = 0;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t vc1 = 0, ec1 = 0, vc2 = 0, ec2 = 0;
     igraph_adjlist_t adjlist;
-    igraph_vector_long_t added;
-    long int i;
+    igraph_vector_int_t added;
+    igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
+    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis1;
-        long int neilen1, j;
-        long int *ecptr;
+        igraph_integer_t neilen1, j;
+        igraph_integer_t *ecptr;
         if (VECTOR(*types)[i]) {
             vc2++;
             ecptr = &ec2;
@@ -119,7 +123,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
         neis1 = igraph_adjlist_get(&adjlist, i);
         neilen1 = igraph_vector_int_size(neis1);
         for (j = 0; j < neilen1; j++) {
-            long int k, neilen2, nei = (long int) VECTOR(*neis1)[j];
+            igraph_integer_t k, neilen2, nei = VECTOR(*neis1)[j];
             igraph_vector_int_t *neis2 = igraph_adjlist_get(&adjlist, nei);
             if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                 IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
@@ -127,7 +131,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
             }
             neilen2 = igraph_vector_int_size(neis2);
             for (k = 0; k < neilen2; k++) {
-                long int nei2 = (long int) VECTOR(*neis2)[k];
+                igraph_integer_t nei2 = VECTOR(*neis2)[k];
                 if (nei2 <= i) {
                     continue;
                 }
@@ -140,45 +144,56 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
         }
     }
 
-    *vcount1 = (igraph_integer_t) vc1;
-    *ecount1 = (igraph_integer_t) ec1;
-    *vcount2 = (igraph_integer_t) vc2;
-    *ecount2 = (igraph_integer_t) ec2;
+    if (vcount1) {
+        *vcount1 = vc1;
+    }
+
+    if (ecount1) {
+        *ecount1 = ec1;
+    }
+
+    if (vcount2) {
+        *vcount2 = vc2;
+    }
+
+    if (ecount2) {
+        *ecount2 = ec2;
+    }
 
     igraph_adjlist_destroy(&adjlist);
-    igraph_vector_long_destroy(&added);
+    igraph_vector_int_destroy(&added);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_bipartite_projection(const igraph_t *graph,
+static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                                          const igraph_vector_bool_t *types,
                                          igraph_t *proj,
                                          int which,
-                                         igraph_vector_t *multiplicity) {
+                                         igraph_vector_int_t *multiplicity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i, j, k;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, k;
     igraph_integer_t remaining_nodes = 0;
-    igraph_vector_t vertex_perm, vertex_index;
-    igraph_vector_t edges;
+    igraph_vector_int_t vertex_perm, vertex_index;
+    igraph_vector_int_t edges;
     igraph_adjlist_t adjlist;
     igraph_vector_int_t *neis1, *neis2;
-    long int neilen1, neilen2;
-    igraph_vector_long_t added;
+    igraph_integer_t neilen1, neilen2;
+    igraph_vector_int_t added;
     igraph_vector_t mult;
 
     if (which < 0) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&vertex_perm, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&vertex_perm, no_of_nodes));
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&vertex_index, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_perm, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&vertex_perm, no_of_nodes));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_index, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
@@ -186,24 +201,24 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
      * throw warnings in the compiler output if we initialize it conditionally */
     IGRAPH_VECTOR_INIT_FINALLY(&mult, multiplicity ? no_of_nodes : 1);
     if (multiplicity) {
-        igraph_vector_clear(multiplicity);
+        igraph_vector_int_clear(multiplicity);
     }
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
             VECTOR(vertex_index)[i] = ++remaining_nodes;
-            igraph_vector_push_back(&vertex_perm, i);
+            igraph_vector_int_push_back(&vertex_perm, i);
         }
     }
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
-            long int new_i = (long int) VECTOR(vertex_index)[i] - 1;
-            long int iedges = 0;
+            igraph_integer_t new_i = VECTOR(vertex_index)[i] - 1;
+            igraph_integer_t iedges = 0;
             neis1 = igraph_adjlist_get(&adjlist, i);
             neilen1 = igraph_vector_int_size(neis1);
             for (j = 0; j < neilen1; j++) {
-                long int nei = (long int) VECTOR(*neis1)[j];
+                igraph_integer_t nei = VECTOR(*neis1)[j];
                 if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                     IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
                                  IGRAPH_EINVAL);
@@ -211,7 +226,7 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
                 neis2 = igraph_adjlist_get(&adjlist, nei);
                 neilen2 = igraph_vector_int_size(neis2);
                 for (k = 0; k < neilen2; k++) {
-                    long int nei2 = (long int) VECTOR(*neis2)[k], new_nei2;
+                    igraph_integer_t nei2 = VECTOR(*neis2)[k], new_nei2;
                     if (nei2 <= i) {
                         continue;
                     }
@@ -227,28 +242,28 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
                     }
                     iedges++;
 
-                    IGRAPH_CHECK(igraph_vector_push_back(&edges, new_i));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_i));
                     if (multiplicity) {
                         /* If we need the multiplicity as well, then we put in the
-                           old vertex ids here and rewrite it later */
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, nei2));
+                           old vertex IDs here and rewrite it later */
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei2));
                     } else {
-                        new_nei2 = (long int) VECTOR(vertex_index)[nei2] - 1;
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, new_nei2));
+                        new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_nei2));
                     }
                 }
             }
             if (multiplicity) {
                 /* OK, we need to go through all the edges added for vertex new_i
                    and check their multiplicity */
-                long int now = igraph_vector_size(&edges);
-                long int from = now - iedges * 2;
+                igraph_integer_t now = igraph_vector_int_size(&edges);
+                igraph_integer_t from = now - iedges * 2;
                 for (j = from; j < now; j += 2) {
-                    long int nei2 = (long int) VECTOR(edges)[j + 1];
-                    long int new_nei2 = (long int) VECTOR(vertex_index)[nei2] - 1;
-                    long int m = (long int) VECTOR(mult)[nei2];
+                    igraph_integer_t nei2 = VECTOR(edges)[j + 1];
+                    igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                    igraph_integer_t m = VECTOR(mult)[nei2];
                     VECTOR(edges)[j + 1] = new_nei2;
-                    IGRAPH_CHECK(igraph_vector_push_back(multiplicity, m));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(multiplicity, m));
                 }
             }
         } /* if VECTOR(*type)[i] == which */
@@ -256,23 +271,23 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
 
     igraph_vector_destroy(&mult);
     igraph_adjlist_destroy(&adjlist);
-    igraph_vector_long_destroy(&added);
-    igraph_vector_destroy(&vertex_index);
+    igraph_vector_int_destroy(&added);
+    igraph_vector_int_destroy(&vertex_index);
     IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes,
                                /*directed=*/ 0));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, proj);
 
     IGRAPH_I_ATTRIBUTE_DESTROY(proj);
     IGRAPH_I_ATTRIBUTE_COPY(proj, graph, 1, 0, 0);
     IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, proj, &vertex_perm));
-    igraph_vector_destroy(&vertex_perm);
+    igraph_vector_int_destroy(&vertex_perm);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -318,15 +333,15 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
  * \example examples/simple/igraph_bipartite_projection.c
  */
 
-int igraph_bipartite_projection(const igraph_t *graph,
+igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                 const igraph_vector_bool_t *types,
                                 igraph_t *proj1,
                                 igraph_t *proj2,
-                                igraph_vector_t *multiplicity1,
-                                igraph_vector_t *multiplicity2,
+                                igraph_vector_int_t *multiplicity1,
+                                igraph_vector_int_t *multiplicity2,
                                 igraph_integer_t probe1) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     /* t1 is -1 if proj1 is omitted, it is 0 if it belongs to type zero,
        it is 1 if it belongs to type one. The same for t2 */
@@ -345,7 +360,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
     }
 
     if (probe1 >= 0) {
-        t1 = VECTOR(*types)[(long int)probe1];
+        t1 = VECTOR(*types)[probe1];
         if (proj2) {
             t2 = 1 - t1;
         } else {
@@ -361,7 +376,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj2, t2, multiplicity2));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -407,7 +422,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
  * \sa \ref igraph_full() for non-bipartite full graphs.
  */
 
-int igraph_full_bipartite(igraph_t *graph,
+igraph_error_t igraph_full_bipartite(igraph_t *graph,
                           igraph_vector_bool_t *types,
                           igraph_integer_t n1, igraph_integer_t n2,
                           igraph_bool_t directed,
@@ -415,10 +430,10 @@ int igraph_full_bipartite(igraph_t *graph,
 
     igraph_integer_t nn1 = n1, nn2 = n2;
     igraph_integer_t no_of_nodes = nn1 + nn2;
-    igraph_vector_t edges;
-    long int no_of_edges;
-    long int ptr = 0;
-    long int i, j;
+    igraph_vector_int_t edges;
+    igraph_integer_t no_of_edges;
+    igraph_integer_t ptr = 0;
+    igraph_integer_t i, j;
 
     if (!directed) {
         no_of_edges = nn1 * nn2;
@@ -428,7 +443,7 @@ int igraph_full_bipartite(igraph_t *graph,
         no_of_edges = nn1 * nn2 * 2;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     if (!directed || mode == IGRAPH_OUT) {
 
@@ -461,7 +476,7 @@ int igraph_full_bipartite(igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, graph);
 
@@ -475,7 +490,7 @@ int igraph_full_bipartite(igraph_t *graph,
 
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -493,7 +508,7 @@ int igraph_full_bipartite(igraph_t *graph,
  * \param types Boolean vector giving the vertex types. The length of
  *   the vector defines the number of vertices in the graph.
  * \param edges Vector giving the edges of the graph. The highest
- *   vertex id in this vector must be smaller than the length of the
+ *   vertex ID in this vector must be smaller than the length of the
  *   \p types vector.
  * \param directed Boolean scalar, whether to create a directed
  *   graph.
@@ -505,15 +520,14 @@ int igraph_full_bipartite(igraph_t *graph,
  * \example examples/simple/igraph_bipartite_create.c
  */
 
-int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
-                            const igraph_vector_t *edges,
+igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
+                            const igraph_vector_int_t *edges,
                             igraph_bool_t directed) {
 
-    igraph_integer_t no_of_nodes =
-        (igraph_integer_t) igraph_vector_bool_size(types);
-    long int no_of_edges = igraph_vector_size(edges);
-    igraph_real_t min_edge = 0, max_edge = 0;
-    long int i;
+    igraph_integer_t no_of_nodes = igraph_vector_bool_size(types);
+    igraph_integer_t no_of_edges = igraph_vector_int_size(edges);
+    igraph_integer_t min_edge = 0, max_edge = 0;
+    igraph_integer_t i;
 
     if (no_of_edges % 2 != 0) {
         IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
@@ -521,18 +535,18 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
     no_of_edges /= 2;
 
     if (no_of_edges != 0) {
-        igraph_vector_minmax(edges, &min_edge, &max_edge);
+        igraph_vector_int_minmax(edges, &min_edge, &max_edge);
     }
     if (min_edge < 0 || max_edge >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative) vertex ID", IGRAPH_EINVVID);
     }
 
     /* Check bipartiteness */
     for (i = 0; i < no_of_edges * 2; i += 2) {
-        long int from = (long int) VECTOR(*edges)[i];
-        long int to = (long int) VECTOR(*edges)[i + 1];
-        long int t1 = VECTOR(*types)[from];
-        long int t2 = VECTOR(*types)[to];
+        igraph_integer_t from = VECTOR(*edges)[i];
+        igraph_integer_t to = VECTOR(*edges)[i + 1];
+        igraph_bool_t t1 = VECTOR(*types)[from];
+        igraph_bool_t t2 = VECTOR(*types)[to];
         if ( (t1 && t2) || (!t1 && !t2) ) {
             IGRAPH_ERROR("Invalid edges, not a bipartite graph", IGRAPH_EINVAL);
         }
@@ -543,7 +557,7 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
     IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -552,15 +566,15 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
  *
  * A bipartite (or two-mode) graph contains two types of vertices and
  * edges always connect vertices of different types. An incidence
- * matrix is an nxm matrix, n and m are the number of vertices of the
- * two types, respectively. Nonzero elements in the matrix denote
+ * matrix is an \em n x \em m matrix, \em n and \em m are the number of vertices
+ * of the two types, respectively. Nonzero elements in the matrix denote
  * edges between the two corresponding vertices.
  *
  * </para><para>
  * Note that this function can operate in two modes, depending on the
- * \p multiple argument. If it is FALSE (i.e. 0), then a single edge is
+ * \p multiple argument. If it is \c FALSE (i.e. 0), then a single edge is
  * created for every non-zero element in the incidence matrix. If \p
- * multiple is TRUE (i.e. 1), then the matrix elements are rounded up
+ * multiple is \c TRUE (i.e. 1), then the matrix elements are rounded up
  * to the closest non-negative integer to get the number of edges to
  * create between a pair of vertices.
  *
@@ -588,25 +602,25 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
  * Time complexity: O(n*m), the size of the incidence matrix.
  */
 
-int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
                      const igraph_matrix_t *incidence,
                      igraph_bool_t directed,
                      igraph_neimode_t mode, igraph_bool_t multiple) {
 
-    igraph_integer_t n1 = (igraph_integer_t) igraph_matrix_nrow(incidence);
-    igraph_integer_t n2 = (igraph_integer_t) igraph_matrix_ncol(incidence);
+    igraph_integer_t n1 = igraph_matrix_nrow(incidence);
+    igraph_integer_t n2 = igraph_matrix_ncol(incidence);
     igraph_integer_t no_of_nodes = n1 + n2;
-    igraph_vector_t edges;
-    long int i, j, k;
+    igraph_vector_int_t edges;
+    igraph_integer_t i, j, k;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (multiple) {
 
         for (i = 0; i < n1; i++) {
             for (j = 0; j < n2; j++) {
-                long int elem = (long int) MATRIX(*incidence, i, j);
-                long int from, to;
+                igraph_integer_t elem = ceil(MATRIX(*incidence, i, j));
+                igraph_integer_t from, to;
 
                 if (!elem) {
                     continue;
@@ -622,15 +636,15 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
                 if (mode != IGRAPH_ALL || !directed) {
                     for (k = 0; k < elem; k++) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
                     }
                 } else {
                     for (k = 0; k < elem; k++) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
                     }
                 }
             }
@@ -640,7 +654,7 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
         for (i = 0; i < n1; i++) {
             for (j = 0; j < n2; j++) {
-                long int from, to;
+                igraph_integer_t from, to;
 
                 if (MATRIX(*incidence, i, j) != 0) {
                     if (mode == IGRAPH_IN) {
@@ -651,13 +665,13 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
                         to = n1 + j;
                     }
                     if (mode != IGRAPH_ALL || !directed) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
                     } else {
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
-                        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
                     }
                 }
             }
@@ -666,7 +680,7 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, graph);
 
@@ -679,7 +693,7 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -695,11 +709,11 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  *   vertices. The rows will correspond to vertices with type 0,
  *   the columns correspond to vertices with type 1.
  * \param row_ids Pointer to an initialized vector or a null
- *   pointer. If not a null pointer, then the vertex ids (in the
+ *   pointer. If not a null pointer, then the vertex IDs (in the
  *   graph) corresponding to the rows of the result matrix are stored
  *   here.
  * \param col_ids Pointer to an initialized vector or a null
- *   pointer. If not a null pointer, then the vertex ids corresponding
+ *   pointer. If not a null pointer, then the vertex IDs corresponding
  *   to the columns of the result matrix are stored here.
  * \return Error code.
  *
@@ -709,18 +723,18 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  * \sa \ref igraph_incidence() for the opposite operation.
  */
 
-int igraph_get_incidence(const igraph_t *graph,
+igraph_error_t igraph_get_incidence(const igraph_t *graph,
                          const igraph_vector_bool_t *types,
                          igraph_matrix_t *res,
-                         igraph_vector_t *row_ids,
-                         igraph_vector_t *col_ids) {
+                         igraph_vector_int_t *row_ids,
+                         igraph_vector_int_t *col_ids) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int n1 = 0, n2 = 0, i;
-    igraph_vector_t perm;
-    long int p1, p2;
-    long int ignored_edges = 0;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t n1 = 0, n2 = 0, i;
+    igraph_vector_int_t perm;
+    igraph_integer_t p1, p2;
+    igraph_integer_t ignored_edges = 0;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
         IGRAPH_ERRORF("Vertex type vector size (%ld) not equal to number of vertices (%ld).",
@@ -732,7 +746,7 @@ int igraph_get_incidence(const igraph_t *graph,
     }
     n2 = no_of_nodes - n1;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&perm, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&perm, no_of_nodes);
 
     for (i = 0, p1 = 0, p2 = n1; i < no_of_nodes; i++) {
         VECTOR(perm)[i] = VECTOR(*types)[i] ? p2++ : p1++;
@@ -741,10 +755,10 @@ int igraph_get_incidence(const igraph_t *graph,
     IGRAPH_CHECK(igraph_matrix_resize(res, n1, n2));
     igraph_matrix_null(res);
     for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
-        long int from2 = (long int) VECTOR(perm)[from];
-        long int to2 = (long int) VECTOR(perm)[to];
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to = IGRAPH_TO(graph, i);
+        igraph_integer_t from2 = VECTOR(perm)[from];
+        igraph_integer_t to2 = VECTOR(perm)[to];
         if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
             ignored_edges++;
         } else if (! VECTOR(*types)[from]) {
@@ -758,29 +772,30 @@ int igraph_get_incidence(const igraph_t *graph,
     }
 
     if (row_ids) {
-        IGRAPH_CHECK(igraph_vector_resize(row_ids, n1));
+        IGRAPH_CHECK(igraph_vector_int_resize(row_ids, n1));
     }
     if (col_ids) {
-        IGRAPH_CHECK(igraph_vector_resize(col_ids, n2));
+        IGRAPH_CHECK(igraph_vector_int_resize(col_ids, n2));
     }
     if (row_ids || col_ids) {
         for (i = 0; i < no_of_nodes; i++) {
             if (! VECTOR(*types)[i]) {
                 if (row_ids) {
-                    long int i2 = (long int) VECTOR(perm)[i];
+                    igraph_integer_t i2 = VECTOR(perm)[i];
                     VECTOR(*row_ids)[i2] = i;
                 }
             } else {
                 if (col_ids) {
-                    long int i2 = (long int) VECTOR(perm)[i];
+                    igraph_integer_t i2 = VECTOR(perm)[i];
                     VECTOR(*col_ids)[i2 - n1] = i;
                 }
             }
         }
     }
 
-    igraph_vector_destroy(&perm);
+    igraph_vector_int_destroy(&perm);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -814,7 +829,7 @@ int igraph_get_incidence(const igraph_t *graph,
  * edges.
  */
 
-int igraph_is_bipartite(const igraph_t *graph,
+igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                         igraph_bool_t *res,
                         igraph_vector_bool_t *types) {
 
@@ -826,17 +841,17 @@ int igraph_is_bipartite(const igraph_t *graph,
        2 means type 2.
     */
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_char_t seen;
-    igraph_dqueue_t Q;
-    igraph_vector_t neis;
+    igraph_dqueue_int_t Q;
+    igraph_vector_int_t neis;
     igraph_bool_t bi = 1;
-    long int i;
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &seen);
-    IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     for (i = 0; bi && i < no_of_nodes; i++) {
 
@@ -844,34 +859,34 @@ int igraph_is_bipartite(const igraph_t *graph,
             continue;
         }
 
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, i));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, i));
         VECTOR(seen)[i] = 1;
 
-        while (bi && !igraph_dqueue_empty(&Q)) {
-            long int n, j;
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&Q);
+        while (bi && !igraph_dqueue_int_empty(&Q)) {
+            igraph_integer_t n, j;
+            igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             char acttype = VECTOR(seen)[actnode];
 
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
-            n = igraph_vector_size(&neis);
+            n = igraph_vector_int_size(&neis);
             for (j = 0; j < n; j++) {
-                long int nei = (long int) VECTOR(neis)[j];
+                igraph_integer_t nei = VECTOR(neis)[j];
                 if (VECTOR(seen)[nei]) {
-                    long int neitype = VECTOR(seen)[nei];
+                    igraph_integer_t neitype = VECTOR(seen)[nei];
                     if (neitype == acttype) {
                         bi = 0;
                         break;
                     }
                 } else {
                     VECTOR(seen)[nei] = 3 - acttype;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                 }
             }
         }
     }
 
-    igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&Q);
+    igraph_vector_int_destroy(&neis);
+    igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(2);
 
     if (res) {
@@ -888,17 +903,17 @@ int igraph_is_bipartite(const igraph_t *graph,
     igraph_vector_char_destroy(&seen);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_integer_t n1, igraph_integer_t n2,
                               igraph_real_t p, igraph_bool_t directed,
                               igraph_neimode_t mode) {
 
-    int retval = 0;
-    igraph_vector_t edges, s;
-    int i;
+    igraph_error_t retval = 0;
+    igraph_vector_int_t edges, s;
+    igraph_integer_t i;
 
     if (p < 0.0 || p > 1.0) {
         IGRAPH_ERROR("Invalid connection probability", IGRAPH_EINVAL);
@@ -919,76 +934,79 @@ int igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
                               mode));
     } else {
 
-        long int to, from, slen;
+        igraph_integer_t to, from, slen;
+        igraph_real_t n1_real = (igraph_real_t) n1;  /* for divisions below */
+        igraph_real_t n2_real = (igraph_real_t) n2;  /* for divisions below */
+
         double maxedges, last;
         if (!directed || mode != IGRAPH_ALL) {
-            maxedges = (double) n1 * (double) n2;
+            maxedges = n1_real * n2_real;
         } else {
-            maxedges = 2.0 * (double) n1 * (double) n2;
+            maxedges = 2.0 * n1_real * n2_real;
         }
 
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, (long) (maxedges * p * 1.1)));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&s, (igraph_integer_t) (maxedges * p * 1.1)));
 
         RNG_BEGIN();
 
         last = RNG_GEOM(p);
         while (last < maxedges) {
-            IGRAPH_CHECK(igraph_vector_push_back(&s, last));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&s, last));
             last += RNG_GEOM(p);
             last += 1;
         }
 
         RNG_END();
 
-        slen = igraph_vector_size(&s);
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, slen * 2));
+        slen = igraph_vector_int_size(&s);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, slen * 2));
 
         for (i = 0; i < slen; i++) {
             if (!directed || mode != IGRAPH_ALL) {
-                to = (long) floor(VECTOR(s)[i] / n1);
-                from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                to = floor(VECTOR(s)[i] / n1_real);
+                from = VECTOR(s)[i] - to * n1_real;
                 to += n1;
             } else {
-                long int n1n2 = n1 * n2;
+                igraph_integer_t n1n2 = n1 * n2;
                 if (VECTOR(s)[i] < n1n2) {
-                    to = (long) floor(VECTOR(s)[i] / n1);
-                    from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                    to = floor(VECTOR(s)[i] / n1_real);
+                    from = VECTOR(s)[i] - to * n1_real;
                     to += n1;
                 } else {
-                    to = (long) floor( (VECTOR(s)[i] - n1n2) / n2);
-                    from = (long) (VECTOR(s)[i] - n1n2 - ((igraph_real_t) to) * n2);
+                    to = floor((VECTOR(s)[i] - n1n2) / n2_real);
+                    from = VECTOR(s)[i] - n1n2 - to * n2_real;
                     from += n1;
                 }
             }
 
             if (mode != IGRAPH_IN) {
-                igraph_vector_push_back(&edges, from);
-                igraph_vector_push_back(&edges, to);
+                igraph_vector_int_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to);
             } else {
-                igraph_vector_push_back(&edges, to);
-                igraph_vector_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to);
+                igraph_vector_int_push_back(&edges, from);
             }
         }
 
-        igraph_vector_destroy(&s);
+        igraph_vector_int_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
         IGRAPH_CHECK(retval = igraph_create(graph, &edges, n1 + n2, directed));
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
     return retval;
 }
 
-int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_integer_t n1, igraph_integer_t n2,
                               igraph_integer_t m, igraph_bool_t directed,
                               igraph_neimode_t mode) {
-    igraph_vector_t edges;
-    igraph_vector_t s;
-    int retval = 0;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t s;
+    igraph_error_t retval = 0;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -998,7 +1016,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
     }
 
     if (types) {
-        long int i;
+        igraph_integer_t i;
         IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
         igraph_vector_bool_null(types);
         for (i = n1; i < n1 + n2; i++) {
@@ -1014,7 +1032,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
     } else {
 
 
-        long int i;
+        igraph_integer_t i;
         double maxedges;
         if (!directed || mode != IGRAPH_ALL) {
             maxedges = (double) n1 * (double) n2;
@@ -1031,43 +1049,46 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
                                   directed, mode));
         } else {
 
-            long int to, from;
-            IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-            IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+            igraph_integer_t to, from;
+            igraph_real_t n1_real = (igraph_real_t) n1;  /* for divisions below */
+            igraph_real_t n2_real = (igraph_real_t) n2;  /* for divisions below */
+
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
             IGRAPH_CHECK(igraph_random_sample(&s, 0, maxedges - 1, m));
-            IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&s) * 2));
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_int_size(&s) * 2));
 
             for (i = 0; i < m; i++) {
                 if (!directed || mode != IGRAPH_ALL) {
-                    to = (long) floor(VECTOR(s)[i] / n1);
-                    from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                    to = floor(VECTOR(s)[i] / n1_real);
+                    from = VECTOR(s)[i] - to * n1_real;
                     to += n1;
                 } else {
-                    long int n1n2 = n1 * n2;
+                    igraph_integer_t n1n2 = n1 * n2;
                     if (VECTOR(s)[i] < n1n2) {
-                        to = (long) floor(VECTOR(s)[i] / n1);
-                        from = (long) (VECTOR(s)[i] - ((igraph_real_t) to) * n1);
+                        to = floor(VECTOR(s)[i] / n1_real);
+                        from = VECTOR(s)[i] - to * n1_real;
                         to += n1;
                     } else {
-                        to = (long) floor( (VECTOR(s)[i] - n1n2) / n2);
-                        from = (long) (VECTOR(s)[i] - n1n2 - ((igraph_real_t) to) * n2);
+                        to = floor((VECTOR(s)[i] - n1n2) / n2_real);
+                        from = VECTOR(s)[i] - n1n2 - to * n2_real;
                         from += n1;
                     }
                 }
 
                 if (mode != IGRAPH_IN) {
-                    igraph_vector_push_back(&edges, from);
-                    igraph_vector_push_back(&edges, to);
+                    igraph_vector_int_push_back(&edges, from);
+                    igraph_vector_int_push_back(&edges, to);
                 } else {
-                    igraph_vector_push_back(&edges, to);
-                    igraph_vector_push_back(&edges, from);
+                    igraph_vector_int_push_back(&edges, to);
+                    igraph_vector_int_push_back(&edges, from);
                 }
             }
 
-            igraph_vector_destroy(&s);
+            igraph_vector_int_destroy(&s);
             IGRAPH_FINALLY_CLEAN(1);
             IGRAPH_CHECK(retval = igraph_create(graph, &edges, n1 + n2, directed));
-            igraph_vector_destroy(&edges);
+            igraph_vector_int_destroy(&edges);
             IGRAPH_FINALLY_CLEAN(1);
         }
     }
@@ -1082,7 +1103,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
  * Similarly to unipartite (one-mode) networks, we can define the
  * G(n,p), and G(n,m) graph classes for bipartite graphs, via their
  * generating process. In G(n,p) every possible edge between top and
- * bottom vertices is realized with probablity p, independently of the
+ * bottom vertices is realized with probability p, independently of the
  * rest of the edges. In G(n,m), we uniformly choose m edges to
  * realize.
  *
@@ -1128,7 +1149,7 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
  * edges.
  */
 
-int igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
                           igraph_erdos_renyi_t type,
                           igraph_integer_t n1, igraph_integer_t n2,
                           igraph_real_t p, igraph_integer_t m,

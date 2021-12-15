@@ -61,7 +61,7 @@
  *           not enough memory for temporary
  *           data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -75,22 +75,22 @@
  * \sa \ref igraph_get_shortest_paths() to get the paths themselves,
  * \ref igraph_shortest_paths_dijkstra() for the weighted version.
  */
-int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
                           const igraph_vs_t from, const igraph_vs_t to,
                           igraph_neimode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_from, no_of_to;
-    long int *already_counted;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_from, no_of_to;
+    igraph_integer_t *already_counted;
     igraph_adjlist_t adjlist;
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     igraph_bool_t all_to;
 
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_vit_t fromvit, tovit;
     igraph_real_t my_infinity = IGRAPH_INFINITY;
-    igraph_vector_t indexv;
+    igraph_vector_int_t indexv;
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
@@ -104,23 +104,23 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    already_counted = IGRAPH_CALLOC(no_of_nodes, long int);
+    already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_counted == 0) {
         IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, already_counted);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     all_to = igraph_vs_is_all(&to);
     if (all_to) {
         no_of_to = no_of_nodes;
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&indexv, no_of_nodes);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
         IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
         no_of_to = IGRAPH_VIT_SIZE(tovit);
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
-            long int v = IGRAPH_VIT_GET(tovit);
+            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
                 IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
                              IGRAPH_EINVAL);
@@ -135,25 +135,25 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
          IGRAPH_VIT_NEXT(fromvit), i++) {
-        long int reached = 0;
-        IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(fromvit)));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-        already_counted[ (long int) IGRAPH_VIT_GET(fromvit) ] = i + 1;
+        igraph_integer_t reached = 0;
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, IGRAPH_VIT_GET(fromvit)));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
+        already_counted[ IGRAPH_VIT_GET(fromvit) ] = i + 1;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_empty(&q)) {
-            long int act = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
 
             if (all_to) {
                 MATRIX(*res, i, act) = actdist;
             } else {
                 if (VECTOR(indexv)[act]) {
-                    MATRIX(*res, i, (long int)(VECTOR(indexv)[act] - 1)) = actdist;
+                    MATRIX(*res, i, VECTOR(indexv)[act] - 1) = actdist;
                     reached++;
                     if (reached == no_of_to) {
-                        igraph_dqueue_clear(&q);
+                        igraph_dqueue_int_clear(&q);
                         break;
                     }
                 }
@@ -161,13 +161,13 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
 
             neis = igraph_adjlist_get(&adjlist, act);
             for (j = 0; j < igraph_vector_int_size(neis); j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (already_counted[neighbor] == i + 1) {
                     continue;
                 }
                 already_counted[neighbor] = i + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
             }
         }
     }
@@ -175,17 +175,17 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     /* Clean */
     if (!all_to) {
         igraph_vit_destroy(&tovit);
-        igraph_vector_destroy(&indexv);
+        igraph_vector_int_destroy(&indexv);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
     IGRAPH_FREE(already_counted);
-    igraph_dqueue_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     igraph_vit_destroy(&fromvit);
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -197,23 +197,23 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  * If there is more than one geodesic between two vertices, this
  * function gives only one of them.
  * \param graph The graph object.
- * \param vertices The result, the ids of the vertices along the paths.
- *        This is a pointer vector, each element points to a vector
+ * \param vertices The result, the IDs of the vertices along the paths.
+ *        This is a pointer vector, each element points to an \ref igraph_vector_int_t
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors.
- * \param edges The result, the ids of the edges along the paths.
- *        This is a pointer vector, each element points to a vector
+ * \param edges The result, the IDs of the edges along the paths.
+ *        This is a pointer vector, each element points to an \ref igraph_vector_int_t
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
+ *        and fill the IDs of the vertices along the geodesics from/to
  *        the vertices. Supply a null pointer here if you don't need
  *        these vectors.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
  * \param mode The type of shortest paths to be used for the
@@ -250,7 +250,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
+ *           \p from is invalid vertex ID, or the length of \p to is
  *           not the same as the length of \p res.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
@@ -266,28 +266,28 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_get_shortest_paths.c
  */
-int igraph_get_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                               igraph_vector_ptr_t *vertices,
                               igraph_vector_ptr_t *edges,
                               igraph_integer_t from, const igraph_vs_t to,
                               igraph_neimode_t mode,
-                              igraph_vector_long_t *predecessors,
-                              igraph_vector_long_t *inbound_edges) {
+                              igraph_vector_int_t *predecessors,
+                              igraph_vector_int_t *inbound_edges) {
 
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int *father;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t *father;
 
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
-    long int i, j, vsize;
-    igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i, j, vsize;
+    igraph_vector_int_t tmp = IGRAPH_VECTOR_NULL;
 
     igraph_vit_t vit;
 
-    long int to_reach;
-    long int reached = 0;
+    igraph_integer_t to_reach;
+    igraph_integer_t reached = 0;
 
     if (from < 0 || from >= no_of_nodes) {
         IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
@@ -307,19 +307,19 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_ERROR("Size of the `edges' and the `to' should match", IGRAPH_EINVAL);
     }
 
-    father = IGRAPH_CALLOC(no_of_nodes, long int);
+    father = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (father == 0) {
         IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, father);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (father[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
-            father[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
+        if (father[ IGRAPH_VIT_GET(vit) ] == 0) {
+            father[ IGRAPH_VIT_GET(vit) ] = -1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
@@ -339,27 +339,27 @@ int igraph_get_shortest_paths(const igraph_t *graph,
      *   reached plus 2.
      */
 
-    IGRAPH_CHECK(igraph_dqueue_push(&q, from + 1));
-    if (father[ (long int) from ] < 0) {
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, from + 1));
+    if (father[ from ] < 0) {
         reached++;
     }
-    father[ (long int)from ] = 1;
+    father[ from ] = 1;
 
-    while (!igraph_dqueue_empty(&q) && reached < to_reach) {
-        long int act = (long int) igraph_dqueue_pop(&q) - 1;
+    while (!igraph_dqueue_int_empty(&q) && reached < to_reach) {
+        igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act, mode));
-        vsize = igraph_vector_size(&tmp);
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode));
+        vsize = igraph_vector_int_size(&tmp);
         for (j = 0; j < vsize; j++) {
-            long int edge = (long int) VECTOR(tmp)[j];
-            long int neighbor = IGRAPH_OTHER(graph, edge, act);
+            igraph_integer_t edge = VECTOR(tmp)[j];
+            igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, act);
             if (father[neighbor] > 0) {
                 continue;
             } else if (father[neighbor] < 0) {
                 reached++;
             }
             father[neighbor] = edge + 2;
-            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor + 1));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor + 1));
         }
     }
 
@@ -369,7 +369,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 
     /* Create `predecessors' if needed */
     if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (father[i] <= 0) {
@@ -387,7 +387,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 
     /* Create `inbound_edges' if needed */
     if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (father[i] <= 1) {
@@ -405,34 +405,34 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         for (IGRAPH_VIT_RESET(vit), j = 0;
              !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), j++) {
-            long int node = IGRAPH_VIT_GET(vit);
-            igraph_vector_t *vvec = 0, *evec = 0;
+            igraph_integer_t node = IGRAPH_VIT_GET(vit);
+            igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
                 vvec = VECTOR(*vertices)[j];
-                igraph_vector_clear(vvec);
+                igraph_vector_int_clear(vvec);
             }
             if (edges) {
                 evec = VECTOR(*edges)[j];
-                igraph_vector_clear(evec);
+                igraph_vector_int_clear(evec);
             }
 
             IGRAPH_ALLOW_INTERRUPTION();
 
             if (father[node] > 0) {
-                long int act = node;
-                long int size = 0;
-                long int edge;
+                igraph_integer_t act = node;
+                igraph_integer_t size = 0;
+                igraph_integer_t edge;
                 while (father[act] > 1) {
                     size++;
                     edge = father[act] - 2;
                     act = IGRAPH_OTHER(graph, edge, act);
                 }
                 if (vvec) {
-                    IGRAPH_CHECK(igraph_vector_resize(vvec, size + 1));
+                    IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
                     VECTOR(*vvec)[size] = node;
                 }
                 if (evec) {
-                    IGRAPH_CHECK(igraph_vector_resize(evec, size));
+                    IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
                 }
                 act = node;
                 while (father[act] > 1) {
@@ -452,12 +452,12 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 
     /* Clean */
     IGRAPH_FREE(father);
-    igraph_dqueue_destroy(&q);
-    igraph_vector_destroy(&tmp);
+    igraph_dqueue_int_destroy(&q);
+    igraph_vector_int_destroy(&tmp);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -475,11 +475,11 @@ int igraph_get_shortest_paths(const igraph_t *graph,
  *        undirected. Directed paths are considered in directed
  *        graphs.
  * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex ids along
+ *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
  * \param edges Pointer to an uninitialized vector or a null
- *        pointer. If not a null pointer, then the edge ids along the
+ *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.
@@ -498,9 +498,9 @@ int igraph_get_shortest_paths(const igraph_t *graph,
  * vertices.
  */
 
-int igraph_get_shortest_path(const igraph_t *graph,
-                             igraph_vector_t *vertices,
-                             igraph_vector_t *edges,
+igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
+                             igraph_vector_int_t *vertices,
+                             igraph_vector_int_t *edges,
                              igraph_integer_t from,
                              igraph_integer_t to,
                              igraph_neimode_t mode) {
@@ -535,5 +535,5 @@ int igraph_get_shortest_path(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

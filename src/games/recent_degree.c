@@ -61,32 +61,32 @@
  * vertices, |E| is the number of edges in the graph.
  *
  */
-int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
                               igraph_real_t power,
                               igraph_integer_t time_window,
                               igraph_integer_t m,
-                              const igraph_vector_t *outseq,
+                              const igraph_vector_int_t *outseq,
                               igraph_bool_t outpref,
                               igraph_real_t zero_appeal,
                               igraph_bool_t directed) {
 
-    long int no_of_nodes = nodes;
-    long int no_of_neighbors = 0;
-    long int no_of_edges;
-    igraph_vector_t edges;
-    long int i, j;
+    igraph_integer_t no_of_nodes = nodes;
+    igraph_integer_t no_of_neighbors = 0;
+    igraph_integer_t no_of_edges;
+    igraph_vector_int_t edges;
+    igraph_integer_t i, j;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    igraph_dqueue_t history;
-    igraph_bool_t have_outseq = outseq && igraph_vector_size(outseq) > 0;
+    igraph_dqueue_int_t history;
+    igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERRORF("Number of vertices cannot be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
+        IGRAPH_ERRORF("Number of vertices cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (have_outseq && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%ld) does not equal the number of nodes (%ld).",
-                      IGRAPH_EINVAL, (long) igraph_vector_size(outseq), no_of_nodes);
+    if (have_outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
+        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%" IGRAPH_PRId ") does not equal the number of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
     if (!have_outseq && m < 0) {
         IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".",
@@ -108,37 +108,37 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
         no_of_neighbors = m;
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
-        long int outseq_len = igraph_vector_size(outseq);
+        igraph_integer_t outseq_len = igraph_vector_int_size(outseq);
         no_of_edges = 0;
         for (i = 1; i < outseq_len; i++) {
             no_of_edges += VECTOR(*outseq)[i];
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_dqueue_init(&history,
+    IGRAPH_CHECK(igraph_dqueue_int_init(&history,
                                     1.5 * time_window * no_of_edges / no_of_nodes + 10));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &history);
 
     RNG_BEGIN();
 
     /* first node */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
-    igraph_dqueue_push(&history, -1);
+    igraph_dqueue_int_push(&history, -1);
 
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
-        long int to;
+        igraph_integer_t to;
         if (have_outseq) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[i];
+            no_of_neighbors = VECTOR(*outseq)[i];
         }
 
         if (i >= time_window) {
-            while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
+            while ((j = igraph_dqueue_int_pop(&history)) != -1) {
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(&sumtree, j, pow(VECTOR(degree)[j], power) + zero_appeal));
             }
@@ -150,13 +150,13 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
-            igraph_dqueue_push(&history, to);
+            igraph_dqueue_int_push(&history, to);
         }
-        igraph_dqueue_push(&history, -1);
+        igraph_dqueue_int_push(&history, -1);
 
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
-            long int nn = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
+            igraph_integer_t nn = VECTOR(edges)[edgeptr - 2 * j - 1];
             IGRAPH_CHECK(igraph_psumtree_update(&sumtree, nn, pow(VECTOR(degree)[nn], power) + zero_appeal));
         }
         if (outpref) {
@@ -169,16 +169,16 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
 
     RNG_END();
 
-    igraph_dqueue_destroy(&history);
+    igraph_dqueue_int_destroy(&history);
     igraph_psumtree_destroy(&sumtree);
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -221,10 +221,10 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes,
  * Time complexity: O((|V|+|V|/aging_bins)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
-int igraph_recent_degree_aging_game(igraph_t *graph,
+igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_integer_t nodes,
                                     igraph_integer_t m,
-                                    const igraph_vector_t *outseq,
+                                    const igraph_vector_int_t *outseq,
                                     igraph_bool_t outpref,
                                     igraph_real_t pa_exp,
                                     igraph_real_t aging_exp,
@@ -233,28 +233,28 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_real_t zero_appeal,
                                     igraph_bool_t directed) {
 
-    long int no_of_nodes = nodes;
-    long int no_of_neighbors;
-    long int binwidth;
-    long int no_of_edges;
-    igraph_vector_t edges;
-    long int i, j, k;
+    igraph_integer_t no_of_nodes = nodes;
+    igraph_integer_t no_of_neighbors;
+    igraph_integer_t binwidth;
+    igraph_integer_t no_of_edges;
+    igraph_vector_int_t edges;
+    igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    igraph_dqueue_t history;
-    igraph_bool_t have_outseq = outseq && igraph_vector_size(outseq) > 0;
+    igraph_dqueue_int_t history;
+    igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
     if (no_of_nodes == 0) {
         igraph_empty(graph, 0, directed);
         return IGRAPH_SUCCESS;
     }
     if (no_of_nodes < 0) {
-        IGRAPH_ERRORF("Number of nodes should not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
+        IGRAPH_ERRORF("Number of nodes should not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (have_outseq && igraph_vector_size(outseq) != no_of_nodes) {
-        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%ld) does not equal the number of nodes (%ld).",
-                      IGRAPH_EINVAL, (long) igraph_vector_size(outseq), no_of_nodes);
+    if (have_outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
+        IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%" IGRAPH_PRId ") does not equal the number of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
     if (!have_outseq && m < 0) {
         IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
@@ -273,7 +273,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         no_of_neighbors = m;
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
-        long int outseq_len = igraph_vector_size(outseq);
+        igraph_integer_t outseq_len = igraph_vector_int_size(outseq);
         no_of_edges = 0;
         for (i = 1; i < outseq_len; i++) {
             no_of_edges += VECTOR(*outseq)[i];
@@ -282,32 +282,32 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
     binwidth = nodes / aging_bins + 1;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_dqueue_init(&history,
-                                    1.5 * time_window * no_of_edges / no_of_nodes + 10));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&history,
+                                        1.5 * time_window * no_of_edges / no_of_nodes + 10));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &history);
 
     RNG_BEGIN();
 
     /* first node */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
-    igraph_dqueue_push(&history, -1);
+    igraph_dqueue_int_push(&history, -1);
 
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
-        long int to;
+        igraph_integer_t to;
 
         if (have_outseq) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[i];
+            no_of_neighbors = VECTOR(*outseq)[i];
         }
 
         if (i >= time_window) {
-            while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
-                long int age = (i - j) / binwidth;
+            while ((j = igraph_dqueue_int_pop(&history)) != -1) {
+                igraph_integer_t age = (i - j) / binwidth;
                 VECTOR(degree)[j] -= 1;
                 IGRAPH_CHECK(igraph_psumtree_update(
                     &sumtree, j,
@@ -322,14 +322,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
-            igraph_dqueue_push(&history, to);
+            igraph_dqueue_int_push(&history, to);
         }
-        igraph_dqueue_push(&history, -1);
+        igraph_dqueue_int_push(&history, -1);
 
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
-            long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            long int age = (i - n) / binwidth;
+            igraph_integer_t n = VECTOR(edges)[edgeptr - 2 * j - 1];
+            igraph_integer_t age = (i - n) / binwidth;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, n,
                 (pow(VECTOR(degree)[n], pa_exp) + zero_appeal) * pow(age + 1, aging_exp)
@@ -347,9 +347,9 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
         /* aging */
         for (k = 1; binwidth * k <= i; k++) {
-            long int shnode = i - binwidth * k;
-            long int deg = (long int) VECTOR(degree)[shnode];
-            long int age = (i - shnode) / binwidth;
+            igraph_integer_t shnode = i - binwidth * k;
+            igraph_integer_t deg = VECTOR(degree)[shnode];
+            igraph_integer_t age = (i - shnode) / binwidth;
             IGRAPH_CHECK(igraph_psumtree_update(
                 &sumtree, shnode,
                 (pow(deg, pa_exp) + zero_appeal) * pow(age + 2, aging_exp)
@@ -359,14 +359,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
     RNG_END();
 
-    igraph_dqueue_destroy(&history);
+    igraph_dqueue_int_destroy(&history);
     igraph_vector_destroy(&degree);
     igraph_psumtree_destroy(&sumtree);
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

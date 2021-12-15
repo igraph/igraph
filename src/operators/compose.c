@@ -64,16 +64,16 @@
  *
  * \example examples/simple/igraph_compose.c
  */
-int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
-                   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
+                   igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2) {
 
-    long int no_of_nodes_left = igraph_vcount(g1);
-    long int no_of_nodes_right = igraph_vcount(g2);
-    long int no_of_nodes;
+    igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
+    igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
+    igraph_integer_t no_of_nodes;
     igraph_bool_t directed = igraph_is_directed(g1);
-    igraph_vector_t edges;
-    igraph_vector_t neis1, neis2;
-    long int i;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t neis1, neis2;
+    igraph_integer_t i;
 
     if (directed != igraph_is_directed(g2)) {
         IGRAPH_ERROR("Cannot compose directed and undirected graph",
@@ -83,53 +83,52 @@ int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
     no_of_nodes = no_of_nodes_left > no_of_nodes_right ?
                   no_of_nodes_left : no_of_nodes_right;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis1, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis2, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis1, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis2, 0);
 
     if (edge_map1) {
-        igraph_vector_clear(edge_map1);
+        igraph_vector_int_clear(edge_map1);
     }
     if (edge_map2) {
-        igraph_vector_clear(edge_map2);
+        igraph_vector_int_clear(edge_map2);
     }
 
     for (i = 0; i < no_of_nodes_left; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_incident(g1, &neis1, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_incident(g1, &neis1, i,
                                      IGRAPH_OUT));
-        while (!igraph_vector_empty(&neis1)) {
-            long int con = (long int) igraph_vector_pop_back(&neis1);
-            long int v1 = IGRAPH_OTHER(g1, con, i);
+        while (!igraph_vector_int_empty(&neis1)) {
+            igraph_integer_t con = igraph_vector_int_pop_back(&neis1);
+            igraph_integer_t v1 = IGRAPH_OTHER(g1, con, i);
             if (v1 < no_of_nodes_right) {
-                IGRAPH_CHECK(igraph_incident(g2, &neis2, (igraph_integer_t) v1,
+                IGRAPH_CHECK(igraph_incident(g2, &neis2, v1,
                                              IGRAPH_OUT));
             } else {
                 continue;
             }
-            while (!igraph_vector_empty(&neis2)) {
-                long int con2 = igraph_vector_pop_back(&neis2);
-                long int v2 = IGRAPH_OTHER(g2, con2, v1);
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, v2));
+            while (!igraph_vector_int_empty(&neis2)) {
+                igraph_integer_t con2 = igraph_vector_int_pop_back(&neis2);
+                igraph_integer_t v2 = IGRAPH_OTHER(g2, con2, v1);
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v2));
                 if (edge_map1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map1, con));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map1, con));
                 }
                 if (edge_map2) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map2, con2));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map2, con2));
                 }
             }
         }
     }
 
-    igraph_vector_destroy(&neis1);
-    igraph_vector_destroy(&neis2);
+    igraph_vector_int_destroy(&neis1);
+    igraph_vector_int_destroy(&neis2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

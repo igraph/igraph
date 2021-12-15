@@ -23,54 +23,47 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
-
 int main() {
     igraph_t g;
     igraph_integer_t eid;
-    igraph_vector_t hist;
-    long int i;
-    int ret;
+    igraph_vector_int_t hist;
+    igraph_integer_t i;
+    igraph_error_t ret;
 
     /* DIRECTED */
 
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
 
-    igraph_vector_init(&hist, 9);
+    igraph_vector_int_init(&hist, 9);
 
     for (i = 1; i < 10; i++) {
         igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ 1);
-        VECTOR(hist)[ (long int) eid ] = 1;
+        VECTOR(hist)[ eid ] = 1;
     }
-    print_vector(&hist, stdout);
 
-    igraph_vector_destroy(&hist);
+    igraph_vector_int_print(&hist);
+
+    igraph_vector_int_destroy(&hist);
     igraph_destroy(&g);
 
     /* UNDIRECTED */
 
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
 
-    igraph_vector_init(&hist, 9);
+    igraph_vector_int_init(&hist, 9);
 
     for (i = 1; i < 10; i++) {
         igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ 1);
-        VECTOR(hist)[ (long int) eid ] += 1;
+        VECTOR(hist)[ eid ] += 1;
         igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ 1);
-        VECTOR(hist)[ (long int) eid ] += 1;
+        VECTOR(hist)[ eid ] += 1;
     }
-    print_vector(&hist, stdout);
+    igraph_vector_int_print(&hist);
 
-    igraph_vector_destroy(&hist);
+    igraph_vector_int_destroy(&hist);
     igraph_destroy(&g);
 
-    /* NON-EXISTANT EDGE */
+    /* NON-EXISTENT EDGE */
 
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
 
@@ -91,7 +84,7 @@ int main() {
 /* int main() { */
 
 /*   igraph_t g; */
-/*   long int i, n; */
+/*   igraph_integer_t i, n; */
 /*   igraph_integer_t from, to, eid; */
 
 /*   igraph_barabasi_game(&g, 10000, 100, 0, 0, 1); */

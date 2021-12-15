@@ -27,7 +27,7 @@
 
 int main() {
     igraph_matrix_t m, m1;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
 
     /* igraph_matrix_init, igraph_matrix_destroy */
     igraph_matrix_init(&m, 10, 10);
@@ -108,7 +108,6 @@ int main() {
     igraph_matrix_destroy(&m);
 
     /* TODO: igraph_matrix_permdelete_rows */
-    /* TODO: igraph_matrix_delete_rows_neg */
 
     /* igraph_matrix_copy */
     igraph_matrix_init(&m, 2, 3);

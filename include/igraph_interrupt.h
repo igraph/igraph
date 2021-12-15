@@ -106,7 +106,7 @@ __BEGIN_DECLS
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-typedef int igraph_interruption_handler_t (void* data);
+typedef igraph_error_t igraph_interruption_handler_t (void* data);
 
 /**
  * \function igraph_allow_interruption
@@ -119,7 +119,7 @@ typedef int igraph_interruption_handler_t (void* data);
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-IGRAPH_EXPORT int igraph_allow_interruption(void* data);
+IGRAPH_EXPORT igraph_error_t igraph_allow_interruption(void* data);
 
 IGRAPH_EXPORT igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
 

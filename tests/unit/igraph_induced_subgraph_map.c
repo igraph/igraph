@@ -28,17 +28,17 @@
 
 int main() {
     igraph_t g, sub;
-    igraph_vector_t map, invmap;
-    igraph_vector_t keep;
-    long int i;
+    igraph_vector_int_t map, invmap;
+    igraph_vector_int_t keep;
+    igraph_integer_t i;
 
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,
                  -1);
-    igraph_vector_init(&map, 0);
-    igraph_vector_init(&invmap, 0);
-    igraph_vector_init(&keep, igraph_vcount(&g));
-    for (i = 0; i < igraph_vector_size(&keep); i++) {
+    igraph_vector_int_init(&map, 0);
+    igraph_vector_int_init(&invmap, 0);
+    igraph_vector_int_init(&keep, igraph_vcount(&g));
+    for (i = 0; i < igraph_vector_int_size(&keep); i++) {
         VECTOR(keep)[i] = i;
     }
 
@@ -48,14 +48,14 @@ int main() {
                                 &map, &invmap);
 
     printf("Map:         ");
-    igraph_vector_print(&map);
+    igraph_vector_int_print(&map);
     printf("Inverse map: ");
-    igraph_vector_print(&invmap);
+    igraph_vector_int_print(&invmap);
     igraph_write_graph_edgelist(&sub, stdout);
 
-    igraph_vector_destroy(&keep);
-    igraph_vector_destroy(&map);
-    igraph_vector_destroy(&invmap);
+    igraph_vector_int_destroy(&keep);
+    igraph_vector_int_destroy(&map);
+    igraph_vector_int_destroy(&invmap);
 
     igraph_destroy(&sub);
     igraph_destroy(&g);

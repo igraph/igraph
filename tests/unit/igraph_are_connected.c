@@ -59,7 +59,7 @@ int main() {
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 2,3, -1);
     igraph_set_error_handler(igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_are_connected(&g, 0, igraph_vcount(&g) + 2 /* vertex id out of range */, &connected) == IGRAPH_EINVVID);
+    IGRAPH_ASSERT(igraph_are_connected(&g, 0, igraph_vcount(&g) + 2 /* vertex ID out of range */, &connected) == IGRAPH_EINVVID);
     igraph_set_error_handler(igraph_error_handler_abort);
     igraph_destroy(&g);
 

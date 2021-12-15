@@ -51,8 +51,8 @@ int main() {
     igraph_t g, p1, p2, full, ring;
     igraph_vector_bool_t types;
     igraph_bool_t iso;
-    long int i, m2 = 0, w, f, t;
-    igraph_vector_t mult1, mult2;
+    igraph_integer_t i, m2 = 0, w, f, t;
+    igraph_vector_int_t mult1, mult2;
 
     /*******************************************************/
     /* Full bipartite graph -> full graphs                 */
@@ -137,22 +137,22 @@ int main() {
     igraph_vector_bool_fill(&types, 1);
     VECTOR(types)[8] = VECTOR(types)[9] = 0;
 
-    igraph_vector_init(&mult1, 0);
-    igraph_vector_init(&mult2, 0);
+    igraph_vector_int_init(&mult1, 0);
+    igraph_vector_int_init(&mult2, 0);
     igraph_bipartite_projection(&g, &types, &p1, &p2, &mult1, &mult2,
                                 /*probe=*/ -1);
     check_projection(&g, &types, &p1, &p2);
 
-    if (igraph_vector_size(&mult1) != igraph_ecount(&p1)) {
+    if (igraph_vector_int_size(&mult1) != igraph_ecount(&p1)) {
         return 21;
     }
-    if (igraph_vector_size(&mult2) != igraph_ecount(&p2)) {
+    if (igraph_vector_int_size(&mult2) != igraph_ecount(&p2)) {
         return 22;
     }
     if (VECTOR(mult1)[0] != 2) {
         return 23;
     }
-    for (i = 0; i < igraph_vector_size(&mult2); i++) {
+    for (i = 0; i < igraph_vector_int_size(&mult2); i++) {
         if (VECTOR(mult2)[i] != 1 && VECTOR(mult2)[i] != 2) {
             return 24;
         }
@@ -170,8 +170,8 @@ int main() {
         return 26;
     }
 
-    igraph_vector_destroy(&mult1);
-    igraph_vector_destroy(&mult2);
+    igraph_vector_int_destroy(&mult1);
+    igraph_vector_int_destroy(&mult2);
     igraph_destroy(&p1);
     igraph_destroy(&p2);
     igraph_destroy(&g);

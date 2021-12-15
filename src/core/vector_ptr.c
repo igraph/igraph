@@ -28,6 +28,7 @@
 #include "igraph_qsort.h"
 
 #include <string.h>         /* memcpy & co. */
+#include <stdint.h>         /* uintptr_t */
 #include <stdlib.h>
 
 /**
@@ -86,8 +87,8 @@
  * time \endquote required to allocate \p size elements.
  */
 
-int igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
-    long int alloc_size = size > 0 ? size : 1;
+igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_integer_t size) {
+    igraph_integer_t alloc_size = size > 0 ? size : 1;
     IGRAPH_ASSERT(v != NULL);
     if (size < 0) {
         size = 0;
@@ -100,14 +101,14 @@ int igraph_vector_ptr_init(igraph_vector_ptr_t* v, int long size) {
     v->end = v->stor_begin + size;
     v->item_destructor = 0;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  */
 
 const igraph_vector_ptr_t *igraph_vector_ptr_view(const igraph_vector_ptr_t *v, void *const *data,
-        long int length) {
+        igraph_integer_t length) {
     igraph_vector_ptr_t *v2 = (igraph_vector_ptr_t*) v;
     v2->stor_begin = (void **)data;
     v2->stor_end = (void**)data + length;
@@ -214,14 +215,14 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) {
-    long int actual_size = igraph_vector_ptr_size(v);
+igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_t size) {
+    igraph_integer_t actual_size = igraph_vector_ptr_size(v);
     void **tmp;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
     if (size <= igraph_vector_ptr_size(v)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, void*);
@@ -232,7 +233,7 @@ int igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, long int size) {
     v->stor_end = v->stor_begin + size;
     v->end = v->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -257,7 +258,7 @@ igraph_bool_t igraph_vector_ptr_empty(const igraph_vector_ptr_t* v) {
  * Time complexity: O(1).
  */
 
-long int igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
+igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
     IGRAPH_ASSERT(v != NULL);
     /*  IGRAPH_ASSERT(v->stor_begin != NULL);       */ /* TODO */
     return v->end - v->stor_begin;
@@ -309,13 +310,13 @@ void igraph_vector_ptr_clear(igraph_vector_ptr_t* v) {
  * push_back operations need O(n) time to complete.
  */
 
-int igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
+igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (v->stor_end == v->end) {
-        long int new_size = igraph_vector_ptr_size(v) * 2;
+        igraph_integer_t new_size = igraph_vector_ptr_size(v) * 2;
         if (new_size == 0) {
             new_size = 1;
         }
@@ -325,7 +326,7 @@ int igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
     *(v->end) = e;
     v->end += 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
@@ -350,15 +351,15 @@ void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
  * \param pos The position where the new element is inserted.
  * \param e The inserted element
  */
-int igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
-    long int size = igraph_vector_ptr_size(v);
+igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_integer_t pos, void* e) {
+    igraph_integer_t size = igraph_vector_ptr_size(v);
     IGRAPH_CHECK(igraph_vector_ptr_resize(v, size + 1));
     if (pos < size) {
         memmove(v->stor_begin + pos + 1, v->stor_begin + pos,
                 sizeof(void*) * (size_t) (size - pos));
     }
     v->stor_begin[pos] = e;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -373,7 +374,7 @@ int igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
  * Time complexity: O(1).
  */
 
-void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, long int pos) {
+void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return *(v->stor_begin + pos);
@@ -391,7 +392,7 @@ void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, long int pos) {
  * Time complexity: O(1).
  */
 
-void igraph_vector_ptr_set(igraph_vector_ptr_t* v, long int pos, void* value) {
+void igraph_vector_ptr_set(igraph_vector_ptr_t* v, igraph_integer_t pos, void* value) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     *(v->stor_begin + pos) = value;
@@ -430,10 +431,10 @@ void igraph_vector_ptr_null(igraph_vector_ptr_t* v) {
  * needed to allocate the memory for the vector elements.
  */
 
-int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
+igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t newsize) {
     IGRAPH_CHECK(igraph_vector_ptr_reserve(v, newsize));
     v->end = v->stor_begin + newsize;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -444,7 +445,7 @@ int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
  *         \c IGRAPH_ENOMEM if out of memory
  */
 
-int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int length) {
+igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, igraph_integer_t length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
@@ -454,7 +455,7 @@ int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int l
     v->item_destructor = 0;
     memcpy(v->stor_begin, data, (size_t) length * sizeof(void*));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -497,8 +498,8 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  * done in O(n) time.
  */
 
-int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    long int from_size;
+igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+    igraph_integer_t from_size;
 
     IGRAPH_ASSERT(from != NULL);
     /*   IGRAPH_ASSERT(from->stor_begin != NULL); */ /* TODO */
@@ -515,7 +516,7 @@ int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *f
     memcpy(to->stor_begin, from->stor_begin,
            (size_t) igraph_vector_ptr_size(from)*sizeof(void*));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -523,7 +524,7 @@ int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *f
  * \brief Remove an element from a pointer vector.
  */
 
-void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
+void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     if (pos + 1 < igraph_vector_ptr_size(v)) { /* No need to move data when removing the last element. */
@@ -561,10 +562,10 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
           compar);
 }
 
-int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
+igraph_error_t igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
                                 const igraph_vector_int_t *idx) {
     void **tmp;
-    int i, n = igraph_vector_int_size(idx);
+    igraph_integer_t i, n = igraph_vector_int_size(idx);
 
     tmp = IGRAPH_CALLOC(n, void*);
     if (!tmp) {
@@ -579,20 +580,20 @@ int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
     v->stor_begin = tmp;
     v->stor_end = v->end = tmp + n;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    long int origsize = igraph_vector_ptr_size(to);
-    long int othersize = igraph_vector_ptr_size(from);
-    long int i;
+igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+    igraph_integer_t origsize = igraph_vector_ptr_size(to);
+    igraph_integer_t othersize = igraph_vector_ptr_size(from);
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_ptr_resize(to, origsize + othersize));
     for (i = 0; i < othersize; i++, origsize++) {
         to->stor_begin[origsize] = from->stor_begin[i];
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -636,4 +637,149 @@ igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(
 igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v) {
     IGRAPH_ASSERT(v != 0);
     return v->item_destructor;
+}
+
+typedef int cmp_t (const void *, const void *);
+
+/**
+ * Comparison function passed to qsort_r from  igraph_vector_ptr_sort_ind
+ */
+static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
+    cmp_t* cmp = (cmp_t*) thunk;
+    uintptr_t *pa = (uintptr_t*) p1;
+    uintptr_t *pb = (uintptr_t*) p2;
+    void** item_a_ptr = (void**) *pa;
+    void** item_b_ptr = (void**) *pb;
+    return cmp(*item_a_ptr, *item_b_ptr);
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_sort_ind
+ * \brief Return a permutation of indices that sorts a vector of pointers
+ *
+ * Takes an unsorted array \c v as input and computes an array of
+ * indices inds such that v[ inds[i] ], with i increasing from 0, is
+ * an ordered array (either ascending or descending, depending on
+ * \v order). The order of indices for identical elements is not
+ * defined.
+ *
+ * \param v the array to be sorted
+ * \param inds the output array of indices. This must be initialized,
+ *         but will be resized
+ * \param cmp a comparator function that takes two elements of the pointer
+ *        vector being sorted (these are constant pointers on their own)
+ *        and returns a negative value if the item \em "pointed to" by the
+ *        first pointer is smaller than the item \em "pointed to" by the
+ *        second pointer, a positive value if it is larger, or zero if the
+ *        two items are equal
+ * \return Error code.
+ *
+ * This routine uses the C library qsort routine.
+ * Algorithm: 1) create an array of pointers to the elements of v. 2)
+ * Pass this array to qsort. 3) after sorting the difference between
+ * the pointer value and the first pointer value gives its original
+ * position in the array. Use this to set the values of inds.
+ */
+
+igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
+        igraph_vector_int_t *inds, cmp_t cmp) {
+    igraph_integer_t i;
+    uintptr_t *vind, first;
+    igraph_integer_t n = igraph_vector_ptr_size(v);
+
+    IGRAPH_CHECK(igraph_vector_int_resize(inds, n));
+    if (n == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    vind = IGRAPH_CALLOC(n, uintptr_t);
+    if (vind == 0) {
+        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM);
+    }
+
+    for (i = 0; i < n; i++) {
+        vind[i] = (uintptr_t) &VECTOR(*v)[i];
+    }
+
+    first = vind[0];
+
+    igraph_qsort_r(vind, n, sizeof(vind[0]), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
+
+    for (i = 0; i < n; i++) {
+        VECTOR(*inds)[i] = (vind[i] - first) / sizeof(uintptr_t);
+    }
+
+    IGRAPH_FREE(vind);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_permute
+ * \brief Permutes the elements of a pointer vector in place according to an index vector.
+ *
+ * </para><para>
+ * This function takes a vector \c v and a corresponding index vector \c ind,
+ * and permutes the elements of \c v such that \c v[ind[i]] is moved to become
+ * \c v[i] after the function is executed.
+ *
+ * </para><para>
+ * It is an error to call this function with an index vector that does not
+ * represent a valid permutation. Each element in the index vector must be
+ * between 0 and the length of the vector minus one (inclusive), and each such
+ * element must appear only once. The function does not attempt to validate the
+ * index vector.
+ *
+ * </para><para>
+ * The index vector that this function takes is compatible with the index vector
+ * returned from \ref igraph_vector_ptr_sort_ind(); passing in the index vector
+ * from \ref igraph_vector_ptr_sort_ind() will sort the original vector.
+ *
+ * </para><para>
+ * As a special case, this function allows the index vector to be \em shorter
+ * than the vector being permuted, in which case the elements whose indices do
+ * not occur in the index vector will be removed from the vector.
+ *
+ * \param v    the vector to permute
+ * \param ind  the index vector
+ *
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: O(n), the size of the vector.
+ */
+igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_vector_int_t* index) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(index != NULL);
+    IGRAPH_ASSERT(index->stor_begin != NULL);
+    IGRAPH_ASSERT(igraph_vector_ptr_size(v) >= igraph_vector_int_size(index));
+
+    igraph_vector_ptr_t v_copy;
+    void** v_ptr;
+    igraph_integer_t *ind_ptr;
+
+    /* There is a more space-efficient algorithm that needs O(1) space only,
+     * but it messes up the index vector, which we don't want */
+
+    IGRAPH_CHECK(igraph_vector_ptr_init(&v_copy, igraph_vector_int_size(index)));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &v_copy);
+
+    for (
+        v_ptr = v_copy.stor_begin, ind_ptr = index->stor_begin;
+        ind_ptr < index->end;
+        v_ptr++, ind_ptr++
+    ) {
+        *v_ptr = VECTOR(*v)[*ind_ptr];
+    }
+
+    IGRAPH_CHECK(igraph_vector_ptr_resize(v, igraph_vector_int_size(index)));
+    igraph_vector_ptr_copy_to(&v_copy, VECTOR(*v));
+
+    igraph_vector_ptr_destroy(&v_copy);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }

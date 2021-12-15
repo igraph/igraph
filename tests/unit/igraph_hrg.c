@@ -32,7 +32,7 @@ int main() {
     igraph_hrg_t hrg;
     igraph_t dendrogram;
     // int i, j;
-    // igraph_vector_t neis;
+    // igraph_vector_int_t neis;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -55,7 +55,7 @@ int main() {
     igraph_hrg_dendrogram(&dendrogram, &hrg);
 
     // Print the tree, with labels
-    // igraph_vector_init(&neis, 0);
+    // igraph_vector_int_init(&neis, 0);
     // for (i=0; i<igraph_vcount(&graph)-1; i++) {
     //   printf("Vertex # %2i, ", (int) (i+igraph_vcount(&graph)));
     //   igraph_neighbors(&dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT);
@@ -64,7 +64,7 @@ int main() {
     //   printf("prob: %6.2g\n",
     //       VAN(&dendrogram, "probability", i+igraph_vcount(&graph)));
     // }
-    // igraph_vector_destroy(&neis);
+    // igraph_vector_int_destroy(&neis);
 
     igraph_destroy(&dendrogram);
     igraph_hrg_destroy(&hrg);
