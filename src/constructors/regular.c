@@ -311,12 +311,45 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                 igraph_bool_t mutual, igraph_bool_t circular) {
 
-    igraph_vector_t v = IGRAPH_VECTOR_NULL;
-
     if (n < 0) {
         IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
     }
+    if(n == 1 && circular)
+    {
+        igraph_vector_t edges;
+        
+        //initialise edge vector and insert edge 0-0 for self loop
+        igraph_vector_init(&edges,2);
+        igraph_vector_set(&edges,0,0);
+        igraph_vector_set(&edges,1,0);
 
+        //create the graph
+        IGRAPH_CHECK(igraph_create(graph,&edges,0,directed));
+        igraph_vector_destroy(&edges);
+        //IGRAPH_FINALLY_CLEAN(1);
+
+        return IGRAPH_SUCCESS;
+    }
+
+    if(n == 2 && circular && directed)
+    {
+        igraph_vector_t edges;
+        //initialise edge vector and insert edge 0-0 for self loop
+        igraph_vector_init(&edges,4);
+        igraph_vector_set(&edges,0,0);
+        igraph_vector_set(&edges,1,1);
+        igraph_vector_set(&edges,2,1);
+        igraph_vector_set(&edges,3,0);
+
+        //create the graph
+        IGRAPH_CHECK(igraph_create(graph,&edges,0,directed));
+        igraph_vector_destroy(&edges);
+        //IGRAPH_FINALLY_CLEAN(1);
+
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_t v = IGRAPH_VECTOR_NULL;
     IGRAPH_VECTOR_INIT_FINALLY(&v, 1);
     VECTOR(v)[0] = n;
 

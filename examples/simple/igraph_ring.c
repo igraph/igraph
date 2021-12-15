@@ -42,5 +42,10 @@ int main() {
     /* Destroy the graph. */
     igraph_destroy(&graph);
 
+    igraph_ring(&graph,1,IGRAPH_UNDIRECTED,0,1);
+    printf("\n1-cycle graph:\n");
+    igraph_write_graph_edgelist(&graph, stdout);
+    igraph_destroy(&graph);
+
     return 0;
 }
