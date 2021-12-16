@@ -24,7 +24,7 @@
 #include "igraph_stack.h"
 
 /* count the number of vertices reachable from the root */
-static  igraph_integer_t igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *visited, const igraph_adjlist_t *al, igraph_integer_t *visited_count,igraph_integer_t *res,  igraph_neimode_t mode){
+static  igraph_error_t igraph_i_is_forest_visitor(igraph_integer_t root,igraph_vector_t *visited, const igraph_adjlist_t *al, igraph_integer_t *visited_count, igraph_bool_t *res, igraph_neimode_t mode){
 
     igraph_stack_int_t stack;
     igraph_integer_t i;
