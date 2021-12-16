@@ -27,7 +27,7 @@ macro(find_dependencies)
   set(VENDORED_DEPENDENCIES "")
 
   # Declare minimum supported version for some dependencies
-  set(GLPK_VERSION_MIN "4.57") # 4.57 is the firt version providing glp_on_error()
+  set(GLPK_VERSION_MIN "4.57") # 4.57 is the first version providing glp_on_error()
 
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
