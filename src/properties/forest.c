@@ -125,6 +125,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
 
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
+    IGRAPH_CHECK(igraph_vector_resize(roots,0));
 
     /*By convention, a zero-vertex graph will be considered a forest.*/
     if (vcount == 0) {
@@ -152,7 +153,6 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
     *res = 1; /* assume success */
     IGRAPH_CHECK(igraph_vector_init(&visited,vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &visited);
-    IGRAPH_CHECK(igraph_vector_resize(roots,0));
     igraph_integer_t i;
 
     /* The main algorithm:
