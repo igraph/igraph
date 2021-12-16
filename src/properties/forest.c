@@ -185,10 +185,10 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
     }
     case IGRAPH_IN:
     case IGRAPH_OUT: {
-        igraph_vector_t degree;
+        igraph_vector_int_t degree;
 
-        IGRAPH_CHECK(igraph_vector_init(&degree, 0));
-        IGRAPH_FINALLY(igraph_vector_destroy, &degree);
+        IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, /* loops = */ 1));
 
         for (i = 0; i < vcount; ++i){
@@ -198,7 +198,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
             }
         }
 
-        igraph_vector_destroy(&degree);
+        igraph_vector_int_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
         break;
     }
