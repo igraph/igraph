@@ -311,25 +311,24 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                 igraph_bool_t mutual, igraph_bool_t circular) {
 
+    igraph_vector_t v;
+
     if (n < 0) {
         IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
     }
     
     if(n == 1 && circular)
     {
-        //create the graph
         IGRAPH_CHECK(igraph_small(graph,1,directed,0,0,-1));        
         return IGRAPH_SUCCESS;
     }
 
     if(n == 2 && circular && directed)
     {
-        //create the graph
         IGRAPH_CHECK(igraph_small(graph,2,directed,0,1,1,0,-1));
         return IGRAPH_SUCCESS;
     }
 
-    igraph_vector_t v = IGRAPH_VECTOR_NULL;
     IGRAPH_VECTOR_INIT_FINALLY(&v, 1);
     VECTOR(v)[0] = n;
 
