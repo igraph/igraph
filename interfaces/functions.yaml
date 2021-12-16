@@ -841,16 +841,19 @@ igraph_random_edge_walk:
 
 igraph_global_efficiency:
     PARAMS: GRAPH graph, OUT REAL res, VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True
+    DEPS: weights ON graph
 
 igraph_local_efficiency:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
         VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
+    DEPS: weights ON graph
 
 igraph_average_local_efficiency:
     PARAMS: |-
         GRAPH graph, OUT REAL res, VERTEXWEIGHTS weights=NULL,
         BOOLEAN directed=True, NEIMODE mode=ALL
+    DEPS: weights ON graph
 
 #######################################
 # Degree sequences
@@ -1036,15 +1039,16 @@ igraph_weighted_cliques:
     PARAMS: |-
         GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT VERTEXSETLIST res,
         REAL min_weight=0, REAL max_weight=0, BOOLEAN maximal=False
-    DEPS: res ON graph
+    DEPS: vertex_weights ON graph, res ON graph
 
 igraph_largest_weighted_cliques:
     PARAMS: |-
         GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT VERTEXSETLIST res
-    DEPS: res ON graph
+    DEPS: vertex_weights ON graph, res ON graph
 
 igraph_weighted_clique_number:
     PARAMS: GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT REAL res
+    DEPS: vertex_weights ON graph
 
 igraph_independent_vertex_sets:
     PARAMS: |-
