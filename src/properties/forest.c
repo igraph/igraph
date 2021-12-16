@@ -152,7 +152,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
     *res = 1; /* assume success */
     IGRAPH_CHECK(igraph_vector_init(&visited,vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &visited);
-    IGRAPH_CHECK(igraph_vector_resize(&roots,0));
+    IGRAPH_CHECK(igraph_vector_resize(roots,0));
     igraph_integer_t i;
 
     /* The main algorithm:
