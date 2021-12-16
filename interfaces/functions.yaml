@@ -68,6 +68,9 @@ igraph_get_eids:
 igraph_incident:
     PARAMS: GRAPH graph, OUT VECTOR eids, INTEGER vid, NEIMODE mode=ALL
 
+igraph_is_same_graph:
+    PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN res
+
 #######################################
 # Constructors, deterministic
 #######################################
@@ -139,6 +142,11 @@ igraph_full_bipartite:
     PARAMS: |-
         OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, INTEGER n1,
         INTEGER n2, BOOLEAN directed=False, NEIMODE mode=ALL
+
+igraph_realize_degree_sequence:
+    PARAMS: |-
+        OUT GRAPH graph, VECTOR out_deg, VECTOR_OR_0 in_deg,
+        EDGE_TYPE_SW allowed_edge_types, REALIZE_DEGSEQ_METHOD method=SMALLEST
 
 #######################################
 # Constructors, games
@@ -221,6 +229,11 @@ igraph_rewire_edges:
     PARAMS: |-
         INOUT GRAPH graph, REAL prob, BOOLEAN loops=False,
         BOOLEAN multiple=False
+
+igraph_rewire_directed_edges:
+    PARAMS: |-
+        INOUT GRAPH graph, REAL prob, BOOLEAN loops=False,
+        NEIMODE mode=OUT
 
 igraph_watts_strogatz_game:
     PARAMS: |-
@@ -790,6 +803,19 @@ igraph_random_edge_walk:
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, weights ON graph, edgewalk ON graph
 
+igraph_global_efficiency:
+    PARAMS: GRAPH graph, OUT REAL res, VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True
+
+igraph_local_efficiency:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
+        VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
+
+igraph_average_local_efficiency:
+    PARAMS: |-
+        GRAPH graph, OUT REAL res, VERTEXWEIGHTS weights=NULL,
+        BOOLEAN directed=True, NEIMODE mode=ALL
+
 #######################################
 # Degree sequences
 #######################################
@@ -941,6 +967,15 @@ igraph_cliques:
         INTEGER max_size=0
     DEPS: res ON graph
 
+igraph_cliques_callback:
+    PARAMS: |-
+        GRAPH graph, INTEGER min_size=0, INTEGER max_size=0,
+        CLIQUE_FUNC cliquehandler_fn, EXTRA arg
+
+igraph_clique_size_hist:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR hist, INTEGER min_size=0, INTEGER max_size=0
+
 igraph_largest_cliques:
     PARAMS: GRAPH graph, OUT VERTEXSETLIST res
     DEPS: res ON graph
@@ -948,6 +983,11 @@ igraph_largest_cliques:
 igraph_maximal_cliques:
     PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, INTEGER max_size=0
     DEPS: res ON graph
+
+igraph_maximal_cliques_callback:
+    PARAMS: |-
+        GRAPH graph, CLIQUE_FUNC cliquehandler_fn, EXTRA arg,
+        INTEGER min_size=0, INTEGER max_size=0
 
 igraph_maximal_cliques_count:
     PARAMS: |-
@@ -957,8 +997,26 @@ igraph_maximal_cliques_file:
     PARAMS: |-
         GRAPH graph, OUTFILE res, INTEGER min_size=0, INTEGER max_size=0
 
+igraph_maximal_cliques_hist:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR hist, INTEGER min_size=0, INTEGER max_size=0
+
 igraph_clique_number:
     PARAMS: GRAPH graph, OUT INTEGER no
+
+igraph_weighted_cliques:
+    PARAMS: |-
+        GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT VERTEXSETLIST res,
+        REAL min_weight=0, REAL max_weight=0, BOOLEAN maximal=False
+    DEPS: res ON graph
+
+igraph_largest_weighted_cliques:
+    PARAMS: |-
+        GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT VERTEXSETLIST res
+    DEPS: res ON graph
+
+igraph_weighted_clique_number:
+    PARAMS: GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT REAL res
 
 igraph_independent_vertex_sets:
     PARAMS: |-
@@ -1770,8 +1828,7 @@ igraph_canonical_permutation:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors,
         OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
-    DEPS: |-
-        colors ON graph
+    DEPS: colors ON graph
 
 igraph_permute_vertices:
     PARAMS: GRAPH graph, OUT GRAPH res, VECTORM1 permutation
@@ -1783,20 +1840,29 @@ igraph_isomorphic_bliss:
         OUT BOOLEAN iso, OUT VECTORM1_OR_0 map12,
         OUT VECTORM1_OR_0 map21, BLISSSH sh="fm",
         OUT BLISSINFO info1, OUT BLISSINFO info2
-    DEPS: |-
-        colors1 ON graph1, colors2 ON graph2
+    DEPS: colors1 ON graph1, colors2 ON graph2
 
 igraph_automorphisms:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors, BLISSSH sh="fm", OUT BLISSINFO info
-    DEPS: |-
-        colors ON graph
+    DEPS: colors ON graph
+
+igraph_automorphism_group:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL VERTEX_COLOR colors, PRIMARY OUT VECTORLIST generators,
+        BLISSSH sh="fm", OUT BLISSINFO info
+    DEPS: colors ON graph
 
 igraph_subisomorphic_lad:
     PARAMS: |-
         GRAPH pattern, GRAPH target, OPTIONAL VERTEXSETLIST domains,
         OPTIONAL OUT BOOLEAN iso, OUT VECTOR_OR_0 map,
         OPTIONAL OUT VECTORLIST maps, BOOLEAN induced, INT time_limit
+
+igraph_simplify_and_colorize:
+    PARAMS: |-
+        GRAPH graph, OUT GRAPH res, OUT VERTEX_COLOR vertex_color, OUT EDGE_COLOR edge_color
+    DEPS: vertex_color ON graph, edge_color ON graph
 
 #######################################
 # SCG

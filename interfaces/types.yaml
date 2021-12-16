@@ -416,6 +416,12 @@ RANDOM_TREE_METHOD:
     CTYPE: igraph_random_tree_t
     FLAGS: ENUM
 
+REALIZE_DEGSEQ_METHOD:
+    # Enum that describes the various methods for realizing a graph with an
+    # arbitrary degree sequence
+    CTYPE: igraph_realize_degseq_t
+    FLAGS: ENUM
+
 RECIP:
     # Enum that describes how the reciprocity of a graph should be calculated
     CTYPE: igraph_reciprocity_t
@@ -517,6 +523,11 @@ EDGE_TYPE_SW:
 ARPACKFUNC:
     # ARPACK matrix multiplication function.
     CTYPE: igraph_arpack_function_t
+
+CLIQUE_FUNC:
+    # Callback function for igraph_cliques_callback(). called with every clique
+    # that was found by the function.
+    CTYPE: igraph_clique_handler_t
 
 BFS_FUNC:
     # Callback function for igraph_bfs(). Called with every vertex that was
