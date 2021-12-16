@@ -314,40 +314,18 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
     if (n < 0) {
         IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
     }
+    
     if(n == 1 && circular)
     {
-        igraph_vector_t edges;
-        
-        //initialise edge vector and insert edge 0-0 for self loop
-        igraph_vector_init_int(&edges,2,0,0);
-
-        // add it to stack for deallocating memory in case of error
-        IGRAPH_FINALLY(igraph_vector_destroy,&edges);
-
         //create the graph
-        IGRAPH_CHECK(igraph_create(graph,&edges,0,directed));
-        igraph_vector_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(1);
-
+        IGRAPH_CHECK(igraph_small(graph,1,directed,0,0,-1));        
         return IGRAPH_SUCCESS;
     }
 
     if(n == 2 && circular && directed)
     {
-        igraph_vector_t edges;
-
-        //initialise edge vector and insert edge 0-1 and 1-0
-        igraph_vector_init_int(&edges,4,0,1,1,0);
-
-
-        // add it to stack for deallocating memory in case of error
-        IGRAPH_FINALLY(igraph_vector_destroy,&edges);
-
         //create the graph
-        IGRAPH_CHECK(igraph_create(graph,&edges,0,directed));
-        igraph_vector_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(1);
-
+        IGRAPH_CHECK(igraph_small(graph,2,directed,0,1,1,0,-1));
         return IGRAPH_SUCCESS;
     }
 
