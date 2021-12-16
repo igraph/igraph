@@ -45,7 +45,7 @@ int main() {
     printf("Empty Graph\n");
     mode=IGRAPH_ALL;
     res=1;
-    igraph_small(&graph,2,0,-1);
+    igraph_empty(&graph, 0, 0);
     check_output(&graph,&res,mode);
     igraph_destroy(&graph);
 
