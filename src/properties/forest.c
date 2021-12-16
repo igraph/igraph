@@ -150,15 +150,10 @@ igraph_error_t igraph_is_forest(const igraph_t *graph,igraph_bool_t *res, igraph
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     *res = 1; /* assume success */
-    IGRAPH_CHECK(igraph_vector_init(&visited, 0));
+    IGRAPH_CHECK(igraph_vector_init(&visited,vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &visited);
-
-    IGRAPH_CHECK(igraph_vector_resize(&visited,vcount));
+    IGRAPH_CHECK(igraph_vector_resize(&roots,0));
     igraph_integer_t i;
-
-    for(i =0; i<vcount;++i){
-        VECTOR(visited)[i]=0;
-    }
 
     /* The main algorithm:
      * Undirected Graph:- We add each unvisited vertex to the roots vector, and
