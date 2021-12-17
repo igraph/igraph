@@ -294,6 +294,7 @@ int igraph_almost_equals(double a, double b, double eps) {
 int igraph_cmp_epsilon(double a, double b, double eps) {
     double diff;
     double abs_diff;
+    double sum;
 
     if (a == b) {
         /* shortcut, handles infinities */
@@ -302,14 +303,18 @@ int igraph_cmp_epsilon(double a, double b, double eps) {
 
     diff = a - b;
     abs_diff = fabs(diff);
+    sum = fabs(a) + fabs(b);
 
-    if (a == 0 || b == 0 || diff < DBL_MIN) {
+    if (a == 0 || b == 0 || sum < DBL_MIN) {
         /* a or b is zero or both are extremely close to it; relative
          * error is less meaningful here so just compare it with
          * epsilon */
         return abs_diff < (eps * DBL_MIN) ? 0 : (diff < 0 ? -1 : 1);
+    } else if (!isfinite(sum)) {
+        /* addition overflow, so presumably |a| and |b| are both large; use a
+         * different formulation */
+        return (abs_diff < (eps * fabs(a) + eps * fabs(b))) ? 0 : (diff < 0 ? -1 : 1);
     } else {
-        /* use relative error */
-        return (abs_diff / (fabs(a) + fabs(b)) < eps) ? 0 : (diff < 0 ? -1 : 1);
+        return (abs_diff / sum < eps) ? 0 : (diff < 0 ? -1 : 1);
     }
 }

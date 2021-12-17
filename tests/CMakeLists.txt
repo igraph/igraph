@@ -447,6 +447,11 @@ add_examples(
   igraph_power_law_fit
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_almost_equals
+)
+
 # operators.at
 add_examples(
   FOLDER examples/simple NAMES

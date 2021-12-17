@@ -503,8 +503,11 @@
  - `igraph_community_label_propagation()` no longer leaves any vertices unlabeled
    when they were not reachable from any labeled ones, i.e. the returned membership
    vector is guaranteed not to contain negative values (#1853).
- - The Kamada-Kawai layout is now iterruptible.
+ - The Kamada-Kawai layout is now interruptible.
  - The Fruchterman-Reingold layout is now interruptible.
+ - Fixed a bug in `igraph_cmp_epsilon()` that resulted in incorrect results for
+   edge betweenness calculations in certain rare cases with x87 floating point
+   math when LTO was also enabled (#1894).
 
 ### Other
 
