@@ -80,8 +80,8 @@ double igraph_fmin(double a, double b);
     == log(2*pi)/2 */
 #endif
 
-int igraph_almost_equals(double a, double b, double eps);
-int igraph_cmp_epsilon(double a, double b, double eps);
+IGRAPH_PRIVATE_EXPORT int igraph_almost_equals(double a, double b, double eps);
+IGRAPH_PRIVATE_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
 
 __END_DECLS
 
