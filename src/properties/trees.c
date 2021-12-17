@@ -404,7 +404,7 @@ static igraph_error_t igraph_i_is_forest_visitor(const igraph_t *graph, igraph_i
             }
         }
     }
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -456,7 +456,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
 
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
-    IGRAPH_CHECK(igraph_vector_resize(roots, 0));
+    IGRAPH_CHECK(igraph_vector_int_resize(roots, 0));
 
     /*By convention, a zero-vertex graph will be considered a forest.*/
     if (vcount == 0) {
@@ -471,7 +471,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
     /*A single-vertex graph is a forest, provided it has no edges (checked in the previous if (..)) */
     if (vcount == 1) {
         *res = 1;
-        igraph_vector_push_back(roots, 0);
+        igraph_vector_int_push_back(roots, 0);
         return IGRAPH_SUCCESS;
     }
     /* Ignore mode for undirected graphs. */
