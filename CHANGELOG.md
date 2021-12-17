@@ -490,6 +490,7 @@
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
  - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou!)
  - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
+ - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM!)
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
 
 ### Changed
