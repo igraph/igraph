@@ -1,0 +1,36 @@
+Empty Graph
+Root nodes: 
+
+Graph with 0 edges
+Root nodes: 0 1 2 3 4
+
+Graph with 1 vertex
+Root nodes: 0
+
+Undirected Graph
+Root nodes: 0 3
+
+Directed Graph out trees
+Root nodes: 0 3
+
+Directed Graph in trees
+Not a forest.
+
+Undirected Graph with cycle
+Not a forest.
+
+Undirected Graph with ecount>vcount-1
+Not a forest.
+
+Undirected Graph with self-loop
+Not a forest.
+
+Directed Multigraph
+Not a forest.
+
+Disjoint union of a cycle with two trees, directed
+Not a forest.
+
+Disjoint union of a cycle with two trees, undirected
+Not a forest.
+

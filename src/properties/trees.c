@@ -349,3 +349,255 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
 
     return IGRAPH_SUCCESS;
 }
+
+/* igraph_is_forest() -- check if a graph is a forest */
+
+/* Verify that the graph has no cycles and count the number of reachable vertices.
+ * This function performs a DFS starting from 'root'.
+ * If it finds a cycle, it sets *res to false, otherwise it does not change it.
+ * *visited_count will be incremented by the number of vertices reachable from 'root',
+ * including 'root' itself.
+ */
+static igraph_error_t igraph_i_is_forest_visitor(
+        const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+        igraph_vector_bool_t *visited, igraph_stack_int_t *stack, igraph_vector_int_t *neis,
+        igraph_integer_t *visited_count, igraph_bool_t *res)
+{
+    igraph_integer_t i;
+
+    igraph_stack_int_clear(stack);
+
+    /* push the root onto the stack */
+    IGRAPH_CHECK(igraph_stack_int_push(stack, root));
+
+    while (! igraph_stack_int_empty(stack)) {
+        igraph_integer_t u;
+        igraph_integer_t ncount;
+
+        /* Take a vertex from stack and check if it is already visited.
+         * If yes, then we found a cycle: the graph is not a forest.
+         * Otherwise mark it as visited and continue.
+         */
+        u = igraph_stack_int_pop(stack);
+        if (IGRAPH_LIKELY(! VECTOR(*visited)[u])) {
+            VECTOR(*visited)[u] = 1;
+            *visited_count += 1;
+        }
+        else {
+            *res = 0;
+            break;
+        }
+
+        /* Vertex discovery: Register all its neighbours for future processing */
+        IGRAPH_CHECK(igraph_neighbors(graph, neis, u, mode));
+        ncount = igraph_vector_int_size(neis);
+
+        for (i = 0; i < ncount; ++i) {
+            igraph_integer_t v = VECTOR(*neis)[i];
+            
+            if (mode == IGRAPH_ALL) {
+                /* In the undirected case, we avoid returning to the predecessor
+                 * vertex of 'v' in the DFS tree by skipping visited vertices.
+                 *
+                 * Note that in order to succcessfully detect a cycle, a vertex
+                 * within that cycle must end up on the stack more than once.
+                 * Does skipping visited vertices preclude this sometimes?
+                 * No, because any visited vertex can only be accessed through
+                 * an already discovered vertex (i.e. one that has already been
+                 * pushed onto the stack).
+                 */
+                if (IGRAPH_LIKELY(! VECTOR(*visited)[v])) {
+                    IGRAPH_CHECK(igraph_stack_int_push(stack, v));
+                }
+                /* To check for a self-loop in undirected graph */
+                else if (v == u) {
+                    *res = 0;
+                    break;
+                }
+            }
+            else {
+                IGRAPH_CHECK(igraph_stack_int_push(stack, v));
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_is_forest
+ * \brief Decides whether the graph is a forest.
+ *
+ * An undirected graph is a forest if it has no cycles.
+ * </para><para>
+ *
+ * In the directed case, a possible additional requirement is that edges in each
+ * tree are oriented away from the root (out-trees or arborescences) or all edges
+ * are oriented towards the root (in-trees or anti-arborescences).
+ * This test can be controlled using the \p mode parameter.
+ * </para><para>
+ *
+ * By convention, the null graph (i.e. the graph with no vertices) is considered to be a forest.
+ *
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a logical variable. If not \c NULL, then the result will be stored
+ *        here.
+ * \param roots If not \c NULL, the root nodes will be stored here. When \p mode
+ *        is \c IGRAPH_ALL or the graph is undirected, any one vertex from each
+ *        component can be the root. When \p mode is \c IGRAPH_OUT
+ *        or \c IGRAPH_IN, all the vertices with zero in- or out-degree,
+ *        respectively are considered as root nodes.
+ * \param mode For a directed graph this specifies whether to test for an
+ *        out-forest, an in-forest or ignore edge directions. The respective
+ *        possible values are:
+ *        \c IGRAPH_OUT, \c IGRAPH_IN, \c IGRAPH_ALL. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code:
+ *        \c IGRAPH_EINVMODE: invalid mode argument.
+ *
+ * Time complexity: At most O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ */
+igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
+                                igraph_vector_int_t *roots, igraph_neimode_t mode) {
+    igraph_vector_bool_t visited;
+    igraph_vector_int_t neis;
+    igraph_stack_int_t stack;
+    igraph_integer_t visited_count = 0;
+    igraph_integer_t vcount, ecount;
+    igraph_integer_t v;
+    igraph_bool_t result;
+
+    vcount = igraph_vcount(graph);
+    ecount = igraph_ecount(graph);
+
+    if (roots) {
+        igraph_vector_int_clear(roots);
+    }
+    
+    /* Any graph with 0 edges is a forest. */
+    if (ecount == 0) {
+        if (res) {
+            *res=1;
+        }
+        if (roots) {
+            for (v = 0; v < vcount; v++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(roots, v));
+            }
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    /* A forest can have at most vcount-1 edges. */
+    if (ecount > vcount - 1) {
+        if (res) {
+            *res = 0;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Ignore mode for undirected graphs. */
+    if (! igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    result = 1; /* assume success */
+
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, vcount);
+
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+
+    /* The main algorithm:
+     *
+     * Undirected Graph:- We add each unvisited vertex to the roots vector, and
+     * mark all other vertices that are reachable from it as visited.
+     *
+     * Directed Graph:- For each tree, the root is the node with no
+     * incoming/outgoing connections, depending on 'mode'. We add each vertex
+     * with zero degree to the roots vector and mark all other vertices that are
+     * reachable from it as visited.
+     *
+     * If all the vertices are visited exactly once, then the graph is a forest.
+     */
+
+    switch (mode) {
+        case IGRAPH_ALL:
+        {
+            for (v = 0; v < vcount; ++v) {
+                if (!result) {
+                    break;
+                }
+                if (! VECTOR(visited)[v]) {
+                    if (roots) {
+                        IGRAPH_CHECK(igraph_vector_int_push_back(roots, v));
+                    }
+                    IGRAPH_CHECK(igraph_i_is_forest_visitor(
+                                     graph, v, mode,
+                                     &visited, &stack, &neis,
+                                     &visited_count, &result));
+                }
+            }
+            break;
+        }
+
+        case IGRAPH_IN:
+        case IGRAPH_OUT:
+        {
+            igraph_vector_int_t degree;
+
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
+            IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
+                            IGRAPH_REVERSE_MODE(mode), /* loops = */ 1));
+
+            for (v = 0; v < vcount; ++v) {
+                /* In an out-tree, roots have in-degree 0,
+                 * and all other vertices have in-degree 1. */
+                if (VECTOR(degree)[v] > 1 || !result) {
+                    result = 0;
+                    break;
+                }
+                if (VECTOR(degree)[v] == 0) {
+                    if (roots) {
+                        IGRAPH_CHECK(igraph_vector_int_push_back(roots, v));
+                    }
+                    IGRAPH_CHECK(igraph_i_is_forest_visitor(
+                                     graph, v, mode,
+                                     &visited, &stack, &neis,
+                                     &visited_count, &result));
+                }
+            }
+
+            igraph_vector_int_destroy(&degree);
+            IGRAPH_FINALLY_CLEAN(1);
+            break;
+        }
+
+        default:
+            IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVMODE);
+    }
+
+    if (result) {
+        /* In a forest, all vertices are reachable from the roots. */
+        result = (visited_count == vcount);
+    }
+
+    if (res) {
+        *res = result;
+    }
+
+    /* If the graph is not a forest then the root vector will be empty. */
+    if (!result && roots) {
+        igraph_vector_int_clear(roots);
+    }
+
+    igraph_vector_int_destroy(&neis);
+    igraph_stack_int_destroy(&stack);
+    igraph_vector_bool_destroy(&visited);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}
