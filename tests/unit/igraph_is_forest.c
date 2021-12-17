@@ -94,7 +94,7 @@ int main() {
     printf("Undirected Graph with ecount>vcount-1\n");
     mode=IGRAPH_ALL;
     res=0;
-    igraph_small(&graph, 6, 0, 0, 1, 1, 2, 3, 4, 3, 5, 4, 5, -1);
+    igraph_small(&graph, 6, 0, 0, 1, 1, 2, 2, 3, 3, 4, 3, 5, 4, 5, -1);
     check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
