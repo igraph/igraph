@@ -2049,7 +2049,7 @@ igraph_eulerian_cycle:
 #######################################
 
 igraph_is_tree:
-    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEX root, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEX root, NEIMODE mode=OUT
     DEPS: root ON graph
 
 igraph_from_prufer:
