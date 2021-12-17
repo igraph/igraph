@@ -24,5 +24,5 @@ int main() {
 
     // TODO: Add tests
 
-    return 0;
+    return 77;
 }

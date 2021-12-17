@@ -25,17 +25,12 @@
 #include "igraph_paths.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_stack.h"
 #include "igraph_qsort.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-
-#include <string.h>   /* memset */
-
 
 igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
                                        igraph_vector_ptr_t *vertices,
@@ -49,7 +44,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
 
     // TODO: implement a modified dijkstra to calculate widest paths from a source to every other node
 
-    return IGRAPH_SUCCESS;
+    return IGRAPH_UNIMPLEMENTED;
 }
 
 igraph_error_t igraph_get_widest_path(const igraph_t *graph,
@@ -62,7 +57,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
 
     // TODO: calls igraph_get_widest_paths and returns the one specific path to "to"
 
-    return IGRAPH_SUCCESS;
+    return IGRAPH_UNIMPLEMENTED;
 }
 
 igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
@@ -75,12 +70,12 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
 
     // TODO: implement a modified dijkstra that stores all paths
 
-    return IGRAPH_SUCCESS;
+    return IGRAPH_UNIMPLEMENTED;
 }
 
 
 
-igraph_error_t igraph_widest_paths_floyd_warshalls(const igraph_t *graph,
+igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
@@ -89,7 +84,7 @@ igraph_error_t igraph_widest_paths_floyd_warshalls(const igraph_t *graph,
 
     // TODO: implement floyd warshalls to calculate widest paths between all nodes
 
-    return IGRAPH_SUCCESS;
+    return IGRAPH_UNIMPLEMENTED;
 }
 
 igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
