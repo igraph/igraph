@@ -20,20 +20,20 @@
 
 #include "test_utilities.inc"
 
-void check_output(const igraph_t *graph,igraph_bool_t *res,igraph_neimode_t mode){
+void check_output(const igraph_t *graph, igraph_bool_t *res, igraph_neimode_t mode){
     igraph_bool_t result;
-    igraph_vector_t roots;
-    igraph_vector_init(&roots, 0);
-    igraph_is_forest(graph,&result,&roots, mode);
+    igraph_vector_int_t roots;
+    igraph_vector_int_init(&roots, 0);
+    igraph_is_forest(graph, &result, &roots, mode);
     IGRAPH_ASSERT(*res==result);
     if(result){
         printf("Root nodes: ");
-        igraph_vector_print(&roots);
+        igraph_vector_int_print(&roots);
     }
     else{
-        printf("Not a forest\n");
+        printf("Not a forest.\n");
     }
-    igraph_vector_destroy(&roots);
+    igraph_vector_int_destroy(&roots);
     printf("\n");
 }
 
@@ -46,56 +46,70 @@ int main() {
     mode=IGRAPH_ALL;
     res=1;
     igraph_empty(&graph, 0, 0);
-    check_output(&graph,&res,mode);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Graph with 0 edges\n");
     mode=IGRAPH_ALL;
     res=1;
-    igraph_small(&graph,5,0,-1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 5, 0, -1);
+    check_output(&graph, &res, mode);
+    igraph_destroy(&graph);
+
+    printf("Graph with 1 vertex\n");
+    mode=IGRAPH_ALL;
+    res=1;
+    igraph_small(&graph, 1, 0, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Undirected Graph\n");
     mode=IGRAPH_ALL;
     res=1;
-    igraph_small(&graph,6,0, 0,1, 1,2, 3,4, 3,5, -1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 6, 0, 0, 1, 1, 2, 3, 4, 3, 5, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Directed Graph out trees\n");
     mode=IGRAPH_OUT;
     res=1;
-    igraph_small(&graph,6,1, 0,1, 1,2, 3,4, 3,5, -1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 6, 1, 0, 1, 1, 2, 3, 4, 3, 5, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Directed Graph in trees\n");
     mode=IGRAPH_IN;
     res=0;
-    igraph_small(&graph,6,1, 0,1, 1,2, 3,4, 3,5, -1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 6, 1, 0, 1, 1, 2, 3, 4, 3, 5, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Undirected Graph with cycle\n");
     mode=IGRAPH_ALL;
     res=0;
-    igraph_small(&graph,6,0, 0,1, 1,2, 3,4, 3,5, 4,5, -1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 7, 0, 0, 1, 1, 2, 3, 4, 3, 5, 4, 5, -1);
+    check_output(&graph, &res, mode);
+    igraph_destroy(&graph);
+
+    printf("Undirected Graph with ecount>vcount-1\n");
+    mode=IGRAPH_ALL;
+    res=0;
+    igraph_small(&graph, 6, 0, 0, 1, 1, 2, 3, 4, 3, 5, 4, 5, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Undirected Graph self loop\n");
     mode=IGRAPH_ALL;
     res=0;
-    igraph_small(&graph,4,0, 0,1, 1,2, 2,3, 3,3, -1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 5, 0, 0, 1, 1, 2, 2, 4, 3, 3, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     printf("Directed Multigraph\n");
     mode=IGRAPH_OUT;
     res=0;
-    igraph_small(&graph,6,1, 0,1, 1,2, 3,4, 3,5, 3,5, -1);
-    check_output(&graph,&res,mode);
+    igraph_small(&graph, 6, 1, 0, 1, 1, 2, 3, 4, 3, 5, 3, 5, -1);
+    check_output(&graph, &res, mode);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

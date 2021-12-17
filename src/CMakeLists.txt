@@ -246,7 +246,6 @@ add_library(
   properties/perfect.c
   properties/spectral.c
   properties/trees.c
-  properties/forest.c
   properties/triangles.c
 
   isomorphism/bliss.cc
