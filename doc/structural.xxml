@@ -147,8 +147,8 @@
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
 <!-- doxrox-include igraph_random_spanning_tree -->
 <!-- doxrox-include igraph_is_tree -->
-<!-- doxrox-include igraph_to_prufer -->
 <!-- doxrox-include igraph_is_forest -->
+<!-- doxrox-include igraph_to_prufer -->
 </section>
 
 <section id="transitivity-or-clustering-coefficient"><title>Transitivity or clustering coefficient</title>
