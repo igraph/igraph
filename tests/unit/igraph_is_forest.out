@@ -22,9 +22,15 @@ Not a forest.
 Undirected Graph with ecount>vcount-1
 Not a forest.
 
-Undirected Graph self loop
+Undirected Graph with self-loop
 Not a forest.
 
 Directed Multigraph
+Not a forest.
+
+Disjoint union of a cycle with two trees, directed
+Not a forest.
+
+Disjoint union of a cycle with two trees, undirected
 Not a forest.
 

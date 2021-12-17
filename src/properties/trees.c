@@ -579,9 +579,10 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
         default:
             IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVMODE);
     }
+
     if (result) {
         /* In a forest, all vertices are reachable from the roots. */
-        *res = (visited_count == vcount);
+        result = (visited_count == vcount);
     }
 
     if (res) {
