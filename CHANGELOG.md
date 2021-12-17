@@ -18,7 +18,8 @@
 
 ### Other
 
- - The build system now checks that GLPK is of a ccompatbile version (4.57 or later).
+ - `igraph_is_tree()` has improved performance and memory usage.
+ - The build system now checks that GLPK is of a compatible version (4.57 or later).
  - Documentation improvements.
 
 ## [0.9.5] - 2021-11-11
