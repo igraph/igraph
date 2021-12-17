@@ -2009,6 +2009,10 @@ igraph_is_tree:
     PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEX root, NEIMODE mode=ALL
     DEPS: root ON graph
 
+igraph_is_forest:
+    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEXSET roots, NEIMODE mode=ALL
+    DEPS: roots ON graph
+
 igraph_from_prufer:
     PARAMS: OUT GRAPH graph, INDEX_VECTOR prufer
 
