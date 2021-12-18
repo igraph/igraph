@@ -283,6 +283,7 @@ add_legacy_tests(
   igraph_is_mutual
   igraph_is_tree
   igraph_is_forest
+  igraph_is_forest2
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
