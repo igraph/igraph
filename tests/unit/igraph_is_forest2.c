@@ -94,6 +94,8 @@ int main() {
 
     RNG_END();
 
+    igraph_vector_int_destroy(&edges);
+
     /* ensure that test fails if we got an unexpected result */
     IGRAPH_ASSERT(res1 == res2);
 
@@ -101,6 +103,8 @@ int main() {
      * With random multigraphs, this should be around 20-30% when the edge count is half
      * that of the vertex count/ */
     printf("Fraction of random multigraphs which were a forest: %g\n", ((double) true_count) / trials);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
