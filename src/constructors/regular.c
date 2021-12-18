@@ -319,13 +319,13 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
     
     if(n == 1 && circular)
     {
-        IGRAPH_CHECK(igraph_small(graph,1,directed,0,0,-1));        
+        IGRAPH_CHECK(igraph_small(graph, 1, directed, 0, 0, -1));        
         return IGRAPH_SUCCESS;
     }
 
-    if(n == 2 && circular && directed)
+    if(n == 2 && circular)
     {
-        IGRAPH_CHECK(igraph_small(graph,2,directed,0,1,1,0,-1));
+        IGRAPH_CHECK(igraph_small(graph, 2, directed, 0, 1, 1, 0, -1));
         return IGRAPH_SUCCESS;
     }
 
