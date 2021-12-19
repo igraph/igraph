@@ -33,7 +33,7 @@ int main() {
     igraph_destroy(&graph);
 
     /* Create a 4-cycle graph. */
-    igraph_ring(&graph, 4, IGRAPH_UNDIRECTED, /* mutual= */ 0, /* circular= */ 1);
+    igraph_ring(&graph, 4, IGRAPH_DIRECTED, /* mutual= */ 0, /* circular= */ 1);
 
     /* Output the edge list of the graph. */
     printf("\n4-cycle graph:\n");

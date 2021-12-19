@@ -72,58 +72,92 @@
  * \example examples/simple/igraph_star.c
  */
 int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
-                igraph_integer_t center) {
+                igraph_integer_t center)
+{
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int i;
 
-    if (n < 0) {
+    if (n < 0)
+    {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVVID);
     }
-    if (center < 0 || center > n - 1) {
+    if (center < 0 || center > n - 1)
+    {
         IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
     }
     if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN &&
-        mode != IGRAPH_STAR_MUTUAL && mode != IGRAPH_STAR_UNDIRECTED) {
+        mode != IGRAPH_STAR_MUTUAL && mode != IGRAPH_STAR_UNDIRECTED)
+    {
         IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
     }
 
-    if (mode != IGRAPH_STAR_MUTUAL) {
+    if (mode != IGRAPH_STAR_MUTUAL)
+    {
         IGRAPH_VECTOR_INIT_FINALLY(&edges, (n - 1) * 2);
-    } else {
+    }
+    else
+    {
         IGRAPH_VECTOR_INIT_FINALLY(&edges, (n - 1) * 2 * 2);
     }
 
-    if (mode == IGRAPH_STAR_OUT) {
-        for (i = 0; i < center; i++) {
-            VECTOR(edges)[2 * i] = center;
-            VECTOR(edges)[2 * i + 1] = i;
+    if (mode == IGRAPH_STAR_OUT)
+    {
+        for (i = 0; i < center; i++)
+        {
+            VECTOR(edges)
+            [2 * i] = center;
+            VECTOR(edges)
+            [2 * i + 1] = i;
         }
-        for (i = center + 1; i < n; i++) {
-            VECTOR(edges)[2 * (i - 1)] = center;
-            VECTOR(edges)[2 * (i - 1) + 1] = i;
+        for (i = center + 1; i < n; i++)
+        {
+            VECTOR(edges)
+            [2 * (i - 1)] = center;
+            VECTOR(edges)
+            [2 * (i - 1) + 1] = i;
         }
-    } else if (mode == IGRAPH_STAR_MUTUAL) {
-        for (i = 0; i < center; i++) {
-            VECTOR(edges)[4 * i] = center;
-            VECTOR(edges)[4 * i + 1] = i;
-            VECTOR(edges)[4 * i + 2] = i;
-            VECTOR(edges)[4 * i + 3] = center;
+    }
+    else if (mode == IGRAPH_STAR_MUTUAL)
+    {
+        for (i = 0; i < center; i++)
+        {
+            VECTOR(edges)
+            [4 * i] = center;
+            VECTOR(edges)
+            [4 * i + 1] = i;
+            VECTOR(edges)
+            [4 * i + 2] = i;
+            VECTOR(edges)
+            [4 * i + 3] = center;
         }
-        for (i = center + 1; i < n; i++) {
-            VECTOR(edges)[4 * i - 4] = center;
-            VECTOR(edges)[4 * i - 3] = i;
-            VECTOR(edges)[4 * i - 2] = i;
-            VECTOR(edges)[4 * i - 1] = center;
+        for (i = center + 1; i < n; i++)
+        {
+            VECTOR(edges)
+            [4 * i - 4] = center;
+            VECTOR(edges)
+            [4 * i - 3] = i;
+            VECTOR(edges)
+            [4 * i - 2] = i;
+            VECTOR(edges)
+            [4 * i - 1] = center;
         }
-    } else {
-        for (i = 0; i < center; i++) {
-            VECTOR(edges)[2 * i + 1] = center;
-            VECTOR(edges)[2 * i] = i;
+    }
+    else
+    {
+        for (i = 0; i < center; i++)
+        {
+            VECTOR(edges)
+            [2 * i + 1] = center;
+            VECTOR(edges)
+            [2 * i] = i;
         }
-        for (i = center + 1; i < n; i++) {
-            VECTOR(edges)[2 * (i - 1) + 1] = center;
-            VECTOR(edges)[2 * (i - 1)] = i;
+        for (i = center + 1; i < n; i++)
+        {
+            VECTOR(edges)
+            [2 * (i - 1) + 1] = center;
+            VECTOR(edges)
+            [2 * (i - 1)] = i;
         }
     }
 
@@ -178,82 +212,104 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  */
 int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                    igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
-                   igraph_bool_t circular) {
+                   igraph_bool_t circular)
+{
 
     long int dims = igraph_vector_size(dimvector);
-    long int no_of_nodes = (long int) igraph_vector_prod(dimvector);
+    long int no_of_nodes = (long int)igraph_vector_prod(dimvector);
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int *coords, *weights;
     long int i, j;
     int carry, pos;
 
-    if (igraph_vector_any_smaller(dimvector, 0)) {
+    if (igraph_vector_any_smaller(dimvector, 0))
+    {
         IGRAPH_ERROR("Invalid dimension vector", IGRAPH_EINVAL);
     }
 
     /* init coords & weights */
 
     coords = IGRAPH_CALLOC(dims, long int);
-    if (coords == 0) {
+    if (coords == 0)
+    {
         IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, coords);
     weights = IGRAPH_CALLOC(dims, long int);
-    if (weights == 0) {
+    if (weights == 0)
+    {
         IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, weights);
-    if (dims > 0) {
+    if (dims > 0)
+    {
         weights[0] = 1;
-        for (i = 1; i < dims; i++) {
-            weights[i] = weights[i - 1] * (long int) VECTOR(*dimvector)[i - 1];
+        for (i = 1; i < dims; i++)
+        {
+            weights[i] = weights[i - 1] * (long int)VECTOR(*dimvector)[i - 1];
         }
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_nodes * dims +
-                                       mutual * directed * no_of_nodes * dims));
+                                                   mutual * directed * no_of_nodes * dims));
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (i = 0; i < no_of_nodes; i++)
+    {
         IGRAPH_ALLOW_INTERRUPTION();
-        for (j = 0; j < dims; j++) {
-            if (circular || coords[j] != VECTOR(*dimvector)[j] - 1) {
+        for (j = 0; j < dims; j++)
+        {
+            if (circular || coords[j] != VECTOR(*dimvector)[j] - 1)
+            {
                 long int new_nei;
-                if (coords[j] != VECTOR(*dimvector)[j] - 1) {
+                if (coords[j] != VECTOR(*dimvector)[j] - 1)
+                {
                     new_nei = i + weights[j] + 1;
-                } else {
-                    new_nei = i - (long int) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
+                }
+                else
+                {
+                    new_nei = i - (long int)(VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
-                    (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed)) {
-                    igraph_vector_push_back(&edges, i); /* reserved */
+                    (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed))
+                {
+                    igraph_vector_push_back(&edges, i);           /* reserved */
                     igraph_vector_push_back(&edges, new_nei - 1); /* reserved */
                 }
             } /* if circular || coords[j] */
-            if (mutual && directed && (circular || coords[j] != 0)) {
+            if (mutual && directed && (circular || coords[j] != 0))
+            {
                 long int new_nei;
-                if (coords[j] != 0) {
+                if (coords[j] != 0)
+                {
                     new_nei = i - weights[j] + 1;
-                } else {
-                    new_nei = i + (long int) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
+                }
+                else
+                {
+                    new_nei = i + (long int)(VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
-                    (VECTOR(*dimvector)[j] != 2 || !circular)) {
-                    igraph_vector_push_back(&edges, i); /* reserved */
+                    (VECTOR(*dimvector)[j] != 2 || !circular))
+                {
+                    igraph_vector_push_back(&edges, i);           /* reserved */
                     igraph_vector_push_back(&edges, new_nei - 1); /* reserved */
                 }
             } /* if circular || coords[0] */
-        } /* for j<dims */
+        }     /* for j<dims */
 
         /* increase coords */
         carry = 1;
         pos = 0;
 
-        while (carry == 1 && pos != dims) {
-            if (coords[pos] != VECTOR(*dimvector)[pos] - 1) {
+        while (carry == 1 && pos != dims)
+        {
+            if (coords[pos] != VECTOR(*dimvector)[pos] - 1)
+            {
                 coords[pos]++;
                 carry = 0;
-            } else {
+            }
+            else
+            {
                 coords[pos] = 0;
                 pos++;
             }
@@ -261,9 +317,10 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 
     } /* for i<no_of_nodes */
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t)no_of_nodes,
                                directed));
-    if (nei >= 2) {
+    if (nei >= 2)
+    {
         IGRAPH_CHECK(igraph_connect_neighborhood(graph, nei, IGRAPH_ALL));
     }
 
@@ -309,30 +366,61 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
  * \example examples/simple/igraph_ring.c
  */
 int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
-                igraph_bool_t mutual, igraph_bool_t circular) {
-
+                igraph_bool_t mutual, igraph_bool_t circular)
+{
     igraph_vector_t v;
 
-    if (n < 0) {
+    if (n < 0)
+    {
         IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
     }
-    
-    if(n == 1 && circular)
+
+    if (n == 1 && circular)
     {
-        IGRAPH_CHECK(igraph_small(graph, 1, directed, 0, 0, -1));        
+        IGRAPH_CHECK(igraph_small(graph, 1, directed, 0, 0, -1));
         return IGRAPH_SUCCESS;
     }
 
-    if(n == 2 && circular)
+    if (n == 2 && circular)
     {
         IGRAPH_CHECK(igraph_small(graph, 2, directed, 0, 1, 1, 0, -1));
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&v, 1);
-    VECTOR(v)[0] = n;
+    long edges = circular ? 2*n : 2*n - 2;
+    igraph_vector_init(&v, edges);
+    IGRAPH_FINALLY(igraph_vector_destroy, &v);
 
-    IGRAPH_CHECK(igraph_lattice(graph, &v, 1, directed, mutual, circular));
+    long cnt = 0;
+    for (long i = 0; i < 2 * n - 2; i += 2)
+    {
+        VECTOR(v)[i] = cnt++;
+        VECTOR(v)[i + 1] = cnt;
+    }
+
+    if(circular)
+    {
+        VECTOR(v)[2*n-2] = cnt;
+        VECTOR(v)[2*n-1] = 0;
+    }
+
+    if(directed && mutual)
+    {
+        cnt = 1;
+        for(long i = 0; i < 2 * n - 2; i += 2)
+        {
+            igraph_vector_push_back(&v,cnt);
+            igraph_vector_push_back(&v,cnt-1);
+            cnt++;
+        }
+        if(circular)
+        {
+            igraph_vector_push_back(&v,0);
+            igraph_vector_push_back(&v,n-1);
+        }
+    }
+    
+    IGRAPH_CHECK(igraph_create(graph,&v,1,directed));
 
     igraph_vector_destroy(&v);
     IGRAPH_FINALLY_CLEAN(1);
@@ -385,40 +473,55 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * \example examples/simple/igraph_tree.c
  */
 int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
-                igraph_tree_mode_t type) {
+                igraph_tree_mode_t type)
+{
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int i, j;
     long int idx = 0;
     long int to = 1;
 
-    if (n < 0) {
+    if (n < 0)
+    {
         IGRAPH_ERROR("Number of vertices cannot be negative.", IGRAPH_EINVAL);
     }
-    if (children <= 0) {
+    if (children <= 0)
+    {
         IGRAPH_ERROR("Number of children must be positive.", IGRAPH_EINVAL);
     }
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
-        type != IGRAPH_TREE_UNDIRECTED) {
+        type != IGRAPH_TREE_UNDIRECTED)
+    {
         IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
 
     i = 0;
-    if (type == IGRAPH_TREE_OUT) {
-        while (idx < 2 * (n - 1)) {
-            for (j = 0; j < children && idx < 2 * (n - 1); j++) {
-                VECTOR(edges)[idx++] = i;
-                VECTOR(edges)[idx++] = to++;
+    if (type == IGRAPH_TREE_OUT)
+    {
+        while (idx < 2 * (n - 1))
+        {
+            for (j = 0; j < children && idx < 2 * (n - 1); j++)
+            {
+                VECTOR(edges)
+                [idx++] = i;
+                VECTOR(edges)
+                [idx++] = to++;
             }
             i++;
         }
-    } else {
-        while (idx < 2 * (n - 1)) {
-            for (j = 0; j < children && idx < 2 * (n - 1); j++) {
-                VECTOR(edges)[idx++] = to++;
-                VECTOR(edges)[idx++] = i;
+    }
+    else
+    {
+        while (idx < 2 * (n - 1))
+        {
+            for (j = 0; j < children && idx < 2 * (n - 1); j++)
+            {
+                VECTOR(edges)
+                [idx++] = to++;
+                VECTOR(edges)
+                [idx++] = i;
             }
             i++;
         }
@@ -472,45 +575,61 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  */
 int igraph_extended_chordal_ring(
     igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_t *W,
-    igraph_bool_t directed) {
+    igraph_bool_t directed)
+{
     igraph_vector_t edges;
     long int period = igraph_matrix_ncol(W);
-    long int nrow   = igraph_matrix_nrow(W);
+    long int nrow = igraph_matrix_nrow(W);
     long int i, j, mpos = 0, epos = 0;
 
-    if (nodes < 3) {
+    if (nodes < 3)
+    {
         IGRAPH_ERROR("An extended chordal ring has at least 3 nodes", IGRAPH_EINVAL);
     }
 
-    if ((long int)nodes % period != 0) {
+    if ((long int)nodes % period != 0)
+    {
         IGRAPH_ERROR("The period (number of columns in W) should divide the "
-                     "number of nodes", IGRAPH_EINVAL);
+                     "number of nodes",
+                     IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (nodes + nodes * nrow));
 
-    for (i = 0; i < nodes - 1; i++) {
-        VECTOR(edges)[epos++] = i;
-        VECTOR(edges)[epos++] = i + 1;
+    for (i = 0; i < nodes - 1; i++)
+    {
+        VECTOR(edges)
+        [epos++] = i;
+        VECTOR(edges)
+        [epos++] = i + 1;
     }
-    VECTOR(edges)[epos++] = nodes - 1;
-    VECTOR(edges)[epos++] = 0;
+    VECTOR(edges)
+    [epos++] = nodes - 1;
+    VECTOR(edges)
+    [epos++] = 0;
 
-    if (nrow > 0) {
-        for (i = 0; i < nodes; i++) {
-            for (j = 0; j < nrow; j++) {
-                long int offset = (long int) MATRIX(*W, j, mpos);
+    if (nrow > 0)
+    {
+        for (i = 0; i < nodes; i++)
+        {
+            for (j = 0; j < nrow; j++)
+            {
+                long int offset = (long int)MATRIX(*W, j, mpos);
                 long int v = (i + offset) % nodes;
 
-                if (v < 0) {
-                    v += nodes;    /* handle negative offsets */
+                if (v < 0)
+                {
+                    v += nodes; /* handle negative offsets */
                 }
 
-                VECTOR(edges)[epos++] = i;
-                VECTOR(edges)[epos++] = v;
-
+                VECTOR(edges)
+                [epos++] = i;
+                VECTOR(edges)
+                [epos++] = v;
             }
-            mpos++; if (mpos == period) {
+            mpos++;
+            if (mpos == period)
+            {
                 mpos = 0;
             }
         }
