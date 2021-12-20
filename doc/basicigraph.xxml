@@ -15,7 +15,7 @@ of ordered (if directed) or unordered (if undirected) labeled pairs.
 The labels of the pairs plus the number of vertices always starts with
 zero and ends with the number of edges minus one. In addition to that
 a table of metadata is also attached to every graph, its most
-important entries are the number of vertices in the graph and whether
+important entries being the number of vertices in the graph and whether
 the graph is directed or undirected.
 </para>
 
@@ -30,17 +30,18 @@ So, to summarize, a directed graph can be imagined like this:
     {
      (0,2),
      (2,2),
-     (2,3),
+     (3,2),
      (3,3),
      (3,4),
      (3,4),
+     (4,3),
      (4,1)
     }
   )
 </programlisting>
 </informalexample>
-Here the edges are ordered pairs or vertex IDs, and the graph is a multiset
-of edges plus some meta-data.
+Here the edges are ordered pairs or vertex ids, and the graph is a multiset
+of edges plus some metadata.
 </para>
 
 <para>
@@ -50,38 +51,57 @@ An undirected graph is like this:
   ( vertices: 6,
     directed: no,
     {
-     {0,2},
-     {2},
-     {2,3},
-     {3},
-     {3,4},
-     {3,4},
-     {4,1}
+     (0,2),
+     (2,2),
+     (2,3),
+     (3,3),
+     (3,4),
+     (3,4),
+     (3,4),
+     (1,4)
     }
   )
 </programlisting>
 </informalexample>
-Here an edge is a set of one or two vertex IDs, two for most of the
-time, except for loop edges. A graph is a multiset of edges plus meta data,
-just like in the directed case.
+Here, an edge is an unordered pair of two vertex IDs. A graph is a multiset
+of edges plus metadata, just like in the directed case.
 </para>
 
-<para>It is possible to convert a directed graph to an undirected one,
+<para>It is possible to convert between directed and undirected graphs,
 see the <link linkend="igraph_to_directed">
 <function>igraph_to_directed()</function></link>
 and <link linkend="igraph_to_undirected">
 <function>igraph_to_undirected()</function></link> functions.
 </para>
 
-<para>Note that &igraph; has some limited support for
-graphs with multiple edges. The support means that multiple edges can
-be stored in &igraph; graphs, but for most functions
-(like <link linkend="igraph_betweenness">
-<function>igraph_betweenness()</function></link>) it is not checked
-that they work well on graphs with multiple edges.
-To eliminate multiple edges from a graph, you can use
+<para>&igraph; aims to robustly support multigraphs, i.e. graphs which
+have more than one edge between some pairs of vertices, as well as
+graphs with self-loops. Most functions which do not support such graphs
+will check their input and issue an error if it is not valid. Those
+rare functions which do not perform this check clearly indicate this
+in their documentation. To eliminate multiple edges from a graph, you can use
 <link linkend="igraph_simplify">
   <function>igraph_simplify()</function></link>.
+</para>
+</section>
+
+<section id="igraph-functions"><title>About &igraph; functions</title>
+<para>
+&igraph; has a simple and consistent interface. Most functions check
+their input for validity and display an informative error message
+when something goes wrong. In order to support this, the majority of functions
+return an error code. In basic usage, this code can be ignored, as the
+default behaviour is to abort the program immediately upon error. See
+<link linkend="igraph-Error">the section on error handling</link> for
+more information on this topic.
+</para>
+
+<para>
+Results are typically returned through <emphasis>output arguments</emphasis>,
+i.e. pointers to a data structure into which the result will be written.
+In almost all cases, this data structure is expected to be pre-initialized.
+A few simple functions communicate their result directly through their return
+value—these functions can never encounter an error.
 </para>
 </section>
 
