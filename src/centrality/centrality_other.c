@@ -493,6 +493,13 @@ static int igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igrap
  * self-loops on the corresponding vertex.
  *
  * </para><para>
+ * In the weighted case, the eigenvector centrality of a vertex is proportional
+ * to the weighted sum of centralities of its neighbours, i.e.
+ * <code>c_i = sum_j w_ij c_j</code>, where <code>w_ij</code> is the weight
+ * of the edge connecting vertices \c i and \c j. The weights of parallel edges
+ * are added up.
+ *
+ * </para><para>
  * The centrality scores returned by igraph can be normalized
  * (using the \p scale parameter) such that the largest eigenvector centrality
  * score is 1 (with one exception, see below).
