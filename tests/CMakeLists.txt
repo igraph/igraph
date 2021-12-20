@@ -155,6 +155,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   edge_selectors
   igraph_es_path
+  igraph_es_all_between
   vertex_selectors
 )
 
@@ -788,6 +789,7 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  expand_path_to_pairs
   igraph_running_mean
   igraph_solve_lsap
 )

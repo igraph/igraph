@@ -2291,17 +2291,17 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
     }
 
     igraph_are_connected(graph, source, target, &conn);
+
     if (conn) {
         /* We need to remove every (possibly directed) edge between source
            and target and calculate the disjoint paths on the new
            graph. Finally we add 1 for the removed connection(s).  */
+        /* We need to remove every (possibly directed) edge between source
+           and target and calculate the disjoint paths on the new
+           graph. Finally we add 1 for the removed connection(s).  */
         igraph_es_t es;
-        igraph_vector_int_t v;
         igraph_t newgraph;
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 2);
-        VECTOR(v)[0] = source;
-        VECTOR(v)[1] = target;
-        IGRAPH_CHECK(igraph_es_multipairs(&es, &v, IGRAPH_DIRECTED));
+        IGRAPH_CHECK(igraph_es_all_between(&es, source, target, IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_es_destroy, &es);
 
         IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -2322,23 +2322,19 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
             *res += 1;
         }
 
-        IGRAPH_FINALLY_CLEAN(3);
+        IGRAPH_FINALLY_CLEAN(2);
         igraph_destroy(&newgraph);
         igraph_es_destroy(&es);
-        igraph_vector_int_destroy(&v);
-    }
-
-    /* These do nothing if the two vertices are connected,
-       so it is safe to call them. */
-
-    if (igraph_is_directed(graph)) {
-        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
-                     source, target,
-                     IGRAPH_VCONN_NEI_IGNORE));
     } else {
-        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
-                     source, target,
-                     IGRAPH_VCONN_NEI_IGNORE));
+        if (igraph_is_directed(graph)) {
+            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+                        source, target,
+                        IGRAPH_VCONN_NEI_IGNORE));
+        } else {
+            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
+                        source, target,
+                        IGRAPH_VCONN_NEI_IGNORE));
+        }
     }
 
     return IGRAPH_SUCCESS;

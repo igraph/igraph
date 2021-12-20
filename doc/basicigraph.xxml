@@ -13,7 +13,7 @@ The &igraph; library can handle directed and
 undirected graphs. The &igraph; graphs are multisets
 of ordered (if directed) or unordered (if undirected) labeled pairs.
 The labels of the pairs plus the number of vertices always starts with
-zero and ends with the number of edges minus one. In addition to that
+zero and ends with the number of edges minus one. In addition to that,
 a table of metadata is also attached to every graph, its most
 important entries being the number of vertices in the graph and whether
 the graph is directed or undirected.
@@ -118,6 +118,7 @@ value—these functions can never encounter an error.
 <section id="basic-query-operations"><title>Basic query operations</title>
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
+<!-- doxrox-include igraph_is_directed -->
 <!-- doxrox-include igraph_edge -->
 <!-- doxrox-include igraph_edges -->
 <!-- doxrox-include IGRAPH_FROM -->
@@ -125,11 +126,9 @@ value—these functions can never encounter an error.
 <!-- doxrox-include IGRAPH_OTHER -->
 <!-- doxrox-include igraph_get_eid -->
 <!-- doxrox-include igraph_get_eids -->
-<!-- doxrox-include igraph_get_eids_multi -->
+<!-- doxrox-include igraph_get_all_eids_between -->
 <!-- doxrox-include igraph_neighbors -->
 <!-- doxrox-include igraph_incident -->
-<!-- doxrox-include igraph_is_directed -->
-<!-- doxrox-include igraph_is_same_graph -->
 <!-- doxrox-include igraph_degree -->
 </section>
 
@@ -139,8 +138,12 @@ value—these functions can never encounter an error.
 <!-- doxrox-include igraph_add_vertices -->
 <!-- doxrox-include igraph_delete_edges -->
 <!-- doxrox-include igraph_delete_vertices -->
+<!-- doxrox-include igraph_delete_vertices_idx -->
 </section>
 
+<section id="misc-helper-functions"><title>Miscellaneous helper functions</title>
+<!-- doxrox-include igraph_expand_path_to_pairs -->
+<!-- doxrox-include igraph_is_same_graph -->
 </section>
 
 </chapter>

@@ -233,7 +233,8 @@ typedef enum {
     IGRAPH_ES_SEQ,
     IGRAPH_ES_PAIRS,
     IGRAPH_ES_PATH,
-    IGRAPH_ES_MULTIPAIRS,
+    IGRAPH_ES_UNUSED_WAS_MULTIPAIRS,  /* placeholder for deprecated IGRAPH_ES_MULTIPAIRS from igraph 0.10 */
+    IGRAPH_ES_ALL_BETWEEN,
 } igraph_es_type_t;
 
 typedef struct igraph_es_t {
@@ -254,6 +255,11 @@ typedef struct igraph_es_t {
             const igraph_vector_int_t *ptr;
             igraph_bool_t mode;
         } path;
+        struct {
+            igraph_integer_t from;
+            igraph_integer_t to;
+            igraph_bool_t directed;
+        } between;
     } data;
 } igraph_es_t;
 
@@ -286,12 +292,14 @@ IGRAPH_EXPORT igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vecto
                                   igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_int_t *v,
-                                       igraph_bool_t directed);
-
 IGRAPH_EXPORT igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
                                  igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...);
+
+IGRAPH_EXPORT igraph_error_t igraph_es_all_between(
+    igraph_es_t *es, igraph_integer_t from, igraph_integer_t to,
+    igraph_bool_t directed
+);
 
 IGRAPH_EXPORT void igraph_es_destroy(igraph_es_t *es);
 

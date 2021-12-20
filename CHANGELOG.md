@@ -169,6 +169,9 @@
  - `igraph_edges()` now takes an `igraph_vector_int_t` for its
    `edges` argument instead of an `igraph_vector_t`.
 
+ - `igraph_es_multipairs()` was removed; you can use the newly added
+   `igraph_es_all_between()` instead.
+
  - `igraph_establishment_game()` now takes an `igraph_vector_int_t` for its
    `node_type_vec` argument instead of an `igraph_vector_t`.
 
@@ -182,8 +185,16 @@
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
- - `igraph_get_eids()` and `igraph_get_eids_multi()` now use `igraph_vector_int_t`
-   to return lists of edge IDs and to receive lists of vertex IDs.
+ - `igraph_get_eids()` now uses `igraph_vector_int_t` to return lists of edge IDs
+   and to receive lists of vertex IDs.
+
+ - The `path` argument of `igraph_get_eids()` was removed. You can replicate the
+   old behaviour by constructing the list of vertex IDs explicitly from the
+   path by duplicating each vertex in the path except the first and last ones.
+
+ - `igraph_get_eids_multi()` was removed as its design was fundamentally broken;
+   there was no way to retrieve the IDs of all edges between a specific pair of
+   vertices without knowing in advance how many such edges there are in the graph.
 
  - `igraph_get_incidence()` now returns the vertex IDs corresponding to the
    rows and columns of the incidence matrix as `igraph_vector_int_t`.
@@ -492,6 +503,7 @@
  - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
  - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM!)
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
+ - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
 
 ### Changed
 
