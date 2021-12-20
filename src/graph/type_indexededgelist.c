@@ -1089,7 +1089,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  * \param error Logical scalar, whether to report an error if the edge
  *        was not found. If it is false, then -1 will be assigned to \p eid.
  * \return Error code.
- * \sa \ref igraph_edge() for the opposite operation.
+ * \sa \ref igraph_edge() for the opposite operation, \ref igraph_get_all_eids_between()
+ *     to retrieve all edge IDs between a pair of vertices.
  *
  * Time complexity: O(log (d)), where d is smaller of the out-degree
  * of \c pfrom and in-degree of \c pto if \p directed is true. If \p directed
@@ -1238,6 +1239,27 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \function igraph_get_all_eids_between
+ * \brief Returns all edge IDs between a pair of vertices.
+ *
+ * </para><para>
+ * For undirected graphs \c source and \c target are exchangeable.
+ *
+ * \param graph The input graph.
+ * \param eids Pointer to an initialized vector, the result is stored
+ *        here. It will be resized as needed.
+ * \param source The ID of the source vertex
+ * \param target The ID of the target vertex
+ * \param directed Logical scalar, whether to consider edge directions
+ *        in directed graphs. This is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: TODO
+ *
+ * \sa \ref igraph_get_eid() for a single edge.
+ */
 igraph_error_t igraph_get_all_eids_between(
     const igraph_t *graph, igraph_vector_int_t *eids,
     igraph_integer_t source, igraph_integer_t target, igraph_bool_t directed
@@ -1254,6 +1276,8 @@ igraph_error_t igraph_get_all_eids_between(
     }
 
     igraph_vector_int_clear(eids);
+
+    /* TODO(ntamas): not ready yet, returns a single edge ID only */
 
     if (igraph_is_directed(graph)) {
         eid = -1;

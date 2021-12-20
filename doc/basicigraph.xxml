@@ -141,6 +141,8 @@ value—these functions can never encounter an error.
 <!-- doxrox-include igraph_delete_vertices_idx -->
 </section>
 
+</section>
+
 <section id="misc-helper-functions"><title>Miscellaneous helper functions</title>
 <!-- doxrox-include igraph_expand_path_to_pairs -->
 <!-- doxrox-include igraph_is_same_graph -->
