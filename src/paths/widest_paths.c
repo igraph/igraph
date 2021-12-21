@@ -60,7 +60,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
     return IGRAPH_UNIMPLEMENTED;
 }
 
-igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_widest_paths(const igraph_t *graph,
                                             igraph_vector_ptr_t *vertices,
                                             igraph_vector_ptr_t *edges,
                                             igraph_vector_int_t *nrgeo,
@@ -96,5 +96,5 @@ igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
 
     // TODO: calls igraph_get_widest_path for each node
 
-    return IGRAPH_SUCCESS;
+    return IGRAPH_UNIMPLEMENTED;
 }
