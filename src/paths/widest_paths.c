@@ -94,7 +94,137 @@ igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    igraph_neimode_t mode) {
 
-    // TODO: calls igraph_get_widest_path for each node
+    /* Implementation details: This is a copy of the igraph_shortest_paths_dijkstra() algorithm,
+    with some small modifications. Namely:
 
-    return IGRAPH_UNIMPLEMENTED;
+        - We prioritise nodes with the widest path so far in the heap.
+        - When adding nodes into the heap, we set the value to be equal to the min of the current
+          widest path and the weight of the edge.
+        - We allow negative weights.
+        - The widest path from a node to itself has width infinity.
+    */
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_2wheap_t Q;
+    igraph_vit_t fromvit, tovit;
+    igraph_integer_t no_of_from, no_of_to;
+    igraph_lazy_inclist_t inclist;
+    igraph_integer_t i, j;
+    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
+    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
+    igraph_bool_t all_to;
+    igraph_vector_int_t indexv;
+
+    if (!weights) {
+        return igraph_shortest_paths(graph, res, from, to, mode);
+    }
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
+                      " of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
+    }
+
+    IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+    no_of_from = IGRAPH_VIT_SIZE(fromvit);
+
+    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+    IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
+
+    all_to = igraph_vs_is_all(&to);
+    if (all_to) {
+        no_of_to = no_of_nodes;
+    } else {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&indexv, no_of_nodes);
+        IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+        IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
+        no_of_to = IGRAPH_VIT_SIZE(tovit);
+        for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
+            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
+            if (VECTOR(indexv)[v]) {
+                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
+                             IGRAPH_EINVAL);
+            }
+            VECTOR(indexv)[v] = ++i;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
+    igraph_matrix_fill(res, my_neginfinity);
+
+    for (IGRAPH_VIT_RESET(fromvit), i = 0;
+         !IGRAPH_VIT_END(fromvit);
+         IGRAPH_VIT_NEXT(fromvit), i++) {
+
+        igraph_integer_t reached = 0;
+        igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
+        igraph_2wheap_clear(&Q);
+        igraph_2wheap_push_with_index(&Q, source, my_posinfinity);
+
+        while (!igraph_2wheap_empty(&Q)) {
+            igraph_integer_t maxnei = igraph_2wheap_max_index(&Q);
+            igraph_real_t maxwidth = igraph_2wheap_deactivate_max(&Q);
+            igraph_vector_int_t *neis;
+            igraph_integer_t nlen;
+
+            if (all_to) {
+                MATRIX(*res, i, maxnei) = maxwidth;
+            } else {
+                if (VECTOR(indexv)[maxnei]) {
+                    MATRIX(*res, i, VECTOR(indexv)[maxnei] - 1) = maxwidth;
+                    reached++;
+                    if (reached == no_of_to) {
+                        igraph_2wheap_clear(&Q);
+                        break;
+                    }
+                }
+            }
+
+            /* Now check all neighbors of 'maxnei' for a wider path*/
+            neis = igraph_lazy_inclist_get(&inclist, maxnei);
+            nlen = igraph_vector_int_size(neis);
+            for (j = 0; j < nlen; j++) {
+                igraph_integer_t edge = VECTOR(*neis)[j];
+                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, maxnei);
+                igraph_real_t edgeweight = VECTOR(*weights)[edge];
+                igraph_real_t altwidth = maxwidth < edgeweight ? maxwidth : edgeweight;
+                igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
+                igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
+                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : my_posinfinity;
+                if (!has) {
+                    /* This is the first time assigning a width to this vertex */
+                    IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, altwidth));
+                } else if (altwidth > curwidth) {
+                    /* This is a wider path */
+                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, altwidth));
+                }
+            }
+
+        } /* !igraph_2wheap_empty(&Q) */
+
+    } /* !IGRAPH_VIT_END(fromvit) */
+
+    if (!all_to) {
+        igraph_vit_destroy(&tovit);
+        igraph_vector_int_destroy(&indexv);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+
+    igraph_lazy_inclist_destroy(&inclist);
+    igraph_2wheap_destroy(&Q);
+    igraph_vit_destroy(&fromvit);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
 }
