@@ -82,6 +82,12 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    igraph_neimode_t mode) {
 
+    /* Implementation Details: This is a slightly modified Floyd Warshall algorithm, modified so that
+    we take the max of each vertex, and the resulting width of going through an intermediate vertex.
+    We denote the widest path from a node to itself as infinity, and the widest path from a node to a node it ca
+
+    */
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_lazy_inclist_t inclist;

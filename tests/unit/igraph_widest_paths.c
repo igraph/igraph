@@ -90,5 +90,13 @@ int main() {
 
     VERIFY_FINALLY_STACK();
 
+    /* Test Ideas:
+    - Duplicates in from / to
+    - Directed graphs
+    - Behaviour with self loops
+    - Behaviour under different modes
+
+    */
+
     return 0;
 }
