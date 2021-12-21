@@ -24,9 +24,11 @@ int main() {
 
     igraph_integer_t n, m;
     igraph_t g;
-    igraph_matrix_t res;
+    igraph_matrix_t res1, res2;
     igraph_vs_t from, to;
     igraph_vector_t w;
+
+    /* === igraph_widest_paths_dijkstra() === */
 
     /* 1. Simple Graph */
     n = 5;
@@ -36,18 +38,24 @@ int main() {
                  -1);
     igraph_vector_init_real(&w, m, 8.0, 6.0, 10.0, 7.0, 5.0);
 
-    igraph_matrix_init(&res, 5, 5);
+    igraph_matrix_init(&res1, 5, 5);
+    igraph_matrix_init(&res2, 5, 5);
     igraph_vs_seq(&from, 0, 4);
     igraph_vs_seq(&to, 0, 4);
 
-    igraph_widest_paths_dijkstra(&g, &res, from, to, &w, IGRAPH_OUT);
+    igraph_widest_paths_dijkstra(&g, &res1, from, to, &w, IGRAPH_OUT);
+    print_matrix_format(&res1, stdout, "%f");
 
-    print_matrix_format(&res, stdout, "%f");
+    igraph_widest_paths_floyd_warshall(&g, &res2, from, to, &w, IGRAPH_OUT);
+    print_matrix_format(&res2, stdout, "%f");
+
+    IGRAPH_ASSERT(igraph_matrix_all_e(&res1, &res2));
 
     igraph_vector_destroy(&w);
     igraph_vs_destroy(&to);
     igraph_vs_destroy(&from);
-    igraph_matrix_destroy(&res);
+    igraph_matrix_destroy(&res2);
+    igraph_matrix_destroy(&res1);
     igraph_destroy(&g);
 
     /* 2. Graph from Wikipedia */
@@ -60,18 +68,24 @@ int main() {
     igraph_vector_init_real(&w, m, 15.0, 53.0, 40.0, 46.0, 31.0,
                             17.0, 3.0, 11.0, 29.0, 8.0, 40.0);
 
-    igraph_matrix_init(&res, 1, n);
+    igraph_matrix_init(&res1, 1, n);
+    igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 3);
     igraph_vs_seq(&to, 0, n-1);
 
-    igraph_widest_paths_dijkstra(&g, &res, from, to, &w, IGRAPH_OUT);
+    igraph_widest_paths_dijkstra(&g, &res1, from, to, &w, IGRAPH_OUT);
+    print_matrix_format(&res1, stdout, "%f");
 
-    print_matrix_format(&res, stdout, "%f");
+    igraph_widest_paths_floyd_warshall(&g, &res2, from, to, &w, IGRAPH_OUT);
+    print_matrix_format(&res2, stdout, "%f");
+
+    IGRAPH_ASSERT(igraph_matrix_all_e(&res1, &res2));
 
     igraph_vector_destroy(&w);
     igraph_vs_destroy(&to);
     igraph_vs_destroy(&from);
-    igraph_matrix_destroy(&res);
+    igraph_matrix_destroy(&res2);
+    igraph_matrix_destroy(&res1);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

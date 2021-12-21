@@ -82,9 +82,104 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    igraph_neimode_t mode) {
 
-    // TODO: implement floyd warshalls to calculate widest paths between all nodes
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_lazy_inclist_t inclist;
+    igraph_matrix_t adj;
+    igraph_integer_t i, j, k;
+    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
+    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
+    igraph_vit_t fromvit, tovit;
+    igraph_integer_t no_of_from, no_of_to;
 
-    return IGRAPH_UNIMPLEMENTED;
+    if (!weights) {
+        return igraph_shortest_paths(graph, res, from, to, mode);
+    }
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
+                      " of edges (%ld).", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
+    }
+
+    // Construct adjacency matrix
+    IGRAPH_CHECK(igraph_matrix_init(&adj, no_of_nodes, no_of_nodes));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &adj);
+
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+    IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
+
+    for (i = 0; i < no_of_nodes; i++) {
+        for (j = 0; j < no_of_nodes; j++) {
+            if (i == j) {
+                MATRIX(adj, i, j) = my_posinfinity;
+            } else {
+                MATRIX(adj, i, j) = my_neginfinity;
+            }
+        }
+    }
+
+    for (i = 0; i < no_of_nodes; i++) {
+        igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, i);
+        igraph_integer_t nlen = igraph_vector_int_size(neis);
+        for (j = 0; j < nlen; j++) {
+            igraph_integer_t edge = VECTOR(*neis)[j];
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, i);
+            MATRIX(adj, i, tto) = VECTOR(*weights)[edge];
+        }
+    }
+
+    // Run modified Floyd Warshall
+    for (k = 0; k < no_of_nodes; k++) {
+        for (i = 0; i < no_of_nodes; i++) {
+            if (i == k) continue;
+            for (j = 0; j < no_of_nodes; j++) {
+                if (i == j || j == k) continue;
+                igraph_real_t altwidth = MATRIX(adj, i, k);
+                if (MATRIX(adj, k, j) < altwidth) {
+                    altwidth = MATRIX(adj, k, j);
+                }
+                if (altwidth > MATRIX(adj, i, j)) {
+                    MATRIX(adj, i, j) = altwidth;
+                }
+            }
+        }
+    }
+
+    // Write into results matrix
+    IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+    no_of_from = IGRAPH_VIT_SIZE(fromvit);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
+    no_of_to = IGRAPH_VIT_SIZE(tovit);
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
+
+    for (IGRAPH_VIT_RESET(fromvit), i = 0; !IGRAPH_VIT_END(fromvit); IGRAPH_VIT_NEXT(fromvit), i++) {
+        igraph_integer_t u = IGRAPH_VIT_GET(fromvit);
+        for (IGRAPH_VIT_RESET(tovit),j = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), j++) {
+            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
+            MATRIX(*res, i, j) = MATRIX(adj, u, v);
+        }
+    }
+
+    // Final deletion stuff
+    igraph_vit_destroy(&tovit);
+    igraph_vit_destroy(&fromvit);
+    igraph_lazy_inclist_destroy(&inclist);
+    igraph_matrix_destroy(&adj);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
