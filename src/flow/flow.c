@@ -2298,12 +2298,15 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
            graph. Finally we add 1 for the removed connection(s).  */
         igraph_es_t es;
         igraph_t newgraph;
+        igraph_integer_t num_removed_edges;
+
         IGRAPH_CHECK(igraph_es_all_between(&es, source, target, IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_es_destroy, &es);
 
         IGRAPH_CHECK(igraph_copy(&newgraph, graph));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         IGRAPH_CHECK(igraph_delete_edges(&newgraph, es));
+        num_removed_edges = igraph_ecount(graph) - igraph_ecount(&newgraph);
 
         if (igraph_is_directed(graph)) {
             IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(&newgraph, res,
@@ -2316,7 +2319,7 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
         }
 
         if (res) {
-            *res += 1;
+            *res += num_removed_edges;
         }
 
         IGRAPH_FINALLY_CLEAN(2);
