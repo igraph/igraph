@@ -2296,9 +2296,6 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
         /* We need to remove every (possibly directed) edge between source
            and target and calculate the disjoint paths on the new
            graph. Finally we add 1 for the removed connection(s).  */
-        /* We need to remove every (possibly directed) edge between source
-           and target and calculate the disjoint paths on the new
-           graph. Finally we add 1 for the removed connection(s).  */
         igraph_es_t es;
         igraph_t newgraph;
         IGRAPH_CHECK(igraph_es_all_between(&es, source, target, IGRAPH_DIRECTED));
