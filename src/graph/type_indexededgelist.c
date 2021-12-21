@@ -1108,6 +1108,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge
  *        was not found. If it is false, then -1 will be assigned to \p eid.
+ *        Note that invalid vertex IDs in input arguments (\p pfrom or \p pto)
+ *        always return an error code.
  * \return Error code.
  * \sa \ref igraph_edge() for the opposite operation, \ref igraph_get_all_eids_between()
  *     to retrieve all edge IDs between a pair of vertices.

@@ -191,6 +191,8 @@
  - The `path` argument of `igraph_get_eids()` was removed. You can replicate the
    old behaviour by constructing the list of vertex IDs explicitly from the
    path by duplicating each vertex in the path except the first and last ones.
+   A helper function called `igraph_expand_path_to_pairs()` is provided to ease
+   the transition.
 
  - `igraph_get_eids_multi()` was removed as its design was fundamentally broken;
    there was no way to retrieve the IDs of all edges between a specific pair of
