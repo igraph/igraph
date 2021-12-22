@@ -42,6 +42,21 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
                                        igraph_vector_int_t *predecessors,
                                        igraph_vector_int_t *inbound_edges) {
 
+    /* Implementation details: This is a Dijkstra algorithm with a
+    binary heap, modified to support widest paths. The heap is indexed,
+    so it stores both the widest path to a node, as well as it's index. We
+    use a 2 way heap so that we can query indexes directly in the heap.
+
+    To adapt a Dijkstra to handle widest path, instead of prioritising candidate
+    nodes with the minimum distance, we prioritise those with the maximum
+    width instead. When adding a node into our set of 'completed' nodes, we
+    update all neighbouring nodes with a width that is equal to the min of the
+    width to the current node and the width of the edge.
+
+    We denote the widest path from a node to itself as infinity, and the widest
+    path from a node to a node it cannot reach as negative infinity.
+    */
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
@@ -61,11 +76,9 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
-        }
+
+    if (igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
@@ -146,6 +159,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         }
     } /* !igraph_2wheap_empty(&Q) */
 
+
     if (to_reach > 0) {
         IGRAPH_WARNING("Couldn't reach some vertices");
     }
@@ -182,7 +196,6 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             }
         }
     }
-
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
@@ -196,8 +209,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             if (edges) {
                 evec = VECTOR(*edges)[i];
                 igraph_vector_int_clear(evec);
-            }
-
+            };
             IGRAPH_ALLOW_INTERRUPTION();
 
             size = 0;
@@ -335,11 +347,8 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
                       igraph_vector_size(weights), no_of_edges);
     }
 
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-        }
+    if (igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     /* Construct adjacency matrix */
@@ -462,11 +471,8 @@ igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
                       igraph_vector_size(weights), no_of_edges);
     }
 
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (igraph_is_nan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-        }
+    if (igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));

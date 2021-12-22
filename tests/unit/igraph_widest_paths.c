@@ -27,8 +27,9 @@ int main() {
     igraph_matrix_t res1, res2;
     igraph_vs_t from, to;
     igraph_vector_t w;
+    igraph_integer_t i;
 
-    /* === igraph_widest_paths_dijkstra() === */
+    /* === igraph_widest_paths_dijkstra and igraph_widest_paths_floyd_warshall === */
 
     /* 1. Simple Graph */
     n = 5;
@@ -43,10 +44,10 @@ int main() {
     igraph_vs_seq(&from, 0, 4);
     igraph_vs_seq(&to, 0, 4);
 
-    igraph_widest_paths_dijkstra(&g, &res1, from, to, &w, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_widest_paths_dijkstra(&g, &res1, from, to, &w, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix_format(&res1, stdout, "%f");
 
-    igraph_widest_paths_floyd_warshall(&g, &res2, from, to, &w, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_widest_paths_floyd_warshall(&g, &res2, from, to, &w, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix_format(&res2, stdout, "%f");
 
     IGRAPH_ASSERT(igraph_matrix_all_e(&res1, &res2));
@@ -73,19 +74,84 @@ int main() {
     igraph_vs_1(&from, 3);
     igraph_vs_seq(&to, 0, n-1);
 
-    igraph_widest_paths_dijkstra(&g, &res1, from, to, &w, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_widest_paths_dijkstra(&g, &res1, from, to, &w, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix_format(&res1, stdout, "%f");
 
-    igraph_widest_paths_floyd_warshall(&g, &res2, from, to, &w, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_widest_paths_floyd_warshall(&g, &res2, from, to, &w, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix_format(&res2, stdout, "%f");
 
     IGRAPH_ASSERT(igraph_matrix_all_e(&res1, &res2));
 
-    igraph_vector_destroy(&w);
     igraph_vs_destroy(&to);
     igraph_vs_destroy(&from);
     igraph_matrix_destroy(&res2);
     igraph_matrix_destroy(&res1);
+
+
+    /* === igraph_get_widest_paths === */
+    igraph_vector_ptr_t vertices;
+    igraph_vector_ptr_t edges;
+    igraph_vector_int_t predecessors;
+    igraph_vector_int_t inbound_edges;
+
+    igraph_vector_ptr_init(&vertices, n);
+    igraph_vector_ptr_init(&edges, n);
+    for (i = 0; i < igraph_vector_ptr_size(&vertices); i++) {
+        VECTOR(vertices)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_init(VECTOR(vertices)[i], 0);
+        VECTOR(edges)[i] = calloc(1, sizeof(igraph_vector_int_t));
+        igraph_vector_init(VECTOR(edges)[i], 0);
+    }
+    igraph_vector_int_init(&predecessors, 0);
+    igraph_vector_int_init(&inbound_edges, 0);
+
+    igraph_vs_seq(&to, 0, n-1);
+    IGRAPH_ASSERT(igraph_get_widest_paths(/* graph */ &g, /* vertices */ &vertices, /* edges */ &edges,
+                                /* from */ 3, /* to */ to, /* weights */ &w,
+                                /* mode */ IGRAPH_OUT,
+                                /* predecessors */ &predecessors, /* inbound_edges */ &inbound_edges
+                                ) == IGRAPH_SUCCESS);
+    for (i = 0; i < n; i++) {
+        printf("node: %lld\n", i);
+        igraph_vector_int_t *vertex_path = VECTOR(vertices)[i];
+        igraph_vector_int_t *edge_path = VECTOR(edges)[i];
+        print_vector_int(vertex_path);
+        print_vector_int(edge_path);
+    }
+    printf("predecessors:\n");
+    print_vector_int(&predecessors);
+    printf("inbound_edges:\n");
+    print_vector_int(&inbound_edges);
+
+    igraph_vs_destroy(&to);
+    igraph_vector_int_destroy(&inbound_edges);
+    igraph_vector_int_destroy(&predecessors);
+    for (i = 0; i < igraph_vector_ptr_size(&vertices); i++) {
+        igraph_vector_int_destroy(VECTOR(vertices)[i]);
+        free(VECTOR(vertices)[i]);
+        igraph_vector_int_destroy(VECTOR(edges)[i]);
+        free(VECTOR(edges)[i]);
+    }
+    igraph_vector_ptr_destroy(&edges);
+    igraph_vector_ptr_destroy(&vertices);
+
+    /* === igraph_get_widest_path === */
+    igraph_vector_int_t vertices2;
+    igraph_vector_int_t edges2;
+    igraph_vector_int_init(&vertices2, 0);
+    igraph_vector_int_init(&edges2, 0);
+
+    IGRAPH_ASSERT(igraph_get_widest_path(/* graph */ &g, /* vertices */ &vertices2, /* edges */ &edges2,
+                                /* from */ 3, /* to */ 6, /* weights */ &w,
+                                /* mode */ IGRAPH_OUT ) == IGRAPH_SUCCESS);
+    printf("get_widest_path()\n");
+    print_vector_int(&vertices2);
+    print_vector_int(&edges2);
+
+    igraph_vector_int_destroy(&edges2);
+    igraph_vector_int_destroy(&vertices2);
+
+    igraph_vector_destroy(&w);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
@@ -95,7 +161,8 @@ int main() {
     - Directed graphs
     - Behaviour with self loops
     - Behaviour under different modes
-
+    - Check for Nan values in weight
+    - Null weight
     */
 
     return 0;
