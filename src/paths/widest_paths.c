@@ -294,21 +294,6 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_get_all_widest_paths(const igraph_t *graph,
-                                            igraph_vector_ptr_t *vertices,
-                                            igraph_vector_ptr_t *edges,
-                                            igraph_vector_int_t *nrgeo,
-                                            igraph_integer_t from, igraph_vs_t to,
-                                            const igraph_vector_t *weights,
-                                            igraph_neimode_t mode) {
-
-    // TODO: implement a modified dijkstra that stores all paths
-
-    return IGRAPH_UNIMPLEMENTED;
-}
-
-
-
 igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
