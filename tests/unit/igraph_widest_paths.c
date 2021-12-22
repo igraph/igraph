@@ -112,7 +112,7 @@ int main() {
                                 /* predecessors */ &predecessors, /* inbound_edges */ &inbound_edges
                                 ) == IGRAPH_SUCCESS);
     for (i = 0; i < n; i++) {
-        printf("node: %lld\n", i);
+        printf("node: %" IGRAPH_PRId "\n", i);
         igraph_vector_int_t *vertex_path = VECTOR(vertices)[i];
         igraph_vector_int_t *edge_path = VECTOR(edges)[i];
         print_vector_int(vertex_path);
