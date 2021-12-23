@@ -810,6 +810,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted
   igraph_cliques
