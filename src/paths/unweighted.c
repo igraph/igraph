@@ -160,7 +160,8 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
             }
 
             neis = igraph_adjlist_get(&adjlist, act);
-            for (j = 0; j < igraph_vector_int_size(neis); j++) {
+            long int nei_count = igraph_vector_int_size(neis);
+            for (j = 0; j < nei_count; j++) {
                 long int neighbor = (long int) VECTOR(*neis)[j];
                 if (already_counted[neighbor] == i + 1) {
                     continue;
