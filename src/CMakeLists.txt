@@ -79,6 +79,7 @@ add_library(
   graph/basic_query.c
   graph/cattributes.c
   graph/iterators.c
+  graph/type_common.c
   graph/type_indexededgelist.c
   graph/visitors.c
 

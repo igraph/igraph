@@ -197,6 +197,8 @@ IGRAPH_EXPORT igraph_error_t igraph_spanner(const igraph_t *graph,
                                 igraph_real_t stretch,
                                 const igraph_vector_t *weights);
 
+IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
+
 __END_DECLS
 
 #endif

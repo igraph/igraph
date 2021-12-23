@@ -74,6 +74,20 @@ int main() {
         return 1;
     }
 
+    /* INVALID VERTEX ID */
+
+    ret = igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ 1);
+    if (ret != IGRAPH_EINVVID) {
+        return 1;
+    }
+
+    /* INVALID VERTEX ID even if error == 0 */
+
+    ret = igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ 0);
+    if (ret != IGRAPH_EINVVID) {
+        return 1;
+    }
+
     igraph_destroy(&g);
 
     return 0;

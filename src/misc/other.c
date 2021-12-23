@@ -22,6 +22,7 @@
 */
 
 #include "igraph_nongraph.h"
+#include "igraph_paths.h"
 #include "igraph_random.h"
 #include "igraph_types.h"
 
@@ -259,6 +260,45 @@ igraph_error_t igraph_convex_hull(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_expand_path_to_pairs
+ * \brief Helper function to convert a sequence of vertex IDs describing a path into a "pairs" vector.
+ *
+ * </para><para>
+ * This function is useful when you have a sequence of vertex IDs in a graph and
+ * you would like to retrieve the IDs of the edges between them. The function
+ * duplicates all but the first and the last elements in the vector, effectively
+ * converting the path into a vector of vertex IDs that can be passed to
+ * \ref igraph_get_eids().
+ *
+ * \param  vector  the input vector. It will be modified in-place and it will be
+ *         resized as needed. When the vector contains less than two vertex IDs,
+ *         it will be cleared.
+ * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory to expand
+ *         the vector.
+ */
+igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
+    igraph_integer_t no_of_vertices = igraph_vector_int_size(path);
+    igraph_integer_t i, j, no_of_items = (no_of_vertices - 1) * 2;
+
+    if (no_of_vertices <= 1) {
+        igraph_vector_int_clear(path);
+    } else {
+        IGRAPH_CHECK(igraph_vector_int_resize(path, no_of_items));
+
+        i = no_of_vertices - 1;
+        j = no_of_items - 1;
+        VECTOR(*path)[j] = VECTOR(*path)[i];
+        while (i > 1) {
+            i--; j--;
+            VECTOR(*path)[j] = VECTOR(*path)[i];
+            j--;
+            VECTOR(*path)[j] = VECTOR(*path)[i];
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
 
 static const char* igraph_i_plfit_error_message = 0;
 

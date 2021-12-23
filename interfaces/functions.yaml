@@ -62,8 +62,13 @@ igraph_get_eid:
 
 igraph_get_eids:
     PARAMS: |-
-        GRAPH graph, OUT EDGESET eids, OPTIONAL VECTOR_INT pairs,
-        OPTIONAL VECTOR_INT path, BOOLEAN directed=True, BOOLEAN error=True
+        GRAPH graph, OUT EDGESET eids, VECTOR_INT pairs,
+        BOOLEAN directed=True, BOOLEAN error=True
+
+igraph_get_all_eids_between:
+    PARAMS: |-
+        GRAPH graph, OUT EDGESET eids, VERTEX from, VERTEX to,
+        BOOLEAN directed=True
 
 igraph_incident:
     PARAMS: GRAPH graph, OUT EDGESET eids, VERTEX vid, NEIMODE mode=ALL
