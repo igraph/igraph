@@ -359,10 +359,18 @@ static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 
 int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                         igraph_connectedness_t mode) {
-    if (igraph_vcount(graph) == 0) {
+
+    long int no_of_nodes = igraph_vcount(graph);
+
+    if (no_of_nodes == 0) {
         /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1538
          * for the reasoning behind the change */
         *res = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    if (no_of_nodes == 1) {
+        *res = 1;
         return IGRAPH_SUCCESS;
     }
 
@@ -371,7 +379,15 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     } else if (mode == IGRAPH_STRONG) {
         int retval;
         igraph_integer_t no;
-        retval = igraph_i_clusters_strong(graph, 0, 0, &no);
+
+        /* A strongly connected graph has at least as many edges as vertices,
+         * except for the singleton graph, which is handled above. */
+        if (igraph_ecount(graph) < no_of_nodes) {
+            *res = 0;
+            return IGRAPH_SUCCESS;
+        }
+
+        retval = igraph_i_clusters_strong(graph, NULL, NULL, &no);
         *res = (no == 1);
         return retval;
     }
