@@ -335,6 +335,12 @@ static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  * \function igraph_is_connected
  * \brief Decides whether the graph is (weakly or strongly) connected.
  *
+ * A graph is considered connected when any of its vertices is reachable
+ * from any other. A directed graph with this property is called
+ * \em strongly connected. A directed graph that would be connected when
+ * ignoring the directions of its edges is called \em weakly connected.
+ *
+ * </para><para>
  * A graph with zero vertices (i.e. the null graph) is \em not connected by
  * definition. This behaviour changed in igraph 0.9; earlier versions assumed
  * that the null graph is connected. See the following issue on Github for the
@@ -392,7 +398,7 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
         return retval;
     }
 
-    IGRAPH_ERROR("mode argument", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
 }
 
 static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
