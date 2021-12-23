@@ -32,10 +32,10 @@ int main() {
     igraph_destroy(&graph);
 
     {
-        igraph_vector_t dims;
-        igraph_vector_init_int(&dims, 3, 15, 15, 15);
+        igraph_vector_int_t dims;
+        igraph_vector_int_init_int(&dims, 3, 15, 15, 15);
         igraph_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, 0, 1);
-        igraph_vector_destroy(&dims);
+        igraph_vector_int_destroy(&dims);
         igraph_rewire(&graph, 100, IGRAPH_REWIRING_SIMPLE);
         igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
     }

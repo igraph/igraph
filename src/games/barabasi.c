@@ -681,7 +681,8 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
         no_of_edges = 0;
-        for (i = 1; i < igraph_vector_int_size(outseq); i++) {
+        /* the length of 'outseq' is verified to be no_of_nodes above */
+        for (i = 1; i < no_of_nodes; i++) {
             no_of_edges += VECTOR(*outseq)[i];
         }
     }

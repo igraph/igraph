@@ -27,23 +27,23 @@ int main() {
     igraph_destroy(&graph);
 
     {
-        igraph_vector_t dims;
+        igraph_vector_int_t dims;
 
-        igraph_vector_init_int_end(&dims, -1, 8, 8, 8, 8, -1);
+        igraph_vector_int_init_int_end(&dims, -1, 8, 8, 8, 8, -1);
         igraph_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 0);
         BENCH(" 4 Betweenness, Grid(8,8,8,8), undirected",
               igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL));
         igraph_destroy(&graph);
-        igraph_vector_destroy(&dims);
+        igraph_vector_int_destroy(&dims);
 
-        igraph_vector_init_int_end(&dims, -1, 10, 10, 10, 10, -1);
+        igraph_vector_int_init_int_end(&dims, -1, 10, 10, 10, 10, -1);
         igraph_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 0);
         BENCH(" 5 Betweenness, Grid(10,10,10,10), cutoff 5",
               igraph_betweenness_cutoff(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL, 5));
         BENCH(" 6 Betweenness, Grid(10,10,10,10), cutoff 8",
               igraph_betweenness_cutoff(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL, 8));
         igraph_destroy(&graph);
-        igraph_vector_destroy(&dims);
+        igraph_vector_int_destroy(&dims);
     }
 
     igraph_barabasi_game(&graph, 8000, 1, 1, NULL, 1, 0, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE, NULL);

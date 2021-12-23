@@ -4,13 +4,14 @@
 
 int main() {
     igraph_t graph;
-    igraph_vector_t walk, weights;
+    igraph_vector_int_t walk;
+    igraph_vector_t weights;
     igraph_integer_t ec, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
     BENCH_INIT();
 
-    igraph_vector_init(&walk, 0);
+    igraph_vector_int_init(&walk, 0);
     igraph_vector_init(&weights, 0);
 
     /* create a small graph, and a compatible weight vector */
@@ -88,7 +89,7 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_vector_destroy(&weights);
-    igraph_vector_destroy(&walk);
+    igraph_vector_int_destroy(&walk);
 
     return 0;
 }
