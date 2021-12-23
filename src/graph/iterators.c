@@ -594,7 +594,8 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
                    igraph_integer_t *result) {
     igraph_vector_int_t vec;
     igraph_bool_t *seen;
-    long i;
+    igraph_integer_t i;
+    igraph_integer_t vec_len;
 
     switch (vs->type) {
     case IGRAPH_VS_NONE:
@@ -625,13 +626,14 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
     case IGRAPH_VS_NONADJ:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
         IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
+        vec_len = igraph_vector_int_size(&vec);
         *result = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(*result, igraph_bool_t);
         if (seen == 0) {
             IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, seen);
-        for (i = 0; i < igraph_vector_int_size(&vec); i++) {
+        for (i = 0; i < vec_len; i++) {
             if (!seen[ VECTOR(vec)[i] ]) {
                 (*result)--;
                 seen[ VECTOR(vec)[i] ] = 1;
@@ -692,6 +694,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
     igraph_vector_int_t *vec_int;
     igraph_bool_t *seen;
     igraph_integer_t i, j, n;
+    igraph_integer_t vec_len;
 
     switch (vs.type) {
     case IGRAPH_VS_ALL:
@@ -734,13 +737,14 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
         IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
+        vec_len = igraph_vector_int_size(&vec);
         n = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(n, igraph_bool_t);
         if (seen == 0) {
             IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
         }
         IGRAPH_FINALLY(igraph_free, seen);
-        for (i = 0; i < igraph_vector_int_size(&vec); i++) {
+        for (i = 0; i < vec_len; i++) {
             if (! seen [ VECTOR(vec)[i] ] ) {
                 n--;
                 seen[ VECTOR(vec)[i] ] = 1;
@@ -1761,7 +1765,7 @@ static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n / 2);
 
-    for (i = 0; i < igraph_vector_int_size(vec); i++) {
+    for (i = 0; i < n / 2; i++) {
         igraph_integer_t from = VECTOR(*es.data.path.ptr)[2 * i];
         igraph_integer_t to = VECTOR(*es.data.path.ptr)[2 * i + 1];
         igraph_integer_t eid;
