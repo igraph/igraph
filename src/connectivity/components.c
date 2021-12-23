@@ -328,7 +328,7 @@ static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *memb
     return 0;
 }
 
-int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
+static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 
 /**
  * \ingroup structural
@@ -379,26 +379,7 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     IGRAPH_ERROR("mode argument", IGRAPH_EINVAL);
 }
 
-/**
- * \ingroup structural
- * \function igraph_is_connected_weak
- * \brief Query whether the graph is weakly connected.
- *
- * A graph with zero vertices (i.e. the null graph) is weakly connected by
- * definition. A directed graph is weakly connected if its undirected version
- * is connected. In the case of undirected graphs, weakly connected and
- * connected are equivalent.
- *
- * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable; the result will be stored here.
- * \return Error code:
- *        \c IGRAPH_ENOMEM: unable to allocate requested memory.
- *
- * Time complexity: O(|V|+|E|), the number of vertices plus the number of
- * edges in the graph.
- */
-
-int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
+static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
     long int no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
     long int added_count;
