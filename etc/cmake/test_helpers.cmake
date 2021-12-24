@@ -10,6 +10,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   set(TEST_NAME "${NAMESPACE}::${NAME}")
 
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/${FOLDER}/${NAME}.c)
+  use_all_warnings(${TARGET_NAME})
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
