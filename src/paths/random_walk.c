@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
+
 #include "core/interruption.h"
 
 /**
@@ -75,10 +76,10 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
     igraph_integer_t i;
 
     if (start < 0 || start >= vc) {
-        IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid start vertex.", IGRAPH_EINVAL);
     }
     if (steps < 0) {
-        IGRAPH_ERROR("Invalid number of steps", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of steps.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -100,7 +101,7 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
-                IGRAPH_ERROR("Random walk got stuck", IGRAPH_ERWSTUCK);
+                IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
         start = VECTOR(*walk)[i] = VECTOR(*neis)[ RNG_INTEGER(0, nn - 1) ];
@@ -111,7 +112,7 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
     igraph_lazy_adjlist_destroy(&adj);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -169,9 +170,8 @@ int igraph_random_edge_walk(const igraph_t *graph,
     igraph_vector_t weight_temp;
     igraph_vector_ptr_t cdfs; /* cumulative distribution vectors for each node, used for weighted choice */
 
-    /* the fourth igraph_neimode_t value, IGRAPH_TOTAL, is disallowed */
     if (! (mode == IGRAPH_ALL || mode == IGRAPH_IN || mode == IGRAPH_OUT)) {
-        IGRAPH_ERROR("Invalid mode parameter", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode parameter.", IGRAPH_EINVMODE);
     }
 
     /* ref switch statement at end of main loop */
@@ -180,24 +180,24 @@ int igraph_random_edge_walk(const igraph_t *graph,
     }
 
     if (start < 0 || start >= vc) {
-        IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid start vertex.", IGRAPH_EINVAL);
     }
 
     if (steps < 0) {
-        IGRAPH_ERROR("Invalid number of steps", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of steps.", IGRAPH_EINVAL);
     }
 
     if (weights) {
         if (igraph_vector_size(weights) != ec) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
         if (ec > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weights must be non-negative.", IGRAPH_EINVAL);
             }
             else if (igraph_is_nan(min)) {
-                IGRAPH_ERROR("Weights must not contain NaN values", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
     }
@@ -231,7 +231,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
-                IGRAPH_ERROR("Random walk got stuck", IGRAPH_ERWSTUCK);
+                IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
 
@@ -245,7 +245,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
 
                 *cd = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (*cd == NULL) {
-                    IGRAPH_ERROR("random edge walk failed", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Random edge walk failed.", IGRAPH_ENOMEM);
                 }
                 IGRAPH_CHECK(igraph_vector_init(*cd, degree));
 
