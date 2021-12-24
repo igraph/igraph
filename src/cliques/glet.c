@@ -561,7 +561,7 @@ int igraph_graphlets_candidate_basis(const igraph_t *graph,
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
 
-    igraph_is_simple(graph, &simple);
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
     if (!simple) {
         IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
     }
@@ -613,7 +613,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative", IGRAPH_EINVAL);
     }
-    igraph_is_simple(graph, &simple);
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
     if (!simple) {
         IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
     }
