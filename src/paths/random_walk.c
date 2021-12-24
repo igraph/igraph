@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
+
 #include "core/interruption.h"
 
 /**
@@ -175,9 +176,8 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
     igraph_vector_t weight_temp;
     igraph_vector_ptr_t cdfs; /* cumulative distribution vectors for each node, used for weighted choice */
 
-    /* the fourth igraph_neimode_t value, IGRAPH_TOTAL, is disallowed */
     if (! (mode == IGRAPH_ALL || mode == IGRAPH_IN || mode == IGRAPH_OUT)) {
-        IGRAPH_ERROR("Invalid mode parameter", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode parameter.", IGRAPH_EINVMODE);
     }
 
     /* ref switch statement at end of main loop */
@@ -186,24 +186,24 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
     }
 
     if (start < 0 || start >= vc) {
-        IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid start vertex.", IGRAPH_EINVAL);
     }
 
     if (steps < 0) {
-        IGRAPH_ERROR("Invalid number of steps", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of steps.", IGRAPH_EINVAL);
     }
 
     if (weights) {
         if (igraph_vector_size(weights) != ec) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
         if (ec > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weights must be non-negative.", IGRAPH_EINVAL);
             }
             else if (igraph_is_nan(min)) {
-                IGRAPH_ERROR("Weights must not contain NaN values", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
     }
@@ -237,7 +237,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
-                IGRAPH_ERROR("Random walk got stuck", IGRAPH_ERWSTUCK);
+                IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
 
@@ -251,7 +251,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
                 *cd = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (*cd == NULL) {
-                    IGRAPH_ERROR("random edge walk failed", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Random edge walk failed.", IGRAPH_ENOMEM);
                 }
                 IGRAPH_CHECK(igraph_vector_init(*cd, degree));
 
