@@ -463,8 +463,8 @@ static bool igraph_i_lad_matchVertex(int u, bool induced, Tdomain* D, Tgraph* Gp
     igraph_vector_int_init(&toBeMatched, Gp->nbVertices);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &toBeMatched);
     VECTOR(toBeMatched)[0] = u;
-    igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt,
-                               &invalid);
+    IGRAPH_CHECK(igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt,
+                               &invalid));
     igraph_vector_int_destroy(&toBeMatched);
     IGRAPH_FINALLY_CLEAN(1);
 

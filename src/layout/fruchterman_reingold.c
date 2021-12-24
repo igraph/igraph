@@ -51,7 +51,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
     igraph_bool_t conn = 1;
     float C = 0;
 
-    igraph_is_connected(graph, &conn, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
         C = no_nodes * sqrtf(no_nodes);
     }
@@ -552,7 +552,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
     }
 
-    igraph_is_connected(graph, &conn, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
         C = no_nodes * sqrtf(no_nodes);
     }

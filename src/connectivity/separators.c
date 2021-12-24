@@ -790,8 +790,8 @@ int igraph_minimum_size_separators(const igraph_t *graph,
             if (ii == j) {
                 continue;    /* the same vertex */
             }
-            igraph_are_connected(&graph_copy, (igraph_integer_t) ii,
-                                 (igraph_integer_t) j, &conn);
+            IGRAPH_CHECK(igraph_are_connected(&graph_copy, (igraph_integer_t) ii,
+                                 (igraph_integer_t) j, &conn));
             if (conn) {
                 continue;    /* they are connected */
             }

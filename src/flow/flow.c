@@ -2287,7 +2287,7 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    igraph_are_connected(graph, source, target, &conn);
+    IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
     if (conn) {
         /* We need to remove every (possibly directed) edge between source
            and target and calculate the disjoint paths on the new
