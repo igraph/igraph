@@ -528,6 +528,7 @@
 ### Other
 
  - `igraph_is_tree()` has improved performance and memory usage.
+ - `igraph_is_connected()` has improved performance when checking weak connectedness.
  - The build system now checks that GLPK is of a compatible version (4.57 or later).
  - Documentation improvements.
 
