@@ -28,7 +28,7 @@
 
 int main() {
 
-    igraph_vector_t v, v2, v3;
+    igraph_vector_t v;
     igraph_vector_int_t v4, v5, v6;
     igraph_integer_t i;
     igraph_real_t *ptr;
