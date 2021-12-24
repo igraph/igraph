@@ -134,7 +134,8 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
         while ( !igraph_dqueue_int_empty(&q) ) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
-            for (i = 0; i < igraph_vector_int_size(&neis); i++) {
+            igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+            for (i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
                 if (already_added[neighbor] == 1) {
                     continue;
@@ -615,8 +616,9 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
             /* pop from the queue of this component */
             igraph_integer_t actvert = igraph_dqueue_int_pop(&q);
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvert, IGRAPH_ALL));
+            igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             /* iterate over the neighbors */
-            for (i = 0; i < igraph_vector_int_size(&neis); i++) {
+            for (i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
                 if (already_added[neighbor] == 1) {
                     continue;
