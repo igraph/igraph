@@ -23,7 +23,7 @@
 
 #define NCOMPLEX  /* to make it compile with MSVC on Windows */
 
-#include <cs/cs.h>
+#include <cs.h>
 #include <igraph.h>
 
 int permute(const igraph_matrix_t *M,
