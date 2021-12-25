@@ -22,7 +22,15 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   # Some tests depend on internal igraph headers so we also have to add src/
   # to the include path even though it's not part of the public API
   target_include_directories(
-    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/vendor ${CMAKE_BINARY_DIR}/src
+    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
+  )
+
+  # Some tests include cs.h from CXSparse. The following ensures that the
+  # correct version is included, depending on whether CXSparse is vendored
+  target_include_directories(
+    ${TARGET_NAME} PRIVATE
+    $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
+    $<$<BOOL:${CXSPARSE_INCLUDE_DIRS}>:${CXSPARSE_INCLUDE_DIRS}>
   )
 
   if (MSVC)
