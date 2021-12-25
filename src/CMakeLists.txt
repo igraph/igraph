@@ -331,7 +331,6 @@ target_include_directories(
   $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
 
   # Include paths for dependencies
-  $<$<BOOL:${CXSPARSE_INCLUDE_DIRS}>:${CXSPARSE_INCLUDE_DIRS}>
   $<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>
   $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
   $<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>
@@ -347,10 +346,6 @@ endif()
 
 if(BLAS_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${BLAS_LIBRARIES})
-endif()
-
-if(CXSPARSE_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${CXSPARSE_LIBRARIES})
 endif()
 
 if(GLPK_LIBRARIES)
