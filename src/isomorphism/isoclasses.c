@@ -820,34 +820,41 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                            igraph_integer_t number, igraph_bool_t directed) {
     igraph_vector_int_t edges;
     const unsigned int *classedges;
+    igraph_integer_t graphcount;
     igraph_integer_t power;
     igraph_integer_t code;
     igraph_integer_t pos;
 
     if (size < 3 || size > 4) {
-        IGRAPH_ERROR("Only for graphs with three of four vertices",
+        IGRAPH_ERROR("Isoclasses are supported only three- and four-vertex graphs.",
                      IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
+#define CHECK_ISOCLASS(number, directed, size) \
+    IGRAPH_ERRORF( \
+        "Isoclass " IGRAPH_PRId " requested, but there are only " \
+        IGRAPH_PRId " %s graphs of size " IGRAPH_PRId ".", IGRAPH_EINVAL, \
+        (igraph_integer_t) number, directed ? "directed" : "undirected", (igraph_integer_t) size)
+
     if (directed) {
         if (size == 3) {
             classedges = igraph_i_classedges_3;
+            graphcount = sizeof(igraph_i_isographs_3) / sizeof(igraph_i_isographs_3[0]);
 
-            if (number < 0 ||
-                number >= (sizeof(igraph_i_isographs_3) / sizeof(igraph_i_isographs_3[0]))) {
-                IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+            if (number < 0 || number >= graphcount) {
+                CHECK_ISOCLASS(number, directed, size);
             }
 
             code = igraph_i_isographs_3[ number];
             power = 32;
         } else {
             classedges = igraph_i_classedges_4;
+            graphcount = sizeof(igraph_i_isographs_4) / sizeof(igraph_i_isographs_4[0]);
 
-            if (number < 0 ||
-                number >= (sizeof(igraph_i_isographs_4) / sizeof(igraph_i_isographs_4[0]))) {
-                IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+            if (number < 0 || number >= graphcount) {
+                CHECK_ISOCLASS(number, directed, size);
             }
 
             code = igraph_i_isographs_4[ number];
@@ -856,26 +863,28 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     } else {
         if (size == 3) {
             classedges = igraph_i_classedges_3u;
+            graphcount = sizeof(igraph_i_isographs_3u) / sizeof(igraph_i_isographs_3u[0]));
 
-            if (number < 0 ||
-                number >= (sizeof(igraph_i_isographs_3u) / sizeof(igraph_i_isographs_3u[0]))) {
-                IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+            if (number < 0 || number >= graphcount) {
+                CHECK_ISOCLASS(number, directed, size);
             }
 
             code = igraph_i_isographs_3u[ number];
             power = 4;
         } else {
             classedges = igraph_i_classedges_4u;
+            graphcount = sizeof(igraph_i_isographs_4u) / sizeof(igraph_i_isographs_4u[0]));
 
-            if (number < 0 ||
-                number >= (sizeof(igraph_i_isographs_4u) / sizeof(igraph_i_isographs_4u[0]))) {
-                IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+            if (number < 0 || number >= graphcount) {
+                CHECK_ISOCLASS(number, directed, size);
             }
 
             code = igraph_i_isographs_4u[ number];
             power = 32;
         }
     }
+
+#undef CHECK_ISOCLASS
 
     pos = 0;
     while (code > 0) {
@@ -891,5 +900,6 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     IGRAPH_CHECK(igraph_create(graph, &edges, size, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
