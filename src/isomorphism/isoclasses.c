@@ -863,7 +863,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     } else {
         if (size == 3) {
             classedges = igraph_i_classedges_3u;
-            graphcount = sizeof(igraph_i_isographs_3u) / sizeof(igraph_i_isographs_3u[0]));
+            graphcount = sizeof(igraph_i_isographs_3u) / sizeof(igraph_i_isographs_3u[0]);
 
             if (number < 0 || number >= graphcount) {
                 CHECK_ISOCLASS(number, directed, size);
@@ -873,7 +873,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             power = 4;
         } else {
             classedges = igraph_i_classedges_4u;
-            graphcount = sizeof(igraph_i_isographs_4u) / sizeof(igraph_i_isographs_4u[0]));
+            graphcount = sizeof(igraph_i_isographs_4u) / sizeof(igraph_i_isographs_4u[0]);
 
             if (number < 0 || number >= graphcount) {
                 CHECK_ISOCLASS(number, directed, size);
