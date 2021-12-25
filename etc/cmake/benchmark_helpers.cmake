@@ -4,6 +4,7 @@ function(add_benchmark NAME NAMESPACE)
   set(TARGET_NAME ${NAMESPACE}_${NAME})
 
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/tests/benchmarks/${NAME}.c)
+  use_all_warnings(${TARGET_NAME})
   add_dependencies(build_benchmarks ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
