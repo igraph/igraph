@@ -109,20 +109,44 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  */
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                           int size, const igraph_vector_t *cut_prob) {
+    igraph_bool_t directed = igraph_is_directed(graph);
     int histlen;
 
-    if (size != 3 && size != 4) {
-        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
-                     IGRAPH_EINVAL);
+    if (directed) {
+        switch (size) {
+        case 3:
+            histlen = 16;
+            break;
+        case 4:
+            histlen = 218;
+            break;
+        default:
+            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
+    } else {
+        switch (size) {
+        case 3:
+            histlen = 4;
+            break;
+        case 4:
+            histlen = 11;
+            break;
+        case 5:
+            histlen = 34;
+            break;
+        case 6:
+            histlen = 156;
+            break;
+        default:
+            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
     }
+
     if (igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
-    }
-    if (size == 3) {
-        histlen = igraph_is_directed(graph) ? 16 : 4;
-    } else {
-        histlen = igraph_is_directed(graph) ? 218 : 11;
     }
 
     IGRAPH_CHECK(igraph_vector_resize(hist, histlen));
@@ -132,13 +156,13 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                  &igraph_i_motifs_randesu_update_hist, hist));
 
     if (size == 3) {
-        if (igraph_is_directed(graph)) {
+        if (directed) {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[3] = IGRAPH_NAN;
         } else {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = IGRAPH_NAN;
         }
     } else if (size == 4) {
-        if (igraph_is_directed(graph)) {
+        if (directed) {
             int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
                                     28, 33, 34, 39, 62, 120
                                   };
@@ -149,6 +173,22 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
         } else {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[2] =
                     VECTOR(*hist)[3] = VECTOR(*hist)[5] = IGRAPH_NAN;
+        }
+    } else if (size == 5) {
+        /* undirected only */
+        int not_connected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 19 };
+        int i, n = sizeof(not_connected) / sizeof(int);
+        for (i = 0; i < n; i++) {
+            VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
+        }
+    } else if (size == 6) {
+        /* undirected only */
+        int not_connected[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                               19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 38,
+                               44, 50, 51, 54, 74, 77, 89, 120};
+        int i, n = sizeof(not_connected) / sizeof(int);
+        for (i = 0; i < n; i++) {
+            VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
         }
     }
 
@@ -213,34 +253,53 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 
     igraph_bool_t terminate = 0;
 
-    if (size != 3 && size != 4) {
-        IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented.",
-                     IGRAPH_EINVAL);
+    if (igraph_is_directed(graph)) {
+        switch (size) {
+        case 3:
+            arr_idx = igraph_i_isoclass_3_idx;
+            arr_code = igraph_i_isoclass2_3;
+            mul = 3;
+            break;
+        case 4:
+            arr_idx = igraph_i_isoclass_4_idx;
+            arr_code = igraph_i_isoclass2_4;
+            mul = 4;
+            break;
+        default:
+            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
+    } else {
+        switch (size) {
+        case 3:
+            arr_idx = igraph_i_isoclass_3u_idx;
+            arr_code = igraph_i_isoclass2_3u;
+            mul = 3;
+            break;
+        case 4:
+            arr_idx = igraph_i_isoclass_4u_idx;
+            arr_code = igraph_i_isoclass2_4u;
+            mul = 4;
+            break;
+        case 5:
+            arr_idx = igraph_i_isoclass_5u_idx;
+            arr_code = igraph_i_isoclass2_5u;
+            mul = 5;
+            break;
+        case 6:
+            arr_idx = igraph_i_isoclass_6u_idx;
+            arr_code = igraph_i_isoclass2_6u;
+            mul = 6;
+            break;
+        default:
+            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
     }
 
     if (igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
-    }
-
-    if (size == 3) {
-        mul = 3;
-        if (igraph_is_directed(graph)) {
-            arr_idx = igraph_i_isoclass_3_idx;
-            arr_code = igraph_i_isoclass2_3;
-        } else {
-            arr_idx = igraph_i_isoclass_3u_idx;
-            arr_code = igraph_i_isoclass2_3u;
-        }
-    } else {
-        mul = 4;
-        if (igraph_is_directed(graph)) {
-            arr_idx = igraph_i_isoclass_4_idx;
-            arr_code = igraph_i_isoclass2_4;
-        } else {
-            arr_idx = igraph_i_isoclass_4u_idx;
-            arr_code = igraph_i_isoclass2_4u;
-        }
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, long int);
@@ -425,6 +484,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_adjlist_destroy(&allneis);
     igraph_stack_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(7);
+
     return IGRAPH_SUCCESS;
 }
 
