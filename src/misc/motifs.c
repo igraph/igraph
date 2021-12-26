@@ -59,21 +59,23 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  * the graph.
  *
  * </para><para>
- * This function is able to find the different motifs of size three
- * and four (i.e. the number of different subgraphs with three and four
- * vertices) in the network.
+ * This function is able to find directed motifs of sizes three
+ * and four and undirected motifs of sizes three to six
+ * (i.e. the number of different subgraphs with three to six
+ * vertices in the network).
  *
  * </para><para>
  * In a big network the total number of motifs can be very large, so
  * it takes a lot of time to find all of them, a sampling method can
  * be used. This function is capable of doing sampling via the
- * \c cut_prob argument. This argument gives the probability that
+ * \p cut_prob argument. This argument gives the probability that
  * a branch of the motif search tree will not be explored. See
  * S. Wernicke and F. Rasche: FANMOD: a tool for fast network motif
  * detection, Bioinformatics 22(9), 1152--1153, 2006 for details.
+ * https://doi.org/10.1093/bioinformatics/btl038
  *
  * </para><para>
- * Set the \c cut_prob argument to a zero vector for finding all
+ * Set the \p cut_prob argument to a zero vector for finding all
  * motifs.
  *
  * </para><para>
@@ -87,21 +89,23 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  *        Note that this function does \em not count isomorphism
  *        classes that are not connected and will report NaN (more
  *        precisely \c IGRAPH_NAN) for them.
- * \param size The size of the motifs to search for. Only three and
- *        four are implemented currently. The limitation is not in the
- *        motif finding code, but the graph isomorphism code.
+ * \param size The size of the motifs to search for. For directed graphs,
+ *        only 3 and 4 are implemented, for undirected, 3 to 6.
+ *        The limitation is not in the motif finding code, but the graph
+ *        isomorphism code.
  * \param cut_prob Vector of probabilities for cutting the search tree
  *        at a given level. The first element is the first level, etc.
- *        Supply all zeros here (of length \c size) to find all motifs
+ *        Supply all zeros here (of length \p size) to find all motifs
  *        in a graph.
  * \return Error code.
+ *
  * \sa \ref igraph_motifs_randesu_estimate() for estimating the number
  * of motifs in a graph, this can help to set the \p cut_prob
  * parameter; \ref igraph_motifs_randesu_no() to calculate the total
  * number of motifs of a given size in a graph;
  * \ref igraph_motifs_randesu_callback() for calling a callback function
  * for every motif found; \ref igraph_subisomorphic_lad() for finding
- * subgraphs on more than 4 vertices.
+ * subgraphs on more than 4 (directed) or 6 (undirected) vertices.
  *
  * Time complexity: TODO.
  *
@@ -200,9 +204,10 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
  * \brief Finds motifs in a graph and calls a function for each of them.
  *
  * </para><para>
- * Similarly to \ref igraph_motifs_randesu(), this function is able to find the
- * different motifs of size three and four (i.e. the number of different
- * subgraphs with three and four vertices) in the network. However, instead of
+ * Similarly to \ref igraph_motifs_randesu(), this function is able to find
+ * directed motifs of sizes three and four and undirected motifs of sizes
+ * three to six (i.e. the number of different subgraphs with three to six
+ * vertices in the network). However, instead of
  * counting them, the function will call a callback function for each motif
  * found to allow further tests or post-processing.
  *
@@ -492,10 +497,10 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  * \function igraph_motifs_randesu_estimate
  * \brief Estimate the total number of motifs in a graph.
  *
- * This function estimates the total number of connected induced
+ * This function estimates the total number of weakly connected induced
  * subgraphs, called motifs, of a fixed number of vertices. For
  * example, an undirected complete graph on \c n vertices
- * will have one motif of \p size \c n, and \c n motifs
+ * will have one motif of size \c n, and \c n motifs
  * of \p size <code>n - 1</code>. As another example, one triangle
  * and a separate vertex will have zero motifs of size four.
  *
@@ -517,17 +522,17 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  * \param graph The graph object to study.
  * \param est Pointer to an integer type, the result will be stored
  *        here.
- * \param size The size of the motif to look for.
+ * \param size The size of the motifs to look for.
  * \param cut_prob Vector giving the probabilities to cut a branch of
  *        the search tree and omit counting the motifs in that branch.
- *        It contains a probability for each level. Supply \c size
+ *        It contains a probability for each level. Supply \p size
  *        zeros here to count all the motifs in the sample.
  * \param sample_size The number of vertices to use as the
- *        sample. This parameter is only used if the \c parsample
+ *        sample. This parameter is only used if the \p parsample
  *        argument is a null pointer.
  * \param parsample Either pointer to an initialized vector or a null
  *        pointer. If a vector then the vertex ids in the vector are
- *        used as a sample. If a null pointer then the \c sample_size
+ *        used as a sample. If a null pointer then the \p sample_size
  *        argument is used to create a sample of vertices drawn with
  *        uniform probability.
  * \return Error code.

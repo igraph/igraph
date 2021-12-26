@@ -2519,11 +2519,17 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * they are isomorphic.
  *
  * </para><para>
- * The first isomorphism class is numbered zero and it is the empty
- * graph, the last isomorphism class is the full graph. The number of
- * isomorphism class for directed graphs with three vertices is 16
+ * The first isomorphism class is numbered zero and it contains the edgeless
+ * graph. The last isomorphism class contains the full graph. The number of
+ * isomorphism classes for directed graphs with three vertices is 16
  * (between 0 and 15), for undirected graph it is only 4. For graphs
  * with four vertices it is 218 (directed) and 11 (undirected).
+ * For 5 and 6 vertex undirected graphs, it is 34 and 156, respectively.
+ * For more information, see https://oeis.org/A000273 and https://oeis.org/A000088.
+ *
+ * </para><para>
+ * At the moment, 3- and 4-vertex directed graphs and 3 to 6 vertex
+ * undirected graphs are supported.
  *
  * </para><para>
  * Multi-edges and self-loops are ignored by this function.
@@ -2608,9 +2614,16 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * \function igraph_isoclass_subgraph
  * \brief The isomorphism class of a subgraph of a graph.
  *
+ * This function identifies the isomorphism class of the subgraph
+ * induced the vertices specified in \p vids.
+ *
  * </para><para>
- * This function is only implemented for subgraphs with three or four
- * vertices.
+ * At the moment, 3- and 4-vertex directed graphs and 3 to 6 vertex
+ * undirected graphs are supported.
+ *
+ * </para><para>
+ * Multi-edges and self-loops are ignored by this function.
+ *
  * \param graph The graph object.
  * \param vids A vector containing the vertex ids to be considered as
  *        a subgraph. Each vertex id should be included at most once.
@@ -2705,8 +2718,20 @@ int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
  * \brief Creates a graph from the given isomorphism class.
  *
  * </para><para>
- * This function is implemented only for graphs with three or four
- * vertices.
+ * This function creates the canonical representative graph of the
+ * given isomorphism class.
+ *
+ * </para><para>
+ * The isomorphism class is an integer between 0 and the number of
+ * unique unlabeled (i.e. non-isomorphic) graphs on the given number
+ * of vertices and give directedness. See https://oeis.org/A000273
+ * and https://oeis.org/A000088 for the number of directed and
+ * undirected graphs on \p size nodes.
+ *
+ * </para><para>
+ * At the moment, 3- and 4-vertex directed graphs and 3 to 6 vertex
+ * undirected graphs are supported.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param size The number of vertices to add to the graph.
  * \param number The isomorphism class.
