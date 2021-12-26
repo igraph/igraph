@@ -268,6 +268,112 @@ void test_motifs_undirected() {
     igraph_vector_destroy(&lad_counts);
     igraph_vector_destroy(&cut_prob);
 
+    /* 5-motifs */
+
+    n = 34; /* there are 34 size-5 undirected graphs */
+
+    igraph_vector_init(&lad_counts, n);
+
+    for (i = 0; i < n; i++) {
+        igraph_t pattern;
+        igraph_vector_ptr_t maps;
+        igraph_integer_t nAutomorphisms;
+
+        igraph_isoclass_create(&pattern, 5, i, /* directed = */ 0);
+        igraph_vector_ptr_init(&maps, 0);
+
+        igraph_subisomorphic_lad(&pattern, &graph, NULL, NULL, NULL, &maps, /* induced = */ 1, 0);
+
+        igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
+
+        VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
+
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        igraph_vector_ptr_destroy_all(&maps);
+
+        igraph_destroy(&pattern);
+    }
+
+    igraph_vector_init(&cut_prob, 5);
+    igraph_vector_init(&randesu_counts, 0);
+    igraph_motifs_randesu(&graph, &randesu_counts, 5, &cut_prob);
+
+    equal = 1 /* true */;
+    for (i = 0; i < n; i++) {
+        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+            continue;
+        }
+        if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
+            equal = 0;
+            break;
+        }
+    }
+
+    if (! equal) {
+        printf("LAD undirected 5-motif count does not agree with RANDESU.\n");
+    }
+
+    if (igraph_vector_sum(&lad_counts) != vcount * (vcount - 1) * (vcount - 2) * (vcount - 3) * (vcount - 4) / 120) {
+        printf("Total 5-vertex undirected subgraph count is incorrect.\n");
+    }
+
+    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_destroy(&lad_counts);
+    igraph_vector_destroy(&cut_prob);
+
+    /* 6-motifs */
+
+    n = 156; /* there are 156 size-6 undirected graphs */
+
+    igraph_vector_init(&lad_counts, n);
+
+    for (i = 0; i < n; i++) {
+        igraph_t pattern;
+        igraph_vector_ptr_t maps;
+        igraph_integer_t nAutomorphisms;
+
+        igraph_isoclass_create(&pattern, 6, i, /* directed = */ 0);
+        igraph_vector_ptr_init(&maps, 0);
+
+        igraph_subisomorphic_lad(&pattern, &graph, NULL, NULL, NULL, &maps, /* induced = */ 1, 0);
+
+        igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
+
+        VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
+
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        igraph_vector_ptr_destroy_all(&maps);
+
+        igraph_destroy(&pattern);
+    }
+
+    igraph_vector_init(&cut_prob, 6);
+    igraph_vector_init(&randesu_counts, 0);
+    igraph_motifs_randesu(&graph, &randesu_counts, 6, &cut_prob);
+
+    equal = 1 /* true */;
+    for (i = 0; i < n; i++) {
+        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+            continue;
+        }
+        if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
+            equal = 0;
+            break;
+        }
+    }
+
+    if (! equal) {
+        printf("LAD undirected 6-motif count does not agree with RANDESU.\n");
+    }
+
+    if (igraph_vector_sum(&lad_counts) != vcount * (vcount - 1) * (vcount - 2) * (vcount - 3) * (vcount - 4) * (vcount - 5) / 720) {
+        printf("Total 6-vertex undirected subgraph count is incorrect.\n");
+    }
+
+    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_destroy(&lad_counts);
+    igraph_vector_destroy(&cut_prob);
+
     igraph_destroy(&graph);
 }
 
