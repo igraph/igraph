@@ -2756,11 +2756,11 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-#define CHECK_ISOCLASS(number, directed, size) \
+#define CHECK_ISOCLASS(number, directed, size, graphcount) \
     IGRAPH_ERRORF( \
-        "Isoclass " IGRAPH_PRId " requested, but there are only " \
-        IGRAPH_PRId " %s graphs of size " IGRAPH_PRId ".", IGRAPH_EINVAL, \
-        (igraph_integer_t) number, directed ? "directed" : "undirected", (igraph_integer_t) size)
+        "Isoclass %" IGRAPH_PRId " requested, but there are only %" \
+        IGRAPH_PRId " %s graphs of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, \
+        (igraph_integer_t) number, graphcount, directed ? "directed" : "undirected", (igraph_integer_t) size)
 
     if (directed) {
         switch (size) {
@@ -2769,7 +2769,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             graphcount = sizeof(igraph_i_isographs_3) / sizeof(igraph_i_isographs_3[0]);
 
             if (number < 0 || number >= graphcount) {
-                CHECK_ISOCLASS(number, directed, size);
+                CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
             code = igraph_i_isographs_3[ (long int) number];
@@ -2782,7 +2782,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             graphcount = sizeof(igraph_i_isographs_4) / sizeof(igraph_i_isographs_4[0]);
 
             if (number < 0 || number >= graphcount) {
-                CHECK_ISOCLASS(number, directed, size);
+                CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
             code = igraph_i_isographs_4[ (long int) number];
@@ -2802,7 +2802,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             graphcount = sizeof(igraph_i_isographs_3u) / sizeof(igraph_i_isographs_3u[0]);
 
             if (number < 0 || number >= graphcount) {
-                CHECK_ISOCLASS(number, directed, size);
+                CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
             code = igraph_i_isographs_3u[ (long int) number];
@@ -2815,7 +2815,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             graphcount = sizeof(igraph_i_isographs_4u) / sizeof(igraph_i_isographs_4u[0]);
 
             if (number < 0 || number >= graphcount) {
-                CHECK_ISOCLASS(number, directed, size);
+                CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
             code = igraph_i_isographs_4u[ (long int) number];
@@ -2828,7 +2828,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             graphcount = sizeof(igraph_i_isographs_5u) / sizeof(igraph_i_isographs_5u[0]);
 
             if (number < 0 || number >= graphcount) {
-                CHECK_ISOCLASS(number, directed, size);
+                CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
             code = igraph_i_isographs_5u[ (long int) number];
@@ -2841,7 +2841,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
             graphcount = sizeof(igraph_i_isographs_6u) / sizeof(igraph_i_isographs_6u[0]);
 
             if (number < 0 || number >= graphcount) {
-                CHECK_ISOCLASS(number, directed, size);
+                CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
             code = igraph_i_isographs_6u[ (long int) number];
