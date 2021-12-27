@@ -16,6 +16,32 @@ find_library(PLFIT_LIBRARY
   NAMES plfit
 )
 
+# parse version from header
+if(PLFIT_INCLUDE_DIR)
+  set(PLFIT_VERSION_FILE ${PLFIT_INCLUDE_DIR}/plfit_version.h)
+  file(READ ${PLFIT_VERSION_FILE} PLFIT_VERSION_FILE_CONTENTS)
+
+  string(REGEX MATCH "#define[ ]+PLFIT_VERSION_MAJOR[ ]+[0-9]+"
+    PLFIT_VERSION_MAJOR "${PLFIT_VERSION_FILE_CONTENTS}")
+  string(REGEX REPLACE "#define[ ]+PLFIT_VERSION_MAJOR[ ]+([0-9]+)" "\\1"
+    PLFIT_VERSION_MAJOR "${PLFIT_VERSION_MAJOR}")
+
+  string(REGEX MATCH "#define[ ]+PLFIT_VERSION_MINOR[ ]+[0-9]+"
+    PLFIT_VERSION_MINOR "${PLFIT_VERSION_FILE_CONTENTS}")
+  string(REGEX REPLACE "#define[ ]+PLFIT_VERSION_MINOR[ ]+([0-9]+)" "\\1"
+    PLFIT_VERSION_MINOR "${PLFIT_VERSION_MINOR}")
+
+  string(REGEX MATCH "#define[ ]+PLFIT_VERSION_PATCH[ ]+[0-9]+"
+    PLFIT_VERSION_PATCH "${PLFIT_VERSION_FILE_CONTENTS}")
+  string(REGEX REPLACE "#define[ ]+PLFIT_VERSION_PATCH[ ]+([0-9]+)" "\\1"
+    PLFIT_VERSION_PATCH "${PLFIT_VERSION_PATCH}")
+
+  set(PLFIT_VERSION "${PLFIT_VERSION_MAJOR}.${PLFIT_VERSION_MINOR}.${PLFIT_VERSION_PATCH}")
+
+  # compatibility variables
+  set(PLFIT_VERSION_STRING "${PLFIT_VERSION}")
+endif()
+
 # behave like a CMake module is supposed to behave
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(

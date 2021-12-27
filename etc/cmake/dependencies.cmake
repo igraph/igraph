@@ -30,6 +30,7 @@ macro(find_dependencies)
 
   # Declare minimum supported version for some dependencies
   set(GLPK_VERSION_MIN "4.57") # 4.57 is the first version providing glp_on_error()
+  set(PLFIT_VERSION_MIN "0.9.3")
 
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
