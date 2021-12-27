@@ -17,8 +17,8 @@ function(add_benchmark NAME NAMESPACE)
   # that the correct version is included, depending on whether plfit is vendored
   target_include_directories(
     ${TARGET_NAME} PRIVATE
-	$<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
-	$<$<BOOL:${PLFIT_INCLUDE_DIR}>:${PLFIT_INCLUDE_DIR}>
+    $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
+    $<$<BOOL:${PLFIT_INCLUDE_DIR}>:${PLFIT_INCLUDE_DIR}>
   )
 
   if (MSVC)
