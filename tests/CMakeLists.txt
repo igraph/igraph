@@ -379,6 +379,7 @@ add_legacy_tests(
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses
+  isoclasses2
   VF2-compat
 )
 
