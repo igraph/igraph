@@ -22,6 +22,7 @@
  - `igraph_is_connected()` has improved performance when checking weak connectedness.
  - The build system now checks that GLPK is of a compatible version (4.57 or later).
  - The vendored `plfit` package was updated to 0.9.3.
+ - You can now build igraph with an external `plfit` instead of the vendored one.
  - Documentation improvements.
 
 ## [0.9.5] - 2021-11-11

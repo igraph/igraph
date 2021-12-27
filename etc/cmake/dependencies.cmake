@@ -8,7 +8,7 @@ include(FindThreads)
 
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored
-  set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK GMP)
+  set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK GMP PLFIT)
 
   # Declare optional dependencies associated with IGRAPH_..._SUPPORT flags
   # Note that GLPK is both vendorable and optional
@@ -21,6 +21,7 @@ macro(find_dependencies)
   tristate(IGRAPH_USE_INTERNAL_CXSPARSE "Compile igraph with internal CXSparse" AUTO)
   tristate(IGRAPH_USE_INTERNAL_GLPK "Compile igraph with internal GLPK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_PLFIT "Compile igraph with internal plfit" AUTO)
 
   # Declare dependencies
   set(REQUIRED_DEPENDENCIES "")
@@ -36,7 +37,7 @@ macro(find_dependencies)
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
-      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} OFF)
       else()
@@ -57,7 +58,7 @@ macro(find_dependencies)
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
-    find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_${LIBNAME_UPPER}_SUPPORT ON)
       else()
@@ -150,7 +151,7 @@ macro(find_dependencies)
       set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
     endif()
     unset(SINH_FUNCTION_EXISTS CACHE)
-	set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
+    set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
   endif()
 
   if(NEED_LINKING_AGAINST_LIBM)

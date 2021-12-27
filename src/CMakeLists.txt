@@ -291,6 +291,7 @@ add_library(
   $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_OBJECTS:glpk_vendored>,>
   $<IF:$<BOOL:${GMP_IS_VENDORED}>,$<TARGET_OBJECTS:gmp_vendored>,>
   $<IF:$<BOOL:${LAPACK_IS_VENDORED}>,$<TARGET_OBJECTS:lapack_vendored>,>
+  $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
 # Set soname for the library
@@ -327,12 +328,14 @@ target_include_directories(
   # Vendored library include paths
   $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
   $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
+  $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
 
   # Include paths for dependencies
   $<$<BOOL:${CXSPARSE_INCLUDE_DIRS}>:${CXSPARSE_INCLUDE_DIRS}>
   $<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>
   $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
   $<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>
+  $<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>
 )
 
 if(MATH_LIBRARY)
@@ -367,11 +370,15 @@ if(LIBXML2_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${LIBXML2_LIBRARIES})
 endif()
 
+if(PLFIT_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${PLFIT_LIBRARIES})
+endif()
+
 # Link igraph statically to some of the libraries from the subdirectories
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer plfit prpack
+  bliss cliquer prpack
 )
 
 # Disable complex number support for CXSparse because:
@@ -427,7 +434,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer plfit prpack
+  TARGETS igraph bliss cliquer prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
