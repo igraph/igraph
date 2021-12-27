@@ -15,28 +15,28 @@
 
 #include "igraph_random.h"
 
-#include "mt.h"
+#include "plfit_mt.h"
 
 static uint16_t get_random_uint16() {
     return RNG_INT31() & 0xFFFF;
 }
 
-void mt_init(mt_rng_t* rng) {
-    mt_init_from_rng(rng, 0);
+void plfit_mt_init(plfit_mt_rng_t* rng) {
+    plfit_mt_init_from_rng(rng, 0);
 }
 
-void mt_init_from_rng(mt_rng_t* rng, mt_rng_t* seeder) {
+void plfit_mt_init_from_rng(plfit_mt_rng_t* rng, plfit_mt_rng_t* seeder) {
     int i;
 
     if (seeder == 0) {
-        for (i = 0; i < MT_LEN; i++) {
+        for (i = 0; i < PLFIT_MT_LEN; i++) {
             /* RAND_MAX is guaranteed to be at least 32767, so we can use two
              * calls to rand() to produce a random 32-bit number */
             rng->mt_buffer[i] = (get_random_uint16() << 16) + get_random_uint16();
         }
     } else {
-        for (i = 0; i < MT_LEN; i++) {
-            rng->mt_buffer[i] = mt_random(seeder);
+        for (i = 0; i < PLFIT_MT_LEN; i++) {
+            rng->mt_buffer[i] = plfit_mt_random(seeder);
         }
     }
 
@@ -44,33 +44,33 @@ void mt_init_from_rng(mt_rng_t* rng, mt_rng_t* seeder) {
 }
 
 #define MT_IA           397
-#define MT_IB           (MT_LEN - MT_IA)
+#define MT_IB           (PLFIT_MT_LEN - MT_IA)
 #define UPPER_MASK      0x80000000
 #define LOWER_MASK      0x7FFFFFFF
 #define MATRIX_A        0x9908B0DF
 #define TWIST(b,i,j)    ((b)[i] & UPPER_MASK) | ((b)[j] & LOWER_MASK)
 #define MAGIC(s)        (((s)&1)*MATRIX_A)
 
-uint32_t mt_random(mt_rng_t* rng) {
+uint32_t plfit_mt_random(plfit_mt_rng_t* rng) {
     uint32_t * b = rng->mt_buffer;
     int idx = rng->mt_index;
     uint32_t s;
     int i;
 	
-    if (idx == MT_LEN * sizeof(uint32_t)) {
+    if (idx == PLFIT_MT_LEN * sizeof(uint32_t)) {
         idx = 0;
         i = 0;
         for (; i < MT_IB; i++) {
             s = TWIST(b, i, i+1);
             b[i] = b[i + MT_IA] ^ (s >> 1) ^ MAGIC(s);
         }
-        for (; i < MT_LEN-1; i++) {
+        for (; i < PLFIT_MT_LEN-1; i++) {
             s = TWIST(b, i, i+1);
             b[i] = b[i - MT_IB] ^ (s >> 1) ^ MAGIC(s);
         }
         
-        s = TWIST(b, MT_LEN-1, 0);
-        b[MT_LEN-1] = b[MT_IA-1] ^ (s >> 1) ^ MAGIC(s);
+        s = TWIST(b, PLFIT_MT_LEN-1, 0);
+        b[PLFIT_MT_LEN-1] = b[MT_IA-1] ^ (s >> 1) ^ MAGIC(s);
     }
 
     rng->mt_index = idx + sizeof(uint32_t);
@@ -88,8 +88,6 @@ uint32_t mt_random(mt_rng_t* rng) {
 }
 
 
-double mt_uniform_01(mt_rng_t* rng) {
-    return ((double)mt_random(rng)) / MT_RAND_MAX;
+double plfit_mt_uniform_01(plfit_mt_rng_t* rng) {
+    return ((double)plfit_mt_random(rng)) / PLFIT_MT_RAND_MAX;
 }
-
-

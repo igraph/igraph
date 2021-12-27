@@ -26,7 +26,7 @@
 #include "igraph_types.h"
 
 #include "core/interruption.h"
-#include "plfit/error.h"
+#include "plfit/plfit_error.h"
 #include "plfit/plfit.h"
 
 #include <math.h>

@@ -1,4 +1,4 @@
-/* error.h
+/* plfit_error.h
  *
  * Copyright (C) 2010-2011 Tamas Nepusz
  *
