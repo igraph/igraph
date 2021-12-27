@@ -44,11 +44,12 @@ endif()
 
 # behave like a CMake module is supposed to behave
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(
-  PLFIT
-  DEFAULT_MSG
-  PLFIT_LIBRARY
-  PLFIT_INCLUDE_DIR
+find_package_handle_standard_args(PLFIT
+  FOUND_VAR PLFIT_FOUND
+  REQUIRED_VARS
+    PLFIT_LIBRARY
+    PLFIT_INCLUDE_DIR
+  VERSION_VAR PLFIT_VERSION
 )
 
 # hide the introduced cmake cached variables in cmake GUIs
