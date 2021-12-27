@@ -1,7 +1,7 @@
 #include <igraph.h>
 
 #include "bench.h"
-#include "../../vendor/plfit/sampling.h"
+#include "../../vendor/plfit/plfit_sampling.h"
 
 igraph_vector_t data;
 
