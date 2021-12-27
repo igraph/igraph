@@ -1,73 +1,54 @@
-/* -*- mode: C -*-  */
-/*
-   IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
-
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
-*/
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    igraph_real_t sum = 0.0;
-    for (i = 0; i < n; i++) {
-        if (!igraph_is_nan(VECTOR(*v)[i])) {
-            sum += VECTOR(*v)[i];
-        }
-    }
-    for (i = 0; i < n; i++) {
-        igraph_real_printf(VECTOR(*v)[i] / sum);
-        printf(" ");
-    }
-    printf("\n");
-}
-
+/* This is a callback function suitable for use with igraph_motifs_randesu_callback().
+ * It prints each motif it is calld with. */
 igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
                           int isoclass, void* extra) {
-    printf("Class %d: ", isoclass);
+    printf("Found isoclass %2d:  ", isoclass);
     igraph_vector_print(vids);
-    return 0;
+    return 0; /* Return 'false': do not interrupt the search. */
 }
-
 
 int main() {
 
-    igraph_t g;
+    igraph_t graph;
     igraph_vector_t hist;
-    igraph_vector_t cp_3, cp_4;
+    igraph_real_t zeros[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    igraph_vector_t cut_prob;
 
-    igraph_vector_init_real(&cp_3, 3, 0.0, 0.0, 0.0);
-    igraph_vector_init_real(&cp_4, 4, 0.0, 0.0, 0.0, 0.0);
+    /* Compute the 4-motif distritbuion in Zachary's karate club network. */
 
-    igraph_ring(&g, 1000, IGRAPH_DIRECTED, 1, 1);
+    igraph_famous(&graph, "Zachary");
     igraph_vector_init(&hist, 0);
-    igraph_motifs_randesu(&g, &hist, 3, &cp_3);
-    print_vector(&hist);
-    igraph_destroy(&g);
+
+    igraph_motifs_randesu(&graph, &hist, 4, igraph_vector_view(&cut_prob, zeros, 4));
+
+    /* Compute the total number of motifs (connected 4-vertex subgraphs)
+     * so that we can print the normalized distribution. */
+    igraph_real_t sum = 0.0;
+    igraph_integer_t n = igraph_vector_size(&hist);
+    for (igraph_integer_t i=0; i < n; i++) {
+        if (!igraph_is_nan(VECTOR(hist)[i])) {
+            sum += VECTOR(hist)[i];
+        }
+    }
+    printf("4-motif distribution:\n");
+    for (igraph_integer_t i=0; i < n; i++) {
+        /* Print NaN values in a platform-independent manner: */
+        igraph_real_printf(VECTOR(hist)[i] / sum);
+        printf(" ");
+    }
+    printf("\n\n");
+
     igraph_vector_destroy(&hist);
+    igraph_destroy(&graph);
 
-    igraph_famous(&g, "bull");
-    igraph_motifs_randesu_callback(&g, 3, &cp_3, &print_motif, 0);
-    igraph_motifs_randesu_callback(&g, 4, &cp_4, &print_motif, 0);
-    igraph_destroy(&g);
+    /* Identify the vertices of each three-motif in a small Kautz graph. */
 
-    igraph_vector_destroy(&cp_3);
-    igraph_vector_destroy(&cp_4);
+    igraph_kautz(&graph, 2, 1);
+    igraph_motifs_randesu_callback(&graph, 3, igraph_vector_view(&cut_prob, zeros, 3), &print_motif, NULL);
+    igraph_destroy(&graph);
+
     return 0;
 }
