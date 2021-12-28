@@ -557,6 +557,11 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     long int sam;
     long int i;
 
+    if (size < 3) {
+        IGRAPH_ERRORF("Motif size must be at least 3, received %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, (igraph_integer_t) size);
+    }
+
     if (igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%ld) must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
