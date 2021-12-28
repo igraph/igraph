@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed
+
+ - Isomorphism class functions (`igraph_isoclass()`, `igraph_isoclass_subgraph()`, 
+   `igraph_isoclass_create`) and motif finder functions (`igraph_motifs_randesu()`,
+   `igraph_motifs_randesu_estimate()`, `igraph_motifs_randesu_callback()`) now
+   support undirected (sub)graphs of sizes 5 and 6. Previsouly only sizes 3 and 4
+   were supported.
+
 ### Fixed
 
  - igraph would not build with MinGW when using the vendored GLPK and enabling TLS.
