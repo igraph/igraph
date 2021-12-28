@@ -524,12 +524,16 @@
  - Fixed a bug in `igraph_cmp_epsilon()` that resulted in incorrect results for
    edge betweenness calculations in certain rare cases with x87 floating point
    math when LTO was also enabled (#1894).
+ - Weighted clique related functions now fall back to the unweighted variants
+   when a null vertex weight vector is given to them.
 
 ### Other
 
  - `igraph_is_tree()` has improved performance and memory usage.
  - `igraph_is_connected()` has improved performance when checking weak connectedness.
  - The build system now checks that GLPK is of a compatible version (4.57 or later).
+ - The vendored `plfit` package was updated to 0.9.3.
+ - You can now build igraph with an external `plfit` instead of the vendored one.
  - Documentation improvements.
 
 ## [0.9.5] - 2021-11-11

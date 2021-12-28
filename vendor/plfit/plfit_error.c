@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "error.h"
+#include "plfit_error.h"
 #include "platform.h"
 
 static char *plfit_i_error_strings[] = {

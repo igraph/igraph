@@ -1042,17 +1042,17 @@ igraph_clique_number:
 
 igraph_weighted_cliques:
     PARAMS: |-
-        GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT VERTEXSETLIST res,
+        GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT VERTEXSETLIST res,
         REAL min_weight=0, REAL max_weight=0, BOOLEAN maximal=False
     DEPS: vertex_weights ON graph, res ON graph
 
 igraph_largest_weighted_cliques:
     PARAMS: |-
-        GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT VERTEXSETLIST res
+        GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT VERTEXSETLIST res
     DEPS: vertex_weights ON graph, res ON graph
 
 igraph_weighted_clique_number:
-    PARAMS: GRAPH graph, VERTEXWEIGHTS vertex_weights, OUT REAL res
+    PARAMS: GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT REAL res
     DEPS: vertex_weights ON graph
 
 igraph_independent_vertex_sets:
