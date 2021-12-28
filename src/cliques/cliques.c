@@ -429,7 +429,8 @@ int igraph_cliques_callback(const igraph_t *graph,
  *
  * \param graph The input graph.
  * \param vertex_weights A vector of vertex weights. The current implementation
- *   will truncate all weights to their integer parts.
+ *   will truncate all weights to their integer parts. You may pass \c NULL
+ *   here to make each vertex have a weight of 1.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
@@ -450,7 +451,13 @@ int igraph_cliques_callback(const igraph_t *graph,
 int igraph_weighted_cliques(const igraph_t *graph,
                             const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
                             igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
-    return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
+    if (vertex_weights) {
+        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
+    } else if (maximal) {
+        return igraph_maximal_cliques(graph, res, min_weight, max_weight);
+    } else {
+        return igraph_cliques(graph, res, min_weight, max_weight);
+    }
 }
 
 
@@ -469,7 +476,8 @@ int igraph_weighted_cliques(const igraph_t *graph,
  *
  * \param graph The input graph.
  * \param vertex_weights A vector of vertex weights. The current implementation
- *   will truncate all weights to their integer parts.
+ *   will truncate all weights to their integer parts. You may pass \c NULL
+ *   here to make each vertex have a weight of 1.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
@@ -483,7 +491,11 @@ int igraph_weighted_cliques(const igraph_t *graph,
  */
 int igraph_largest_weighted_cliques(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res) {
-    return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
+    if (vertex_weights) {
+        return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
+    } else {
+        return igraph_largest_cliques(graph, res);
+    }
 }
 
 
@@ -499,7 +511,8 @@ int igraph_largest_weighted_cliques(const igraph_t *graph,
  *
  * \param graph The input graph.
  * \param vertex_weights A vector of vertex weights. The current implementation
- *   will truncate all weights to their integer parts.
+ *   will truncate all weights to their integer parts. You may pass \c NULL
+ *   here to make each vertex have a weight of 1.
  * \param res The largest weight will be returned to the \c igraph_real_t
  *   pointed to by this variable.
  * \return Error code.
@@ -511,7 +524,16 @@ int igraph_largest_weighted_cliques(const igraph_t *graph,
  */
 int igraph_weighted_clique_number(const igraph_t *graph,
                                   const igraph_vector_t *vertex_weights, igraph_real_t *res) {
-    return igraph_i_weighted_clique_number(graph, vertex_weights, res);
+    if (vertex_weights) {
+        return igraph_i_weighted_clique_number(graph, vertex_weights, res);
+    } else {
+        igraph_integer_t res_int;
+        IGRAPH_CHECK(igraph_clique_number(graph, &res_int));
+        if (res) {
+            *res = res_int;
+        }
+        return IGRAPH_SUCCESS;
+    }
 }
 
 typedef int(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);

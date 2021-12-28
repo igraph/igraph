@@ -15,6 +15,8 @@
  - Fixed a bug in `igraph_cmp_epsilon()` that resulted in incorrect results for
    edge betweenness calculations in certain rare cases with x87 floating point
    math when LTO was also enabled (#1894).
+ - Weighted clique related functions now fall back to the unweighted variants
+   when a null vertex weight vector is given to them.
 
 ### Other
 
