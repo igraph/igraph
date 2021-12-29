@@ -338,7 +338,7 @@
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t`
    with the vertex IDs instead of an `igraph_vector_t`, and use `igraph_integer_t`
    for the isoclass parameter.
-   
+
  - Motif functions now use `igraph_integer_t` instead of `int` for their `size`
    parameter.
 
@@ -537,6 +537,8 @@
    when a null vertex weight vector is given to them.
  - `igraph_erdos_renyi_game_(gnm|gnp)` would not produce self-loops for the singleton
    graph.
+ - Fixed a bug in `igraph_local_efficiency()` that sometimes erroneously
+   reported zero as the local efficiency of a vertex in directed graphs.
 
 ### Other
 
