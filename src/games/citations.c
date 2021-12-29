@@ -262,7 +262,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     /* the case of zero-length type vector is caught above, safe to call vector_min here */
     if (igraph_vector_int_min(types) < 0) {
-        IGRAPH_ERRORF("Types should be non-negative, but found %g.",
+        IGRAPH_ERRORF("Types should be non-negative, but found %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, igraph_vector_int_min(types));
     }
 
@@ -401,14 +401,14 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
 
     if (igraph_matrix_ncol(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix columns (%" IGRAPH_PRId ") not "
-                      "equal to number of types (%g).",
+                      "equal to number of types (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_matrix_ncol(pref),
                       no_of_types);
     }
     if (igraph_matrix_nrow(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix rows (%" IGRAPH_PRId ") not "
-                      "equal to number of types (%g).",
+                      "equal to number of types (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_matrix_nrow(pref),
                       no_of_types);

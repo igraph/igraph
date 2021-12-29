@@ -315,7 +315,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
-        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 1);

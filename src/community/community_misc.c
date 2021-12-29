@@ -272,17 +272,17 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
 
         if (c < 0) {
             IGRAPH_ERRORF("Membership indices should non-negative. "
-            "Found member of cluster %ld.", IGRAPH_EINVAL, c);
+            "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
         }
 
         if (c < 0) {
             IGRAPH_ERRORF("Membership indices should be non-negative. "
-            "Found member of cluster %ld.", IGRAPH_EINVAL, c);
+            "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
         }
 
         if (c >= n) {
             IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
-            "Found member of cluster %ld, but only %ld vertices.", IGRAPH_EINVAL, c, n);
+            "Found member of cluster %" IGRAPH_PRId ", but only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL, c, n);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
@@ -485,7 +485,7 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
     igraph_vector_int_t c1, c2;
 
     if (igraph_vector_int_size(comm1) != igraph_vector_int_size(comm2)) {
-        IGRAPH_ERRORF("Community membership vectors have different lengths: %ld and %ld.",
+        IGRAPH_ERRORF("Community membership vectors have different lengths: %" IGRAPH_PRId " and %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, igraph_vector_int_size(comm1), igraph_vector_int_size(comm2));
     }
 
@@ -791,7 +791,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
 
     if (igraph_vector_int_size(v1) <= 1) {
         IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
-        "Found membership vector of size %ld", IGRAPH_EINVAL, igraph_vector_int_size(v1));
+        "Found membership vector of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, igraph_vector_int_size(v1));
     }
 
     /* Calculate the confusion matrix */

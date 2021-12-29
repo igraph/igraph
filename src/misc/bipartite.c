@@ -737,7 +737,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
     igraph_integer_t ignored_edges = 0;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERRORF("Vertex type vector size (%ld) not equal to number of vertices (%ld).",
+        IGRAPH_ERRORF("Vertex type vector size (%" IGRAPH_PRId ") not equal to number of vertices (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
 
@@ -768,7 +768,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
         }
     }
     if (ignored_edges) {
-            IGRAPH_WARNINGF("%ld edges running within partitions were ignored.", ignored_edges);
+            IGRAPH_WARNINGF("%" IGRAPH_PRId " edges running within partitions were ignored.", ignored_edges);
     }
 
     if (row_ids) {

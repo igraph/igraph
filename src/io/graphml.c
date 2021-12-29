@@ -843,11 +843,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
 
     if (key == 0) {
         /* no key specified, issue a warning */
-        igraph_warningf(
-            "missing attribute key in a <data> tag, ignoring attribute",
-            IGRAPH_FILE_BASENAME, __LINE__, 0,
-            key
-        );
+        IGRAPH_WARNING("missing attribute key in a <data> tag, ignoring attribute");
         IGRAPH_FREE(state->data_char);
         return;
     }
@@ -855,9 +851,8 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
     igraph_trie_check(trie, key, &recid);
     if (recid < 0) {
         /* no such attribute key, issue a warning */
-        igraph_warningf(
+        IGRAPH_WARNINGF(
             "unknown attribute key '%s' in a <data> tag, ignoring attribute",
-            IGRAPH_FILE_BASENAME, __LINE__, 0,
             key
         );
         IGRAPH_FREE(state->data_char);

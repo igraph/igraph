@@ -179,7 +179,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match the number of edges (%ld).",
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match the number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {

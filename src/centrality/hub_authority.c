@@ -217,8 +217,8 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
             IGRAPH_ERRORF(
-                    "Weights vector length (%d) should match number of "
-                    "edges (%d) when calculating "
+                    "Weights vector length (%" IGRAPH_PRId ") should match number of "
+                    "edges (%" IGRAPH_PRId ") when calculating "
                     "hub or authority scores.",
                     IGRAPH_EINVAL,
                     igraph_vector_size(weights),

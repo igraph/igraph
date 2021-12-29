@@ -1039,7 +1039,7 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merg
     /* Check membership vector */
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*membership)[i] < 0) {
-            IGRAPH_ERRORF("Invalid membership vector, negative ID found: %g.", IGRAPH_EINVAL, VECTOR(*membership)[i]);
+            IGRAPH_ERRORF("Invalid membership vector, negative ID found: %" IGRAPH_PRId ".", IGRAPH_EINVAL, VECTOR(*membership)[i]);
         }
         VECTOR(fake_memb)[ VECTOR(*membership)[i] ] += 1;
     }

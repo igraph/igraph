@@ -115,8 +115,8 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
-                      " of edges (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 

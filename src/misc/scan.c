@@ -599,8 +599,8 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
         IGRAPH_ERROR("k must be non-negative in k-scan.", IGRAPH_EINVAL);
     }
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERRORF("The weight vector length (%ld) in k-scan should equal "
-                      "the number of edges of the graph (%d).",
+        IGRAPH_ERRORF("The weight vector length (%" IGRAPH_PRId ") in k-scan should equal "
+                      "the number of edges of the graph (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights),
                       igraph_ecount(graph));
     }

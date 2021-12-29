@@ -631,7 +631,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     igraph_vector_int_t degree;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERRORF("Number of nodes must not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
+        IGRAPH_ERRORF("Number of nodes must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_int_size(outseq) != 0 && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("The length of the out-degree sequence (%" IGRAPH_PRId ") does not agree with the number of nodes (%" IGRAPH_PRId ").",

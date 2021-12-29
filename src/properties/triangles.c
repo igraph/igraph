@@ -903,8 +903,8 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Edge weight vector length (%ld) not equal to "
-                      "number of edges (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Edge weight vector length (%" IGRAPH_PRId ") not equal to "
+                      "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
