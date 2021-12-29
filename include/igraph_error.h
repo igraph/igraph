@@ -40,15 +40,23 @@ __BEGIN_DECLS
  * However, since igraph is currently compiled with older standards, and since
  * the standard 'noreturn' specification would need to be diferent between C and C++,
  * we do not use these facilities.
+ *
+ * IGRAPH_PRINTFLIKE(string, first) marks a function as having a printf-like syntax,
+ * allowing the compiler to check that the format specifiers match argument types.
+ * 'string' is the index of the string-argument and 'first' is the index of the
+ * first argument to check against format specifiers.
  */
 #if defined(__GNUC__)
 /* Compilers that support the GNU C syntax. Use __noreturn__ instead of 'noreturn' as the latter is a macro in C11. */
 #define IGRAPH_NORETURN __attribute__((__noreturn__))
+#define IGRAPH_PRINTFLIKE(string, first) __attribute__((format(printf, string, first)))
 #elif defined(_MSC_VER)
 /* Compilers that support the MSVC syntax. */
 #define IGRAPH_NORETURN __declspec(noreturn)
+#define IGRAPH_PRINTFLIKE(string, first)
 #else
 #define IGRAPH_NORETURN
+#define IGRAPH_PRINTFLIKE(string, first)
 #endif
 
 /**
@@ -532,6 +540,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
  * \sa igraph_error().
  */
 
+IGRAPH_PRINTFLIKE(1,5)
 IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
                                 igraph_error_t igraph_errno, ...);
 
@@ -850,6 +859,7 @@ IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file
  * \return The supplied error code.
  */
 
+IGRAPH_PRINTFLIKE(1,5)
 IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
                                   igraph_error_t igraph_errno, ...);
 
@@ -964,6 +974,7 @@ IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *
  * \param ... The additional arguments to be substituted into the template string.
  */
 
+IGRAPH_PRINTFLIKE(1,4)
 IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
 
 /**
