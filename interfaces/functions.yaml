@@ -1532,15 +1532,15 @@ igraph_write_graph_dot:
 #######################################
 
 igraph_motifs_randesu:
-    PARAMS: GRAPH graph, OUT VECTOR hist, INT size=3, VECTOR cut_prob
+    PARAMS: GRAPH graph, OUT VECTOR hist, INTEGER size=3, VECTOR cut_prob
 
 igraph_motifs_randesu_estimate:
     PARAMS: |-
-        GRAPH graph, OUT INTEGER est, INT size=3, VECTOR cut_prob,
+        GRAPH graph, OUT INTEGER est, INTEGER size=3, VECTOR cut_prob,
         INTEGER sample_size, OPTIONAL VECTOR_INT sample
 
 igraph_motifs_randesu_no:
-    PARAMS: GRAPH graph, OUT INTEGER no, INT size=3, VECTOR cut_prob
+    PARAMS: GRAPH graph, OUT INTEGER no, INTEGER size=3, VECTOR cut_prob
 
 igraph_dyad_census:
     PARAMS: GRAPH graph, OUT INTEGER mut, OUT INTEGER asym, OUT INTEGER null
