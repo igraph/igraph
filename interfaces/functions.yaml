@@ -850,7 +850,7 @@ igraph_global_efficiency:
 
 igraph_local_efficiency:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
