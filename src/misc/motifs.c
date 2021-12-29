@@ -303,11 +303,6 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     }
 
     if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
-                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
-    }
-
-    if (igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
@@ -570,11 +565,11 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
     if (size < 3) {
         IGRAPH_ERRORF("Motif size must be at least 3, received %" IGRAPH_PRId ".",
-                      IGRAPH_EINVAL, (igraph_integer_t) size);
+                      IGRAPH_EINVAL, size);
     }
 
     if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
@@ -784,11 +779,11 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
 
     if (size < 3) {
         IGRAPH_ERRORF("Motif size must be at least 3, received %" IGRAPH_PRId ".",
-                      IGRAPH_EINVAL, (igraph_integer_t) size);
+                      IGRAPH_EINVAL, size);
     }
 
     if (igraph_vector_size(cut_prob) != size) {
-        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
