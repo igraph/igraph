@@ -59,7 +59,7 @@ macro(find_dependencies)
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
-      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_${LIBNAME_UPPER}_SUPPORT ON)
       else()
@@ -70,7 +70,7 @@ macro(find_dependencies)
 
   # GraphML support is treated separately because the library name is different
   if(IGRAPH_GRAPHML_SUPPORT STREQUAL "AUTO")
-    find_package(LibXml2)
+    find_package(LibXml2 QUIET)
     if(LibXml2_FOUND)
       set(IGRAPH_GRAPHML_SUPPORT ON)
     else()
