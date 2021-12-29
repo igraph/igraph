@@ -1,3 +1,50 @@
+###### Testing graph: Ring graph ######
+
+UNWEIGHTED CASE:
+
+Global efficiency, undirected: 0.833333
+Global efficiency, directed: 0.611111
+Average local efficiency, undirected: 0.500000
+Average local efficiency, directed, all neighbors: 0.250000
+Average local efficiency, directed, in-neighbors: 0.000000
+Average local efficiency, directed, out-neighbors: 0.000000
+
+Local efficiency, undirected:
+( 0.5 0.5 0.5 0.5 )
+
+Local efficiency, directed, all neighbors:
+( 0.25 0.25 0.25 0.25 )
+
+Local efficiency, directed, in-neighbors:
+( 0 0 0 0 )
+
+Local efficiency, directed, out-neighbors:
+( 0 0 0 0 )
+
+WEIGHTED CASE:
+
+Global efficiency, undirected: 0.833333
+Global efficiency, directed: 0.611111
+Average local efficiency, undirected: 0.500000
+Average local efficiency, directed, all neighbors: 0.250000
+Average local efficiency, directed, in-neighbors: 0.000000
+Average local efficiency, directed, out-neighbors: 0.000000
+
+Local efficiency, undirected:
+( 0.5 0.5 0.5 0.5 )
+
+Local efficiency, directed, all neighbors:
+( 0.25 0.25 0.25 0.25 )
+
+Local efficiency, directed, in-neighbors:
+( 0 0 0 0 )
+
+Local efficiency, directed, out-neighbors:
+( 0 0 0 0 )
+
+
+###### Testing graph: Small test graph ######
+
 UNWEIGHTED CASE:
 
 Global efficiency, undirected: 0.509615
@@ -19,7 +66,6 @@ Local efficiency, directed, in-neighbors:
 Local efficiency, directed, out-neighbors:
 ( 0 0.3875 0.25 0 0.0555556 0 0 0 0.583333 0.166667 0 0.5 0 )
 
-
 WEIGHTED CASE:
 
 Global efficiency, undirected: 0.247686
@@ -40,3 +86,5 @@ Local efficiency, directed, in-neighbors:
 
 Local efficiency, directed, out-neighbors:
 ( 0 0.180711 0.116667 0 0.0416667 0 0 0 0.246164 0.0555556 0 0.25 0 )
+
+

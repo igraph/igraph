@@ -4,7 +4,7 @@
 
 ### Changed
 
- - Isomorphism class functions (`igraph_isoclass()`, `igraph_isoclass_subgraph()`, 
+ - Isomorphism class functions (`igraph_isoclass()`, `igraph_isoclass_subgraph()`,
    `igraph_isoclass_create`) and motif finder functions (`igraph_motifs_randesu()`,
    `igraph_motifs_randesu_estimate()`, `igraph_motifs_randesu_callback()`) now
    support undirected (sub)graphs of sizes 5 and 6. Previsouly only sizes 3 and 4
@@ -27,6 +27,8 @@
    when a null vertex weight vector is given to them.
  - `igraph_erdos_renyi_game_(gnm|gnp)` would not produce self-loops for the singleton
    graph.
+ - Fixed a bug in `igraph_local_efficiency()` that sometimes erroneously
+   reported zero as the local efficiency of a vertex in directed graphs.
 
 ### Other
 

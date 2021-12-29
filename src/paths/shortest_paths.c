@@ -446,6 +446,10 @@ static int igraph_i_local_efficiency_unweighted(
     long int i, j;
 
     igraph_dqueue_clear(q);
+
+    /* already_counted[i] is 0 iff vertex i was not reached so far, otherwise
+     * it is the index of the source vertex in vertex_neis that it was reached
+     * from, plus 1 */
     memset(already_counted, 0, no_of_nodes * sizeof(long int));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
@@ -479,11 +483,12 @@ static int igraph_i_local_efficiency_unweighted(
 
         if (VECTOR(*nei_mask)[source] == 2)
             continue;
+
         VECTOR(*nei_mask)[source] = 2; /* mark neighbour as already processed */
 
         IGRAPH_CHECK(igraph_dqueue_push(q, source));
         IGRAPH_CHECK(igraph_dqueue_push(q, 0));
-        already_counted[source] = source + 1;
+        already_counted[source] = i + 1;
 
         while (!igraph_dqueue_empty(q)) {
             igraph_vector_int_t *act_neis;
