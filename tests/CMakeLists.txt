@@ -183,6 +183,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   erdos_renyi_game
+  erdos_renyi_game_gnp
   full
   igraph_barabasi_aging_game
   igraph_bipartite_game
