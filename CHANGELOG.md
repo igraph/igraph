@@ -336,7 +336,11 @@
    `igraph_vector_int_t` instead of an `igraph_int_t`.
 
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t`
-   with the vertex IDs instead of an `igraph_vector_t`.
+   with the vertex IDs instead of an `igraph_vector_t`, and use `igraph_integer_t`
+   for the isoclass parameter.
+   
+ - Motif functions now use `igraph_integer_t` instead of `int` for their `size`
+   parameter.
 
  - `igraph_neighborhood_size()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
