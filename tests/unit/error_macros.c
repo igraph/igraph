@@ -20,17 +20,17 @@
 #include "test_utilities.inc"
 
 int cause_error() {
-    IGRAPH_ERRORF("%d %f %ld %c", IGRAPH_EINVAL, 1, 1.0, 1, 'a');
+    IGRAPH_ERRORF("%d %f %ld %c", IGRAPH_EINVAL, 1, 1.0, 1L, 'a');
     return IGRAPH_SUCCESS;
 }
 
 int cause_warning() {
-    IGRAPH_WARNINGF("%d %f %ld %c", 1, 1.0, 1, 'a');
+    IGRAPH_WARNINGF("%d %f %ld %c", 1, 1.0, 1L, 'a');
     return IGRAPH_SUCCESS;
 }
 
 int cause_fatal() {
-    IGRAPH_FATALF("%d %f %ld %c", 1, 1.0, 1, 'a');
+    IGRAPH_FATALF("%d %f %ld %c", 1, 1.0, 1L, 'a');
 }
 
 void error_handler(const char *reason, const char *file, int line, int igraph_errno) {
