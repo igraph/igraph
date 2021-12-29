@@ -1853,7 +1853,7 @@ igraph_automorphisms:
 
 igraph_automorphism_group:
     PARAMS: |-
-        GRAPH graph, OPTIONAL VERTEX_COLOR colors, PRIMARY OUT VECTORLIST generators,
+        GRAPH graph, OPTIONAL VERTEX_COLOR colors, PRIMARY OUT VERTEXSETLIST generators,
         BLISSSH sh="fm", OUT BLISSINFO info
     DEPS: colors ON graph
 
