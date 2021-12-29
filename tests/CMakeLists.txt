@@ -395,6 +395,7 @@ add_legacy_tests(
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses
+  isoclasses2
   VF2-compat
 )
 
@@ -413,6 +414,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_dyad_census
+  igraph_motifs_randesu
   igraph_motifs_randesu_estimate
   igraph_motifs_randesu_no
   triad_census

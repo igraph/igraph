@@ -59,21 +59,23 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  * the graph.
  *
  * </para><para>
- * This function is able to find the different motifs of size three
- * and four (i.e. the number of different subgraphs with three and four
- * vertices) in the network.
+ * This function is able to find directed motifs of sizes three
+ * and four and undirected motifs of sizes three to six
+ * (i.e. the number of different subgraphs with three to six
+ * vertices in the network).
  *
  * </para><para>
  * In a big network the total number of motifs can be very large, so
  * it takes a lot of time to find all of them. In this case, a sampling
  * method can be used. This function is capable of doing sampling via the
- * \c cut_prob argument. This argument gives the probability that
+ * \p cut_prob argument. This argument gives the probability that
  * a branch of the motif search tree will not be explored. See
  * S. Wernicke and F. Rasche: FANMOD: a tool for fast network motif
  * detection, Bioinformatics 22(9), 1152--1153, 2006 for details.
+ * https://doi.org/10.1093/bioinformatics/btl038
  *
  * </para><para>
- * Set the \c cut_prob argument to a zero vector for finding all
+ * Set the \p cut_prob argument to a zero vector for finding all
  * motifs.
  *
  * </para><para>
@@ -87,21 +89,23 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  *        Note that this function does \em not count isomorphism
  *        classes that are not connected and will report NaN (more
  *        precisely \c IGRAPH_NAN) for them.
- * \param size The size of the motifs to search for. Only three and
- *        four are implemented currently. The limitation is not in the
- *        motif finding code, but the graph isomorphism code.
+ * \param size The size of the motifs to search for. For directed graphs,
+ *        only 3 and 4 are implemented, for undirected, 3 to 6.
+ *        The limitation is not in the motif finding code, but the graph
+ *        isomorphism code.
  * \param cut_prob Vector of probabilities for cutting the search tree
  *        at a given level. The first element is the first level, etc.
- *        Supply all zeros here (of length \c size) to find all motifs
+ *        Supply all zeros here (of length \p size) to find all motifs
  *        in a graph.
  * \return Error code.
+ *
  * \sa \ref igraph_motifs_randesu_estimate() for estimating the number
  * of motifs in a graph, this can help to set the \p cut_prob
  * parameter; \ref igraph_motifs_randesu_no() to calculate the total
  * number of motifs of a given size in a graph;
  * \ref igraph_motifs_randesu_callback() for calling a callback function
  * for every motif found; \ref igraph_subisomorphic_lad() for finding
- * subgraphs on more than 4 vertices.
+ * subgraphs on more than 4 (directed) or 6 (undirected) vertices.
  *
  * Time complexity: TODO.
  *
@@ -109,14 +113,44 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  */
 igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                           int size, const igraph_vector_t *cut_prob) {
-    int histlen;
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t histlen;
 
-    if (size == 3) {
-        histlen = igraph_is_directed(graph) ? 16 : 4;
-    } else if (size == 4) {
-        histlen = igraph_is_directed(graph) ? 218 : 11;
+    if (directed) {
+        switch (size) {
+        case 3:
+            histlen = 16;
+            break;
+        case 4:
+            histlen = 218;
+            break;
+        default:
+            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
     } else {
-        IGRAPH_ERROR("Only motifs of size 3 and 4 are implemented", IGRAPH_EINVAL);
+        switch (size) {
+        case 3:
+            histlen = 4;
+            break;
+        case 4:
+            histlen = 11;
+            break;
+        case 5:
+            histlen = 34;
+            break;
+        case 6:
+            histlen = 156;
+            break;
+        default:
+            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
+    }
+
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
     IGRAPH_CHECK(igraph_vector_resize(hist, histlen));
@@ -126,13 +160,13 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
                  &igraph_i_motifs_randesu_update_hist, hist));
 
     if (size == 3) {
-        if (igraph_is_directed(graph)) {
+        if (directed) {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[3] = IGRAPH_NAN;
         } else {
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = IGRAPH_NAN;
         }
-    } else {
-        if (igraph_is_directed(graph)) {
+    } else if (size == 4) {
+        if (directed) {
             int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
                                     28, 33, 34, 39, 62, 120
                                   };
@@ -144,6 +178,22 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
             VECTOR(*hist)[0] = VECTOR(*hist)[1] = VECTOR(*hist)[2] =
                     VECTOR(*hist)[3] = VECTOR(*hist)[5] = IGRAPH_NAN;
         }
+    } else if (size == 5) {
+        /* undirected only */
+        int not_connected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 19 };
+        int i, n = sizeof(not_connected) / sizeof(int);
+        for (i = 0; i < n; i++) {
+            VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
+        }
+    } else if (size == 6) {
+        /* undirected only */
+        int not_connected[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                               19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 38,
+                               44, 50, 51, 54, 74, 77, 89, 120};
+        int i, n = sizeof(not_connected) / sizeof(int);
+        for (i = 0; i < n; i++) {
+            VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
+        }
     }
 
     return IGRAPH_SUCCESS;
@@ -154,9 +204,10 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
  * \brief Finds motifs in a graph and calls a function for each of them.
  *
  * </para><para>
- * Similarly to \ref igraph_motifs_randesu(), this function is able to find the
- * different motifs of size three and four (i.e. the number of different
- * subgraphs with three and four vertices) in the network. However, instead of
+ * Similarly to \ref igraph_motifs_randesu(), this function is able to find
+ * directed motifs of sizes three and four and undirected motifs of sizes
+ * three to six (i.e. the number of different subgraphs with three to six
+ * vertices in the network). However, instead of
  * counting them, the function will call a callback function for each motif
  * found to allow further tests or post-processing.
  *
@@ -207,30 +258,57 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
 
     igraph_bool_t terminate = 0;
 
-    if (size == 3) {
-        mul = 3;
-        if (igraph_is_directed(graph)) {
+    if (igraph_is_directed(graph)) {
+        switch (size) {
+        case 3:
             arr_idx = igraph_i_isoclass_3_idx;
             arr_code = igraph_i_isoclass2_3;
-        } else {
-            arr_idx = igraph_i_isoclass_3u_idx;
-            arr_code = igraph_i_isoclass2_3u;
-        }
-    } else if (size == 4) {
-        mul = 4;
-        if (igraph_is_directed(graph)) {
+            mul = 3;
+            break;
+        case 4:
             arr_idx = igraph_i_isoclass_4_idx;
             arr_code = igraph_i_isoclass2_4;
-        } else {
-            arr_idx = igraph_i_isoclass_4u_idx;
-            arr_code = igraph_i_isoclass2_4u;
+            mul = 4;
+            break;
+        default:
+            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
         }
     } else {
-        IGRAPH_ERROR("Only motifs of size 3 and 4 are implemented", IGRAPH_EINVAL);
+        switch (size) {
+        case 3:
+            arr_idx = igraph_i_isoclass_3u_idx;
+            arr_code = igraph_i_isoclass2_3u;
+            mul = 3;
+            break;
+        case 4:
+            arr_idx = igraph_i_isoclass_4u_idx;
+            arr_code = igraph_i_isoclass2_4u;
+            mul = 4;
+            break;
+        case 5:
+            arr_idx = igraph_i_isoclass_5u_idx;
+            arr_code = igraph_i_isoclass2_5u;
+            mul = 5;
+            break;
+        case 6:
+            arr_idx = igraph_i_isoclass_6u_idx;
+            arr_code = igraph_i_isoclass2_6u;
+            mul = 6;
+            break;
+        default:
+            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+                         IGRAPH_UNIMPLEMENTED);
+        }
     }
 
     if (igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
+                      IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
+    }
+
+    if (igraph_vector_size(cut_prob) != size) {
+        IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
@@ -422,6 +500,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     igraph_adjlist_destroy(&allneis);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(7);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -429,10 +508,10 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  * \function igraph_motifs_randesu_estimate
  * \brief Estimate the total number of motifs in a graph.
  *
- * This function estimates the total number of connected induced
+ * This function estimates the total number of weakly connected induced
  * subgraphs, called motifs, of a fixed number of vertices. For
  * example, an undirected complete graph on \c n vertices
- * will have one motif of \p size \c n, and \c n motifs
+ * will have one motif of size \c n, and \c n motifs
  * of \p size <code>n - 1</code>. As another example, one triangle
  * and a separate vertex will have zero motifs of size four.
  *
@@ -454,17 +533,17 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  * \param graph The graph object to study.
  * \param est Pointer to an integer type, the result will be stored
  *        here.
- * \param size The size of the motif to look for.
+ * \param size The size of the motifs to look for.
  * \param cut_prob Vector giving the probabilities to cut a branch of
  *        the search tree and omit counting the motifs in that branch.
- *        It contains a probability for each level. Supply \c size
+ *        It contains a probability for each level. Supply \p size
  *        zeros here to count all the motifs in the sample.
  * \param sample_size The number of vertices to use as the
- *        sample. This parameter is only used if the \c parsample
+ *        sample. This parameter is only used if the \p parsample
  *        argument is a null pointer.
  * \param parsample Either pointer to an initialized vector or a null
  *        pointer. If a vector then the vertex IDs in the vector are
- *        used as a sample. If a null pointer then the \c sample_size
+ *        used as a sample. If a null pointer then the \p sample_size
  *        argument is used to create a sample of vertices drawn with
  *        uniform probability.
  * \return Error code.
@@ -488,6 +567,11 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     igraph_vector_int_t *sample;
     igraph_integer_t sam;
     igraph_integer_t i;
+
+    if (size < 3) {
+        IGRAPH_ERRORF("Motif size must be at least 3, received %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, (igraph_integer_t) size);
+    }
 
     if (igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%d).",
