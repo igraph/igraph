@@ -26,8 +26,8 @@
 #include "test_utilities.inc"
 
 igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
-                          int isoclass, void* extra) {
-    printf("Class %d: ", isoclass);
+                          igraph_integer_t isoclass, void* extra) {
+    printf("Class %" IGRAPH_PRId ": ", isoclass);
     print_vector_int(vids);
     return IGRAPH_SUCCESS;
 }

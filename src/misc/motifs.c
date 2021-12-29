@@ -40,7 +40,7 @@
  */
 static igraph_error_t igraph_i_motifs_randesu_update_hist(
         const igraph_t *graph,
-        igraph_vector_int_t *vids, int isoclass, void* extra) {
+        igraph_vector_int_t *vids, igraph_integer_t isoclass, void* extra) {
     igraph_vector_t *hist = (igraph_vector_t*)extra;
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(vids);
     VECTOR(*hist)[isoclass]++;
@@ -112,7 +112,7 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  * \example examples/simple/igraph_motifs_randesu.c
  */
 igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
-                          int size, const igraph_vector_t *cut_prob) {
+                          igraph_integer_t size, const igraph_vector_t *cut_prob) {
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t histlen;
 
@@ -234,7 +234,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
  * \example examples/simple/igraph_motifs_randesu.c
  */
 
-igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
+igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_integer_t size,
                                    const igraph_vector_t *cut_prob, igraph_motifs_handler_t *callback,
                                    void* extra) {
 
@@ -553,7 +553,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  */
 
 igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-                                   int size, const igraph_vector_t *cut_prob,
+                                   igraph_integer_t size, const igraph_vector_t *cut_prob,
                                    igraph_integer_t sample_size,
                                    const igraph_vector_int_t *parsample) {
 
@@ -771,7 +771,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
  */
 
 igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-                             int size, const igraph_vector_t *cut_prob) {
+                             igraph_integer_t size, const igraph_vector_t *cut_prob) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t neis;
