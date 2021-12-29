@@ -116,7 +116,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (igraph_vector_int_sum(block_sizes) != n) {
-        IGRAPH_ERRORF("Sum of the block sizes (%ld) must equal the number of vertices (%ld).",
+        IGRAPH_ERRORF("Sum of the block sizes (%" IGRAPH_PRId ") must equal the number of vertices (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_sum(block_sizes), n);
     }
 

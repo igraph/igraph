@@ -101,7 +101,7 @@ int igraph_lastcit_game(igraph_t *graph,
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERRORF("The `preference' vector should be of length `agebins' plus one."
-                     "Number of agebins is %"IGRAPH_PRId", preference vector is of length %"IGRAPH_PRId"",
+                     "Number of agebins is %"IGRAPH_PRId", preference vector is of length %ld.",
                      IGRAPH_EINVAL,
                      agebins, igraph_vector_size(preference));
     }
@@ -401,14 +401,14 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     if (igraph_matrix_ncol(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix columns (%ld) not "
-                      "equal to number of types (%g).",
+                      "equal to number of types (%ld).",
                       IGRAPH_EINVAL,
                       igraph_matrix_ncol(pref),
                       no_of_types);
     }
     if (igraph_matrix_nrow(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix rows (%ld) not "
-                      "equal to number of types (%g).",
+                      "equal to number of types (%ld).",
                       IGRAPH_EINVAL,
                       igraph_matrix_nrow(pref),
                       no_of_types);

@@ -2758,9 +2758,9 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 
 #define CHECK_ISOCLASS(number, directed, size, graphcount) \
     IGRAPH_ERRORF( \
-        "Isoclass %" IGRAPH_PRId " requested, but there are only %" \
-        IGRAPH_PRId " %s graphs of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, \
-        (igraph_integer_t) number, graphcount, directed ? "directed" : "undirected", (igraph_integer_t) size)
+        "Isoclass %" IGRAPH_PRId " requested, but there are only %ld" \
+        " %s graphs of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, \
+        (igraph_integer_t) number, graphcount, directed ? "directed" : "undirected", size)
 
     if (directed) {
         switch (size) {
