@@ -151,7 +151,7 @@ inline igraph_error_t bliss_set_colors(AbstractGraph *g, const igraph_vector_int
     for (int i = 0; i < n; ++i) {
         igraph_integer_t color = VECTOR(*colors)[i];
         if (color < INT_MIN || color > INT_MAX) {
-            IGRAPH_ERRORF("Invalid vertex color index for vertex %d", IGRAPH_EOVERFLOW, color);
+            IGRAPH_ERRORF("Invalid vertex color index %" IGRAPH_PRId " for vertex %d.", IGRAPH_EOVERFLOW, color, i);
         }
         g->change_color(i, static_cast<int>(color));
     }
