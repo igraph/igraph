@@ -531,6 +531,8 @@
    math when LTO was also enabled (#1894).
  - Weighted clique related functions now fall back to the unweighted variants
    when a null vertex weight vector is given to them.
+ - `igraph_erdos_renyi_game_(gnm|gnp)` would not produce self-loops for the singleton
+   graph.
 
 ### Other
 

@@ -253,8 +253,8 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     char *subg;
 
     const unsigned int *arr_idx, *arr_code;
-    int code = 0;
-    unsigned char mul, idx;
+    unsigned int code = 0;
+    unsigned int mul, idx;
 
     igraph_bool_t terminate = 0;
 
