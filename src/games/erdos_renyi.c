@@ -104,8 +104,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             }
         } else if (directed && !loops) {
             for (i = 0; i < vsize; i++) {
-                igraph_integer_t to = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
-                igraph_integer_t from = VECTOR(s)[i] - to * (no_of_nodes_real - 1);
+                igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
+                igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 if (from == to) {
                     to = no_of_nodes - 1;
                 }
