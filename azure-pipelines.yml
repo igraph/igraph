@@ -14,7 +14,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og"'
 
   - job: linux_static_external
     steps:
