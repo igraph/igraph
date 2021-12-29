@@ -110,7 +110,7 @@ void bliss_free_graph(AbstractGraph *g) {
 }
 
 
-inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
+inline igraph_error_t bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
     if (directed) {
         Digraph::SplittingHeuristic gsh = Digraph::shs_fsm;
         switch (sh) {
@@ -140,7 +140,7 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
 }
 
 
-inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors) {
+inline igraph_error_t bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors) {
     if (colors == NULL) {
         return IGRAPH_SUCCESS;
     }
@@ -159,7 +159,7 @@ inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors)
 }
 
 
-inline int bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
+inline igraph_error_t bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
     if (info) {
         size_t group_size_strlen;
 
