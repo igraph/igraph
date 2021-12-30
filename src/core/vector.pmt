@@ -2262,7 +2262,7 @@ igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *
 int FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     size_t n = (size_t) FUNCTION(igraph_vector, size)(from);
-    FUNCTION(igraph_vector, resize)(to, (long) n);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, (long) n));
     memcpy(to->stor_begin, from->stor_begin, sizeof(BASE)*n);
     return 0;
 }
