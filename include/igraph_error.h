@@ -35,28 +35,32 @@ __BEGIN_DECLS
  * prefix renamed to IGRAPH_), as I couldn't find a better way to do
  * them. */
 
-/* IGRAPH_NORETURN indicates to the compiler that a function does not return.
+/* With some compilers, we use function attributes to help diagnostics
+ * and optimizations. These are not part of the public API, do not use
+ * them outside of igraph itself.
+ *
+ * IGRAPH_FUNCATTR_NORETURN indicates to the compiler that a function does not return.
  * There are standard facilities for this, namely _Noreturn in C11 and [[noreturn]] in C++11.
  * However, since igraph is currently compiled with older standards, and since
  * the standard 'noreturn' specification would need to be diferent between C and C++,
  * we do not use these facilities.
  *
- * IGRAPH_PRINTFLIKE(string, first) marks a function as having a printf-like syntax,
+ * IGRAPH_FUNCATTR_PRINTFLIKE(string, first) marks a function as having a printf-like syntax,
  * allowing the compiler to check that the format specifiers match argument types.
  * 'string' is the index of the string-argument and 'first' is the index of the
  * first argument to check against format specifiers.
  */
 #if defined(__GNUC__)
 /* Compilers that support the GNU C syntax. Use __noreturn__ instead of 'noreturn' as the latter is a macro in C11. */
-#define IGRAPH_NORETURN __attribute__((__noreturn__))
-#define IGRAPH_PRINTFLIKE(string, first) __attribute__((format(printf, string, first)))
+#define IGRAPH_FUNCATTR_NORETURN __attribute__((__noreturn__))
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first) __attribute__((format(printf, string, first)))
 #elif defined(_MSC_VER)
 /* Compilers that support the MSVC syntax. */
-#define IGRAPH_NORETURN __declspec(noreturn)
-#define IGRAPH_PRINTFLIKE(string, first)
+#define IGRAPH_FUNCATTR_NORETURN __declspec(noreturn)
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first)
 #else
-#define IGRAPH_NORETURN
-#define IGRAPH_PRINTFLIKE(string, first)
+#define IGRAPH_FUNCATTR_NORETURN
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first)
 #endif
 
 /**
@@ -540,7 +544,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
  * \sa igraph_error().
  */
 
-IGRAPH_PRINTFLIKE(1,5)
+IGRAPH_FUNCATTR_PRINTFLIKE(1,5)
 IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
                                 igraph_error_t igraph_errno, ...);
 
@@ -859,7 +863,7 @@ IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file
  * \return The supplied error code.
  */
 
-IGRAPH_PRINTFLIKE(1,5)
+IGRAPH_FUNCATTR_PRINTFLIKE(1,5)
 IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
                                   igraph_error_t igraph_errno, ...);
 
@@ -958,7 +962,7 @@ IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
  * \param line The number of line in the source file which triggered the error.
  */
 
-IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
 
 /**
  * \function igraph_fatalf
@@ -974,8 +978,8 @@ IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *
  * \param ... The additional arguments to be substituted into the template string.
  */
 
-IGRAPH_PRINTFLIKE(1,4)
-IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+IGRAPH_FUNCATTR_PRINTFLIKE(1,4)
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
 
 /**
  * \define IGRAPH_FATALF
