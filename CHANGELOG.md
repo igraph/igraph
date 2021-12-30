@@ -539,6 +539,8 @@
    graph.
  - Fixed a bug in `igraph_local_efficiency()` that sometimes erroneously
    reported zero as the local efficiency of a vertex in directed graphs.
+ - `igraph_vector_update()` (and its type-specific variants) did not check for
+   memory allocation failure.
 
 ### Other
 
