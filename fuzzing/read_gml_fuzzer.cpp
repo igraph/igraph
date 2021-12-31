@@ -30,6 +30,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
+    // Turn on attribute handling
+    igraph_set_attribute_table(&igraph_cattribute_table);
+
     // Create input file
     char filename[256];
     sprintf(filename, "/tmp/libfuzzer.gml");
