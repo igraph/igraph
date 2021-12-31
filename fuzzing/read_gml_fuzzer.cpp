@@ -18,15 +18,15 @@
    02110-1301 USA
 */
 
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
 #include "igraph.h"
-#include <stdio.h>
+#include <cstdint>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 
 extern "C"
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
-    if(size<5) return 0;
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    if (size < 5) return 0;
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
@@ -53,7 +53,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
         igraph_destroy(&g);
     }
 
-    // no need to call igraph_destroy() if igraph_raed_graph_gml() returns an
+    // no need to call igraph_destroy() if igraph_read_graph_gml() returns an
     // error code as we don't have a valid graph object in that case
 
     fclose(ifile);
