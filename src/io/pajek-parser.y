@@ -95,8 +95,6 @@ igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *con
 igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
 
 extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
-extern long int igraph_i_pajek_actvertex;
-extern long int igraph_i_pajek_actedge;
 
 #define scanner context->scanner
 
@@ -606,7 +604,7 @@ igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   rec=VECTOR(*attrs)[id];
   na=(igraph_strvector_t*)rec->value;
   if (igraph_strvector_size(na) <= vid) {
-    long int origsize=igraph_strvector_size(na);
+    igraph_integer_t origsize=igraph_strvector_size(na);
     IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
     for (;origsize<count; origsize++) {
       igraph_strvector_set(na, origsize, "");
