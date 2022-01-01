@@ -135,8 +135,8 @@ extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 %lex-param { void *scanner }
 
 %union {
-  long int intnum;
-  double   realnum;
+  igraph_integer_t intnum;
+  igraph_real_t    realnum;
   struct {
     char *str;
     size_t len;
@@ -526,8 +526,18 @@ adjmatrixentry: number {
 
 /* -----------------------------------------------------*/
 
-longint: NUM { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
-                                          igraph_pajek_yyget_leng(scanner)); };
+longint: NUM { 
+  igraph_integer_t i;
+  igraph_real_t    f;
+  f=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
+                            igraph_pajek_yyget_leng(scanner)); 
+  i=(igraph_integer_t)f;
+  if (f != (igraph_real_t) i) {
+    IGRAPH_YY_ERRORF("Non-representable integer (%.17g) while parsing Pajek file.", 
+                      IGRAPH_PARSEERROR, f);
+  }
+  $$=i; 
+};
 
 number: NUM  { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
                                           igraph_pajek_yyget_leng(scanner)); };
