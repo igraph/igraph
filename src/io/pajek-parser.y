@@ -75,6 +75,15 @@
         } \
     } while (0)
 
+#define IGRAPH_YY_ERRORF(reason, igraph_errno, ...) \
+    do { \
+        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      igraph_errno, __VA_ARGS__) ; \
+        context->igraph_errcode = igraph_errno; \
+        YYABORT; \
+    } while (0)
+
+
 int igraph_pajek_yyerror(YYLTYPE* locp,
                          igraph_i_pajek_parsedata_t *context,
                          const char *s);
@@ -221,7 +230,15 @@ vertdefs: /* empty */  | vertdefs vertexline;
 
 vertexline: NEWLINE |
             vertex NEWLINE |
-            vertex { context->actvertex=$1; } vertexid vertexcoords shape params NEWLINE { }
+            vertex {
+              context->actvertex=$1;
+              if (context->actvertex < 1 || context->actvertex > context->vcount) {
+                  IGRAPH_YY_ERRORF(
+                              "Invalid vertex id (%" IGRAPH_PRId ") in Pajek file. "
+                              "The number of vertices is %" IGRAPH_PRId ".",
+                              IGRAPH_EINVAL, context->actvertex, context->vcount);
+              }
+            } vertexid vertexcoords shape params NEWLINE { }
 ;
 
 vertex: longint { $$=$1; context->mode=1; };
