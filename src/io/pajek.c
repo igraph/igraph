@@ -186,7 +186,8 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
-    switch (igraph_pajek_yyparse(&context)) {
+    int err = igraph_pajek_yyparse(&context);
+    switch (err) {
     case 0: /* success */
         break;
     case 1: /* parse error */
@@ -203,25 +204,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         break;
     default:
         /* Must never reach here. */
-        IGRAPH_FATAL("Parser returned unexpected error code when reading Pajek file.");
-    }
-
-    /* TODO: Find out maximum reasonable vertex count for Pajek.
-     * There should be a limit because the vertex count is explicit in Pajek
-     * files, thus a malformed file may trigger extreme memory allocation.
-     */
-    const igraph_integer_t pajek_max_vertex_count = INT32_MAX;
-    if (context.vcount < 0) {
-        IGRAPH_ERROR("Invalid vertex count in Pajek file.", IGRAPH_EINVAL);
-    }
-    if (context.vcount > pajek_max_vertex_count) {
-        IGRAPH_ERROR("Vertex count too large in Pajek file.", IGRAPH_EINVAL);
-    }
-    if (context.vcount2 < 0) {
-        IGRAPH_ERROR("Invalid 2-mode vertex count in Pajek file.", IGRAPH_EINVAL);
-    }
-    if (context.vcount2 > pajek_max_vertex_count) {
-        IGRAPH_ERROR("2-mode vertex count too large in Pajek file.", IGRAPH_EINVAL);
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading Pajek file.", err);
     }
 
     for (i = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
