@@ -592,7 +592,7 @@ igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   if (igraph_vector_size(na) == vid) {
     IGRAPH_CHECK(igraph_vector_push_back(na, number));
   } else if (igraph_vector_size(na) < vid) {
-    long int origsize=igraph_vector_size(na);
+    igraph_integer_t origsize=igraph_vector_size(na);
     IGRAPH_CHECK(igraph_vector_resize(na, vid+1));
     for (;origsize<count; origsize++) {
       VECTOR(*na)[origsize] = IGRAPH_NAN;
