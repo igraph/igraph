@@ -69,17 +69,17 @@
     do { \
         igraph_error_t igraph_i_ret = (expr); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
-            context->igraph_errcode = igraph_i_ret; \
+            context->igraph_errno = igraph_i_ret; \
             if (igraph_i_ret == IGRAPH_ENOMEM) { YYNOMEM; } \
             else { YYABORT; } \
         } \
     } while (0)
 
-#define IGRAPH_YY_ERRORF(reason, igraph_errno, ...) \
+#define IGRAPH_YY_ERRORF(reason, errno, ...) \
     do { \
         igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
-                      igraph_errno, __VA_ARGS__) ; \
-        context->igraph_errcode = igraph_errno; \
+                      errno, __VA_ARGS__) ; \
+        context->igraph_errno = errno; \
         YYABORT; \
     } while (0)
 
