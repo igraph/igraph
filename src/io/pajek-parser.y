@@ -60,6 +60,11 @@
 #include "io/parsers/pajek-lexer.h"
 #include "internal/hacks.h"
 
+/* The old version of Bison that ships with macOS does not provide YYNOMEM. */
+#ifndef YYNOMEM
+#define YYNOMEM YYABORT
+#endif
+
 #define IGRAPH_YY_CHECK(expr) \
     do { \
         igraph_error_t igraph_i_ret = (expr); \
