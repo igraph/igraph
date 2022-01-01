@@ -30,6 +30,7 @@ typedef struct {
     void *scanner;
     int eof;
     char errmsg[300];
+    igraph_error_t igraph_errcode;
     igraph_vector_int_t *vector;
     igraph_bool_t directed;
     igraph_integer_t vcount, vcount2;
