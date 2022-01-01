@@ -158,7 +158,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     context.actedge = 0;
     context.eof = 0;
     context.errmsg[0] = '\0';
-    context.igraph_errcode = IGRAPH_SUCCESS;
+    context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_pajek_yylex_init_extra(&context, &context.scanner);
     IGRAPH_FINALLY(igraph_pajek_yylex_destroy, context.scanner);
@@ -171,8 +171,8 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
-        } else if (context.igraph_errcode != IGRAPH_SUCCESS) {
-            IGRAPH_ERROR("", context.igraph_errcode);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
             IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_PARSEERROR);
         }
