@@ -218,10 +218,13 @@ public:
 
 /**
  * \function igraph_canonical_permutation
- * Canonical permutation using Bliss
+ * \brief Canonical permutation using Bliss.
  *
- * This function computes the canonical permutation which transforms
- * the graph into a canonical form by using the Bliss algorithm.
+ * This function computes the vertex permutation which transforms
+ * the graph into a canonical form, using the Bliss algorithm.
+ * Two graphs have the same canonical form if and only if they
+ * are isomorphic. Use \ref igraph_is_same_graph() to compare
+ * two canonical forms.
  *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
@@ -234,8 +237,11 @@ public:
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info If not \c NULL then information on Bliss internals is
- *    stored here. See \ref igraph_bliss_info_t.
+ *    stored here. The memory used by this structure must to be freed
+ *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
+ *
+ * \sa igraph_is_same_graph()
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
@@ -272,7 +278,7 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
 
 /**
  * \function igraph_automorphisms
- * Number of automorphisms using Bliss
+ * \brief Number of automorphisms using Bliss.
  *
  * The number of automorphisms of a graph is computed using Bliss. The
  * result is returned as part of the \p info structure, in tag \c
@@ -288,7 +294,8 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info The result is stored here, in particular in the \c
- *    group_size tag of \p info.
+ *    group_size tag of \p info. The memory used by this structure must be
+ *    released when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
@@ -320,11 +327,12 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
 
 /**
  * \function igraph_automorphism_group
- * Automorphism group generators using Bliss
+ * \brief Automorphism group generators using Bliss.
  *
  * The generators of the automorphism group of a graph are computed
  * using Bliss. The generator set may not be minimal and may depend on
- * the splitting heuristics.
+ * the splitting heuristics. The generators are permutations represented
+ * using zero-based indexing.
  *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
@@ -336,7 +344,8 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info If not \c NULL then information on Bliss internals is
- *    stored here. See \ref igraph_bliss_info_t.
+ *    stored here. The memory used by this structure must to be freed
+ *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
@@ -391,7 +400,7 @@ int igraph_automorphism_group(
 
 /**
  * \function igraph_isomorphic_bliss
- * Graph isomorphism via Bliss
+ * \brief Graph isomorphism via Bliss.
  *
  * This function uses the Bliss graph isomorphism algorithm, a
  * successor of the famous NAUTY algorithm and implementation. Bliss
@@ -400,6 +409,9 @@ int igraph_automorphism_group(
  * details. Currently the 0.75 version of Bliss is included in igraph.
  *
  * </para><para>
+ * Isomorphism testing is implemented by producing the canonical form
+ * of both graphs using \ref igraph_canonical_permutation() and
+ * comparing them.
  *
  * \param graph1 The first input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
@@ -419,9 +431,11 @@ int igraph_automorphism_group(
  * \param sh Splitting heuristics to be used for the graphs. See
  *   \ref igraph_bliss_sh_t.
  * \param info1 If not \c NULL, information about the canonization of
- *    the first input graph is stored here. See \ref igraph_bliss_info_t
- *    for details. Note that if the two graphs have different number
- *    of vertices or edges, then this is not filled.
+ *    the first input graph is stored here. Note that if the two graphs
+ *    have different number of vertices or edges, then this is only
+ *    partially filled. The memory used by this structure should be
+ *    released when no longer needed, see \ref igraph_bliss_info_t
+ *    for details.
  * \param info2 Same as \p info1, but for the second graph.
  * \return Error code.
  *
