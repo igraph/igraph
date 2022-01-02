@@ -25,9 +25,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (! igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED)) {
         igraph_integer_t conn;
 
-        check_err(igraph_edge_connectivity(&graph, &conn, 0));
+        /* Enable connectivity checks in order to try to force the fuzzer
+         * to find connected graphs. Disconnected graphs result in low coverage. */
+        check_err(igraph_edge_connectivity(&graph, &conn, 1));
         check_err(igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, nullptr));
-        check_err(igraph_edge_connectivity(&graph, &conn, 0));
+        check_err(igraph_edge_connectivity(&graph, &conn, 1));
 
         igraph_destroy(&graph);
     }

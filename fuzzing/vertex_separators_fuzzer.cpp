@@ -13,13 +13,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     igraph_set_error_handler(&igraph_error_handler_ignore);
 
-    if (Size % 2 == 1 || Size > 32640) {
+    /* We work with small, up-to 16-vertex graphs, as the algorithms
+     * tested here can be slow. Each byte is interpreted as an edge.
+     * A simple graph can have at most 120 edges, but we allow up
+     * to 240, as the fuzzer usually generates multigraphs. */
+
+    if (Size > 240) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size));
+    check_err(igraph_vector_int_init(&edges, 2*Size));
+    size_t j = 0;
     for (size_t i=0; i < Size; ++i) {
-        VECTOR(edges)[i] = Data[i];
+        VECTOR(edges)[j++] = Data[i] / 16;
+        VECTOR(edges)[j++] = Data[i] % 16;
     }
 
     if (! igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED)) {
