@@ -29,6 +29,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if (size < 5) return 0;
 
     igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     // Turn on attribute handling
     igraph_set_attribute_table(&igraph_cattribute_table);
