@@ -202,8 +202,12 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     case 2: /* out of memory */
         IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_ENOMEM);
         break;
-    default:
-        /* Must never reach here. */
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
         IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading Pajek file.", err);
     }
 
