@@ -9,11 +9,13 @@ zip $OUT/read_gml_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/karate.gml
 
 zip $OUT/read_pajek_fuzzer_seed_corpus.zip \
-        $SRC/igraph/examples/simple/links.net
+        $SRC/igraph/examples/simple/links.net \
+        $SRC/igraph/tests/unit/bipartite.net \
+        $SRC/igraph/tests/unit/pajek*.net
 
 cd $SRC/igraph
 
-for TARGET in read_gml_fuzzer bliss_fuzzer vertex_connectivity_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
+for TARGET in read_gml_fuzzer read_pajek_fuzzer bliss_fuzzer vertex_connectivity_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
 do
   $CXX $CXXFLAGS -I$SRC/igraph/build/include -I$SRC/igraph/include -o $TARGET.o -c ./fuzzing/$TARGET.cpp
   $CXX $CXXFLAGS $LIB_FUZZING_ENGINE $TARGET.o -o $OUT/$TARGET ./build/src/libigraph.a
