@@ -60,20 +60,13 @@
 #include "io/parsers/pajek-lexer.h"
 #include "internal/hacks.h"
 
-/* YYNOMEM is available only in Bison 3.8 and later.
- * Fall back to YYABORT for older versions. */
-#ifndef YYNOMEM
-#define YYNOMEM YYABORT
-#endif
-
 /* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
 #define IGRAPH_YY_CHECK(expr) \
     do { \
         igraph_error_t igraph_i_ret = (expr); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
             context->igraph_errno = igraph_i_ret; \
-            if (igraph_i_ret == IGRAPH_ENOMEM) { YYNOMEM; } \
-            else { YYABORT; } \
+            YYABORT; \
         } \
     } while (0)
 
