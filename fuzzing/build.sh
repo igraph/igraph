@@ -1,7 +1,9 @@
 #!/bin/bash -eu
 
 mkdir build && cd build
-cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=Debug
+# CMAKE_BUILD_TYPE=None is an arbitrary value that prevents the automatic Release
+# build type setting, allowing OSS-Fuzz to pass on its own optimization flags.
+cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None
 make -j$(nproc)
 
 # Create seed corpus
