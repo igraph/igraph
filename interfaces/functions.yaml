@@ -145,8 +145,8 @@ igraph_full_bipartite:
 
 igraph_realize_degree_sequence:
     PARAMS: |-
-        OUT GRAPH graph, VECTOR out_deg, VECTOR_OR_0 in_deg,
-        EDGE_TYPE_SW allowed_edge_types, REALIZE_DEGSEQ_METHOD method=SMALLEST
+        OUT GRAPH graph, VECTOR out_deg, VECTOR_OR_0 in_deg=NULL,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE, REALIZE_DEGSEQ_METHOD method=SMALLEST
 
 #######################################
 # Constructors, games
@@ -1864,8 +1864,10 @@ igraph_subisomorphic_lad:
         OPTIONAL OUT VECTORLIST maps, BOOLEAN induced, INT time_limit
 
 igraph_simplify_and_colorize:
+    # Despite their names, vertex_color and edge_color are not really colors
+    # but _multiplicities_, so we simply use VECTOR_INT there
     PARAMS: |-
-        GRAPH graph, OUT GRAPH res, OUT VERTEX_COLOR vertex_color, OUT EDGE_COLOR edge_color
+        GRAPH graph, OUT GRAPH res, OUT VECTOR_INT vertex_color, OUT VECTOR_INT edge_color
     DEPS: vertex_color ON graph, edge_color ON graph
 
 #######################################
