@@ -54,6 +54,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_ptr_t generators;
             check_err(igraph_vector_ptr_init(&generators, 0));
             check_err(igraph_automorphism_group(&graph, nullptr, &generators, IGRAPH_BLISS_FS, &info));
+            igraph_free(info.group_size);
             IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_int_destroy);
             igraph_vector_ptr_destroy_all(&generators);
         }
