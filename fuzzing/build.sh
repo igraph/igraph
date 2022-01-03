@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 mkdir build && cd build
-cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF
+cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=Debug
 make -j$(nproc)
 
 # Create seed corpus
