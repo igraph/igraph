@@ -787,6 +787,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/regression NAMES
   igraph_read_graph_gml_invalid_inputs
+  igraph_read_graph_graphml_invalid_inputs
   igraph_read_graph_pajek_invalid_inputs
 )
 
