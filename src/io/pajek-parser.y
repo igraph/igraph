@@ -79,14 +79,6 @@
         YYABORT; \
     } while (0)
 
-/* According to Pajek's author, limits of the Pajek program as of 2022-1-1 are:
- * "At the moment regular Pajek has limit one billion vertices, 
- *  PajekXXL two billions, while Pajek 3XL ten billions."
- * Hard-coding the limit INT32_MAX is safe when compiling wiht 32-bit integers,
- * and likely sufficient for practical applications.
- */
-#define IGRAPH_PAJEK_MAX_VERTEX_COUNT INT32_MAX
-
 int igraph_pajek_yyerror(YYLTYPE* locp,
                          igraph_i_pajek_parsedata_t *context,
                          const char *s);
