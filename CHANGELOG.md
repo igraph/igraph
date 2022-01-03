@@ -541,6 +541,8 @@
    reported zero as the local efficiency of a vertex in directed graphs.
  - `igraph_vector_update()` (and its type-specific variants) did not check for
    memory allocation failure.
+ - Fixed a potential crash in the GraphML reader that would be triggered by some
+   invalid GraphML files.
 
 ### Other
 

@@ -286,7 +286,6 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     state->edges_directed = 0;
     state->destroyed = 0;
     state->data_key = 0;
-    state->error_message = 0;
     state->data_char = 0;
     state->unknown_depth = 0;
     state->ignore_namespaces = 0;
@@ -1401,6 +1400,9 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
     /* Create a progressive parser context */
     state.g = graph;
     state.index = index < 0 ? 0 : index;
+    state.successful = 1;
+    state.error_message = NULL;
+
     res = (int) fread(buffer, 1, 4096, instream);
     ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
                                    &state,
