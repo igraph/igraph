@@ -269,11 +269,11 @@ static void igraph_i_graphml_parser_state_destroy_keep_error(struct igraph_i_gra
 
     if (state->data_key) {
         free(state->data_key);
-        state->data_key = 0;
+        state->data_key = NULL;
     }
     if (state->data_char) {
         free(state->data_char);
-        state->data_char = 0;
+        state->data_char = NULL;
     }
 }
 
@@ -281,7 +281,7 @@ static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser
     igraph_i_graphml_parser_state_destroy_keep_error(state);
     if (state->error_message) {
         free(state->error_message);
-        state->error_message = 0;
+        state->error_message = NULL;
     }
 }
 
@@ -334,8 +334,8 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     state->successful = 1;
     state->edges_directed = 0;
     state->destroyed = 0;
-    state->data_key = 0;
-    state->data_char = 0;
+    state->data_key = NULL;
+    state->data_char = NULL;
     state->unknown_depth = 0;
     state->ignore_namespaces = 0;
 }
@@ -539,8 +539,8 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         struct igraph_i_graphml_parser_state *state) {
     xmlChar **it;
     xmlChar *localname;
-    igraph_trie_t *trie = 0;
-    igraph_vector_ptr_t *ptrvector = 0;
+    igraph_trie_t *trie = NULL;
+    igraph_vector_ptr_t *ptrvector = NULL;
     long int id;
     unsigned short int skip = 0;
     int i, ret;
@@ -749,7 +749,7 @@ static void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser
             if (state->data_char) {
                 free(state->data_char);
             }
-            state->data_char = 0;
+            state->data_char = NULL;
             state->data_type = type;
         } else {
             /* ignore */
@@ -783,8 +783,8 @@ static void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_
 static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state *state) {
     const char *key = fromXmlChar(state->data_key);
     igraph_attribute_elemtype_t type = state->data_type;
-    igraph_trie_t *trie = 0;
-    igraph_vector_ptr_t *ptrvector = 0;
+    igraph_trie_t *trie = NULL;
+    igraph_vector_ptr_t *ptrvector = NULL;
     igraph_i_graphml_attribute_record_t *graphmlrec;
     igraph_attribute_record_t *rec;
     long int recid, id = 0;
@@ -1175,7 +1175,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
         break;
 
     case INSIDE_KEY:
-        state->current_attr_record = 0;
+        state->current_attr_record = NULL;
         state->st = INSIDE_GRAPHML;
         break;
 
@@ -1361,6 +1361,8 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
     struct igraph_i_graphml_parser_state state;
     int res;
     char buffer[4096];
+    igraph_bool_t parsing_successful;
+    char* error_message;
 
     if (index < 0) {
         IGRAPH_ERROR("Graph index must be non-negative", IGRAPH_EINVAL);
@@ -1407,21 +1409,31 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
     /* Free the context */
     xmlFreeParserCtxt(ctxt);
 
-    /* Extract the error message from the parser state (if any) */
-    if (!state.successful) {
-        if (state.error_message != 0) {
-            IGRAPH_ERROR(state.error_message, IGRAPH_PARSEERROR);
+    /* Extract the error message from the parser state (if any), and make a
+     * copy so we can safely destroy the parser state before triggering the
+     * error */
+    parsing_successful = state.successful;
+    error_message = parsing_successful || state.error_message == NULL ? NULL : strdup(state.error_message);
+
+    /* Now we can free the parser state */
+    igraph_i_graphml_parser_state_destroy(&state);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* ...and we can put only the error message pointer on the FINALLY stack */
+    if (error_message != NULL) {
+        IGRAPH_FINALLY(free, error_message);
+    }
+
+    /* Trigger the stored error if needed */
+    if (!parsing_successful) {
+        if (error_message != NULL) {
+            IGRAPH_ERROR(error_message, IGRAPH_PARSEERROR);
         } else {
             IGRAPH_ERROR("Malformed GraphML file", IGRAPH_PARSEERROR);
         }
-    }
-    if (state.index >= 0) {
+    } else if (state.index >= 0) {
         IGRAPH_ERROR("Graph index was too large", IGRAPH_EINVAL);
     }
-
-    /* Free the parser state */
-    igraph_i_graphml_parser_state_destroy(&state);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 #else
