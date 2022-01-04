@@ -24,6 +24,8 @@
 #include "igraph.h"
 #include <stdio.h>
 
+#include "../unit/test_utilities.inc"
+
 int test_file(const char* fname) {
     FILE *ifile;
     igraph_t g;
@@ -48,11 +50,13 @@ int test_file(const char* fname) {
     return 0;
 }
 
+#undef RUN_TEST
 #define RUN_TEST(fname) {   \
     index++;                \
     if (test_file(fname)) { \
         return index;       \
     }                       \
+    VERIFY_FINALLY_STACK(); \
 }
 
 int main(int argc, char* argv[]) {
