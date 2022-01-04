@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team
+   Copyright (C) 2021-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,14 +19,10 @@
 */
 
 #include "igraph.h"
-#include <cstdint>
-#include <cstring>
-#include <cstdlib>
 #include <cstdio>
 
 extern "C"
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if (size < 5) return 0;
 
     igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
