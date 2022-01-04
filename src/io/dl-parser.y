@@ -167,12 +167,16 @@ fullmatrixdata: {} | fullmatrixdata zerooneseq NEWLINE {
 zerooneseq: | zerooneseq zeroone { } ;
 
 zeroone: DIGIT {
-  /* TODO: What if the digit is neither 0 or 1? */
-  if (igraph_dl_yyget_text(scanner)[0]=='1') {
+  /* TODO: What if the digit is neither 0 or 1? Are multigraphs allowed? */
+  char c = igraph_dl_yyget_text(scanner)[0];
+  if (c == '1') {
     IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges,
                                          context->from));
     IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges,
                                          context->to));
+  } else if (c != '0') {
+      IGRAPH_YY_ERRORF("Unexpected digit '%c' in adjacency matrix in DL file.",
+                    IGRAPH_EINVAL, c);
   }
   context->to += 1;
 } ;

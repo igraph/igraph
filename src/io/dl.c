@@ -126,7 +126,6 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     /* Check number of vertices */
     if (n2 > 0) {
         n = igraph_vector_int_max(&context.edges);
-        IGRAPH_ASSERT(n < IGRAPH_DL_MAX_VERTEX_COUNT);
     } else {
         n = 0;
     }
