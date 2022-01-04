@@ -37,17 +37,19 @@ int test_file(const char* fname, igraph_bool_t should_parse) {
     }
 
     retval = igraph_read_graph_graphml(&g, ifile, 0);
-    if (!should_parse && retval == IGRAPH_SUCCESS) {
-        /* input was accepted, this is a bug; attempt to clean up after
-         * ourselves nevertheless */
+    if (retval == IGRAPH_SUCCESS) {
+        /* destroy the graph if we managed to parse it */
         igraph_destroy(&g);
-        fclose(ifile);
-        return 2;
     }
 
     fclose(ifile);
 
-    return 0;
+    if (!should_parse && retval == IGRAPH_SUCCESS) {
+        /* input was accepted but it should not have been, this is a bug */
+        return 2;
+    } else {
+        return 0;
+    }
 }
 
 #undef RUN_TEST
