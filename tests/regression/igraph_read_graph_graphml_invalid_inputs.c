@@ -70,6 +70,7 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST("invalid1.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid2.graphml", /* should_parse = */ 1);
+    RUN_TEST("invalid3.graphml", /* should_parse = */ 0);
 
     return 0;
 }

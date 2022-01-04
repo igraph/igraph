@@ -204,6 +204,8 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
 }
 
 static int igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, int index) {
+    memset(state, 0, sizeof(struct igraph_i_graphml_parser_state));
+
     state->g = graph;
     state->index = index < 0 ? 0 : index;
     state->successful = 1;
