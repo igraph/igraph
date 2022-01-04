@@ -34,7 +34,7 @@ void canonicalize_list(igraph_vector_ptr_t *list) {
     igraph_integer_t i, len;
     len = igraph_vector_ptr_size(list);
     for (i = 0; i < len; ++i) {
-        igraph_vector_sort((igraph_vector_t *) VECTOR(*list)[i]);
+        igraph_vector_int_sort((igraph_vector_int_t *) VECTOR(*list)[i]);
     }
     qsort(&(VECTOR(*list)[0]), len, sizeof(void *), &compare_vectors);
 }
