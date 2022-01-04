@@ -187,10 +187,10 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     } else if (rec->record.type == IGRAPH_ATTRIBUTE_STRING) {
         if (rec->record.value != 0) {
             igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
-            if (rec->default_value.as_string != 0) {
-                IGRAPH_FREE(rec->default_value.as_string);
-            }
             IGRAPH_FREE(rec->record.value);
+        }
+        if (rec->default_value.as_string != 0) {
+            IGRAPH_FREE(rec->default_value.as_string);
         }
     } else if (rec->record.type == IGRAPH_ATTRIBUTE_BOOLEAN) {
         if (rec->record.value != 0) {
