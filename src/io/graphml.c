@@ -116,7 +116,8 @@ struct igraph_i_graphml_parser_state {
     igraph_vector_int_t prev_state_stack;
     unsigned int unknown_depth;
     int index;
-    igraph_bool_t successful, edges_directed, destroyed;
+    igraph_bool_t successful;
+    igraph_bool_t edges_directed;
     igraph_trie_t v_names;
     igraph_vector_ptr_t v_attrs;
     igraph_trie_t e_names;
@@ -252,13 +253,7 @@ static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_graphml_parser_state_destroy_keep_error(struct igraph_i_graphml_parser_state* state) {
-    if (state->destroyed) {
-        return;
-    }
-
-    state->destroyed = 1;
-
+static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser_state* state) {
     igraph_trie_destroy(&state->node_trie);
     igraph_strvector_destroy(&state->edgeids);
     igraph_trie_destroy(&state->v_names);
@@ -279,10 +274,7 @@ static void igraph_i_graphml_parser_state_destroy_keep_error(struct igraph_i_gra
         free(state->data_char);
         state->data_char = NULL;
     }
-}
 
-static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser_state* state) {
-    igraph_i_graphml_parser_state_destroy_keep_error(state);
     if (state->error_message) {
         free(state->error_message);
         state->error_message = NULL;
@@ -299,6 +291,8 @@ static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ..
     va_start(ap, msg);
 
     if (state->error_message == 0) {
+        /* ownership of state->error_message passed on immediately to
+         * state so the state destructor is responsible for freeing it */
         state->error_message = IGRAPH_CALLOC(max_error_message_length, char);
     }
 
@@ -337,7 +331,6 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     state->st = START;
     state->successful = 1;
     state->edges_directed = 0;
-    state->destroyed = 0;
     state->data_key = NULL;
     state->data_char = NULL;
     state->unknown_depth = 0;
@@ -1361,7 +1354,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
 
     xmlInitParser();
     IGRAPH_CHECK(igraph_i_graphml_parser_state_init(&state, graph, index));
-    IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy_keep_error, &state);
+    IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
 
     /* Create a progressive parser context */
     res = (int) fread(buffer, 1, 4096, instream);
@@ -1388,7 +1381,15 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
         IGRAPH_ERROR("Cannot set options for the parser context", IGRAPH_EINVAL);
     }
 
-    /* Parse the file */
+    /* Okay, parsing will start now. The parser might do things that eventually
+     * trigger the igraph error handler, but we want the parser state to
+     * survive whatever happens here. So, we need to pop off
+     * igraph_i_graphml_parser_state_destroy() from the stack and temporarily
+     * assume responsibility for calling it ourselves until we are back from the
+     * parser */
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* Do the parsing */
     while ((res = (int) fread(buffer, 1, 4096, instream)) > 0) {
         xmlParseChunk(ctxt, buffer, res, 0);
         if (!state.successful) {
@@ -1407,9 +1408,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     error_message = parsing_successful || state.error_message == NULL ? NULL : strdup(state.error_message);
 
     /* Now that we have lifted error_message out of the parser state, we can
-     * replace the destructor of the parser state in the finally stack with the
-     * "proper" destructor */
-    IGRAPH_FINALLY_CLEAN(1);
+     * put the destructor of the parser state back on the FINALLY stack */
     IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
 
     /* ...and we can also put the error message pointer on the FINALLY stack */
