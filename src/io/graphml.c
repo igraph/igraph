@@ -535,8 +535,8 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
         return 0;
     }
-    IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
     IGRAPH_FINALLY(igraph_free, rec);
+    IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
 
     rec->type = I_GRAPHML_UNKNOWN_TYPE;
 
