@@ -26,7 +26,7 @@
 
 #include "../unit/test_utilities.inc"
 
-int test_file(const char* fname) {
+int test_file(const char* fname, igraph_bool_t should_parse) {
     FILE *ifile;
     igraph_t g;
     int retval;
@@ -37,7 +37,7 @@ int test_file(const char* fname) {
     }
 
     retval = igraph_read_graph_graphml(&g, ifile, 0);
-    if (!retval) {
+    if (!should_parse && retval == IGRAPH_SUCCESS) {
         /* input was accepted, this is a bug; attempt to clean up after
          * ourselves nevertheless */
         igraph_destroy(&g);
@@ -51,12 +51,12 @@ int test_file(const char* fname) {
 }
 
 #undef RUN_TEST
-#define RUN_TEST(fname) {   \
-    index++;                \
-    if (test_file(fname)) { \
-        return index;       \
-    }                       \
-    VERIFY_FINALLY_STACK(); \
+#define RUN_TEST(fname, should_parse) {   \
+    index++;                              \
+    if (test_file(fname, should_parse)) { \
+        return index;                     \
+    }                                     \
+    VERIFY_FINALLY_STACK();               \
 }
 
 int main(int argc, char* argv[]) {
@@ -66,8 +66,8 @@ int main(int argc, char* argv[]) {
      * should not segfault and should not accept invalid input either */
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    RUN_TEST("invalid1.graphml");
-    RUN_TEST("invalid2.graphml");
+    RUN_TEST("invalid1.graphml", /* should_parse = */ 0);
+    RUN_TEST("invalid2.graphml", /* should_parse = */ 1);
 
     return 0;
 }

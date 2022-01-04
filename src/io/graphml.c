@@ -218,15 +218,17 @@ static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml
     IGRAPH_CHECK(igraph_vector_ptr_init(&state->v_attrs, 0));
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->v_attrs,
                                           igraph_i_graphml_attribute_record_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->v_attrs);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &state->v_attrs);
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&state->e_attrs, 0));
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->e_attrs,
                                           igraph_i_graphml_attribute_record_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->e_attrs);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &state->e_attrs);
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&state->g_attrs, 0));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->g_attrs);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&state->g_attrs,
+                                          igraph_i_graphml_attribute_record_destroy);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &state->g_attrs);
 
     IGRAPH_CHECK(igraph_vector_int_init(&state->edgelist, 0));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &state->edgelist);
