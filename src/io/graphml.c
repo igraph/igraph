@@ -72,7 +72,6 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
 
 #define GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) do {  \
         if (state->successful) {                                    \
-            igraph_error(msg, IGRAPH_FILE_BASENAME, __LINE__, code);              \
             igraph_i_graphml_sax_handler_error(state, msg);           \
         }                                                           \
     } while (0)
