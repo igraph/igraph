@@ -1,4 +1,5 @@
 
+
 # Traverse subdirectories
 add_subdirectory(centrality/prpack)
 add_subdirectory(cliques/cliquer)
@@ -228,8 +229,7 @@ add_library(
   paths/shortest_paths.c
   paths/simple_paths.c
   paths/unweighted.c
-  paths/steiner.c
-  paths/floyd_warshall.c
+  paths/steiner.cpp
 
   properties/basic_properties.c
   properties/constraint.c
