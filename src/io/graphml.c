@@ -535,6 +535,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
         return 0;
     }
+    IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
     IGRAPH_FINALLY(igraph_free, rec);
 
     rec->type = I_GRAPHML_UNKNOWN_TYPE;
@@ -644,8 +645,9 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     /* if the code above requested skipping the attribute, free everything and
      * return */
     if (skip) {
+        igraph_i_graphml_attribute_record_destroy(rec);
         igraph_free(rec);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_FINALLY_CLEAN(2);
         return 0;
     }
 
@@ -664,7 +666,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
     /* Ownership of 'rec' is now taken by ptrvector so we can clean the
      * finally stack */
-    IGRAPH_FINALLY_CLEAN(1);  /* rec */
+    IGRAPH_FINALLY_CLEAN(2);  /* rec, destructor + igraph_free */
 
     /* create the attribute values */
     switch (rec->record.type) {
