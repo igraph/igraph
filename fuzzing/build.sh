@@ -8,16 +8,19 @@ make -j$(nproc)
 
 # Create seed corpus
 zip $OUT/read_gml_fuzzer_seed_corpus.zip \
-        $SRC/igraph/examples/simple/karate.gml
+        $SRC/igraph/examples/simple/*.gml \
+        $SRC/igraph/fuzzing/test_inputs/*.gml
 
 zip $OUT/read_pajek_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/links.net \
         $SRC/igraph/tests/unit/bipartite.net \
-        $SRC/igraph/tests/unit/pajek*.net
+        $SRC/igraph/tests/unit/pajek*.net \
+        $SRC/igraph/fuzzing/test_inputs/*.net
 
 zip $OUT/read_dl_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.dl \
-        $SRC/igraph/tests/unit/*.dl
+        $SRC/igraph/tests/unit/*.dl \
+        $SRC/igraph/fuzzing/test_inputs/*.dl
 
 cd $SRC/igraph
 
