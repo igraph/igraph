@@ -905,9 +905,10 @@ static void igraph_i_graphml_attribute_default_value_finish(
     igraph_i_graphml_attribute_record_t *graphmlrec = state->current_attr_record;
 
     if (graphmlrec == 0) {
-        igraph_warning("state->current_attr_record was null where it should have been "
-                       "non-null; this is probably a bug. Please notify the developers!",
-                       IGRAPH_FILE_BASENAME, __LINE__, 0);
+        IGRAPH_FATAL(
+            "state->current_attr_record was null where it should have been "
+            "non-null; please report as a bug."
+        );
         return;
     }
 
