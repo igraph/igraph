@@ -52,18 +52,37 @@
 #include "io/parsers/dl-parser.h"
 #include "io/parsers/dl-lexer.h"
 
-#include <stdio.h>
+/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
+#define IGRAPH_YY_CHECK(expr) \
+    do { \
+        igraph_error_t igraph_i_ret = (expr); \
+        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
+            context->igraph_errno = igraph_i_ret; \
+            YYABORT; \
+        } \
+    } while (0)
+
+/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
+#define IGRAPH_YY_ERRORF(reason, errno, ...) \
+    do { \
+        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      errno, __VA_ARGS__) ; \
+        context->igraph_errno = errno; \
+        YYABORT; \
+    } while (0)
 
 int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
                       const char *s);
-int igraph_i_dl_add_str(char *newstr, yy_size_t length,
+igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context);
-int igraph_i_dl_add_edge(long int from, long int to,
+igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
                          igraph_i_dl_parsedata_t *context);
-int igraph_i_dl_add_edge_w(long int from, long int to,
+igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to,
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context);
+igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
 
+/* TODO do not depend on Pajek reader */
 extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
@@ -81,7 +100,7 @@ extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 %lex-param { void* scanner }
 
 %union {
-  long int integer;
+  igraph_integer_t integer;
   igraph_real_t real;
 };
 
@@ -105,7 +124,15 @@ extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 
 %%
 
-input: DL NEQ integer NEWLINE rest trail eof { context->n=$3; };
+input: DL NEQ integer NEWLINE rest trail eof {
+  context->n=$3;
+  if (context->n < 0) {
+    IGRAPH_YY_ERRORF("Invalid vertex count in DL file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->n);
+  }
+  if (context->n > IGRAPH_DL_MAX_VERTEX_COUNT) {
+    IGRAPH_YY_ERRORF("Vertex count too large in DL file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->n);
+  }
+};
 
 trail: | trail newline;
 
@@ -127,9 +154,9 @@ fullmatrix:   DATA newline fullmatrixdata { }
 
 labels:       {} /* nothing, empty matrix */
             | labels newline LABEL {
-              igraph_i_dl_add_str(igraph_dl_yyget_text(scanner),
-                                  igraph_dl_yyget_leng(scanner),
-                                  context); }
+              IGRAPH_YY_CHECK(igraph_i_dl_add_str(igraph_dl_yyget_text(scanner),
+                                                  igraph_dl_yyget_leng(scanner),
+                                                  context)); }
 ;
 
 fullmatrixdata: {} | fullmatrixdata zerooneseq NEWLINE {
@@ -140,10 +167,11 @@ fullmatrixdata: {} | fullmatrixdata zerooneseq NEWLINE {
 zerooneseq: | zerooneseq zeroone { } ;
 
 zeroone: DIGIT {
+  /* TODO: What if the digit is neither 0 or 1? */
   if (igraph_dl_yyget_text(scanner)[0]=='1') {
-    IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
+    IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges,
                                          context->from));
-    IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
+    IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges,
                                          context->to));
   }
   context->to += 1;
@@ -155,9 +183,9 @@ reallabeledfullmatrixdata: labelseq NEWLINE labeledmatrixlines {} ;
 
 labelseq: | labelseq newline label ;
 
-label: LABEL { igraph_i_dl_add_str(igraph_dl_yyget_text(scanner),
-                                   igraph_dl_yyget_leng(scanner),
-                                   context); };
+label: LABEL { IGRAPH_YY_CHECK(igraph_i_dl_add_str(igraph_dl_yyget_text(scanner),
+                                                   igraph_dl_yyget_leng(scanner),
+                                                   context)); };
 
 labeledmatrixlines: labeledmatrixline {
                  context->from += 1;
@@ -186,9 +214,15 @@ edgelist1data: {} /* nothing, empty graph */
 ;
 
 edgelist1dataline: integer integer weight NEWLINE {
-                   igraph_i_dl_add_edge_w($1-1, $2-1, $3, context); }
+                    igraph_integer_t from = $1, to = $2;
+                    IGRAPH_YY_CHECK(igraph_i_dl_check_vid(from));
+                    IGRAPH_YY_CHECK(igraph_i_dl_check_vid(to));
+                    IGRAPH_YY_CHECK(igraph_i_dl_add_edge_w(from-1, to-1, $3, context)); }
                  | integer integer NEWLINE {
-                   igraph_i_dl_add_edge($1-1, $2-1, context);
+                    igraph_integer_t from = $1, to = $2;
+                    IGRAPH_YY_CHECK(igraph_i_dl_check_vid(from));
+                    IGRAPH_YY_CHECK(igraph_i_dl_check_vid(to));
+                    IGRAPH_YY_CHECK(igraph_i_dl_add_edge(from-1, to-1, context));
 } ;
 
 integer: NUM { $$=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
@@ -199,9 +233,9 @@ labelededgelist1data: {} /* nothing, empty graph */
 ;
 
 labelededgelist1dataline: elabel elabel weight NEWLINE {
-                          igraph_i_dl_add_edge_w($1, $2, $3, context); }
+                          IGRAPH_YY_CHECK(igraph_i_dl_add_edge_w($1, $2, $3, context)); }
                         | elabel elabel NEWLINE {
-                          igraph_i_dl_add_edge($1, $2, context);
+                          IGRAPH_YY_CHECK(igraph_i_dl_add_edge($1, $2, context));
  };
 
 weight: NUM { $$=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
@@ -221,7 +255,8 @@ elabel: LABEL {
   }
   igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
                    igraph_dl_yyget_leng(scanner), &trie_id);
-  $$ = (long) trie_id;
+  IGRAPH_ASSERT(0 <= trie_id && trie_id < IGRAPH_DL_MAX_VERTEX_COUNT);
+  $$ = trie_id;
  };
 
 /*-----------------------------------------------------------*/
@@ -242,12 +277,16 @@ nodelist1data: {} /* nothing, empty graph */
 nodelist1dataline: from tolist NEWLINE {} ;
 
 from: NUM { context->from=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
-                                                          igraph_dl_yyget_leng(scanner)); } ;
+                                                  igraph_dl_yyget_leng(scanner));
+            IGRAPH_YY_CHECK(igraph_i_dl_check_vid(context->from));
+          } ;
 
 tolist: {} | tolist integer {
-  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
-                                       context->from-1));
-  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, $2-1));
+  igraph_integer_t to = $2;
+  IGRAPH_YY_CHECK(igraph_i_dl_check_vid(to));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges,
+                                              context->from-1));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges, to-1));
  } ;
 
 labelednodelist1data: {} /* nothing, empty graph */
@@ -261,9 +300,9 @@ fromelabel: elabel {
  };
 
 labeltolist: | labeltolist elabel {
-  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges,
-                                       context->from));
-  IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, $2));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges,
+                                              context->from));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(&context->edges, $2));
  } ;
 
 %%
@@ -276,34 +315,50 @@ int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
   return 0;
 }
 
-int igraph_i_dl_add_str(char *newstr, yy_size_t length,
+igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
-  int tmp=newstr[length];
+  char tmp=newstr[length];
   newstr[length]='\0';
   IGRAPH_CHECK(igraph_strvector_add(&context->labels, newstr));
   newstr[length]=tmp;
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
-int igraph_i_dl_add_edge(long int from, long int to,
+igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
                          igraph_i_dl_parsedata_t *context) {
+  //IGRAPH_CHECK(igraph_i_dl_check_vid(from+1));
+  //IGRAPH_CHECK(igraph_i_dl_check_vid(to+1));
   IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, from));
   IGRAPH_CHECK(igraph_vector_int_push_back(&context->edges, to));
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
-int igraph_i_dl_add_edge_w(long int from, long int to,
+igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to,
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context) {
-  long int n=igraph_vector_size(&context->weights);
-  long int n2=igraph_vector_int_size(&context->edges)/2;
+  igraph_integer_t n=igraph_vector_size(&context->weights);
+  igraph_integer_t n2=igraph_vector_int_size(&context->edges)/2;
   if (n != n2) {
-    igraph_vector_resize(&context->weights, n2);
+    IGRAPH_CHECK(igraph_vector_resize(&context->weights, n2));
     for (; n<n2; n++) {
       VECTOR(context->weights)[n]=IGRAPH_NAN;
     }
   }
   IGRAPH_CHECK(igraph_i_dl_add_edge(from, to, context));
   IGRAPH_CHECK(igraph_vector_push_back(&context->weights, weight));
-  return 0;
+  return IGRAPH_SUCCESS;
+}
+
+/* Raise an error if the vertex index is invalid in the DL file.
+ * DL files use 1-based vertex indices. */
+igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid) {
+    if (dl_vid < 1) {
+        IGRAPH_ERRORF("Invalid vertex index in DL file: %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, dl_vid);
+    }
+    if (dl_vid > IGRAPH_DL_MAX_VERTEX_COUNT) {
+        IGRAPH_ERRORF("Vertex index too large in DL file: %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, dl_vid);
+    }
+    return IGRAPH_SUCCESS;
 }
