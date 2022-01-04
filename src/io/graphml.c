@@ -1020,8 +1020,9 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
         break;
 
     case INSIDE_KEY:
-        /* If we are in the INSIDE_KEY state, check for default tag */
-        if (xmlStrEqual(localname, toXmlChar("default"))) {
+        /* If we are in the INSIDE_KEY state and we are not skipping the current
+         * attribute, check for default tag */
+        if (state->current_attr_record != NULL && xmlStrEqual(localname, toXmlChar("default"))) {
             state->st = INSIDE_DEFAULT;
         } else {
             igraph_i_graphml_handle_unknown_start_tag(state);

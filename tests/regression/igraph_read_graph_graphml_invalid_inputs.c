@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     RUN_TEST("invalid1.graphml");
+    RUN_TEST("invalid2.graphml");
 
     return 0;
 }
