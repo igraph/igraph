@@ -25,7 +25,7 @@
 /* This file is ported from Java; the original source is here:
    https://floating-point-gui.de/errors/NearlyEqualsTest.java */
 
-const double EPS = 0.00001f;
+const double EPS = 0.00001;
 
 void assert_almost_equal_with_eps(double a, double b, double eps, int line) {
     if (!igraph_almost_equals(a, b, eps)) {
@@ -93,8 +93,8 @@ void test_small_differences_away_from_zero() {
 
 void test_comparisons_involving_zero() {
     ASSERT_ALMOST_EQUAL(0, 0);
-    ASSERT_ALMOST_EQUAL(0.0f, -0.0f);
-    ASSERT_ALMOST_EQUAL(-0.0f, -0.0f);
+    ASSERT_ALMOST_EQUAL(0.0, -0.0);
+    ASSERT_ALMOST_EQUAL(-0.0, -0.0);
     ASSERT_NOT_EQUAL(0.00000001, 0.0);
     ASSERT_NOT_EQUAL(0.0, 0.00000001);
     ASSERT_NOT_EQUAL(-0.00000001, 0.0);
@@ -128,8 +128,8 @@ void test_infinities() {
 void test_nans() {
     ASSERT_NOT_EQUAL(IGRAPH_NAN, IGRAPH_NAN);
     ASSERT_NOT_EQUAL(IGRAPH_NAN, 0);
-    ASSERT_NOT_EQUAL(-0.0f, IGRAPH_NAN);
-    ASSERT_NOT_EQUAL(IGRAPH_NAN, -0.0f);
+    ASSERT_NOT_EQUAL(-0.0, IGRAPH_NAN);
+    ASSERT_NOT_EQUAL(IGRAPH_NAN, -0.0);
     ASSERT_NOT_EQUAL(IGRAPH_NAN, IGRAPH_POSINFINITY);
     ASSERT_NOT_EQUAL(IGRAPH_POSINFINITY, IGRAPH_NAN);
     ASSERT_NOT_EQUAL(IGRAPH_NAN, IGRAPH_NEGINFINITY);

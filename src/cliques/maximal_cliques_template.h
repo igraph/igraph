@@ -194,7 +194,7 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
 
     int err;
 
-    igraph_vector_int_push_back(H, -1); /* boundary */
+    IGRAPH_CHECK(igraph_vector_int_push_back(H, -1)); /* boundary */
 
     if (PS > PE && XS > XE) {
         /* Found a maximum clique, report it */
@@ -205,15 +205,16 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     } else if (PS <= PE) {
         /* Select a pivot element */
         igraph_integer_t pivot, mynextv;
-        igraph_i_maximal_cliques_select_pivot(PX, PS, PE, XS, XE, pos,
-                                              adjlist, &pivot, nextv,
-                                              oldPS, oldXE);
+        IGRAPH_CHECK(igraph_i_maximal_cliques_select_pivot(
+            PX, PS, PE, XS, XE, pos, adjlist, &pivot, nextv, oldPS, oldXE
+        ));
         while ((mynextv = igraph_vector_int_pop_back(nextv)) != -1) {
             igraph_integer_t newPS, newXE;
 
             /* Going down, prepare */
-            igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
-                                          mynextv, R, &newPS, &newXE);
+            IGRAPH_CHECK(igraph_i_maximal_cliques_down(
+                PX, PS, PE, XS, XE, pos, adjlist, mynextv, R, &newPS, &newXE
+            ));
             /* Recursive call */
             err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
                       PX, newPS, PE, XS, newXE, PS, XE, R,
@@ -227,14 +228,15 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
             }
             /* Putting v from P to X */
             if (igraph_vector_int_tail(nextv) != -1) {
-                igraph_i_maximal_cliques_PX(PX, PS, &PE, &XS, XE, pos, adjlist,
-                                            mynextv, H);
+                IGRAPH_CHECK(igraph_i_maximal_cliques_PX(
+                    PX, PS, &PE, &XS, XE, pos, adjlist, mynextv, H
+                ));
             }
         }
     }
 
     /* Putting back vertices from X to P, see notes in H */
-    igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H);
+    IGRAPH_CHECK(igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H));
 
     return IGRAPH_SUCCESS;
 }
@@ -365,11 +367,9 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
         }
 
         /* Reorder the adjacency lists, according to P and X. */
-        IGRAPH_CHECK(
-            igraph_i_maximal_cliques_reorder_adjlists(
-                &PX, PS, PE, XS, XE, &pos, &adjlist
-            )
-        );
+        IGRAPH_CHECK(igraph_i_maximal_cliques_reorder_adjlists(
+            &PX, PS, PE, XS, XE, &pos, &adjlist
+        ));
 
         err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
                 &PX, PS, PE, XS, XE, PS, XE, &R, &pos,
