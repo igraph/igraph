@@ -273,6 +273,21 @@ int igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
 }
 
+/* Use value-safe floating point math for igraph_cmp_epsilon() with
+ * the Intel compiler.
+ *
+ * The Intel compiler rewrites arithmetic expressions for faster
+ * evaluation by default. In the below function, it will evaluate
+ * (eps * fabs(a) + eps * fabs(b)) as eps*(fabs(a) + fabs(b)).
+ * However, this code path is taken precisely when fabs(a) + fabs(b)
+ * overflows, thus this rearrangement of the expression causes
+ * the function to return incorrect results, and some test failures.
+ * To avoid this, we switch the Intel compiler to "precise" mode.
+ */
+#ifdef __INTEL_COMPILER
+#pragma float_control(push)
+#pragma float_control (precise, on)
+#endif
 
 /**
  * \function igraph_cmp_epsilon
@@ -318,3 +333,7 @@ int igraph_cmp_epsilon(double a, double b, double eps) {
         return (abs_diff / sum < eps) ? 0 : (diff < 0 ? -1 : 1);
     }
 }
+
+#ifdef __INTEL_COMPILER
+#pragma float_control(pop)
+#endif
