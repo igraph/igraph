@@ -311,11 +311,12 @@ labeltolist: | labeltolist elabel {
 
 %%
 
-int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
+int igraph_dl_yyerror(YYLTYPE* locp,
+                      igraph_i_dl_parsedata_t* context,
                       const char *s) {
-  snprintf(context->errmsg,
-           sizeof(context->errmsg)/sizeof(char)-1,
-           "%s in line %i", s, locp->first_line);
+  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
+           "Parse error in DL file, line %i (%s)",
+           locp->first_line, s);
   return 0;
 }
 
