@@ -190,7 +190,7 @@ static int igraph_i_maximal_cliques_select_pivot(
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_int_push_back(nextv, -1));
+    igraph_vector_int_push_back(nextv, -1);
     pivotvectneis = igraph_adjlist_get(adjlist, *pivot);
     pivotvectlen = igraph_vector_int_size(pivotvectneis);
 
@@ -210,7 +210,7 @@ static int igraph_i_maximal_cliques_select_pivot(
             }
         }
         if (!nei) {
-            IGRAPH_CHECK(igraph_vector_int_push_back(nextv, vcand));
+            igraph_vector_int_push_back(nextv, vcand);
         }
     }
 

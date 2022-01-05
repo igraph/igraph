@@ -27,11 +27,13 @@
 #define SUFFIX
 #define RECORD do {                         \
         igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
+        int j;                              \
         if (!cl) {                              \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
         }                                   \
         IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));             \
-        IGRAPH_CHECK(igraph_vector_copy(cl, R));                   \
+        IGRAPH_CHECK(igraph_vector_init(cl, clsize));                   \
+        for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }    \
     } while (0)
 #define FINALLY do {                    \
         igraph_vector_ptr_clear(res);           \
@@ -75,11 +77,13 @@
 #define RECORD do {                         \
         if (res) {                                \
             igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t);      \
+            int j;                              \
             if (!cl) {                              \
                 IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
             }                                   \
             IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));             \
-            IGRAPH_CHECK(igraph_vector_copy(cl, R));                    \
+            IGRAPH_CHECK(igraph_vector_init(cl, clsize));                   \
+            for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }    \
         }                                 \
         if (no) { (*no)++; }                              \
         if (outfile) { igraph_vector_int_fprint(R, outfile); }        \
@@ -108,10 +112,12 @@
 #define SUFFIX _callback
 #define RECORD do { \
         igraph_vector_t *cl=IGRAPH_CALLOC(1, igraph_vector_t); \
+        long j; \
         if (!cl) { \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
         } \
-        IGRAPH_CHECK(igraph_vector_copy(cl, R)); \
+        IGRAPH_CHECK(igraph_vector_init(cl, clsize)); \
+        for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; } \
         if (!cliquehandler_fn(cl, arg)) \
             return IGRAPH_STOP; \
     } while (0)
