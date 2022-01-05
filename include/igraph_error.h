@@ -136,7 +136,9 @@ __BEGIN_DECLS
  * <para>
  * If you want to write an error handler, your error handler should
  * call \ref IGRAPH_FINALLY_FREE() to deallocate all temporary memory to
- * prevent memory leaks.
+ * prevent memory leaks. Note that this may invalidate the error message
+ * buffer \p reason passed to the error handler. Do not access it after
+ * having called \ref IGRAPH_FINALLY_FREE().
  * </para>
  */
 
@@ -222,7 +224,7 @@ __BEGIN_DECLS
  * \param igraph_errno The \a igraph error code.
  */
 
-typedef void igraph_error_handler_t (const char * reason, const char * file,
+typedef void igraph_error_handler_t (const char *reason, const char *file,
                                      int line, int igraph_errno);
 
 /**

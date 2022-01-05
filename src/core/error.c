@@ -212,9 +212,9 @@ void igraph_error_handler_ignore(const char *reason, const char *file,
 #ifndef USING_R
 void igraph_error_handler_printignore(const char *reason, const char *file,
                                       int line, int igraph_errno) {
-    IGRAPH_FINALLY_FREE();
     fprintf(stderr, "Error at %s:%i : %s - %s.\n",
             file, line, reason, igraph_strerror(igraph_errno));
+    IGRAPH_FINALLY_FREE();
 }
 #endif
 
