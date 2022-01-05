@@ -249,30 +249,29 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     /* Check if we have the names attribute */
     if (names && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
             names)) {
-        names = 0;
-        IGRAPH_WARNING("names attribute does not exists");
+        IGRAPH_WARNINGF("Names attribute '%s' does not exists.", names);
+        names = NULL;
     }
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
         if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
-            IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
-            names = 0;
+            IGRAPH_WARNINGF("Ignoring names attribute '%s', unknown attribute type.", names);
+            names = NULL;
         }
     }
 
     /* Check the weights as well */
-    if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-            weights)) {
-        weights = 0;
-        IGRAPH_WARNING("weights attribute does not exists");
+    if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, weights)) {
+        IGRAPH_WARNINGF("Weights attribute '%s' does not exists.", weights);
+        weights = NULL;
     }
     if (weights) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
         if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC && weighttype != IGRAPH_ATTRIBUTE_STRING) {
-            IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
-            weights = 0;
+            IGRAPH_WARNINGF("Ignoring weights attribute '%s', unknown attribute type.", weights);
+            weights = NULL;
         }
     }
 
@@ -289,7 +288,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId "\n", from, to);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -317,7 +316,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 ret = fprintf(outstream, "# %s\n%s\n", str1, str2);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -344,7 +343,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId " %s\n", from, to, str1);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -379,11 +378,11 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 ret = fprintf(outstream, "# %s\n%s ", str1, str2);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             ret = fprintf(outstream, "%s\n", str3);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -416,7 +415,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 }
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
         }
         igraph_strvector_destroy(&nvec);
