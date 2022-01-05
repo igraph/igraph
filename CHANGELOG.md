@@ -548,6 +548,7 @@
 
  - `igraph_is_tree()` has improved performance and memory usage.
  - `igraph_is_connected()` has improved performance when checking weak connectedness.
+ - Improved error handling in `igraph_maximal_cliques()` and related functions.
  - The build system now checks that GLPK is of a compatible version (4.57 or later).
  - The vendored `plfit` package was updated to 0.9.3.
  - You can now build igraph with an external `plfit` instead of the vendored one.
