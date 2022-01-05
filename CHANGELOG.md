@@ -1,5 +1,7 @@
 # igraph C library changelog
 
+## [Unreleased]
+
 ## [0.9.6] - 2022-01-05
 
 ### Changed
@@ -519,7 +521,8 @@
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.5..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.6..HEAD
+[0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6
 [0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5
 [0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/igraph/igraph/compare/0.9.2...0.9.3
