@@ -129,7 +129,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
             igraph_strvector_get(predefnames, i, &key);
             igraph_trie_get(&trie, key, &id);
             if (id != i) {
-                IGRAPH_WARNING("reading NCOL file, duplicate entry in predefnames");
+                IGRAPH_WARNING("Reading NCOL file, duplicate entry in predefined names.");
                 no_predefined--;
             }
         }
@@ -175,7 +175,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     if (predefnames != 0 &&
         igraph_trie_size(&trie) != no_predefined) {
-        IGRAPH_WARNING("unknown vertex/vertices found, predefnames extended");
+        IGRAPH_WARNING("Unknown vertex/vertices found in NCOL file, predefined names extended.");
     }
 
     if (names) {
