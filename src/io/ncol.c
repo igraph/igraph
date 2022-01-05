@@ -140,18 +140,37 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     context.weights = &ws;
     context.trie = &trie;
     context.eof = 0;
+    context.errmsg[0] = '\0';
+    context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_ncol_yylex_init_extra(&context, &context.scanner);
     IGRAPH_FINALLY(igraph_ncol_yylex_destroy, context.scanner);
 
     igraph_ncol_yyset_in(instream, context.scanner);
 
-    if (igraph_ncol_yyparse(&context)) {
+    int err = igraph_ncol_yyparse(&context);
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
-            IGRAPH_ERROR("Cannot read NCOL file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read NCOL file.", IGRAPH_PARSEERROR);
         }
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read NCOL file.", IGRAPH_ENOMEM);
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading NCOL file.", err);
     }
 
     if (predefnames != 0 &&
@@ -163,7 +182,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
         pname = &name;
-        igraph_trie_getkeys(&trie, &namevec); /* dirty */
+        IGRAPH_CHECK(igraph_trie_getkeys(&trie, &namevec)); /* dirty */
         namerec.name = namestr;
         namerec.type = IGRAPH_ATTRIBUTE_STRING;
         namerec.value = namevec;

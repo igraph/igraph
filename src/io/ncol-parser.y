@@ -58,6 +58,25 @@
 #include "io/parsers/ncol-lexer.h"
 #include "internal/hacks.h"
 
+/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
+#define IGRAPH_YY_CHECK(expr) \
+    do { \
+        igraph_error_t igraph_i_ret = (expr); \
+        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
+            context->igraph_errno = igraph_i_ret; \
+            YYABORT; \
+        } \
+    } while (0)
+
+/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
+#define IGRAPH_YY_ERRORF(reason, errno, ...) \
+    do { \
+        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      errno, __VA_ARGS__) ; \
+        context->igraph_errno = errno; \
+        YYABORT; \
+    } while (0)
+
 int igraph_ncol_yyerror(YYLTYPE* locp,
                         igraph_i_ncol_parsedata_t *context,
                         const char *s);
@@ -77,8 +96,8 @@ igraph_real_t igraph_ncol_get_number(const char *str, yy_size_t len);
 %lex-param { void *scanner }
 
 %union {
-  long int edgenum;
-  double weightnum;
+  igraph_integer_t edgenum;
+  igraph_real_t weightnum;
 }
 
 %type <edgenum>   edgeid
@@ -96,14 +115,14 @@ input :    /* empty */
 ;
 
 edge :   edgeid edgeid NEWLINE        {
-           igraph_vector_int_push_back(context->vector, $1);
-           igraph_vector_int_push_back(context->vector, $2);
-           igraph_vector_push_back(context->weights, 0);
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 0.0));
        }
        | edgeid edgeid weight NEWLINE {
-           igraph_vector_int_push_back(context->vector, $1);
-           igraph_vector_int_push_back(context->vector, $2);
-           igraph_vector_push_back(context->weights, $3);
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, $3));
            context->has_weights = 1;
        }
 ;
@@ -115,7 +134,7 @@ edgeid : ALNUM  {
     igraph_ncol_yyget_leng(scanner),
     &trie_id
   );
-  $$ = (long) trie_id;
+  $$ = trie_id;
 };
 
 weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yyget_text(scanner),
