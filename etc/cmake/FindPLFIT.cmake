@@ -10,6 +10,7 @@
 
 find_path(PLFIT_INCLUDE_DIR
   NAMES plfit.h
+  PATH_SUFFIXES plfit
 )
 
 find_library(PLFIT_LIBRARY
