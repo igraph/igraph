@@ -144,7 +144,8 @@ static int igraph_i_maximal_cliques_reorder_adjlists(
             }
         }
     }
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 static int igraph_i_maximal_cliques_select_pivot(
@@ -190,7 +191,7 @@ static int igraph_i_maximal_cliques_select_pivot(
         }
     }
 
-    igraph_vector_int_push_back(nextv, -1);
+    IGRAPH_CHECK(igraph_vector_int_push_back(nextv, -1));
     pivotvectneis = igraph_adjlist_get(adjlist, *pivot);
     pivotvectlen = igraph_vector_int_size(pivotvectneis);
 
@@ -210,11 +211,11 @@ static int igraph_i_maximal_cliques_select_pivot(
             }
         }
         if (!nei) {
-            igraph_vector_int_push_back(nextv, vcand);
+            IGRAPH_CHECK(igraph_vector_int_push_back(nextv, vcand));
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define SWAP(p1,p2) do {            \
@@ -250,9 +251,9 @@ static int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
         }
     }
 
-    igraph_vector_int_push_back(R, mynextv);
+    IGRAPH_CHECK(igraph_vector_int_push_back(R, mynextv));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef SWAP
@@ -274,9 +275,9 @@ static int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
     VECTOR(*pos)[v] = (*PE) + 1;
     VECTOR(*pos)[tmp] = vpos + 1;
     (*PE)--; (*XS)--;
-    igraph_vector_int_push_back(H, v);
+    IGRAPH_CHECK(igraph_vector_int_push_back(H, v));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,

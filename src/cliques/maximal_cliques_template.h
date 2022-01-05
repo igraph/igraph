@@ -200,7 +200,7 @@ static int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
 
     int err;
 
-    igraph_vector_int_push_back(H, -1); /* boundary */
+    IGRAPH_CHECK(igraph_vector_int_push_back(H, -1)); /* boundary */
 
     if (PS > PE && XS > XE) {
         /* Found a maximum clique, report it */
@@ -211,15 +211,16 @@ static int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     } else if (PS <= PE) {
         /* Select a pivot element */
         int pivot, mynextv;
-        igraph_i_maximal_cliques_select_pivot(PX, PS, PE, XS, XE, pos,
-                                              adjlist, &pivot, nextv,
-                                              oldPS, oldXE);
+        IGRAPH_CHECK(igraph_i_maximal_cliques_select_pivot(
+            PX, PS, PE, XS, XE, pos, adjlist, &pivot, nextv, oldPS, oldXE
+        ));
         while ((mynextv = igraph_vector_int_pop_back(nextv)) != -1) {
             int newPS, newXE;
 
             /* Going down, prepare */
-            igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
-                                          mynextv, R, &newPS, &newXE);
+            IGRAPH_CHECK(igraph_i_maximal_cliques_down(
+                PX, PS, PE, XS, XE, pos, adjlist, mynextv, R, &newPS, &newXE
+            ));
             /* Recursive call */
             err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
                       PX, newPS, PE, XS, newXE, PS, XE, R,
@@ -233,14 +234,15 @@ static int FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
             }
             /* Putting v from P to X */
             if (igraph_vector_int_tail(nextv) != -1) {
-                igraph_i_maximal_cliques_PX(PX, PS, &PE, &XS, XE, pos, adjlist,
-                                            mynextv, H);
+                IGRAPH_CHECK(igraph_i_maximal_cliques_PX(
+                    PX, PS, &PE, &XS, XE, pos, adjlist, mynextv, H
+                ));
             }
         }
     }
 
     /* Putting back vertices from X to P, see notes in H */
-    igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H);
+    IGRAPH_CHECK(igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H));
 
     return 0;
 }
@@ -267,14 +269,11 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
                        "calculation");
     }
 
-    igraph_vector_init(&order, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_destroy, &order);
-    igraph_vector_int_init(&rank, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
-    igraph_vector_init(&coreness, no_of_nodes);
-    igraph_coreness(graph, &coreness, /*mode=*/ IGRAPH_ALL);
-    IGRAPH_FINALLY(igraph_vector_destroy, &coreness);
-    igraph_vector_qsort_ind(&coreness, &order, /*descending=*/ 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&coreness, no_of_nodes);
+    IGRAPH_CHECK(igraph_coreness(graph, &coreness, /*mode=*/ IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_vector_qsort_ind(&coreness, &order, /*descending=*/ 0));
     for (ii = 0; ii < no_of_nodes; ii++) {
         int v = VECTOR(order)[ii];
         VECTOR(rank)[v] = ii;
@@ -289,16 +288,11 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fulladjlist);
 
-    igraph_vector_int_init(&PX, 20);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &PX);
-    igraph_vector_int_init(&R,  20);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &R);
-    igraph_vector_int_init(&H, 100);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &H);
-    igraph_vector_int_init(&pos, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &pos);
-    igraph_vector_int_init(&nextv, 100);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nextv);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&PX, 20);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&R,  20);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&H, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&pos, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nextv, 100);
 
     FINALLY;
 
@@ -326,11 +320,11 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        igraph_vector_int_resize(&PX, vdeg);
-        igraph_vector_int_resize(&R, 1);
-        igraph_vector_int_resize(&H, 1);
+        IGRAPH_CHECK(igraph_vector_int_resize(&PX, vdeg));
+        IGRAPH_CHECK(igraph_vector_int_resize(&R, 1));
+        IGRAPH_CHECK(igraph_vector_int_resize(&H, 1));
         igraph_vector_int_null(&pos); /* TODO: makes it quadratic? */
-        igraph_vector_int_resize(&nextv, 1);
+        IGRAPH_CHECK(igraph_vector_int_resize(&nextv, 1));
 
         VECTOR(H)[0] = -1;      /* marks the end of the recursion */
         VECTOR(nextv)[0] = -1;
@@ -358,8 +352,10 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
         /* Create an adjacency list that is specific to the
            v vertex. It only contains 'v' and its neighbors. Moreover, we
            only deal with the vertices in P and X (and R). */
-        igraph_vector_int_update(igraph_adjlist_get(&adjlist, v),
-                                 igraph_adjlist_get(&fulladjlist, v));
+        IGRAPH_CHECK(igraph_vector_int_update(
+            igraph_adjlist_get(&adjlist, v),
+            igraph_adjlist_get(&fulladjlist, v)
+        ));
         for (j = 0; j <= vdeg - 1; j++) {
             int vv = VECTOR(PX)[j];
             igraph_vector_int_t *fadj = igraph_adjlist_get(&fulladjlist, vv);
@@ -370,14 +366,15 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
                 int nei = VECTOR(*fadj)[k];
                 int neipos = VECTOR(pos)[nei] - 1;
                 if (neipos >= PS && neipos <= XE) {
-                    igraph_vector_int_push_back(radj, nei);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(radj, nei));
                 }
             }
         }
 
         /* Reorder the adjacency lists, according to P and X. */
-        igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
-                &adjlist);
+        IGRAPH_CHECK(igraph_i_maximal_cliques_reorder_adjlists(
+            &PX, PS, PE, XS, XE, &pos, &adjlist
+        ));
 
         err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
                 &PX, PS, PE, XS, XE, PS, XE, &R, &pos,
