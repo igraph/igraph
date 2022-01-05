@@ -38,7 +38,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_ncol
- * \brief Reads a <code>.ncol</code> file used by LGL.
+ * \brief Reads an <code>.ncol</code> file used by LGL.
  *
  * Also useful for creating graphs from \quote named\endquote (and
  * optionally weighted) edge lists.
@@ -59,14 +59,15 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * LGL cannot deal with files which contain multiple or loop edges,
  * this is however not checked here, as \a igraph is happy with
  * these.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
  * \param predefnames Pointer to the symbolic names of the vertices in
  *        the file. If \c NULL is given here then vertex IDs will be
  *        assigned to vertex names in the order of their appearance in
- *        the \c .ncol file. If it is not \c NULL and some unknown
- *        vertex names are found in the \c .ncol file then new vertex
- *        IDs will be assigned to them.
+ *        the <code>.ncol</code> file. If it is not \c NULL and some unknown
+ *        vertex names are found in the <code>.ncol</code> file then new vertex
+ *        ids will be assigned to them.
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
