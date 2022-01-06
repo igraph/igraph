@@ -516,6 +516,12 @@
  - `igraph_version()` no longer returns an error code.
  - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
 
+### Fixed
+
+ - The GraphML parser does not print to stderr any more in case of encoding
+   errors and other error conditions originating fron the underlying `libxml2`
+   library.
+
 ## [0.9.6] - 2022-01-05
 
  - Isomorphism class functions (`igraph_isoclass()`, `igraph_isoclass_subgraph()`,

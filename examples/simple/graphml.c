@@ -103,6 +103,7 @@ int main() {
     /* If we can't create the test file, just skip the test */
     if (ofile) {
         if ((result = igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ 1))) {
+            printf("Received unexpected return code: %d\n", result);
             return 1;
         }
         fclose(ofile);
@@ -114,6 +115,7 @@ int main() {
     /* The same with undirected graph */
     ifile = fopen("test.gxl", "r");
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
         return 1;
     }
     fclose(ifile);
@@ -123,6 +125,7 @@ int main() {
     /* Test a GraphML file with default attributes */
     ifile = fopen("graphml-default-attrs.xml", "r");
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
         return 1;
     }
     fclose(ifile);
@@ -136,6 +139,7 @@ int main() {
     /* Test a GraphML file with namespaces */
     ifile = fopen("graphml-namespace.xml", "r");
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
         return 1;
     }
     fclose(ifile);
@@ -145,6 +149,7 @@ int main() {
     /* Test a not-really-valid GraphML file as it has no namespace information */
     ifile = fopen("graphml-lenient.xml", "r");
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
         return 1;
     }
     fclose(ifile);
@@ -157,6 +162,7 @@ int main() {
     igraph_set_warning_handler(igraph_warning_handler_ignore);
     result = igraph_read_graph_graphml(&g, ifile, 0);
     if (result != IGRAPH_PARSEERROR) {
+        printf("Received unexpected return code: %d\n", result);
         return 1;
     }
     fclose(ifile);

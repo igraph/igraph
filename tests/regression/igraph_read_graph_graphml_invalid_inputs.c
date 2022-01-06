@@ -65,12 +65,14 @@ int main(int argc, char* argv[]) {
     int index = 0;
 
     /* We do not care about errors; all we care about is that the library
-     * should not segfault and should not accept invalid input either */
+     * should not segfault, should not accept invalid input and should not
+     * print anything to stdout or stderr while parsing */
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     RUN_TEST("invalid1.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid2.graphml", /* should_parse = */ 1);
     RUN_TEST("invalid3.graphml", /* should_parse = */ 0);
+    RUN_TEST("invalid4.graphml", /* should_parse = */ 0);
 
     return 0;
 }

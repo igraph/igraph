@@ -42,6 +42,7 @@
 
 #if HAVE_LIBXML == 1
 #include <libxml/encoding.h>
+#include <libxml/globals.h>
 #include <libxml/parser.h>
 
 xmlEntity blankEntityStruct = {
@@ -283,14 +284,10 @@ static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser
     }
 }
 
-static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
-    struct igraph_i_graphml_parser_state *state =
-        (struct igraph_i_graphml_parser_state*)state0;
+static void igraph_i_graphml_parser_state_set_error_from_varargs(
+    struct igraph_i_graphml_parser_state *state, const char* msg, va_list args
+) {
     const size_t max_error_message_length = 4096;
-
-    va_list ap;
-
-    va_start(ap, msg);
 
     if (state->error_message == 0) {
         /* ownership of state->error_message passed on immediately to
@@ -300,9 +297,35 @@ static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ..
 
     state->successful = 0;
     state->st = ERROR;
-    vsnprintf(state->error_message, max_error_message_length, msg, ap);
 
-    va_end(ap);
+    vsnprintf(state->error_message, max_error_message_length, msg, args);
+}
+
+static void igraph_i_graphml_parser_state_set_error_from_xmlerror(
+    struct igraph_i_graphml_parser_state *state, const xmlErrorPtr error
+) {
+    const size_t max_error_message_length = 4096;
+
+    if (state->error_message == 0) {
+        /* ownership of state->error_message passed on immediately to
+         * state so the state destructor is responsible for freeing it */
+        state->error_message = IGRAPH_CALLOC(max_error_message_length, char);
+    }
+
+    state->successful = 0;
+    state->st = ERROR;
+
+    snprintf(state->error_message, max_error_message_length, "%s:%d : %s",
+        error->file, error->line, error->message);
+}
+
+static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
+    struct igraph_i_graphml_parser_state *state =
+        (struct igraph_i_graphml_parser_state*)state0;
+    va_list args;
+    va_start(args, msg);
+    igraph_i_graphml_parser_state_set_error_from_varargs(state, msg, args);
+    va_end(args);
 }
 
 static xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
@@ -1308,6 +1331,21 @@ static igraph_error_t igraph_i_xml_escape(char* src, char** dest) {
     return IGRAPH_SUCCESS;
 }
 
+#if HAVE_LIBXML == 1
+static void igraph_i_libxml_generic_error_handler(void* ctx, const char* msg, ...) {
+    struct igraph_i_graphml_parser_state* state = (struct igraph_i_graphml_parser_state*) ctx;
+    va_list args;
+    va_start(args, msg);
+    igraph_i_graphml_parser_state_set_error_from_varargs(state, msg, args);
+    va_end(args);
+}
+
+static void igraph_i_libxml_structured_error_handler(void* ctx, xmlErrorPtr error) {
+    struct igraph_i_graphml_parser_state* state = (struct igraph_i_graphml_parser_state*) ctx;
+    igraph_i_graphml_parser_state_set_error_from_xmlerror(state, error);
+}
+#endif
+
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_graphml
@@ -1346,6 +1384,10 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
 
 #if HAVE_LIBXML == 1
     xmlParserCtxtPtr ctxt;
+    xmlGenericErrorFunc libxml_old_generic_error_handler;
+    void* libxml_old_generic_error_context;
+    xmlStructuredErrorFunc libxml_old_structured_error_handler;
+    void* libxml_old_structured_error_context;
     struct igraph_i_graphml_parser_state state;
     int res;
     char buffer[4096];
@@ -1357,6 +1399,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     }
 
     xmlInitParser();
+
     IGRAPH_CHECK(igraph_i_graphml_parser_state_init(&state, graph, index));
     IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
 
@@ -1393,6 +1436,15 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
      * parser */
     IGRAPH_FINALLY_CLEAN(1);
 
+    /* Retrieve the current libxml2 error handlers and temporarily replace them
+     * with ones that do not print anything to stdout/stderr */
+    libxml_old_generic_error_handler = xmlGenericError;
+    libxml_old_generic_error_context = xmlGenericErrorContext;
+    libxml_old_structured_error_handler = xmlStructuredError;
+    libxml_old_structured_error_context = xmlStructuredErrorContext;
+    xmlSetGenericErrorFunc(&state, &igraph_i_libxml_generic_error_handler);
+    xmlSetStructuredErrorFunc(&state, &igraph_i_libxml_structured_error_handler);
+
     /* Do the parsing */
     while ((res = (int) fread(buffer, 1, 4096, instream)) > 0) {
         xmlParseChunk(ctxt, buffer, res, 0);
@@ -1401,6 +1453,10 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
         }
     }
     xmlParseChunk(ctxt, buffer, res, 1);
+
+    /* Restore error handlers */
+    xmlSetGenericErrorFunc(libxml_old_generic_error_context, libxml_old_generic_error_handler);
+    xmlSetStructuredErrorFunc(libxml_old_structured_error_context, libxml_old_structured_error_handler);
 
     /* Free the context */
     xmlFreeParserCtxt(ctxt);
