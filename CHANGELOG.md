@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Fixed
+
+ - NCOL and LGL format writers no longer accept "name" and "weight" attributes
+   of invalid types.
+ - The LGL writer could not access numerical weight attributes, potentially leading
+   to crashes.
+ - External PLFIT libraries and their headers are now detected at their standard
+   installation location.
+   
+### Other
+
+ - The C attribute handler now verifies attribute types when retrieving attributes.
+ - Documentation improvements
+
 ## [0.9.6] - 2022-01-05
 
 ### Changed
