@@ -514,6 +514,7 @@
 ### Changed
 
  - `igraph_version()` no longer returns an error code.
+ - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
 
 ## [0.9.6] - 2022-01-05
 
