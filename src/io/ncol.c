@@ -48,8 +48,8 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * (http://lgl.sourceforge.net), and it is simply a
  * symbolic weighted edge list. It is a simple text file with one edge
  * per line. An edge is defined by two symbolic vertex names separated
- * by whitespace. (The symbolic vertex names themselves cannot contain
- * whitespace. They might follow by an optional number, this will be
+ * by whitespace. The vertex names themselves cannot contain
+ * whitespace. They may be followed by an optional number,
  * the weight of the edge; the number can be negative and can be in
  * scientific notation. If there is no weight specified to an edge it
  * is assumed to be zero.
@@ -207,7 +207,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_ncol
- * \brief Writes the graph to a file in <code>.ncol</code> format
+ * \brief Writes the graph to a file in <code>.ncol</code> format.
  *
  * </para><para>
  * <code>.ncol</code> is a format used by LGL, see \ref
@@ -217,6 +217,10 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  * Note that having multiple or loop edges in an
  * <code>.ncol</code> file breaks the  LGL software but
  * \a igraph does not check for this condition.
+ *
+ * </para><para>
+ * This format cannot represent zero-degree vertices.
+ *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
