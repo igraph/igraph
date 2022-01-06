@@ -192,14 +192,16 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  * Note that having multiple or loop edges in an
  * <code>.lgl</code> file breaks the  LGL software but \a igraph
  * does not check for this condition.
+ *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
- * \param names The name of the vertex attribute, if symbolic names
- *        are written to the file. If not supply 0 here.
- * \param weights The name of the edge attribute, if they are also
- *        written to the file. If you don't want weights supply 0
- *        here.
+ * \param names The name of a string vertex attribute, if symbolic names
+ *        are to be written to the file. Supply \c NULL to write vertex
+ *        ids instead.
+ * \param weights The name of a numerical edge attribute, which will be
+ *        written as weights to the file. Supply \c NULL to skip writing
+ *        edge weights.
  * \param isolates Logical, if TRUE isolated vertices are also written
  *        to the file. If FALSE they will be omitted.
  * \return Error code:
