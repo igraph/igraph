@@ -240,11 +240,12 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
- * \param names The name of the vertex attribute, if symbolic names
- *        are written to the file. If not, supply 0 here.
- * \param weights The name of the edge attribute, if they are also
- *        written to the file. If you don't want weights, supply 0
- *        here.
+ * \param names The name of a string vertex attribute, if symbolic names
+ *        are to be written to the file. Supply \c NULL to write vertex
+ *        ids instead.
+ * \param weights The name of a numerical edge attribute, which will be
+ *        written as weights to the file. Supply \c NULL to skip writing
+ *        edge weights.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error writing the
  *         file.
@@ -273,7 +274,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
-        if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
+        if (nametype != IGRAPH_ATTRIBUTE_STRING) {
             IGRAPH_WARNINGF("Ignoring names attribute '%s', unknown attribute type.", names);
             names = NULL;
         }

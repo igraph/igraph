@@ -2315,6 +2315,9 @@ static igraph_error_t igraph_i_cattribute_get_numeric_graph_attr(const igraph_t 
     }
 
     rec = VECTOR(*gal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_NUMERIC) {
+        IGRAPH_ERROR("Numeric graph attribute expected.", IGRAPH_EINVAL);
+    }
     num = (igraph_vector_t*)rec->value;
     IGRAPH_CHECK(igraph_vector_resize(value, 1));
     VECTOR(*value)[0] = VECTOR(*num)[0];
@@ -2337,6 +2340,9 @@ static igraph_error_t igraph_i_cattribute_get_bool_graph_attr(const igraph_t *gr
     }
 
     rec = VECTOR(*gal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+        IGRAPH_ERROR("Boolean graph attribute expected.", IGRAPH_EINVAL);
+    }
     log = (igraph_vector_bool_t*)rec->value;
     IGRAPH_CHECK(igraph_vector_bool_resize(value, 1));
     VECTOR(*value)[0] = VECTOR(*log)[0];
@@ -2359,6 +2365,9 @@ static igraph_error_t igraph_i_cattribute_get_string_graph_attr(const igraph_t *
     }
 
     rec = VECTOR(*gal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_STRING) {
+        IGRAPH_ERROR("String graph attribute expected.", IGRAPH_EINVAL);
+    }
     str = (igraph_strvector_t*)rec->value;
     IGRAPH_CHECK(igraph_strvector_resize(value, 1));
     IGRAPH_CHECK(igraph_strvector_set(value, 0, STR(*str, 0)));
@@ -2382,6 +2391,9 @@ static igraph_error_t igraph_i_cattribute_get_numeric_vertex_attr(const igraph_t
     }
 
     rec = VECTOR(*val)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_NUMERIC) {
+        IGRAPH_ERROR("Numeric vertex attribute expected.", IGRAPH_EINVAL);
+    }
     num = (igraph_vector_t*)rec->value;
     if (igraph_vs_is_all(&vs)) {
         igraph_vector_clear(value);
@@ -2420,6 +2432,9 @@ static igraph_error_t igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *g
     }
 
     rec = VECTOR(*val)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+        IGRAPH_ERROR("Boolean vertex attribute expected.", IGRAPH_EINVAL);
+    }
     log = (igraph_vector_bool_t*)rec->value;
     if (igraph_vs_is_all(&vs)) {
         igraph_vector_bool_clear(value);
@@ -2455,6 +2470,9 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
     }
 
     rec = VECTOR(*val)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_STRING) {
+        IGRAPH_ERROR("String vertex attribute expected.", IGRAPH_EINVAL);
+    }
     str = (igraph_strvector_t*)rec->value;
     if (igraph_vs_is_all(&vs)) {
         igraph_strvector_resize(value, 0);
@@ -2494,6 +2512,9 @@ static igraph_error_t igraph_i_cattribute_get_numeric_edge_attr(const igraph_t *
     }
 
     rec = VECTOR(*eal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_NUMERIC) {
+        IGRAPH_ERROR("Numeric edge attribute expected.", IGRAPH_EINVAL);
+    }
     num = (igraph_vector_t*)rec->value;
     if (igraph_es_is_all(&es)) {
         igraph_vector_clear(value);
@@ -2531,6 +2552,9 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(const igraph_t *g
     }
 
     rec = VECTOR(*eal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_STRING) {
+        IGRAPH_ERROR("String edge attribute expected.", IGRAPH_EINVAL);
+    }
     str = (igraph_strvector_t*)rec->value;
     if (igraph_es_is_all(&es)) {
         igraph_strvector_resize(value, 0);
@@ -2570,6 +2594,9 @@ static igraph_error_t igraph_i_cattribute_get_bool_edge_attr(const igraph_t *gra
     }
 
     rec = VECTOR(*eal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+        IGRAPH_ERROR("Boolean edge attribute expected.", IGRAPH_EINVAL);
+    }
     log = (igraph_vector_bool_t*)rec->value;
     if (igraph_es_is_all(&es)) {
         igraph_vector_bool_clear(value);

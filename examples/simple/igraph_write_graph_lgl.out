@@ -26,12 +26,12 @@ Output with isolates:
 
 Output vertex and edge labels:
 # A
-B 3
+B 1
 C 4
 # B
-C 5
-D 6
+C 3
+D 2
 # C
-E 7
+E 5
 # D
-E 8
+E 6
