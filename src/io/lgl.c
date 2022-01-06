@@ -304,41 +304,40 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         }
         IGRAPH_FINALLY_CLEAN(1);
     } else if (names == 0) {
-        igraph_strvector_t wvec;
-        IGRAPH_CHECK(igraph_strvector_init(&wvec, igraph_ecount(graph)));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &wvec);
-        IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, weights,
+        /* No names but weights */
+        igraph_vector_t wvec;
+        IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
+        IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, weights,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
-        /* No names but weights */
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
-            int ret = 0;
-            char *str1;
+            int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&wvec, edge, &str1);
             if (from == actvertex) {
-                ret = fprintf(outstream, "%li %s\n", (long)to, str1);
+                ret1 = fprintf(outstream, "%li ", (long)to);
             } else {
                 actvertex = from;
-                ret = fprintf(outstream, "# %li\n%li %s\n", (long)from, (long)to, str1);
+                ret1 = fprintf(outstream, "# %li\n%li ", (long)from, (long)to);
             }
-            if (ret < 0) {
+            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret3 = fputc('\n', outstream);
+            if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
-        igraph_strvector_destroy(&wvec);
+        igraph_vector_destroy(&wvec);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         /* Both names and weights */
-        igraph_strvector_t nvec, wvec;
-        IGRAPH_CHECK(igraph_strvector_init(&wvec, igraph_ecount(graph)));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &wvec);
+        igraph_strvector_t nvec;
+        igraph_vector_t wvec;
+        IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
         IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
-        IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, weights,
+        IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, weights,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
         IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
@@ -347,11 +346,10 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
-            int ret = 0;
-            char *str1, *str2, *str3;
+            int ret = 0, ret2;
+            char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             igraph_strvector_get(&nvec, to, &str2);
-            igraph_strvector_get(&wvec, edge, &str3);
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s ", str2);
             } else {
@@ -362,14 +360,15 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
-            ret = fprintf(outstream, "%s\n", str3);
-            if (ret < 0) {
+            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret2 = fputc('\n', outstream);
+            if (ret < 0 || ret2 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
         igraph_strvector_destroy(&nvec);
-        igraph_strvector_destroy(&wvec);
+        igraph_vector_destroy(&wvec);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
