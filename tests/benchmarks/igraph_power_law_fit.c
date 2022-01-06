@@ -1,5 +1,5 @@
 #include <igraph.h>
-#include <plfit_sampling.h>
+#include <plfit/plfit_sampling.h>
 
 #include "bench.h"
 
