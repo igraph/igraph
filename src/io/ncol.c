@@ -261,7 +261,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     igraph_eit_t it;
     igraph_attribute_type_t nametype, weighttype;
 
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
                                    &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
 
