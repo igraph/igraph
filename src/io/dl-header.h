@@ -28,7 +28,7 @@
 /* TODO: Find out maximum supported vertex count. */
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 /* Limit maximum vertex count when using a fuzzer, to avoid out-of-memory failure. */
-#define IGRAPH_DL_MAX_VERTEX_COUNT (1 << 25)
+#define IGRAPH_DL_MAX_VERTEX_COUNT (1 << 20)
 #else
 #define IGRAPH_DL_MAX_VERTEX_COUNT INT32_MAX
 #endif
