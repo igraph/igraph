@@ -236,7 +236,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
-        if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
+        if (nametype != IGRAPH_ATTRIBUTE_STRING) {
             IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
             names = 0;
         }
