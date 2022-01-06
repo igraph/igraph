@@ -28,7 +28,7 @@ int main() {
     printf("\nOutput vertex and edge labels:\n");
     igraph_strvector_init(&names, vcount);
     for (i = 0; i < vcount; i++) {
-        char str[2];
+        char str[2] = " "; /* initialize to ensure presence of null terminator */
         str[0] = 'A' + i;
         igraph_strvector_set(&names, i, str);
     }
