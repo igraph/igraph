@@ -251,7 +251,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     if (weights) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
-        if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC && weighttype != IGRAPH_ATTRIBUTE_STRING) {
+        if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
             IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
             weights = 0;
         }
