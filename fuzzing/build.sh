@@ -22,9 +22,19 @@ zip $OUT/read_dl_fuzzer_seed_corpus.zip \
         $SRC/igraph/tests/unit/*.dl \
         $SRC/igraph/fuzzing/test_inputs/*.dl
 
+zip $OUT/read_lgl_fuzzer_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.lgl \
+        $SRC/igraph/tests/unit/*.lgl \
+        $SRC/igraph/fuzzing/test_inputs/*.lgl
+
+zip $OUT/read_ncol_fuzzer_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.ncol \
+        $SRC/igraph/tests/unit/*.ncol \
+        $SRC/igraph/fuzzing/test_inputs/*.ncol
+
 cd $SRC/igraph
 
-for TARGET in read_gml_fuzzer read_pajek_fuzzer read_dl_fuzzer bliss_fuzzer vertex_connectivity_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
+for TARGET in read_gml_fuzzer read_pajek_fuzzer read_dl_fuzzer read_lgl_fuzzer read_ncol_fuzzer bliss_fuzzer vertex_connectivity_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
 do
   $CXX $CXXFLAGS -I$SRC/igraph/build/include -I$SRC/igraph/include -o $TARGET.o -c ./fuzzing/$TARGET.cpp
   $CXX $CXXFLAGS $LIB_FUZZING_ENGINE $TARGET.o -o $OUT/$TARGET ./build/src/libigraph.a
