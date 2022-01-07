@@ -58,26 +58,8 @@
 #include "io/pajek-header.h"
 #include "io/parsers/pajek-parser.h" /* it must come first because of YYSTYPE */
 #include "io/parsers/pajek-lexer.h"
+#include "io/parse_utils.h"
 #include "internal/hacks.h"
-
-/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
-#define IGRAPH_YY_CHECK(expr) \
-    do { \
-        igraph_error_t igraph_i_ret = (expr); \
-        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
-            context->igraph_errno = igraph_i_ret; \
-            YYABORT; \
-        } \
-    } while (0)
-
-/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
-#define IGRAPH_YY_ERRORF(reason, errno, ...) \
-    do { \
-        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
-                      errno, __VA_ARGS__) ; \
-        context->igraph_errno = errno; \
-        YYABORT; \
-    } while (0)
 
 int igraph_pajek_yyerror(YYLTYPE* locp,
                          igraph_i_pajek_parsedata_t *context,
@@ -112,8 +94,6 @@ igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 
 igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
-
-extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
 
@@ -540,20 +520,20 @@ adjmatrixentry: number {
 /* -----------------------------------------------------*/
 
 longint: NUM { 
-  igraph_integer_t i;
-  igraph_real_t    f;
-  f=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
-                            igraph_pajek_yyget_leng(scanner)); 
-  i=(igraph_integer_t)f;
-  if (f != (igraph_real_t) i) {
-    IGRAPH_YY_ERRORF("Non-representable integer (%.17g) while parsing Pajek file.", 
-                      IGRAPH_PARSEERROR, f);
-  }
-  $$=i; 
+  igraph_integer_t val;
+  IGRAPH_YY_CHECK(igraph_i_parse_integer(igraph_pajek_yyget_text(scanner),
+                                         igraph_pajek_yyget_leng(scanner),
+                                         &val));
+  $$=val;
 };
 
-number: NUM  { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
-                                          igraph_pajek_yyget_leng(scanner)); };
+number: NUM  {
+  igraph_real_t val;
+  IGRAPH_YY_CHECK(igraph_i_parse_real(igraph_pajek_yyget_text(scanner),
+                                      igraph_pajek_yyget_leng(scanner),
+                                      &val));
+  $$=val;
+};
 
 words: /* empty */ | words word;
 
@@ -573,17 +553,6 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
            "Parse error in Pajek file, line %i (%s)",
            locp->first_line, s);
   return 0;
-}
-
-igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t length) {
-  igraph_real_t num;
-  char *tmp=IGRAPH_CALLOC(length+1, char);
-
-  strncpy(tmp, str, length);
-  tmp[length]='\0';
-  sscanf(tmp, "%lf", &num);
-  IGRAPH_FREE(tmp);
-  return num;
 }
 
 /* TODO: NA's */

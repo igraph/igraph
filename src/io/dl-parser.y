@@ -51,25 +51,7 @@
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"
 #include "io/parsers/dl-lexer.h"
-
-/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
-#define IGRAPH_YY_CHECK(expr) \
-    do { \
-        igraph_error_t igraph_i_ret = (expr); \
-        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
-            context->igraph_errno = igraph_i_ret; \
-            YYABORT; \
-        } \
-    } while (0)
-
-/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
-#define IGRAPH_YY_ERRORF(reason, errno, ...) \
-    do { \
-        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
-                      errno, __VA_ARGS__) ; \
-        context->igraph_errno = errno; \
-        YYABORT; \
-    } while (0)
+#include "io/parse_utils.h"
 
 int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
                       const char *s);
@@ -81,9 +63,6 @@ igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context);
 igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
-
-/* TODO do not depend on Pajek reader */
-extern igraph_real_t igraph_pajek_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
 
@@ -229,8 +208,13 @@ edgelist1dataline: integer integer weight NEWLINE {
                     IGRAPH_YY_CHECK(igraph_i_dl_add_edge(from-1, to-1, context));
 } ;
 
-integer: NUM { $$=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
-                                          igraph_dl_yyget_leng(scanner)); };
+integer: NUM {
+    igraph_integer_t val;
+    IGRAPH_YY_CHECK(igraph_i_parse_integer(igraph_dl_yyget_text(scanner),
+                                           igraph_dl_yyget_leng(scanner),
+                                           &val));
+    $$=val;
+};
 
 labelededgelist1data: {} /* nothing, empty graph */
                     | labelededgelist1data labelededgelist1dataline {}
@@ -242,8 +226,13 @@ labelededgelist1dataline: elabel elabel weight NEWLINE {
                           IGRAPH_YY_CHECK(igraph_i_dl_add_edge($1, $2, context));
  };
 
-weight: NUM { $$=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
-                                         igraph_dl_yyget_leng(scanner)); };
+weight: NUM {
+    igraph_real_t val;
+    IGRAPH_YY_CHECK(igraph_i_parse_real(igraph_dl_yyget_text(scanner),
+                                        igraph_dl_yyget_leng(scanner),
+                                        &val));
+    $$=val;
+};
 
 elabel: LABEL {
   igraph_integer_t trie_id;
@@ -280,10 +269,12 @@ nodelist1data: {} /* nothing, empty graph */
 
 nodelist1dataline: from tolist NEWLINE {} ;
 
-from: NUM { context->from=igraph_pajek_get_number(igraph_dl_yyget_text(scanner),
-                                                  igraph_dl_yyget_leng(scanner));
-            IGRAPH_YY_CHECK(igraph_i_dl_check_vid(context->from));
-          } ;
+from: NUM {
+  IGRAPH_YY_CHECK(igraph_i_parse_integer(igraph_dl_yyget_text(scanner),
+                  igraph_dl_yyget_leng(scanner),
+                  &context->from));
+  IGRAPH_YY_CHECK(igraph_i_dl_check_vid(context->from));
+} ;
 
 tolist: {} | tolist integer {
   igraph_integer_t to = $2;

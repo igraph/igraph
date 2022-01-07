@@ -56,30 +56,11 @@
 #include "io/lgl-header.h"
 #include "io/parsers/lgl-parser.h"
 #include "io/parsers/lgl-lexer.h"
+#include "io/parse_utils.h"
 #include "internal/hacks.h"
-
-/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
-#define IGRAPH_YY_CHECK(expr) \
-    do { \
-        igraph_error_t igraph_i_ret = (expr); \
-        if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
-            context->igraph_errno = igraph_i_ret; \
-            YYABORT; \
-        } \
-    } while (0)
-
-/* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
-#define IGRAPH_YY_ERRORF(reason, errno, ...) \
-    do { \
-        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
-                      errno, __VA_ARGS__) ; \
-        context->igraph_errno = errno; \
-        YYABORT; \
-    } while (0)
 
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
                        const char *s);
-igraph_real_t igraph_lgl_get_number(const char *str, yy_size_t len);
 
 #define scanner context->scanner
 %}
@@ -144,8 +125,13 @@ edgeid : ALNUM  {
   $$ = trie_id;
 };
 
-weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yyget_text(scanner),
-                                           igraph_lgl_yyget_leng(scanner)); } ;
+weight : ALNUM  {
+    igraph_real_t val;
+    IGRAPH_YY_CHECK(igraph_i_parse_real(igraph_lgl_yyget_text(scanner),
+                                        igraph_lgl_yyget_leng(scanner),
+                                        &val));
+    $$=val;
+} ;
 
 %%
 
@@ -157,13 +143,3 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
   return 0;
 }
 
-igraph_real_t igraph_lgl_get_number(const char *str, yy_size_t length) {
-  igraph_real_t num;
-  char *tmp=IGRAPH_CALLOC(length+1, char);
-
-  strncpy(tmp, str, length);
-  tmp[length]='\0';
-  sscanf(tmp, "%lf", &num);
-  IGRAPH_FREE(tmp);
-  return num;
-}

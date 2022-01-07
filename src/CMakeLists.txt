@@ -182,6 +182,7 @@ add_library(
   io/lgl.c
   io/ncol.c
   io/pajek.c
+  io/parse_utils.c
   ${PARSER_SOURCES}
 
   layout/circular.c
