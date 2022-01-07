@@ -1401,40 +1401,13 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     xmlInitParser();
 
     IGRAPH_CHECK(igraph_i_graphml_parser_state_init(&state, graph, index));
-    IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
-
-    /* Create a progressive parser context */
-    res = (int) fread(buffer, 1, 4096, instream);
-    ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
-                                   &state,
-                                   buffer,
-                                   res,
-                                   NULL);
-    /*   ctxt=xmlCreateIOParserCtxt(&igraph_i_graphml_sax_handler, &state, */
-    /*               igraph_i_libxml2_read_callback, */
-    /*               igraph_i_libxml2_close_callback, */
-    /*               instream, XML_CHAR_ENCODING_NONE); */
-    if (ctxt == NULL) {
-        IGRAPH_ERROR("Can't create progressive parser context", IGRAPH_PARSEERROR);
-    }
-
-    /* Set parsing options */
-    if (xmlCtxtUseOptions(ctxt,
-                          XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
-                          XML_PARSE_NONET | XML_PARSE_NSCLEAN |
-                          XML_PARSE_NOCDATA | XML_PARSE_HUGE
-                         )) {
-        xmlFreeParserCtxt(ctxt);
-        IGRAPH_ERROR("Cannot set options for the parser context", IGRAPH_EINVAL);
-    }
 
     /* Okay, parsing will start now. The parser might do things that eventually
      * trigger the igraph error handler, but we want the parser state to
-     * survive whatever happens here. So, we need to pop off
-     * igraph_i_graphml_parser_state_destroy() from the stack and temporarily
+     * survive whatever happens here. So, we do _not_ put
+     * igraph_i_graphml_parser_state_destroy() on the stack, and temporarily
      * assume responsibility for calling it ourselves until we are back from the
      * parser */
-    IGRAPH_FINALLY_CLEAN(1);
 
     /* Retrieve the current libxml2 error handlers and temporarily replace them
      * with ones that do not print anything to stdout/stderr */
@@ -1445,21 +1418,47 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     xmlSetGenericErrorFunc(&state, &igraph_i_libxml_generic_error_handler);
     xmlSetStructuredErrorFunc(&state, &igraph_i_libxml_structured_error_handler);
 
-    /* Do the parsing */
-    while ((res = (int) fread(buffer, 1, 4096, instream)) > 0) {
-        xmlParseChunk(ctxt, buffer, res, 0);
-        if (!state.successful) {
-            break;
+    /* Create a progressive parser context and use the first 4K to detect the
+     * encoding */
+    res = (int) fread(buffer, 1, 4096, instream);
+    ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
+                                   &state,
+                                   buffer,
+                                   res,
+                                   NULL);
+    if (ctxt) {
+        if (xmlCtxtUseOptions(ctxt,
+                              XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
+                              XML_PARSE_NONET | XML_PARSE_NSCLEAN |
+                              XML_PARSE_NOCDATA | XML_PARSE_HUGE
+                             )) {
+            xmlFreeParserCtxt(ctxt);
+            ctxt = NULL;
         }
     }
-    xmlParseChunk(ctxt, buffer, res, 1);
+
+    /* Do the parsing */
+    if (ctxt) {
+        while ((res = (int) fread(buffer, 1, 4096, instream)) > 0) {
+            xmlParseChunk(ctxt, buffer, res, 0);
+            if (!state.successful) {
+                break;
+            }
+        }
+        xmlParseChunk(ctxt, buffer, res, 1);
+    }
 
     /* Restore error handlers */
     xmlSetGenericErrorFunc(libxml_old_generic_error_context, libxml_old_generic_error_handler);
     xmlSetStructuredErrorFunc(libxml_old_structured_error_context, libxml_old_structured_error_handler);
 
     /* Free the context */
-    xmlFreeParserCtxt(ctxt);
+    if (ctxt) {
+        xmlFreeParserCtxt(ctxt);
+    } else {
+        /* We could not create the context earlier so no parsing was done */
+        IGRAPH_ERROR("Cannot create XML parser context", IGRAPH_FAILURE);
+    }
 
     /* Extract the error message from the parser state (if any), and make a
      * copy so we can safely destroy the parser state before triggering the
