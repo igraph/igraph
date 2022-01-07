@@ -58,5 +58,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     fclose(ifile);
     remove(filename);
+
+    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
     return 0;
 }
