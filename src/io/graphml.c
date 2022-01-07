@@ -1479,6 +1479,10 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     /* Trigger the stored error if needed */
     if (!parsing_successful) {
         if (error_message != NULL) {
+            size_t len = strlen(error_message);
+            if (error_message[len-1] == '\n') {
+                error_message[len-1] = '\0';
+            }
             IGRAPH_ERROR(error_message, IGRAPH_PARSEERROR);
         } else {
             IGRAPH_ERROR("Malformed GraphML file", IGRAPH_PARSEERROR);
