@@ -208,13 +208,29 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     igraph_gml_yyset_in(instream, context.scanner);
 
-    i = igraph_gml_yyparse(&context);
-    if (i != 0) {
+    int err = igraph_gml_yyparse(&context);
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
             IGRAPH_ERROR("Cannot read GML file.", IGRAPH_PARSEERROR);
         }
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading GML file.", err);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
