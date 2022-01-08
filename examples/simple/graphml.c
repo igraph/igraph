@@ -80,7 +80,7 @@ int main() {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* GraphML */
-    ifile = fopen("test.gxl", "r");
+    ifile = fopen("test.graphml", "r");
     if (ifile == 0) {
         return 10;
     }
@@ -99,7 +99,7 @@ int main() {
     fclose(ifile);
 
     /* Write it back */
-    ofile = fopen("test2.gxl", "w");
+    ofile = fopen("test2.graphml", "w");
     /* If we can't create the test file, just skip the test */
     if (ofile) {
         if ((result = igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ 1))) {
@@ -107,13 +107,13 @@ int main() {
             return 1;
         }
         fclose(ofile);
-        unlink("test2.gxl");
+        unlink("test2.graphml");
     }
     dump_graph("The directed graph:\n", &g);
     igraph_destroy(&g);
 
     /* The same with undirected graph */
-    ifile = fopen("test.gxl", "r");
+    ifile = fopen("test.graphml", "r");
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
