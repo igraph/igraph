@@ -81,6 +81,7 @@ whitespace  [ \r\n\t]
 \"[^\x00\"]*\"                                  { return STRING; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 [a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
+\-                      { return MINUS; }
 \[                      {
                           yyextra->depth++;
                           if (yyextra->depth >= 32) {

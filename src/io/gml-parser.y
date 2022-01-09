@@ -66,7 +66,8 @@ igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, void *res);
 igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, void *res);
 igraph_error_t igraph_i_gml_make_numeric(const igraph_gml_string_t name, igraph_real_t value, igraph_gml_tree_t **tree);
 igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name, 
-                                          igraph_gml_string_t value, 
+                                          igraph_gml_string_t value,
+                                          igraph_real_t sign,
                                           igraph_gml_tree_t **tree);
 igraph_error_t igraph_i_gml_make_string(const igraph_gml_string_t name,
                                         igraph_gml_string_t value,
@@ -106,6 +107,7 @@ igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
 %token STRING
 %token NUM
 %token <str>    KEYWORD
+%token MINUS
 %token LISTOPEN
 %token LISTCLOSE
 %token EOFF
@@ -130,12 +132,14 @@ keyvalue:   key num
           | key LISTOPEN list LISTCLOSE
             { IGRAPH_YY_CHECK(igraph_i_gml_make_list($1, $3, &$$)); }
           | key key
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, $2, &$$)); }
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, $2, 1.0, &$$)); }
+          | key MINUS key
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, $3, -1.0, &$$)); }
 ;
 
 key: KEYWORD { IGRAPH_YY_CHECK(igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner),
-                                        igraph_gml_yyget_leng(scanner),
-                                        &$$)); USE($1); };
+                               igraph_gml_yyget_leng(scanner),
+                               &$$)); USE($1); };
 num : NUM {
     igraph_real_t val;
     IGRAPH_YY_CHECK(igraph_i_parse_real(igraph_gml_yyget_text(scanner),
@@ -202,7 +206,8 @@ igraph_error_t igraph_i_gml_make_numeric(const igraph_gml_string_t name, igraph_
 }
 
 igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name, 
-                                          igraph_gml_string_t value, 
+                                          igraph_gml_string_t value,
+                                          igraph_real_t sign,
                                           igraph_gml_tree_t **tree) {
 
   char tmp = value.str[value.len];
@@ -226,7 +231,7 @@ igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name,
     IGRAPH_ERROR("Error while parsing GML.", IGRAPH_PARSEERROR);
   }
   if (strcasecmp(value.str, "inf") == 0) {
-    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, IGRAPH_INFINITY));
+    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, sign * IGRAPH_INFINITY));
   } else if (strcasecmp(value.str, "nan") == 0) {
     IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, IGRAPH_NAN));
   } else {
