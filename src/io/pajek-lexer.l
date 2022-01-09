@@ -70,6 +70,7 @@
 %option reentrant
 %option bison-bridge
 %option bison-locations
+%option yylineno
 
 digit [0-9]
 word [^ \t\r\n\0]

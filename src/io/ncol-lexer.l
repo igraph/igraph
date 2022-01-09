@@ -70,6 +70,7 @@
 %option reentrant
 %option bison-bridge
 %option bison-locations
+%option yylineno
 
 alnum [^ \t\n\r\0]
 
