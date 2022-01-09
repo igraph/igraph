@@ -519,6 +519,7 @@
    of invalid types.
  - The LGL writer could not access numerical weight attributes, potentially leading
    to crashes.
+ - The GML parser interpreted NaN as Inf and vice versa. This is now corrected.
  - External PLFIT libraries and their headers are now detected at their standard
    installation location.
    
