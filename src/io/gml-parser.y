@@ -222,12 +222,12 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len,
   /* if v == "inf" or v == "nan", the newly created tree node will take ownership
    * of s. If the creation fails, we need to free s and v as well in order not
    * to leak memory */
-  if (strcasecmp(v, "inf") == 0) {
+  if (strcasecmp(v, "inf")) {
     if (igraph_gml_tree_init_real(t, s, len, IGRAPH_INFINITY)) {
       free(t);
       t = 0;
     }
-  } else if (strcasecmp(v, "nan") == 0) {
+  } else if (strcasecmp(v, "nan")) {
     if (igraph_gml_tree_init_real(t, s, len, IGRAPH_NAN)) {
       free(t);
       t = 0;
