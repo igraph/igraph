@@ -518,6 +518,7 @@
 
 ### Fixed
 
+ - When an error occurs during parsing DL, GML, NCOL, LGL or Pajek files, line numbers are now reported correctly.
  - The GraphML parser does not print to stderr any more in case of encoding
    errors and other error conditions originating from the underlying `libxml2`
    library.
