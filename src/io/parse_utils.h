@@ -10,6 +10,7 @@
         igraph_error_t igraph_i_ret = (expr); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) { \
             context->igraph_errno = igraph_i_ret; \
+            yyerror(&yylloc, context, "failed"); \
             YYABORT; \
         } \
     } while (0)
