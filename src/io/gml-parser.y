@@ -225,9 +225,9 @@ igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name,
      * Do not read past their end with strcasecmp(). */
     IGRAPH_ERROR("Error while parsing GML.", IGRAPH_PARSEERROR);
   }
-  if (strcasecmp(value.str, "inf")) {
+  if (strcasecmp(value.str, "inf") == 0) {
     IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, IGRAPH_INFINITY));
-  } else if (strcasecmp(value.str, "nan")) {
+  } else if (strcasecmp(value.str, "nan") == 0) {
     IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, IGRAPH_NAN));
   } else {
     IGRAPH_ERROR("Error while parsing GML.", IGRAPH_PARSEERROR);
