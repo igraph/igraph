@@ -122,7 +122,8 @@ igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
     context->depth = 0;
     context->scanner = 0;
     context->tree = 0;
-    context->errmsg[0] = 0;
+    context->errmsg[0] = '\0';
+    context->igraph_errno = IGRAPH_SUCCESS;
 
     return IGRAPH_SUCCESS;
 }
@@ -240,7 +241,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     if (i >= 0 &&
         igraph_gml_tree_type(context.tree, i) == IGRAPH_I_GML_TREE_INTEGER &&
         igraph_gml_tree_get_integer(context.tree, i) != 1) {
-        IGRAPH_ERROR("Unknown GML version.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERRORF("Unknown GML version: %"IGRAPH_PRId".",
+                      IGRAPH_UNIMPLEMENTED,
+                      igraph_gml_tree_get_integer(context.tree, i));
         /* RETURN HERE!!!! */
     }
 
