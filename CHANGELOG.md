@@ -511,6 +511,18 @@
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
 
+### Changed
+
+ - `igraph_version()` no longer returns an error code.
+ - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
+
+### Fixed
+
+ - The GraphML parser does not print to stderr any more in case of encoding
+   errors and other error conditions originating fron the underlying `libxml2`
+   library.
+ - The GML parser now handles -Inf values.
+
 ## [Unreleased 0.9.7]
 
 ### Fixed
@@ -527,19 +539,6 @@
 
  - The C attribute handler now verifies attribute types when retrieving attributes.
  - Documentation improvements
-
-## [0.9.6] - 2022-01-05
-
-### Changed
-
- - `igraph_version()` no longer returns an error code.
- - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
-
-### Fixed
-
- - The GraphML parser does not print to stderr any more in case of encoding
-   errors and other error conditions originating fron the underlying `libxml2`
-   library.
 
 ## [0.9.6] - 2022-01-05
 
