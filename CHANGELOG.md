@@ -519,9 +519,9 @@
 ### Fixed
 
  - The GraphML parser does not print to stderr any more in case of encoding
-   errors and other error conditions originating fron the underlying `libxml2`
+   errors and other error conditions originating from the underlying `libxml2`
    library.
- - The GML parser now handles -Inf values.
+ - The GML parser no longer mixes up Inf and NaN and -Inf now works.
 
 ## [Unreleased 0.9.7]
 
@@ -531,10 +531,9 @@
    of invalid types.
  - The LGL writer could not access numerical weight attributes, potentially leading
    to crashes.
- - The GML parser interpreted NaN as Inf and vice versa. This is now corrected.
  - External PLFIT libraries and their headers are now detected at their standard
    installation location.
-   
+
 ### Other
 
  - The C attribute handler now verifies attribute types when retrieving attributes.
