@@ -82,7 +82,7 @@ whitespace [ \t\v\f]
 %%
 
 <*>{whitespace}+  { }
-%[^\n\r\0]*[\n\r]+  { } /* comments */
+%[^\n\r\0]*[\n\r]*  { } /* comments */
 \*net             { BEGIN(netline); return NETWORKLINE; }
 \*network         { BEGIN(netline); return NETWORKLINE; }
 <netline>{whitespace}({word}|{whitespace})* { 
