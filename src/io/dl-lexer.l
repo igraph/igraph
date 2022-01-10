@@ -72,6 +72,7 @@
 %option bison-bridge
 %option bison-locations
 %option yylineno
+%option caseless
 
 digit      [0-9]
 whitespace [ \t\v\f]
@@ -80,14 +81,13 @@ whitespace [ \t\v\f]
 
 %%
 
-<*>\n\r|\r\n|\r|\n         { return NEWLINE; }
+<*>\n\r|\r\n|\r|\n             { return NEWLINE; }
 
-[dD][lL]{whitespace}+      { return DL; }
-[nN]{whitespace}*[=]{whitespace}* {
-  return NEQ; }
-{digit}+                   { return NUM; }
+dl{whitespace}+                { return DL; }
+n{whitespace}*[=]{whitespace}* { return NEQ; }
+{digit}+                       { return NUM; }
 
-<INITIAL,LABELM>[dD][aA][tT][aA][:]        {
+<INITIAL,LABELM>data:        {
   switch (yyextra->mode) {
   case 0: BEGIN(FULLMATRIX);
     break;
@@ -98,14 +98,14 @@ whitespace [ \t\v\f]
   }
   return DATA; }
 
-[lL][aA][bB][eE][lL][sS]:  { BEGIN(LABELM); return LABELS; }
-<INITIAL,LABELM>[lL][aA][bB][eE][lL][sS]{whitespace}+[eE][mM][bB][eE][dD][dD][eE][dD]:?{whitespace}* {
+labels:  { BEGIN(LABELM); return LABELS; }
+<INITIAL,LABELM>labels{whitespace}+embedded:?{whitespace}* {
   return LABELSEMBEDDED; }
-[fF][oO][rR][mM][aA][tT]{whitespace}*[=]{whitespace}*[fF][uU][lL][lL][mM][aA][tT][rR][iI][xX]{whitespace}* {
+format{whitespace}*[=]{whitespace}*fullmatrix{whitespace}* {
   yyextra->mode=0; return FORMATFULLMATRIX; }
-[fF][oO][rR][mM][aA][tT]{whitespace}*[=]{whitespace}*[eE][dD][gG][eE][lL][iI][sS][tT][1]{whitespace}* {
+format{whitespace}*[=]{whitespace}*edgelist1{whitespace}* {
   yyextra->mode=1; return FORMATEDGELIST1; }
-[fF][oO][rR][mM][aA][tT]{whitespace}*[=]{whitespace}*[nN][oO][dD][eE][lL][iI][sS][tT][1]{whitespace}* {
+format{whitespace}*[=]{whitespace}*nodelist1{whitespace}* {
   yyextra->mode=2; return FORMATNODELIST1; }
 
 <LABELM>[, ]                               { /* eaten up */ }
