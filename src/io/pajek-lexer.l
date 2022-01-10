@@ -82,8 +82,7 @@ whitespace [ \t\v\f]
 %%
 
 <*>{whitespace}+  { }
-%[^\n]*\n[\r]*    { }
-%[^\n]*\r[\n]*    { }
+%[^\n\r]*[\n\r]+  { } /* comments */
 \*net             { BEGIN(netline); return NETWORKLINE; }
 \*network         { BEGIN(netline); return NETWORKLINE; }
 <netline>{whitespace}({word}|{whitespace})* { 
@@ -94,10 +93,7 @@ whitespace [ \t\v\f]
 \*arcslist        { return ARCSLISTLINE; }
 \*edgeslist       { return EDGESLISTLINE; }
 \*matrix          { return MATRIXLINE; }
-<*>\n\r|\r\n|\n|\r { 
-   BEGIN(INITIAL);
-   yyextra->mode=0; 
-   return NEWLINE; }
+<*>[\n\r]+        { BEGIN(INITIAL); yyextra->mode=0; return NEWLINE; } /* skip over multiple newlines */
 \"[^\"]*\"        { return QSTR; }
 \([^\)]*\)        { return PSTR; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
