@@ -82,7 +82,7 @@ whitespace [ \t\v\f]
 %%
 
 <*>{whitespace}+  { }
-%[^\n\r]*[\n\r]+  { } /* comments */
+%[^\n\r\0]*[\n\r]+  { } /* comments */
 \*net             { BEGIN(netline); return NETWORKLINE; }
 \*network         { BEGIN(netline); return NETWORKLINE; }
 <netline>{whitespace}({word}|{whitespace})* { 
@@ -94,8 +94,8 @@ whitespace [ \t\v\f]
 \*edgeslist       { return EDGESLISTLINE; }
 \*matrix          { return MATRIXLINE; }
 <*>[\n\r]+        { BEGIN(INITIAL); yyextra->mode=0; return NEWLINE; } /* skip over multiple newlines */
-\"[^\"]*\"        { return QSTR; }
-\([^\)]*\)        { return PSTR; }
+\"[^\"\0]*\"      { return QSTR; }
+\([^\)\0]*\)      { return PSTR; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
                     return NUM; }
 

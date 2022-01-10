@@ -109,18 +109,18 @@ format{whitespace}*[=]{whitespace}*nodelist1{whitespace}* {
   yyextra->mode=2; return FORMATNODELIST1; }
 
 <LABELM>[, ]                               { /* eaten up */ }
-<LABELM>[^, \t\n\r\f\v]+{whitespace}*      { return LABEL; }
+<LABELM>[^, \t\n\r\f\v\0]+{whitespace}*    { return LABEL; }
 
 <FULLMATRIX>{digit}{whitespace}*          { return DIGIT; }
-<FULLMATRIX>[^ \t\n\r\v\f,]+              { return LABEL; }
+<FULLMATRIX>[^ \t\n\r\v\f\0,]+            { return LABEL; }
 <FULLMATRIX>{whitespace}                  { }
 
 <EDGELIST>\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)?  { return NUM; }
-<EDGELIST>[^ \t\n\r\v\f,]+                                 { return LABEL; }
+<EDGELIST>[^ \t\n\r\v\f\0,]+                                 { return LABEL; }
 <EDGELIST>{whitespace}*                                    { }
 
 <NODELIST>{digit}+                      { return NUM; }
-<NODELIST>[^ \t\r\n\v\f,]+              { return LABEL; }
+<NODELIST>[^ \t\r\n\v\f\0,]+            { return LABEL; }
 <NODELIST>{whitespace}*                 { }
 
 {whitespace}+                      { /* eaten up */ }
