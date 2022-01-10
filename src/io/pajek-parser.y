@@ -135,6 +135,7 @@ igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *contex
 %token QSTR
 %token PSTR
 %token NETWORKLINE
+%token NET_TITLE
 %token VERTICESLINE
 %token ARCSLINE
 %token EDGESLINE
@@ -187,7 +188,7 @@ input: nethead vertices edgeblock {
   if (context->vcount2 > 0) { igraph_i_pajek_check_bipartite(context); }
  };
 
-nethead: /* empty */ | NETWORKLINE words NEWLINE;
+nethead: /* empty */ | NETWORKLINE NEWLINE | NETWORKLINE NET_TITLE NEWLINE ;
 
 vertices: verticeshead NEWLINE vertdefs;
 
@@ -534,8 +535,6 @@ number: NUM  {
                                       &val));
   $$=val;
 };
-
-words: /* empty */ | words word;
 
 word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner);
               $$.len=igraph_pajek_yyget_leng(scanner); }

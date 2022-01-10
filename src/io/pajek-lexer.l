@@ -74,22 +74,30 @@
 %option caseless
 
 digit [0-9]
-word [^ \t\r\n\0]
+word [^ \t\v\f\r\n\0]
+whitespace [ \t\v\f]
+
+%x netline
 
 %%
 
-[ \t]+          { }
-%[^\n]*\n[\r]*  { }
-%[^\n]*\r[\n]*  { }
-\*net             { return NETWORKLINE; }
-\*network         { return NETWORKLINE; }
+<*>{whitespace}+  { }
+%[^\n]*\n[\r]*    { }
+%[^\n]*\r[\n]*    { }
+\*net             { BEGIN(netline); return NETWORKLINE; }
+\*network         { BEGIN(netline); return NETWORKLINE; }
+<netline>{whitespace}({word}|{whitespace})* { 
+   return NET_TITLE; }
 \*vertices        { return VERTICESLINE; }
 \*arcs            { return ARCSLINE; }
 \*edges           { return EDGESLINE; }
 \*arcslist        { return ARCSLISTLINE; }
 \*edgeslist       { return EDGESLISTLINE; }
 \*matrix          { return MATRIXLINE; }
-\n\r|\r\n|\n|\r   { yyextra->mode=0; return NEWLINE; }
+<*>\n\r|\r\n|\n|\r { 
+   BEGIN(INITIAL);
+   yyextra->mode=0; 
+   return NEWLINE; }
 \"[^\"]*\"        { return QSTR; }
 \([^\)]*\)        { return PSTR; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
@@ -144,6 +152,6 @@ fos/[ \t\n\r]     { if (yyextra->mode==1) { return VP_FOS; } else
                     }
                   }
 
-.                 { return ERROR; }
+<*>.              { return ERROR; }
 
 %%
