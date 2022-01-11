@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+ - `igraph_get_all_shortest_paths_dijsktra()` now uses tolerances when comparing path
+   lengths, and is thus robust to numerical roundoff errors.
+
 ### Fixed
 
  - NCOL and LGL format writers no longer accept "name" and "weight" attributes
