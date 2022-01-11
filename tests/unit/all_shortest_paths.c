@@ -143,7 +143,9 @@ int main() {
                                     6.1225042, 20.7217776, 6.8027218, 16.3147479,
                                     5.2605598, 6.6816853, 4.9482123, 1.8989790 };
 
-    from = 1;
+    /* Choose carefully: If not using tolerances, the result would be incorrect
+     * for starting vertices 5 and 6, but not for all other starting vertices. */
+    from = 6;
     printf("From: %" IGRAPH_PRId ", to: all.\n", from);
 
     igraph_vector_view(&weights, weights_raw, sizeof(weights_raw) / sizeof(igraph_real_t));
