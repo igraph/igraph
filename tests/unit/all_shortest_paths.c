@@ -51,6 +51,7 @@ int main() {
 
     igraph_get_all_shortest_paths(&graph, &paths, NULL, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
+    printf("Vertex paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector_int(VECTOR(paths)[i]);
     }
@@ -62,6 +63,7 @@ int main() {
     igraph_vector_fill(&weights, 1);
     igraph_get_all_shortest_paths_dijkstra(&graph, &paths, NULL, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
+    printf("Vertex paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector_int(VECTOR(paths)[i]);
     }
@@ -77,14 +79,15 @@ int main() {
 
     igraph_get_all_shortest_paths(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
+    printf("Vertex paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector_int(VECTOR(paths)[i]);
     }
-
+    printf("Edge paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
+    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
 
     igraph_vector_ptr_free_all(&paths);
     igraph_vector_ptr_free_all(&paths_edge);
@@ -103,13 +106,15 @@ int main() {
     printf("\nUnweighted\n");
     igraph_get_all_shortest_paths(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
+    printf("Vertex paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector_int(VECTOR(paths)[i]);
     }
+    printf("Edge paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
+    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
 
     igraph_vector_ptr_free_all(&paths);
     igraph_vector_ptr_free_all(&paths_edge);
@@ -120,13 +125,15 @@ int main() {
 
     igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
+    printf("Vertex paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector_int(VECTOR(paths)[i]);
     }
+    printf("Edge paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
+    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
 
     igraph_vector_ptr_free_all(&paths);
     igraph_vector_ptr_free_all(&paths_edge);
@@ -137,21 +144,57 @@ int main() {
 
     igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
+    printf("Vertex paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
         print_vector_int(VECTOR(paths)[i]);
     }
+    printf("Edge paths:\n");
     for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
         print_vector_int(VECTOR(paths_edge)[i]);
     }
+    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
 
     igraph_vector_ptr_free_all(&paths);
     igraph_vector_ptr_free_all(&paths_edge);
 
-    igraph_vector_ptr_destroy(&paths);
-    igraph_vector_ptr_destroy(&paths_edge);
-    igraph_vector_int_destroy(&nrgeo);
     igraph_vector_destroy(&weights);
+    igraph_destroy(&graph);
+
+    /* Graph is from https://github.com/igraph/rigraph/issues/314 */
+    printf("\nWeighted, multiple weighted shortest paths, testing tolerances\n");
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
+                 0,3, 1,2, 2,5, 2,3, 2,4, 3,5, 5,6, 6,7, 1,8, 8,9, 4,10, 6,11, 8,12, 8,13, 4,14, 7,15,
+                 -1);
+
+    igraph_real_t weights_raw[] = { 1.9617537, 0.9060834, 2.2165446, 1.6251956,
+                                    2.4473929, 0.5913490, 8.7093236, 2.8387330,
+                                    6.1225042, 20.7217776, 6.8027218, 16.3147479,
+                                    5.2605598, 6.6816853, 4.9482123, 1.8989790 };
+
+    /* Choose carefully: If not using tolerances, the result would be incorrect
+     * for starting vertices 5 and 6, but not for all other starting vertices. */
+    from = 6;
+    printf("From: %" IGRAPH_PRId ", to: all.\n", from);
+
+    igraph_vector_view(&weights, weights_raw, sizeof(weights_raw) / sizeof(igraph_real_t));
+    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_all(), &weights, IGRAPH_ALL);
+
+    printf("Vertex paths:\n");
+    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
+        print_vector_int(VECTOR(paths)[i]);
+    }
+    printf("Edge paths:\n");
+    for (i=0; i < igraph_vector_ptr_size(&paths_edge); ++i) {
+        print_vector_int(VECTOR(paths_edge)[i]);
+    }
+
+    printf("nrgeo: ");
+    print_vector_int(&nrgeo);
+
+    igraph_vector_ptr_destroy_all(&paths);
+    igraph_vector_ptr_destroy_all(&paths_edge);
+
+    igraph_vector_int_destroy(&nrgeo);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
