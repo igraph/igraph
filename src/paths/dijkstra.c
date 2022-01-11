@@ -31,6 +31,7 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+#include "core/math.h"
 
 #include <string.h>   /* memset */
 
@@ -701,6 +702,8 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_finally_func_t *res_item_destructor;
     unsigned char *is_target;
     long int i, n, to_reach;
+    int cmp_result;
+    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (!weights) {
         return igraph_get_all_shortest_paths(graph, res, nrgeo, from, to, mode);
@@ -808,13 +811,14 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             igraph_real_t curdist = VECTOR(dists)[tto];
             igraph_vector_t *parent_vec;
 
+            cmp_result = igraph_cmp_epsilon(curdist, altdist, eps);
             if (curdist < 0) {
                 /* This is the first non-infinite distance */
                 VECTOR(dists)[tto] = altdist;
                 parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
                 IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
-            } else if (altdist == curdist && VECTOR(*weights)[edge] > 0) {
+            } else if (cmp_result == 0 /* altdist == curdist */ && VECTOR(*weights)[edge] > 0) {
                 /* This is an alternative path with exactly the same length.
                      * Note that we consider this case only if the edge via which we
                      * reached the node has a nonzero weight; otherwise we could create
@@ -822,7 +826,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                      * back-and-forth */
                 parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
                 IGRAPH_CHECK(igraph_vector_push_back(parent_vec, minnei));
-            } else if (altdist < curdist) {
+            } else if (cmp_result > 0 /* altdist < curdist */) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
                 parent_vec = (igraph_vector_t*)VECTOR(parents)[tto];
