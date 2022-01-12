@@ -570,7 +570,7 @@ static igraph_error_t weighted_clique_search_single(int *table, int min_weight,
 	int search_weight;
 	int min_w;
 	clique_options localopts;
-	igraph_error_t retval;
+	igraph_error_t retval = IGRAPH_SUCCESS;
 
 	ASSERT(result != NULL);
 
@@ -684,7 +684,7 @@ static igraph_error_t weighted_clique_search_single(int *table, int min_weight,
 		*result = clique_size[table[i-1]];
 	}
 
-	return IGRAPH_SUCCESS;
+	return retval;
 }
 
 
