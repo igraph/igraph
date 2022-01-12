@@ -1266,7 +1266,7 @@ igraph_error_t clique_unweighted_find_all(
 	int i;
 	int *table;
 	CLIQUER_LARGE_INT count;
-	igraph_error_t retval;
+	igraph_error_t retval = IGRAPH_SUCCESS;
 
 	ENTRANCE_SAVE();
 	entrance_level++;
