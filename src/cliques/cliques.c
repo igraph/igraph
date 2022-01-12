@@ -948,17 +948,17 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 /* MAXIMAL CLIQUES, LARGEST CLIQUES                                      */
 /*************************************************************************/
 
-static igraph_bool_t igraph_i_maximal_cliques_store_max_size(igraph_vector_int_t* clique, void* data) {
+static igraph_error_t igraph_i_maximal_cliques_store_max_size(igraph_vector_int_t* clique, void* data) {
     igraph_integer_t* result = (igraph_integer_t*)data;
     if (*result < igraph_vector_int_size(clique)) {
         *result = igraph_vector_int_size(clique);
     }
     igraph_vector_int_destroy(clique);
     igraph_Free(clique);
-    return 1;
+    return IGRAPH_SUCCESS;
 }
 
-static igraph_bool_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique, void* data) {
+static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique, void* data) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
     igraph_integer_t i, n;
 
@@ -968,7 +968,7 @@ static igraph_bool_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique,
         if (n < igraph_vector_int_size(VECTOR(*result)[0])) {
             igraph_vector_int_destroy(clique);
             igraph_Free(clique);
-            return 1;
+            return IGRAPH_SUCCESS;
         }
 
         if (n > igraph_vector_int_size(VECTOR(*result)[0])) {
@@ -982,7 +982,7 @@ static igraph_bool_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique,
 
     IGRAPH_CHECK(igraph_vector_ptr_push_back(result, clique));
 
-    return 1;
+    return IGRAPH_SUCCESS;
 }
 
 /**

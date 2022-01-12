@@ -108,12 +108,17 @@
 #define SUFFIX _callback
 #define RECORD do { \
         igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t); \
+        igraph_error_t cliquehandler_retval; \
         if (!cl) { \
             IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
         } \
         IGRAPH_CHECK(igraph_vector_int_copy(cl, R)); \
-        if (!cliquehandler_fn(cl, arg)) \
+        cliquehandler_retval = cliquehandler_fn(cl, arg); \
+        if (cliquehandler_retval == IGRAPH_STOP) { \
             return IGRAPH_STOP; \
+        } else if (cliquehandler_retval) { \
+            IGRAPH_ERROR("Cannot list maximal cliques", cliquehandler_retval); \
+        } \
     } while (0)
 #define FINALLY
 #define CLEANUP

@@ -64,7 +64,7 @@ struct userdata {
     igraph_vector_ptr_t *list;
 };
 
-igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
     struct userdata *ud;
     igraph_bool_t cont;
 
@@ -81,7 +81,7 @@ igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
 
     ud->i += 1;
 
-    return cont;
+    return cont ? IGRAPH_SUCCESS : IGRAPH_STOP;
 }
 
 void test_callback(const igraph_t *graph) {

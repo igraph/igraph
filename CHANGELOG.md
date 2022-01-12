@@ -86,8 +86,9 @@
  - `igraph_citing_cited_type_game()` now uses an `igraph_vector_int_t` for its
    types parameter.
 
- - `igraph_clique_handler_t()` now uses an `igraph_vector_int_t` for its
-   `clique` parameter.
+ - `igraph_clique_handler_t` now uses an `igraph_vector_int_t` for its
+   `clique` parameter, and must return an `igraph_error_t`. Use `IGRAPH_STOP`
+   as the return code to terminate the search prematurely.
 
  - The `igraph_vector_ptr_t` res parameter in `igraph_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.

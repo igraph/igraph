@@ -96,9 +96,10 @@ IGRAPH_EXPORT igraph_error_t igraph_independence_number(const igraph_t *graph, i
  *   to do this.
  * \param arg This extra argument was passed to \ref
  *   igraph_cliques_callback() when it was called.
- * \return Boolean, whether to continue with the clique search.
+ * \return Error code; \c IGRAPH_SUCCESS to continue the search or
+ *   \c IGRAPH_STOP to stop the search without signaling an error.
  */
-typedef igraph_bool_t igraph_clique_handler_t(igraph_vector_int_t *clique, void *arg);
+typedef igraph_error_t igraph_clique_handler_t(igraph_vector_int_t *clique, void *arg);
 
 IGRAPH_EXPORT igraph_error_t igraph_cliques_callback(const igraph_t *graph,
                                           igraph_integer_t min_size, igraph_integer_t max_size,

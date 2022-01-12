@@ -35,7 +35,7 @@ int compare_vectors(const void *p1, const void *p2) {
 }
 
 
-igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
     struct userdata *ud;
     igraph_bool_t cont;
 
@@ -52,7 +52,7 @@ igraph_bool_t handler(igraph_vector_int_t *clique, void *arg) {
 
     ud->i += 1;
 
-    return cont;
+    return cont ? IGRAPH_SUCCESS : IGRAPH_STOP;
 }
 
 
@@ -64,13 +64,13 @@ igraph_bool_t handler_stop(igraph_vector_int_t *clique, void *arg) {
         igraph_vector_int_destroy(clique);
         igraph_free(clique);
 
-        return 0;    /* false */
+        return IGRAPH_STOP;
     }
 
     igraph_vector_int_destroy(clique);
     igraph_free(clique);
 
-    return 1 /* true */;
+    return IGRAPH_SUCCESS;
 }
 
 
