@@ -291,6 +291,9 @@
  - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
    instead of `long int`.
 
+ - The fixed parameter of `igraph_layout_drl()` and `igraph_layout_drl_3d()`
+   was removed as it has never been implemented properly.
+
  - The width parameter of `igraph_layout_grid()` is now an `igraph_integer_t`
    instead of `long int`.
 
