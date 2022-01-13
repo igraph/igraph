@@ -359,7 +359,9 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*neis)[j];
             igraph_integer_t tto = IGRAPH_OTHER(graph, edge, i);
-            MATRIX(adj, i, tto) = VECTOR(*weights)[edge];
+            if (VECTOR(*weights)[edge] >  MATRIX(adj, i, tto)) {
+                MATRIX(adj, i, tto) = VECTOR(*weights)[edge];
+            }
         }
     }
 
