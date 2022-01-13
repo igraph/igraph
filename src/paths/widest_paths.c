@@ -85,10 +85,10 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     if (vertices && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(vertices)) {
-        IGRAPH_ERROR("Size of `vertices' and `to' should match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Size of `vertices' and `to' should match.", IGRAPH_EINVAL);
     }
     if (edges && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(edges)) {
-        IGRAPH_ERROR("Size of `edges' and `to' should match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -101,12 +101,12 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
 
     parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parents == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, parents);
     is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
     if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -161,7 +161,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
 
 
     if (to_reach > 0) {
-        IGRAPH_WARNING("Couldn't reach some vertices");
+        IGRAPH_WARNING("Couldn't reach some vertices.");
     }
 
     /* Create `predecessors' if needed */
@@ -196,7 +196,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             }
         }
     }
-    /* Reconstruct the shortest paths based on vertex and/or edge IDs */
+    /* Reconstruct the widest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
             igraph_integer_t node = IGRAPH_VIT_GET(vit);
@@ -482,7 +482,7 @@ igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
             igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
-                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
+                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed.",
                              IGRAPH_EINVAL);
             }
             VECTOR(indexv)[v] = ++i;
