@@ -32,6 +32,86 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
+/**
+ * \function igraph_get_widest_paths
+ * \brief Widest paths from a single vertex
+ *
+ * Calculates the widest paths from a single node to all other specified nodes,
+ * using a modified Dijkstra's algorithm.  If there is more than one path with
+ * the largest width between two vertices, this function gives only one of them.
+ * \param graph The graph object.
+ * \param vertices The result, the IDs of the vertices along the paths.
+ *        This is a pointer vector, each element points to a vector
+ *        object. These should be initialized before passing them to
+ *        the function, which will properly clear and/or resize them
+ *        and fill the IDs of the vertices along the paths from/to
+ *        the vertices. Supply a null pointer here if you don't need
+ *        these vectors. Normally, either this argument, or the \c
+ *        edges should be non-null, but no error or warning is given
+ *        if they are both null pointers.
+ * \param edges The result, the IDs of the edges along the paths.
+ *        This is a pointer vector, each element points to a vector
+ *        object. These should be initialized before passing them to
+ *        the function, which will properly clear and/or resize them
+ *        and fill the IDs of the vertices along the paths from/to
+ *        the vertices. Supply a null pointer here if you don't need
+ *        these vectors. Normally, either this argument, or the \c
+ *        vertices should be non-null, but no error or warning is given
+ *        if they are both null pointers.
+ * \param from The id of the vertex from/to which the widest paths are
+ *        calculated.
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
+ *        widest paths will be calculated. A vertex might be given multiple
+ *        times.
+ * \param weights The edge weights. Edge weights can be negative. If this
+ *        is a null pointer or if any edge weight is NaN, then an error
+ *        is returned.
+ * \param mode The type of widest paths to be use for the
+ *        calculation in directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the outgoing paths are calculated.
+ *        \cli IGRAPH_IN
+ *          the incoming paths are calculated.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \param predecessors A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the predecessor of each vertex in
+ *        the single source widest path tree is returned here. The
+ *        predecessor of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The predecessor of the start vertex (in the \c from
+ *        argument) is itself by definition. If the predecessor is -1, it means
+ *        that the given vertex was not reached from the source during the
+ *        search. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ * \param inbound_edges A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the inbound edge of each vertex in
+ *        the single source widest path tree is returned here. The
+ *        inbound edge of vertex i in the tree is the edge via which vertex i
+ *        was reached. The start vertex and vertices that were not reached
+ *        during the search will have -1 in the corresponding entry of the
+ *        vector. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           \p from is invalid vertex ID, or the length of \p to is
+ *           not the same as the length of \p vertices (if not NULL) or
+ *           the length of \p edges (if not NULL)
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
+ * vertices and |E| is the number of edges
+ *
+ * \sa \ref igraph_widest_paths_dijkstra() or \ref igraph_widest_paths_floyd_warshall()
+ * if you only need the path length but not the paths themselves.
+ */
 igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
                                        igraph_vector_ptr_t *vertices,
                                        igraph_vector_ptr_t *edges,
@@ -252,6 +332,42 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_get_widest_path
+ * \brief Widest path from one vertex to another one.
+ *
+ * Calculates a single widest path from a single vertex to another
+ * one, using Dijkstra's algorithm.
+ *
+ * </para><para>This function is a special case (and a wrapper) to
+ * \ref igraph_get_widest_paths().
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param vertices Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the vertex IDs along
+ *        the path are stored here, including the source and target
+ *        vertices.
+ * \param edges Pointer to an uninitialized vector or a null
+ *        pointer. If not a null pointer, then the edge IDs along the
+ *        path are stored here.
+ * \param from The id of the source vertex.
+ * \param to The id of the target vertex.
+ * \param weights The edge weights. Edge weights can be negative. If this
+ *        is a null pointer or if any edge weight is NaN, then an error
+ *        is returned.
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. \c IGRAPH_OUT follows edge
+ *        directions, \c IGRAPH_IN follows the opposite directions,
+ *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|log|E|+|V|), |V| is the number of vertices,
+ * |E| is the number of edges in the graph.
+ *
+ * \sa \ref igraph_get_widest_paths() for the version with
+ * more target vertices.
+ */
 igraph_error_t igraph_get_widest_path(const igraph_t *graph,
                                       igraph_vector_int_t *vertices,
                                       igraph_vector_int_t *edges,
@@ -294,6 +410,38 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_widest_paths_floyd_warshall
+ * \brief Widest path lengths between vertices.
+ *
+ * This function implements a modified Floyd Warshalls algorithm,
+ * to find the widest path widths from a set of source vertices to
+ * all other target vertices.
+ *
+ * \param graph The input graph, can be directed.
+ * \param res The result, a matrix. A pointer to an initialized matrix
+ *    should be passed here. The matrix will be resized as needed.
+ *    Each row contains the widths from a single source, to the
+ *    vertices given in the \c to argument.
+ *    Unreachable vertices have width \c IGRAPH_NEGINFINITY, and vertices
+ *    have a width of \c IGRAPH_POSINFINITY to themselves.
+ * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
+ * \param weights The edge weights. Edge weights can be negative. If this
+ *        is a null pointer or if any edge weight is NaN, then an error
+ *        is returned.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
+ *    for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|^3), where |V| is the number of vertices.
+ *
+ * \sa \ref igraph_widest_paths_dijkstra() for a variant that runs faster
+ * on sparse graphs.
+ */
 igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
@@ -414,6 +562,42 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_widest_paths_dijkstra
+ * \brief Widest path lengths between vertices.
+ *
+ * This function implements a modified Dijkstra's algorithm, which
+ * can find the widest path widths from a source vertex to all
+ * other vertices. This function allows specifying a set of source
+ * and target vertices. The algorithm is run independently for each
+ * source and the results are retained only for the specified targets.
+ * This implementation uses a binary heap for efficiency.
+ *
+ * \param graph The input graph, can be directed.
+ * \param res The result, a matrix. A pointer to an initialized matrix
+ *    should be passed here. The matrix will be resized as needed.
+ *    Each row contains the widths from a single source, to the
+ *    vertices given in the \c to argument.
+ *    Unreachable vertices have width \c IGRAPH_NEGINFINITY, and vertices
+ *    have a width of \c IGRAPH_POSINFINITY to themselves.
+ * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
+ * \param weights The edge weights. Edge weights can be negative. If this
+ *        is a null pointer or if any edge weight is NaN, then an error
+ *        is returned.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
+ *    for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(s*|E|log|E|+|V|), where |V| is the number of
+ * vertices, |E| the number of edges and s the number of sources.
+ *
+ * \sa \ref igraph_widest_paths_floyd_warshall() for a variant that runs faster
+ * on dense graphs.
+ */
 igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
