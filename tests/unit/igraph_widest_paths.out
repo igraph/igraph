@@ -135,3 +135,48 @@ inbound_edges:
 get_widest_path()
 ( 3 1 2 4 5 6 )
 ( 3 2 4 8 10 )
+
+=== 14. Testing Negative Weights ===
+[ Inf 2.000000 -3.000000 -5.000000 ]
+node: 0
+( 0 )
+( )
+node: 1
+( 0 1 )
+( 0 )
+node: 2
+( 0 3 2 )
+( 2 3 )
+node: 3
+( 0 3 )
+( 2 )
+predecessors:
+( 0 0 3 0 )
+inbound_edges:
+( -1 0 3 2 )
+
+=== 15. Testing Disconnected Graphs ===
+[ Inf 5.000000 5.000000 -Inf -Inf
+  5.000000 Inf 5.000000 -Inf -Inf
+  5.000000 5.000000 Inf -Inf -Inf
+  -Inf -Inf -Inf Inf 7.000000
+  -Inf -Inf -Inf 7.000000 Inf ]
+node: 0
+( 0 )
+( )
+node: 1
+( 0 2 1 )
+( 2 1 )
+node: 2
+( 0 2 )
+( 2 )
+node: 3
+( )
+( )
+node: 4
+( )
+( )
+predecessors:
+( 0 2 0 -1 -1 )
+inbound_edges:
+( -1 1 2 -1 -1 )
