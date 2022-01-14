@@ -517,10 +517,10 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
     for (k = 0; k < no_of_nodes; k++) {
         for (i = 0; i < no_of_nodes; i++) {
             if (i == k) continue;
+            IGRAPH_ALLOW_INTERRUPTION();
+
             for (j = 0; j < no_of_nodes; j++) {
                 if (i == j || j == k) continue;
-
-                IGRAPH_ALLOW_INTERRUPTION();
 
                 igraph_real_t altwidth = MATRIX(adj, i, k);
                 if (MATRIX(adj, k, j) < altwidth) {
