@@ -28,7 +28,7 @@ int main() {
 
     igraph_t g;
     igraph_real_t res;
-    igraph_vector_t types, outtypes, intypes;
+    igraph_vector_t types;
     igraph_vector_int_t int_types;
 
     igraph_integer_t football_types[] = {
@@ -63,6 +63,7 @@ int main() {
     igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0);
     printf("%.5f\n", res);
 
+    igraph_vector_destroy(&types);
     igraph_destroy(&g);
 
     /*---------------------*/
