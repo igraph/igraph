@@ -323,7 +323,7 @@ igraph_error_t igraph_adjlist_init_from_inclist(
 
     if (igraph_inclist_size(il) != no_of_nodes) {
         IGRAPH_ERRORF(
-            "Incidence list has " IGRAPH_PRId " entries but the graph has " IGRAPH_PRId " vertices.",
+            "Incidence list has %" IGRAPH_PRId " entries but the graph has %" IGRAPH_PRId " vertices.",
             IGRAPH_EINVAL,
             igraph_inclist_size(il),
             no_of_nodes

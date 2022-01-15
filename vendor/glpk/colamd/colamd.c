@@ -30,7 +30,7 @@
         floating point operations than A.  Symamd constructs a matrix M such
         that M'M has the same nonzero pattern of A, and then orders the columns
         of M using colmmd.  The column ordering of M is then returned as the
-        row and column ordering P of A. 
+        row and column ordering P of A.
 
     Authors:
 
@@ -168,7 +168,7 @@
                 entries are removed prior to ordering.  Columns with more than
                 max (16, knobs [COLAMD_DENSE_COL] * sqrt (MIN (n_row,n_col)))
                 entries are removed prior to
-                ordering, and placed last in the output column ordering. 
+                ordering, and placed last in the output column ordering.
 
                 Symamd: uses only knobs [COLAMD_DENSE_ROW], which is knobs [0].
                 Rows and columns with more than
@@ -211,7 +211,7 @@
             (AQ)'AQ=LL' have less fill-in and require fewer floating point
             operations than factorizing the unpermuted matrix A or A'A,
             respectively.
-            
+
         Returns:
 
             TRUE (1) if successful, FALSE (0) otherwise.
@@ -378,7 +378,7 @@
                 Future versions may return more statistics in the stats array.
 
         Example:
-        
+
             See http://www.cise.ufl.edu/research/sparse/colamd/example.c
             for a complete example.
 
@@ -442,12 +442,12 @@
             int A [nnz] ;       Input argument.
 
                 A is an integer array of size nnz, where nnz = p [n].
-                
+
                 The row indices of the entries in column c of the matrix are
                 held in A [(p [c]) ... (p [c+1]-1)].  The row indices in a
                 given column c need not be in ascending order, and duplicate
                 row indices may be present.  However, symamd will run faster
-                if the columns are in sorted order with no duplicate entries. 
+                if the columns are in sorted order with no duplicate entries.
 
                 The matrix is 0-based.  That is, rows are in the range 0 to
                 n-1, and columns are in the range 0 to n-1.  Symamd
@@ -489,7 +489,7 @@
                 Symamd returns FALSE if stats is not present.
 
                 stats [0]:  number of dense or empty row and columns ignored
-                                (and ordered last in the output permutation 
+                                (and ordered last in the output permutation
                                 perm).  Note that a row/column can become
                                 "empty" if it contains only "dense" and/or
                                 "empty" columns/rows.
@@ -663,9 +663,6 @@
 /* === Include files ======================================================== */
 /* ========================================================================== */
 
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshorten-64-to-32"
-
 #include "colamd.h"
 
 #if 0 /* by mao */
@@ -797,7 +794,7 @@ typedef struct Colamd_Row_struct
 #define ONES_COMPLEMENT(r) (-(r)-1)
 
 /* -------------------------------------------------------------------------- */
-/* Change for version 2.1:  define TRUE and FALSE only if not yet defined */  
+/* Change for version 2.1:  define TRUE and FALSE only if not yet defined */
 /* -------------------------------------------------------------------------- */
 
 #ifndef TRUE
@@ -1114,7 +1111,7 @@ PUBLIC size_t COLAMD_recommended        /* returns recommended value of Alen. */
         Colamd: rows with more than max (16, knobs [0] * sqrt (n_col))
         entries are removed prior to ordering.  Columns with more than
         max (16, knobs [1] * sqrt (MIN (n_row,n_col))) entries are removed
-        prior to ordering, and placed last in the output column ordering. 
+        prior to ordering, and placed last in the output column ordering.
 
         Symamd: Rows and columns with more than max (16, knobs [0] * sqrt (n))
         entries are removed prior to ordering, and placed last in the
@@ -1187,7 +1184,7 @@ PUBLIC Int SYMAMD_MAIN                  /* return TRUE if OK, FALSE otherwise */
     Int nnz ;                   /* number of entries in A */
     Int i ;                     /* row index of A */
     Int j ;                     /* column index of A */
-    Int k ;                     /* row index of M */ 
+    Int k ;                     /* row index of M */
     Int mnz ;                   /* number of nonzeros in M */
     Int pp ;                    /* index into a column of A */
     Int last_row ;              /* last row seen in the current column */
@@ -1639,7 +1636,7 @@ PUBLIC Int COLAMD_MAIN          /* returns TRUE if successful, FALSE otherwise*/
     stats [COLAMD_DENSE_ROW] = n_row - n_row2 ;
     stats [COLAMD_DENSE_COL] = n_col - n_col2 ;
     stats [COLAMD_DEFRAG_COUNT] = ngarbage ;
-    DEBUG0 (("colamd: done.\n")) ; 
+    DEBUG0 (("colamd: done.\n")) ;
     return (TRUE) ;
 }
 
@@ -1701,7 +1698,7 @@ PRIVATE Int init_rows_cols      /* returns TRUE if OK, or FALSE otherwise */
     Colamd_Col Col [],          /* of size n_col+1 */
     Int A [],                   /* row indices of A, of size Alen */
     Int p [],                   /* pointers to columns in A, of size n_col+1 */
-    Int stats [COLAMD_STATS]    /* colamd statistics */ 
+    Int stats [COLAMD_STATS]    /* colamd statistics */
 )
 {
     /* === Local variables ================================================== */

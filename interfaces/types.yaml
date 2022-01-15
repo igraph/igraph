@@ -1,0 +1,564 @@
+# vim:set ts=4 sw=4 sts=4 et:
+#
+# This file is a YAML representation of the types used in the functions.yaml
+# function specification file. It provides the meaning of each type in comments
+# and also specifies the C types correspnding to each abstract type.
+#
+# See https://github.com/igraph/stimulus for more information
+
+###############################################################################
+## Core igraph data types
+###############################################################################
+
+INTEGER:
+    # An ordinary igraph integer
+    CTYPE: igraph_integer_t
+
+REAL:
+    # An ordinary igraph floating-point number
+    CTYPE: igraph_real_t
+
+BOOLEAN:
+    # An ordinary igraph Boolean value
+    CTYPE: igraph_bool_t
+
+COMPLEX:
+    # An ordinary igraph complex number
+    CTYPE: igraph_complex_t
+
+ERROR:
+    # An igraph error code
+    CTYPE: int
+
+###############################################################################
+## C data types
+###############################################################################
+
+INT:
+    # A C integer
+    CTYPE: int
+
+LONGINT:
+    # A C long integer
+    CTYPE: long int
+
+CSTRING:
+    # A null-terminated immutable C string
+    CTYPE: const char*
+
+INFILE:
+    # A file, already open for reading
+    CTYPE: FILE*
+
+OUTFILE:
+    # A file, already open for writing
+    CTYPE: FILE*
+
+###############################################################################
+# Vectors, matrices and other template types
+###############################################################################
+
+INDEX_VECTOR:
+    # A vector of integer indices that should adapt to the conventions of the
+    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
+    # Python and similar).
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+VECTOR:
+    # A vector of floating-point numbers
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+VECTOR_INT:
+    # A vector of igraph integers
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+VECTOR_BOOL:
+    # A vector of Boolean values
+    CTYPE: igraph_vector_bool_t
+    FLAGS: BY_REF
+
+VECTOR_COMPLEX:
+    # A vector of igraph complex numbers
+    CTYPE: igraph_vector_complex_t
+
+STRVECTOR:
+    # A vector of strings
+    # TODO(ntamas): maybe rename this to igraph_vector_str_t and VECTOR_STR
+    # for consistency?
+    CTYPE: igraph_strvector_t
+    FLAGS: BY_REF
+
+VECTORLIST:
+    # A vector containing pointers to vectors of floating-point numbers
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VECTORM1:
+    # A vector of integer indices that should adapt to the conventions of the
+    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
+    # Python and similar).
+    # TODO(ntamas): should be replaced with INDEX_VECTOR
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+MATRIX:
+    # A matrix of floating-point numbers
+    CTYPE: igraph_matrix_t
+    FLAGS: BY_REF
+
+MATRIX_INT:
+    # A matrix of igraph integers
+    CTYPE: igraph_matrix_int_t
+    FLAGS: BY_REF
+
+MATRIX_COMPLEX:
+    # A matrix of igraph complex numbers
+    CTYPE: igraph_matrix_complex_t
+
+MATRIXLIST:
+    # A vector containing pointers to matrices of floating-point numbers
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+SPARSEMAT:
+    # A sparse matrix of floating-point numbers
+    CTYPE: igraph_sparsemat_t
+    FLAGS: BY_REF
+
+SPARSEMATPTR:
+    # A sparse matrix of floating-point numbers. The specialty of this type
+    # is that it is uninitialized upon calling the function that uses it; the
+    # function will initialize it instead.
+    # TODO(ntamas): check whether we could merge this with SPARSEMAT in 0.10
+    CTYPE: igraph_sparsemat_t
+    FLAGS: BY_REF
+
+###############################################################################
+# Vertices, edges, vertex and edge sequences
+###############################################################################
+
+EDGE:
+    # A single edge index
+    CTYPE: igraph_integer_t
+
+EDGE_INDICES:
+    # An integer vector containing edges indices. Consistent in its in- and
+    # out-type, unlike EDGESET
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+EDGESET:
+    # An igraph edge sequence. This is an ugly hybrid type; when it is an
+    # IN argument in generated code, it is an igraph_es_t, but when it is an
+    # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
+    CTYPE:
+        IN: igraph_es_t
+        OUT: igraph_vector_int_t
+
+VERTEX:
+    # A single vertex index
+    CTYPE: igraph_integer_t
+
+VERTEX_INDICES:
+    # An integer vector containing vertex indices. Consistent in its in- and
+    # out-type, unlike VERTEXSET
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+VERTEXSET:
+    # An igraph vertex sequence. This is an ugly hybrid type; when it is an
+    # IN argument in generated code, it is an igraph_vs_t, but when it is an
+    # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
+    CTYPE:
+        IN: igraph_vs_t
+        OUT: igraph_vector_int_t
+
+###############################################################################
+# Specialized vectors with semantic meaning
+###############################################################################
+
+BIPARTITE_TYPES:
+    # A vector containing Booleans that define the two partitions of a
+    # bipartite graph
+    CTYPE: igraph_vector_bool_t
+    FLAGS: BY_REF
+
+EDGE_CAPACITY:
+    # A vector containing edge capacities (typically for max-flow algorithms)
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+EDGE_COLOR:
+    # A vector containing edge colors
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+EDGEWEIGHTS:
+    # A vector containing edge weights
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+EDGESETLIST:
+    # A vector containing vectors of igraph integers where each such
+    # vector represents a sequence of edge indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because EDGESET is
+    # the abstract type for igraph_es_t, but an EDGESETLIST is _not_ a
+    # vector of igraph_es_t objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+GRAPHLIST:
+    # A vector containing pointers to graph objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VERTEX_QTY:
+    # A vector of floating-point numbers where each entry corresponds to
+    # one of the vertices in a graph and its value represents some quantity
+    # associated to the vertex with the same index. Higher-level interfaces may
+    # use this type to provide a "named vector" such that each entry can be
+    # indexed either by the vertex index or by the vertex name.
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+SIRLIST:
+    # A vector containing pointers to igraph_sir_t objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VERTEXSETLIST:
+    # A vector containing vectors of igraph integers where each such
+    # vector represents a sequence of vertex indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
+    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
+    # vector of igraph_vs_t objects
+    CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VERTEX_COLOR:
+    # A vector containing vertex colors
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
+VERTEXWEIGHTS:
+    # A vector containing vertex weights
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+###############################################################################
+# Graph representations
+###############################################################################
+
+GRAPH:
+    # An igraph graph
+    CTYPE: igraph_t
+    FLAGS: BY_REF
+
+ADJLIST:
+    # A graph represented as an adjacency list
+    CTYPE: igraph_adjlist_t
+    FLAGS: BY_REF
+
+INCLIST:
+    # A graph represented as an incidence list
+    CTYPE: igraph_inclist_t
+    FLAGS: BY_REF
+
+###############################################################################
+# Enums
+###############################################################################
+
+ADD_WEIGHTS:
+    # Whether to add the weights of the edges read from a file to the graph
+    # being created
+    CTYPE: igraph_add_weights_t
+    FLAGS: ENUM
+
+ADJACENCYMODE:
+    # Enum that describes how an adjacency matrix should be constructed
+    CTYPE: igraph_adjacency_t
+    FLAGS: ENUM
+
+BARABASI_ALGORITHM:
+    # Enum that describes the various implementations of the Barabasi model
+    # that igraph supports
+    CTYPE: igraph_barabasi_algorithm_t
+    FLAGS: ENUM
+
+BLISSSH:
+    # Enum containing splitting heuristics for the Bliss algorithm
+    CTYPE: igraph_bliss_sh_t
+    FLAGS: ENUM
+
+COMMCMP:
+    # Enum containing identifiers for community comparison methods
+    CTYPE: igraph_community_comparison_t
+    FLAGS: ENUM
+
+CONNECTEDNESS:
+    # Enum that selects between weak and strong connectivity
+    CTYPE: igraph_connectedness_t
+    FLAGS: ENUM
+
+DEGSEQMODE:
+    # Enum that describes the various implementations of generating a graph
+    # with an arbitrary degree sequence
+    CTYPE: igraph_degseq_t
+    FLAGS: ENUM
+
+EIGENALGO:
+    # Enum used for selecting an algorithm that determines the eigenvalues
+    # and eigenvectors of some input
+    CTYPE: igraph_eigen_algorithm_t
+    FLAGS: ENUM
+
+EIGENWHICHPOS:
+    # Enum representing which eigenvalues to use in the spectral embedding
+    # algorithm
+    CTYPE: igraph_eigen_which_position_t
+    FLAGS: ENUM
+
+GETADJACENCY:
+    # Enum storing how to retrieve the adjacency matrix from a graph
+    CTYPE: igraph_get_adjacency_t
+    FLAGS: ENUM
+
+GREEDY_COLORING_HEURISTIC:
+    # Enum representing different heuristics for a greedy vertex coloring
+    CTYPE: igraph_coloring_greedy_t
+    FLAGS: ENUM
+
+LAYOUT_GRID:
+    # Whether to use the fast (but less accurate) grid-based version of a
+    # layout algorithm that supports it (typically the Fruchterman-Reingold
+    # layout)
+    CTYPE: igraph_layout_grid_t
+    FLAGS: ENUM
+
+LSETYPE:
+    # Enum storing the possible types (definitions) of the Laplacian matrix
+    # to use in the Laplacian spectral embedding algorithms
+    CTYPE: igraph_laplacian_spectral_embedding_type_t
+    FLAGS: ENUM
+
+NEIMODE:
+    # Enum that describes how a particular function should take into account
+    # the neighbors of vertices
+    CTYPE: igraph_neimode_t
+    FLAGS: ENUM
+
+PAGERANKALGO:
+    # Enum that describes the various implementations of the PageRank algorithm
+    CTYPE: igraph_pagerank_algo_t
+    FLAGS: ENUM
+
+RANDOM_TREE_METHOD:
+    # Enum that describes the various implementation of the uniform random tree
+    # sampling method
+    CTYPE: igraph_random_tree_t
+    FLAGS: ENUM
+
+REALIZE_DEGSEQ_METHOD:
+    # Enum that describes the various methods for realizing a graph with an
+    # arbitrary degree sequence
+    CTYPE: igraph_realize_degseq_t
+    FLAGS: ENUM
+
+RECIP:
+    # Enum that describes how the reciprocity of a graph should be calculated
+    CTYPE: igraph_reciprocity_t
+    FLAGS: ENUM
+
+REWIRINGMODE:
+    # Enum for the rewiring modes of igraph_rewire()
+    CTYPE: igraph_rewiring_t
+    FLAGS: ENUM
+
+RWSTUCK:
+    # Enum that describes what igraph should do when a random walk gets stuck
+    # in a sink vertex
+    CTYPE: igraph_random_walk_stuck_t
+    FLAGS: ENUM
+
+SPINCOMMUPDATE:
+    # Enum containing update modes for the spinglass community detection
+    # algorithm
+    CTYPE: igraph_spincomm_update_t
+    FLAGS: ENUM
+
+SPINGLASS_IMPLEMENTATION:
+    # Enum that describes the various implementations of the spinglass community
+    # detection algorithm
+    CTYPE: igraph_spinglass_implementation_t
+    FLAGS: ENUM
+
+STARMODE:
+    # Enum that describes how a star graph should be constructed
+    CTYPE: igraph_star_mode_t
+    FLAGS: ENUM
+
+SUBGRAPH_IMPL:
+    # Enum that describes how igraph should create an induced subgraph of a
+    # graph
+    CTYPE: igraph_subgraph_implementation_t
+    FLAGS: ENUM
+
+TODIRECTED:
+    # Enum representing the possible ways to convert an undirected graph to a
+    # directed one
+    CTYPE: igraph_to_directed_t
+    FLAGS: ENUM
+
+TOUNDIRECTED:
+    # Enum representing the possible ways to convert a directed graph to an
+    # undirected one
+    CTYPE: igraph_to_undirected_t
+    FLAGS: ENUM
+
+TRANSITIVITYMODE:
+    # Enum that specifies how isolated vertices should be handled in transitivity
+    # calcuations
+    CTYPE: igraph_transitivity_mode_t
+    FLAGS: ENUM
+
+TREEMODE:
+    # Enum that describes how a tree graph should be constructed
+    CTYPE: igraph_tree_mode_t
+    FLAGS: ENUM
+
+###############################################################################
+# Switches / flags / bits
+###############################################################################
+
+EDGE_TYPE_SW:
+    # Flag bitfield that specifies what sort of edges are allowed in an
+    # algorithm
+    CTYPE: igraph_edge_type_sw_t
+    FLAGS: BITS
+
+###############################################################################
+# Callbacks
+###############################################################################
+
+ARPACKFUNC:
+    # ARPACK matrix multiplication function.
+    CTYPE: igraph_arpack_function_t
+
+CLIQUE_FUNC:
+    # Callback function for igraph_cliques_callback(). called with every clique
+    # that was found by the function.
+    CTYPE: igraph_clique_handler_t
+
+BFS_FUNC:
+    # Callback function for igraph_bfs(). Called with every vertex that was
+    # visited during the BFS traversal.
+    CTYPE: igraph_bfshandler_t
+
+DFS_FUNC:
+    # Callback function for igraph_dfs(). Called with every vertex that was
+    # visited during the DFS traversal.
+    CTYPE: igraph_dfshandler_t
+
+ISOCOMPAT_FUNC:
+    # Callback function for isomorphism algorithms that determines whether two
+    # vertices are compatible or not.
+    CTYPE: igraph_isocompat_t
+
+ISOMORPHISM_FUNC:
+    # Callback function that is called by isomorphism functions when an
+    # isomorphism is found
+    CTYPE: igraph_isohandler_t
+
+LEVCFUNC:
+    # Callback function for igraph_leading_eigenvector_community(). Called
+    # after each eigenvalue / eigenvector calculation.
+    CTYPE: igraph_community_leading_eigenvector_callback_t
+
+###############################################################################
+# Miscellaneous
+###############################################################################
+
+ARPACKFUNC:
+    # ARPACK matrix multiplication function.
+    CTYPE: igraph_arpack_function_t
+
+ARPACKOPT:
+    # Structure that contains the options of the ARPACK eigensolver.
+    CTYPE: igraph_arpack_options_t
+    FLAGS: BY_REF
+
+ARPACKSTORAGE:
+    # Pointer to a general-purpose memory block that ARPACK-based algorithms
+    # may use as a working area.
+    CTYPE: igraph_arpack_storage_t
+    FLAGS: BY_REF
+
+ATTRIBUTES:
+    # An opaque data structure that a high-level interface may use to pass
+    # information about graph/vertex/edge attributes to a low-level igraph
+    # C function
+    CTYPE: void
+    FLAGS: BY_REF
+
+BLISSINFO:
+    # Struct holding information about the internal statistics of a single
+    # run of the Bliss algorithm
+    CTYPE: igraph_bliss_info_t
+
+DRL_OPTIONS:
+    # Structure containing the options of the DrL layout algorithm
+    CTYPE: igraph_layout_drl_options_t
+    FLAGS: BY_REF
+
+EDGE_ATTRIBUTE_COMBINATION:
+    # Structure specifying how the attributes of edges should be combined
+    # during graph operations that may merge multiple edges into a single one
+    CTYPE: igraph_attribute_combination_t
+    FLAGS: BY_REF
+
+EIGENWHICH:
+    # Structure representing which eigenvalue(s) to use in the spectral embedding
+    # algorithm
+    CTYPE: igraph_eigen_which_t
+    FLAGS: BY_REF
+
+EXTRA:
+    # Thunk argument that usually accompanies callback functions and can be used
+    # to provide user-specific data or context to the callback function
+    CTYPE: void
+    FLAGS: BY_REF
+
+HRG:
+    # Structure storing a fitted hierarchical random graph model
+    CTYPE: igraph_hrg_t
+    FLAGS: BY_REF
+
+MAXFLOW_STATS:
+    # Structure storing statistics about a single run of a max-flow algorithm
+    CTYPE: igraph_maxflow_stats_t
+    FLAGS: BY_REF
+
+PAGERANKOPT:
+    # Enum that describes the PageRank options pointer, which is used only if
+    # the PageRank implementation uses ARPACK
+    CTYPE: igraph_arpack_options_t
+    FLAGS: BY_REF
+
+PLFIT:
+    # Structure representing the result of a power-law fitting algorithms
+    CTYPE: igraph_plfit_result_t
+    FLAGS: BY_REF
+
+VCONNNEI:
+    CTYPE: igraph_vconn_nei_t
+
+VERTEX_ATTRIBUTE_COMBINATION:
+    # Structure specifying how the attributes of vertices should be combined
+    # during graph operations that may merge multiple vertices into a single one
+    CTYPE: igraph_attribute_combination_t
+    FLAGS: BY_REF

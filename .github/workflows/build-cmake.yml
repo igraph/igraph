@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: ['i686', 'x86_64', 'ucrt-x86_64']
-        shared_libs: ['ON', 'OFF']
+        shared_libs: ['shared', 'static']
         include:
           - arch: i686
             msystem: MINGW32
@@ -46,7 +46,7 @@ jobs:
         run: |
           mkdir -p build-${{ matrix.arch }}
           cd build-${{ matrix.arch }}
-          cmake .. -GNinja -DBUILD_SHARED_LIBS=${{ matrix.shared_libs }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DBLA_VENDOR=Generic -DIGRAPH_PRINT_ARITH_HEADER=ON
+          cmake .. -GNinja -DBUILD_SHARED_LIBS=${{ matrix.shared_libs == 'shared' && 'ON' || 'OFF' }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DBLA_VENDOR=Generic -DIGRAPH_PRINT_ARITH_HEADER=ON -DIGRAPH_USE_INTERNAL_GLPK=ON
 
       - name: Build
         run: cmake --build . --target build_tests

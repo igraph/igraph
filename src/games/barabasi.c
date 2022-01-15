@@ -631,7 +631,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     igraph_vector_int_t degree;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERRORF("Number of nodes must not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
+        IGRAPH_ERRORF("Number of nodes must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_int_size(outseq) != 0 && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("The length of the out-degree sequence (%" IGRAPH_PRId ") does not agree with the number of nodes (%" IGRAPH_PRId ").",
@@ -681,7 +681,8 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
         no_of_edges = 0;
-        for (i = 1; i < igraph_vector_int_size(outseq); i++) {
+        /* the length of 'outseq' is verified to be no_of_nodes above */
+        for (i = 1; i < no_of_nodes; i++) {
             no_of_edges += VECTOR(*outseq)[i];
         }
     }
@@ -736,7 +737,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
         }
 
         /* aging */
-        for (k = 1; i - binwidth * k + 1 >= 1; k++) {
+        for (k = 1; binwidth * k <= i; k++) {
             igraph_integer_t shnode = i - binwidth * k;
             igraph_integer_t deg = VECTOR(degree)[shnode];
             igraph_integer_t age = (i - shnode) / binwidth;

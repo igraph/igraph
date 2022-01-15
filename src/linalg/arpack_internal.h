@@ -126,15 +126,27 @@
 
 #ifdef HAVE_GFORTRAN
 
-int igraphdsaupd_(int *ido, char *bmat, int *n,
+/* GFortran-specific calling conventions, used when compiling the R interface.
+ * Derived with "gfortran -fc-prototypes-external", applied on the original
+ * Fortran sources of these functions.
+ *
+ * Caveats:
+ *
+ * 1) gfortran prints size_t for the "_len" arguments, but in fact they must be
+ *    long int
+ * 2) gofrtran maps Fortran LOGICAL types to int_least32_t, but in fact they
+ *    must be void* (anything else doesn't work, not even _Bool*)
+ * */
+
+void igraphdsaupd_(int *ido, char *bmat, int *n,
                   char *which, int *nev, igraph_real_t *tol,
                   igraph_real_t *resid, int *ncv, igraph_real_t *v,
                   int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
                   int *lworkl, int *info,
-                  int bmat_len, int which_len);
+                  long int bmat_len, long int which_len);
 
-int igraphdseupd_(int *rvec, char *howmny, int *select,
+void igraphdseupd_(void *rvec, char *howmny, void *select,
                   igraph_real_t *d, igraph_real_t *z, int *ldz,
                   igraph_real_t *sigma, char *bmat, int *n,
                   char *which, int *nev, igraph_real_t *tol,
@@ -142,17 +154,17 @@ int igraphdseupd_(int *rvec, char *howmny, int *select,
                   int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
                   int *lworkl, int *info,
-                  int howmny_len, int bmat_len, int which_len);
+                  long int howmny_len, long int bmat_len, long int which_len);
 
-int igraphdnaupd_(int *ido, char *bmat, int *n,
+void igraphdnaupd_(int *ido, char *bmat, int *n,
                   char *which, int *nev, igraph_real_t *tol,
                   igraph_real_t *resid, int *ncv, igraph_real_t *v,
                   int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
                   int *lworkl, int *info,
-                  int bmat_len, int which_len);
+                  long int bmat_len, long int which_len);
 
-int igraphdneupd_(int *rvec, char *howmny, int *select,
+void igraphdneupd_(void *rvec, char *howmny, void *select,
                   igraph_real_t *dr, igraph_real_t *di,
                   igraph_real_t *z, int *ldz,
                   igraph_real_t *sigmar, igraph_real_t *sigmai,
@@ -162,15 +174,13 @@ int igraphdneupd_(int *rvec, char *howmny, int *select,
                   int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
                   int *lworkl, int *info,
-                  int howmny_len, int bmat_len, int which_len);
+                  long int howmny_len, long int bmat_len, long int which_len);
 
-int igraphdsortr_(char *which, int *apply, int* n, igraph_real_t *x1,
-                  igraph_real_t *x2,
-                  int which_len);
+void igraphdsortr_(char *which, void *apply, int* n, igraph_real_t *x1,
+                  igraph_real_t *x2, long int which_len);
 
-int igraphdsortc_(char *which, int *apply, int* n, igraph_real_t *xreal,
-                  igraph_real_t *ximag, igraph_real_t *y,
-                  int which_len);
+void igraphdsortc_(char *which, void *apply, int* n, igraph_real_t *xreal,
+                  igraph_real_t *ximag, igraph_real_t *y, long int which_len);
 
 #else
 

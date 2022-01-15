@@ -599,8 +599,8 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
         IGRAPH_ERROR("k must be non-negative in k-scan.", IGRAPH_EINVAL);
     }
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERRORF("The weight vector length (%ld) in k-scan should equal "
-                      "the number of edges of the graph (%d).",
+        IGRAPH_ERRORF("The weight vector length (%" IGRAPH_PRId ") in k-scan should equal "
+                      "the number of edges of the graph (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights),
                       igraph_ecount(graph));
     }
@@ -664,7 +664,7 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
 
 /**
  * \function igraph_local_scan_k_ecount_them
- * Local THEM scan-statistics, general function, edge count and sum of weights
+ * \brief Local THEM scan-statistics, edge count or sum of weights.
  *
  * Count the number of edges or the sum the edge weights in the
  * k-neighborhood of vertices.
@@ -695,18 +695,24 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
     igraph_inclist_t incs_us, incs_them;
 
     if (igraph_vcount(them) != no_of_nodes) {
-        IGRAPH_ERROR("Number of vertices must match in scan-k", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of vertices in the two graphs must "
+                "match in scan-k.",
+                IGRAPH_EINVAL);
     }
     if (igraph_is_directed(us) != igraph_is_directed(them)) {
-        IGRAPH_ERROR("Directedness must match in scan-k", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Directedness in the two graphs must match "
+                "in scan-k", IGRAPH_EINVAL);
     }
     if (k < 0) {
-        IGRAPH_ERROR("k must be non-negative in k-scan", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("k must be non-negative in k-scan, got %" IGRAPH_PRId
+                ".", IGRAPH_EINVAL, k);
     }
     if (weights_them &&
         igraph_vector_size(weights_them) != igraph_ecount(them)) {
-        IGRAPH_ERROR("Invalid weight vector length in k-scan (them)",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The weight vector length (%" IGRAPH_PRId
+            ") must be equal to the number of edges (%" IGRAPH_PRId
+            ").", IGRAPH_EINVAL, igraph_vector_size(weights_them),
+            igraph_ecount(them));
     }
 
     if (k == 0) {

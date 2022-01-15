@@ -86,8 +86,9 @@
  - `igraph_citing_cited_type_game()` now uses an `igraph_vector_int_t` for its
    types parameter.
 
- - `igraph_clique_handler_t()` now uses an `igraph_vector_int_t` for its
-   `clique` parameter.
+ - `igraph_clique_handler_t` now uses an `igraph_vector_int_t` for its
+   `clique` parameter, and must return an `igraph_error_t`. Use `IGRAPH_STOP`
+   as the return code to terminate the search prematurely.
 
  - The `igraph_vector_ptr_t` res parameter in `igraph_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
@@ -111,7 +112,9 @@
    IDs whose removal broke a single component into two.
 
  - `igraph_community_label_propagation()` now uses an `igraph_vector_int_t` for its
-   `initial` parameter.
+   `initial` parameter. It also takes a `mode` argument that specifies how
+   labels should be propagated along edges (forward, backward or ignoring edge
+   directions).
 
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
@@ -167,6 +170,9 @@
  - `igraph_edges()` now takes an `igraph_vector_int_t` for its
    `edges` argument instead of an `igraph_vector_t`.
 
+ - `igraph_es_multipairs()` was removed; you can use the newly added
+   `igraph_es_all_between()` instead.
+
  - `igraph_establishment_game()` now takes an `igraph_vector_int_t` for its
    `node_type_vec` argument instead of an `igraph_vector_t`.
 
@@ -180,8 +186,18 @@
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
- - `igraph_get_eids()` and `igraph_get_eids_multi()` now use `igraph_vector_int_t`
-   to return lists of edge IDs and to receive lists of vertex IDs.
+ - `igraph_get_eids()` now uses `igraph_vector_int_t` to return lists of edge IDs
+   and to receive lists of vertex IDs.
+
+ - The `path` argument of `igraph_get_eids()` was removed. You can replicate the
+   old behaviour by constructing the list of vertex IDs explicitly from the
+   path by duplicating each vertex in the path except the first and last ones.
+   A helper function called `igraph_expand_path_to_pairs()` is provided to ease
+   the transition.
+
+ - `igraph_get_eids_multi()` was removed as its design was fundamentally broken;
+   there was no way to retrieve the IDs of all edges between a specific pair of
+   vertices without knowing in advance how many such edges there are in the graph.
 
  - `igraph_get_incidence()` now returns the vertex IDs corresponding to the
    rows and columns of the incidence matrix as `igraph_vector_int_t`.
@@ -276,6 +292,9 @@
  - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
    instead of `long int`.
 
+ - The fixed parameter of `igraph_layout_drl()` and `igraph_layout_drl_3d()`
+   was removed as it has never been implemented properly.
+
  - The width parameter of `igraph_layout_grid()` is now an `igraph_integer_t`
    instead of `long int`.
 
@@ -321,7 +340,11 @@
    `igraph_vector_int_t` instead of an `igraph_int_t`.
 
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t`
-   with the vertex IDs instead of an `igraph_vector_t`.
+   with the vertex IDs instead of an `igraph_vector_t`, and use `igraph_integer_t`
+   for the isoclass parameter.
+
+ - Motif functions now use `igraph_integer_t` instead of `int` for their `size`
+   parameter.
 
  - `igraph_neighborhood_size()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
@@ -486,12 +509,90 @@
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
+ - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou!)
+ - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
+ - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM!)
+ - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
+ - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
 
 ### Changed
 
  - `igraph_version()` no longer returns an error code.
+ - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
+ - The Pajek parser is now less strict and accepts more files.
 
-## [0.9.5]
+### Fixed
+
+ - When an error occurs during parsing DL, GML, NCOL, LGL or Pajek files, line numbers are now reported correctly.
+ - The GraphML parser does not print to stderr any more in case of encoding
+   errors and other error conditions originating from the underlying `libxml2`
+   library.
+ - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+
+## [Unreleased 0.9.7]
+
+### Changed
+
+ - `igraph_get_all_shortest_paths_dijsktra()` now uses tolerances when comparing path
+   lengths, and is thus robust to numerical roundoff errors.
+
+### Fixed
+
+ - NCOL and LGL format writers no longer accept "name" and "weight" attributes
+   of invalid types.
+ - The LGL writer could not access numerical weight attributes, potentially leading
+   to crashes.
+ - External PLFIT libraries and their headers are now detected at their standard
+   installation location.
+
+### Other
+
+ - The C attribute handler now verifies attribute types when retrieving attributes.
+ - Documentation improvements
+
+## [0.9.6] - 2022-01-05
+
+ - Isomorphism class functions (`igraph_isoclass()`, `igraph_isoclass_subgraph()`,
+   `igraph_isoclass_create`) and motif finder functions (`igraph_motifs_randesu()`,
+   `igraph_motifs_randesu_estimate()`, `igraph_motifs_randesu_callback()`) now
+   support undirected (sub)graphs of sizes 5 and 6. Previsouly only sizes 3 and 4
+   were supported.
+
+### Fixed
+
+ - igraph would not build with MinGW when using the vendored GLPK and enabling TLS.
+ - Removed some uses of `abort()` from vendored libraries, which could unexpectedly
+   shut down the host language of igraph's high-level interfaces.
+ - `igraph_community_label_propagation()` no longer leaves any vertices unlabeled
+   when they were not reachable from any labeled ones, i.e. the returned membership
+   vector is guaranteed not to contain negative values (#1853).
+ - The Kamada-Kawai layout is now interruptible.
+ - The Fruchterman-Reingold layout is now interruptible.
+ - Fixed a bug in `igraph_cmp_epsilon()` that resulted in incorrect results for
+   edge betweenness calculations in certain rare cases with x87 floating point
+   math when LTO was also enabled (#1894).
+ - Weighted clique related functions now fall back to the unweighted variants
+   when a null vertex weight vector is given to them.
+ - `igraph_erdos_renyi_game_(gnm|gnp)` would not produce self-loops for the singleton
+   graph.
+ - Fixed a bug in `igraph_local_efficiency()` that sometimes erroneously
+   reported zero as the local efficiency of a vertex in directed graphs.
+ - `igraph_vector_update()` (and its type-specific variants) did not check for
+   memory allocation failure.
+ - Fixed a potential crash in the GraphML reader that would be triggered by some
+   invalid GraphML files.
+
+### Other
+
+ - `igraph_is_tree()` has improved performance and memory usage.
+ - `igraph_is_connected()` has improved performance when checking weak connectedness.
+ - Improved error handling in `igraph_maximal_cliques()` and related functions.
+ - The build system now checks that GLPK is of a compatible version (4.57 or later).
+ - The vendored `plfit` package was updated to 0.9.3.
+ - You can now build igraph with an external `plfit` instead of the vendored one.
+ - Documentation improvements.
+
+## [0.9.5] - 2021-11-11
 
 ### Fixed
 
@@ -501,7 +602,37 @@
    are ignored, to make it consistent with the directed case.
 
  - Fixed a bug in `igraph_gomory_hu_tree()` that returned only the equivalent flow
-   tree instead of the cut tree; see Github issue #1810 for more details.
+   tree instead of the cut tree (#1810).
+
+ - Fixed a bug in the `IGRAPH_TO_UNDIRECTED_COLLAPSE` mode of
+   `igraph_to_undirected()` that provided an incorrect merge vector to the
+   attribute handler, leading to problems when edge attributes were merged
+   using an attribute combination (#1814).
+
+ - Fixed the behaviour of the `IGRAPH_ENABLE_LTO` option when it was set to
+   `AUTO`; earlier versions had a bug where `AUTO` simply checked whether LTO
+   is supported but then did not use LTO even if it was supported.
+
+ - When using igraph from a CMake project, it is now checked that the project has
+   the C++ language enabled. This is necessary for linking to igraph with CMake.
+
+### Other
+
+ - Improved the root selection method for disconnected graphs in the
+   Reingold-Tilford layout (#1836). The new root selection method provides
+   niceer results if the graph is not a tree, although it is still recommended
+   to use the Sugiyama layout instead, unless the input graph is _almost_ a
+   tree, in which case Reingold-Tilfold may still be preferred.
+
+ - `igraph_decompose()` is now much faster for large graphs containing many
+   isolates or small components (#960).
+
+ - `igraph_largest_cliques()` and `igraph_clique_number()` were re-written to
+   use `igraph_maximal_cliques_callback()` so they are much faster now (#804).
+
+ - The vendored GLPK has been upgraded to GLPK 5.0.
+
+ - Documentation improvements.
 
 ## [0.9.4] - 2021-05-31
 
@@ -937,7 +1068,8 @@
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.5..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.6..HEAD
+[0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6
 [0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5
 [0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/igraph/igraph/compare/0.9.2...0.9.3

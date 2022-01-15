@@ -132,7 +132,7 @@ igraph_error_t igraph_progress_handler_stderr(const char *message, igraph_real_t
 #endif
 
 /**
- * \function igraph_set_progress_handler.
+ * \function igraph_set_progress_handler
  * \brief Install a progress handler, or remove the current handler.
  *
  * There is a single simple predefined progress handler:

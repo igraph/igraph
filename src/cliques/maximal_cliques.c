@@ -194,7 +194,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
         }
     }
 
-    igraph_vector_int_push_back(nextv, -1);
+    IGRAPH_CHECK(igraph_vector_int_push_back(nextv, -1));
     pivotvectneis = igraph_adjlist_get(adjlist, *pivot);
     pivotvectlen = igraph_vector_int_size(pivotvectneis);
 
@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
             }
         }
         if (!nei) {
-            igraph_vector_int_push_back(nextv, vcand);
+            IGRAPH_CHECK(igraph_vector_int_push_back(nextv, vcand));
         }
     }
 
@@ -461,7 +461,8 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  *   stored here
  * \param no Pointer to an \c igraph_integer_t; the number of maximal
  *   cliques will be stored here.
- * \param outfile Pointer to the output file, it should be writable.
+ * \param outfile Pointer to an output file or \c NULL.
+ *   When not \c NULL, the file should be writable.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be

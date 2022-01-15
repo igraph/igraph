@@ -28,6 +28,8 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 
+#include "random/random_internal.h"
+
 /**
  * \section about_games
  *
@@ -57,7 +59,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         IGRAPH_ERROR("Invalid probability given", IGRAPH_EINVAL);
     }
 
-    if (p == 0.0 || no_of_nodes <= 1) {
+    if (p == 0.0 || no_of_nodes == 0) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
     } else if (p == 1.0) {
         IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
@@ -102,8 +104,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             }
         } else if (directed && !loops) {
             for (i = 0; i < vsize; i++) {
-                igraph_integer_t to = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
-                igraph_integer_t from = VECTOR(s)[i] - to * (no_of_nodes_real - 1);
+                igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
+                igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 if (from == to) {
                     to = no_of_nodes - 1;
                 }
@@ -159,7 +161,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
     }
 
-    if (m == 0.0 || no_of_nodes <= 1) {
+    if (m == 0.0 || no_of_nodes == 0) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
     } else {
 

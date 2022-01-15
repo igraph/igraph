@@ -179,7 +179,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match the number of edges (%ld).",
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match the number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {
@@ -446,6 +446,10 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
     igraph_integer_t i, j;
 
     igraph_dqueue_int_clear(q);
+
+    /* already_counted[i] is 0 iff vertex i was not reached so far, otherwise
+     * it is the index of the source vertex in vertex_neis that it was reached
+     * from, plus 1 */
     memset(already_counted, 0, no_of_nodes * sizeof(already_counted[0]));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
@@ -479,11 +483,12 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
 
         if (VECTOR(*nei_mask)[source] == 2)
             continue;
+
         VECTOR(*nei_mask)[source] = 2; /* mark neighbour as already processed */
 
         IGRAPH_CHECK(igraph_dqueue_int_push(q, source));
         IGRAPH_CHECK(igraph_dqueue_int_push(q, 0));
-        already_counted[source] = source + 1;
+        already_counted[source] = i + 1;
 
         while (!igraph_dqueue_int_empty(q)) {
             igraph_vector_int_t *act_neis;

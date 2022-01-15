@@ -10,6 +10,9 @@ if(IGRAPH_ENABLE_LTO)
   if(IGRAPH_ENABLE_LTO STREQUAL "AUTO")
     # autodetection
     set(IGRAPH_ENABLE_LTO ${IPO_SUPPORTED})
+    if(IPO_SUPPORTED)
+      set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
   elseif(IPO_SUPPORTED)
     # user wanted LTO and the compiler supports it
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)

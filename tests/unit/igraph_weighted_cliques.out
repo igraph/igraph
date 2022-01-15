@@ -134,3 +134,29 @@
  0 1 8 9 w=15.0
  1 2 3 9 w=15.0
 weighted clique number: 15.0
+15 unweighted cliques found between sizes 4 and 5
+ 0 1 6 7 w=4.0
+ 0 1 6 8 w=4.0
+ 0 1 7 8 w=4.0
+ 0 1 8 9 w=4.0
+ 0 6 7 8 w=4.0
+ 1 2 3 6 w=4.0
+ 1 2 3 7 w=4.0
+ 1 2 3 9 w=4.0
+ 1 2 6 7 w=4.0
+ 1 3 6 7 w=4.0
+ 1 4 6 7 w=4.0
+ 1 6 7 8 w=4.0
+ 2 3 6 7 w=4.0
+ 0 1 6 7 8 w=5.0
+ 1 2 3 6 7 w=5.0
+5 unweighted maximal cliques found between sizes 4 and 5
+ 0 1 8 9 w=4.0
+ 1 2 3 9 w=4.0
+ 1 4 6 7 w=4.0
+ 0 1 6 7 8 w=5.0
+ 1 2 3 6 7 w=5.0
+2 largest unweighted cliques found
+ 0 1 6 7 8 w=5.0
+ 1 2 3 6 7 w=5.0
+unweighted clique number: 5.0

@@ -346,7 +346,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         }
 
         /* aging */
-        for (k = 1; i - binwidth * k + 1 >= 1; k++) {
+        for (k = 1; binwidth * k <= i; k++) {
             igraph_integer_t shnode = i - binwidth * k;
             igraph_integer_t deg = VECTOR(degree)[shnode];
             igraph_integer_t age = (i - shnode) / binwidth;

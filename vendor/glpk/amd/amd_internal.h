@@ -6,21 +6,20 @@
 #define AMD_INTERNAL_H
 
 /* AMD will be exceedingly slow when running in debug mode. */
-#if 1
 #ifndef NDEBUG
 #define NDEBUG
 #endif
-#endif
 
 #include "amd.h"
-#define _GLPSTD_STDIO
-#include "glpenv.h"
+#include "env.h"
 
 #define Int int
 #define ID "%d"
 #define Int_MAX INT_MAX
 
-#ifndef SIZE_T_MAX
+#if 0 /* 15/II-2012 */
+/* now this macro is defined in glpenv.h; besides, the definiton below
+   depends on implementation, because size_t is an unsigned type */
 #define SIZE_T_MAX ((size_t)(-1))
 #endif
 
@@ -54,7 +53,7 @@
 #if 0 /* 24/V-2009 */
 #define amd_free xfree
 #else
-#define amd_free(ptr) { if ((ptr) != NULL) xfree(ptr); } 
+#define amd_free(ptr) { if ((ptr) != NULL) xfree(ptr); }
 #endif
 #define amd_printf xprintf
 

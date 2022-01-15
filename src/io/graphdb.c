@@ -24,8 +24,6 @@
 
 #include "igraph_constructors.h"
 
-#include "core/trie.h"
-
 static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
     int b1, b2;
     unsigned char c1, c2;

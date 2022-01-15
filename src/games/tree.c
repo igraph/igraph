@@ -35,7 +35,7 @@
 
 static igraph_error_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_int_t prufer;
-    long i;
+    igraph_integer_t i;
 
     if (directed) {
         IGRAPH_ERROR("The Prufer method for random tree generation does not support directed trees", IGRAPH_EINVAL);
@@ -153,6 +153,10 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
  *
  * This function samples uniformly from the set of labelled trees,
  * i.e. it generates each labelled tree with the same probability.
+ *
+ * </para><para>
+ * Note that for <code>n=0</code>, the null graph is returned,
+ * which is not considered to be a tree by \ref igraph_is_tree().
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of nodes in the tree.

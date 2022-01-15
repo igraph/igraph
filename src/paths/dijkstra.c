@@ -32,6 +32,7 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+#include "core/math.h"
 
 #include <string.h>   /* memset */
 
@@ -115,8 +116,8 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
-                      " of edges (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
@@ -727,6 +728,8 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     unsigned char *is_target;
     igraph_integer_t i, n, to_reach;
     igraph_bool_t free_vertices = 0;
+    int cmp_result;
+    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (!weights) {
         return igraph_get_all_shortest_paths(graph, vertices, edges, nrgeo, from, to, mode);
@@ -847,6 +850,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             igraph_real_t curdist = VECTOR(dists)[tto];
             igraph_vector_int_t *parent_vec, *parent_edge_vec;
 
+            cmp_result = igraph_cmp_epsilon(curdist, altdist, eps);
             if (curdist < 0) {
                 /* This is the first non-infinite distance */
                 VECTOR(dists)[tto] = altdist;
@@ -857,7 +861,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
 
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
-            } else if (altdist == curdist && VECTOR(*weights)[edge] > 0) {
+            } else if (cmp_result == 0 /* altdist == curdist */ && VECTOR(*weights)[edge] > 0) {
                 /* This is an alternative path with exactly the same length.
                      * Note that we consider this case only if the edge via which we
                      * reached the node has a nonzero weight; otherwise we could create
@@ -867,7 +871,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_int_push_back(parent_vec, minnei));
                 parent_edge_vec = (igraph_vector_int_t*)VECTOR(parents_edge)[tto];
                 IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
-            } else if (altdist < curdist) {
+            } else if (cmp_result > 0 /* altdist < curdist */) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
 

@@ -53,7 +53,7 @@
     </listitem>
     <listitem>
       <para>
-        <ulink url="https://www.gnu.org/software/glpk/">GLPK</ulink>
+        <ulink url="https://www.gnu.org/software/glpk/">GLPK</ulink> (version 4.57 or later)
       </para>
     </listitem>
     <listitem>
@@ -251,7 +251,7 @@ cmake --build . --target check --config Release
       <section id="igraph-Installation-msys2">
       <title>MSYS2</title>
       <para>
-        MSYS2 can be installed from www.msys2.org. After installing MSYS2,
+        MSYS2 can be installed from <ulink url="https://www.msys2.org/">msys2.org</ulink>. After installing MSYS2,
         ensure that it is up to date by opening a terminal and running
         <literal>pacman -Syuu</literal>.
       </para>
@@ -405,6 +405,16 @@ pacman -S \
           <literal>IGRAPH_ENABLE_TLS</literal>: whether to enable
           thread-local storage. Required when using igraph from multiple
           threads.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <literal>IGRAPH_WARNINGS_AS_ERRORS</literal>: whether to treat
+          compiler warnings as errors. We strive to eliminate all compiler
+          warnings during development so this switch is turned on by default.
+          If your compiler prints warnings for some parts of the code that we
+          did not anticipate, you can turn off this option to prevent the
+          warnings from stopping the compilation.
         </para>
       </listitem>
       <listitem>

@@ -75,7 +75,7 @@
  *        (not including that vertex).
  * \param all_reachable Pointer to a Boolean. If not \c NULL, it indicates if all
  *        vertices of the graph were reachable from each vertex in \p vids.
- *        If false, the graph is non-connected If true, and the graph is undirected,
+ *        If false, the graph is non-connected. If true, and the graph is undirected,
  *        or if the graph is directed and \p vids contains all vertices, then the
  *        graph is connected.
  * \param vids The vertices for which the closeness centrality will be computed.
@@ -401,7 +401,8 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
 
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
-            for (j = 0; j < igraph_vector_int_size(neis); j++) {
+            igraph_integer_t nei_count = igraph_vector_int_size(neis);
+            for (j = 0; j < nei_count; j++) {
                 igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;
@@ -512,7 +513,8 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
 
             /* check the neighbors */
             neis = igraph_adjlist_get(&allneis, act);
-            for (j = 0; j < igraph_vector_int_size(neis); j++) {
+            igraph_integer_t nei_count = igraph_vector_int_size(neis);
+            for (j = 0; j < nei_count; j++) {
                 igraph_integer_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;

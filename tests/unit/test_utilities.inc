@@ -14,6 +14,10 @@
 void print_real(FILE *f, igraph_real_t x, const char *format) {
     igraph_bool_t g8 = !strcmp(format, "%8g");
     if (igraph_finite(x)) {
+        if (x == 0 && signbit(x)) {
+            /* print negative zeros as positive zeros for sake of consistency */
+            x = +0.0;
+        }
         fprintf(f, format, x);
     } else if (igraph_is_nan(x)) {
         fprintf(f, g8 ? "     NaN" : "NaN");

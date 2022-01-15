@@ -135,7 +135,8 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t v = vert[i];
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, omode));
-        for (j = 0; j < igraph_vector_int_size(&neis); j++) {
+        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        for (j = 0; j < nei_count; j++) {
             igraph_integer_t u = VECTOR(neis)[j];
             if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
                 igraph_integer_t du = VECTOR(*cores)[u];

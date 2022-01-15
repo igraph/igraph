@@ -396,7 +396,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
         igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvect,
                                       mode));
-        for (i = 0; i < igraph_vector_int_size(&neis); i++) {
+        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        for (i = 0; i < nei_count; i++) {
             igraph_integer_t neighbor = VECTOR(neis)[i];
             if (added[neighbor] == 0) {
                 added[neighbor] = 1;

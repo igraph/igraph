@@ -120,7 +120,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V|+|E|), linear.
  *
  */
-igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -155,7 +155,8 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
         for (i = 0; i < no_of_nodes; i++) {
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = igraph_vector_int_size(&incident); j < k; j++) {
+            igraph_integer_t incident_count = igraph_vector_int_size(&incident);
+            for (j = 0, k = incident_count; j < k; j++) {
                 w = VECTOR(*weights)[ VECTOR(incident)[j] ];
                 s += w;
                 ent += (w * log(w));
@@ -174,7 +175,8 @@ igraph_error_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, v,
                                          /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = igraph_vector_int_size(&incident); j < k; j++) {
+            igraph_integer_t incident_count = igraph_vector_int_size(&incident);
+            for (j = 0, k = incident_count; j < k; j++) {
                 w = VECTOR(*weights)[ VECTOR(incident)[j] ];
                 s += w;
                 ent += (w * log(w));

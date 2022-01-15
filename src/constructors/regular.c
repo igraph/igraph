@@ -17,7 +17,6 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 #include "igraph_constructors.h"
@@ -211,8 +210,11 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_nodes * dims +
-                                       mutual * directed * no_of_nodes * dims));
+    if (mutual && directed) {
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_nodes * dims));
+    } else {
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_nodes * dims));
+    }
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
@@ -278,23 +280,30 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 /**
  * \ingroup generators
  * \function igraph_ring
- * \brief Creates a \em ring graph, a one dimensional lattice.
+ * \brief Creates a \em cycle graph or a \em path graph.
  *
- * An undirected (circular) ring on n vertices is commonly known in graph
- * theory as the cycle graph C_n.
+ * A circular ring on \c n vertices is commonly known in graph
+ * theory as the cycle graph, and often denoted by <code>C_n</code>.
+ * Removing a single edge from the cycle graph <code>C_n</code> results
+ * in the path graph <code>P_n</code>. This function can generate both.
+ *
+ * </para><para>
+ * This function is a convenience wrapper for the one-dimensional case of
+ * \ref igraph_lattice().
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param n The number of vertices in the ring.
- * \param directed Logical, whether to create a directed ring.
- * \param mutual Logical, whether to create mutual edges in a directed
- *        ring. It is ignored for undirected graphs.
- * \param circular Logical, if false, the ring will be open (this is
- *        not a real \em ring actually).
+ * \param n The number of vertices in the graph.
+ * \param directed Logical, whether to create a directed graph.
+ *        All edges will be oriented in the same direction along
+ *        the cycle or path.
+ * \param mutual Logical, whether to create mutual edges in directed
+ *        graphs. It is ignored for undirected graphs.
+ * \param circular Logical, whether to create a closed ring (a cycle)
+ *        or an open path.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
  *
- * Time complexity: O(|V|), the
- * number of vertices in the graph.
+ * Time complexity: O(|V|), the number of vertices in the graph.
  *
  * \sa \ref igraph_lattice() for generating more general lattices.
  *
@@ -306,16 +315,17 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
-        IGRAPH_ERROR("negative number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 1);
     VECTOR(v)[0] = n;
 
     IGRAPH_CHECK(igraph_lattice(graph, &v, 1, directed, mutual, circular));
-    igraph_vector_int_destroy(&v);
 
+    igraph_vector_int_destroy(&v);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -323,6 +333,16 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * \ingroup generators
  * \function igraph_tree
  * \brief Creates a tree in which almost all vertices have the same number of children.
+ *
+ * To obtain a completely symmetric tree with \c l layers, where each
+ * vertex has precisely \p children descendants, use
+ * <code>n = (children^(l+1) - 1) / (children - 1)</code>.
+ * Such trees are often called <code>k</code>-ary trees, where \c k refers
+ * to the number of children.
+ *
+ * </para><para>
+ * Note that for <code>n=0</code>, the null graph is returned,
+ * which is not considered to be a tree by \ref igraph_is_tree().
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.
@@ -361,12 +381,15 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
     igraph_integer_t idx = 0;
     igraph_integer_t to = 1;
 
-    if (n < 0 || children <= 0) {
-        IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
+    if (n < 0) {
+        IGRAPH_ERROR("Number of vertices cannot be negative.", IGRAPH_EINVAL);
+    }
+    if (children <= 0) {
+        IGRAPH_ERROR("Number of children must be positive.", IGRAPH_EINVAL);
     }
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
         type != IGRAPH_TREE_UNDIRECTED) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
@@ -394,6 +417,98 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_symmetric_tree
+ * \brief Creates a symmetric tree with the specified number of branches at each level.
+ *
+ * This function creates a tree in which all vertices at distance \c d from the
+ * root have \p branching_counts[d] children.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param branching_counts Vector detailing the number of branches at each level.
+ * \param type Constant, gives whether to create a directed tree, and
+ *        if this is the case, also its orientation. Possible values:
+ *        \clist
+ *        \cli IGRAPH_TREE_OUT
+ *          directed tree, the edges point
+ *          from the parents to their children,
+ *        \cli IGRAPH_TREE_IN
+ *          directed tree, the edges point from
+ *          the children to their parents.
+ *        \cli IGRAPH_TREE_UNDIRECTED
+ *          undirected tree.
+ *        \endclist
+ * \return Error code:
+ *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVAL: invalid number of children.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_tree() and \ref igraph_star() for creating regular tree
+ * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \ref igraph_tree_game() for uniform random sampling of trees.
+ *
+ * \example examples/simple/igraph_symmetric_tree.c
+ */
+
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branching_counts,
+                igraph_tree_mode_t type) {
+
+    igraph_vector_int_t edges;
+    igraph_integer_t j, k, temp, vertex_count, idx, parent, child, level_end;
+    igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
+
+    if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN && type != IGRAPH_TREE_UNDIRECTED) {
+        IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
+    }
+    if (!igraph_vector_int_empty(branching_counts) && igraph_vector_int_min(branching_counts) <= 0) {
+        IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
+    }
+
+    /* Compute the number of vertices in the tree.
+     * TODO: add integer overflow check. */
+    vertex_count = 1;
+    temp = 1;
+    for(j = 0; j < branching_counts_size; ++j) {
+        temp *= VECTOR(*branching_counts)[j];
+        vertex_count += temp;
+    }
+
+    /* Trees have precisely |E| = |V| - 1 edges. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (vertex_count - 1));
+
+    idx = 0;
+
+    /* Current parent and child vertex ids.
+     * parent -> child edges will be added. */
+    child = 1;
+    parent = 0;
+    for (k = 0; k < branching_counts_size; ++k) {
+        level_end = child; /* points to one past the last vertex of the current level of parents */
+        while(parent < level_end) {
+            for (j = 0; j < VECTOR(*branching_counts)[k]; j++) {
+                if (type == IGRAPH_TREE_IN) {
+                    VECTOR(edges)[idx++] = child++;
+                    VECTOR(edges)[idx++] = parent;
+                } else {
+                    VECTOR(edges)[idx++] = parent;
+                    VECTOR(edges)[idx++] = child++;
+                }
+            }
+            parent++;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, vertex_count, type != IGRAPH_TREE_UNDIRECTED));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 

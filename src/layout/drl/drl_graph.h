@@ -61,8 +61,7 @@ public:
     void init_parms ( const igraph_layout_drl_options_t *options );
     void read_parms ( char *parms_file );
     void read_real ( char *real_file );
-    int read_real ( const igraph_matrix_t *real_mat,
-                    const igraph_vector_bool_t *fixed);
+    int read_real ( const igraph_matrix_t *real_mat );
     void scan_int ( char *filename );
     void read_int ( char *file_name );
     void draw_graph ( int int_out, char *coord_file );

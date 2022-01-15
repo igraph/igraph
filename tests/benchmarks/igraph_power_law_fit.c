@@ -1,17 +1,17 @@
 #include <igraph.h>
+#include <plfit_sampling.h>
 
 #include "bench.h"
-#include "../../vendor/plfit/sampling.h"
 
 igraph_vector_t data;
 
-inline double rpareto(double xmin, double alpha) {
+double rpareto(double xmin, double alpha) {
     /* 1-u is used in the base here because we want to avoid the case of
      * sampling zero */
     return pow(1 - RNG_UNIF01(), -1.0 / alpha) * xmin;
 }
 
-inline double rzeta(long int xmin, double alpha) {
+double rzeta(long int xmin, double alpha) {
     double u, v, t;
     long int x;
     double alpha_minus_1 = alpha-1;

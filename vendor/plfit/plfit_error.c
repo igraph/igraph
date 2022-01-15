@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "error.h"
+#include "plfit_error.h"
 #include "platform.h"
 
 static char *plfit_i_error_strings[] = {
@@ -32,7 +32,7 @@ static char *plfit_i_error_strings[] = {
 };
 
 #ifndef USING_R
-static plfit_error_handler_t* plfit_error_handler = plfit_error_handler_abort;
+static plfit_error_handler_t* plfit_error_handler = plfit_error_handler_printignore;
 #else
 /* This is overwritten, anyway */
 static plfit_error_handler_t* plfit_error_handler = plfit_error_handler_ignore;
@@ -52,15 +52,6 @@ void plfit_error(const char *reason, const char *file, int line,
         int plfit_errno) {
     plfit_error_handler(reason, file, line, plfit_errno);
 }
-
-#ifndef USING_R
-void plfit_error_handler_abort(const char *reason, const char *file, int line,
-        int plfit_errno) {
-    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
-            plfit_strerror(plfit_errno));
-    abort();
-}
-#endif
 
 #ifndef USING_R
 void plfit_error_handler_printignore(const char *reason, const char *file, int line,

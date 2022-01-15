@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_connect_neighborhood
- * \brief Connects every vertex to its neighborhood
+ * \brief Graph power: connect each vertex to its neighborhood.
  *
  * This function adds new edges to the input graph. Each vertex is connected
  * to all vertices reachable by at most \p order steps from it

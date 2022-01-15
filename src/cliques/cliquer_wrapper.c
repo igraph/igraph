@@ -11,29 +11,6 @@
 
 #include <limits.h>
 
-/* Call this to allow for interruption in Cliquer callback functions */
-#define CLIQUER_ALLOW_INTERRUPTION() \
-    { \
-        if (igraph_i_interruption_handler) \
-            if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) { \
-                cliquer_interrupted = 1; \
-                return FALSE; \
-            } \
-    }
-
-/* Interruptable Cliquer functions must be wrapped in CLIQUER_INTERRUPTABLE when called */
-#define CLIQUER_INTERRUPTABLE(x) \
-    { \
-        cliquer_interrupted = 0; \
-        x; \
-        if (cliquer_interrupted) return IGRAPH_INTERRUPTED; \
-    }
-
-
-/* Nonzero value signals interuption from Cliquer callback function */
-static IGRAPH_THREAD_LOCAL int cliquer_interrupted;
-
-
 /* For use with IGRAPH_FINALLY */
 static void free_clique_list(igraph_vector_ptr_t *vp) {
     igraph_integer_t i, len;
@@ -107,7 +84,7 @@ static igraph_error_t set_weights(const igraph_vector_t *vertex_weights, graph_t
 
 /* Find all cliques. */
 
-static boolean collect_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
+static igraph_error_t collect_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_ptr_t *list;
     igraph_vector_int_t *clique;
     int i;
@@ -115,20 +92,23 @@ static boolean collect_cliques_callback(set_t s, graph_t *g, clique_options *opt
 
     IGRAPH_UNUSED(g);
 
-    CLIQUER_ALLOW_INTERRUPTION();
+    IGRAPH_ALLOW_INTERRUPTION();
 
     list = (igraph_vector_ptr_t *) opt->user_data;
     clique = (igraph_vector_int_t *) malloc(sizeof(igraph_vector_int_t));
-    igraph_vector_int_init(clique, set_size(s));
+    if (clique == 0) {
+        IGRAPH_ERROR("storing cliques failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_CHECK(igraph_vector_int_init(clique, set_size(s)));
 
     i = -1; j = 0;
     while ((i = set_return_next(s, i)) >= 0) {
         VECTOR(*clique)[j++] = i;
     }
 
-    igraph_vector_ptr_push_back(list, clique);
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(list, clique));
 
-    return TRUE;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
@@ -164,7 +144,7 @@ igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_ptr
     igraph_cliquer_opt.user_function = &collect_cliques_callback;
 
     IGRAPH_FINALLY(free_clique_list, res);
-    CLIQUER_INTERRUPTABLE(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt));
+    IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
     IGRAPH_FINALLY_CLEAN(1);
 
     graph_free(g);
@@ -176,17 +156,17 @@ igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_ptr
 
 /* Count cliques of each size. */
 
-static boolean count_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
+static igraph_error_t count_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_t *hist;
 
     IGRAPH_UNUSED(g);
 
-    CLIQUER_ALLOW_INTERRUPTION();
+    IGRAPH_ALLOW_INTERRUPTION();
 
     hist = (igraph_vector_t *) opt->user_data;
     VECTOR(*hist)[set_size(s) - 1] += 1;
 
-    return TRUE;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t *hist,
@@ -225,7 +205,7 @@ igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t
     igraph_cliquer_opt.user_data = hist;
     igraph_cliquer_opt.user_function = &count_cliques_callback;
 
-    CLIQUER_INTERRUPTABLE(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt));
+    IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
 
     for (i = max_size; i > 0; --i)
         if (VECTOR(*hist)[i - 1] > 0) {
@@ -248,7 +228,7 @@ struct callback_data {
     void *arg;
 };
 
-static boolean callback_callback(set_t s, graph_t *g, clique_options *opt) {
+static igraph_error_t callback_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_int_t *clique;
     struct callback_data *cd;
     int i;
@@ -256,12 +236,15 @@ static boolean callback_callback(set_t s, graph_t *g, clique_options *opt) {
 
     IGRAPH_UNUSED(g);
 
-    CLIQUER_ALLOW_INTERRUPTION();
+    IGRAPH_ALLOW_INTERRUPTION();
 
     cd = (struct callback_data *) opt->user_data;
 
     clique = (igraph_vector_int_t *) malloc(sizeof(igraph_vector_int_t));
-    igraph_vector_int_init(clique, set_size(s));
+    if (clique == 0) {
+        IGRAPH_ERROR("storing cliques failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_CHECK(igraph_vector_int_init(clique, set_size(s)));
 
     i = -1; j = 0;
     while ((i = set_return_next(s, i)) >= 0) {
@@ -305,7 +288,7 @@ igraph_error_t igraph_i_cliquer_callback(const igraph_t *graph,
     igraph_cliquer_opt.user_data = &cd;
     igraph_cliquer_opt.user_function = &callback_callback;
 
-    CLIQUER_INTERRUPTABLE(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt));
+    IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
 
     graph_free(g);
     IGRAPH_FINALLY_CLEAN(1);
@@ -358,7 +341,7 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
     igraph_cliquer_opt.user_function = &collect_cliques_callback;
 
     IGRAPH_FINALLY(free_clique_list, res);
-    CLIQUER_INTERRUPTABLE(clique_find_all(g, (int) min_weight, (int) max_weight, maximal, &igraph_cliquer_opt));
+    IGRAPH_CHECK(clique_find_all(g, (int) min_weight, (int) max_weight, maximal, &igraph_cliquer_opt, NULL));
     IGRAPH_FINALLY_CLEAN(1);
 
     graph_free(g);
@@ -390,7 +373,7 @@ igraph_error_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
     igraph_cliquer_opt.user_function = &collect_cliques_callback;
 
     IGRAPH_FINALLY(free_clique_list, res);
-    CLIQUER_INTERRUPTABLE(clique_find_all(g, 0, 0, FALSE, &igraph_cliquer_opt));
+    IGRAPH_CHECK(clique_find_all(g, 0, 0, FALSE, &igraph_cliquer_opt, NULL));
     IGRAPH_FINALLY_CLEAN(1);
 
     graph_free(g);
@@ -402,13 +385,21 @@ igraph_error_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
 
 /* Find weight of largest weight clique. */
 
+static igraph_error_t check_interruption_callback(set_t s, graph_t *g, clique_options *opt) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    return IGRAPH_SUCCESS;
+}
+
 igraph_error_t igraph_i_weighted_clique_number(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_real_t *res) {
     graph_t *g;
     igraph_integer_t vcount = igraph_vcount(graph);
+    int res_int;
 
     if (vcount == 0) {
-        *res = 0;
+        if (res) {
+            *res = 0;
+        }
         return IGRAPH_SUCCESS;
     }
 
@@ -417,13 +408,16 @@ igraph_error_t igraph_i_weighted_clique_number(const igraph_t *graph,
 
     IGRAPH_CHECK(set_weights(vertex_weights, g));
 
-    igraph_cliquer_opt.user_function = NULL;
+    igraph_cliquer_opt.user_function = check_interruption_callback;
 
-    /* we are not using a callback function, thus this is not interruptable */
-    *res = clique_max_weight(g, &igraph_cliquer_opt);
+    IGRAPH_CHECK(clique_max_weight(g, &igraph_cliquer_opt, &res_int));
 
     graph_free(g);
     IGRAPH_FINALLY_CLEAN(1);
+
+    if (res) {
+        *res = res_int;
+    }
 
     return IGRAPH_SUCCESS;
 }

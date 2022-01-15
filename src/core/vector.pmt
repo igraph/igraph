@@ -444,7 +444,8 @@ igraph_error_t FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, igrap
     BASE *tmp;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    if (size <= FUNCTION(igraph_vector, size)(v)) {
+
+    if (size <= actual_size) {
         return IGRAPH_SUCCESS;
     }
 
@@ -2357,7 +2358,7 @@ igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *
 igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     igraph_integer_t n = FUNCTION(igraph_vector, size)(from);
-    FUNCTION(igraph_vector, resize)(to, n);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, n));
     memcpy(to->stor_begin, from->stor_begin, sizeof(BASE)*n);
     return IGRAPH_SUCCESS;
 }

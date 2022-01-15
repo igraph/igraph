@@ -26,18 +26,18 @@
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 
-static igraph_error_t igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix,
+static igraph_error_t igraph_i_adjacency_directed(const igraph_matrix_t *adjmatrix,
                                        igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_max(igraph_matrix_t *adjmatrix,
+static igraph_error_t igraph_i_adjacency_max(const igraph_matrix_t *adjmatrix,
                                   igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix,
+static igraph_error_t igraph_i_adjacency_upper(const igraph_matrix_t *adjmatrix,
                                     igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix,
+static igraph_error_t igraph_i_adjacency_lower(const igraph_matrix_t *adjmatrix,
                                     igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_min(igraph_matrix_t *adjmatrix,
+static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix,
                                   igraph_vector_int_t *edges);
 
-static igraph_error_t igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_directed(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j, k;
@@ -55,7 +55,7 @@ static igraph_error_t igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, ig
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_max(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j, k;
@@ -77,7 +77,7 @@ static igraph_error_t igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, igraph_
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_upper(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j, k;
@@ -94,7 +94,7 @@ static igraph_error_t igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, igrap
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_lower(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j, k;
@@ -111,7 +111,7 @@ static igraph_error_t igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, igrap
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j, k;
@@ -192,7 +192,7 @@ static igraph_error_t igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_
  *
  * \example examples/simple/igraph_adjacency.c
  */
-igraph_error_t igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
+igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
                      igraph_adjacency_t mode) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
@@ -501,7 +501,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *
  * \example examples/simple/igraph_weighted_adjacency.c
  */
-igraph_error_t igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
+igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
                               igraph_adjacency_t mode, const char* attr,
                               igraph_bool_t loops) {
 

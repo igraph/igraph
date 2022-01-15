@@ -59,8 +59,7 @@ public:
     // Methods
     void init_parms ( int rand_seed, float edge_cut, float real_parm );
     void init_parms ( const igraph_layout_drl_options_t *options );
-    int read_real ( const igraph_matrix_t *real_mat,
-                    const igraph_vector_bool_t *fixed);
+    int read_real ( const igraph_matrix_t *real_mat );
     int draw_graph (igraph_matrix_t *res);
     float get_tot_energy ( );
 
