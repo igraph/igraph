@@ -219,7 +219,6 @@ add_legacy_tests(
 # structural_properties.at
 add_examples(
   FOLDER examples/simple NAMES
-  assortativity
   bellman_ford
   dijkstra
   igraph_average_path_length
@@ -254,6 +253,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
+  assortativity
   efficiency
   global_transitivity
   hub_and_authority
