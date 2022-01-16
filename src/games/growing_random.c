@@ -72,7 +72,7 @@ int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
         IGRAPH_ERROR("Invalid number of edges per step (m)", IGRAPH_EINVAL);
     }
 
-    no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
+    no_of_edges = no_of_nodes > 0 ? (no_of_nodes - 1) * no_of_neighbors : 0;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 

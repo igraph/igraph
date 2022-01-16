@@ -112,7 +112,7 @@ int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t 
     igraph_vector_t edges;
     long int i, j, n, no_of_nodes = igraph_vcount(graph);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes - 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
     if (weights) {
         /* Find a maximum weight spanning tree. igraph has a routine for minimum
          * spanning trees, so we negate the weights */
