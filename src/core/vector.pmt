@@ -123,9 +123,7 @@
 
 int FUNCTION(igraph_vector, init)      (TYPE(igraph_vector)* v, int long size) {
     long int alloc_size = size > 0 ? size : 1;
-    if (size < 0) {
-        size = 0;
-    }
+    IGRAPH_ASSERT(size >= 0);
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
