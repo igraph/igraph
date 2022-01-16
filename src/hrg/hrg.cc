@@ -575,7 +575,7 @@ int igraph_hrg_dendrogram(igraph_t *graph,
 
     int orig_nodes = igraph_hrg_size(hrg);
     int no_of_nodes = orig_nodes * 2 - 1;
-    int no_of_edges = no_of_nodes - 1;
+    int no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     igraph_vector_t edges;
     int i, idx = 0;
     igraph_vector_ptr_t vattrs;
@@ -917,7 +917,7 @@ int igraph_hrg_create(igraph_hrg_t *hrg,
                       const igraph_vector_t *prob) {
 
     int no_of_nodes = igraph_vcount(graph);
-    int no_of_internal = (no_of_nodes - 1) / 2;
+    int no_of_internal = no_of_nodes > 0 ? (no_of_nodes - 1) / 2 : 0;
     igraph_vector_t deg, idx;
     int root = 0;
     int d0 = 0, d1 = 0, d2 = 0;
