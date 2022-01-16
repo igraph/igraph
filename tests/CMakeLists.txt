@@ -253,6 +253,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_feedback_arc_set_undirected
   igraph_rewire # Uses internal igraph_i_rewire
 )
 
