@@ -71,6 +71,22 @@ int main() {
     }
     igraph_destroy(&g);
 
+    /* Null graph */
+    igraph_empty(&g, 0, IGRAPH_DIRECTED);
+    igraph_feedback_arc_set(&g, &result, NULL, IGRAPH_FAS_APPROX_EADES);
+    if (igraph_vector_size(&result) != 0) {
+        return 4;
+    }
+    igraph_destroy(&g);
+
+    /* Singleton graph */
+    igraph_empty(&g, 1, IGRAPH_DIRECTED);
+    igraph_feedback_arc_set(&g, &result, NULL, IGRAPH_FAS_APPROX_EADES);
+    if (igraph_vector_size(&result) != 0) {
+        return 5;
+    }
+    igraph_destroy(&g);
+
     igraph_vector_destroy(&result);
 
     return 0;
