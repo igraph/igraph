@@ -544,6 +544,7 @@
    to crashes.
  - External PLFIT libraries and their headers are now detected at their standard
    installation location.
+ - `igraph_vector_init()` no longer accepts negative vector sizes.
 
 ### Other
 

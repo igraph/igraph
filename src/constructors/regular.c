@@ -392,7 +392,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
         IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, n > 0 ? 2 * (n - 1) : 0);
 
     i = 0;
     if (type == IGRAPH_TREE_OUT) {

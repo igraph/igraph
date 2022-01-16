@@ -132,9 +132,7 @@
 
 igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_integer_t size) {
     igraph_integer_t alloc_size = size > 0 ? size : 1;
-    if (size < 0) {
-        size = 0;
-    }
+    IGRAPH_ASSERT(size >= 0);
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == 0) {
         IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
