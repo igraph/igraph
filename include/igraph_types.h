@@ -67,8 +67,10 @@ typedef int    igraph_bool_t;
 /* maximum allowed value for igraph_integer_t */
 #if IGRAPH_INTEGER_SIZE == 64
 #  define IGRAPH_INTEGER_MAX INT64_MAX
+#  define IGRAPH_INTEGER_MIN INT64_MIN
 #else
 #  define IGRAPH_INTEGER_MAX INT32_MAX
+#  define IGRAPH_INTEGER_MIN INT32_MIN
 #endif
 
 /* Replacements for printf that print doubles in the same way on all platforms
