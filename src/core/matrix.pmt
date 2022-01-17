@@ -25,6 +25,8 @@
 #include "igraph_random.h"
 #include "igraph_error.h"
 
+#include "math/safe_intop.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -65,7 +67,9 @@
 
 igraph_error_t FUNCTION(igraph_matrix, init)(
         TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, nrow * ncol));
+    igraph_integer_t size;
+    IGRAPH_SAFE_MULT(nrow, ncol, size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, size));
     m->nrow = nrow;
     m->ncol = ncol;
     return IGRAPH_SUCCESS;
@@ -75,7 +79,10 @@ const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(
         const TYPE(igraph_matrix) *m, const BASE *data,
         igraph_integer_t nrow, igraph_integer_t ncol) {
     TYPE(igraph_matrix) *m2 = (TYPE(igraph_matrix)*)m;
-    FUNCTION(igraph_vector, view)(&m2->data, data, nrow * ncol);
+    /* No oveflow checking, as this function does not return igraph_error_t.
+     * It is the caller's resposibility to ensure that the size of 'data'
+     * matches nrow*ncol, which also implies that nrow*ncol does not overflow. */
+    FUNCTION(igraph_vector, view)(&m2->data, data, ncol * nrow);
     m2->nrow = nrow;
     m2->ncol = ncol;
     return m;
@@ -149,7 +156,9 @@ igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m)
  */
 
 igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol));
+    igraph_integer_t size;
+    IGRAPH_SAFE_MULT(nrow, ncol, size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, size));
     m->nrow = nrow;
     m->ncol = ncol;
     return IGRAPH_SUCCESS;
@@ -309,13 +318,15 @@ igraph_error_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_
  */
 
 igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_integer_t n) {
-    igraph_integer_t i;
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n)));
-    for (i = m->ncol - 1; i >= 0; i--) {
+    igraph_integer_t new_nrow, new_size;
+    IGRAPH_SAFE_ADD(m->nrow, n, new_nrow);
+    IGRAPH_SAFE_MULT(m->ncol, new_nrow, new_size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, new_size));
+    for (igraph_integer_t i = m->ncol - 1; i >= 0; i--) {
         FUNCTION(igraph_vector, move_interval2)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
-                                                (m->nrow + n)*i);
+                                                new_nrow * i);
     }
-    m->nrow += n;
+    m->nrow = new_nrow;
     return IGRAPH_SUCCESS;
 }
 
