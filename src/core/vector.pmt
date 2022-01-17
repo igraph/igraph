@@ -544,7 +544,11 @@ igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE 
 
     /* full, allocate more storage */
     if (v->stor_end == v->end) {
-        igraph_integer_t new_size = FUNCTION(igraph_vector, size)(v) * 2;
+        igraph_integer_t old_size = FUNCTION(igraph_vector, size)(v);
+        igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to vector, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
         if (new_size == 0) {
             new_size = 1;
         }
