@@ -429,7 +429,8 @@ typedef enum {
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
-    IGRAPH_STOP              = 60  /* undocumented, used internally */
+    IGRAPH_STOP              = 60,
+    IGRAPH_ERANGE            = 61
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in core/error.c

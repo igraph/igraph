@@ -73,6 +73,16 @@ typedef int    igraph_bool_t;
 #  define IGRAPH_INTEGER_MIN INT32_MIN
 #endif
 
+/* Maximum vertex count for igraph_t
+ * The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
+ * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1 */
+#define IGRAPH_VCOUNT_MAX (IGRAPH_INTEGER_MAX-1)
+
+/* Maximum edge count for igraph_t
+ * The endpoints of edges are often stored in a vector twice the length
+ * of the edge count, thus this cannot be larger than IGRAPH_INTEGER_MAX/2 */
+#define IGRAPH_ECOUNT_MAX (IGRAPH_INTEGER_MAX/2)
+
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */
 IGRAPH_EXPORT int igraph_real_printf(igraph_real_t val);
