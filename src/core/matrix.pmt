@@ -68,6 +68,7 @@
 igraph_error_t FUNCTION(igraph_matrix, init)(
         TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     igraph_integer_t size;
+    IGRAPH_ASSERT(nrow >= 0 && ncol >= 0);
     IGRAPH_SAFE_MULT(nrow, ncol, &size);
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, size));
     m->nrow = nrow;
@@ -157,6 +158,7 @@ igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m)
 
 igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     igraph_integer_t size;
+    IGRAPH_ASSERT(nrow >= 0 && ncol >= 0);
     IGRAPH_SAFE_MULT(nrow, ncol, &size);
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, size));
     m->nrow = nrow;
