@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \ingroup generators
  * \function igraph_full
@@ -64,16 +66,20 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
                 igraph_bool_t loops) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t no_of_edges2;
     igraph_integer_t i, j;
 
     if (n < 0) {
-        IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (directed && loops) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * n));
+        /* ecount = n * n */
+        IGRAPH_SAFE_MULT(n, n, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -81,7 +87,10 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
             }
         }
     } else if (directed && !loops) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * (n - 1)));
+        /* ecount = n * (n - 1) */
+        IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = 0; j < i; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -93,7 +102,10 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
             }
         }
     } else if (!directed && loops) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * (n + 1) / 2));
+        /* ecount = n * (n + 1) / 2 */
+        IGRAPH_SAFE_ADD(n, 1, &no_of_edges2);
+        IGRAPH_SAFE_MULT(n, no_of_edges2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = i; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -101,7 +113,9 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * (n - 1) / 2));
+        /* ecount = n * (n - 1) / 2 */
+        IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = i + 1; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */

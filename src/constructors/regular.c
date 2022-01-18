@@ -587,15 +587,22 @@ igraph_error_t igraph_extended_chordal_ring(
     igraph_integer_t i, j, mpos = 0, epos = 0;
 
     if (nodes < 3) {
-        IGRAPH_ERROR("An extended chordal ring has at least 3 nodes", IGRAPH_EINVAL);
+        IGRAPH_ERROR("An extended chordal ring has at least 3 nodes.", IGRAPH_EINVAL);
     }
 
     if (nodes % period != 0) {
-        IGRAPH_ERROR("The period (number of columns in W) should divide the "
-                     "number of nodes", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The period (number of columns in W) should divide the number of nodes.",
+                     IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (nodes + nodes * nrow));
+    {
+        /* ecount = nodes + nodes * nrow */
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(nodes, nrow, &no_of_edges2);
+        IGRAPH_SAFE_ADD(no_of_edges2, nodes, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
 
     for (i = 0; i < nodes - 1; i++) {
         VECTOR(edges)[epos++] = i;
