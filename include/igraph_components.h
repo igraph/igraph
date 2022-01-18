@@ -37,7 +37,11 @@ __BEGIN_DECLS
 /* Components                                         */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
+/* Deprecated alias to igraph_connected_components; will be removed in 0.11 */
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
+                                  igraph_vector_int_t *csize, igraph_integer_t *no,
+                                  igraph_connectedness_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_connected_components(const igraph_t *graph, igraph_vector_int_t *membership,
                                   igraph_vector_int_t *csize, igraph_integer_t *no,
                                   igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,

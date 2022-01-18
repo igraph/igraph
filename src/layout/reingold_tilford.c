@@ -537,8 +537,10 @@ igraph_error_t igraph_i_layout_reingold_tilford_select_roots(
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, no_of_nodes);
-    IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ NULL,
-                                 &no_comps, mode == IGRAPH_ALL ? IGRAPH_WEAK : IGRAPH_STRONG));
+    IGRAPH_CHECK(igraph_connected_components(
+        graph, &membership, /*csize=*/ NULL,
+        &no_comps, mode == IGRAPH_ALL ? IGRAPH_WEAK : IGRAPH_STRONG
+    ));
 
     IGRAPH_CHECK(igraph_vector_int_resize(roots, no_comps));
     igraph_vector_int_fill(roots, -1); /* -1 signifies a not-yet-determined root for a component */

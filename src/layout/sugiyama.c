@@ -370,8 +370,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     }
 
     /* 2. Find the connected components. */
-    IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
-                                 IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, &membership, 0, &no_of_components, IGRAPH_WEAK));
 
     /* 3. For each component... */
     dx = 0;

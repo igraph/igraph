@@ -1416,9 +1416,10 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* -------------------------------------------------------------------- */
     /* We shrink it to its strongly connected components */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&NtoL, 0);
-    IGRAPH_CHECK(igraph_clusters(&residual, /*membership=*/ &NtoL,
-                                 /*csize=*/ 0, /*no=*/ &proj_nodes,
-                                 IGRAPH_STRONG));
+    IGRAPH_CHECK(igraph_connected_components(
+        &residual, /*membership=*/ &NtoL, /*csize=*/ 0,
+        /*no=*/ &proj_nodes, IGRAPH_STRONG
+    ));
     IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL,
                                           /*vertex_comb=*/ 0));
     IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ 1, /*loops=*/ 1,

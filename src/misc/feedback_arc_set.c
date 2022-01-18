@@ -459,8 +459,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_vector_int_clear(result);
 
     /* Decompose the graph into connected components */
-    IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
-                                 IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, &membership, 0, &no_of_components, IGRAPH_WEAK));
 
     /* Construct vertex and edge lists for each of the components */
     IGRAPH_CHECK(igraph_vector_ptr_init(&vertices_by_components, no_of_components));

@@ -961,7 +961,7 @@ igraph_laplacian:
 # Components
 #######################################
 
-igraph_clusters:
+igraph_connected_components:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR_INT csize,
         OUT INTEGER no, CONNECTEDNESS mode=WEAK

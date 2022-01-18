@@ -91,7 +91,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
             IGRAPH_FINALLY(igraph_destroy, &copy);
 
             IGRAPH_CHECK(igraph_delete_edges(&copy, igraph_ess_1(min_weight_edge_index)));
-            IGRAPH_CHECK(igraph_clusters(&copy, &membership, 0, &no_of_clusters, IGRAPH_WEAK));
+            IGRAPH_CHECK(igraph_connected_components(&copy, &membership, 0, &no_of_clusters, IGRAPH_WEAK));
 
             if (no_of_clusters != 2) {
                 printf(

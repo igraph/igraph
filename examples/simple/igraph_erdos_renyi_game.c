@@ -17,7 +17,7 @@ int main() {
     /* Compute the fraction of vertices contained within the largest connected component */
 
     igraph_vector_int_init(&component_sizes, 0);
-    igraph_clusters(&graph, NULL, &component_sizes, NULL, IGRAPH_STRONG);
+    igraph_connected_components(&graph, NULL, &component_sizes, NULL, IGRAPH_STRONG);
 
     printf("Fraction of vertices in giant component: %g\n", (double) igraph_vector_int_max(&component_sizes) / igraph_vcount(&graph));
 
