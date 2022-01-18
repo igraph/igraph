@@ -183,6 +183,9 @@
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
+ - `igraph_get_adjacency_sparse()` now returns the sparse adjacency matrix in
+   an `igraph_sparsemat_t` structure.
+
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
@@ -448,6 +451,10 @@
  - `igraph_vector_order()` was removed; use `igraph_vector_int_pair_order()` instead.
    (The original function worked for vectors containing integers only).
 
+ - `igraph_vector_qsort_ind()` and its variants now take an `igraph_order_t` enum
+   instead of a boolean to denote whether the order should be ascending or
+   descending.
+
  - The `add_edges()` function in the attribute handler now takes an
    `igraph_vector_int_t` for its `edges` parameter instead of an
    `igraph_vector_t`. The `add_vertices()` function now takes an
@@ -500,7 +507,8 @@
 
  - Every `igraph_spmatrix_*()` function and struct now uses `igraph_integer_t`
    instead of `long int` for the numbers of rows and columns, and row and column
-   indexes.
+   indexes. Note that `igraph_spmatrix_t` itself has been deprecated in favour
+   of `igraph_sparsemat_t`.
 
 ### Added
 
@@ -528,6 +536,14 @@
    errors and other error conditions originating from the underlying `libxml2`
    library.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+
+### Deprecated
+
+ - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
+   the old name is deprecated and will be removed in 0.11.
+
+ - `igraph_spmatrix_t` and its related functions are deprecated in favour of
+   `igraph_sparsemat_t`. These will be removed in 0.11.
 
 ## [Unreleased 0.9.7]
 

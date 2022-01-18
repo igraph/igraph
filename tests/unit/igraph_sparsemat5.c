@@ -238,7 +238,7 @@ int main() {
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
-    igraph_get_sparsemat(&g3, &A);
+    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&g3);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
@@ -306,7 +306,7 @@ int main() {
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
-    igraph_get_sparsemat(&g3, &A);
+    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&g3);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
@@ -344,7 +344,7 @@ int main() {
                  6, 1, 6, 4, 7, 9, 8, 5, 8, 7, 9, 8, 10, 0,
                  -1);
 
-    igraph_get_sparsemat(&g1, &A);
+    igraph_get_adjacency_sparse(&g1, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&g1);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);

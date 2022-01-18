@@ -39,7 +39,7 @@ int main() {
     /* Convert a ring graph to a matrix, print it, compress, print again */
 #define VC 10
     igraph_ring(&G, VC, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_get_sparsemat(&G, &A);
+    igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
 
     igraph_sparsemat_compress(&A, &B);
@@ -101,7 +101,7 @@ int main() {
 
     /* Transpose matrices */
     igraph_tree(&G, 10, /*children=*/ 2, IGRAPH_TREE_OUT);
-    igraph_get_sparsemat(&G, &A);
+    igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_print(&B, stdout);
@@ -153,8 +153,8 @@ int main() {
 
     igraph_star(&G, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
     igraph_ring(&H, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_get_sparsemat(&G, &A);
-    igraph_get_sparsemat(&H, &B);
+    igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
+    igraph_get_adjacency_sparse(&H, &B, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
     igraph_destroy(&H);
     igraph_sparsemat_compress(&A, &C);
