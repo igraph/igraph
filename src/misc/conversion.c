@@ -71,7 +71,6 @@ igraph_error_t igraph_get_adjacency(
     const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type
 ) {
 
-    igraph_eit_t edgeit;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -800,15 +799,6 @@ igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
 /**
  * \function igraph_get_stochastic_sparsemat
  * \brief Stochastic adjacency matrix of a graph (deprecated alias)
- *
- * Deprecated alias to \ref igraph_get_stochastic().
- *
- * \param graph The input graph.
- * \param sparsemat Pointer to an uninitialized sparse matrix, the
- *    result is stored here.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
- * \return Error code.
  *
  * \deprecated-by igraph_get_stochastic_sparse 0.10.0
  */
