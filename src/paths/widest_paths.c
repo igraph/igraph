@@ -154,7 +154,9 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
     }
 
     if (igraph_vector_is_any_nan(weights)) {
@@ -475,8 +477,8 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
-                      " of edges (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
@@ -637,8 +639,8 @@ igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
-                      " of edges (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
