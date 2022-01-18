@@ -482,7 +482,7 @@
 
  - Functions that used an `igraph_vector_t` to represent cluster size
    and cluster membership now use an `igraph_vector_int_t` instead. These are:
-   - `igraph_clusters()`
+   - `igraph_connected_components()` (used to be `igraph_clusters()` in 0.9 and before)
    - `igraph_community_eb_get_merges()`
    - `igraph_community_edge_betweenness()`
    - `igraph_community_fastgreedy()`
@@ -541,6 +541,9 @@
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
 
 ### Deprecated
+
+ - `igraph_clusters()` has been renamed to `igraph_connected_components()`; the
+   old name is deprecated and will be removed in 0.11.
 
  - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
    the old name is deprecated and will be removed in 0.11.
