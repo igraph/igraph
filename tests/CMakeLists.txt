@@ -458,6 +458,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_almost_equals
+  overflow
 )
 
 # operators.at
