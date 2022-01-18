@@ -68,7 +68,7 @@
 igraph_error_t FUNCTION(igraph_matrix, init)(
         TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     igraph_integer_t size;
-    IGRAPH_SAFE_MULT(nrow, ncol, size);
+    IGRAPH_SAFE_MULT(nrow, ncol, &size);
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, size));
     m->nrow = nrow;
     m->ncol = ncol;
@@ -157,7 +157,7 @@ igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m)
 
 igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
     igraph_integer_t size;
-    IGRAPH_SAFE_MULT(nrow, ncol, size);
+    IGRAPH_SAFE_MULT(nrow, ncol, &size);
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, size));
     m->nrow = nrow;
     m->ncol = ncol;
@@ -319,8 +319,8 @@ igraph_error_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_
 
 igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_integer_t n) {
     igraph_integer_t new_nrow, new_size;
-    IGRAPH_SAFE_ADD(m->nrow, n, new_nrow);
-    IGRAPH_SAFE_MULT(m->ncol, new_nrow, new_size);
+    IGRAPH_SAFE_ADD(m->nrow, n, &new_nrow);
+    IGRAPH_SAFE_MULT(m->ncol, new_nrow, &new_size);
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, new_size));
     for (igraph_integer_t i = m->ncol - 1; i >= 0; i--) {
         FUNCTION(igraph_vector, move_interval2)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),

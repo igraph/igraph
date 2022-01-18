@@ -13,19 +13,19 @@
 
 #define IGRAPH_SAFE_ADD(ia, ib, res) \
     do { \
-        igraph_integer_t a = ia, b = ib; \
+        igraph_integer_t a = (ia), b = (ib); \
         igraph_integer_t sum; \
         if (((b > 0) && (a > (IGRAPH_INTEGER_MAX - b))) || \
             ((b < 0) && (a < (IGRAPH_INTEGER_MIN - b)))) { \
             IGRAPH_ERRORF("Overflow when adding %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, a, b); \
         } \
         sum = a+b; \
-        res = sum; \
-    } while (0);
+        *(res) = sum; \
+    } while (0)
 
 #define IGRAPH_SAFE_MULT(ia, ib, res) \
     do { \
-        igraph_integer_t a = ia, b = ib; \
+        igraph_integer_t a = (ia), b = (ib); \
         igraph_integer_t prod; \
         int err=0; \
         if (a > 0) {  /* a is positive */ \
@@ -53,7 +53,7 @@
             IGRAPH_ERRORF("Overflow when multiplying %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, a, b); \
         } \
         prod = a*b; \
-        res = prod; \
+        *(res) = prod; \
     } while (0)
 
 #endif
