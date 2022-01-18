@@ -505,7 +505,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     /* Trees have precisely |E| = |V| - 1 edges. */
     {
         igraph_integer_t no_of_edges2;
-        IGRAPH_SAFE_MULT(no_of_nodes, 2, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_nodes - 1, 2, &no_of_edges2);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
     }
 
