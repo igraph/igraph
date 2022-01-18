@@ -27,6 +27,7 @@
 
 #include "graph/attributes.h"
 #include "graph/neighbors.h"
+#include "math/safe_intop.h"
 
 /* Internal functions */
 
@@ -86,8 +87,7 @@ static igraph_error_t igraph_i_create_start(
 igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
 
     if (n < 0) {
-        IGRAPH_ERROR("cannot create empty graph with negative number of vertices",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create empty graph with negative number of vertices.", IGRAPH_EINVAL);
     }
 
     graph->n = 0;
@@ -222,6 +222,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
                      void *attr) {
     igraph_integer_t no_of_edges = igraph_vector_int_size(&graph->from);
     igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
+    igraph_integer_t new_no_of_edges;
     igraph_integer_t i = 0;
     igraph_error_handler_t *oldhandler;
     igraph_error_t ret1, ret2;
@@ -229,13 +230,18 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (igraph_vector_int_size(edges) % 2 != 0) {
-        IGRAPH_ERROR("invalid (odd) length of edges vector", IGRAPH_EINVEVECTOR);
+        IGRAPH_ERROR("Invalid (odd) length of edges vector.", IGRAPH_EINVEVECTOR);
     }
     if (!igraph_vector_int_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
-        IGRAPH_ERROR("cannot add edges", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Out-of-range edge IDs when adding edges.", IGRAPH_EINVVID);
     }
 
     /* from & to */
+    IGRAPH_SAFE_ADD(no_of_edges, edges_to_add, &new_no_of_edges);
+    if (new_no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERRORF("Maximum edge count (%"IGRAPH_PRId") exceeded.", IGRAPH_ERANGE,
+                      IGRAPH_ECOUNT_MAX);
+    }
     IGRAPH_CHECK(igraph_vector_int_reserve(&graph->from, no_of_edges + edges_to_add));
     IGRAPH_CHECK(igraph_vector_int_reserve(&graph->to, no_of_edges + edges_to_add));
 
@@ -323,18 +329,24 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
  */
 igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     igraph_integer_t ec = igraph_ecount(graph);
+    igraph_integer_t new_vc;
     igraph_integer_t i;
 
     if (nv < 0) {
-        IGRAPH_ERROR("cannot add negative number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot add negative number of vertices.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_reserve(&graph->os, graph->n + nv + 1));
-    IGRAPH_CHECK(igraph_vector_int_reserve(&graph->is, graph->n + nv + 1));
+    IGRAPH_SAFE_ADD(graph->n, nv, &new_vc);
+    if (new_vc > IGRAPH_VCOUNT_MAX) {
+        IGRAPH_ERRORF("Maximum vertex count (%"IGRAPH_PRId") exceeded.", IGRAPH_ERANGE,
+                      IGRAPH_VCOUNT_MAX);
+    }
+    IGRAPH_CHECK(igraph_vector_int_reserve(&graph->os, new_vc + 1));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&graph->is, new_vc + 1));
 
-    igraph_vector_int_resize(&graph->os, graph->n + nv + 1); /* reserved */
-    igraph_vector_int_resize(&graph->is, graph->n + nv + 1); /* reserved */
-    for (i = graph->n + 1; i < graph->n + nv + 1; i++) {
+    igraph_vector_int_resize(&graph->os, new_vc + 1); /* reserved */
+    igraph_vector_int_resize(&graph->is, new_vc + 1); /* reserved */
+    for (i = graph->n + 1; i < new_vc + 1; i++) {
         VECTOR(graph->os)[i] = ec;
         VECTOR(graph->is)[i] = ec;
     }
