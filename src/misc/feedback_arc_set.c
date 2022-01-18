@@ -152,7 +152,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
         IGRAPH_VECTOR_INT_INIT_FINALLY(&roots, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
                                      IGRAPH_ALL, 0, weights));
-        IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, &roots, /* descending = */ 1));
+        IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, &roots, IGRAPH_DESCENDING));
 
         IGRAPH_CHECK(igraph_bfs(graph,
                                 /* root = */ 0,
@@ -400,7 +400,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&ranks, 0);
 
-        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&order_vec, &ranks, 0));
+        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&order_vec, &ranks, IGRAPH_ASCENDING));
 
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t from = VECTOR(ranks)[i];

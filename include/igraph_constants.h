@@ -25,8 +25,6 @@
 #define IGRAPH_CONSTANTS_H
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
-#include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
@@ -180,13 +178,6 @@ typedef enum { IGRAPH_IMITATE_AUGMENTED = 0,
                IGRAPH_IMITATE_BLIND,
                IGRAPH_IMITATE_CONTRACTED
              } igraph_imitate_algorithm_t;
-
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
-        const igraph_vector_t *par,
-        void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t *var,
-                                      const igraph_vector_t *par,
-                                      igraph_vector_t* res, void* extra);
 
 typedef enum { IGRAPH_LAYOUT_GRID = 0,
                IGRAPH_LAYOUT_NOGRID,
