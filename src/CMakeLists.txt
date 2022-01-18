@@ -65,6 +65,7 @@ add_library(
 
   math/bfgs.c
   math/complex.c
+  math/safe_intop.c
   math/utils.c
 
   linalg/arpack.c
