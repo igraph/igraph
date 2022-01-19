@@ -155,10 +155,10 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
-    if (m < 0) {
-        IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
+    if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
     }
 
     if (m == 0.0 || no_of_nodes == 0) {
