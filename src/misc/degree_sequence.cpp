@@ -766,11 +766,6 @@ igraph_error_t igraph_realize_degree_sequence(
         igraph_edge_type_sw_t allowed_edge_types,
         igraph_realize_degseq_t method)
 {
-    igraph_integer_t n = igraph_vector_int_size(outdeg);
-    if (n != igraph_integer_t(n)) { // does the vector size fit into an igraph_integer_t ?
-        IGRAPH_ERROR("Degree sequence vector too long.", IGRAPH_EINVAL);
-    }
-
     bool directed = indeg != 0;
 
     try {
