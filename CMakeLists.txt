@@ -145,5 +145,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(packaging)
 endif()
 
+find_package(igraph REQUIRED)
+add_executable(igraph_wheel ${PROJECT_SOURCE_DIR}/tests/unit/igraph_wheel.c)
+target_link_libraries(igraph_wheel PUBLIC igraph::igraph)
+
 # Show result of configuration
 include(summary)
