@@ -73,7 +73,7 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
     if (directed && loops) {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * n));
+        IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * n * n));
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                 igraph_vector_push_back(&edges, i); /* reserved */
@@ -81,7 +81,7 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
             }
         }
     } else if (directed && !loops) {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n - 1)));
+        IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * n * (n - 1)));
         for (i = 0; i < n; i++) {
             for (j = 0; j < i; j++) {
                 igraph_vector_push_back(&edges, i); /* reserved */
@@ -93,7 +93,7 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
             }
         }
     } else if (!directed && loops) {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n + 1) / 2));
+        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n + 1)));
         for (i = 0; i < n; i++) {
             for (j = i; j < n; j++) {
                 igraph_vector_push_back(&edges, i); /* reserved */
@@ -101,7 +101,7 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n - 1) / 2));
+        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n - 1)));
         for (i = 0; i < n; i++) {
             for (j = i + 1; j < n; j++) {
                 igraph_vector_push_back(&edges, i); /* reserved */
