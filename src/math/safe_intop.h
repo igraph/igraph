@@ -42,7 +42,7 @@ __BEGIN_DECLS
         igraph_integer_t _safe_a = (a), _safe_b = (b); \
         igraph_integer_t _safe_sum; \
         if (__builtin_add_overflow(_safe_a, _safe_b, &_safe_sum)) { \
-            IGRAPH_ERRORF("Overflow when adding %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
+            IGRAPH_ERRORF("Overflow when adding %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
         } \
         *(res) = _safe_sum; \
     } while (0)
@@ -52,7 +52,7 @@ __BEGIN_DECLS
         igraph_integer_t _safe_a = (a), _safe_b = (b); \
         igraph_integer_t _safe_prod; \
         if (__builtin_mul_overflow(_safe_a, _safe_b, &_safe_prod)) { \
-            IGRAPH_ERRORF("Overflow when multiplying %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
+            IGRAPH_ERRORF("Overflow when multiplying %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
         } \
         *(res) = _safe_prod; \
     } while (0)

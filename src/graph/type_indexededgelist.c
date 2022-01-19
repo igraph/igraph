@@ -239,7 +239,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     /* from & to */
     IGRAPH_SAFE_ADD(no_of_edges, edges_to_add, &new_no_of_edges);
     if (new_no_of_edges > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERRORF("Maximum edge count (%"IGRAPH_PRId") exceeded.", IGRAPH_ERANGE,
+        IGRAPH_ERRORF("Maximum edge count (%" IGRAPH_PRId ") exceeded.", IGRAPH_ERANGE,
                       IGRAPH_ECOUNT_MAX);
     }
     IGRAPH_CHECK(igraph_vector_int_reserve(&graph->from, no_of_edges + edges_to_add));
@@ -338,7 +338,7 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
 
     IGRAPH_SAFE_ADD(graph->n, nv, &new_vc);
     if (new_vc > IGRAPH_VCOUNT_MAX) {
-        IGRAPH_ERRORF("Maximum vertex count (%"IGRAPH_PRId") exceeded.", IGRAPH_ERANGE,
+        IGRAPH_ERRORF("Maximum vertex count (%" IGRAPH_PRId ") exceeded.", IGRAPH_ERANGE,
                       IGRAPH_VCOUNT_MAX);
     }
     IGRAPH_CHECK(igraph_vector_int_reserve(&graph->os, new_vc + 1));

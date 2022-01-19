@@ -90,7 +90,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         igraph_real_t m_to_pow_n_real = pow(m, n);
         igraph_integer_t m_to_pow_n = m_to_pow_n_real;
         if (m_to_pow_n != m_to_pow_n_real) {
-            IGRAPH_ERRORF("Parameters (%"IGRAPH_PRId", %"IGRAPH_PRId") too large for Kautz graph.", IGRAPH_EINVAL,
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
                           m, n);
         }
         IGRAPH_SAFE_MULT(m+1, m_to_pow_n, &no_of_nodes);
@@ -101,7 +101,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         igraph_real_t allstrings_real = pow(m + 1, n + 1);
         allstrings = allstrings_real;
         if (allstrings != allstrings_real) {
-            IGRAPH_ERRORF("Parameters (%"IGRAPH_PRId", %"IGRAPH_PRId") too large for Kautz graph.", IGRAPH_EINVAL,
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
                           m, n);
         }
     }

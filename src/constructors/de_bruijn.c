@@ -81,7 +81,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
         igraph_real_t no_of_nodes_real = pow(m, n);
         no_of_nodes = no_of_nodes_real;
         if (no_of_nodes != no_of_nodes_real) {
-            IGRAPH_ERRORF("Parameters (%"IGRAPH_PRId", %"IGRAPH_PRId") too large for De Bruijn graph.", IGRAPH_EINVAL,
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for De Bruijn graph.", IGRAPH_EINVAL,
                           m, n);
         }
     }

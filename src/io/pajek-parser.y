@@ -196,26 +196,26 @@ verticeshead: VERTICESLINE longint {
   context->vcount=$2;
   context->vcount2=0;
   if (context->vcount < 0) {
-    IGRAPH_YY_ERRORF("Invalid vertex count in Pajek file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->vcount);
+    IGRAPH_YY_ERRORF("Invalid vertex count in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
   if (context->vcount > IGRAPH_PAJEK_MAX_VERTEX_COUNT) {
-    IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->vcount);
+    IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
             }
             | VERTICESLINE longint longint {
   context->vcount=$2;
   context->vcount2=$3;
   if (context->vcount < 0) {
-    IGRAPH_YY_ERRORF("Invalid vertex count in Pajek file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->vcount);
+    IGRAPH_YY_ERRORF("Invalid vertex count in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
   if (context->vcount > IGRAPH_PAJEK_MAX_VERTEX_COUNT) {
-    IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->vcount);
+    IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
   if (context->vcount2 < 0) {
-    IGRAPH_YY_ERRORF("Invalid two-mode vertex count in Pajek file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->vcount2);
+    IGRAPH_YY_ERRORF("Invalid two-mode vertex count in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount2);
   }
   if (context->vcount2 > IGRAPH_PAJEK_MAX_VERTEX_COUNT) {
-    IGRAPH_YY_ERRORF("2-mode vertex count too large in Pajek file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->vcount2);
+    IGRAPH_YY_ERRORF("2-mode vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount2);
   }
   IGRAPH_YY_CHECK(igraph_i_pajek_add_bipartite_type(context));
 };
