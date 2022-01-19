@@ -31,6 +31,31 @@
  * https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard
  */
 
+/* TODO: re-enable implementations in terms of GCC intrinsics */
+#if /* defined(__GNUC__) */ 0
+
+#define IGRAPH_SAFE_ADD(a, b, res) \
+    do { \
+        igraph_integer_t _safe_a = (a), _safe_b = (b); \
+        igraph_integer_t _safe_sum; \
+        if (__builtin_add_overflow(_safe_a, _safe_b, &_safe_sum)) { \
+            IGRAPH_ERRORF("Overflow when adding %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
+        } \
+        *(res) = _safe_sum; \
+    } while (0)
+
+#define IGRAPH_SAFE_MULT(a, b, res) \
+    do { \
+        igraph_integer_t _safe_a = (a), _safe_b = (b); \
+        igraph_integer_t _safe_prod; \
+        if (__builtin_mul_overflow(_safe_a, _safe_b, &_safe_prod)) { \
+            IGRAPH_ERRORF("Overflow when multiplying %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
+        } \
+        *(res) = _safe_prod; \
+    } while (0)
+
+#else
+
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
         igraph_integer_t _safe_a = (a), _safe_b = (b); \
@@ -75,6 +100,8 @@
         _safe_prod = _safe_a*_safe_b; \
         *(res) = _safe_prod; \
     } while (0)
+
+#endif
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
