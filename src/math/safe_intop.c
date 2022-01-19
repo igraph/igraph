@@ -28,3 +28,23 @@ igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph
     IGRAPH_SAFE_MULT(a, b, res);
     return IGRAPH_SUCCESS;
 }
+
+igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res) {
+    igraph_integer_t i, n = igraph_vector_int_size(vec);
+    igraph_integer_t sum = 0;
+    for (i=0; i < n; ++i) {
+        IGRAPH_SAFE_ADD(sum, VECTOR(*vec)[i], &sum);
+    }
+    *res = sum;
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_integer_t *res) {
+    igraph_integer_t i, n = igraph_vector_int_size(vec);
+    igraph_integer_t prod = 1;
+    for (i=0; i < n; ++i) {
+        IGRAPH_SAFE_MULT(prod, VECTOR(*vec)[i], &prod);
+    }
+    *res = prod;
+    return IGRAPH_SUCCESS;
+}

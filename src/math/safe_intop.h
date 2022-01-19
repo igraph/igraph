@@ -23,6 +23,7 @@
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
+#include "igraph_vector.h"
 
 /* These macros raise an error if the operation would result in an overflow.
  * They must only be used in functions that return an igraph_error_t.
@@ -105,5 +106,7 @@
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
+igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res);
+igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_integer_t *res);
 
 #endif /* IGRAPH_MATH_SAFE_INTOP_H */
