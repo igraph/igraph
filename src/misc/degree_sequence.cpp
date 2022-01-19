@@ -20,6 +20,8 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 #include <vector>
 #include <list>
 #include <algorithm>
@@ -513,7 +515,9 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
         igraph_realize_degseq_t method)
 {
     igraph_integer_t node_count = igraph_vector_int_size(deg);
-    igraph_integer_t deg_sum = igraph_vector_int_sum(deg);
+    igraph_integer_t deg_sum;
+
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg, &deg_sum));
 
     if (deg_sum % 2 != 0) {
         IGRAPH_ERROR("The sum of degrees must be even for an undirected graph.", IGRAPH_EINVAL);
@@ -606,12 +610,16 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
         igraph_realize_degseq_t method)
 {
     igraph_integer_t node_count = igraph_vector_int_size(outdeg);
-    igraph_integer_t edge_count = igraph_vector_int_sum(outdeg);
+    igraph_integer_t edge_count, edge_count2, indeg_sum;
+
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outdeg, &edge_count));
 
     if (igraph_vector_int_size(indeg) != node_count) {
         IGRAPH_ERROR("In- and out-degree sequences must have the same length.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_sum(indeg) != edge_count) {
+
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(indeg, &indeg_sum));
+    if (indeg_sum != edge_count) {
         IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value.", IGRAPH_EINVAL);
     }
 
@@ -625,7 +633,8 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
     }
 
     igraph_vector_int_t edges;
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, 2 * edge_count));
+    IGRAPH_SAFE_MULT(edge_count, 2, &edge_count2);
+    IGRAPH_CHECK(igraph_vector_int_init(&edges, edge_count2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
 
     switch (method) {
