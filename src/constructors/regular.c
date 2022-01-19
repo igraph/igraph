@@ -196,10 +196,7 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
     }
 
     /* compute no. of nodes in overflow-safe manner */
-    no_of_nodes = 1;
-    for (i=0; i < dims; ++i) {
-        IGRAPH_SAFE_MULT(no_of_nodes, VECTOR(*dimvector)[i], &no_of_nodes);
-    }
+    IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
 
     /* init coords & weights */
 
