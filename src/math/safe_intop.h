@@ -25,6 +25,8 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+__BEGIN_DECLS
+
 /* These macros raise an error if the operation would result in an overflow.
  * They must only be used in functions that return an igraph_error_t.
  *
@@ -63,7 +65,7 @@
         igraph_integer_t _safe_sum; \
         if (((_safe_b > 0) && (_safe_a > (IGRAPH_INTEGER_MAX - _safe_b))) || \
             ((_safe_b < 0) && (_safe_a < (IGRAPH_INTEGER_MIN - _safe_b)))) { \
-            IGRAPH_ERRORF("Overflow when adding %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
+            IGRAPH_ERRORF("Overflow when adding %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
         } \
         _safe_sum = _safe_a+_safe_b; \
         *(res) = _safe_sum; \
@@ -96,7 +98,7 @@
             } /* End if _safe_a and _safe_b are nonpositive */ \
         } /* End if _safe_a is nonpositive */ \
         if (err) { \
-            IGRAPH_ERRORF("Overflow when multiplying %"IGRAPH_PRId" and %"IGRAPH_PRId".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
+            IGRAPH_ERRORF("Overflow when multiplying %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
         } \
         _safe_prod = _safe_a*_safe_b; \
         *(res) = _safe_prod; \
@@ -108,5 +110,7 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igrap
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_integer_t *res);
+
+__END_DECLS
 
 #endif /* IGRAPH_MATH_SAFE_INTOP_H */
