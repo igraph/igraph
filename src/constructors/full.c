@@ -133,7 +133,7 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 
 /**
  * \function igraph_full_citation
- * Creates a full citation graph
+ * \brief Creates a full citation graph.
  *
  * This is a directed graph, where every <code>i->j</code> edge is
  * present if and only if <code>j&lt;i</code>.
@@ -153,7 +153,11 @@ igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
     igraph_vector_int_t edges;
     igraph_integer_t i, j, ptr = 0;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, n * (n - 1));
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(n, n-1, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
     for (i = 1; i < n; i++) {
         for (j = 0; j < i; j++) {
             VECTOR(edges)[ptr++] = i;
