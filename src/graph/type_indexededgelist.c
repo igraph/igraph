@@ -1194,8 +1194,8 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
  *
  * </para><para>
  * If there are multiple edges in the graph, then these are ignored;
- * i.e. for a given pair of vertex IDs, always the same edge ID is
- * returned, even if the pair appears multiple times in \c pairs.
+ * i.e. for a given pair of vertex IDs, igraph always returns the same edge ID,
+ * even if the pair appears multiple times in \c pairs.
  *
  * \param graph The input graph.
  * \param eids Pointer to an initialized vector, the result is stored

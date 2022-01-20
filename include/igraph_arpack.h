@@ -98,7 +98,7 @@ __BEGIN_DECLS
  * \struct igraph_arpack_options_t
  * \brief Options for ARPACK
  *
- * This data structure contains the options of thee ARPACK eigenvalue
+ * This data structure contains the options of the ARPACK eigenvalue
  * solver routines. It must be initialized by calling \ref
  * igraph_arpack_options_init() on it. Then it can be used for
  * multiple ARPACK calls, as the ARPACK solvers do not modify it.

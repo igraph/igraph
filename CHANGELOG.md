@@ -279,7 +279,8 @@
  - The `vids` parameter for `igraph_isoclass_subgraph()` is now an
    `igraph_vector_int_t` instead of `igraph_vector_t`.
 
- - `igraph_isomorphic_vf2()`, `igraph_isomorphic_function_vf2()` and
+ - `igraph_isomorphic_vf2()`, `igraph_get_isomorphisms_vf2_callback()` (which
+   used to be called `igraph_isomorphic_function_vf2()`) and
    `igraph_isohandler_t` now all use `igraph_vector_int_t` for their `map12` and
    `map21` parameters.
 
@@ -414,7 +415,8 @@
    return the list of vertices in the same component as the seed vertex instead
    of an `igraph_vector_t`.
 
- - `igraph_subisomorphic_vf2()`, `igraph_subisomorphic_function_vf2()` and
+ - `igraph_subisomorphic_vf2()`, `igraph_get_subisomorphisms_vf2_callback()`
+   (which used to be called `igraph_subisomorphic_function_vf2()`) and
    `igraph_isomorphic_bliss()` now all use `igraph_vector_int_t` for their `map12`
    and `map21` parameters.
 
