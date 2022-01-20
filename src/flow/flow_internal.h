@@ -23,7 +23,12 @@
 #ifndef IGRAPH_FLOW_INTERNAL_H
 #define IGRAPH_FLOW_INTERNAL_H
 
+#include "igraph_datatype.h"
+#include "igraph_decls.h"
 #include "igraph_types.h"
+
+#include "core/estack.h"
+#include "core/marked_queue.h"
 
 __BEGIN_DECLS
 

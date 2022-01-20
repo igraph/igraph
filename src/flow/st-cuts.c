@@ -37,8 +37,8 @@
 #include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
-#include "graph/attributes.h"
 #include "flow/flow_internal.h"
+#include "graph/attributes.h"
 
 typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
                                                    const igraph_marked_queue_int_t *S,

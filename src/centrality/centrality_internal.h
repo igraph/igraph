@@ -21,8 +21,8 @@
 
 */
 
-#ifndef IGRAPH_CENTRALITY_INTERNAL
-#define IGRAPH_CENTRALITY_INTERNAL
+#ifndef IGRAPH_CENTRALITY_INTERNAL_H
+#define IGRAPH_CENTRALITY_INTERNAL_H
 
 #include "igraph_decls.h"
 #include "igraph_types.h"
