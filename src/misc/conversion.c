@@ -126,8 +126,8 @@ igraph_error_t igraph_get_adjacency(
  * \brief Returns the adjacency matrix of a graph in a sparse matrix format.
  *
  * \param graph The input graph.
- * \param res Pointer to an uninitialized sparse matrix. The result
- *    will be stored here.
+ * \param res Pointer to an initialized sparse matrix. The result
+ *    will be stored here. The matrix will be resized as needed.
  * \param type Constant specifying the type of the adjacency matrix to
  *        create for undirected graphs. It is ignored for directed
  *        graphs. Possible values:
@@ -158,8 +158,7 @@ igraph_error_t igraph_get_adjacency_sparse(
     igraph_integer_t nzmax = directed ? no_of_edges : no_of_edges * 2;
     igraph_integer_t i, from, to;
 
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, res);
+    IGRAPH_CHECK(igraph_sparsemat_resize(res, no_of_nodes, no_of_nodes, nzmax));
 
     if (directed) {
         for (i = 0; i < no_of_edges; i++) {
@@ -199,8 +198,6 @@ igraph_error_t igraph_get_adjacency_sparse(
     } else {
         IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
     }
-
-    IGRAPH_FINALLY_CLEAN(1);   /* res */
 
     return IGRAPH_SUCCESS;
 }
@@ -710,8 +707,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * its adjacency matrix, normalized row-wise or column-wise, such that
  * the sum of each row (or column) is one.
  * \param graph The input graph.
- * \param sparsemat Pointer to an initialized matrix, the
- *    result is stored here.
+ * \param matrix Pointer to an initialized matrix, the result is stored here.
+ *   It will be resized as needed.
  * \param column_wise Whether to normalize column-wise. For undirected
  *    graphs this argument does not have any effect.
  * \return Error code.
@@ -765,8 +762,8 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
  * its adjacency matrix, normalized row-wise or column-wise, such that
  * the sum of each row (or column) is one.
  * \param graph The input graph.
- * \param sparsemat Pointer to an uninitialized sparse matrix, the
- *    result is stored here.
+ * \param sparsemat Pointer to an initialized sparse matrix, the
+ *    result is stored here. The matrix will be resized as needed.
  * \param column_wise Whether to normalize column-wise. For undirected
  *    graphs this argument does not have any effect.
  * \return Error code.
@@ -782,15 +779,12 @@ igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
                                     igraph_bool_t column_wise) {
 
     IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, sparsemat, IGRAPH_GET_ADJACENCY_BOTH));
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, sparsemat);
 
     if (column_wise) {
         IGRAPH_CHECK(igraph_sparsemat_normalize_cols(sparsemat, /* allow_zeros = */ 0));
     } else {
         IGRAPH_CHECK(igraph_sparsemat_normalize_rows(sparsemat, /* allow_zeros = */ 0));
     }
-
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

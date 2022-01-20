@@ -128,14 +128,6 @@ SPARSEMAT:
     CTYPE: igraph_sparsemat_t
     FLAGS: BY_REF
 
-SPARSEMATPTR:
-    # A sparse matrix of floating-point numbers. The specialty of this type
-    # is that it is uninitialized upon calling the function that uses it; the
-    # function will initialize it instead.
-    # TODO(ntamas): check whether we could merge this with SPARSEMAT in 0.10
-    CTYPE: igraph_sparsemat_t
-    FLAGS: BY_REF
-
 ###############################################################################
 # Vertices, edges, vertex and edge sequences
 ###############################################################################

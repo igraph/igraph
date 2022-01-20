@@ -1438,7 +1438,7 @@ igraph_get_adjacency:
 
 igraph_get_adjacency_sparse:
     PARAMS: |-
-        GRAPH graph, OUT SPARSEMATPTR sparsemat, GETADJACENCY type=BOTH
+        GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH
 
 igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, BOOLEAN bycol=False
@@ -1456,7 +1456,7 @@ igraph_get_stochastic:
 
 igraph_get_stochastic_sparse:
     PARAMS: |-
-        GRAPH graph, OUT SPARSEMATPTR sparsemat,
+        GRAPH graph, OUT SPARSEMAT sparsemat,
         BOOLEAN column_wise=False
 
 #######################################

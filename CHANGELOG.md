@@ -187,7 +187,8 @@
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
  - `igraph_get_adjacency_sparse()` now returns the sparse adjacency matrix in
-   an `igraph_sparsemat_t` structure.
+   an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
+   _initialized_ for sake of consistency with other igraph functions.
 
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
@@ -226,6 +227,10 @@
  - The `igraph_vector_ptr_t` maps parameters in `igraph_get_isomorphisms_vf2()`
    and `igraph_get_subisomorphisms_vf2()` now contain `igraph_vector_int_t`,
    not `igraph_vector_t`.
+
+ - `igraph_get_stochastic_sparse()` now returns the sparse adjacency matrix in
+   an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
+   _initialized_ for sake of consistency with other igraph functions.
 
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
@@ -365,7 +370,7 @@
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
 
- - `igraph_preferennce_game()` now uses an `igraph_vector_int_t` to return the
+ - `igraph_preference_game()` now uses an `igraph_vector_int_t` to return the
    types of the nodes in the generated graph.
 
  - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
