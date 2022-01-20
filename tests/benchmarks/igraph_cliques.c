@@ -4,7 +4,7 @@
 #include "bench.h"
 
 void free_result(igraph_vector_ptr_t *res) {
-    long int i, n;
+    igraph_integer_t i, n;
 
     n = igraph_vector_ptr_size(res);
     for (i = 0; i < n; i++) {
