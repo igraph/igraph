@@ -136,6 +136,131 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
 
 /**
  * \ingroup generators
+ * \function igraph_wheel
+ * \brief Creates a \em wheel graph, a union of a star graph and a
+ *        cycle graph.
+ * \param graph Pointer to an uninitialized graph object, this will
+ *        be the result.
+ * \param n Integer constant, the number of vertices in the graph.
+ * \param mode Constant, gives the type of the star graph to
+ *        create. Possible values:
+ *        \clist
+ *        \cli IGRAPH_WHEEL_OUT
+ *          directed wheel graph, edges point
+ *          \em from the center to the other vertices.
+ *        \cli IGRAPH_WHEEL_IN
+ *          directed wheel graph, edges point
+ *          \em to the center from the other vertices.
+ *        \cli IGRAPH_STAR_MUTUAL
+ *          directed wheel graph with mutual edges.
+ *        \cli IGRAPH_STAR_UNDIRECTED
+ *          an undirected wheel graph is
+ *          created.
+ *        \endclist
+ * \param center Id of the vertex which will be the center of the
+ *          graph.
+ * \return Error code:
+ *         \clist
+ *         \cli IGRAPH_EINVVID
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVAL
+ *           invalid center vertex.
+ *         \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *         \endclist
+ *
+ * Time complexity: O(|V|), the
+ * number of vertices in the graph.
+ *
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star, \ref igraph_tree()
+ * for creating other regular structures.
+ *
+ */
+
+igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
+                igraph_integer_t center) {
+
+    igraph_integer_t* rim_vertex;
+    igraph_integer_t  v;
+    igraph_star_mode_t star_mode;
+    igraph_vector_int_t rim_edges;
+    long int i;
+
+    /* create a star and also make use of its existing pre-check */
+    /* works for all input parameters                            */
+
+    switch(mode)
+    {
+        case IGRAPH_WHEEL_OUT:
+            star_mode = IGRAPH_STAR_OUT;
+            break;
+        case IGRAPH_WHEEL_IN:
+            star_mode = IGRAPH_STAR_IN;
+            break;
+        case IGRAPH_WHEEL_MUTUAL:
+            star_mode = IGRAPH_STAR_MUTUAL;
+            break;
+        case IGRAPH_WHEEL_UNDIRECTED:
+            star_mode = IGRAPH_STAR_UNDIRECTED;
+            break;
+        default:
+            IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
+    }
+
+    IGRAPH_CHECK(igraph_star(graph, n, star_mode, center));
+
+    /* If n <= 2, wheel graph is identical with star graph, */
+    /* no further processing is needed                      */
+
+    if (n <= 2) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* A wheel rim will be created with an array rim_vertex */
+    /* whose elements contains the real vertices            */
+
+    rim_vertex = (igraph_integer_t*)calloc(n-2, sizeof(igraph_integer_t));
+    for (i = 0; i < center; i++) {
+        rim_vertex[i] = i;
+    }
+    for (i = center; i < n-1; i++) {
+        rim_vertex[i] = i + 1;
+    }
+
+    /* Add edges to the rim */
+
+    igraph_vector_int_init(&rim_edges, 2 * (n-1));
+    for (i = 0; i < n-2; i++) {
+        VECTOR(rim_edges)[2 * i] = rim_vertex[i];
+        VECTOR(rim_edges)[2 * i + 1] = rim_vertex[i + 1];
+    }
+    VECTOR(rim_edges)[2 * n - 4] = rim_vertex[n-2];
+    VECTOR(rim_edges)[2 * n - 3] = rim_vertex[0];
+
+    /* Combine the rim into the star to make it a wheel graph */
+
+    IGRAPH_CHECK(igraph_add_edges(graph, &rim_edges, 0));
+
+    /* Add a reverse direction rim if mode is MUTUAL */
+
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        for (i=0; i < n-1; i++) {
+            v = VECTOR(rim_edges)[2 * i];
+            VECTOR(rim_edges)[2 * i] = VECTOR(rim_edges)[2 * i + 1];
+            VECTOR(rim_edges)[2 * i + 1] = v;
+        }
+        IGRAPH_CHECK(igraph_add_edges(graph, &rim_edges, 0));
+    }
+
+    igraph_vector_int_destroy(&rim_edges);
+    free(rim_vertex);
+
+    return IGRAPH_SUCCESS;
+    
+}
+
+/**
+ * \ingroup generators
  * \function igraph_lattice
  * \brief Arbitrary dimensional square lattices.
  *
