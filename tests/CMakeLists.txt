@@ -270,6 +270,7 @@ add_legacy_tests(
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
+  igraph_steiner_tree_fpt
   igraph_is_bipartite
   igraph_is_chordal
   igraph_is_mutual
@@ -289,6 +290,7 @@ add_legacy_tests(
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
+ 
 )
 
 add_legacy_tests(

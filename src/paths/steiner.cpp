@@ -11,14 +11,15 @@
 #include <map>
 #include <limits.h>
 #include <vector>
+#include <set>
 
-std::map<igraph_vector_t,igraph_integer_t> subsetMap;
+std::map<std::set<int>,igraph_integer_t> subsetMap;
 
 
-std::vector<igraph_vector_t> generateSubsets(igraph_vector_t steinerTerminals, igraph_integer_t n,igraph_integer_t graphsize)
+std::vector<std::set<int>> generateSubsets(igraph_vector_t steinerTerminals, igraph_integer_t n,igraph_integer_t graphsize)
 {
     igraph_integer_t count = pow(2, n);
-    std::vector<igraph_vector_t> allSubsets;
+    std::vector< std::set<int> > allSubsets;
     igraph_integer_t subsetIndex = graphsize;
 
     // The outer for loop will run 2^n times to print all subset .
@@ -28,7 +29,7 @@ std::vector<igraph_vector_t> generateSubsets(igraph_vector_t steinerTerminals, i
     {
         // The inner for loop will run n times , As the maximum number of elements a set can have is n
         // This loop will generate a subset
-        igraph_vector_t newSubset;
+        std::set<int> newSubset;
         for (int j = 0; j < n; j++)
         {
             // This if condition will check if jth bit in binary representation of  i  is set or not
@@ -36,11 +37,11 @@ std::vector<igraph_vector_t> generateSubsets(igraph_vector_t steinerTerminals, i
             // otherwise exclude arr[j]
             if ((i & (1 << j)) > 0)
             {
-              	igraph_vector_push_back(&newSubset,VECTOR(steinerTerminals)[j]);
+              	newSubset.insert(VECTOR(steinerTerminals)[j]);
             }
         }
 
-        if ( igraph_vector_size(&newSubset) > 1)
+        if ( newSubset.size() > 1)
         {
             allSubsets.push_back(newSubset);
             subsetMap.insert(std::make_pair(newSubset,subsetIndex));
@@ -52,10 +53,10 @@ std::vector<igraph_vector_t> generateSubsets(igraph_vector_t steinerTerminals, i
 }
 
 
-int fetchIndexofMapofSets(igraph_vector_t subset)
+int fetchIndexofMapofSets(std::set<int> subset)
 {
     int key;
-	std::map< igraph_vector_t , int >::iterator it;
+	std::map< std::set<int> , int >::iterator it;
     for(it = subsetMap.begin(); it != subsetMap.end(); ++it)
     {
         if (it -> first == subset)
@@ -78,7 +79,7 @@ long int no_of_edges = igraph_ecount(&graph);
 igraph_vector_t steiner_vertices;
 igraph_matrix_t dp_cache; // dynamic programming table
 igraph_integer_t q;
-std::vector<igraph_vector_t> allSubsets;
+std::vector<std::set<int>> allSubsets;
 igraph_matrix_t distance;
 igraph_vs_t vs;
 
@@ -126,34 +127,40 @@ for (int i = 0; i < igraph_vector_size(&steiner_terminals); i++)
 	}
 }
 
-
-for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(&dp_cache); i++ )
-{
-	igraph_vector_t D = allSubsets[i];
+for (int m=2; m < igraph_vector_size(&steiner_vertices);m++ ){
+	
+	for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(&dp_cache); i++ )
+	{
+	std::set<int> D = allSubsets[i];
 	igraph_integer_t indexOfSubsetD;
 
-	if(igraph_vector_size(&D) == 1)
-        {
-        	indexOfSubsetD = VECTOR(D)[0];
-        }
-        else
-        {
-                indexOfSubsetD = fetchIndexofMapofSets(D);
-        }
+    indexOfSubsetD = fetchIndexofMapofSets(D);
+    
 
 	for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 	{
 		int u = INT_MAX;
+		std::set<int>::iterator subset_D_iterator;
 
-		for (int subset_D_iterator = 0; subset_D_iterator < igraph_vector_size(&D) ; subset_D_iterator++)
+		for ( subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++)
 		{
-			int E = (int)(VECTOR(D)[subset_D_iterator]);
+			int E = *subset_D_iterator;
 			
 			int distanceEJ = MATRIX(distance,E,j);
-			igraph_vector_t DMinusE = D;
+			std::set<int> DMinusE = D;
 
-			igraph_vector_remove(&DMinusE,E);
+			//igraph_vector_remove(&DMinusE,E);
 			
+			for (std::set<int>::iterator iter = DMinusE.begin(); iter != DMinusE.end();){
+                if (*iter == E){
+                    iter = DMinusE.erase(iter);
+                }
+                else{
+                    ++iter;
+                }
+            }
+
+
 			igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE);
 
 			if ( distanceEJ + ( MATRIX (dp_cache,indexOfSubsetDMinusE,j)) < u )
@@ -167,21 +174,31 @@ for (int i = igraph_vector_size(&steiner_terminals); i < igraph_matrix_capacity(
 		}
 
 	}
+	}
 }
+
+igraph_integer_t u = INT_MAX;
+igraph_integer_t v = INT_MAX;
 
 for (int j = 0; j < igraph_vector_size(&steiner_vertices); j++ )
 {
-	igraph_integer_t u = INT_MAX;
-	igraph_integer_t v = INT_MAX;
-	for (int subset_C_iterator = 0; subset_C_iterator < igraph_vector_size(&steiner_terminals) ; subset_C_iterator++)
+	
+	
+	for (int subset_C_iterator = 0; subset_C_iterator < igraph_vector_size(&steiner_terminals); subset_C_iterator++)
 	{
 		int F = VECTOR(steiner_terminals)[subset_C_iterator];
 		int distanceFJ = MATRIX(distance,F,j);
-		igraph_vector_t CMinusF = steiner_terminals;
 		
-		igraph_vector_remove(&CMinusF,F);
+		std::set<int> CMinusF;
 		
-
+		for(int k = 0; k < igraph_vector_size(&steiner_terminals); k++){
+			
+			if (VECTOR(steiner_terminals)[k] != F){
+				CMinusF.insert(VECTOR(steiner_terminals)[k]);
+			}
+			
+		}
+		
 		igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(CMinusF);
 
 		if ( distanceFJ + ( MATRIX (dp_cache,indexOfSubsetCMinusF,j) ) < u)
