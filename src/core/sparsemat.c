@@ -2801,10 +2801,10 @@ igraph_error_t igraph_sparsemat_add_cols(igraph_sparsemat_t *A, igraph_integer_t
 
 /**
  * \function igraph_sparsemat_resize
- * \brief Resizes a sparse matrix.
+ * \brief Resizes a sparse matrix and clears all the elements.
  *
  * This function resizes a sparse matrix. The resized sparse matrix
- * will be empty.
+ * will become empty, even if it contained nonzero entries.
  *
  * \param A The initialized sparse matrix to resize.
  * \param nrow The new number of rows.
