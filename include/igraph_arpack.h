@@ -325,7 +325,7 @@ IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun
                                         igraph_matrix_t *values, igraph_matrix_t *vectors);
 
 IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                               long int nev);
+                                               igraph_integer_t nev);
 
 __END_DECLS
 

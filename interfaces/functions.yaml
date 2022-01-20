@@ -702,7 +702,7 @@ igraph_arpack_rnsolve:
 igraph_arpack_unpack_complex:
     # TODO(ntamas): this should probably not be exposed to higher-level
     # interfaces; igraph's goal is not to provide an ARPACK wrapper
-    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, LONGINT nev
+    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
 
 igraph_unfold_tree:
     PARAMS: |-

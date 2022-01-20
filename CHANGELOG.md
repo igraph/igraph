@@ -36,6 +36,9 @@
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` now return the cuts in
    an `igraph_vector_ptr_t` containing `igraph_vector_int_t` vectors.
 
+ - `igraph_arpack_unpack_complex()` now uses `igraph_integer_t` for its `nev`
+   argument instead of `long int`.
+
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
