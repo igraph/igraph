@@ -232,7 +232,7 @@ int main() {
     /* A tree, plus a ring */
     printf("\n== A tree, plus a ring ==\n");
 #define DIM 10
-    igraph_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_UNDIRECTED);
     igraph_ring(&g2, DIM, IGRAPH_UNDIRECTED, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_union(&g3, &g1, &g2, /*edge_map1=*/ 0, /*edge_map1=*/ 0);
     igraph_destroy(&g1);
@@ -301,7 +301,7 @@ int main() {
     /* A directed tree and a directed, mutual ring */
     printf("\n== A directed tree and a directed, mutual ring ==\n");
 #define DIM 10
-    igraph_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
     igraph_ring(&g2, DIM, IGRAPH_DIRECTED, /*mutual=*/ 1, /*circular=*/ 1);
     igraph_union(&g3, &g1, &g2, /*edge_map1=*/ 0, /*edge_map2=*/ 0);
     igraph_destroy(&g1);

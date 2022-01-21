@@ -102,7 +102,7 @@ int main() {
 
     /* Transpose matrices */
     igraph_sparsemat_init(&A, 1, 1, 0);
-    igraph_tree(&G, 10, /*children=*/ 2, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&G, 10, /*children=*/ 2, IGRAPH_TREE_OUT);
     igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
     igraph_sparsemat_compress(&A, &B);

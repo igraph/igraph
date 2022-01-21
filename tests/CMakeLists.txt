@@ -171,11 +171,11 @@ add_examples(
   igraph_erdos_renyi_game
   igraph_full
   igraph_grg_game
+  igraph_kary_tree
   igraph_lcf
   igraph_ring
   igraph_small
   igraph_star
-  igraph_tree
   igraph_symmetric_tree
   igraph_weighted_adjacency
 )
@@ -214,7 +214,7 @@ add_legacy_tests(
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
   igraph_static_power_law_game
-  tree
+  kary_tree
   symmetric_tree
   tree_game
   ring

@@ -142,7 +142,7 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_tree(&g, 5, 2, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&g, 5, 2, IGRAPH_TREE_OUT);
     igraph_cliques(&g, &result, 5, 5);
     if (igraph_vector_ptr_size(&result) != 0) {
         return 1;

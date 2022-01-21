@@ -178,7 +178,7 @@ graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>),
 ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices
 (<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>) or trees
-(<link linkend="igraph_tree"><function>igraph_tree()</function></link>).
+(<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>).
 </para>
 
 <para>

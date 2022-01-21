@@ -49,7 +49,7 @@
  *             invalid Pr&uuml;fer sequence given
  *          \endclist
  *
- * \sa \ref igraph_to_prufer(), \ref igraph_tree(), \ref igraph_tree_game()
+ * \sa \ref igraph_to_prufer(), \ref igraph_kary_tree(), \ref igraph_tree_game()
  *
  */
 igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {

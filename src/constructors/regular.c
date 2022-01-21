@@ -66,7 +66,7 @@
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_tree()
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_star.c
@@ -344,8 +344,8 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 
 /**
  * \ingroup generators
- * \function igraph_tree
- * \brief Creates a tree in which almost all vertices have the same number of children.
+ * \function igraph_kary_tree
+ * \brief Creates a k-ary tree in which almost all vertices have k children.
  *
  * To obtain a completely symmetric tree with \c l layers, where each
  * vertex has precisely \p children descendants, use
@@ -384,9 +384,9 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
- * \example examples/simple/igraph_tree.c
+ * \example examples/simple/igraph_kary_tree.c
  */
-igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
                 igraph_tree_mode_t type) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
@@ -443,6 +443,18 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
 
 /**
  * \ingroup generators
+ * \function igraph_tree
+ * \brief Creates a k-ary tree in which almost all vertices have k children (deprecated alias).
+ *
+ * \deprecated-by igraph_kary_tree 0.10.0
+ */
+igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+                igraph_tree_mode_t type) {
+    return igraph_kary_tree(graph, n, children, type);
+}
+
+/**
+ * \ingroup generators
  * \function igraph_symmetric_tree
  * \brief Creates a symmetric tree with the specified number of branches at each level.
  *
@@ -470,7 +482,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_tree() and \ref igraph_star() for creating regular tree
+ * \sa \ref igraph_kary_tree() and \ref igraph_star() for creating regular tree
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *

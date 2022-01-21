@@ -243,7 +243,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  *
  * \sa igraph_is_weakly_connected()
  *
- * \example examples/simple/igraph_tree.c
+ * \example examples/simple/igraph_kary_tree.c
  */
 igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
     igraph_integer_t iroot = 0;
@@ -394,7 +394,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
 
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(*neis)[i];
-            
+
             if (mode == IGRAPH_ALL) {
                 /* In the undirected case, we avoid returning to the predecessor
                  * vertex of 'v' in the DFS tree by skipping visited vertices.
@@ -475,7 +475,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
     if (roots) {
         igraph_vector_int_clear(roots);
     }
-    
+
     /* Any graph with 0 edges is a forest. */
     if (ecount == 0) {
         if (res) {
@@ -550,7 +550,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
             igraph_vector_int_t degree;
 
             IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
-            IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
+            IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                             IGRAPH_REVERSE_MODE(mode), /* loops = */ 1));
 
             for (v = 0; v < vcount; ++v) {
