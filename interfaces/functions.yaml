@@ -1338,14 +1338,13 @@ igraph_community_leading_eigenvector:
 
 igraph_community_fluid_communities:
     PARAMS: |-
-        GRAPH graph, INTEGER no_of_communities,
-        OUT VECTOR_INT membership, OUT REAL modularity
+        GRAPH graph, INTEGER no_of_communities, OUT VECTOR_INT membership
 
 igraph_community_label_propagation:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, NEIMODE mode=ALL,
         OPTIONAL EDGEWEIGHTS weights, OPTIONAL VECTOR_INT initial,
-        OPTIONAL VECTOR_BOOL fixed, OUT REAL modularity
+        OPTIONAL VECTOR_BOOL fixed
     DEPS: weights ON graph
 
 igraph_community_multilevel:

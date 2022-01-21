@@ -114,10 +114,18 @@
    return the edge IDs in the order of their removal as well as the list of edge
    IDs whose removal broke a single component into two.
 
+ - `igraph_community_fluid_communities()` does not provide the modularity in a
+   separate output argument any more; use `igraph_modularity()` to retrieve the
+   modularity if you need it.
+
  - `igraph_community_label_propagation()` now uses an `igraph_vector_int_t` for its
    `initial` parameter. It also takes a `mode` argument that specifies how
    labels should be propagated along edges (forward, backward or ignoring edge
    directions).
+
+ - `igraph_community_label_propagation()` does not provide the modularity in a
+   separate output argument any more; use `igraph_modularity()` to retrieve the
+   modularity if you need it.
 
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
