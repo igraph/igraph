@@ -220,6 +220,7 @@
 <!-- doxrox-include igraph_get_stochastic_sparse -->
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_edgelist -->
+<!-- doxrox-include igraph_is_acyclic -->
 </section>
 
 </chapter>

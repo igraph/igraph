@@ -22,6 +22,7 @@
 */
 
 #include "igraph_structural.h"
+#include "igraph_topology.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_constructors.h"
@@ -599,5 +600,44 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
     igraph_vector_bool_destroy(&visited);
     IGRAPH_FINALLY_CLEAN(3);
 
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_is_acyclic
+ * \brief Checks whether a graph is acyclic or not.
+ *
+ * This function checks whether a graph is acyclic or not.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to a boolean constant, the result
+        is stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
+ * vertices and edges in the original input graph.
+ */
+igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res) {
+    igraph_bool_t dag, forest;
+
+    if (igraph_is_directed(graph)) {
+        // check if it's dag
+        IGRAPH_CHECK(igraph_is_dag(graph, &dag));
+        if (dag) {
+            // it's acyclic
+            *res = 1;
+            return IGRAPH_SUCCESS;
+        }
+    } else {
+        // check if it's forest - need to figure out roots
+        IGRAPH_CHECK(igraph_is_forest(graph, &forest, NULL, IGRAPH_ALL));
+        if (forest) {
+            *res = 1;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    *res = 0;
     return IGRAPH_SUCCESS;
 }
