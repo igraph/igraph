@@ -448,6 +448,7 @@ add_legacy_tests(
   igraph_write_graph_leda
   igraph_write_graph_dimacs_flow
   lineendings
+  ncol
   pajek
   pajek2
   pajek_bipartite
