@@ -113,6 +113,15 @@ void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
 #endif
 }
 
+/**
+ * \function igraph_blas_dnrm2
+ * \brief Euclidean norm of a vector.
+ *
+ * \param v The vector.
+ * \return Real value, the norm of \p v.
+ *
+ * Time complexity: O(n) where n is the length of the vector.
+ */
 igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
     int n = igraph_vector_size(v);
     int one = 1;
