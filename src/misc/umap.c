@@ -93,35 +93,67 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_fit(igraph_real_t min_dist, float *a, float *b)
+static igraph_error_t igraph_fit(igraph_real_t min_dist, float *a_p, float *b_p)
 {
-	/*We're fitting a and b, such that
-	 * (1 + a*d^2b)^-1
-	 * has the minimum least-squares error compared to
-	 * the fuzzy ball with min-dist ball size and
-	 * plain e^-d fuzzyness
-	 * */
+    /*We're fitting a and b, such that
+     * (1 + a*d^2b)^-1
+     * has the minimum least-squares error compared to
+     * the fuzzy ball with min-dist ball size and
+     * plain e^-d fuzzyness
+     * */
+
+    igraph_vector_t residuals;
+    igraph_vector_t x;
+    igraph_integer_t nr_points = 100;
+    igraph_real_t end_point = min_dist*1000;
+    igraph_real_t a = 1.;
+    igraph_real_t b = 1.;
+    igraph_matrix_t jacobian;
+    igraph_real_t delta = 0.00001;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&residuals, nr_points);
+    IGRAPH_VECTOR_INIT_FINALLY(&x, nr_points);
+    IGRAPH_MATRIX_INIT_FINALLY(&jacobian, nr_points, 2);
+
+    for (int i = 0; i < nr_points; i++) {
+        VECTOR(x)[i] = (end_point / nr_points) * i;
+    }
+    for (int i = 0; i < nr_points; i++) {
+        VECTOR(residuals)[i] =
+            (1 / (1 + a* powf(VECTOR(x)[i], 2 * b))) -
+            exp(-VECTOR(x)[i]);
+    }
+    for (int i = 0; i < nr_points; i++) {
+        MATRIX(jacobian, i, 0) =
+            ((1 / (1 + (a + delta) * powf(VECTOR(x)[i], 2 * b))) -
+            (1 / (1 + a * powf(VECTOR(x)[i], 2 * b)))) / (2 * delta);
+        MATRIX(jacobian, i, 1) =
+            ((1 / (1 + a * powf(VECTOR(x)[i], 2 * (b + delta)))) -
+            (1 / (1 + a * powf(VECTOR(x)[i], 2 * b)))) / (2 * delta);
+    }
+
+    //TODO transpose, inversion, etc.
 }
 
 /*xd is difference in x direction, w is a weight */
 static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     /* the paper says on page 16: "where a and b are hyper-parameters",
-	 * which I understood to mean that it cannot be inferred from the data.
-	 * Then at the top of page 21 "a and b are chosen by non-linear least squares fitting...".
-	 * I think it's the same a and b, so I'm surprised it's not a hyperparameter now.
-	 * Or doesn't the fit depend on the data? does it only depend on min-dist?
-	 * They're used to fit the smooth force curve to the flat ball with fuzzy falloff.
-	 * I also don't understand why we first make the fuzzy open balls and then use
-	 * the smooth curve, instead of fitting a smooth curve immediately.
-	 * From algorithm 5 it seems like an and b should not depend on a particular vertex,
-	 * but either on all the data or none at all, because the fitting should be done only once.
-	 * I'm guessing it should not depend on the data, but only on the min-dist, which means
-	 * they are actual hyperparameters. Only for fitting to curves I have to fit
-	 * them at certain points, or all points, which means doing some integrals
-	 * I guess? I'll just fit them at some random points
-	 * TODO:
-	 * we should do non-linear least squares fitting for a and b */
+     * which I understood to mean that it cannot be inferred from the data.
+     * Then at the top of page 21 "a and b are chosen by non-linear least squares fitting...".
+     * I think it's the same a and b, so I'm surprised it's not a hyperparameter now.
+     * Or doesn't the fit depend on the data? does it only depend on min-dist?
+     * They're used to fit the smooth force curve to the flat ball with fuzzy falloff.
+     * I also don't understand why we first make the fuzzy open balls and then use
+     * the smooth curve, instead of fitting a smooth curve immediately.
+     * From algorithm 5 it seems like an and b should not depend on a particular vertex,
+     * but either on all the data or none at all, because the fitting should be done only once.
+     * I'm guessing it should not depend on the data, but only on the min-dist, which means
+     * they are actual hyperparameters. Only for fitting to curves I have to fit
+     * them at certain points, or all points, which means doing some integrals
+     * I guess? I'll just fit them at some random points
+     * TODO:
+     * we should do non-linear least squares fitting for a and b */
     igraph_real_t a = 1; //hyperparameter
     igraph_real_t b = 1; //hyperparameter
     igraph_real_t dsq;
