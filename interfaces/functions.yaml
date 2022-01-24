@@ -639,6 +639,9 @@ igraph_is_loop:
 igraph_is_dag:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
+igraph_is_acyclic:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
+
 igraph_is_simple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
