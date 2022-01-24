@@ -25,10 +25,10 @@ int main() {
     igraph_bool_t acyclic;
 
     /* Null graph directed */
-    // igraph_empty(&graph, 0, IGRAPH_DIRECTED);
-    // igraph_is_acyclic(&graph, &acyclic);
-    // IGRAPH_ASSERT(! acyclic);
-    // igraph_destroy(&graph);
+    igraph_empty(&graph, 0, IGRAPH_DIRECTED);
+    igraph_is_acyclic(&graph, &acyclic);
+    IGRAPH_ASSERT(acyclic);
+    igraph_destroy(&graph);
 
     /* Null graph undirected */
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
@@ -48,7 +48,7 @@ int main() {
     IGRAPH_ASSERT(acyclic);
     igraph_destroy(&graph);
 
-    /* Directed cycle */
+    /* Directed cyclic */
     igraph_small(&graph, 4, IGRAPH_DIRECTED,
         0,1, 2,0, 1,3, 3,2,
         -1);
@@ -56,7 +56,7 @@ int main() {
     IGRAPH_ASSERT(!acyclic);
     igraph_destroy(&graph);
 
-    /* Directed without cycle */
+    /* Directed acyclic */
     igraph_small(&graph, 3, IGRAPH_DIRECTED,
         0,1, 2,0, 1,3,
         -1);
@@ -64,7 +64,7 @@ int main() {
     IGRAPH_ASSERT(acyclic);
     igraph_destroy(&graph);
 
-    /* Undirected cycle */
+    /* Undirected cyclic */
     igraph_small(&graph, 4, IGRAPH_UNDIRECTED,
         0,1, 2,0, 1,3, 3,2,
         -1);
@@ -72,7 +72,7 @@ int main() {
     IGRAPH_ASSERT(! acyclic);
     igraph_destroy(&graph);
 
-    /* Undirected without cycle */
+    /* Undirected acyclic */
     igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
         0,1, 2,0, 1,3,
         -1);
