@@ -619,25 +619,9 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
  * vertices and edges in the original input graph.
  */
 igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res) {
-    igraph_bool_t dag, forest;
-
     if (igraph_is_directed(graph)) {
-        // check if it's dag
-        IGRAPH_CHECK(igraph_is_dag(graph, &dag));
-        if (dag) {
-            // it's acyclic
-            *res = 1;
-            return IGRAPH_SUCCESS;
-        }
+        return igraph_is_dag(graph, res);
     } else {
-        // check if it's forest - need to figure out roots
-        IGRAPH_CHECK(igraph_is_forest(graph, &forest, NULL, IGRAPH_ALL));
-        if (forest) {
-            *res = 1;
-            return IGRAPH_SUCCESS;
-        }
+        return igraph_is_forest(graph, res, NULL, IGRAPH_ALL);
     }
-
-    *res = 0;
-    return IGRAPH_SUCCESS;
 }
