@@ -2,10 +2,6 @@
 
 ## [Unreleased]
 
-### Added
-
- - Add `igraph_is_acyclic()` to check whether a graph is acyclic.
-
 ### Changed
 
  - `igraph_get_all_shortest_paths_dijsktra()` now uses tolerances when comparing path
