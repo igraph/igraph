@@ -138,7 +138,10 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  * \ingroup generators
  * \function igraph_wheel
  * \brief Creates a \em wheel graph, a union of a star graph and a
- *        cycle graph.
+ *        cycle graph. Note that in case of a graph with 2 vertices,
+ *        the non-center vertex will have a self loop (may imagine
+ *        the earth is the center of the wheel, the moon and its orbit
+ *        is the rim of the wheel).
  * \param graph Pointer to an uninitialized graph object, this will
  *        be the result.
  * \param n Integer constant, the number of vertices in the graph.
@@ -151,9 +154,9 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  *        \cli IGRAPH_WHEEL_IN
  *          directed wheel graph, edges point
  *          \em to the center from the other vertices.
- *        \cli IGRAPH_STAR_MUTUAL
+ *        \cli IGRAPH_WHEEL_MUTUAL
  *          directed wheel graph with mutual edges.
- *        \cli IGRAPH_STAR_UNDIRECTED
+ *        \cli IGRAPH_WHEEL_UNDIRECTED
  *          an undirected wheel graph is
  *          created.
  *        \endclist
@@ -180,11 +183,10 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
 igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
                 igraph_integer_t center) {
 
-    igraph_integer_t* rim_vertex;
     igraph_integer_t  v;
     igraph_star_mode_t star_mode;
-    igraph_vector_int_t rim_edges;
-    long int i;
+    igraph_vector_int_t rim_edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i;
 
     /* create a star and also make use of its existing pre-check */
     /* works for all input parameters                            */
@@ -209,33 +211,45 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 
     IGRAPH_CHECK(igraph_star(graph, n, star_mode, center));
 
-    /* If n <= 2, wheel graph is identical with star graph, */
+    /* If n <= 1, wheel graph is identical with star graph, */
     /* no further processing is needed                      */
 
-    if (n <= 2) {
+    if (n <= 1) {
         return IGRAPH_SUCCESS;
-    }
-
-    /* A wheel rim will be created with an array rim_vertex */
-    /* whose elements contains the real vertices            */
-
-    rim_vertex = (igraph_integer_t*)calloc(n-2, sizeof(igraph_integer_t));
-    for (i = 0; i < center; i++) {
-        rim_vertex[i] = i;
-    }
-    for (i = center; i < n-1; i++) {
-        rim_vertex[i] = i + 1;
     }
 
     /* Add edges to the rim */
 
-    igraph_vector_int_init(&rim_edges, 2 * (n-1));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 2 * (n-1));
+
+    /* Assign first n-1 edges */
+
     for (i = 0; i < n-2; i++) {
-        VECTOR(rim_edges)[2 * i] = rim_vertex[i];
-        VECTOR(rim_edges)[2 * i + 1] = rim_vertex[i + 1];
+        if ( i < center ) {
+            VECTOR(rim_edges)[2 * i] = i;
+            if ( i + 1 < center ) {
+                VECTOR(rim_edges)[2 * i + 1] = i + 1;
+            } else {
+                VECTOR(rim_edges)[2 * i + 1] = i + 2;
+            }
+        } else {
+            VECTOR(rim_edges)[2 * i] = i + 1;
+            VECTOR(rim_edges)[2 * i + 1] = i + 2;
+        }
     }
-    VECTOR(rim_edges)[2 * n - 4] = rim_vertex[n-2];
-    VECTOR(rim_edges)[2 * n - 3] = rim_vertex[0];
+
+    /* Assign the last edge */
+
+    if ( n - 2 < center ) {
+        VECTOR(rim_edges)[2 * n - 4] = n - 2;
+    } else {
+        VECTOR(rim_edges)[2 * n - 4] = n - 1;
+    }
+    if ( center > 0 ) {
+        VECTOR(rim_edges)[2 * n - 3] = 0;
+    } else {
+        VECTOR(rim_edges)[2 * n - 3] = 1;
+    }
 
     /* Combine the rim into the star to make it a wheel graph */
 
@@ -253,7 +267,7 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
     }
 
     igraph_vector_int_destroy(&rim_edges);
-    free(rim_vertex);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
     
