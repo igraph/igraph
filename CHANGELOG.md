@@ -542,6 +542,7 @@
  - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
  - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM!)
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
+ - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica)
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
 
 ### Changed
