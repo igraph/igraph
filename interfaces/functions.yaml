@@ -1060,16 +1060,16 @@ igraph_weighted_clique_number:
 
 igraph_independent_vertex_sets:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0,
+        GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0,
         INTEGER max_size=0
     DEPS: res ON graph
 
 igraph_largest_independent_vertex_sets:
-    PARAMS: GRAPH graph, OUT VERTEXSET_LIST res
+    PARAMS: GRAPH graph, OUT VERTEXSETLIST res
     DEPS: res ON graph
 
 igraph_maximal_independent_vertex_sets:
-    PARAMS: GRAPH graph, OUT VERTEXSET_LIST res
+    PARAMS: GRAPH graph, OUT VERTEXSETLIST res
     DEPS: res ON graph
 
 igraph_independence_number:
