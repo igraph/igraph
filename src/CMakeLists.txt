@@ -60,8 +60,9 @@ add_library(
   core/statusbar.c
   core/strvector.c
   core/trie.c
-  core/vector_ptr.c
   core/vector.c
+  core/vector_list.c
+  core/vector_ptr.c
 
   math/bfgs.c
   math/complex.c

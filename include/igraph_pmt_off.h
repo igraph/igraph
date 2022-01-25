@@ -37,6 +37,10 @@
     #undef BASE_EPSILON
 #endif
 
+#ifdef BASE_VECTOR
+    #undef BASE_VECTOR
+#endif
+
 #ifdef CONCAT2
     #undef CONCAT2
 #endif
@@ -71,6 +75,10 @@
 
 #ifdef IN_FORMAT
     #undef IN_FORMAT
+#endif
+
+#ifdef ITEM_FUNCTION
+    #undef ITEM_FUNCTION
 #endif
 
 #ifdef MULTIPLICITY

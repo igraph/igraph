@@ -30,6 +30,7 @@
 
 #if defined(BASE_IGRAPH_REAL)
     #define BASE igraph_real_t
+    #define BASE_VECTOR igraph_vector_t
     #define SHORT
     #define OUT_FORMAT "%G"
     #define PRINTFUNC(val) igraph_real_printf(val)
@@ -40,6 +41,7 @@
 
 #elif defined(BASE_CHAR)
     #define BASE char
+    #define BASE_VECTOR igraph_vector_char_t
     #define SHORT char
     #define OUT_FORMAT "%d"
     #define ZERO 0
@@ -48,6 +50,7 @@
 
 #elif defined(BASE_BOOL)
     #define BASE igraph_bool_t
+    #define BASE_VECTOR igraph_vector_bool_t
     #define SHORT bool
     #define OUT_FORMAT "%d"
     #define ZERO 0
@@ -59,6 +62,7 @@
 
 #elif defined(BASE_INT)
     #define BASE igraph_integer_t
+    #define BASE_VECTOR igraph_vector_int_t
     #define SHORT int
     #define OUT_FORMAT "%" IGRAPH_PRId
     #define ZERO 0
@@ -82,6 +86,7 @@
 #elif defined(BASE_COMPLEX)
     #undef complex
     #define BASE igraph_complex_t
+    #define BASE_VECTOR igraph_vector_complex_t
     #define SHORT complex
     #define ZERO igraph_complex(0,0)
     #define ONE {{1.0,0.0}}
@@ -99,17 +104,35 @@
     #error unknown BASE_ directive
 #endif
 
-#if defined(BASE_IGRAPH_REAL)
-    #define FUNCTION(dir,name) CONCAT2(dir,name)
-    #define TYPE(dir) CONCAT2(dir,t)
-#elif defined(BASE_BOOL)
-    /* Special case because stdbool.h defines bool as a macro to _Bool which would
-    * screw things up */
-    #define FUNCTION(a,c) CONCAT3x(a,bool,c)
-    #define TYPE(dir) CONCAT3x(dir,bool,t)
+#if defined(VECTOR_LIST)
+    #if defined(BASE_IGRAPH_REAL)
+        #define ITEM_FUNCTION(dir,name) CONCAT2(dir,name)
+        #define FUNCTION(dir,name) CONCAT3(dir,list,name)
+        #define TYPE(dir) CONCAT3(dir,list,t)
+    #elif defined(BASE_BOOL)
+        /* Special case because stdbool.h defines bool as a macro to _Bool which would
+        * screw things up */
+        #define ITEM_FUNCTION(a,c) CONCAT3x(a,bool,c)
+        #define FUNCTION(a,c) CONCAT4x(a,bool,list,c)
+        #define TYPE(dir) CONCAT4x(dir,bool,list,t)
+    #else
+        #define ITEM_FUNCTION(a,c) CONCAT3(a,SHORT,c)
+        #define FUNCTION(a,c) CONCAT4(a,SHORT,list,c)
+        #define TYPE(dir) CONCAT4(dir,SHORT,list,t)
+    #endif
 #else
-    #define FUNCTION(a,c) CONCAT3(a,SHORT,c)
-    #define TYPE(dir) CONCAT3(dir,SHORT,t)
+    #if defined(BASE_IGRAPH_REAL)
+        #define FUNCTION(dir,name) CONCAT2(dir,name)
+        #define TYPE(dir) CONCAT2(dir,t)
+    #elif defined(BASE_BOOL)
+        /* Special case because stdbool.h defines bool as a macro to _Bool which would
+        * screw things up */
+        #define FUNCTION(a,c) CONCAT3x(a,bool,c)
+        #define TYPE(dir) CONCAT3x(dir,bool,t)
+    #else
+        #define FUNCTION(a,c) CONCAT3(a,SHORT,c)
+        #define TYPE(dir) CONCAT3(dir,SHORT,t)
+    #endif
 #endif
 
 #if defined(HEAP_TYPE_MIN)
