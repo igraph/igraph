@@ -96,6 +96,11 @@ VECTORLIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
+VECTOR_LIST:
+    # A vector containing vectors of floating-point numbers
+    CTYPE: igraph_vector_int_list_t
+    FLAGS: BY_REF
+
 VECTORM1:
     # A vector of integer indices that should adapt to the conventions of the
     # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
@@ -230,6 +235,16 @@ VERTEXSETLIST:
     # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
     # vector of igraph_vs_t objects
     CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+VERTEXSET_LIST:
+    # A vector containing vectors of igraph integers where each such
+    # vector represents a sequence of vertex indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
+    # the abstract type for igraph_vs_t, but a VERTEXSET_LIST is _not_ a
+    # vector of igraph_vs_t objects
+    CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
 VERTEX_COLOR:

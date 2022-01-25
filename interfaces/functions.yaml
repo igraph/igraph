@@ -1002,7 +1002,7 @@ igraph_bridges:
 
 igraph_cliques:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0,
+        GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0,
         INTEGER max_size=0
     DEPS: res ON graph
 
@@ -1016,11 +1016,11 @@ igraph_clique_size_hist:
         GRAPH graph, OUT VECTOR hist, INTEGER min_size=0, INTEGER max_size=0
 
 igraph_largest_cliques:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    PARAMS: GRAPH graph, OUT VERTEXSET_LIST res
     DEPS: res ON graph
 
 igraph_maximal_cliques:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0, INTEGER max_size=0
+    PARAMS: GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0, INTEGER max_size=0
     DEPS: res ON graph
 
 igraph_maximal_cliques_callback:
@@ -1045,13 +1045,13 @@ igraph_clique_number:
 
 igraph_weighted_cliques:
     PARAMS: |-
-        GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT VERTEXSETLIST res,
+        GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT VERTEXSET_LIST res,
         REAL min_weight=0, REAL max_weight=0, BOOLEAN maximal=False
     DEPS: vertex_weights ON graph, res ON graph
 
 igraph_largest_weighted_cliques:
     PARAMS: |-
-        GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT VERTEXSETLIST res
+        GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT VERTEXSET_LIST res
     DEPS: vertex_weights ON graph, res ON graph
 
 igraph_weighted_clique_number:
@@ -1060,16 +1060,16 @@ igraph_weighted_clique_number:
 
 igraph_independent_vertex_sets:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSETLIST res, INTEGER min_size=0,
+        GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0,
         INTEGER max_size=0
     DEPS: res ON graph
 
 igraph_largest_independent_vertex_sets:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    PARAMS: GRAPH graph, OUT VERTEXSET_LIST res
     DEPS: res ON graph
 
 igraph_maximal_independent_vertex_sets:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST res
+    PARAMS: GRAPH graph, OUT VERTEXSET_LIST res
     DEPS: res ON graph
 
 igraph_independence_number:

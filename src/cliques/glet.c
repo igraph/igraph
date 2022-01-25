@@ -343,7 +343,8 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     igraph_subgraph_edges(graph, &subg, igraph_ess_vector(&subv),
                           /*delete_vertices=*/ 0);
     IGRAPH_FINALLY(igraph_destroy, &subg);
-    igraph_maximal_cliques(&subg, &mycliques, /*min_size=*/ 0, /*max_size=*/ 0);
+    /* TODO(ntamas): migrate to igraph_vector_int_list_t! */
+    // igraph_maximal_cliques(&subg, &mycliques, /*min_size=*/ 0, /*max_size=*/ 0);
     igraph_destroy(&subg);
     IGRAPH_FINALLY_CLEAN(1);
     nocliques = igraph_vector_ptr_size(&mycliques);

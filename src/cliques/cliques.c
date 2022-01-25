@@ -215,7 +215,7 @@ static igraph_error_t igraph_i_find_k_indsets(
  *
  * \example examples/simple/igraph_cliques.c
  */
-igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_int_list_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size) {
     return igraph_i_cliquer_cliques(graph, res, min_size, max_size);
 }
@@ -329,7 +329,7 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  *
  */
 igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
-                            const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
+                            const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res,
                             igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     if (vertex_weights) {
         return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
@@ -370,7 +370,7 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * Time complexity: TODO
  */
 igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
-                                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res) {
+                                    const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res) {
     if (vertex_weights) {
         return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
     } else {
@@ -959,28 +959,27 @@ static igraph_error_t igraph_i_maximal_cliques_store_max_size(igraph_vector_int_
 }
 
 static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique, void* data) {
-    igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
-    igraph_integer_t i, n;
+    igraph_vector_int_list_t* result = (igraph_vector_int_list_t*)data;
+    igraph_integer_t n;
 
     /* Is the current clique at least as large as the others that we have found? */
-    if (!igraph_vector_ptr_empty(result)) {
+    if (!igraph_vector_int_list_empty(result)) {
+        igraph_vector_int_t* first;
+
         n = igraph_vector_int_size(clique);
-        if (n < igraph_vector_int_size(VECTOR(*result)[0])) {
+        first = igraph_vector_int_list_get(result, 0);
+        if (n < igraph_vector_int_size(first)) {
             igraph_vector_int_destroy(clique);
             igraph_Free(clique);
             return IGRAPH_SUCCESS;
         }
 
-        if (n > igraph_vector_int_size(VECTOR(*result)[0])) {
-            for (i = 0; i < igraph_vector_ptr_size(result); i++) {
-                igraph_vector_int_destroy(VECTOR(*result)[i]);
-            }
-            igraph_vector_ptr_free_all(result);
-            igraph_vector_ptr_resize(result, 0);
+        if (n > igraph_vector_int_size(first)) {
+            igraph_vector_int_list_clear(result);
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(result, clique));
+    IGRAPH_CHECK(igraph_vector_int_list_push_back(result, clique));
 
     return IGRAPH_SUCCESS;
 }
@@ -1018,11 +1017,9 @@ static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique
  * Time complexity: O(3^(|V|/3)) worst case.
  */
 
-igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
-    igraph_vector_ptr_clear(res);
-    IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
+igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_list_t *res) {
+    igraph_vector_int_list_clear(res);
     IGRAPH_CHECK(igraph_maximal_cliques_callback(graph, &igraph_i_largest_cliques_store, (void*)res, 0, 0));
-    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 

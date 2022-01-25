@@ -144,10 +144,12 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_le)(const TYPE(igraph_ve
                                                             const TYPE(igraph_vector) *rhs);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
                                                             const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp)(const void *lhs,
-                                                   const void *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp)(const void *lhs,
-                                                       const void *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp)(
+        const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp)(
+        const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp_untyped)(const void *lhs, const void *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs);
 #endif
 
 /*------------------------------*/

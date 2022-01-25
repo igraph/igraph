@@ -64,7 +64,7 @@ add_examples(
   igraph_sparsemat7
   igraph_sparsemat8
   igraph_strvector
-  igraph_vector_ptr_sort
+  igraph_vector_int_list_sort
 )
 
 add_legacy_tests(

@@ -25,30 +25,29 @@
 
 #include "test_utilities.inc"
 
-void sort_cliques(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+void sort_cliques(igraph_vector_int_list_t *cliques) {
+    int i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get(cliques, i);
         igraph_vector_int_sort(v);
     }
-    igraph_vector_ptr_sort(cliques, igraph_vector_int_lex_cmp);
+    igraph_vector_int_list_sort(cliques, igraph_vector_int_lex_cmp);
 }
 
-int print_and_destroy(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+int print_and_destroy(igraph_vector_int_list_t *cliques) {
+    int i, n = igraph_vector_int_list_size(cliques);
     sort_cliques(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get(cliques, i);
         igraph_vector_int_print(v);
-        igraph_vector_int_destroy(v);
     }
-    igraph_vector_ptr_destroy_all(cliques);
+    igraph_vector_int_list_destroy(cliques);
     return 0;
 }
 
 int main() {
     igraph_t graph;
-    igraph_vector_ptr_t cliques, cl1, cl2;
+    igraph_vector_int_list_t cliques, cl1, cl2;
     igraph_vector_int_t v1, v2;
     igraph_integer_t n, n1, n2;
 
@@ -57,7 +56,7 @@ int main() {
                             /*n=*/ 100, /*p=*/ 0.5, /*directed=*/ 0,
                             /*loops=*/ 0);
 
-    igraph_vector_ptr_init(&cliques, 0);
+    igraph_vector_int_list_init(&cliques, 0);
 
     igraph_maximal_cliques_subset(&graph, /*subset=*/ 0,
                                   &cliques, &n, /*outfile=*/ 0,
@@ -65,8 +64,8 @@ int main() {
 
     igraph_vector_int_init_seq(&v1,  0, 12);
     igraph_vector_int_init_seq(&v2, 13, 99);
-    igraph_vector_ptr_init(&cl1, 0);
-    igraph_vector_ptr_init(&cl2, 0);
+    igraph_vector_int_list_init(&cl1, 0);
+    igraph_vector_int_list_init(&cl2, 0);
     igraph_maximal_cliques_subset(&graph, &v1, &cl1, &n1, /*outfile=*/ 0,
                                   /*min_size=*/ 9, /*max_size=*/ 0);
     igraph_maximal_cliques_subset(&graph, &v2, &cl2, &n2, /*outfile=*/ 0,
@@ -78,10 +77,10 @@ int main() {
     if (n1 + n2 != n) {
         return 1;
     }
-    if (n1 != igraph_vector_ptr_size(&cl1)) {
+    if (n1 != igraph_vector_int_list_size(&cl1)) {
         return 2;
     }
-    if (n2 != igraph_vector_ptr_size(&cl2)) {
+    if (n2 != igraph_vector_int_list_size(&cl2)) {
         return 3;
     }
 
