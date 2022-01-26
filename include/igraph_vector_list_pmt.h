@@ -61,7 +61,7 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_v
 /* Resizing operations    */
 /*------------------------*/
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, append_new)(
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back_new)(
         TYPE(igraph_vector)* v, BASE_VECTOR** result);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize)(

@@ -95,7 +95,7 @@ static igraph_error_t collect_cliques_callback(set_t s, graph_t *g, clique_optio
     IGRAPH_ALLOW_INTERRUPTION();
 
     list = (igraph_vector_int_list_t *) opt->user_data;
-    IGRAPH_CHECK(igraph_vector_int_list_append_new(list, &clique));
+    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(list, &clique));
     IGRAPH_CHECK(igraph_vector_int_resize(clique, set_size(s)));
 
     i = -1; j = 0;
