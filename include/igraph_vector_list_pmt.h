@@ -61,8 +61,6 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_v
 /* Resizing operations    */
 /*------------------------*/
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back_new)(
-        TYPE(igraph_vector)* v, BASE_VECTOR** result);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize)(
         TYPE(igraph_vector)* v, igraph_integer_t newsize);
@@ -70,6 +68,10 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reserve)(
         TYPE(igraph_vector)* v, igraph_integer_t size);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(
         TYPE(igraph_vector)* v, BASE_VECTOR* e);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back_copy)(
+        TYPE(igraph_vector)* v, BASE_VECTOR* e);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back_new)(
+        TYPE(igraph_vector)* v, BASE_VECTOR** result);
 IGRAPH_EXPORT BASE_VECTOR* FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v);
 
 /*-----------*/

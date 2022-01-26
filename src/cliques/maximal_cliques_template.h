@@ -26,9 +26,7 @@
 #define RESNAME res
 #define SUFFIX
 #define RECORD do {                         \
-        igraph_vector_int_t *cl;      \
-        IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &cl));     \
-        IGRAPH_CHECK(igraph_vector_int_copy(cl, R));                   \
+        IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R));     \
     } while (0)
 #define PREPARE do {                    \
         igraph_vector_int_list_clear(res);           \
