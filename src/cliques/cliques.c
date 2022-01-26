@@ -450,6 +450,7 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t neis, *indset;
     igraph_integer_t *member_storage = 0, *new_member_storage, *c1;
+    igraph_vector_int_t new_member_storage_view;
     igraph_integer_t i, j, k, indset_count, old_indset_count;
 
     if (igraph_is_directed(graph)) {
@@ -524,8 +525,8 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
         /* Add the cliques just found to the result if requested */
         if (i >= min_size && i <= max_size) {
             for (j = 0, k = 0; j < indset_count; j++, k += i) {
-                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &indset));
-                IGRAPH_CHECK(igraph_vector_int_init_copy(indset, &new_member_storage[k], i));
+                igraph_vector_int_view(&new_member_storage_view, new_member_storage + k, i);
+                IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &new_member_storage_view));
             }
         }
 
