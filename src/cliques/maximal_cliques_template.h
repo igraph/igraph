@@ -68,9 +68,7 @@
 #define SUFFIX _subset
 #define RECORD do {                         \
         if (res) {                                \
-            igraph_vector_int_t *cl;      \
-            IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &cl));      \
-            IGRAPH_CHECK(igraph_vector_int_copy(cl, R));                    \
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R));      \
         }                                 \
         if (no) { (*no)++; }                              \
         if (outfile) { igraph_vector_int_fprint(R, outfile); }        \

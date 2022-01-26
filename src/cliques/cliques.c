@@ -713,6 +713,9 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
         }
     }
 
+    igraph_vector_int_destroy(&vec);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 

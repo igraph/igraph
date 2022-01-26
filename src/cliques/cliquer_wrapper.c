@@ -11,16 +11,6 @@
 
 #include <limits.h>
 
-/* For use with IGRAPH_FINALLY */
-static void free_clique_list(igraph_vector_ptr_t *vp) {
-    igraph_integer_t i, len;
-    len = igraph_vector_ptr_size(vp);
-    for (i = 0; i < len; ++i) {
-        igraph_vector_int_destroy((igraph_vector_int_t *) VECTOR(*vp)[i]);
-    }
-    igraph_vector_ptr_free_all(vp);
-}
-
 /* We shall use this option struct for all calls to Cliquer */
 static IGRAPH_THREAD_LOCAL clique_options igraph_cliquer_opt = {
     reorder_by_default, NULL, NULL, NULL, NULL, NULL, NULL, 0
