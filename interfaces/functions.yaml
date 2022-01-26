@@ -617,7 +617,7 @@ igraph_neighborhood_size:
 
 igraph_neighborhood:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSETLIST res,
+        GRAPH graph, OUT VERTEXSET_LIST res,
         VERTEXSET vids, INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
     DEPS: res ON graph, vids ON graph
