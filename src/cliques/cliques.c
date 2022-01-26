@@ -980,6 +980,7 @@ static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique
     }
 
     IGRAPH_CHECK(igraph_vector_int_list_push_back(result, clique));
+    igraph_Free(clique);
 
     return IGRAPH_SUCCESS;
 }
