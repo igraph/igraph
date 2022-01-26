@@ -37,7 +37,6 @@ void print_and_destroy(igraph_vector_int_list_t *cliques) {
     sort_cliques(cliques);
     print_vector_int_list(cliques);
     igraph_vector_int_list_destroy(cliques);
-    return 0;
 }
 
 int main() {
