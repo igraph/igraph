@@ -185,14 +185,11 @@ static igraph_error_t igraph_i_find_k_indsets(
  * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
  *
  * \param graph The input graph.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
- *   objects which contain the indices of vertices involved in a clique.
- *   The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed.
- * \param min_size Integer giving the minimum size of the cliques to be
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
+ * \param min_size Integer specifying the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
- * \param max_size Integer giving the maximum size of the cliques to be
+ * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
@@ -224,9 +221,9 @@ igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_int_list_t *r
  * here. The first element will store the number of size-1 cliques, the second
  * element the number of size-2 cliques, etc.  For cliques smaller than \p min_size,
  * zero counts will be returned.
- * \param min_size Integer giving the minimum size of the cliques to be
+ * \param min_size Integer specifying the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
- * \param max_size Integer giving the maximum size of the cliques to be
+ * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
@@ -258,9 +255,9 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
  *
  * \param graph The input graph.
- * \param min_size Integer giving the minimum size of the cliques to be
+ * \param min_size Integer specifying the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
- * \param max_size Integer giving the maximum size of the cliques to be
+ * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param cliquehandler_fn Callback function to be called for each clique.
  * See also \ref igraph_clique_handler_t.
@@ -298,14 +295,11 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts. You may pass \c NULL
  *   here to make each vertex have a weight of 1.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
- *   objects which contain the indices of vertices involved in a clique.
- *   The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed.
- * \param min_weight Integer giving the minimum weight of the cliques to be
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
+ * \param min_weight Integer specifying the minimum weight of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
- * \param max_weight Integer giving the maximum weight of the cliques to be
+ * \param max_weight Integer specifying the maximum weight of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param maximal If true, only maximal cliques will be returned
  * \return Error code.
@@ -345,11 +339,8 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts. You may pass \c NULL
  *   here to make each vertex have a weight of 1.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
- *   objects which contain the indices of vertices involved in a clique.
- *   The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed.
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
  * \return Error code.
  *
  * \sa \ref igraph_weighted_cliques(), \ref igraph_weighted_clique_number(), \ref igraph_largest_cliques()
@@ -437,14 +428,11 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  * 6:505--517, 1977.
  *
  * \param graph The input graph.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
- *   objects which contain the indices of vertices involved in an independent
- *   vertex set. The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed.
- * \param min_size Integer giving the minimum size of the sets to be
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
+ * \param min_size Integer specifying the minimum size of the sets to be
  *   returned. If negative or zero, no lower bound will be used.
- * \param max_size Integer giving the maximum size of the sets to be
+ * \param max_size Integer specifying the maximum size of the sets to be
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
@@ -567,8 +555,8 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
  * 6:505--517, 1977.
  *
  * \param graph The input graph.
- * \param res Pointer to a pointer vector, the result will be stored
- *     here. It will be resized as needed.
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
  * \return Error code.
  *
  * \sa \ref igraph_independent_vertex_sets(), \ref
@@ -761,11 +749,8 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
  * use \ref igraph_independence_number() instead.
  *
  * \param graph The input graph.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
- *   objects which contain the indices of vertices involved in an independent
- *   vertex set. The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed.
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques(), \ref
@@ -972,9 +957,8 @@ static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique
  * these two versions.
  *
  * \param graph The input graph.
- * \param res Pointer to an initialized pointer vector, the result
- *        will be stored here. It will be resized as needed. Note that
- *        vertices of a clique may be returned in arbitrary order.
+ * \param res Pointer to a list of integer vectors, the result will be stored
+ *   here. The pointer vector will be resized if needed.
  * \return Error code.
  *
  * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
