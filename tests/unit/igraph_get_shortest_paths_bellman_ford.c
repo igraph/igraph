@@ -24,17 +24,17 @@
 #include "test_utilities.inc"
 #include <stdlib.h>
 
-void check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
-                 const igraph_vector_ptr_t *evecs) {
+void check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
+                 const igraph_vector_int_list_t *evecs) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t i, n = igraph_vector_ptr_size(vecs);
+    igraph_integer_t i, n = igraph_vector_int_list_size(vecs);
 
-    IGRAPH_ASSERT(igraph_vector_ptr_size(evecs) == n);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(evecs) == n);
 
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *vvec = VECTOR(*vecs)[i];
-        igraph_vector_int_t *evec = VECTOR(*evecs)[i];
+        igraph_vector_int_t *vvec = igraph_vector_int_list_get(vecs, i);
+        igraph_vector_int_t *evec = igraph_vector_int_list_get(evecs, i);
         igraph_integer_t j, n2 = igraph_vector_int_size(evec);
         if (igraph_vector_int_size(vvec) == 0 && n2 == 0) {
             continue;
@@ -96,9 +96,8 @@ void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
 
 int main() {
     igraph_t g;
-    igraph_vector_ptr_t vecs, evecs;
+    igraph_vector_int_list_t vecs, evecs;
     igraph_vector_int_t pred, inbound;
-    igraph_integer_t i;
     igraph_real_t weights_data_0[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_real_t weights_data_1[] = { 6, 7, 8, -4, -2, -3, 9, 2, 7 };
     igraph_real_t weights_data_2[] = { 6, 7, 2, -4, -2, -3, 9, 2, 7 };
@@ -123,15 +122,8 @@ int main() {
     igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
     igraph_vs_size(&g, &vs, &vs_size);
 
-    igraph_vector_ptr_init(&vecs, vs_size);
-    igraph_vector_ptr_init(&evecs, vs_size);
-
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_int_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_int_init(VECTOR(evecs)[i], 0);
-    }
+    igraph_vector_int_list_init(&vecs, 0);
+    igraph_vector_int_list_init(&evecs, 0);
 
     igraph_vector_view(&weights_vec, weights_data_0, sizeof(weights_data_0) / sizeof(weights_data_0[0]));
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
@@ -143,27 +135,11 @@ int main() {
     check_evecs(&g, &vecs, &evecs);
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_int(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(vecs)[i]);
-        free(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(evecs)[i]);
-        free(VECTOR(evecs)[i]);
-    }
+    print_vector_int_list(&vecs);
 
     printf("\nPaths to all vertices\n");
 
     vs_size = igraph_vcount(&g);
-
-    igraph_vector_ptr_resize(&vecs, vs_size);
-    igraph_vector_ptr_resize(&evecs, vs_size);
-
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_int_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_int_init(VECTOR(evecs)[i], 0);
-    }
 
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ igraph_vss_all(),
@@ -174,16 +150,10 @@ int main() {
     check_evecs(&g, &vecs, &evecs);
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_int(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(vecs)[i]);
-        free(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(evecs)[i]);
-        free(VECTOR(evecs)[i]);
-    }
+    print_vector_int_list(&vecs);
 
-    igraph_vector_ptr_destroy(&vecs);
-    igraph_vector_ptr_destroy(&evecs);
+    igraph_vector_int_list_destroy(&vecs);
+    igraph_vector_int_list_destroy(&evecs);
 
     igraph_vector_int_destroy(&pred);
     igraph_vector_int_destroy(&inbound);
@@ -198,17 +168,11 @@ int main() {
 
     /* Graph with negative weights */
 
-    igraph_vector_ptr_init(&vecs, 5);
-    igraph_vector_ptr_init(&evecs, 5);
+    igraph_vector_int_list_init(&vecs, 0);
+    igraph_vector_int_list_init(&evecs, 0);
     igraph_vector_int_init(&pred, 0);
     igraph_vector_int_init(&inbound, 0);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_int_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_int_init(VECTOR(evecs)[i], 0);
-    }
     igraph_vs_vector_small(&vs, 0, 1, 3, 2, 1,  -1);
     igraph_small(&g, 5, IGRAPH_DIRECTED,
                  0, 1, 0, 3, 1, 3, 1, 4, 2, 1, 3, 2, 3, 4, 4, 0, 4, 2,
@@ -224,13 +188,7 @@ int main() {
     check_evecs(&g, &vecs, &evecs);
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_int(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(vecs)[i]);
-        free(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(evecs)[i]);
-        free(VECTOR(evecs)[i]);
-    }
+    print_vector_int_list(&vecs);
 
     /***************************************/
 
@@ -244,8 +202,8 @@ int main() {
                                                          /*predecessors=*/ &pred,
                                                          /*inbound_edges=*/ &inbound) == IGRAPH_ENEGLOOP);
 
-    igraph_vector_ptr_destroy(&vecs);
-    igraph_vector_ptr_destroy(&evecs);
+    igraph_vector_int_list_destroy(&vecs);
+    igraph_vector_int_list_destroy(&evecs);
     igraph_vector_int_destroy(&pred);
     igraph_vector_int_destroy(&inbound);
 

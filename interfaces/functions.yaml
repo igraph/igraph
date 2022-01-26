@@ -389,7 +389,7 @@ igraph_shortest_paths:
 igraph_get_shortest_paths:
     PARAMS: |-
         GRAPH graph,
-        OPTIONAL OUT VERTEXSETLIST vertices, OPTIONAL OUT EDGESETLIST edges,
+        OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
         VERTEX from, VERTEXSET to=ALL, NEIMODE mode=OUT,
         OPTIONAL OUT VECTOR_INT predecessors,
         OPTIONAL OUT VECTOR_INT inbound_edges
@@ -397,8 +397,8 @@ igraph_get_shortest_paths:
 
 igraph_get_all_shortest_paths:
     PARAMS: |-
-        GRAPH graph, OPTIONAL OUT VERTEXSETLIST vertices,
-        OPTIONAL OUT EDGESETLIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
         VERTEX from, VERTEXSET to, NEIMODE mode=OUT
     DEPS: edges ON graph, from ON graph, to ON graph
 
@@ -410,8 +410,8 @@ igraph_shortest_paths_dijkstra:
 
 igraph_get_shortest_paths_dijkstra:
     PARAMS: |-
-        GRAPH graph, OPTIONAL OUT VERTEXSETLIST vertices,
-        OPTIONAL OUT EDGESETLIST edges, VERTEX from, VERTEXSET to=ALL,
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         OPTIONAL OUT VECTOR_INT predecessors=0,
         OPTIONAL OUT VECTOR_INT inbound_edges=0
@@ -421,8 +421,8 @@ igraph_get_shortest_paths_dijkstra:
 
 igraph_get_shortest_paths_bellman_ford:
     PARAMS: |-
-        GRAPH graph, OPTIONAL OUT VERTEXSETLIST vertices,
-        OPTIONAL OUT EDGESETLIST edges, VERTEX from, VERTEXSET to=ALL,
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         OPTIONAL OUT VECTOR_INT predecessors=0,
         OPTIONAL OUT VECTOR_INT inbound_edges=0
@@ -432,8 +432,8 @@ igraph_get_shortest_paths_bellman_ford:
 
 igraph_get_all_shortest_paths_dijkstra:
     PARAMS: |-
-        GRAPH graph, OPTIONAL OUT VERTEXSETLIST vertices,
-        OPTIONAL OUT EDGESETLIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
         VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights,
         NEIMODE mode=OUT
     DEPS: |-

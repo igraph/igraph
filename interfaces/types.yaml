@@ -208,6 +208,16 @@ EDGESETLIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
+EDGESET_LIST:
+    # A vector containing vectors of igraph integers where each such
+    # vector represents a sequence of edge indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because EDGESET is
+    # the abstract type for igraph_es_t, but an EDGESET_LIST is _not_ a
+    # vector of igraph_es_t objects
+    CTYPE: igraph_vector_int_list_t
+    FLAGS: BY_REF
+
 GRAPHLIST:
     # A vector containing pointers to graph objects
     CTYPE: igraph_vector_ptr_t

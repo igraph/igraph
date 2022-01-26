@@ -225,23 +225,13 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *
  * \param graph The input graph, can be directed.
  * \param vertices The result, the IDs of the vertices along the paths.
- *        This is a pointer vector, each element points to a vector
- *        object. These should be initialized before passing them to
- *        the function, which will properly clear and/or resize them
- *        and fill the IDs of the vertices along the geodesics from/to
- *        the vertices. Supply a null pointer here if you don't need
- *        these vectors. Normally, either this argument, or the \c
- *        edges should be non-null, but no error or warning is given
- *        if they are both null pointers.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
  * \param edges The result, the IDs of the edges along the paths.
- *        This is a pointer vector, each element points to a vector
- *        object. These should be initialized before passing them to
- *        the function, which will properly clear and/or resize them
- *        and fill the IDs of the vertices along the geodesics from/to
- *        the vertices. Supply a null pointer here if you don't need
- *        these vectors. Normally, either this argument, or the \c
- *        vertices should be non-null, but no error or warning is given
- *        if they are both null pointers.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
@@ -295,8 +285,8 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  */
 
 igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
-                                        igraph_vector_ptr_t *vertices,
-                                        igraph_vector_ptr_t *edges,
+                                        igraph_vector_int_list_t *vertices,
+                                        igraph_vector_int_list_t *edges,
                                         igraph_integer_t from,
                                         igraph_vs_t to,
                                         const igraph_vector_t *weights,
@@ -333,11 +323,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
     IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
 
-    if (vertices && IGRAPH_VIT_SIZE(tovit) != igraph_vector_ptr_size(vertices)) {
-        IGRAPH_ERROR("Size of `vertices' and `to' should match.", IGRAPH_EINVAL);
+    if (vertices) {
+        IGRAPH_CHECK(igraph_vector_int_list_resize(vertices, IGRAPH_VIT_SIZE(tovit)));
     }
-    if (edges && IGRAPH_VIT_SIZE(tovit) != igraph_vector_ptr_size(edges)) {
-        IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
+    if (edges) {
+        IGRAPH_CHECK(igraph_vector_int_list_resize(edges, IGRAPH_VIT_SIZE(tovit)));
     }
 
     parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
@@ -432,11 +422,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             igraph_integer_t size, act, edge;
             igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
-                vvec = VECTOR(*vertices)[i];
+                vvec = igraph_vector_int_list_get(vertices, i);
                 igraph_vector_int_clear(vvec);
             }
             if (edges) {
-                evec = VECTOR(*edges)[i];
+                evec = igraph_vector_int_list_get(edges, i);
                 igraph_vector_int_clear(evec);
             }
 
@@ -535,20 +525,18 @@ igraph_error_t igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
                                           const igraph_vector_t *weights,
                                           igraph_neimode_t mode) {
 
-    igraph_vector_ptr_t vertices2, *vp = &vertices2;
-    igraph_vector_ptr_t edges2, *ep = &edges2;
+    igraph_vector_int_list_t vertices2, *vp = &vertices2;
+    igraph_vector_int_list_t edges2, *ep = &edges2;
 
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&vertices2, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vertices2);
-        VECTOR(vertices2)[0] = vertices;
+        IGRAPH_CHECK(igraph_vector_int_list_init(&vertices2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &vertices2);
     } else {
         vp = NULL;
     }
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&edges2, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &edges2);
-        VECTOR(edges2)[0] = edges;
+        IGRAPH_CHECK(igraph_vector_int_list_init(&edges2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &edges2);
     } else {
         ep = NULL;
     }
@@ -558,11 +546,13 @@ igraph_error_t igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
                                                         weights, mode, NULL, NULL));
 
     if (edges) {
-        igraph_vector_ptr_destroy(&edges2);
+        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get(&edges2, 0)));
+        igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        igraph_vector_ptr_destroy(&vertices2);
+        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get(&vertices2, 0)));
+        igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

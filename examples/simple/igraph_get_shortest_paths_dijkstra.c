@@ -25,26 +25,18 @@
 
 #include <stdlib.h>
 
-void print_vector_int(igraph_vector_int_t *v) {
-    igraph_integer_t i, l = igraph_vector_int_size(v);
-    for (i = 0; i < l; i++) {
-        printf(" %" IGRAPH_PRId, VECTOR(*v)[i]);
-    }
-    printf("\n");
-}
-
-int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
-                const igraph_vector_ptr_t *evecs, int error_code) {
+int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
+                const igraph_vector_int_list_t *evecs, int error_code) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t i, n = igraph_vector_ptr_size(vecs);
-    if (igraph_vector_ptr_size(evecs) != n) {
+    igraph_integer_t i, n = igraph_vector_int_list_size(vecs);
+    if (igraph_vector_int_list_size(evecs) != n) {
         exit(error_code + 1);
     }
 
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *vvec = VECTOR(*vecs)[i];
-        igraph_vector_int_t *evec = VECTOR(*evecs)[i];
+        igraph_vector_int_t *vvec = igraph_vector_int_list_get(vecs, i);
+        igraph_vector_int_t *evec = igraph_vector_int_list_get(evecs, i);
         igraph_integer_t j, n2 = igraph_vector_int_size(evec);
         if (igraph_vector_int_size(vvec) == 0 && n2 == 0) {
             continue;
@@ -125,7 +117,7 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
 int main() {
 
     igraph_t g;
-    igraph_vector_ptr_t vecs, evecs;
+    igraph_vector_int_list_t vecs, evecs;
     igraph_vector_int_t pred, inbound;
     igraph_integer_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
@@ -137,17 +129,11 @@ int main() {
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
 
-    igraph_vector_ptr_init(&vecs, 6);
-    igraph_vector_ptr_init(&evecs, 6);
+    igraph_vector_int_list_init(&vecs, 0);
+    igraph_vector_int_list_init(&evecs, 0);
     igraph_vector_int_init(&pred, 0);
     igraph_vector_int_init(&inbound, 0);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_init(VECTOR(vecs)[i], 0);
-        VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_init(VECTOR(evecs)[i], 0);
-    }
     igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
 
     igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs,
@@ -159,8 +145,8 @@ int main() {
     check_evecs(&g, &vecs, &evecs, 10);
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 40);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_int(VECTOR(vecs)[i]);
+    for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
+        igraph_vector_int_print(igraph_vector_int_list_get(&vecs, i));
     }
 
     /* Same ring, but with weights */
@@ -175,8 +161,8 @@ int main() {
     check_evecs(&g, &vecs, &evecs, 20);
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 50);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_int(VECTOR(vecs)[i]);
+    for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
+        igraph_vector_int_print(igraph_vector_int_list_get(&vecs, i));
     }
 
     igraph_destroy(&g);
@@ -202,16 +188,12 @@ int main() {
     check_evecs(&g, &vecs, &evecs, 30);
     check_pred_inbound(&g, &pred, &inbound, /* from= */ 0, 60);
 
-    for (i = 0; i < igraph_vector_ptr_size(&vecs); i++) {
-        print_vector_int(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(vecs)[i]);
-        free(VECTOR(vecs)[i]);
-        igraph_vector_int_destroy(VECTOR(evecs)[i]);
-        free(VECTOR(evecs)[i]);
+    for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
+        igraph_vector_int_print(igraph_vector_int_list_get(&vecs, i));
     }
 
-    igraph_vector_ptr_destroy(&vecs);
-    igraph_vector_ptr_destroy(&evecs);
+    igraph_vector_int_list_destroy(&vecs);
+    igraph_vector_int_list_destroy(&evecs);
     igraph_vector_int_destroy(&pred);
     igraph_vector_int_destroy(&inbound);
 
