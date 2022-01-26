@@ -27,33 +27,28 @@ void call_and_print(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mod
 }
 
 int main() {
-    igraph_t g_1, g_2, g_3, g_4, g_5, g_6, g_7, g_8;
+    igraph_t graph;
 
     printf("-- Test graph with 1 vertex --\n");
-    call_and_print(&g_1, 1, IGRAPH_WHEEL_UNDIRECTED, 0);
+    call_and_print(&graph, 1, IGRAPH_WHEEL_UNDIRECTED, 0);
     printf("-- Test graph with 2 vertices --\n");
-    call_and_print(&g_2, 2, IGRAPH_WHEEL_UNDIRECTED, 0);
+    call_and_print(&graph, 2, IGRAPH_WHEEL_UNDIRECTED, 0);
     printf("-- Test graph with OUT mode --\n");
-    call_and_print(&g_3, 4, IGRAPH_WHEEL_OUT, 0);
+    call_and_print(&graph, 4, IGRAPH_WHEEL_OUT, 0);
     printf("-- Test graph with IN mode --\n");
-    call_and_print(&g_4, 4, IGRAPH_WHEEL_IN, 0);
+    call_and_print(&graph, 4, IGRAPH_WHEEL_IN, 0);
     printf("-- Test graph with MUTUAL mode --\n");
-    call_and_print(&g_5, 4, IGRAPH_WHEEL_MUTUAL, 0);
+    call_and_print(&graph, 4, IGRAPH_WHEEL_MUTUAL, 0);
     printf("-- Test graph with UNDIRECTED mode \n");
-    call_and_print(&g_6, 4, IGRAPH_WHEEL_UNDIRECTED, 0);
+    call_and_print(&graph, 4, IGRAPH_WHEEL_UNDIRECTED, 0);
     printf("-- Test graph with center equal to n/2 --\n");
-    call_and_print(&g_7, 4, IGRAPH_WHEEL_OUT, 2);
-    printf("-- Test graph with center equal n - 1: --\n");
-    call_and_print(&g_8, 4, IGRAPH_WHEEL_OUT, 3);
+    call_and_print(&graph, 4, IGRAPH_WHEEL_OUT, 2);
+    printf("-- Test graph with center equal to n - 1: --\n");
+    call_and_print(&graph, 4, IGRAPH_WHEEL_OUT, 3);
+    printf("-- Test graph with center equal to 1: --\n");
+    call_and_print(&graph, 4, IGRAPH_WHEEL_OUT, 1);
 
-    igraph_destroy(&g_1);
-    igraph_destroy(&g_2);
-    igraph_destroy(&g_3);
-    igraph_destroy(&g_4);
-    igraph_destroy(&g_5);
-    igraph_destroy(&g_6);
-    igraph_destroy(&g_7);
-    igraph_destroy(&g_8);
+    igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
 

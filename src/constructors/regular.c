@@ -183,15 +183,14 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
 igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
                 igraph_integer_t center) {
 
-    igraph_integer_t  v;
     igraph_star_mode_t star_mode;
     igraph_vector_int_t rim_edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t i;
 
-    /* create a star and also make use of its existing pre-check */
-    /* works for all input parameters                            */
+    /* create a star and also make use of its existing input parameter checking, */
+    /* error if "Invalid number of vertices" and "Invalid center vertex".        */
 
-    switch(mode)
+    switch (mode)
     {
         case IGRAPH_WHEEL_OUT:
             star_mode = IGRAPH_STAR_OUT;
@@ -206,23 +205,34 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
             star_mode = IGRAPH_STAR_UNDIRECTED;
             break;
         default:
-            IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
+            IGRAPH_ERROR("Invalid wheel graph mode.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_CHECK(igraph_star(graph, n, star_mode, center));
 
     /* If n <= 1, wheel graph is identical with star graph, */
-    /* no further processing is needed                      */
+    /* no further processing is needed.                     */
 
     if (n <= 1) {
         return IGRAPH_SUCCESS;
     }
 
-    /* Add edges to the rim */
+    /* Register the star for deallocation in case of error flow before */
+    /* the entire wheel is successfully created.                       */
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 2 * (n-1));
+    IGRAPH_FINALLY(igraph_destroy, graph);
 
-    /* Assign first n-1 edges */
+    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices, */
+    /* it will have n - 1 edges. However, for MUTUAL mode, number of   */
+    /* edges will be double.                                           */
+
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 4 * (n-1));
+    } else {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 2 * (n-1));
+    }
+
+    /* Assign first n-1 edges (not MUTUAL). */
 
     for (i = 0; i < n-2; i++) {
         if ( i < center ) {
@@ -238,7 +248,7 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
         }
     }
 
-    /* Assign the last edge */
+    /* Assign the last edge (not MUTUAL). */
 
     if ( n - 2 < center ) {
         VECTOR(rim_edges)[2 * n - 4] = n - 2;
@@ -251,23 +261,23 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
         VECTOR(rim_edges)[2 * n - 3] = 1;
     }
 
+    /* If MUTUAL, add reverse-direction edges. */
+
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        for (i=0; i < 2 * (n-1); i++) {
+            VECTOR(rim_edges)[4 * (n-1) - 1 - i] = VECTOR(rim_edges)[i];
+        }
+    }
+
     /* Combine the rim into the star to make it a wheel graph */
 
     IGRAPH_CHECK(igraph_add_edges(graph, &rim_edges, 0));
 
-    /* Add a reverse direction rim if mode is MUTUAL */
-
-    if (mode == IGRAPH_WHEEL_MUTUAL) {
-        for (i=0; i < n-1; i++) {
-            v = VECTOR(rim_edges)[2 * i];
-            VECTOR(rim_edges)[2 * i] = VECTOR(rim_edges)[2 * i + 1];
-            VECTOR(rim_edges)[2 * i + 1] = v;
-        }
-        IGRAPH_CHECK(igraph_add_edges(graph, &rim_edges, 0));
-    }
-
     igraph_vector_int_destroy(&rim_edges);
-    IGRAPH_FINALLY_CLEAN(1);
+
+    /* 2 instead of 1 because the star graph is registered before */
+
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
     
