@@ -73,13 +73,13 @@ IGRAPH_EXPORT igraph_error_t igraph_largest_weighted_cliques(const igraph_t *gra
 IGRAPH_EXPORT igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
                                                 const igraph_vector_t *vertex_weights, igraph_real_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
-                                                 igraph_vector_ptr_t *res,
+                                                 igraph_vector_int_list_t *res,
                                                  igraph_integer_t min_size,
                                                  igraph_integer_t max_size);
 IGRAPH_EXPORT igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
-                                                         igraph_vector_ptr_t *res);
+                                                         igraph_vector_int_list_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
-                                                         igraph_vector_ptr_t *res);
+                                                         igraph_vector_int_list_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_t *no);
 
 /**
