@@ -24,8 +24,11 @@
 #ifndef IGRAPH_ITERATORS_H
 #define IGRAPH_ITERATORS_H
 
+#include "igraph_datatype.h"
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
@@ -52,7 +55,7 @@ typedef struct igraph_vs_t {
         struct {
             igraph_integer_t vid;
             igraph_neimode_t mode;
-        } adj;                  /* adjacent vertices  */
+        } adj;                              /* adjacent vertices  */
         struct {
             igraph_integer_t from;
             igraph_integer_t to;
@@ -140,7 +143,7 @@ typedef struct igraph_vit_t {
  * igraph_vs_adj(&amp;vs, 0, IGRAPH_ALL);
  * igraph_vit_create(&amp;graph, vs, &amp;vit);
  * while (!IGRAPH_VIT_END(vit)) {
- *   printf(" %li", (long int) IGRAPH_VIT_GET(vit));
+ *   printf(" %" IGRAPH_PRId, IGRAPH_VIT_GET(vit));
  *   IGRAPH_VIT_NEXT(vit);
  * }
  * printf("\n");

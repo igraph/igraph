@@ -36,6 +36,9 @@
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` now return the cuts in
    an `igraph_vector_ptr_t` containing `igraph_vector_int_t` vectors.
 
+ - `igraph_arpack_unpack_complex()` now uses `igraph_integer_t` for its `nev`
+   argument instead of `long int`.
+
  - `igraph_articulation_points()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`.
 
@@ -111,10 +114,18 @@
    return the edge IDs in the order of their removal as well as the list of edge
    IDs whose removal broke a single component into two.
 
+ - `igraph_community_fluid_communities()` does not provide the modularity in a
+   separate output argument any more; use `igraph_modularity()` to retrieve the
+   modularity if you need it.
+
  - `igraph_community_label_propagation()` now uses an `igraph_vector_int_t` for its
    `initial` parameter. It also takes a `mode` argument that specifies how
    labels should be propagated along edges (forward, backward or ignoring edge
    directions).
+
+ - `igraph_community_label_propagation()` does not provide the modularity in a
+   separate output argument any more; use `igraph_modularity()` to retrieve the
+   modularity if you need it.
 
  - `igraph_coreness()` now uses an `igraph_vector_int_t` to return the coreness
    values.
@@ -183,6 +194,10 @@
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
+ - `igraph_get_adjacency_sparse()` now returns the sparse adjacency matrix in
+   an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
+   _initialized_ for sake of consistency with other igraph functions.
+
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
@@ -220,6 +235,10 @@
  - The `igraph_vector_ptr_t` maps parameters in `igraph_get_isomorphisms_vf2()`
    and `igraph_get_subisomorphisms_vf2()` now contain `igraph_vector_int_t`,
    not `igraph_vector_t`.
+
+ - `igraph_get_stochastic_sparse()` now returns the sparse adjacency matrix in
+   an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
+   _initialized_ for sake of consistency with other igraph functions.
 
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
@@ -273,7 +292,8 @@
  - The `vids` parameter for `igraph_isoclass_subgraph()` is now an
    `igraph_vector_int_t` instead of `igraph_vector_t`.
 
- - `igraph_isomorphic_vf2()`, `igraph_isomorphic_function_vf2()` and
+ - `igraph_isomorphic_vf2()`, `igraph_get_isomorphisms_vf2_callback()` (which
+   used to be called `igraph_isomorphic_function_vf2()`) and
    `igraph_isohandler_t` now all use `igraph_vector_int_t` for their `map12` and
    `map21` parameters.
 
@@ -358,7 +378,7 @@
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
 
- - `igraph_preferennce_game()` now uses an `igraph_vector_int_t` to return the
+ - `igraph_preference_game()` now uses an `igraph_vector_int_t` to return the
    types of the nodes in the generated graph.
 
  - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
@@ -408,7 +428,8 @@
    return the list of vertices in the same component as the seed vertex instead
    of an `igraph_vector_t`.
 
- - `igraph_subisomorphic_vf2()`, `igraph_subisomorphic_function_vf2()` and
+ - `igraph_subisomorphic_vf2()`, `igraph_get_subisomorphisms_vf2_callback()`
+   (which used to be called `igraph_subisomorphic_function_vf2()`) and
    `igraph_isomorphic_bliss()` now all use `igraph_vector_int_t` for their `map12`
    and `map21` parameters.
 
@@ -448,6 +469,10 @@
  - `igraph_vector_order()` was removed; use `igraph_vector_int_pair_order()` instead.
    (The original function worked for vectors containing integers only).
 
+ - `igraph_vector_qsort_ind()` and its variants now take an `igraph_order_t` enum
+   instead of a boolean to denote whether the order should be ascending or
+   descending.
+
  - The `add_edges()` function in the attribute handler now takes an
    `igraph_vector_int_t` for its `edges` parameter instead of an
    `igraph_vector_t`. The `add_vertices()` function now takes an
@@ -475,7 +500,7 @@
 
  - Functions that used an `igraph_vector_t` to represent cluster size
    and cluster membership now use an `igraph_vector_int_t` instead. These are:
-   - `igraph_clusters()`
+   - `igraph_connected_components()` (used to be `igraph_clusters()` in 0.9 and before)
    - `igraph_community_eb_get_merges()`
    - `igraph_community_edge_betweenness()`
    - `igraph_community_fastgreedy()`
@@ -500,7 +525,11 @@
 
  - Every `igraph_spmatrix_*()` function and struct now uses `igraph_integer_t`
    instead of `long int` for the numbers of rows and columns, and row and column
-   indexes.
+   indexes. Note that `igraph_spmatrix_t` itself has been deprecated in favour
+   of `igraph_sparsemat_t`.
+
+ - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
+   instead.
 
 ### Added
 
@@ -513,6 +542,7 @@
  - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
  - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM!)
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
+ - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica)
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
 
 ### Changed
@@ -529,6 +559,20 @@
    library.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
 
+### Deprecated
+
+ - `igraph_clusters()` has been renamed to `igraph_connected_components()`; the
+   old name is deprecated and will be removed in 0.11.
+
+ - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
+   the old name is deprecated and will be removed in 0.11.
+
+ - `igraph_spmatrix_t` and its related functions are deprecated in favour of
+   `igraph_sparsemat_t`. These will be removed in 0.11.
+
+ - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
+   deprecated and will be removed in 0.11.
+
 ## [Unreleased 0.9.7]
 
 ### Changed
@@ -544,6 +588,7 @@
    to crashes.
  - External PLFIT libraries and their headers are now detected at their standard
    installation location.
+ - `igraph_vector_init()` no longer accepts negative vector sizes.
 
 ### Other
 

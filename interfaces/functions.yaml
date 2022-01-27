@@ -105,7 +105,7 @@ igraph_ring:
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
         BOOLEAN circular=True
 
-igraph_tree:
+igraph_kary_tree:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREEMODE type=OUT
 
 igraph_full:
@@ -639,6 +639,9 @@ igraph_is_loop:
 igraph_is_dag:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
+igraph_is_acyclic:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
+
 igraph_is_simple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
@@ -702,7 +705,7 @@ igraph_arpack_rnsolve:
 igraph_arpack_unpack_complex:
     # TODO(ntamas): this should probably not be exposed to higher-level
     # interfaces; igraph's goal is not to provide an ARPACK wrapper
-    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, LONGINT nev
+    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
 
 igraph_unfold_tree:
     PARAMS: |-
@@ -961,7 +964,7 @@ igraph_laplacian:
 # Components
 #######################################
 
-igraph_clusters:
+igraph_connected_components:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR_INT csize,
         OUT INTEGER no, CONNECTEDNESS mode=WEAK
@@ -1338,14 +1341,13 @@ igraph_community_leading_eigenvector:
 
 igraph_community_fluid_communities:
     PARAMS: |-
-        GRAPH graph, INTEGER no_of_communities,
-        OUT VECTOR_INT membership, OUT REAL modularity
+        GRAPH graph, INTEGER no_of_communities, OUT VECTOR_INT membership
 
 igraph_community_label_propagation:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, NEIMODE mode=ALL,
         OPTIONAL EDGEWEIGHTS weights, OPTIONAL VECTOR_INT initial,
-        OPTIONAL VECTOR_BOOL fixed, OUT REAL modularity
+        OPTIONAL VECTOR_BOOL fixed
     DEPS: weights ON graph
 
 igraph_community_multilevel:
@@ -1436,6 +1438,10 @@ igraph_get_adjacency:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH
 
+igraph_get_adjacency_sparse:
+    PARAMS: |-
+        GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH
+
 igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, BOOLEAN bycol=False
 
@@ -1450,9 +1456,9 @@ igraph_to_undirected:
 igraph_get_stochastic:
     PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False
 
-igraph_get_stochastic_sparsemat:
+igraph_get_stochastic_sparse:
     PARAMS: |-
-        GRAPH graph, OUT SPARSEMATPTR sparsemat,
+        GRAPH graph, OUT SPARSEMAT sparsemat,
         BOOLEAN column_wise=False
 
 #######################################

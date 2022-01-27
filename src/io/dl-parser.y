@@ -106,10 +106,10 @@ igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
 input: DL NEQ integer NEWLINE rest trail eof {
   context->n=$3;
   if (context->n < 0) {
-    IGRAPH_YY_ERRORF("Invalid vertex count in DL file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->n);
+    IGRAPH_YY_ERRORF("Invalid vertex count in DL file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->n);
   }
   if (context->n > IGRAPH_DL_MAX_VERTEX_COUNT) {
-    IGRAPH_YY_ERRORF("Vertex count too large in DL file (%"IGRAPH_PRId").", IGRAPH_EINVAL, context->n);
+    IGRAPH_YY_ERRORF("Vertex count too large in DL file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->n);
   }
 };
 

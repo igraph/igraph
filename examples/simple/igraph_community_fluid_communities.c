@@ -30,7 +30,6 @@ int main() {
     igraph_t g;
     igraph_integer_t k;
     igraph_vector_int_t membership;
-    igraph_real_t modularity;
 
     igraph_rng_seed(igraph_rng_default(), 247);
 
@@ -38,8 +37,8 @@ int main() {
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
     igraph_vector_int_init(&membership, 0);
     igraph_vector_int_push_back(&membership, 1);
-    igraph_community_fluid_communities(&g, 2, &membership, &modularity);
-    if (!igraph_is_nan(modularity) || igraph_vector_int_size(&membership) != 0) {
+    igraph_community_fluid_communities(&g, 2, &membership);
+    if (igraph_vector_int_size(&membership) != 0) {
         return 2;
     }
     igraph_vector_int_destroy(&membership);
@@ -48,8 +47,8 @@ int main() {
     /* Graph with one vertex only */
     igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1);
     igraph_vector_int_init(&membership, 0);
-    igraph_community_fluid_communities(&g, 2, &membership, &modularity);
-    if (!igraph_is_nan(modularity) || igraph_vector_int_size(&membership) != 1 || VECTOR(membership)[0] != 0) {
+    igraph_community_fluid_communities(&g, 2, &membership);
+    if (igraph_vector_int_size(&membership) != 1 || VECTOR(membership)[0] != 0) {
         return 3;
     }
     igraph_vector_int_destroy(&membership);
@@ -77,8 +76,7 @@ int main() {
 
     igraph_vector_int_init(&membership, 0);
     k = 2;
-    igraph_community_fluid_communities(&g, k, &membership,
-                                       /*modularity=*/ 0);
+    igraph_community_fluid_communities(&g, k, &membership);
     if (!igraph_vector_int_contains(&membership, 0) || !igraph_vector_int_contains(&membership, 1)) {
         printf("Resulting graph does not have exactly 2 communities as expected.\n");
         igraph_vector_int_print(&membership);

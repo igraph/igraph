@@ -20,9 +20,12 @@
 #define IGRAPH_GRAPH_ATTRIBUTES_H
 
 #include "igraph_attributes.h"
+#include "igraph_decls.h"
 #include "igraph_strvector.h"
 #include "igraph_types.h"
 #include "igraph_vector_ptr.h"
+
+__BEGIN_DECLS
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
     do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
@@ -108,5 +111,7 @@ igraph_error_t igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
                                           const char *name,
                                           igraph_es_t es,
                                           igraph_vector_bool_t *value);
+
+__END_DECLS
 
 #endif /* IGRAPH_GRAPH_ATTRIBUTES_H */

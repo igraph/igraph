@@ -20,6 +20,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_circulant
  * \brief Creates a circulant graph.
@@ -54,14 +56,19 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     igraph_integer_t shift_size = igraph_vector_int_size(shifts);
 
     if (n < 0) {
-        IGRAPH_ERRORF("number of nodes = %" IGRAPH_PRId " must be non-negative.", IGRAPH_EINVAL, n);
+        IGRAPH_ERRORF("Number of nodes = %" IGRAPH_PRId " must be non-negative.", IGRAPH_EINVAL, n);
     }
     if (n == 0) {
         return igraph_empty(graph, 0, directed);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * n * shift_size));
+    {
+        igraph_integer_t size;
+        IGRAPH_SAFE_MULT(n, shift_size, &size);
+        IGRAPH_SAFE_MULT(size, 2, &size);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, size));
+    }
 
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&shift_seen, n);
     VECTOR(shift_seen)[0] = 1; /* do not allow self loops */

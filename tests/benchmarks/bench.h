@@ -43,7 +43,7 @@ static inline void igraph_get_cpu_time(double *data) {
 
 #define REPEAT(CODE, N) \
     do { \
-        long rep_i; \
+        igraph_integer_t rep_i; \
         for (rep_i=0; rep_i < N; ++rep_i) { CODE; } \
     } while (0)
 

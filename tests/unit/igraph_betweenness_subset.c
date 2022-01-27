@@ -77,7 +77,7 @@ int main() {
 
     printf("\nTree\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 11111, 10, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 11111, 10, IGRAPH_TREE_UNDIRECTED);
 
     /* We are including the rightmost 200 vertices from the lowermost layer
      * (layer 5) of the tree. These have 20 parents in layer 4, 2 grandparents

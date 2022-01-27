@@ -266,7 +266,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
         }                                                  \
     } while (0)
 
-static igraph_error_t igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
+static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlist_t *adjlist,
                                       igraph_vector_int_t *components,
                                       igraph_vector_int_t *leaveout,
                                       igraph_integer_t *mark,
@@ -508,8 +508,8 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
         }
 
         /* Find the components */
-        IGRAPH_CHECK(igraph_i_clusters_leaveout(&adjlist, &components, &leaveout,
-                                                &mark, &Q));
+        IGRAPH_CHECK(igraph_i_connected_components_leaveout(
+            &adjlist, &components, &leaveout, &mark, &Q));
 
         /* Store the corresponding separators, N(C) for each component C */
         IGRAPH_CHECK(igraph_i_separators_store(separators, &adjlist, &components,
@@ -541,8 +541,8 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
             }
 
             /* Find the components */
-            IGRAPH_CHECK(igraph_i_clusters_leaveout(&adjlist, &components,
-                                                    &leaveout, &mark, &Q));
+            IGRAPH_CHECK(igraph_i_connected_components_leaveout(
+                &adjlist, &components, &leaveout, &mark, &Q));
 
             /* Store the corresponding separators, N(C) for each component C */
             IGRAPH_CHECK(igraph_i_separators_store(separators, &adjlist,

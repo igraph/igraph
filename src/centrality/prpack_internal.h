@@ -21,8 +21,8 @@
 
 */
 
-#ifndef IGRAPH_PRPACK
-#define IGRAPH_PRPACK
+#ifndef IGRAPH_PRPACK_H
+#define IGRAPH_PRPACK_H
 
 #include "igraph_decls.h"
 #include "igraph_types.h"

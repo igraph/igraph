@@ -150,7 +150,8 @@ static const char *igraph_i_error_strings[] = {
     /* 58 */ "Integer or double underflow",
     /* 59 */ "Random walk got stuck",
     /* 60 */ "Search stopped; this error should never be visible to the user, "
-    "please report this error along with the steps to reproduce it."
+    "please report this error along with the steps to reproduce it.",
+    /* 61 */ "Result too large"
 };
 
 const char* igraph_strerror(const igraph_error_t igraph_errno) {

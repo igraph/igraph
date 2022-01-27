@@ -57,8 +57,8 @@
  * This function creates a membership vector from a community
  * structure dendrogram. A membership vector contains for each vertex
  * the id of its graph component, the graph components are numbered
- * from zero, see the same argument of \ref igraph_clusters() for an
- * example of a membership vector.
+ * from zero, see the same argument of \ref igraph_connected_components()
+ * for an example of a membership vector.
  *
  * </para><para>
  * Many community detection algorithms return with a \em merges

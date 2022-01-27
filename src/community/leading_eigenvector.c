@@ -564,7 +564,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     if (!start) {
         /* Calculate the weakly connected components in the graph and use them as
          * an initial split */
-        IGRAPH_CHECK(igraph_clusters(graph, mymembership, &idx, 0, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, 0, IGRAPH_WEAK));
         communities = igraph_vector_int_size(&idx);
         IGRAPH_STATUSF(("Starting from %" IGRAPH_PRId " component(s).\n", 0, communities));
         if (history) {

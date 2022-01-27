@@ -25,8 +25,6 @@
 #define IGRAPH_CONSTANTS_H
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
-#include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
@@ -48,9 +46,7 @@ typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
 typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
 
-typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3,
-               IGRAPH_TOTAL = 3
-             } igraph_neimode_t;
+typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
 
 /* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
 #define IGRAPH_REVERSE_MODE(mode) \
@@ -185,13 +181,6 @@ typedef enum { IGRAPH_IMITATE_AUGMENTED = 0,
                IGRAPH_IMITATE_BLIND,
                IGRAPH_IMITATE_CONTRACTED
              } igraph_imitate_algorithm_t;
-
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
-        const igraph_vector_t *par,
-        void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t *var,
-                                      const igraph_vector_t *par,
-                                      igraph_vector_t* res, void* extra);
 
 typedef enum { IGRAPH_LAYOUT_GRID = 0,
                IGRAPH_LAYOUT_NOGRID,

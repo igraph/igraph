@@ -57,7 +57,8 @@ target_link_libraries(igraph_test PUBLIC igraph::igraph)
 </para>
 
 <para>
-To compile the project, create a new directory called build, and switch to it:
+To compile the project, create a new directory called <filename>build</filename> in
+the root of the igraph source tree, and switch to it:
 <programlisting>
 mkdir build
 cd build
@@ -177,7 +178,7 @@ graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>),
 ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices
 (<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>) or trees
-(<link linkend="igraph_tree"><function>igraph_tree()</function></link>).
+(<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>).
 </para>
 
 <para>

@@ -29,7 +29,7 @@ int main() {
 
     /* Create a directed binary tree on 15 nodes,
        with edges pointing towards the root. */
-    igraph_tree(&graph, 15, 2, IGRAPH_TREE_IN);
+    igraph_kary_tree(&graph, 15, 2, IGRAPH_TREE_IN);
 
     igraph_is_tree(&graph, &res, NULL, IGRAPH_IN);
     printf("Is it an in-tree? %s\n", res ? "Yes" : "No");

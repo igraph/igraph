@@ -132,6 +132,15 @@ igraph_error_t igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t al
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_blas_dnrm2
+ * \brief Euclidean norm of a vector.
+ *
+ * \param v The vector.
+ * \return Real value, the norm of \p v.
+ *
+ * Time complexity: O(n) where n is the length of the vector.
+ */
 igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
     if (igraph_vector_size(v) > INT_MAX) {
         IGRAPH_ERROR("Vector too large for BLAS", IGRAPH_EOVERFLOW);

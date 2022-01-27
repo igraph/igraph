@@ -171,11 +171,11 @@ add_examples(
   igraph_erdos_renyi_game
   igraph_full
   igraph_grg_game
+  igraph_kary_tree
   igraph_lcf
   igraph_ring
   igraph_small
   igraph_star
-  igraph_tree
   igraph_symmetric_tree
   igraph_weighted_adjacency
 )
@@ -216,6 +216,7 @@ add_legacy_tests(
   igraph_static_power_law_game
   igraph_wheel
   tree
+  kary_tree
   symmetric_tree
   tree_game
   ring
@@ -226,7 +227,6 @@ add_legacy_tests(
 # structural_properties.at
 add_examples(
   FOLDER examples/simple NAMES
-  assortativity
   bellman_ford
   dijkstra
   igraph_average_path_length
@@ -255,12 +255,14 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_feedback_arc_set_undirected
   igraph_rewire # Uses internal igraph_i_rewire
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
+  assortativity
   efficiency
   global_transitivity
   hub_and_authority
@@ -288,6 +290,7 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
@@ -458,6 +461,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_almost_equals
+  overflow
 )
 
 # operators.at

@@ -38,15 +38,32 @@
 
 #include <limits.h>
 
-static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_int_t *membership,
-                                  igraph_vector_int_t *csize, igraph_integer_t *no);
-
-static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_int_t *membership,
-                                    igraph_vector_int_t *csize, igraph_integer_t *no);
+static igraph_error_t igraph_i_connected_components_weak(
+    const igraph_t *graph, igraph_vector_int_t *membership,
+    igraph_vector_int_t *csize, igraph_integer_t *no
+);
+static igraph_error_t igraph_i_connected_components_strong(
+    const igraph_t *graph, igraph_vector_int_t *membership,
+    igraph_vector_int_t *csize, igraph_integer_t *no
+);
 
 /**
  * \ingroup structural
  * \function igraph_clusters
+ * \brief Calculates the (weakly or strongly) connected components in a graph (deprecated alias).
+ *
+ * \deprecated-by igraph_connected_components 0.10
+ */
+
+igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
+                    igraph_vector_int_t *csize, igraph_integer_t *no,
+                    igraph_connectedness_t mode) {
+    return igraph_connected_components(graph, membership, csize, no, mode);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_connected_components
  * \brief Calculates the (weakly or strongly) connected components in a graph.
  *
  * \param graph The graph object to analyze.
@@ -75,20 +92,23 @@ static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vec
  * edges in the graph.
  */
 
-igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
-                    igraph_vector_int_t *csize, igraph_integer_t *no,
-                    igraph_connectedness_t mode) {
+igraph_error_t igraph_connected_components(
+    const igraph_t *graph, igraph_vector_int_t *membership,
+    igraph_vector_int_t *csize, igraph_integer_t *no, igraph_connectedness_t mode
+) {
     if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_i_clusters_weak(graph, membership, csize, no);
+        return igraph_i_connected_components_weak(graph, membership, csize, no);
     } else if (mode == IGRAPH_STRONG) {
-        return igraph_i_clusters_strong(graph, membership, csize, no);
+        return igraph_i_connected_components_strong(graph, membership, csize, no);
     }
 
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
 }
 
-static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_int_t *membership,
-                                  igraph_vector_int_t *csize, igraph_integer_t *no) {
+static igraph_error_t igraph_i_connected_components_weak(
+    const igraph_t *graph, igraph_vector_int_t *membership,
+    igraph_vector_int_t *csize, igraph_integer_t *no
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     char *already_added;
@@ -168,8 +188,10 @@ static igraph_error_t igraph_i_clusters_weak(const igraph_t *graph, igraph_vecto
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_int_t *membership,
-                                    igraph_vector_int_t *csize, igraph_integer_t *no) {
+static igraph_error_t igraph_i_connected_components_strong(
+    const igraph_t *graph, igraph_vector_int_t *membership,
+    igraph_vector_int_t *csize, igraph_integer_t *no
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t next_nei = IGRAPH_VECTOR_NULL;
@@ -392,7 +414,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
             return IGRAPH_SUCCESS;
         }
 
-        retval = igraph_i_clusters_strong(graph, NULL, NULL, &no);
+        retval = igraph_i_connected_components_strong(graph, NULL, NULL, &no);
         *res = (no == 1);
         return retval;
     }

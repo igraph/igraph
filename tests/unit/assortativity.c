@@ -27,9 +27,8 @@
 int main() {
 
     igraph_t g;
-    FILE *karate, *neural;
     igraph_real_t res;
-    igraph_vector_t types, outtypes, intypes;
+    igraph_vector_t types;
     igraph_vector_int_t int_types;
 
     igraph_integer_t football_types[] = {
@@ -40,9 +39,8 @@ int main() {
         4, 8, 4, 9, 11
     };
 
-    karate = fopen("karate.gml", "r");
-    igraph_read_graph_gml(&g, karate);
-    fclose(karate);
+
+    igraph_famous(&g, "zachary");
 
     igraph_vector_int_init(&int_types, 0);
     igraph_degree(&g, &int_types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1);
@@ -55,26 +53,7 @@ int main() {
 
     /*---------------------*/
 
-    neural = fopen("celegansneural.gml", "r");
-    igraph_read_graph_gml(&g, neural);
-    fclose(neural);
-
-    igraph_vector_int_init(&int_types, 0);
-    igraph_degree(&g, &int_types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1);
-
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
-
-    igraph_destroy(&g);
-    igraph_vector_int_destroy(&int_types);
-
-    /*---------------------*/
-
-    karate = fopen("karate.gml", "r");
-    igraph_read_graph_gml(&g, karate);
-    fclose(karate);
+    igraph_famous(&g, "zachary");
 
     igraph_vector_init(&types, 0);
 
@@ -84,50 +63,12 @@ int main() {
     igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0);
     printf("%.5f\n", res);
 
-    igraph_destroy(&g);
-
-    /*---------------------*/
-
-    neural = fopen("celegansneural.gml", "r");
-    igraph_read_graph_gml(&g, neural);
-    fclose(neural);
-
-    igraph_strength(&g, &types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1, /* weights=*/ 0);
-    igraph_vector_add_constant(&types, -1);
-
-    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
-
     igraph_vector_destroy(&types);
-
-    /*---------------------*/
-
-    igraph_vector_init(&outtypes, igraph_vcount(&g));
-    igraph_vector_init(&intypes, igraph_vcount(&g));
-    igraph_strength(&g, &intypes, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1, /* weights=*/ 0);
-    igraph_strength(&g, &outtypes, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1, /* weights=*/ 0);
-    igraph_vector_add_constant(&intypes, -1);
-    igraph_vector_add_constant(&outtypes, -1);
-
-    igraph_assortativity(&g, &outtypes, &intypes, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-
-    igraph_vector_destroy(&intypes);
-    igraph_vector_destroy(&outtypes);
-    /*---------------------*/
-
-    igraph_assortativity_degree(&g, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-
     igraph_destroy(&g);
 
     /*---------------------*/
 
-    karate = fopen("karate.gml", "r");
-    igraph_read_graph_gml(&g, karate);
-    fclose(karate);
+    igraph_famous(&g, "zachary");
 
     igraph_assortativity_degree(&g, &res, /*directed=*/ 1);
     printf("%.5f\n", res);
