@@ -26,12 +26,9 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
-static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(
-    TYPE(igraph_vector)* v, igraph_integer_t start, igraph_integer_t end
-);
-static void FUNCTION(igraph_i_vector, destroy_slice)(
-    TYPE(igraph_vector)* v, igraph_integer_t start, igraph_integer_t end
-);
+static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(BASE_VECTOR* start, BASE_VECTOR* end);
+static void FUNCTION(igraph_i_vector, destroy_slice)(BASE_VECTOR* start, BASE_VECTOR* end);
+static igraph_error_t FUNCTION(igraph_i_vector, expand_if_full)(TYPE(igraph_vector)* v);
 static int FUNCTION(igraph_i_vector, sort_ind_cmp)(void *thunk, const void *p1, const void *p2);
 
 igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_integer_t size) {
@@ -44,7 +41,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
 
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_slice)(v, 0, size));
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_slice)(v->stor_begin, v->end));
 
     return IGRAPH_SUCCESS;
 }
@@ -63,24 +60,27 @@ igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v) 
     return v->stor_end - v->stor_begin;
 }
 
-igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_integer_t size) {
-    igraph_integer_t actual_size = FUNCTION(igraph_vector, size)(v);
+igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_integer_t capacity) {
+    igraph_integer_t current_capacity;
     BASE_VECTOR *tmp;
+
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    if (size <= actual_size) {
+    current_capacity = FUNCTION(igraph_vector, capacity)(v);
+
+    if (capacity <= current_capacity) {
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE_VECTOR);
+    tmp = IGRAPH_REALLOC(v->stor_begin, capacity, BASE_VECTOR);
     if (tmp == 0) {
         IGRAPH_ERROR("cannot reserve space for vector list", IGRAPH_ENOMEM);
     }
 
+    v->end = tmp + (v->end - v->stor_begin);
     v->stor_begin = tmp;
-    v->stor_end = v->stor_begin + size;
-    v->end = v->stor_begin + actual_size;
+    v->stor_end = v->stor_begin + capacity;
 
     return IGRAPH_SUCCESS;
 }
@@ -97,27 +97,28 @@ igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_vector)* v) {
     return v->end - v->stor_begin;
 }
 
-igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_integer_t newsize) {
-    igraph_integer_t size;
+igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_integer_t new_size) {
+    igraph_integer_t old_size;
     igraph_error_t retval;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, newsize));
 
-    size = FUNCTION(igraph_vector, size)(v);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, new_size));
 
-    v->end = v->stor_begin + newsize;
+    old_size = FUNCTION(igraph_vector, size)(v);
 
-    if (size < newsize) {
-        retval = FUNCTION(igraph_i_vector, init_slice)(v, size, newsize);
+    v->end = v->stor_begin + new_size;
+
+    if (old_size < new_size) {
+        retval = FUNCTION(igraph_i_vector, init_slice)(v->stor_begin + old_size, v->end);
         if (retval) {
             /* undo the change in v->end */
-            v->end = v->stor_begin + size;
+            v->end = v->stor_begin + old_size;
             IGRAPH_CHECK(retval);
         }
-    } else if (size > newsize) {
-        FUNCTION(igraph_i_vector, destroy_slice)(v, newsize, size);
+    } else if (old_size > new_size) {
+        FUNCTION(igraph_i_vector, destroy_slice)(v->end, v->stor_begin + old_size);
     }
 
     return IGRAPH_SUCCESS;
@@ -126,30 +127,14 @@ igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_in
 void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    FUNCTION(igraph_i_vector, destroy_slice)(v, 0, FUNCTION(igraph_vector, size)(v));
+    FUNCTION(igraph_i_vector, destroy_slice)(v->stor_begin, v->end);
     v->end = v->stor_begin;
 }
 
 igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE_VECTOR* e) {
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-
-    /* full, allocate more storage */
-    if (v->stor_end == v->end) {
-        igraph_integer_t old_size = FUNCTION(igraph_vector, size)(v);
-        igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
-        if (old_size == IGRAPH_INTEGER_MAX) {
-            IGRAPH_ERROR("Cannot push to vector, already at maximum size.", IGRAPH_EOVERFLOW);
-        }
-        if (new_size == 0) {
-            new_size = 1;
-        }
-        IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, new_size));
-    }
-
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
     *(v->end) = *e;
     v->end += 1;
-
     return IGRAPH_SUCCESS;
 }
 
@@ -179,7 +164,7 @@ void FUNCTION(igraph_vector, discard)(TYPE(igraph_vector)* v, igraph_integer_t i
     igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
 
     if (size > 0) {
-        FUNCTION(igraph_i_vector, destroy_slice)(v, index, index + 1);
+        FUNCTION(igraph_i_vector, destroy_slice)(v->end - 1, v->end);
         memmove(v->stor_begin + index, v->stor_begin + index + 1, size - index - 1);
         v->end -= 1;
     }
@@ -188,7 +173,7 @@ void FUNCTION(igraph_vector, discard)(TYPE(igraph_vector)* v, igraph_integer_t i
 void FUNCTION(igraph_vector, discard_back)(TYPE(igraph_vector)* v) {
     igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
     if (size > 0) {
-        FUNCTION(igraph_i_vector, destroy_slice)(v, size - 1, size);
+        FUNCTION(igraph_i_vector, destroy_slice)(v->end - 1, v->end);
         v->end -= 1;
     }
 }
@@ -197,7 +182,7 @@ void FUNCTION(igraph_vector, discard_fast)(TYPE(igraph_vector)* v, igraph_intege
     igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
 
     if (size > 0) {
-        FUNCTION(igraph_i_vector, destroy_slice)(v, index, index + 1);
+        FUNCTION(igraph_i_vector, destroy_slice)(v->end - 1, v->end);
         v->end -= 1;
         v->stor_begin[index] = *(v->end);
     }
@@ -212,20 +197,18 @@ BASE_VECTOR* FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
 }
 
 igraph_error_t FUNCTION(igraph_vector, push_back_copy)(TYPE(igraph_vector)* v, BASE_VECTOR* result) {
-    igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
-    BASE_VECTOR* item;
-
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, size + 1));
-    item = FUNCTION(igraph_vector, get)(v, size);
-    IGRAPH_CHECK(ITEM_FUNCTION(igraph_vector, update)(item, result));
-
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_slice)(v->end, v->end + 1));
+    IGRAPH_CHECK(ITEM_FUNCTION(igraph_vector, update)(v->end, result));
+    v->end += 1;
     return IGRAPH_SUCCESS;
 }
 
 igraph_error_t FUNCTION(igraph_vector, push_back_new)(TYPE(igraph_vector)* v, BASE_VECTOR** result) {
-    igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, size + 1));
-    *result = FUNCTION(igraph_vector, get)(v, size);
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
+    IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_slice)(v->end, v->end + 1));
+    *result = v->end;
+    v->end += 1;
     return IGRAPH_SUCCESS;
 }
 
@@ -340,17 +323,14 @@ igraph_error_t FUNCTION(igraph_vector, sort_ind)(
 
 /* ************************************************************************ */
 
-static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(
-    TYPE(igraph_vector)* v, igraph_integer_t start, igraph_integer_t end
-) {
-    igraph_integer_t current;
+static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(BASE_VECTOR* start, BASE_VECTOR* end) {
+    BASE_VECTOR* current;
     igraph_error_t retval;
 
     for (current = start; current < end; current++) {
-        retval = ITEM_FUNCTION(igraph_vector, init)(v->stor_begin + current, 0);
-
+        retval = ITEM_FUNCTION(igraph_vector, init)(current, 0);
         if (retval) {
-            FUNCTION(igraph_i_vector, destroy_slice)(v, start, current);
+            FUNCTION(igraph_i_vector, destroy_slice)(start, current);
             IGRAPH_CHECK(retval);
         }
     }
@@ -358,12 +338,33 @@ static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(
     return IGRAPH_SUCCESS;
 }
 
-static void FUNCTION(igraph_i_vector, destroy_slice)(
-    TYPE(igraph_vector)* v, igraph_integer_t start, igraph_integer_t end
-) {
+static void FUNCTION(igraph_i_vector, destroy_slice)(BASE_VECTOR* start, BASE_VECTOR* end) {
     for (; start < end; start++) {
-        ITEM_FUNCTION(igraph_vector, destroy)(v->stor_begin + start);
+        ITEM_FUNCTION(igraph_vector, destroy)(start);
     }
+}
+
+/**
+ * Ensures that the vector has at least one extra slot at the end of its
+ * allocated storage area.
+ */
+static igraph_error_t FUNCTION(igraph_i_vector, expand_if_full)(TYPE(igraph_vector)* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    if (v->stor_end == v->end) {
+        igraph_integer_t old_size = FUNCTION(igraph_vector, size)(v);
+        igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to vector, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
+        if (new_size == 0) {
+            new_size = 1;
+        }
+        IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, new_size));
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
