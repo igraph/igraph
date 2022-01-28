@@ -20,9 +20,9 @@ int main(){
     igraph_vector_init(&types, 0);
     igraph_degree(&g, &types, igraph_vss_all(), IGRAPH_ALL, /* No self-loops */ 0);
 
-    igraph_assortativity(&g, &types, NULL, &assortativity, /* ignore edge directions */ 0);
+    igraph_assortativity(&g, &types, NULL, &assortativity, /* ignore edge directions */ IGRAPH_UNDIRECTED);
     printf("Assortativity of undirected graph = %g\n", assortativity);
-    igraph_assortativity(&g, &types, NULL, &assortativity, /* consider edge directions */ 1);
+    igraph_assortativity(&g, &types, NULL, &assortativity, /* consider edge directions */ IGRAPH_DIRECTED);
     printf("Assortativity of directed graph = %g\n", assortativity);
     
     igraph_vector_destroy(&types);
