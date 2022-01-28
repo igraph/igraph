@@ -74,24 +74,44 @@ static igraph_error_t set_weights(const igraph_vector_t *vertex_weights, graph_t
 
 /* Find all cliques. */
 
+typedef struct {
+    igraph_vector_int_t clique;
+    igraph_vector_int_list_t* result;
+} igraph_i_cliquer_cliques_user_data_t;
+
+static igraph_error_t igraph_i_cliquer_cliques_user_data_init(
+    igraph_i_cliquer_cliques_user_data_t* data,
+    igraph_vector_int_list_t* result
+) {
+    data->result = result;
+    igraph_vector_int_list_clear(result);
+    return igraph_vector_int_init(&data->clique, 0);
+}
+
+static void igraph_i_cliquer_cliques_user_data_destroy(
+    igraph_i_cliquer_cliques_user_data_t* data
+) {
+    igraph_vector_int_destroy(&data->clique);
+    data->result = 0;
+}
+
 static igraph_error_t collect_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
-    igraph_vector_int_list_t *list;
-    igraph_vector_int_t *clique;
     int i;
     igraph_integer_t j;
+    igraph_i_cliquer_cliques_user_data_t* data = (igraph_i_cliquer_cliques_user_data_t *) opt->user_data;
 
     IGRAPH_UNUSED(g);
 
     IGRAPH_ALLOW_INTERRUPTION();
 
-    list = (igraph_vector_int_list_t *) opt->user_data;
-    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(list, &clique));
-    IGRAPH_CHECK(igraph_vector_int_resize(clique, set_size(s)));
+    IGRAPH_CHECK(igraph_vector_int_resize(&data->clique, set_size(s)));
 
     i = -1; j = 0;
     while ((i = set_return_next(s, i)) >= 0) {
-        VECTOR(*clique)[j++] = i;
+        VECTOR(data->clique)[j++] = i;
     }
+
+    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(data->result, &data->clique));
 
     return IGRAPH_SUCCESS;
 }
@@ -100,6 +120,7 @@ igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int
                              igraph_integer_t min_size, igraph_integer_t max_size) {
     graph_t *g;
     igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_i_cliquer_cliques_user_data_t data;
 
     if (vcount == 0) {
         igraph_vector_int_list_clear(res);
@@ -121,17 +142,20 @@ igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int
         IGRAPH_ERROR("max_size must not be smaller than min_size", IGRAPH_EINVAL);
     }
 
+    IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
+    IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
+
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
 
-    igraph_vector_int_list_clear(res);
-    igraph_cliquer_opt.user_data = res;
+    igraph_cliquer_opt.user_data = &data;
     igraph_cliquer_opt.user_function = &collect_cliques_callback;
 
     IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
 
     graph_free(g);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_i_cliquer_cliques_user_data_destroy(&data);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -287,6 +311,7 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
                               igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     graph_t *g;
     igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_i_cliquer_cliques_user_data_t data;
 
     if (vcount == 0) {
         igraph_vector_int_list_clear(res);
@@ -314,19 +339,22 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
         IGRAPH_ERROR("max_weight must not be smaller than min_weight", IGRAPH_EINVAL);
     }
 
+    IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
+    IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
+
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
 
     IGRAPH_CHECK(set_weights(vertex_weights, g));
 
-    igraph_vector_int_list_clear(res);
-    igraph_cliquer_opt.user_data = res;
+    igraph_cliquer_opt.user_data = &data;
     igraph_cliquer_opt.user_function = &collect_cliques_callback;
 
     IGRAPH_CHECK(clique_find_all(g, (int) min_weight, (int) max_weight, maximal, &igraph_cliquer_opt, NULL));
 
     graph_free(g);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_i_cliquer_cliques_user_data_destroy(&data);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -338,25 +366,29 @@ igraph_error_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
                                       const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res) {
     graph_t *g;
     igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_i_cliquer_cliques_user_data_t data;
 
     if (vcount == 0) {
         igraph_vector_int_list_clear(res);
         return IGRAPH_SUCCESS;
     }
 
+    IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
+    IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
+
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
 
     IGRAPH_CHECK(set_weights(vertex_weights, g));
 
-    igraph_vector_int_list_clear(res);
-    igraph_cliquer_opt.user_data = res;
+    igraph_cliquer_opt.user_data = &data;
     igraph_cliquer_opt.user_function = &collect_cliques_callback;
 
     IGRAPH_CHECK(clique_find_all(g, 0, 0, FALSE, &igraph_cliquer_opt, NULL));
 
     graph_free(g);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_i_cliquer_cliques_user_data_destroy(&data);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }

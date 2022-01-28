@@ -197,26 +197,15 @@ BASE_VECTOR* FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
 }
 
 igraph_error_t FUNCTION(igraph_vector, push_back_copy)(TYPE(igraph_vector)* v, BASE_VECTOR* result) {
-    igraph_error_t retval;
-
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_slice)(v->end, v->end + 1));
-
-    retval = ITEM_FUNCTION(igraph_vector, update)(v->end, result);
-
-    if (retval) {
-        FUNCTION(igraph_i_vector, destroy_slice)(v->end, v->end + 1);
-        IGRAPH_CHECK(retval);
-    }
-
+    IGRAPH_CHECK(ITEM_FUNCTION(igraph_vector, copy)(v->end, result));
     v->end += 1;
-
     return IGRAPH_SUCCESS;
 }
 
 igraph_error_t FUNCTION(igraph_vector, push_back_new)(TYPE(igraph_vector)* v, BASE_VECTOR** result) {
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_slice)(v->end, v->end + 1));
+    IGRAPH_CHECK(ITEM_FUNCTION(igraph_vector, init)(v->end, 0));
     *result = v->end;
     v->end += 1;
     return IGRAPH_SUCCESS;
