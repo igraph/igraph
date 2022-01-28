@@ -18,7 +18,7 @@ int main(){
                  -1);
 
     igraph_vector_init(&types, 0);
-    igraph_degree(&g, &types, igraph_vss_all(), IGRAPH_ALL, /* No self-loops */ 0);
+    igraph_degree(&g, &types, igraph_vss_all(), IGRAPH_ALL, /* Consider self-loops */ IGRAPH_LOOPS);
 
     igraph_assortativity(&g, &types, NULL, &assortativity, /* ignore edge directions */ IGRAPH_UNDIRECTED);
     printf("Assortativity of undirected graph = %g\n", assortativity);
