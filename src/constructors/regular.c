@@ -180,7 +180,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star, \ref igraph_tree()
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star, \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  */
