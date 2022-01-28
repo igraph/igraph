@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-
 #include <igraph.h>
 #include <stdio.h>
 
