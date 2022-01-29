@@ -21,40 +21,46 @@
 #include "test_utilities.inc"
 
 int main() {
-    igraph_t g;
+    igraph_t g_in;
+    igraph_t g_out;
     char filename[] = "ncol.tmpXXXXXX";
     FILE *file;
+    igraph_bool_t same;
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    igraph_small(&g, 4, IGRAPH_DIRECTED,
+    igraph_small(&g_in, 4, IGRAPH_DIRECTED,
             0, 1, 0, 1, 0, 1,
             1, 2, 2, 3, 3, 0,
             -1);
 
-    SETEAN(&g, "edge_attr", 0, 10);
-    SETVAS(&g, "vertex_attr", 0, "vertex_name0");
-    SETVAS(&g, "vertex_attr", 1, "vertex_name1");
-    SETVAS(&g, "vertex_attr", 2, "vertex_name2");
-    SETVAS(&g, "vertex_attr", 3, "vertex_name3");
+    SETEAN(&g_in, "edge_attr", 0, 10);
+    SETVAS(&g_in, "vertex_attr", 0, "vertex_name0");
+    SETVAS(&g_in, "vertex_attr", 1, "vertex_name1");
+    SETVAS(&g_in, "vertex_attr", 2, "vertex_name2");
+    SETVAS(&g_in, "vertex_attr", 3, "vertex_name3");
 
     mktemp(filename);;
     file = fopen(filename, "w");
 
-    igraph_write_graph_ncol(&g, file, "vertex_attr", "edge_attr");
+    igraph_write_graph_ncol(&g_in, file, "vertex_attr", "edge_attr");
     fclose(file);
 
-    igraph_destroy(&g);
 
     file = fopen(filename, "r");
-    igraph_read_graph_ncol(&g, file, NULL, 1, IGRAPH_ADD_WEIGHTS_YES,
+    igraph_read_graph_ncol(&g_out, file, NULL, 1, IGRAPH_ADD_WEIGHTS_YES,
             IGRAPH_DIRECTED);
 
-    igraph_write_graph_graphml(&g, stdout, 0);
+    igraph_is_same_graph(&g_in, &g_out, &same);
+    if (!same) {
+        printf("Written and read graph are not the same\n");
+        return (1);
+    }
 
     fclose(file);
     unlink(filename);
-    igraph_destroy(&g);
+    igraph_destroy(&g_in);
+    igraph_destroy(&g_out);
     VERIFY_FINALLY_STACK();
     return 0;
 }
