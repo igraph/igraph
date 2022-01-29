@@ -21,7 +21,9 @@ int main() {
                                  IGRAPH_NO_MORE_ATTRIBUTES);
     igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 1, &comb);
     igraph_write_graph_graphml(&g, stdout, /*prefixattr=*/ 1);
+
     igraph_destroy(&g);
+    igraph_attribute_combination_destroy(&comb);
 
     return 0;
 }
