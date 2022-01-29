@@ -1346,14 +1346,14 @@ igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v
  */
 
 igraph_error_t FUNCTION(igraph_vector, init_copy)(
-    TYPE(igraph_vector) *v, const BASE *data, igraph_integer_t length) {
-    v->stor_begin = IGRAPH_CALLOC(length, BASE);
-    if (v->stor_begin == 0) {
-        IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
+        TYPE(igraph_vector) *v, const BASE *data, igraph_integer_t length) {
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, length));
+
+    /* Note: memcpy() behaviour is undefined if data==NULL, even if length==0. */
+    if (length > 0) {
+        memcpy(v->stor_begin, data, length * sizeof(BASE));
     }
-    v->stor_end = v->stor_begin + length;
-    v->end = v->stor_end;
-    memcpy(v->stor_begin, data, length * sizeof(BASE));
 
     return IGRAPH_SUCCESS;
 }
@@ -1407,12 +1407,8 @@ igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
     IGRAPH_ASSERT(from->stor_begin != NULL);
 
     from_size = FUNCTION(igraph_vector, size)(from);
-    to->stor_begin = IGRAPH_CALLOC(from_size, BASE);
-    if (to->stor_begin == 0) {
-        IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
-    }
-    to->stor_end = to->stor_begin + FUNCTION(igraph_vector, size)(from);
-    to->end = to->stor_end;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(to, from_size));
+
     memcpy(to->stor_begin, from->stor_begin,
            FUNCTION(igraph_vector, size)(from) * sizeof(BASE));
 
