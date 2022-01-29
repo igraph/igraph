@@ -467,7 +467,7 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
  * \brief Initialize attribute combination list and add records.
  *
  * \param comb The uninitialized attribute combination list.
- * \param ...  A list of 'name, type[, func]', where 
+ * \param ...  A list of 'name, type[, func]', where:
  * \param name The name of the attribute. If the name already exists
  *             the attribute combination record will be replaced.
  *             Use NULL to add a default combination record for all
@@ -481,6 +481,8 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
  *
  * Time complexity: O(n^2), where n is the number attribute
  *                  combinations records to add.
+ *
+ * \example examples/simple/igraph_attribute_combination.c
  */
 igraph_error_t igraph_attribute_combination(
         igraph_attribute_combination_t *comb, ...) {
