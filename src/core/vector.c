@@ -189,10 +189,10 @@ igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v,
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
             igraph_integer_t next = VECTOR(ptr)[i] - 1;
-            res->stor_begin[j++] = next;
+            VECTOR(*res)[j++] = next;
             while (VECTOR(rad)[next] != 0) {
                 next = VECTOR(rad)[next] - 1;
-                res->stor_begin[j++] = next;
+                VECTOR(*res)[j++] = next;
             }
         }
     }
