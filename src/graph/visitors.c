@@ -318,9 +318,9 @@ cleanup:
  *        stored here, in the same order as they were visited.
  * \param layers If not a null pointer, then an initialized vector must be
  *        passed here. The i-th element of the vector will contain the index
- *        into \c vids where the vertices that are at distance i from the root
+ *        into \c order where the vertices that are at distance i from the root
  *        are stored. In other words, if you are interested in the vertices that
- *        are at distance i from the root, you need to look in the \c vids
+ *        are at distance i from the root, you need to look in the \c order
  *        vector from \c layers[i] to \c layers[i+1].
  * \param parents If not a null pointer, then an initialized vector must be
  *        passed here. The vector will be resized so its length is equal to the
