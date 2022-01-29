@@ -71,12 +71,12 @@
  *        stored here, in the same order as they were visited.
  * \param rank If not a null pointer, then the rank of each vertex is
  *        stored here.
- * \param father If not a null pointer, then the id of the father of
+ * \param parents If not a null pointer, then the id of the parent of
  *        each vertex is stored here. When a vertex was not visited
- *        during the traversal, -2 will be stored as the ID of its father.
+ *        during the traversal, -2 will be stored as the ID of its parent.
  *        When a vertex was visited during the traversal and it was one of
  *        the roots of the search trees, -1 will be stored as the ID of
- *        its father.
+ *        its parent.
  * \param pred If not a null pointer, then the id of vertex that was
  *        visited before the current one is stored here. If there is
  *        no such vertex (the current vertex is the root of a search
@@ -110,7 +110,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                const igraph_vector_int_t *restricted,
                igraph_vector_int_t *order, igraph_vector_int_t *rank,
-               igraph_vector_int_t *father,
+               igraph_vector_int_t *parents,
                igraph_vector_int_t *pred, igraph_vector_int_t *succ,
                igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                void *extra) {
@@ -187,7 +187,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     VINIT(order, -1);
     VINIT(rank, -1);
-    VINIT(father, -2);
+    VINIT(parents, -2);
     VINIT(pred, -2);
     VINIT(succ, -2);
     VINIT(dist, -1);
@@ -224,8 +224,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actroot));
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
         VECTOR(added)[actroot] = 1;
-        if (father) {
-            VECTOR(*father)[actroot] = -1;
+        if (parents) {
+            VECTOR(*parents)[actroot] = -1;
         }
 
         pred_vec = -1;
@@ -257,8 +257,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                     VECTOR(added)[nei] = 1;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actdist + 1));
-                    if (father) {
-                        VECTOR(*father)[nei] = actvect;
+                    if (parents) {
+                        VECTOR(*parents)[nei] = actvect;
                     }
                 }
             }
@@ -307,13 +307,13 @@ cleanup:
  * be ignored.
  *
  * \param graph The input graph.
- * \param vid The id of the root vertex.
+ * \param root The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param vids If not a null pointer, then an initialized vector must be passed
+ * \param order If not a null pointer, then an initialized vector must be passed
  *        here. The IDs of the vertices visited during the traversal will be
  *        stored here, in the same order as they were visited.
  * \param layers If not a null pointer, then an initialized vector must be
@@ -334,8 +334,8 @@ cleanup:
  *
  * \example examples/simple/igraph_bfs_simple.c
  */
-igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                      igraph_vector_int_t *vids, igraph_vector_int_t *layers,
+igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+                      igraph_vector_int_t *order, igraph_vector_int_t *layers,
                       igraph_vector_int_t *parents) {
 
     igraph_dqueue_int_t q;
@@ -366,8 +366,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
     /* results */
-    if (vids) {
-        igraph_vector_int_clear(vids);
+    if (order) {
+        igraph_vector_int_clear(order);
     }
     if (layers) {
         igraph_vector_int_clear(layers);
@@ -376,20 +376,20 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
         IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
     }
 
-    /* ok start with vid */
-    IGRAPH_CHECK(igraph_dqueue_int_push(&q, vid));
+    /* ok start with root */
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, root));
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
     if (layers) {
         IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
     }
-    if (vids) {
-        IGRAPH_CHECK(igraph_vector_int_push_back(vids, vid));
+    if (order) {
+        IGRAPH_CHECK(igraph_vector_int_push_back(order, root));
     }
     if (parents) {
-        VECTOR(*parents)[vid] = vid;
+        VECTOR(*parents)[root] = root;
     }
     num_visited++;
-    added[vid] = 1;
+    added[root] = 1;
 
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
@@ -409,8 +409,8 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
                 if (layers && lastlayer != actdist + 1) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
                 }
-                if (vids) {
-                    IGRAPH_CHECK(igraph_vector_int_push_back(vids, neighbor));
+                if (order) {
+                    IGRAPH_CHECK(igraph_vector_int_push_back(order, neighbor));
                 }
                 num_visited++;
                 lastlayer = actdist + 1;
@@ -466,7 +466,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
  *        their subtree. The tail of the vector will be padded with -1 to ensure
  *        that the length of the vector is the same as the number of vertices,
  *        even if some vertices were not visited during the traversal.
- * \param father If not a null pointer, then the id of the father of
+ * \param parents If not a null pointer, then the id of the parent of
  *        each vertex is stored here. -1 will be stored for the root of the
  *        search tree; -2 will be stored for vertices that were not visited.
  * \param dist If not a null pointer, then the distance from the root of
@@ -488,7 +488,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_n
 igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                igraph_vector_int_t *order,
-               igraph_vector_int_t *order_out, igraph_vector_int_t *father,
+               igraph_vector_int_t *order_out, igraph_vector_int_t *parents,
                igraph_vector_int_t *dist, igraph_dfshandler_t *in_callback,
                igraph_dfshandler_t *out_callback,
                void *extra) {
@@ -541,15 +541,15 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     VINIT(order, -1);
     VINIT(order_out, -1);
-    VINIT(father, -2);
+    VINIT(parents, -2);
     VINIT(dist, -1);
 
 # undef VINIT
 
     IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
     VECTOR(added)[root] = 1;
-    if (father) {
-        VECTOR(*father)[root] = -1;
+    if (parents) {
+        VECTOR(*parents)[root] = -1;
     }
     if (order) {
         VECTOR(*order)[act_rank++] = root;
@@ -578,8 +578,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             }
             IGRAPH_CHECK(igraph_stack_int_push(&stack, actroot));
             VECTOR(added)[actroot] = 1;
-            if (father) {
-                VECTOR(*father)[actroot] = -1;
+            if (parents) {
+                VECTOR(*parents)[actroot] = -1;
             }
             if (order) {
                 VECTOR(*order)[act_rank++] = actroot;
@@ -617,8 +617,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 /* There is such a neighbor, add it */
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, nei));
                 VECTOR(added)[nei] = 1;
-                if (father) {
-                    VECTOR(*father)[ nei ] = actvect;
+                if (parents) {
+                    VECTOR(*parents)[ nei ] = actvect;
                 }
                 if (order) {
                     VECTOR(*order)[act_rank++] = nei;
