@@ -109,11 +109,15 @@ static igraph_error_t igraph_fit(igraph_real_t min_dist, float *a_p, float *b_p)
     igraph_real_t a = 1.;
     igraph_real_t b = 1.;
     igraph_matrix_t jacobian;
+    igraph_matrix_t jacobian_T;
+    igraph_matrix_t jTj_i;
     igraph_real_t delta = 0.00001;
 
     IGRAPH_VECTOR_INIT_FINALLY(&residuals, nr_points);
     IGRAPH_VECTOR_INIT_FINALLY(&x, nr_points);
     IGRAPH_MATRIX_INIT_FINALLY(&jacobian, nr_points, 2);
+    IGRAPH_MATRIX_INIT_FINALLY(&jacobian_T, 0, 0);
+    IGRAPH_MATRIX_INIT_FINALLY(&jTj_i, 0, 0);
 
     for (int i = 0; i < nr_points; i++) {
         VECTOR(x)[i] = (end_point / nr_points) * i;
@@ -132,7 +136,9 @@ static igraph_error_t igraph_fit(igraph_real_t min_dist, float *a_p, float *b_p)
             (1 / (1 + a * powf(VECTOR(x)[i], 2 * b)))) / (2 * delta);
     }
 
-    //TODO transpose, inversion, etc.
+    igraph_matrix_copy(&jacobian_T, &jacobian);
+    igraph_matrix_transpose(&jacobian_T);
+    //TODO inversion, etc.
 }
 
 /*xd is difference in x direction, w is a weight */
