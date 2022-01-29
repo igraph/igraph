@@ -606,6 +606,7 @@ add_examples(
   cattributes2
   cattributes3
   cattributes4
+  igraph_attribute_combination
 )
 
 add_legacy_tests(
