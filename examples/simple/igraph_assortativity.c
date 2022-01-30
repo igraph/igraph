@@ -6,7 +6,7 @@ int main(){
     igraph_vector_t types;
     igraph_real_t assortativity;
 
-/* Create directed graph */
+    /* Create directed graph */
     igraph_small(&g, 10, IGRAPH_DIRECTED, 
                  0, 1, 0, 2, 0, 3, 0, 5,
                  3, 6,
