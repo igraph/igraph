@@ -624,6 +624,7 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   blas
+  blas_dgemm
   eigenvector_centrality
   igraph_lapack_dgeev
   igraph_lapack_dgeevx
@@ -636,6 +637,7 @@ add_legacy_tests(
   dgemv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
+  igraph_blas_dgemm
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs

@@ -544,6 +544,7 @@
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
  - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica)
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
+ - `igraph_blas_dgemm()` to multiply to matrices.
 
 ### Changed
 
