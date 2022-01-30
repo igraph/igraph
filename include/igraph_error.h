@@ -680,7 +680,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 #define IGRAPH_CHECK(a) \
         do { \
             int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
-            int igraph_i_ret=(a); \
+            igraph_error_t igraph_i_ret=(a); \
             if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
                 IGRAPH_ERROR("", igraph_i_ret); \
             } \
