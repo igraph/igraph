@@ -791,7 +791,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * argument is not used.
  */
 
-typedef igraph_error_handler_t igraph_warning_handler_t;
+typedef void igraph_warning_handler_t (const char *reason, const char *file, int line);
 
 /**
  * \function igraph_set_warning_handler
@@ -824,8 +824,7 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file, int line,
-                                 igraph_error_t igraph_errno);
+IGRAPH_EXPORT void igraph_warning(const char *reason, const char *file, int line);
 
 /**
  * \define IGRAPH_WARNINGF
@@ -844,7 +843,7 @@ IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file
 #define IGRAPH_WARNINGF(reason, ...) \
     do { \
         igraph_warningf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
-                        -1, __VA_ARGS__); \
+                        __VA_ARGS__); \
     } while (0)
 
 
@@ -865,12 +864,10 @@ IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file
  *        but this is currently not used in igraph.
  * \param ... The additional arguments to be substituted into the
  *        template string.
- * \return The supplied error code.
  */
 
-IGRAPH_FUNCATTR_PRINTFLIKE(1,5)
-IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
-                                  igraph_error_t igraph_errno, ...);
+IGRAPH_FUNCATTR_PRINTFLIKE(1,4)
+IGRAPH_EXPORT void igraph_warningf(const char *reason, const char *file, int line, ...);
 
 /**
  * \define IGRAPH_WARNING
@@ -883,7 +880,7 @@ IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *fil
 
 #define IGRAPH_WARNING(reason) \
     do { \
-        igraph_warning(reason, IGRAPH_FILE_BASENAME, __LINE__, -1); \
+        igraph_warning(reason, IGRAPH_FILE_BASENAME, __LINE__); \
     } while (0)
 
 

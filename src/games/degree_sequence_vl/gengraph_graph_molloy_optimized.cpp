@@ -722,8 +722,7 @@ igraph_integer_t *graph_molloy_opt::vertices_real(igraph_integer_t &nb_v) {
             *(yo++) = i;
         }
     if (yo != buff + nb_v) {
-        igraph_warningf("wrong #vertices in graph_molloy_opt::vertices_real(%" IGRAPH_PRId ")",
-                        IGRAPH_FILE_BASENAME, __LINE__, -1, nb_v);
+        IGRAPH_WARNINGF("wrong #vertices in graph_molloy_opt::vertices_real(%" IGRAPH_PRId ")", nb_v);
         delete[] buff;
         return NULL;
     } else {

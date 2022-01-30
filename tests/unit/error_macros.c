@@ -33,16 +33,16 @@ int cause_fatal() {
     IGRAPH_FATALF("%d %f %ld %c", 1, 1.0, 1L, 'a');
 }
 
-void error_handler(const char *reason, const char *file, int line, int igraph_errno) {
+void error_handler(const char *reason, const char *file, int line, igraph_error_t igraph_errno) {
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
     printf("Error. Reason: %s\nErrno: %d\n", reason, igraph_errno);
 }
 
-void warning_handler(const char *reason, const char *file, int line, int igraph_errno) {
+void warning_handler(const char *reason, const char *file, int line) {
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
-    printf("Warning. Reason: %s\nErrno: %d\n", reason, igraph_errno);
+    printf("Warning. Reason: %s\n", reason);
 }
 
 void fatal_handler(const char *reason, const char *file, int line) {

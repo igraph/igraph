@@ -290,12 +290,10 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
  *        but this is currently not used in igraph.
  */
 
-void igraph_warning_handler_ignore(const char *reason, const char *file,
-                                   int line, igraph_error_t igraph_errno) {
+void igraph_warning_handler_ignore(const char *reason, const char *file, int line) {
     IGRAPH_UNUSED(reason);
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
-    IGRAPH_UNUSED(igraph_errno);
 }
 
 #ifndef USING_R
@@ -314,34 +312,29 @@ void igraph_warning_handler_ignore(const char *reason, const char *file,
  *        but this is currently not used in igraph.
  */
 
-void igraph_warning_handler_print(const char *reason, const char *file,
-                                  int line, igraph_error_t igraph_errno) {
-    IGRAPH_UNUSED(igraph_errno);
+void igraph_warning_handler_print(const char *reason, const char *file, int line) {
     fprintf(stderr, "Warning at %s:%i : %s\n", file, line, reason);
 }
 #endif
 
-igraph_error_t igraph_warning(const char *reason, const char *file, int line,
-                   igraph_error_t igraph_errno) {
+void igraph_warning(const char *reason, const char *file, int line) {
 
     if (igraph_i_warning_handler) {
-        igraph_i_warning_handler(reason, file, line, igraph_errno);
+        igraph_i_warning_handler(reason, file, line);
 #ifndef USING_R
     }  else {
-        igraph_warning_handler_print(reason, file, line, igraph_errno);
+        igraph_warning_handler_print(reason, file, line);
 #endif
     }
-    return igraph_errno;
 }
 
-igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
-                    igraph_error_t igraph_errno, ...) {
+void igraph_warningf(const char *reason, const char *file, int line,
+                    ...) {
     va_list ap;
-    va_start(ap, igraph_errno);
+    va_start(ap, line);
     vsnprintf(igraph_i_warningmsg_buffer,
               sizeof(igraph_i_warningmsg_buffer) / sizeof(char), reason, ap);
-    return igraph_warning(igraph_i_warningmsg_buffer, file, line,
-                          igraph_errno);
+    igraph_warning(igraph_i_warningmsg_buffer, file, line);
 }
 
 igraph_warning_handler_t *igraph_set_warning_handler(igraph_warning_handler_t *new_handler) {
