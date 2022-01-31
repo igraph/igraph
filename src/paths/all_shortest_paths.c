@@ -268,13 +268,13 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
             while (fatherptr != 0) {
                 /* allocate a new igraph_vector_int_t at the end of paths */
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_new(&paths, &vptr));
-                IGRAPH_CHECK(igraph_vector_int_update(vptr, igraph_vector_int_list_get(&paths, fatherptr - 1)));
+                IGRAPH_CHECK(igraph_vector_int_update(vptr, igraph_vector_int_list_get_ptr(&paths, fatherptr - 1)));
                 IGRAPH_CHECK(igraph_vector_int_push_back(vptr, neighbor));
 
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_new(&path_edge, &vptr_e));
                 if (actnode != from) {
                     /* If the previous vertex was the source then there is no edge to add*/
-                    IGRAPH_CHECK(igraph_vector_int_update(vptr_e, igraph_vector_int_list_get(&path_edge, fatherptr - 1)));
+                    IGRAPH_CHECK(igraph_vector_int_update(vptr_e, igraph_vector_int_list_get_ptr(&path_edge, fatherptr - 1)));
                 }
                 IGRAPH_CHECK(igraph_vector_int_push_back(vptr_e, VECTOR(neis)[j]));
 
@@ -314,12 +314,12 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
             while (fatherptr != 0) {
                 if (vertices) {
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(
-                        vertices, igraph_vector_int_list_get(&paths, fatherptr - 1)
+                        vertices, igraph_vector_int_list_get_ptr(&paths, fatherptr - 1)
                     ));
                 }
                 if (edges) {
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(
-                        edges, igraph_vector_int_list_get(&path_edge, fatherptr - 1)
+                        edges, igraph_vector_int_list_get_ptr(&path_edge, fatherptr - 1)
                     ));
                 }
                 fatherptr = VECTOR(ptrlist)[fatherptr - 1];

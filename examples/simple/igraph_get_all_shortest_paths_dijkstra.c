@@ -41,7 +41,7 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
 
     n = igraph_vector_int_list_size(paths);
     for (i = 0; i < n; i++) {
-        path = igraph_vector_int_list_get(paths, i);
+        path = igraph_vector_int_list_get_ptr(paths, i);
         if (path == 0) {
             printf("Null path found in result vector at index %" IGRAPH_PRId "\n", i);
             return;
@@ -70,7 +70,7 @@ void print_and_destroy_items(igraph_vector_int_list_t* vec) {
     igraph_integer_t i;
 
     for (i = 0; i < igraph_vector_int_list_size(vec); i++) {
-        igraph_vector_int_print(igraph_vector_int_list_get(vec, i));
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(vec, i));
     }
 
     igraph_vector_int_list_clear(vec);

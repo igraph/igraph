@@ -45,7 +45,7 @@ int main() {
         n = igraph_vector_int_list_size(&result);
         printf("%" IGRAPH_PRId " independent sets found\n", n);
         for (i = 0; i < n; i++) {
-            igraph_vector_int_print(igraph_vector_int_list_get(&result, i));
+            igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
         }
     }
     igraph_destroy(&g);
@@ -55,7 +55,7 @@ int main() {
     n = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal independent sets found\n", n);
     for (i = 0; i < n; i++) {
-        igraph_vector_int_print(igraph_vector_int_list_get(&result, i));
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
     }
 
     igraph_independence_number(&g, &alpha);

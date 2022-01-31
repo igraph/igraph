@@ -35,8 +35,8 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
     }
 
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *vvec = igraph_vector_int_list_get(vecs, i);
-        igraph_vector_int_t *evec = igraph_vector_int_list_get(evecs, i);
+        igraph_vector_int_t *vvec = igraph_vector_int_list_get_ptr(vecs, i);
+        igraph_vector_int_t *evec = igraph_vector_int_list_get_ptr(evecs, i);
         igraph_integer_t j, n2 = igraph_vector_int_size(evec);
         if (igraph_vector_int_size(vvec) == 0 && n2 == 0) {
             continue;
@@ -92,7 +92,7 @@ int main() {
     check_evecs(&g, &vecs, &evecs, 10);
 
     for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
-        igraph_vector_int_print(igraph_vector_int_list_get(&vecs, i));
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(&vecs, i));
     }
 
     igraph_vector_int_print(&pred);

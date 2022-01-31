@@ -51,7 +51,7 @@ void canonicalize_list(igraph_vector_int_list_t *list) {
     igraph_integer_t i, len;
     len = igraph_vector_int_list_size(list);
     for (i = 0; i < len; ++i) {
-        igraph_vector_int_sort(igraph_vector_int_list_get(list, i));
+        igraph_vector_int_sort(igraph_vector_int_list_get_ptr(list, i));
     }
     igraph_vector_int_list_sort(list, &compare_vectors);
 }
@@ -68,7 +68,7 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
     ud = (struct userdata *) arg;
     cont = 1; /* true */
 
-    if (compare_vectors(clique, igraph_vector_int_list_get(ud->list, ud->i)) != 0) {
+    if (compare_vectors(clique, igraph_vector_int_list_get_ptr(ud->list, ud->i)) != 0) {
         printf("igraph_cliques() and igraph_cliques_callback() give different results.\n");
         cont = 0; /* false */
     }
@@ -124,7 +124,7 @@ int main() {
         printf("%" IGRAPH_PRId " cliques found\n", n);
         canonicalize_list(&result);
         for (i = 0; i < n; i++) {
-            igraph_vector_int_t* v = igraph_vector_int_list_get(&result, i);
+            igraph_vector_int_t* v = igraph_vector_int_list_get_ptr(&result, i);
             igraph_vector_int_print(v);
         }
     }

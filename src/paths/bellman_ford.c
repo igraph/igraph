@@ -422,11 +422,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             igraph_integer_t size, act, edge;
             igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
-                vvec = igraph_vector_int_list_get(vertices, i);
+                vvec = igraph_vector_int_list_get_ptr(vertices, i);
                 igraph_vector_int_clear(vvec);
             }
             if (edges) {
-                evec = igraph_vector_int_list_get(edges, i);
+                evec = igraph_vector_int_list_get_ptr(edges, i);
                 igraph_vector_int_clear(evec);
             }
 
@@ -546,12 +546,12 @@ igraph_error_t igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
                                                         weights, mode, NULL, NULL));
 
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get(&edges2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get(&vertices2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }

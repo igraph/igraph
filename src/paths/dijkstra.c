@@ -479,11 +479,11 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
             igraph_integer_t size, act, edge;
             igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
-                vvec = igraph_vector_int_list_get(vertices, i);
+                vvec = igraph_vector_int_list_get_ptr(vertices, i);
                 igraph_vector_int_clear(vvec);
             }
             if (edges) {
-                evec = igraph_vector_int_list_get(edges, i);
+                evec = igraph_vector_int_list_get_ptr(edges, i);
                 igraph_vector_int_clear(evec);
             }
 
@@ -597,12 +597,12 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
                  weights, mode, NULL, NULL));
 
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get(&edges2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get(&vertices2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1049,7 +1049,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 */
                 IGRAPH_ASSERT(parent_path_idx >= 0);
                 for (; parent_path_idx < path_count; parent_path_idx++) {
-                    parent_path = igraph_vector_int_list_get(vertices, parent_path_idx);
+                    parent_path = igraph_vector_int_list_get_ptr(vertices, parent_path_idx);
                     if (igraph_vector_int_tail(parent_path) != parent_node) {
                         break;
                     }
@@ -1058,14 +1058,14 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
                     /* We need to re-read parent_path because the previous push_back_new()
                      * call might have reallocated the entire vector list */
-                    parent_path = igraph_vector_int_list_get(vertices, parent_path_idx);
+                    parent_path = igraph_vector_int_list_get_ptr(vertices, parent_path_idx);
                     IGRAPH_CHECK(igraph_vector_int_update(path, parent_path));
                     IGRAPH_CHECK(igraph_vector_int_push_back(path, node));
 
                     if (edges) {
                         IGRAPH_CHECK(igraph_vector_int_list_push_back_new(edges, &path));
                         if (parent_node != from) {
-                            parent_path_edge = igraph_vector_int_list_get(edges, parent_path_idx);
+                            parent_path_edge = igraph_vector_int_list_get_ptr(edges, parent_path_idx);
                             IGRAPH_CHECK(igraph_vector_int_update(path, parent_path_edge));
                         }
                         IGRAPH_CHECK(igraph_vector_int_push_back(path, parent_edge));
@@ -1079,7 +1079,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         i = 0;
         while (i < n) {
             igraph_integer_t tmp;
-            path = igraph_vector_int_list_get(vertices, i);
+            path = igraph_vector_int_list_get_ptr(vertices, i);
             tmp = igraph_vector_int_tail(path);
             if (is_target[tmp] == 1) {
                 /* we need this path, keep it */

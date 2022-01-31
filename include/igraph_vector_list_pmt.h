@@ -45,10 +45,10 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igra
 /* Accessing elements */
 /*--------------------*/
 
-IGRAPH_EXPORT BASE_VECTOR* FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT BASE_VECTOR* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, replace)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE_VECTOR* value);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE_VECTOR* value);
-IGRAPH_EXPORT BASE_VECTOR* FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
+IGRAPH_EXPORT BASE_VECTOR* FUNCTION(igraph_vector, tail_ptr)(const TYPE(igraph_vector) *v);
 
 /*-----------------*/
 /* List properties */

@@ -22,7 +22,7 @@ int main() {
     igraph_vector_int_list_sort(&cliques, igraph_vector_int_lex_cmp);
     n = igraph_vector_int_list_size(&cliques);
     for (i=0; i < n; ++i) {
-        igraph_vector_int_print(igraph_vector_int_list_get(&cliques, i));
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(&cliques, i));
     }
 
     /* Print the cliques in colexicographical order */
@@ -30,7 +30,7 @@ int main() {
     igraph_vector_int_list_sort(&cliques, igraph_vector_int_colex_cmp);
     n = igraph_vector_int_list_size(&cliques);
     for (i=0; i < n; ++i) {
-        igraph_vector_int_print(igraph_vector_int_list_get(&cliques, i));
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(&cliques, i));
     }
 
     /* Destroy data structures when we no longer need them */

@@ -55,7 +55,7 @@ int sort_cmp(const igraph_vector_int_t *a, const igraph_vector_int_t *b) {
 void sort_cliques(igraph_vector_int_list_t *cliques) {
     igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = igraph_vector_int_list_get(cliques, i);
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_vector_int_sort(v);
     }
     igraph_vector_int_list_sort(cliques, sort_cmp);
@@ -65,7 +65,7 @@ void print_cliques(igraph_vector_int_list_t *cliques) {
     igraph_integer_t i;
     sort_cliques(cliques);
     for (i = 0; i < igraph_vector_int_list_size(cliques); i++) {
-        igraph_vector_int_t *v = igraph_vector_int_list_get(cliques, i);
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_vector_int_print(v);
     }
 }

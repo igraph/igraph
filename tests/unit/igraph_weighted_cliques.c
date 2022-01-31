@@ -31,7 +31,7 @@ void canonicalize_list(igraph_vector_int_list_t *list) {
     igraph_integer_t i, len;
     len = igraph_vector_int_list_size(list);
     for (i = 0; i < len; ++i) {
-        igraph_vector_int_sort(igraph_vector_int_list_get(list, i));
+        igraph_vector_int_sort(igraph_vector_int_list_get_ptr(list, i));
     }
     igraph_vector_int_list_sort(list, &compare_vectors);
 }
@@ -56,7 +56,7 @@ void print_and_clear_weighted_clique_list(igraph_vector_int_list_t *cliques, con
 
     count = igraph_vector_int_list_size(cliques);
     for (i = 0; i < count; i++) {
-        igraph_vector_int_t* v = igraph_vector_int_list_get(cliques, i);
+        igraph_vector_int_t* v = igraph_vector_int_list_get_ptr(cliques, i);
         print_weighted_clique(v, vertex_weights);
     }
 

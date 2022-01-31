@@ -39,7 +39,7 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
     ud = (struct userdata *) arg;
     cont = 1; /* true */
 
-    if (compare_vectors(clique, igraph_vector_int_list_get(ud->list, ud->i)) != 0) {
+    if (compare_vectors(clique, igraph_vector_int_list_get_ptr(ud->list, ud->i)) != 0) {
         printf("igraph_maximal_cliques() and igraph_maximal_cliques_callback() give different results.\n");
         cont = 0; /* false */
     }

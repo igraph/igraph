@@ -494,7 +494,7 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     if (min_size <= 1) {
         IGRAPH_CHECK(igraph_vector_int_list_resize(res, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
-            indset = igraph_vector_int_list_get(res, i);
+            indset = igraph_vector_int_list_get_ptr(res, i);
             IGRAPH_CHECK(igraph_vector_int_push_back(indset, i));
         }
     }
@@ -920,7 +920,7 @@ static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique
         igraph_vector_int_t* first;
 
         n = igraph_vector_int_size(clique);
-        first = igraph_vector_int_list_get(result, 0);
+        first = igraph_vector_int_list_get_ptr(result, 0);
         if (n < igraph_vector_int_size(first)) {
             igraph_vector_int_destroy(clique);
             igraph_Free(clique);

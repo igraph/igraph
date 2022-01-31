@@ -49,8 +49,8 @@ int main() {
                               &predecessors, &inbound_edges);
 
     for (i = 0; i < vcount; i++) {
-        igraph_vector_int_t *v1 = igraph_vector_int_list_get(&resvertices, i);
-        igraph_vector_int_t *v2 = igraph_vector_int_list_get(&resedges, i);
+        igraph_vector_int_t *v1 = igraph_vector_int_list_get_ptr(&resvertices, i);
+        igraph_vector_int_t *v2 = igraph_vector_int_list_get_ptr(&resedges, i);
         printf("%i V: ", i);
         igraph_vector_int_print(v1);
         printf("%i E: ", i);
