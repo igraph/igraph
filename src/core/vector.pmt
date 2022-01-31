@@ -987,7 +987,7 @@ igraph_error_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * one comes first. Thus {1, 3} comes after {1, 2, 3}, but before {1, 3, 4}.
  *
  * </para><para>
- * This function is typically used together with \ref igraph_vector_list_sort().
+ * This function is typically used together with \c igraph_vector_list_sort().
  *
  * \param lhs Pointer to the first vector.
  * \param rhs Pointer to the second vector.
@@ -1069,7 +1069,7 @@ int FUNCTION(igraph_vector, lex_cmp_untyped)(const void *lhs, const void *rhs) {
  * but before {0, 1, 2}.
  *
  * </para><para>
- * This function is typically used together with \ref igraph_vector_list_sort().
+ * This function is typically used together with \c igraph_vector_list_sort().
  *
  * \param lhs Pointer to a pointer to the first vector.
  * \param rhs Pointer to a pointer to the second vector.
