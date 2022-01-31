@@ -1725,8 +1725,8 @@ igraph_dominator_tree:
 
 igraph_all_st_cuts:
     PARAMS: |-
-        GRAPH graph, OPTIONAL OUT EDGESETLIST cuts,
-        OPTIONAL OUT VERTEXSETLIST partition1s,
+        GRAPH graph, OPTIONAL OUT EDGESET_LIST cuts,
+        OPTIONAL OUT VERTEXSET_LIST partition1s,
         VERTEX source, VERTEX target
     DEPS: |-
         source ON graph, target ON graph, cuts ON graph,
@@ -1735,8 +1735,8 @@ igraph_all_st_cuts:
 igraph_all_st_mincuts:
     PARAMS: |-
         GRAPH graph, OUT REAL value,
-        OPTIONAL OUT EDGESETLIST cuts,
-        OPTIONAL OUT VERTEXSETLIST partition1s,
+        OPTIONAL OUT EDGESET_LIST cuts,
+        OPTIONAL OUT VERTEXSET_LIST partition1s,
         VERTEX source, VERTEX target, OPTIONAL EDGE_CAPACITY capacity
     DEPS: |-
         capacity ON graph, source ON graph, target ON graph,
@@ -1751,11 +1751,11 @@ igraph_is_minimal_separator:
     DEPS: candidate ON graph
 
 igraph_all_minimal_st_separators:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+    PARAMS: GRAPH graph, OUT VERTEXSET_LIST separators
     DEPS: separators ON graph
 
 igraph_minimum_size_separators:
-    PARAMS: GRAPH graph, OUT VERTEXSETLIST separators
+    PARAMS: GRAPH graph, OUT VERTEXSET_LIST separators
     DEPS: separators ON graph
 
 igraph_cohesive_blocks:

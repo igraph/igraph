@@ -228,7 +228,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     igraph_t *graph_copy;
 
-    igraph_vector_ptr_t separators;
+    igraph_vector_int_list_t separators;
     igraph_vector_int_t compvertices;
     igraph_vector_int_t components;
     igraph_vector_bool_t marked;
@@ -277,8 +277,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_bool_init(&Qcheck, 1));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &Qcheck);
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&separators, 0));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &separators);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&separators, 0);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&compvertices, 0);
     IGRAPH_CHECK(igraph_vector_bool_init(&marked, 0));
@@ -321,8 +320,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
         /* Get the separators */
         IGRAPH_CHECK(igraph_minimum_size_separators(mygraph, &separators));
-        IGRAPH_FINALLY(igraph_i_cohesive_blocks_free_vectors, &separators);
-        nsep = igraph_vector_ptr_size(&separators);
+        nsep = igraph_vector_int_list_size(&separators);
 
         IGRAPH_STATUSF((" %li separators,", 0, nsep));
 
@@ -330,7 +328,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_bool_resize(&marked, mynodes));
         igraph_vector_bool_null(&marked);
         for (i = 0; i < nsep; i++) {
-            igraph_vector_int_t *v = VECTOR(separators)[i];
+            igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&separators, i);
             igraph_integer_t j, n = igraph_vector_int_size(v);
             for (j = 0; j < n; j++) {
                 igraph_integer_t vv = VECTOR(*v)[j];
@@ -426,8 +424,6 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_destroy(mygraph);
         igraph_free(mygraph);
         VECTOR(Q)[Qptr] = 0;
-        igraph_i_cohesive_blocks_free_vectors(&separators);
-        IGRAPH_FINALLY_CLEAN(1);
 
         Qptr++;
     }
@@ -438,7 +434,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_int_destroy(&neis);
     igraph_vector_bool_destroy(&marked);
     igraph_vector_int_destroy(&compvertices);
-    igraph_vector_ptr_destroy(&separators);
+    igraph_vector_int_list_destroy(&separators);
     IGRAPH_FINALLY_CLEAN(7);
 
     if (blocks || cohesion || parent || block_tree) {

@@ -157,7 +157,7 @@ void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, 
     v->stor_begin[pos] = *value;
 }
 
-BASE_VECTOR* FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v) {
+BASE_VECTOR* FUNCTION(igraph_vector, tail_ptr)(const TYPE(igraph_vector) *v) {
     igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
     return size > 0 ? FUNCTION(igraph_vector, get_ptr)(v, size - 1) : 0;
 }
@@ -188,14 +188,6 @@ void FUNCTION(igraph_vector, discard_fast)(TYPE(igraph_vector)* v, igraph_intege
         v->end -= 1;
         v->stor_begin[index] = *(v->end);
     }
-}
-
-BASE_VECTOR* FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
-    BASE_VECTOR* tmp = FUNCTION(igraph_vector, tail)(v);
-    if (tmp) {
-        v->end -= 1;
-    }
-    return tmp;
 }
 
 igraph_error_t FUNCTION(igraph_vector, push_back_copy)(TYPE(igraph_vector)* v, BASE_VECTOR* result) {
