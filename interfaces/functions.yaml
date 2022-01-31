@@ -84,16 +84,19 @@ igraph_create:
     PARAMS: OUT GRAPH graph, VECTOR_INT edges, INTEGER n=0, BOOLEAN directed=True
 
 igraph_adjacency:
-    PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCYMODE mode=DIRECTED
+    PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCY_MODE mode=DIRECTED
 
 igraph_weighted_adjacency:
     PARAMS: |-
         OUT GRAPH graph, MATRIX adjmatrix,
-        ADJACENCYMODE mode=DIRECTED, CSTRING attr="weight",
+        ADJACENCY_MODE mode=DIRECTED, CSTRING attr="weight",
         BOOLEAN loops
 
 igraph_star:
-    PARAMS: OUT GRAPH graph, INTEGER n, STARMODE mode=OUT, INTEGER center=0
+    PARAMS: OUT GRAPH graph, INTEGER n, STAR_MODE mode=OUT, INTEGER center=0
+
+igraph_wheel:
+    PARAMS: OUT GRAPH graph, INTEGER n, WHEEL_MODE mode=OUT, INTEGER center=0
 
 igraph_lattice:
     PARAMS: |-
@@ -106,7 +109,7 @@ igraph_ring:
         BOOLEAN circular=True
 
 igraph_kary_tree:
-    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREEMODE type=OUT
+    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREE_MODE type=OUT
 
 igraph_full:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
@@ -173,7 +176,7 @@ igraph_erdos_renyi_game_gnm:
 igraph_degree_sequence_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
-        DEGSEQMODE method=SIMPLE
+        DEGSEQ_MODE method=SIMPLE
 
 igraph_growing_random_game:
     PARAMS: |-
@@ -546,7 +549,7 @@ igraph_personalized_pagerank:
         options ON algo
 
 igraph_rewire:
-    PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRINGMODE mode=SIMPLE
+    PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRING_MODE mode=SIMPLE
 
 igraph_induced_subgraph:
     PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl=AUTO
@@ -577,18 +580,18 @@ igraph_simplify:
         EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
 
 igraph_transitivity_undirected:
-    PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITYMODE mode=NAN
+    PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITY_MODE mode=NAN
 
 igraph_transitivity_local_undirected:
-    PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, TRANSITIVITYMODE mode=NAN
+    PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, TRANSITIVITY_MODE mode=NAN
 
 igraph_transitivity_avglocal_undirected:
-    PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITYMODE mode=NAN
+    PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITY_MODE mode=NAN
 
 igraph_transitivity_barrat:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
-        EDGEWEIGHTS weights=NULL, TRANSITIVITYMODE mode=NAN
+        EDGEWEIGHTS weights=NULL, TRANSITIVITY_MODE mode=NAN
     DEPS: res ON graph, vids ON graph, weights ON graph
 
 igraph_reciprocity:
