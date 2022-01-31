@@ -554,8 +554,6 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_integer_t pos) {
  *    elements of the pointer vector. For example, if the pointer vector contains
  *    <code>igraph_vector_t *</code> pointers, then the comparison function must
  *    interpret its arguments as <code>igraph_vector_t **</code>.
- *
- * \example examples/simple/igraph_vector_ptr_sort.c
  */
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
     igraph_qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*),
