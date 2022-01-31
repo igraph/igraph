@@ -271,7 +271,7 @@ ADD_WEIGHTS:
     CTYPE: igraph_add_weights_t
     FLAGS: ENUM
 
-ADJACENCYMODE:
+ADJACENCY_MODE:
     # Enum that describes how an adjacency matrix should be constructed
     CTYPE: igraph_adjacency_t
     FLAGS: ENUM
@@ -297,7 +297,7 @@ CONNECTEDNESS:
     CTYPE: igraph_connectedness_t
     FLAGS: ENUM
 
-DEGSEQMODE:
+DEGSEQ_MODE:
     # Enum that describes the various implementations of generating a graph
     # with an arbitrary degree sequence
     CTYPE: igraph_degseq_t
@@ -366,7 +366,7 @@ RECIP:
     CTYPE: igraph_reciprocity_t
     FLAGS: ENUM
 
-REWIRINGMODE:
+REWIRING_MODE:
     # Enum for the rewiring modes of igraph_rewire()
     CTYPE: igraph_rewiring_t
     FLAGS: ENUM
@@ -389,7 +389,7 @@ SPINGLASS_IMPLEMENTATION:
     CTYPE: igraph_spinglass_implementation_t
     FLAGS: ENUM
 
-STARMODE:
+STAR_MODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_star_mode_t
     FLAGS: ENUM
@@ -412,15 +412,20 @@ TOUNDIRECTED:
     CTYPE: igraph_to_undirected_t
     FLAGS: ENUM
 
-TRANSITIVITYMODE:
+TRANSITIVITY_MODE:
     # Enum that specifies how isolated vertices should be handled in transitivity
     # calcuations
     CTYPE: igraph_transitivity_mode_t
     FLAGS: ENUM
 
-TREEMODE:
+TREE_MODE:
     # Enum that describes how a tree graph should be constructed
     CTYPE: igraph_tree_mode_t
+    FLAGS: ENUM
+
+WHEEL_MODE:
+    # Enum that describes how a star graph should be constructed
+    CTYPE: igraph_wheel_mode_t
     FLAGS: ENUM
 
 ###############################################################################
