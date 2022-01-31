@@ -23,16 +23,15 @@
 
 #include <igraph.h>
 
-void print_maps(igraph_vector_int_t *map, igraph_vector_ptr_t *maps) {
+void print_maps(igraph_vector_int_t *map, igraph_vector_int_list_t *maps) {
     igraph_integer_t n, i;
     igraph_vector_int_print(map);
-    n = igraph_vector_ptr_size(maps);
+    n = igraph_vector_int_list_size(maps);
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*maps)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(maps, i);
         igraph_vector_int_print(v);
-        igraph_vector_int_destroy(v);
-        igraph_free(v);
     }
+    igraph_vector_int_list_clear(maps);
 }
 
 /* This test counts motifs using LAD and compares the results with
@@ -53,20 +52,19 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
     for (i = 0; i < n; i++) {
         igraph_t pattern;
-        igraph_vector_ptr_t maps;
+        igraph_vector_int_list_t maps;
         igraph_integer_t nAutomorphisms;
 
         igraph_isoclass_create(&pattern, k, i, directed);
-        igraph_vector_ptr_init(&maps, 0);
+        igraph_vector_int_list_init(&maps, 0);
 
         igraph_subisomorphic_lad(&pattern, graph, NULL, NULL, NULL, &maps, /* induced = */ 1, 0);
 
         igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
 
-        VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
+        VECTOR(lad_counts)[i] = igraph_vector_int_list_size(&maps) / nAutomorphisms;
 
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
-        igraph_vector_ptr_destroy_all(&maps);
+        igraph_vector_int_list_destroy(&maps);
 
         igraph_destroy(&pattern);
     }
@@ -145,8 +143,8 @@ int main() {
     igraph_t target, pattern;
     igraph_bool_t iso;
     igraph_vector_int_t map;
-    igraph_vector_ptr_t maps;
-    igraph_integer_t i, n;
+    igraph_vector_int_list_t maps;
+    igraph_integer_t i;
     igraph_error_t result;
     int domainsvec[] = { 0, 2, 8, -1,
                          4, 5, 6, 7, -1,
@@ -154,7 +152,7 @@ int main() {
                          0, 2, 8, -1,
                          1, 3, 7, 8, -1, -2
                        };
-    igraph_vector_ptr_t domains;
+    igraph_vector_int_list_t domains;
     igraph_vector_int_t *v = 0;
 
     igraph_small(&target, 9, IGRAPH_UNDIRECTED,
@@ -180,7 +178,7 @@ int main() {
     igraph_simplify(&pattern, /*multiple=*/ 1, /*loops=*/ 0, /*edge_comb=*/ 0);
 
     igraph_vector_int_init(&map, 0);
-    igraph_vector_ptr_init(&maps, 0);
+    igraph_vector_int_list_init(&maps, 0);
 
     igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0, &iso, &map,
                              &maps, /*induced=*/ 0, /*time_limit=*/ 0);
@@ -202,13 +200,13 @@ int main() {
 
     printf("---------\n");
 
-    igraph_vector_ptr_init(&domains, 0);
+    igraph_vector_int_list_init(&domains, 0);
     i = 0;
     while (1) {
         if (domainsvec[i] == -2) {
             break;
         } else if (domainsvec[i] == -1) {
-            igraph_vector_ptr_push_back(&domains, v);
+            igraph_vector_int_list_push_back(&domains, v);
             v = 0;
         } else {
             if (!v) {
@@ -228,16 +226,9 @@ int main() {
     }
     print_maps(&map, &maps);
 
-    n = igraph_vector_ptr_size(&domains);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(domains)[i];
-        igraph_vector_int_destroy(v);
-        free(v);
-    }
-
-    igraph_vector_ptr_destroy(&domains);
+    igraph_vector_int_list_destroy(&domains);
     igraph_vector_int_destroy(&map);
-    igraph_vector_ptr_destroy(&maps);
+    igraph_vector_int_list_destroy(&maps);
 
     igraph_destroy(&pattern);
     igraph_destroy(&target);
@@ -245,7 +236,7 @@ int main() {
     printf("---------\n");
 
     igraph_vector_int_init(&map, 0);
-    igraph_vector_ptr_init(&maps, 0);
+    igraph_vector_int_list_init(&maps, 0);
 
     igraph_small(&target, 9, IGRAPH_UNDIRECTED,
                  0, 1, 0, 4, 0, 6,
@@ -280,7 +271,7 @@ int main() {
     if (igraph_vector_int_size(&map) != 0) {
         return 6;
     }
-    if (igraph_vector_ptr_size(&maps) != 0) {
+    if (igraph_vector_int_list_size(&maps) != 0) {
         return 7;
     }
 
@@ -288,7 +279,7 @@ int main() {
     igraph_destroy(&target);
 
     igraph_vector_int_destroy(&map);
-    igraph_vector_ptr_destroy(&maps);
+    igraph_vector_int_list_destroy(&maps);
 
     test_motifs();
     test_motifs_undirected();

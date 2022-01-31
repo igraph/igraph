@@ -108,7 +108,7 @@ void test_bliss() {
     igraph_bool_t iso;
     igraph_bliss_info_t info;
     igraph_vector_int_t color;
-    igraph_vector_ptr_t generators;
+    igraph_vector_int_list_t generators;
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
     igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
@@ -117,8 +117,7 @@ void test_bliss() {
 
     igraph_ring(&directed_ring, 100, /* directed= */ 1, /* mutual = */0, /* circular = */1);
 
-    igraph_vector_ptr_init(&generators, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&generators, igraph_vector_int_destroy);
+    igraph_vector_int_list_init(&generators, 0);
 
     igraph_isomorphic_bliss(&ring1, &ring2, NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL);
     if (! iso) {
@@ -149,35 +148,35 @@ void test_bliss() {
     // that the generating set is valid. For a undirected cycle graph like ring2, there should
     // be two generators: a cyclic permutation and a reversal of the vertex order.
     igraph_automorphism_group(&ring2, NULL, &generators, IGRAPH_BLISS_F, NULL);
-    if (igraph_vector_ptr_size(&generators) != 2)
+    if (igraph_vector_int_list_size(&generators) != 2)
         printf("Bliss automorphism generators may have failed with ring2. "
                "Please verify the generators manually. "
                "Note that the generator set is not guaranteed to be minimal.\n");
-    igraph_vector_ptr_free_all(&generators);
+    igraph_vector_int_list_clear(&generators);
 
     // For a directed ring, the only generator should be a cyclic permutation.
     igraph_automorphism_group(&directed_ring, NULL, &generators, IGRAPH_BLISS_F, NULL);
-    if (igraph_vector_ptr_size(&generators) != 1)
+    if (igraph_vector_int_list_size(&generators) != 1)
         printf("Bliss automorphism generators may have failed with directed_ring. "
                "Please verify the generators manually. "
                "Note that the generator set is not guaranteed to be minimal.\n");
-    igraph_vector_ptr_free_all(&generators);
+    igraph_vector_int_list_clear(&generators);
 
     igraph_vector_int_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
 
     igraph_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "1") != 0) {
-        printf("Biss automorphism count with color failed: ring1.\n");
+        printf("Bliss automorphism count with color failed: ring1.\n");
     }
     igraph_free(info.group_size);
 
     // There's only one automorphism for this coloured graph, so the generating set is empty.
     igraph_automorphism_group(&ring1, &color, &generators, IGRAPH_BLISS_F, NULL);
-    if (igraph_vector_ptr_size(&generators) != 0) {
+    if (igraph_vector_int_list_size(&generators) != 0) {
         printf("Bliss automorphism generators failed with colored graph.\n");
     }
 
-    igraph_vector_ptr_destroy_all(&generators);
+    igraph_vector_int_list_destroy(&generators);
 
     igraph_vector_int_destroy(&color);
 

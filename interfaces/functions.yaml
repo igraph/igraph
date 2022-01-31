@@ -1821,7 +1821,7 @@ igraph_get_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT VECTORLIST maps, ISOCOMPAT_FUNC node_compat_fn,
+        OUT VECTOR_INT_LIST maps, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -1856,7 +1856,7 @@ igraph_get_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
-        OUT VECTORLIST maps, ISOCOMPAT_FUNC node_compat_fn,
+        OUT VECTOR_INT_LIST maps, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -1890,15 +1890,15 @@ igraph_automorphisms:
 
 igraph_automorphism_group:
     PARAMS: |-
-        GRAPH graph, OPTIONAL VERTEX_COLOR colors, PRIMARY OUT VERTEXSETLIST generators,
+        GRAPH graph, OPTIONAL VERTEX_COLOR colors, PRIMARY OUT VERTEXSET_LIST generators,
         BLISSSH sh="fm", OUT BLISSINFO info
     DEPS: colors ON graph, generators ON graph
 
 igraph_subisomorphic_lad:
     PARAMS: |-
-        GRAPH pattern, GRAPH target, OPTIONAL VERTEXSETLIST domains,
+        GRAPH pattern, GRAPH target, OPTIONAL VERTEXSET_LIST domains,
         OPTIONAL OUT BOOLEAN iso, OUT INDEX_VECTOR map,
-        OPTIONAL OUT VECTORLIST maps, BOOLEAN induced, INTEGER time_limit
+        OPTIONAL OUT VECTOR_INT_LIST maps, BOOLEAN induced, INTEGER time_limit
 
 igraph_simplify_and_colorize:
     # Despite their names, vertex_color and edge_color are not really colors

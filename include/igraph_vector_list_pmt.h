@@ -79,7 +79,7 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, discard_fast)(
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(
         TYPE(igraph_vector)* v, BASE_VECTOR* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back_copy)(
-        TYPE(igraph_vector)* v, BASE_VECTOR* e);
+        TYPE(igraph_vector)* v, const BASE_VECTOR* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back_new)(
         TYPE(igraph_vector)* v, BASE_VECTOR** result);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, remove)(
