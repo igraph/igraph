@@ -27,7 +27,7 @@
 #include "igraph_qsort.h"
 
 static igraph_error_t FUNCTION(igraph_i_vector, init_item)(BASE_VECTOR* item);
-static igraph_error_t FUNCTION(igraph_i_vector, init_item_from)(BASE_VECTOR* item, BASE_VECTOR* other);
+static igraph_error_t FUNCTION(igraph_i_vector, init_item_from)(BASE_VECTOR* item, const BASE_VECTOR* other);
 static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(BASE_VECTOR* start, BASE_VECTOR* end);
 static void FUNCTION(igraph_i_vector, destroy_slice)(BASE_VECTOR* start, BASE_VECTOR* end);
 static igraph_error_t FUNCTION(igraph_i_vector, expand_if_full)(TYPE(igraph_vector)* v);
@@ -190,7 +190,7 @@ void FUNCTION(igraph_vector, discard_fast)(TYPE(igraph_vector)* v, igraph_intege
     }
 }
 
-igraph_error_t FUNCTION(igraph_vector, push_back_copy)(TYPE(igraph_vector)* v, BASE_VECTOR* result) {
+igraph_error_t FUNCTION(igraph_vector, push_back_copy)(TYPE(igraph_vector)* v, const BASE_VECTOR* result) {
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_item_from)(v->end, result));
     v->end += 1;
@@ -320,7 +320,7 @@ static igraph_error_t FUNCTION(igraph_i_vector, init_item)(BASE_VECTOR* item) {
     return ITEM_FUNCTION(igraph_vector, init)(item, 0);
 }
 
-static igraph_error_t FUNCTION(igraph_i_vector, init_item_from)(BASE_VECTOR* item, BASE_VECTOR* other) {
+static igraph_error_t FUNCTION(igraph_i_vector, init_item_from)(BASE_VECTOR* item, const BASE_VECTOR* other) {
     return ITEM_FUNCTION(igraph_vector, copy)(item, other);
 }
 
