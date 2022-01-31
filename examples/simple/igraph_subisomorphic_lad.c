@@ -153,7 +153,7 @@ int main() {
                          1, 3, 7, 8, -1, -2
                        };
     igraph_vector_int_list_t domains;
-    igraph_vector_int_t *v = 0;
+    igraph_vector_int_t v;
 
     igraph_small(&target, 9, IGRAPH_UNDIRECTED,
                  0, 1, 0, 4, 0, 6,
@@ -202,21 +202,19 @@ int main() {
 
     igraph_vector_int_list_init(&domains, 0);
     i = 0;
+    igraph_vector_int_init(&v, 0);
     while (1) {
         if (domainsvec[i] == -2) {
             break;
         } else if (domainsvec[i] == -1) {
-            igraph_vector_int_list_push_back(&domains, v);
-            v = 0;
+            igraph_vector_int_list_push_back_copy(&domains, &v);
+            igraph_vector_int_clear(&v);
         } else {
-            if (!v) {
-                v = (igraph_vector_int_t *) malloc(sizeof(igraph_vector_int_t));
-                igraph_vector_int_init(v, 0);
-            }
-            igraph_vector_int_push_back(v, domainsvec[i]);
+            igraph_vector_int_push_back(&v, domainsvec[i]);
         }
         i++;
     }
+    igraph_vector_int_destroy(&v);
 
     igraph_subisomorphic_lad(&pattern, &target, &domains, &iso, &map, &maps,
                              /*induced=*/ 0, /*time_limit=*/ 0);
