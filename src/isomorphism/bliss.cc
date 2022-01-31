@@ -219,7 +219,7 @@ public:
         if (err) {
             throw bad_alloc();
         }
-        copy(aut, aut + n, newvector->stor_begin); // takes care of unsigned int -> igraph_integer_t conversion
+        copy(aut, aut + n, VECTOR(*newvector)); // takes care of unsigned int -> igraph_integer_t conversion
         err = igraph_vector_ptr_push_back(generators, newvector);
         if (err) {
             throw bad_alloc();

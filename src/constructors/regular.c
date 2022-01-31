@@ -141,6 +141,150 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
 
 /**
  * \ingroup generators
+ * \function igraph_wheel
+ * \brief Creates a \em wheel graph, a union of a star graph and a
+ *        cycle graph.
+ *        
+ * In case of a graph with 2 vertices, one of the vertices will have
+ * a self loop (may imagine the earth is one vertex, the moon is 
+ * another vertex; the earth is the center of the wheel; while an edge
+ * connects earth and moon, another edge is the orbit of the moon,
+ * which is the rim of the wheel).
+ *
+ * \param graph Pointer to an uninitialized graph object, this will
+ *        be the result.
+ * \param n Integer constant, the number of vertices in the graph.
+ * \param mode Constant, gives the type of the star graph to
+ *        create. Possible values:
+ *        \clist
+ *        \cli IGRAPH_WHEEL_OUT
+ *          directed wheel graph, edges point
+ *          \em from the center to the other vertices.
+ *        \cli IGRAPH_WHEEL_IN
+ *          directed wheel graph, edges point
+ *          \em to the center from the other vertices.
+ *        \cli IGRAPH_WHEEL_MUTUAL
+ *          directed wheel graph with mutual edges.
+ *        \cli IGRAPH_WHEEL_UNDIRECTED
+ *          an undirected wheel graph is
+ *          created.
+ *        \endclist
+ * \param center Id of the vertex which will be the center of the
+ *          graph.
+ * \return Error code:
+ *         \clist
+ *         \cli IGRAPH_EINVVID
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVAL
+ *           invalid center vertex.
+ *         \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *         \endclist
+ *
+ * Time complexity: O(|V|), the
+ * number of vertices in the graph.
+ *
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star(), 
+ * \ref igraph_kary_tree() for creating other regular structures.
+ *
+ */
+
+igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
+                igraph_integer_t center) {
+
+    igraph_star_mode_t star_mode;
+    igraph_vector_int_t rim_edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i;
+
+    /* Firstly creates a star by the function \ref igraph_star() and makes
+     * use of its existing input parameter checking ability, it can check
+     * "Invalid number of vertices" and "Invalid center vertex".          */
+    switch (mode)
+    {
+        case IGRAPH_WHEEL_OUT:
+            star_mode = IGRAPH_STAR_OUT;
+            break;
+        case IGRAPH_WHEEL_IN:
+            star_mode = IGRAPH_STAR_IN;
+            break;
+        case IGRAPH_WHEEL_MUTUAL:
+            star_mode = IGRAPH_STAR_MUTUAL;
+            break;
+        case IGRAPH_WHEEL_UNDIRECTED:
+            star_mode = IGRAPH_STAR_UNDIRECTED;
+            break;
+        default:
+            IGRAPH_ERROR("Invalid wheel graph mode.", IGRAPH_EINVMODE);
+    }
+
+    IGRAPH_CHECK(igraph_star(graph, n, star_mode, center));
+
+    /* If n <= 1, wheel graph is identical with star graph,
+     * no further processing is needed.                     */
+    if (n <= 1) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Register the star for deallocation in case of error flow before 
+     * the entire wheel is successfully created.                       */
+    IGRAPH_FINALLY(igraph_destroy, graph);
+
+    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices, 
+     * it will have n - 1 edges. For MUTUAL mode, number of edges
+     * will be double.                                                 */
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 4 * (n-1));
+    } else {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 2 * (n-1));
+    }
+
+    /* Assign first n-1 edges (MUTUAL will be handled later). */
+    for (i = 0; i < n-2; i++) {
+        if ( i < center ) {
+            VECTOR(rim_edges)[2 * i] = i;
+            if ( i + 1 < center ) {
+                VECTOR(rim_edges)[2 * i + 1] = i + 1;
+            } else {
+                VECTOR(rim_edges)[2 * i + 1] = i + 2;
+            }
+        } else {
+            VECTOR(rim_edges)[2 * i] = i + 1;
+            VECTOR(rim_edges)[2 * i + 1] = i + 2;
+        }
+    }
+
+    /* Assign the last edge (MUTUAL will be handled later). */
+    if ( n - 2 < center ) {
+        VECTOR(rim_edges)[2 * n - 4] = n - 2;
+    } else {
+        VECTOR(rim_edges)[2 * n - 4] = n - 1;
+    }
+    if ( center > 0 ) {
+        VECTOR(rim_edges)[2 * n - 3] = 0;
+    } else {
+        VECTOR(rim_edges)[2 * n - 3] = 1;
+    }
+
+    /* For MUTUAL mode, add reverse-direction edges. */
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        for (i=0; i < 2 * (n-1); i++) {
+            VECTOR(rim_edges)[4 * (n-1) - 1 - i] = VECTOR(rim_edges)[i];
+        }
+    }
+
+    /* Combine the rim into the star to make it a wheel graph. */
+    IGRAPH_CHECK(igraph_add_edges(graph, &rim_edges, NULL));
+
+    igraph_vector_int_destroy(&rim_edges);
+
+    /* 2 instead of 1 because the star graph is registered before. */
+    IGRAPH_FINALLY_CLEAN(2);
+    
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
  * \function igraph_lattice
  * \brief Arbitrary dimensional square lattices.
  *

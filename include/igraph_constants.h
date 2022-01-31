@@ -69,6 +69,11 @@ typedef enum { IGRAPH_STAR_OUT = 0, IGRAPH_STAR_IN,
                IGRAPH_STAR_MUTUAL
              } igraph_star_mode_t;
 
+typedef enum { IGRAPH_WHEEL_OUT = 0, IGRAPH_WHEEL_IN,
+               IGRAPH_WHEEL_UNDIRECTED,
+               IGRAPH_WHEEL_MUTUAL
+             } igraph_wheel_mode_t;
+
 typedef enum { IGRAPH_TREE_OUT = 0, IGRAPH_TREE_IN,
                IGRAPH_TREE_UNDIRECTED
              } igraph_tree_mode_t;

@@ -462,7 +462,30 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
+/**
+ * \function igraph_attribute_combination
+ * \brief Initialize attribute combination list and add records.
+ *
+ * \param comb The uninitialized attribute combination list.
+ * \param ...  A list of 'name, type[, func]', where:
+ * \param name The name of the attribute. If the name already exists
+ *             the attribute combination record will be replaced.
+ *             Use NULL to add a default combination record for all
+ *             atributes not in the list.
+ * \param type The type of the attribute combination. See \ref
+ *             igraph_attribute_combination_type_t for the options.
+ * \param func Function to be used if \p type is
+ *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * The list is closed by IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * \return Error code.
+ *
+ * Time complexity: O(n^2), where n is the number attribute
+ *                  combinations records to add.
+ *
+ * \example examples/simple/igraph_attribute_combination.c
+ */
+igraph_error_t igraph_attribute_combination(
+        igraph_attribute_combination_t *comb, ...) {
 
     va_list ap;
 
