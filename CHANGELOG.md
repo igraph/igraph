@@ -538,12 +538,13 @@
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
- - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou!)
- - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999!)
- - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM!)
+ - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou)
+ - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999)
+ - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM)
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28)
  - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica)
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
+ - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach)
 
 ### Changed
 
