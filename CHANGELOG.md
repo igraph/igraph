@@ -547,6 +547,10 @@
  - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach).
  - `igraph_stack_capacity()` to query the capacity of a stack.
 
+### Removed
+
+ - The type `igraph_stack_ptr_t`, `igraph_stack_ptr_free_all()` and `igraph_stack_ptr_destroy_all()` are removed. Use `igraph_vector_ptr_t` and associated functions instead. 
+
 ### Changed
 
  - `igraph_version()` no longer returns an error code.
