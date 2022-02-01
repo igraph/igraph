@@ -82,6 +82,28 @@ void FUNCTION(igraph_stack, destroy)    (TYPE(igraph_stack)* s) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_capacity
+ * \brief Returns the allocated capacity of the stack.
+ *
+ * Note that this might be different from the size of the stack (as
+ * queried by \ref igraph_stack_size()), and specifies how many elements
+ * the stack can hold, without reallocation.
+ *
+ * \param v Pointer to the (previously initialized) stack object
+ *          to query.
+ * \return The allocated capacity.
+ *
+ * \sa \ref igraph_stack_size().
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t FUNCTION(igraph_stack, capacity)(const TYPE(igraph_stack) *s) {
+    return s->stor_end - s->stor_begin;
+}
+
+/**
+ * \ingroup stack
  * \function igraph_stack_reserve
  * \brief Reserve memory.
  *
