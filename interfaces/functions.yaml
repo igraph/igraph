@@ -1624,7 +1624,7 @@ igraph_union:
     DEPS: edge_map_left ON left, edge_map_right ON right
 
 igraph_union_many:
-    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
+    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTOR_INT_LIST edgemaps
 
 igraph_intersection:
     PARAMS: |-
@@ -1633,7 +1633,7 @@ igraph_intersection:
     DEPS: edge_map_left ON left, edge_map_right ON right
 
 igraph_intersection_many:
-    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
+    PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTOR_INT_LIST edgemaps
 
 igraph_difference:
     PARAMS: OUT GRAPH res, GRAPH orig, GRAPH sub

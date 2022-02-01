@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
+#include "igraph_vector_list.h"
 
 #include "operators/misc_internal.h"
 
@@ -87,8 +88,8 @@ igraph_error_t igraph_intersection(igraph_t *res,
  * \param graphs Pointer vector, contains pointers to graphs objects,
  *        the operands of the intersection operator.
  * \param edgemaps If not a null pointer, then it must be an initialized
- *        pointer vector and the mappings of edges from the graphs to the
- *        result graph will be stored here, in the same order as
+ *        list of integer vectors, and the mappings of edges from the graphs to
+ *        the result graph will be stored here, in the same order as
  *        \p graphs. Each mapping is stored in a separate
  *        \type igraph_vector_int_t object. For the edges that are not in
  *        the intersection, -1 is stored.
@@ -101,9 +102,10 @@ igraph_error_t igraph_intersection(igraph_t *res,
  * |E| is the number of edges in the smallest graph (i.e. the graph having
  * the less vertices).
  */
-igraph_error_t igraph_intersection_many(igraph_t *res,
-                             const igraph_vector_ptr_t *graphs,
-                             igraph_vector_ptr_t *edgemaps) {
+igraph_error_t igraph_intersection_many(
+    igraph_t *res, const igraph_vector_ptr_t *graphs,
+    igraph_vector_int_list_t *edgemaps
+) {
 
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_integer_t no_of_nodes = 0;
@@ -126,12 +128,6 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
         }
     }
 
-    if (edgemaps) {
-        IGRAPH_CHECK(igraph_vector_ptr_resize(edgemaps, no_of_graphs));
-        igraph_vector_ptr_null(edgemaps);
-        IGRAPH_FINALLY(igraph_i_union_intersection_destroy_vectors, edgemaps);
-    }
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_init(&no_edges, no_of_graphs));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &no_edges);
@@ -147,14 +143,11 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
     }
 
     if (edgemaps) {
+        IGRAPH_CHECK(igraph_vector_int_list_resize(edgemaps, no_of_graphs));
         for (i = 0; i < no_of_graphs; i++) {
-            VECTOR(*edgemaps)[i] = IGRAPH_CALLOC(1, igraph_vector_int_t);
-            if (!VECTOR(*edgemaps)[i]) {
-                IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
-            }
-            IGRAPH_CHECK(igraph_vector_int_init(VECTOR(*edgemaps)[i],
-                                                VECTOR(no_edges)[i]));
-            igraph_vector_int_fill(VECTOR(*edgemaps)[i], -1);
+            igraph_vector_int_t* v = igraph_vector_int_list_get_ptr(edgemaps, i);
+            IGRAPH_CHECK(igraph_vector_int_resize(v, VECTOR(no_edges)[i]));
+            igraph_vector_int_fill(v, -1);
         }
     }
 
@@ -263,7 +256,7 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
                         allne = 0;
                     }
                     if (edgemaps && allsame) {
-                        igraph_vector_int_t *map = VECTOR(*edgemaps)[j];
+                        igraph_vector_int_t *map = igraph_vector_int_list_get_ptr(edgemaps, j);
                         VECTOR(*map)[edge] = idx;
                     }
                 }
@@ -287,9 +280,6 @@ igraph_error_t igraph_intersection_many(igraph_t *res,
     IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    if (edgemaps) {
-        IGRAPH_FINALLY_CLEAN(1);
-    }
 
     return IGRAPH_SUCCESS;
 }
