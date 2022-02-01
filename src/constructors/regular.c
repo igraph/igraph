@@ -142,14 +142,16 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
 /**
  * \ingroup generators
  * \function igraph_wheel
- * \brief Creates a \em wheel graph, a union of a star graph and a
- *        cycle graph.
- *        
- * In case of a graph with 2 vertices, one of the vertices will have
- * a self loop (may imagine the earth is one vertex, the moon is 
- * another vertex; the earth is the center of the wheel; while an edge
- * connects earth and moon, another edge is the orbit of the moon,
- * which is the rim of the wheel).
+ * \brief Creates a \em wheel graph, a union of a star and a cycle graph.
+ *
+ * A wheel graph on \p n vertices can be thought of as a wheel with
+ * <code>n - 1</code> spokes. The cycle graph part makes up the rim,
+ * while the star graph part adds the spokes.
+ *
+ * </para><para>
+ * Note that the two and three-vertex wheel graphs are non-simple:
+ * The two-vertex wheel graph contains a self-loop, while the three-vertex
+ * wheel graph contains parallel edges (a 1-cycle and a 2-cycle, respectively).
  *
  * \param graph Pointer to an uninitialized graph object, this will
  *        be the result.
@@ -198,7 +200,7 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 
     /* Firstly creates a star by the function \ref igraph_star() and makes
      * use of its existing input parameter checking ability, it can check
-     * "Invalid number of vertices" and "Invalid center vertex".          */
+     * "Invalid number of vertices" and "Invalid center vertex". */
     switch (mode)
     {
         case IGRAPH_WHEEL_OUT:
@@ -220,18 +222,18 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
     IGRAPH_CHECK(igraph_star(graph, n, star_mode, center));
 
     /* If n <= 1, wheel graph is identical with star graph,
-     * no further processing is needed.                     */
+     * no further processing is needed. */
     if (n <= 1) {
         return IGRAPH_SUCCESS;
     }
 
     /* Register the star for deallocation in case of error flow before 
-     * the entire wheel is successfully created.                       */
+     * the entire wheel is successfully created. */
     IGRAPH_FINALLY(igraph_destroy, graph);
 
     /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices, 
      * it will have n - 1 edges. For MUTUAL mode, number of edges
-     * will be double.                                                 */
+     * will be double. */
     if (mode == IGRAPH_WHEEL_MUTUAL) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 4 * (n-1));
     } else {
