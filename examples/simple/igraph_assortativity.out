@@ -1,2 +1,14 @@
-Assortativity of undirected graph = -0.618605
-Assortativity of directed graph = -0.546837
+Undirected graph degree sequence:  1 1 2 2 2 2 3 3 3 5
+Assortativity of undirected graph = 0.471611
+Assortativity of undirected graph = -0.362688
+Assortativity of undirected graph = -0.195829
+Assortativity of undirected graph = -0.251448
+Assortativity of undirected graph = 0.0266512
+
+Directed graph degree sequence:  0 0 0 1 1 1 1 2 2 4
+Directed graph degree sequence:  1 1 1 1 1 1 1 1 2 2
+Assortativity of undirected graph = 0.0842152
+Assortativity of undirected graph = 0.421076
+Assortativity of undirected graph = 0.589506
+Assortativity of undirected graph = 0.0842152
+Assortativity of undirected graph = -0.421076
