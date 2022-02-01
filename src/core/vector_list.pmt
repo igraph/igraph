@@ -200,7 +200,9 @@ igraph_error_t FUNCTION(igraph_vector, push_back_copy)(TYPE(igraph_vector)* v, c
 igraph_error_t FUNCTION(igraph_vector, push_back_new)(TYPE(igraph_vector)* v, BASE_VECTOR** result) {
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, expand_if_full)(v));
     IGRAPH_CHECK(FUNCTION(igraph_i_vector, init_item)(v->end));
-    *result = v->end;
+    if (result) {
+        *result = v->end;
+    }
     v->end += 1;
     return IGRAPH_SUCCESS;
 }

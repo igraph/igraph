@@ -25,13 +25,14 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_stack.h"
 #include "igraph_vector.h"
-#include "igraph_constructors.h"
+#include "igraph_vector_list.h"
 
 #include "core/interruption.h"
 
@@ -485,30 +486,18 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
 
 /* Create clusters out of a membership vector.
  *
- * The cluster pointer vector should be initialized for all entries of the
- * membership vector, no range checking is performed. If a vector for a cluster
- * does not yet exist it will be created and initialized. If a vector for a
- * cluster already does exist it will not be emptied on first use. Hence, it
- * should be ensured that all clusters are always properly empty (or
- * non-existing) before calling this function.
+ * It is assumed that the incoming list of integer vectors is already sized
+ * appropriately (i.e. it has at least as many items as the number of clusters
+ * in the membership vector), and that each item in the list of integer vectors
+ * is empty.
  */
-static igraph_error_t igraph_i_community_get_clusters(const igraph_vector_int_t *membership, igraph_vector_ptr_t *clusters) {
-    igraph_integer_t i, c, n = igraph_vector_int_size(membership);
+static igraph_error_t igraph_i_community_get_clusters(const igraph_vector_int_t *membership, igraph_vector_int_list_t *clusters) {
+    igraph_integer_t i, n = igraph_vector_int_size(membership);
     igraph_vector_int_t *cluster;
+
     for (i = 0; i < n; i++) {
         /* Get cluster for node i */
-        c = VECTOR(*membership)[i];
-        cluster = (igraph_vector_int_t*)VECTOR(*clusters)[c];
-
-        /* No cluster vector exists yet, so we create a new one */
-        if (!cluster) {
-            cluster = IGRAPH_CALLOC(1, igraph_vector_int_t);
-            if (cluster == 0) {
-                IGRAPH_ERROR("Cannot allocate memory for assigning cluster", IGRAPH_ENOMEM);
-            }
-            IGRAPH_CHECK(igraph_vector_int_init(cluster, 0));
-            VECTOR(*clusters)[c] = cluster;
-        }
+        cluster = igraph_vector_int_list_get_ptr(clusters, VECTOR(*membership)[i]);
 
         /* Add node i to cluster vector */
         IGRAPH_CHECK(igraph_vector_int_push_back(cluster, i));
@@ -537,16 +526,14 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     igraph_t *aggregated_graph, igraph_vector_t *aggregated_edge_weights, igraph_vector_t *aggregated_node_weights, igraph_vector_int_t *aggregated_membership) {
     igraph_vector_int_t aggregated_edges;
     igraph_vector_t edge_weight_to_cluster;
-    igraph_vector_ptr_t refined_clusters;
+    igraph_vector_int_list_t refined_clusters;
     igraph_vector_int_t *incident_edges;
     igraph_vector_int_t neighbor_clusters;
     igraph_vector_bool_t neighbor_cluster_added;
     igraph_integer_t i, j, c, degree, nb_neigh_clusters;
 
     /* Get refined clusters */
-    IGRAPH_CHECK(igraph_vector_ptr_init(&refined_clusters, nb_refined_clusters));
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&refined_clusters, igraph_vector_int_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &refined_clusters);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&refined_clusters, nb_refined_clusters);
     IGRAPH_CHECK(igraph_i_community_get_clusters(refined_membership, &refined_clusters));
 
     /* Initialize new edges */
@@ -571,7 +558,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
 
     /* Check per cluster */
     for (c = 0; c < nb_refined_clusters; c++) {
-        igraph_vector_int_t* refined_cluster = (igraph_vector_int_t*)VECTOR(refined_clusters)[c];
+        igraph_vector_int_t* refined_cluster = igraph_vector_int_list_get_ptr(&refined_clusters, c);
         igraph_integer_t n_c = igraph_vector_int_size(refined_cluster);
         igraph_integer_t v = -1;
 
@@ -622,7 +609,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
     igraph_vector_int_destroy(&neighbor_clusters);
     igraph_vector_bool_destroy(&neighbor_cluster_added);
     igraph_vector_destroy(&edge_weight_to_cluster);
-    igraph_vector_ptr_destroy_all(&refined_clusters);
+    igraph_vector_int_list_destroy(&refined_clusters);
 
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -732,7 +719,7 @@ static igraph_error_t igraph_i_community_leiden(
     igraph_vector_int_t tmp_membership;
     igraph_vector_int_t refined_membership;
     igraph_vector_int_t aggregate_node;
-    igraph_vector_ptr_t clusters;
+    igraph_vector_int_list_t clusters;
     igraph_inclist_t edges_per_node;
     igraph_bool_t continue_clustering;
     igraph_integer_t level = 0;
@@ -746,9 +733,7 @@ static igraph_error_t igraph_i_community_leiden(
     IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp_membership);
 
     /* Initialize clusters */
-    IGRAPH_CHECK(igraph_vector_ptr_init(&clusters, n));
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&clusters, igraph_vector_int_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &clusters);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&clusters, n);
 
     /* Initialize aggregate nodes, which initially is identical to simply the
      * nodes in the graph. */
@@ -829,7 +814,7 @@ static igraph_error_t igraph_i_community_leiden(
             /* Refine each cluster */
             nb_refined_clusters = 0;
             for (c = 0; c < *nb_clusters; c++) {
-                igraph_vector_int_t* cluster = (igraph_vector_int_t*)VECTOR(clusters)[c];
+                igraph_vector_int_t* cluster = igraph_vector_int_list_get_ptr(&clusters, c);
                 IGRAPH_CHECK(igraph_i_community_leiden_mergenodes(i_graph,
                              &edges_per_node,
                              i_edge_weights, i_node_weights,
@@ -895,7 +880,7 @@ static igraph_error_t igraph_i_community_leiden(
     /* Free remaining memory */
     igraph_vector_int_destroy(&refined_membership);
     igraph_vector_int_destroy(&aggregate_node);
-    igraph_vector_ptr_destroy_all(&clusters);
+    igraph_vector_int_list_destroy(&clusters);
     igraph_vector_int_destroy(&tmp_membership);
     igraph_vector_destroy(&tmp_node_weights);
     igraph_vector_destroy(&tmp_edge_weights);

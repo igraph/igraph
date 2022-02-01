@@ -1338,7 +1338,7 @@ igraph_community_leading_eigenvector:
         INOUT ARPACKOPT options=arpack_defaults,
         OPTIONAL OUT REAL modularity, BOOLEAN start=False,
         OPTIONAL OUT VECTOR eigenvalues,
-        OPTIONAL OUT VECTORLIST eigenvectors,
+        OPTIONAL OUT VECTOR_LIST eigenvectors,
         OPTIONAL OUT VECTOR history,
         LEVCFUNC callback, EXTRA callback_extra
 
