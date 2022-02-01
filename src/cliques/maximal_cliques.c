@@ -457,7 +457,7 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  * \param graph The input graph.
  * \param subset Pointer to an \c  igraph_vector_int_t containing the
  *   subset of initial vertices
- * \param res Pointer to an \c igraph_ptr_t; the cliques will be
+ * \param res Pointer to a list of integer vectors; the cliques will be
  *   stored here
  * \param no Pointer to an \c igraph_integer_t; the number of maximal
  *   cliques will be stored here.

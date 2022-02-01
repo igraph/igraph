@@ -25,11 +25,13 @@
 #define IGRAPH_COMPONENTS_H
 
 #include "igraph_decls.h"
+
 #include "igraph_constants.h"
+#include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
+#include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
-#include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
@@ -54,9 +56,9 @@ IGRAPH_EXPORT igraph_error_t igraph_articulation_points(const igraph_t *graph,
                                              igraph_vector_int_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                                 igraph_integer_t *no,
-                                                igraph_vector_ptr_t *tree_edges,
-                                                igraph_vector_ptr_t *component_edges,
-                                                igraph_vector_ptr_t *components,
+                                                igraph_vector_int_list_t *tree_edges,
+                                                igraph_vector_int_list_t *component_edges,
+                                                igraph_vector_int_list_t *components,
                                                 igraph_vector_int_t *articulation_points);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
 

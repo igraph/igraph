@@ -987,9 +987,9 @@ igraph_articulation_points:
 igraph_biconnected_components:
     PARAMS: |-
         GRAPH graph, OUT INTEGER no,
-        OPTIONAL OUT EDGESETLIST tree_edges,
-        OPTIONAL OUT EDGESETLIST component_edges,
-        OPTIONAL OUT VERTEXSETLIST components,
+        OPTIONAL OUT EDGESET_LIST tree_edges,
+        OPTIONAL OUT EDGESET_LIST component_edges,
+        OPTIONAL OUT VERTEXSET_LIST components,
         OUT VERTEXSET articulation_points
     DEPS: |-
         tree_edges ON graph, component_edges ON graph,

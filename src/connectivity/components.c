@@ -933,18 +933,6 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
     return igraph_biconnected_components(graph, 0, 0, 0, 0, res);
 }
 
-static void igraph_i_free_vector_int_list(igraph_vector_ptr_t *list) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(list);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*list)[i];
-        if (v) {
-            igraph_vector_int_destroy(v);
-            IGRAPH_FREE(v);
-        }
-    }
-    igraph_vector_ptr_destroy(list);
-}
-
 /**
  * \function igraph_biconnected_components
  * Calculate biconnected components
@@ -972,11 +960,6 @@ static void igraph_i_free_vector_int_list(igraph_vector_ptr_t *list) {
  *     are stored here, in a list of vectors. Every vector in the list
  *     is a biconnected component, represented by its edges. More precisely,
  *     a spanning tree of the biconnected component is returned.
- *     Note you'll have to
- *     destroy each vector first by calling \ref igraph_vector_destroy()
- *     and then \ref igraph_free() on it, plus you need to call
- *     \ref igraph_vector_ptr_destroy() on the list to regain all
- *     allocated memory.
  * \param component_edges If not a NULL pointer, then the edges of the
  *     biconnected components are stored here, in the same form as for
  *     \c tree_edges.
@@ -1003,9 +986,9 @@ static void igraph_i_free_vector_int_list(igraph_vector_ptr_t *list) {
 
 igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                   igraph_integer_t *no,
-                                  igraph_vector_ptr_t *tree_edges,
-                                  igraph_vector_ptr_t *component_edges,
-                                  igraph_vector_ptr_t *components,
+                                  igraph_vector_int_list_t *tree_edges,
+                                  igraph_vector_int_list_t *component_edges,
+                                  igraph_vector_int_list_t *components,
                                   igraph_vector_int_t *articulation_points) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -1019,7 +1002,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_integer_t i, counter, rootdfs = 0;
     igraph_vector_int_t vertex_added;
     igraph_integer_t comps = 0;
-    igraph_vector_ptr_t *mycomponents = components, vcomponents;
+    igraph_vector_int_list_t *mycomponents = components, vcomponents;
 
     IGRAPH_CHECK(igraph_vector_int_init(&nextptr, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &nextptr);
@@ -1045,21 +1028,20 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
         *no = 0;
     }
     if (tree_edges) {
-        igraph_vector_ptr_clear(tree_edges);
+        igraph_vector_int_list_clear(tree_edges);
     }
     if (components) {
-        igraph_vector_ptr_clear(components);
+        igraph_vector_int_list_clear(components);
     }
     if (component_edges) {
-        igraph_vector_ptr_clear(component_edges);
+        igraph_vector_int_list_clear(component_edges);
     }
     if (articulation_points) {
         igraph_vector_int_clear(articulation_points);
     }
     if (component_edges && !components) {
         mycomponents = &vcomponents;
-        IGRAPH_CHECK(igraph_vector_ptr_init(mycomponents, 0));
-        IGRAPH_FINALLY(igraph_i_free_vector_int_list, mycomponents);
+        IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(mycomponents, 0);
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -1125,20 +1107,10 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                             igraph_vector_int_t *v = 0, *v2 = 0;
                             comps++;
                             if (tree_edges) {
-                                v = IGRAPH_CALLOC(1, igraph_vector_int_t);
-                                if (!v) {
-                                    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
-                                }
-                                IGRAPH_CHECK(igraph_vector_int_init(v, 0));
-                                IGRAPH_FINALLY(igraph_vector_int_destroy, v);
+                                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(tree_edges, &v));
                             }
                             if (mycomponents) {
-                                v2 = IGRAPH_CALLOC(1, igraph_vector_int_t);
-                                if (!v2) {
-                                    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
-                                }
-                                IGRAPH_CHECK(igraph_vector_int_init(v2, 0));
-                                IGRAPH_FINALLY(igraph_vector_int_destroy, v2);
+                                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(mycomponents, &v2));
                             }
 
                             while (!igraph_stack_int_empty(&edgestack)) {
@@ -1163,23 +1135,12 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                 }
                             }
 
-                            if (mycomponents) {
-                                IGRAPH_CHECK(igraph_vector_ptr_push_back(mycomponents, v2));
-                                IGRAPH_FINALLY_CLEAN(1);
-                            }
-                            if (tree_edges) {
-                                IGRAPH_CHECK(igraph_vector_ptr_push_back(tree_edges, v));
-                                IGRAPH_FINALLY_CLEAN(1);
-                            }
                             if (component_edges) {
-                                igraph_vector_int_t *nodes = VECTOR(*mycomponents)[comps - 1];
-                                igraph_vector_int_t *vv = IGRAPH_CALLOC(1, igraph_vector_int_t);
+                                igraph_vector_int_t *nodes = igraph_vector_int_list_get_ptr(mycomponents, comps - 1);
                                 igraph_integer_t ii, no_vert = igraph_vector_int_size(nodes);
-                                if (!vv) {
-                                    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
-                                }
-                                IGRAPH_CHECK(igraph_vector_int_init(vv, 0));
-                                IGRAPH_FINALLY(igraph_vector_int_destroy, vv);
+                                igraph_vector_int_t *vv;
+
+                                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(component_edges, &vv));
                                 for (ii = 0; ii < no_vert; ii++) {
                                     igraph_integer_t vert = VECTOR(*nodes)[ii];
                                     igraph_vector_int_t *edges = igraph_inclist_get(&inclist,
@@ -1193,8 +1154,6 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                                         }
                                     }
                                 }
-                                IGRAPH_CHECK(igraph_vector_ptr_push_back(component_edges, vv));
-                                IGRAPH_FINALLY_CLEAN(1);
                             }
                         } /* record component if requested */
                         /*------------------------------------*/
@@ -1212,7 +1171,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     } /* i < no_of_nodes */
 
     if (mycomponents != components) {
-        igraph_i_free_vector_int_list(mycomponents);
+        igraph_vector_int_list_destroy(mycomponents);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
