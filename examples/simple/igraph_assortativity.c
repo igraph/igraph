@@ -15,6 +15,9 @@ int main(){
     igraph_real_t assortativity;
     igraph_integer_t edge_count;
 
+    /* Set seed for deterministic results */
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     /* Create graph */
     igraph_small(&g, 10, IGRAPH_DIRECTED, 
                  0, 1, 0, 2, 0, 3, 0, 5,
