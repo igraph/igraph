@@ -60,7 +60,7 @@ int main() {
 
     /* Configuration model, undirected non-simple graphs */
 
-    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_SIMPLE);
+    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_CONFIGURATION);
 
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == n);
@@ -70,14 +70,14 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_SIMPLE);
+    igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_CONFIGURATION);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
 
     /* Configuration model, directed non-simple graphs */
 
-    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_SIMPLE);
+    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_CONFIGURATION);
 
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == n);
@@ -90,14 +90,14 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_degree_sequence_game(&g, &empty, &empty, IGRAPH_DEGSEQ_SIMPLE);
+    igraph_degree_sequence_game(&g, &empty, &empty, IGRAPH_DEGSEQ_CONFIGURATION);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
 
     /* Configuration model, undirected simple graphs */
 
-    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM);
+    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);
 
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == n);
@@ -110,14 +110,14 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM);
+    igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
 
     /* Configuration model, directed simple graphs */
 
-    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM);
+    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);
 
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == n);
@@ -133,14 +133,14 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_degree_sequence_game(&g, &empty, &empty, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM);
+    igraph_degree_sequence_game(&g, &empty, &empty, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
 
     /* Fast heuristic method, undirected simple graphs */
 
-    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE);
+    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE);
 
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == n);
@@ -153,14 +153,14 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE);
+    igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
 
     /* Fast heuristic method, directed simple graphs */
 
-    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE);
+    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE);
 
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == n);
@@ -176,8 +176,36 @@ int main() {
 
     igraph_destroy(&g);
 
-    igraph_degree_sequence_game(&g, &empty, &empty, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE);
+    igraph_degree_sequence_game(&g, &empty, &empty, IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
+    igraph_destroy(&g);
+
+
+    /* Edge-swithching MCMC, undirected, simple graphs */
+
+    igraph_degree_sequence_game(&g, &outdeg, NULL, IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE);
+
+    igraph_is_simple(&g, &is_simple);
+    IGRAPH_ASSERT(is_simple);
+
+    igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
+    IGRAPH_ASSERT(compare_degrees(&outdeg, &degrees));
+
+    igraph_destroy(&g);
+
+    /* Edge-swithching MCMC, directed, simple graphs */
+
+    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE);
+
+    igraph_is_simple(&g, &is_simple);
+    IGRAPH_ASSERT(is_simple);
+
+    igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
+    IGRAPH_ASSERT(compare_degrees(&outdeg, &degrees));
+
+    igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
+    IGRAPH_ASSERT(compare_degrees(&indeg, &degrees));
+
     igraph_destroy(&g);
 
 
