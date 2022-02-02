@@ -28,17 +28,6 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
-void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(v);
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*v)[i] != 0) {
-            igraph_vector_int_destroy(VECTOR(*v)[i]);
-            IGRAPH_FREE(VECTOR(*v)[i]);
-        }
-    }
-    igraph_vector_ptr_destroy(v);
-}
-
 int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     igraph_vector_int_t *edgelist = edges;
     igraph_integer_t edge1 = (*(const igraph_integer_t*) e1) * 2;
