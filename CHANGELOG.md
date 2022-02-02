@@ -157,8 +157,12 @@
    takes an `igraph_vector_t`), use `igraph_strength()` instead with a null
    weight vector.
 
- - `igraph_degree_sequnce_game()` now takes degree sequences represented as
+ - `igraph_degree_sequence_game()` now takes degree sequences represented as
    `igraph_vector_int_t` instead of `igraph_vector_t`.
+
+ - `igraph_degseq_t`, used by `igraph_degree_sequence_game()`, uses new names
+   for its constants. The old names are deprecated, but retained for compatibility.
+   See `igraph_constants.h` to see which new name corresponds to which old one.
 
  - `igraph_delete_vertices_idx()` now uses `igraph_vector_int_t` vectors to
    return the mapping and the inverse mapping of old vertex IDs to new ones.
@@ -556,6 +560,8 @@
  - `igraph_version()` no longer returns an error code.
  - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
  - The Pajek parser is now less strict and accepts more files.
+  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
+    and edge-switching MCMC sampler.
 
 ### Fixed
 
