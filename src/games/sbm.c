@@ -435,11 +435,11 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
 igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                           const igraph_vector_int_t *mlist,
-                          const igraph_vector_ptr_t *rholist,
+                          const igraph_vector_list_t *rholist,
                           const igraph_vector_ptr_t *Clist,
                           igraph_real_t p) {
 
-    igraph_integer_t i, no_blocks = igraph_vector_ptr_size(rholist);
+    igraph_integer_t i, no_blocks = igraph_vector_list_size(rholist);
     igraph_real_t sq_dbl_epsilon = sqrt(DBL_EPSILON);
     igraph_vector_int_t edges;
     igraph_vector_t csizes;
@@ -468,7 +468,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Checks for the rhos */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = VECTOR(*rholist)[i];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         if (!igraph_vector_isininterval(rho, 0, 1)) {
             IGRAPH_ERROR("`rho' must be between zero and one for HSBM",
                          IGRAPH_EINVAL);
@@ -490,7 +490,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Check that C and rho sizes match */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = VECTOR(*rholist)[i];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         const igraph_matrix_t *C = VECTOR(*Clist)[i];
         igraph_integer_t k = igraph_vector_size(rho);
         if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
@@ -500,7 +500,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Check that rho * m is integer */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = VECTOR(*rholist)[i];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         igraph_real_t m = VECTOR(*mlist)[i];
         igraph_integer_t j, k = igraph_vector_size(rho);
         for (j = 0; j < k; j++) {
@@ -520,7 +520,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
 
     for (b = 0; b < no_blocks; b++) {
         igraph_integer_t from, to, fromoff = 0;
-        const igraph_vector_t *rho = VECTOR(*rholist)[b];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, b);
         const igraph_matrix_t *C = VECTOR(*Clist)[b];
         igraph_real_t m = VECTOR(*mlist)[b];
         igraph_integer_t k = igraph_vector_size(rho);

@@ -91,11 +91,6 @@ STRVECTOR:
     CTYPE: igraph_strvector_t
     FLAGS: BY_REF
 
-VECTORLIST:
-    # A vector containing pointers to vectors of floating-point numbers
-    CTYPE: igraph_vector_ptr_t
-    FLAGS: BY_REF
-
 VECTOR_LIST:
     # A vector containing vectors of floating-point numbers
     CTYPE: igraph_vector_list_t
@@ -201,16 +196,6 @@ EDGE_COLOR:
 EDGEWEIGHTS:
     # A vector containing edge weights
     CTYPE: igraph_vector_t
-    FLAGS: BY_REF
-
-EDGESETLIST:
-    # A vector containing vectors of igraph integers where each such
-    # vector represents a sequence of edge indices.
-    #
-    # TODO(ntamas): the name is slightly inconsistent because EDGESET is
-    # the abstract type for igraph_es_t, but an EDGESETLIST is _not_ a
-    # vector of igraph_es_t objects
-    CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
 EDGESET_LIST:

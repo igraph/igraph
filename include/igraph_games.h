@@ -30,6 +30,7 @@
 #include "igraph_matrix.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
+#include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
@@ -186,7 +187,7 @@ IGRAPH_EXPORT igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t 
 
 IGRAPH_EXPORT igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                                         const igraph_vector_int_t *mlist,
-                                        const igraph_vector_ptr_t *rholist,
+                                        const igraph_vector_list_t *rholist,
                                         const igraph_vector_ptr_t *Clist,
                                         igraph_real_t p);
 

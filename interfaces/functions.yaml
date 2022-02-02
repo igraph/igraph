@@ -307,7 +307,7 @@ igraph_hsbm_list_game:
     INTERNAL: true
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, VECTOR_INT mlist,
-        VECTORLIST rholist, MATRIXLIST Clist, REAL p
+        VECTOR_LIST rholist, MATRIXLIST Clist, REAL p
 
 igraph_correlated_game:
     PARAMS: |-
@@ -1600,7 +1600,7 @@ igraph_local_scan_k_ecount_them:
 igraph_local_scan_neighborhood_ecount:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
-        VERTEXSETLIST neighborhoods
+        VERTEXSET_LIST neighborhoods
     DEPS: weights ON graph
 
 igraph_list_triangles:
@@ -1760,7 +1760,7 @@ igraph_minimum_size_separators:
 
 igraph_cohesive_blocks:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSETLIST blocks,
+        GRAPH graph, OUT GRAPHLIST blocks,
         OUT VECTOR_INT cohesion, OUT INDEX_VECTOR parent,
         OUT GRAPH blockTree
     DEPS: blocks ON graph
