@@ -28,7 +28,9 @@
 
 __BEGIN_DECLS
 
-#ifdef __GNUC__
+/* GCC added support for enumerator attributes in version 6.
+ * Verified that clang 3.0 also supports them. */
+#if __GNUC__ >= 6 || defined(__clang__)
 #define IGRAPH_DEPRECATED_ENUMVAL __attribute__ ((deprecated))
 #else
 #define IGRAPH_DEPRECATED_ENUMVAL
