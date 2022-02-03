@@ -77,10 +77,6 @@
     #undef IN_FORMAT
 #endif
 
-#ifdef ITEM_FUNCTION
-    #undef ITEM_FUNCTION
-#endif
-
 #ifdef MULTIPLICITY
     #undef MULTIPLICITY
 #endif

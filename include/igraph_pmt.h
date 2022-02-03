@@ -106,19 +106,16 @@
 
 #if defined(VECTOR_LIST)
     #if defined(BASE_IGRAPH_REAL)
-        #define ITEM_FUNCTION(dir,name) CONCAT2(dir,name)
-        #define FUNCTION(dir,name) CONCAT3(dir,list,name)
-        #define TYPE(dir) CONCAT3(dir,list,t)
+        #define FUNCTION(a,c) CONCAT3(a,list,c)
+        #define TYPE(a) CONCAT3(a,list,t)
     #elif defined(BASE_BOOL)
         /* Special case because stdbool.h defines bool as a macro to _Bool which would
         * screw things up */
-        #define ITEM_FUNCTION(a,c) CONCAT3x(a,bool,c)
         #define FUNCTION(a,c) CONCAT4x(a,bool,list,c)
-        #define TYPE(dir) CONCAT4x(dir,bool,list,t)
+        #define TYPE(a) CONCAT4x(a,bool,list,t)
     #else
-        #define ITEM_FUNCTION(a,c) CONCAT3(a,SHORT,c)
         #define FUNCTION(a,c) CONCAT4(a,SHORT,list,c)
-        #define TYPE(dir) CONCAT4(dir,SHORT,list,t)
+        #define TYPE(a) CONCAT4(a,SHORT,list,t)
     #endif
 #else
     #if defined(BASE_IGRAPH_REAL)

@@ -26,6 +26,19 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
+/* Define the macro that creates the name of a function that refers to a single
+ * _item_ in the vector */
+
+#if defined(BASE_IGRAPH_REAL)
+    #define ITEM_FUNCTION(f) CONCAT2x(igraph_vector,f)
+#elif defined(BASE_BOOL)
+    /* Special case because stdbool.h defines bool as a macro to _Bool which would
+        * screw things up */
+    #define ITEM_FUNCTION(f) CONCAT2x(igraph_vector_bool,f)
+#else
+    #define ITEM_FUNCTION(f) CONCAT3(igraph_vector,SHORT,f)
+#endif
+
 static igraph_error_t FUNCTION(igraph_i_vector, init_item)(BASE_VECTOR* item);
 static igraph_error_t FUNCTION(igraph_i_vector, init_item_from)(BASE_VECTOR* item, const BASE_VECTOR* other);
 static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(BASE_VECTOR* start, BASE_VECTOR* end);
@@ -38,7 +51,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
     IGRAPH_ASSERT(size >= 0);
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE_VECTOR);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("cannot init vector list", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot initialize list", IGRAPH_ENOMEM);
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -77,7 +90,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_i
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, BASE_VECTOR);
     if (tmp == 0) {
-        IGRAPH_ERROR("cannot reserve space for vector list", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot reserve space for list", IGRAPH_ENOMEM);
     }
 
     v->end = tmp + (v->end - v->stor_begin);
@@ -213,7 +226,7 @@ igraph_error_t FUNCTION(igraph_vector, remove)(TYPE(igraph_vector)* v, igraph_in
     IGRAPH_ASSERT(result != 0);
 
     if (size <= 0) {
-        IGRAPH_ERROR("vector list is already empty", IGRAPH_EINVAL);
+        IGRAPH_ERROR("list is already empty", IGRAPH_EINVAL);
     }
     if (index < 0 || index >= size) {
         IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
@@ -233,7 +246,7 @@ igraph_error_t FUNCTION(igraph_vector, remove_fast)(TYPE(igraph_vector)* v, igra
     IGRAPH_ASSERT(result != 0);
 
     if (size <= 0) {
-        IGRAPH_ERROR("vector list is already empty", IGRAPH_EINVAL);
+        IGRAPH_ERROR("list is already empty", IGRAPH_EINVAL);
     }
     if (index < 0 || index >= size) {
         IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
@@ -261,7 +274,7 @@ igraph_error_t FUNCTION(igraph_vector, permute)(TYPE(igraph_vector)* v, const ig
 
     work = IGRAPH_CALLOC(size, BASE_VECTOR);
     if (work == 0) {
-        IGRAPH_ERROR("cannot permute vector list", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot permute list", IGRAPH_ENOMEM);
     }
 
     for (i = 0; i < size; i++) {
@@ -319,11 +332,11 @@ igraph_error_t FUNCTION(igraph_vector, sort_ind)(
 /* ************************************************************************ */
 
 static igraph_error_t FUNCTION(igraph_i_vector, init_item)(BASE_VECTOR* item) {
-    return ITEM_FUNCTION(igraph_vector, init)(item, 0);
+    return ITEM_FUNCTION(init)(item, 0);
 }
 
 static igraph_error_t FUNCTION(igraph_i_vector, init_item_from)(BASE_VECTOR* item, const BASE_VECTOR* other) {
-    return ITEM_FUNCTION(igraph_vector, copy)(item, other);
+    return ITEM_FUNCTION(copy)(item, other);
 }
 
 static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(BASE_VECTOR* start, BASE_VECTOR* end) {
@@ -343,7 +356,7 @@ static igraph_error_t FUNCTION(igraph_i_vector, init_slice)(BASE_VECTOR* start, 
 
 static void FUNCTION(igraph_i_vector, destroy_slice)(BASE_VECTOR* start, BASE_VECTOR* end) {
     for (; start < end; start++) {
-        ITEM_FUNCTION(igraph_vector, destroy)(start);
+        ITEM_FUNCTION(destroy)(start);
     }
 }
 
@@ -379,3 +392,5 @@ static int FUNCTION(igraph_i_vector, sort_ind_cmp)(void *thunk, const void *p1, 
     BASE_VECTOR **pb = (BASE_VECTOR **) p2;
     return cmp(*pa, *pb);
 }
+
+#undef ITEM_FUNCTION

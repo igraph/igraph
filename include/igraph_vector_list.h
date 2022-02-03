@@ -31,9 +31,11 @@
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
-/* Flexible vector                                    */
+/* Flexible list of vectors                           */
 /* -------------------------------------------------- */
 
+/* Indicate to igraph_vector_list_pmt.h that we are going to work with _vectors_
+ * of the base type, not the base type directly */
 #define VECTOR_LIST
 
 #define BASE_IGRAPH_REAL
@@ -66,30 +68,18 @@ __BEGIN_DECLS
 /* Helper macros                                      */
 /* -------------------------------------------------- */
 
-#ifndef IGRAPH_VECTOR_LIST_NULL
-    #define IGRAPH_VECTOR_LIST_NULL { 0,0,0 }
-#endif
-
-#ifndef IGRAPH_VECTOR_LIST_INIT_FINALLY
 #define IGRAPH_VECTOR_LIST_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_vector_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_list_destroy, v); } while (0)
-#endif
-#ifndef IGRAPH_VECTOR_BOOL_LIST_INIT_FINALLY
 #define IGRAPH_VECTOR_BOOL_LIST_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_vector_bool_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_bool_list_destroy, v); } while (0)
-#endif
-#ifndef IGRAPH_VECTOR_CHAR_LIST_INIT_FINALLY
 #define IGRAPH_VECTOR_CHAR_LIST_INIT_FINALLY(v, size) \
   do { IGRAPH_CHECK(igraph_vector_char_list_init(v, size)); \
   IGRAPH_FINALLY(igraph_vector_char_list_destroy, v); } while (0)
-#endif
-#ifndef IGRAPH_VECTOR_INT_LIST_INIT_FINALLY
 #define IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_vector_int_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_int_list_destroy, v); } while (0)
-#endif
 
 __END_DECLS
 
