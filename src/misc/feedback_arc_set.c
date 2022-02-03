@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
+#include "igraph_vector_list.h"
 #include "igraph_visitor.h"
 
 #include "internal/glpk_support.h"
@@ -444,17 +445,17 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_integer_t no_of_components;
     igraph_integer_t no_of_vertices = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_int_t membership;
-    igraph_vector_t ordering, vertex_remapping;
-    igraph_vector_ptr_t vertices_by_components, edges_by_components;
+    igraph_vector_int_t membership, *vec;
+    igraph_vector_int_t ordering, vertex_remapping;
+    igraph_vector_int_list_t vertices_by_components, edges_by_components;
     igraph_integer_t i, j, k, l, m, n, from, to, no_of_rows;
     igraph_real_t weight;
     glp_prob *ip;
     glp_iocp parm;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&ordering, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&vertex_remapping, no_of_vertices);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ordering, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_remapping, no_of_vertices);
 
     igraph_vector_int_clear(result);
 
@@ -462,41 +463,17 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     IGRAPH_CHECK(igraph_connected_components(graph, &membership, 0, &no_of_components, IGRAPH_WEAK));
 
     /* Construct vertex and edge lists for each of the components */
-    IGRAPH_CHECK(igraph_vector_ptr_init(&vertices_by_components, no_of_components));
-    IGRAPH_CHECK(igraph_vector_ptr_init(&edges_by_components, no_of_components));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vertices_by_components);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &edges_by_components);
-    for (i = 0; i < no_of_components; i++) {
-        igraph_vector_int_t* vptr;
-        vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (vptr == 0) {
-            IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, vptr);
-        IGRAPH_CHECK(igraph_vector_int_init(vptr, 0));
-        IGRAPH_FINALLY_CLEAN(1);
-        VECTOR(vertices_by_components)[i] = vptr;
-    }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&vertices_by_components, igraph_vector_int_destroy);
-    for (i = 0; i < no_of_components; i++) {
-        igraph_vector_int_t* vptr;
-        vptr = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (vptr == 0) {
-            IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, vptr);
-        IGRAPH_CHECK(igraph_vector_int_init(vptr, 0));
-        IGRAPH_FINALLY_CLEAN(1);
-        VECTOR(edges_by_components)[i] = vptr;
-    }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&edges_by_components, igraph_vector_int_destroy);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vertices_by_components, no_of_components);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&edges_by_components, no_of_components);
     for (i = 0; i < no_of_vertices; i++) {
         j = VECTOR(membership)[i];
-        IGRAPH_CHECK(igraph_vector_int_push_back(VECTOR(vertices_by_components)[j], i));
+        vec = igraph_vector_int_list_get_ptr(&vertices_by_components, j);
+        IGRAPH_CHECK(igraph_vector_int_push_back(vec, i));
     }
     for (i = 0; i < no_of_edges; i++) {
         j = VECTOR(membership)[IGRAPH_FROM(graph, i)];
-        IGRAPH_CHECK(igraph_vector_int_push_back(VECTOR(edges_by_components)[j], i));
+        vec = igraph_vector_int_list_get_ptr(&edges_by_components, j);
+        IGRAPH_CHECK(igraph_vector_int_push_back(vec, i));
     }
 
 #define VAR2IDX(i, j) (i*(n-1)+j-(i+1)*i/2)
@@ -513,8 +490,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
     /* Solve an IP for feedback arc sets in each of the components */
     for (i = 0; i < no_of_components; i++) {
-        igraph_vector_int_t* vertices_in_comp = (igraph_vector_int_t*)VECTOR(vertices_by_components)[i];
-        igraph_vector_int_t* edges_in_comp = (igraph_vector_int_t*)VECTOR(edges_by_components)[i];
+        igraph_vector_int_t* vertices_in_comp = igraph_vector_int_list_get_ptr(&vertices_by_components, i);
+        igraph_vector_int_t* edges_in_comp = igraph_vector_int_list_get_ptr(&edges_by_components, i);
 
         /*
          * Let x_ij denote whether layer(i) < layer(j).
@@ -621,8 +598,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
 
         /* Find the ordering of the vertices */
-        IGRAPH_CHECK(igraph_vector_resize(&ordering, n));
-        igraph_vector_null(&ordering);
+        IGRAPH_CHECK(igraph_vector_int_resize(&ordering, n));
+        igraph_vector_int_null(&ordering);
         m = n * (n - 1) / 2;
         j = 0; k = 1;
         for (l = 1; l <= m; l++) {
@@ -657,10 +634,10 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_ptr_destroy_all(&vertices_by_components);
-    igraph_vector_ptr_destroy_all(&edges_by_components);
-    igraph_vector_destroy(&vertex_remapping);
-    igraph_vector_destroy(&ordering);
+    igraph_vector_int_list_destroy(&vertices_by_components);
+    igraph_vector_int_list_destroy(&edges_by_components);
+    igraph_vector_int_destroy(&vertex_remapping);
+    igraph_vector_int_destroy(&ordering);
     igraph_vector_int_destroy(&membership);
     IGRAPH_FINALLY_CLEAN(5);
 
