@@ -31,10 +31,10 @@
    parameter.
 
  - `igraph_all_minimal_st_separators()` now returns the separators in
-   an `igraph_vector_ptr_t` containing `igraph_vector_int_t` vectors.
+   an `igraph_vector_int_list_t` containing `igraph_vector_int_t` vectors.
 
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` now return the cuts in
-   an `igraph_vector_ptr_t` containing `igraph_vector_int_t` vectors.
+   an `igraph_vector_int_list_t` containing `igraph_vector_int_t` vectors.
 
  - `igraph_arpack_unpack_complex()` now uses `igraph_integer_t` for its `nev`
    argument instead of `long int`.
@@ -93,8 +93,7 @@
    `clique` parameter, and must return an `igraph_error_t`. Use `IGRAPH_STOP`
    as the return code to terminate the search prematurely.
 
- - The `igraph_vector_ptr_t` res parameter in `igraph_cliques()`
-   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+ - The `res` parameter of `igraph_cliques()` is now an `igraph_vector_int_list_t`.
 
  - `igraph_closeness()` and `igraph_closeness_cutoff()` now use an
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
@@ -232,9 +231,8 @@
    `igraph_get_shortest_paths_dijkstra()` now contain `igraph_vector_int_t` vectors
    instead of `igraph_vector_t`.
 
- - The `igraph_vector_ptr_t` maps parameters in `igraph_get_isomorphisms_vf2()`
-   and `igraph_get_subisomorphisms_vf2()` now contain `igraph_vector_int_t`,
-   not `igraph_vector_t`.
+ - The `maps` parameters in `igraph_get_isomorphisms_vf2()` and
+   `igraph_get_subisomorphisms_vf2()` are now of type `igraph_vector_int_list_t`.
 
  - `igraph_get_stochastic_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
@@ -266,8 +264,8 @@
  - `igraph_incident()` now uses an `igraph_vector_int_t` for its
    `eids` parameter.
 
- - The `igraph_vector_ptr_t` res parameter in `igraph_independent_vertex_sets()`
-   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+ - The `res` parameter in `igraph_independent_vertex_sets()` is now an
+   `igraph_vector_int_list_t`.
 
  - `igraph_induced_subgraph_map()` now uses `igraph_vector_int_t` vectors to
    return the mapping and the inverse mapping of old vertex IDs to new ones.
@@ -343,12 +341,11 @@
  - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
 
- - The `igraph_vector_ptr_t` res parameters in `igraph_maximal_cliques()`
-   and `igraph_maximal_cliques_subset()` now contain `igraph_vector_int_t`,
-   not `igraph_vector_t`.
+ - The `res` parameters in `igraph_maximal_cliques()` and `igraph_maximal_cliques_subset()`
+   are now of type `igraph_vector_int_list_t`.
 
- - The `igraph_vector_ptr_t` res parameter in `igraph_maximal_independent_vertex_sets()`
-   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+ - The `res` parameter in `igraph_maximal_independent_vertex_sets()` is now
+   an `igraph_vector_int_list_t`.
 
  - `igraph_maximum_cardinality_search()` now uses an `igraph_vector_int_t` for
    its `alpha` and `alpham1` arguments.
@@ -433,9 +430,9 @@
    `igraph_isomorphic_bliss()` now all use `igraph_vector_int_t` for their `map12`
    and `map21` parameters.
 
- - The `igraph_vector_ptr_t` maps parameters in `igraph_subisomorphic_lad()`,
-   `igraph_get_isomorphisms_vf2()` and `igraph_get_subisomorphisms_vf2()` now
-   contain `igraph_vector_int_t`, not `igraph_vector_t`.
+ - The `maps` parameters in `igraph_subisomorphic_lad()`,
+   `igraph_get_isomorphisms_vf2()` and `igraph_get_subisomorphisms_vf2()` are
+   now of type `igraph_vector_int_list_t`.
 
  - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its `map`
    parameter. Also, its `domains` parameter is now a pointer vector containing
@@ -455,8 +452,8 @@
    `igraph_vector_t`. Similarly, `igraph_vs_as_vector()` now returns the vector
    of matched vertex IDs in an `igraph_vector_int_t`, not an `igraph_vector_t`.
 
- - The `igraph_vector_ptr_t` res parameter in `igraph_weighted_cliques()`
-   now contains `igraph_vector_int_t`, not `igraph_vector_t`.
+ - The `res` parameter of `igraph_weighted_cliques()` is now an
+   `igraph_vector_int_list_t`.
 
  - `igraph_write_graph_dimacs()` now uses `igraph_integer_t` for the source and
    target vertex index instead of a `long int`.
