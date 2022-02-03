@@ -589,7 +589,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_int_t neis;
     igraph_vector_int_t vids_old2new;
     igraph_integer_t i;
-    igraph_t *newg;
+    igraph_t newg;
 
 
     if (maxcompno < 0) {
@@ -656,19 +656,15 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
             continue;
         }
 
-        newg = IGRAPH_CALLOC(1, igraph_t);
-        if (newg == 0) {
-            IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, newg);
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
-            graph, newg, igraph_vss_vector(&verts),
+            graph, &newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
-        IGRAPH_FINALLY(igraph_destroy, newg);
+        IGRAPH_FINALLY(igraph_destroy, &newg);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, newg));
-        IGRAPH_FINALLY_CLEAN(2);  /* ownership of newg now taken by 'components' */
+        IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
+        memset(&newg, 0, sizeof(newg));
         resco++;
 
         /* vids_old2new does not have to be cleaned up here; since we are doing
@@ -711,7 +707,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     igraph_adjlist_t adjlist;
     igraph_vector_int_t verts;
     igraph_vector_int_t vids_old2new;
-    igraph_t *newg;
+    igraph_t newg;
 
     if (maxcompno < 0) {
         maxcompno = IGRAPH_INTEGER_MAX;
@@ -871,19 +867,15 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
             continue;
         }
 
-        newg = IGRAPH_CALLOC(1, igraph_t);
-        if (newg == 0) {
-            IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, newg);
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
-            graph, newg, igraph_vss_vector(&verts),
+            graph, &newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
-        IGRAPH_FINALLY(igraph_destroy, newg);
-        IGRAPH_CHECK(igraph_graph_list_push_back(components, newg));
-        IGRAPH_FINALLY_CLEAN(2);  /* ownership of newg now taken by 'components' */
+        IGRAPH_FINALLY(igraph_destroy, &newg);
+        IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
+        IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
+        memset(&newg, 0, sizeof(newg));
 
         /* vids_old2new has to be cleaned up here because a vertex may appear
          * in multiple strongly connected components. Simply calling
