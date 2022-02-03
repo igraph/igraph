@@ -123,7 +123,7 @@ MATRIX_COMPLEX:
     # A matrix of igraph complex numbers
     CTYPE: igraph_matrix_complex_t
 
-MATRIXLIST:
+MATRIX_LIST:
     # A vector containing pointers to matrices of floating-point numbers
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
@@ -208,14 +208,14 @@ EDGESET_LIST:
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
-GRAPHLIST:
-    # A vector containing pointers to graph objects
-    CTYPE: igraph_vector_ptr_t
+GRAPH_LIST:
+    # A list containing graphs (owned by the list itself)
+    CTYPE: igraph_graph_list_t
     FLAGS: BY_REF
 
-GRAPH_LIST:
-    # A list containing graphs
-    CTYPE: igraph_graph_list_t
+GRAPH_PTR_LIST:
+    # A vector containing pointers to graph objects (not owned by the vector)
+    CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
 VERTEX_QTY:
@@ -227,18 +227,8 @@ VERTEX_QTY:
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-SIRLIST:
+SIR_LIST:
     # A vector containing pointers to igraph_sir_t objects
-    CTYPE: igraph_vector_ptr_t
-    FLAGS: BY_REF
-
-VERTEXSETLIST:
-    # A list containing vectors of igraph integers where each such
-    # vector represents a sequence of vertex indices.
-    #
-    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
-    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
-    # vector of igraph_vs_t objects
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
@@ -250,6 +240,16 @@ VERTEXSET_LIST:
     # the abstract type for igraph_vs_t, but a VERTEXSET_LIST is _not_ a
     # vector of igraph_vs_t objects
     CTYPE: igraph_vector_int_list_t
+    FLAGS: BY_REF
+
+VERTEXSET_PTR_LIST:
+    # A list containing vectors of igraph integers where each such
+    # vector represents a sequence of vertex indices.
+    #
+    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
+    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
+    # vector of igraph_vs_t objects
+    CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
 VERTEX_COLOR:
