@@ -37,7 +37,6 @@
 #include "operators/subgraph.h"
 
 #include <limits.h>
-#include <string.h>  /* memset */
 
 static igraph_error_t igraph_i_connected_components_weak(
     const igraph_t *graph, igraph_vector_int_t *membership,
@@ -665,7 +664,6 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_destroy, &newg);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
-        memset(&newg, 0, sizeof(newg));
         resco++;
 
         /* vids_old2new does not have to be cleaned up here; since we are doing
@@ -876,7 +874,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_destroy, &newg);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
-        memset(&newg, 0, sizeof(newg));
 
         /* vids_old2new has to be cleaned up here because a vertex may appear
          * in multiple strongly connected components. Simply calling
