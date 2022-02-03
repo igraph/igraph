@@ -1760,7 +1760,7 @@ igraph_minimum_size_separators:
 
 igraph_cohesive_blocks:
     PARAMS: |-
-        GRAPH graph, OUT GRAPHLIST blocks,
+        GRAPH graph, OUT VERTEXSET_LIST blocks,
         OUT VECTOR_INT cohesion, OUT INDEX_VECTOR parent,
         OUT GRAPH blockTree
     DEPS: blocks ON graph
