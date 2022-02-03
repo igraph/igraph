@@ -160,12 +160,10 @@ igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
 
     if (attr) {
         igraph_fixed_vectorlist_t vl;
-        IGRAPH_CHECK(igraph_fixed_vectorlist_convert(&vl, &mergeinto,
-                     actedge + 1));
+        IGRAPH_CHECK(igraph_fixed_vectorlist_convert(&vl, &mergeinto, actedge + 1));
         IGRAPH_FINALLY(igraph_fixed_vectorlist_destroy, &vl);
 
-        IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, &vl.v,
-                     edge_comb));
+        IGRAPH_CHECK(igraph_i_attribute_combine_edges(graph, &res, &vl.vecs, edge_comb));
 
         igraph_fixed_vectorlist_destroy(&vl);
         igraph_vector_int_destroy(&mergeinto);
