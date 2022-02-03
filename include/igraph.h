@@ -53,6 +53,7 @@
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_graph_list.h"
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"

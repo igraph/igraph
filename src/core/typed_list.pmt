@@ -1,0 +1,424 @@
+/* -*- mode: C -*-  */
+/*
+   IGraph library.
+   Copyright (C) 2022  The igraph development team
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
+*/
+
+#include <string.h>  /* memmove */
+
+#include "igraph_error.h"
+#include "igraph_memory.h"
+#include "igraph_qsort.h"
+
+#if defined(VECTOR_LIST)
+  /* It was indicated that every item in a list is a vector of the base type
+   * so let's define ITEM_TYPE appropriately */
+    #define ITEM_TYPE BASE_VECTOR
+
+    /* Define the macro that creates the name of a function that refers to a single
+    * _item_ in the vector */
+    #if defined(BASE_IGRAPH_REAL)
+        #define ITEM_FUNCTION(f) CONCAT2x(igraph_vector,f)
+    #elif defined(BASE_BOOL)
+        /* Special case because stdbool.h defines bool as a macro to _Bool which would
+            * screw things up */
+        #define ITEM_FUNCTION(f) CONCAT2x(igraph_vector_bool,f)
+    #else
+        #define ITEM_FUNCTION(f) CONCAT3(igraph_vector,SHORT,f)
+    #endif
+#else
+    #define ITEM_TYPE BASE
+
+    /* Define the macro that creates the name of a function that refers to a single
+    * _item_ in the vector */
+    #if defined(BASE_GRAPH)
+        #define ITEM_FUNCTION(f) CONCAT2x(igraph,f)
+    #endif
+#endif
+
+static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* item);
+static igraph_error_t INTERNAL_FUNCTION(init_item_from)(const TYPE* list, ITEM_TYPE* item, const ITEM_TYPE* other);
+static void INTERNAL_FUNCTION(destroy_item)(const TYPE* list, ITEM_TYPE* item);
+
+static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end);
+static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end);
+static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* list);
+static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2);
+
+igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
+    igraph_integer_t alloc_size = size > 0 ? size : 1;
+    IGRAPH_ASSERT(size >= 0);
+    v->stor_begin = IGRAPH_CALLOC(alloc_size, ITEM_TYPE);
+    if (v->stor_begin == 0) {
+        IGRAPH_ERROR("cannot initialize list", IGRAPH_ENOMEM);
+    }
+    v->stor_end = v->stor_begin + alloc_size;
+    v->end = v->stor_begin + size;
+
+    IGRAPH_CHECK(INTERNAL_FUNCTION(init_slice)(v, v->stor_begin, v->end));
+
+    return IGRAPH_SUCCESS;
+}
+
+void FUNCTION(destroy)(TYPE* v) {
+    IGRAPH_ASSERT(v != 0);
+
+    if (v->stor_begin != 0) {
+        FUNCTION(clear)(v);
+        IGRAPH_FREE(v->stor_begin);
+        v->stor_begin = NULL;
+    }
+}
+
+igraph_integer_t FUNCTION(capacity)(const TYPE* v) {
+    return v->stor_end - v->stor_begin;
+}
+
+igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
+    igraph_integer_t current_capacity;
+    ITEM_TYPE *tmp;
+
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    current_capacity = FUNCTION(capacity)(v);
+
+    if (capacity <= current_capacity) {
+        return IGRAPH_SUCCESS;
+    }
+
+    tmp = IGRAPH_REALLOC(v->stor_begin, capacity, ITEM_TYPE);
+    if (tmp == 0) {
+        IGRAPH_ERROR("cannot reserve space for list", IGRAPH_ENOMEM);
+    }
+
+    v->end = tmp + (v->end - v->stor_begin);
+    v->stor_begin = tmp;
+    v->stor_end = v->stor_begin + capacity;
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_bool_t FUNCTION(empty)(const TYPE* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_begin == v->end;
+}
+
+igraph_integer_t FUNCTION(size)(const TYPE* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->end - v->stor_begin;
+}
+
+igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
+    igraph_integer_t old_size;
+    igraph_error_t retval;
+
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    IGRAPH_CHECK(FUNCTION(reserve)(v, new_size));
+
+    old_size = FUNCTION(size)(v);
+
+    v->end = v->stor_begin + new_size;
+
+    if (old_size < new_size) {
+        retval = INTERNAL_FUNCTION(init_slice)(v, v->stor_begin + old_size, v->end);
+        if (retval) {
+            /* undo the change in v->end */
+            v->end = v->stor_begin + old_size;
+            IGRAPH_CHECK(retval);
+        }
+    } else if (old_size > new_size) {
+        INTERNAL_FUNCTION(destroy_slice)(v, v->end, v->stor_begin + old_size);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+void FUNCTION(clear)(TYPE* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    INTERNAL_FUNCTION(destroy_slice)(v, v->stor_begin, v->end);
+    v->end = v->stor_begin;
+}
+
+igraph_error_t FUNCTION(push_back) (TYPE* v, ITEM_TYPE* e) {
+    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
+    *(v->end) = *e;
+    v->end += 1;
+    return IGRAPH_SUCCESS;
+}
+
+ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_begin + pos;
+}
+
+void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* value) {
+    INTERNAL_FUNCTION(destroy_item)(v, v->stor_begin + pos);
+    v->stor_begin[pos] = *value;
+}
+
+void FUNCTION(swap)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* value) {
+    ITEM_TYPE old_value = *(FUNCTION(get_ptr)(v, pos));
+    v->stor_begin[pos] = *value;
+    *value = old_value;
+}
+
+ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v) {
+    igraph_integer_t size = FUNCTION(size)(v);
+    return size > 0 ? FUNCTION(get_ptr)(v, size - 1) : 0;
+}
+
+void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
+    igraph_integer_t size = FUNCTION(size)(v);
+
+    if (size > 0) {
+        INTERNAL_FUNCTION(destroy_item)(v, v->stor_begin + index);
+        memmove(v->stor_begin + index, v->stor_begin + index + 1, size - index - 1);
+        v->end -= 1;
+    }
+}
+
+void FUNCTION(discard_back)(TYPE* v) {
+    igraph_integer_t size = FUNCTION(size)(v);
+    if (size > 0) {
+        INTERNAL_FUNCTION(destroy_item)(v, v->end - 1);
+        v->end -= 1;
+    }
+}
+
+void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index) {
+    igraph_integer_t size = FUNCTION(size)(v);
+
+    if (size > 0) {
+        INTERNAL_FUNCTION(destroy_item)(v, v->stor_begin + index);
+        v->end -= 1;
+        v->stor_begin[index] = *(v->end);
+    }
+}
+
+igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* result) {
+    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
+    IGRAPH_CHECK(INTERNAL_FUNCTION(init_item_from)(v, v->end, result));
+    v->end += 1;
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** result) {
+    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
+    IGRAPH_CHECK(INTERNAL_FUNCTION(init_item)(v, v->end));
+    if (result) {
+        *result = v->end;
+    }
+    v->end += 1;
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* result) {
+    igraph_integer_t size = FUNCTION(size)(v);
+
+    IGRAPH_ASSERT(result != 0);
+
+    if (size <= 0) {
+        IGRAPH_ERROR("list is already empty", IGRAPH_EINVAL);
+    }
+    if (index < 0 || index >= size) {
+        IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
+    }
+
+    *result = *(FUNCTION(get_ptr)(v, index));
+
+    memmove(v->stor_begin + index, v->stor_begin + index + 1, size - index - 1);
+    v->end -= 1;
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* result) {
+    igraph_integer_t size = FUNCTION(size)(v);
+
+    IGRAPH_ASSERT(result != 0);
+
+    if (size <= 0) {
+        IGRAPH_ERROR("list is already empty", IGRAPH_EINVAL);
+    }
+    if (index < 0 || index >= size) {
+        IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
+    }
+
+    *result = *(FUNCTION(get_ptr)(v, index));
+
+    v->end -= 1;
+    v->stor_begin[index] = *(v->end);
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
+    ITEM_TYPE* work;
+    igraph_integer_t i, size;
+
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(index != NULL);
+    IGRAPH_ASSERT(index->stor_begin != NULL);
+
+    size = igraph_vector_int_size(index);
+    IGRAPH_ASSERT(FUNCTION(size)(v) == size);
+
+    work = IGRAPH_CALLOC(size, ITEM_TYPE);
+    if (work == 0) {
+        IGRAPH_ERROR("cannot permute list", IGRAPH_ENOMEM);
+    }
+
+    for (i = 0; i < size; i++) {
+        work[i] = v->stor_begin[VECTOR(*index)[i]];
+    }
+
+    memcpy(v->stor_begin, work, sizeof(ITEM_TYPE) * size);
+
+    igraph_Free(work);
+
+    return IGRAPH_SUCCESS;
+}
+
+void FUNCTION(sort)(TYPE *v, int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    igraph_qsort(
+        v->stor_begin, FUNCTION(size)(v), sizeof(ITEM_TYPE),
+        (int(*)(const void*, const void*))cmp
+    );
+}
+
+igraph_error_t FUNCTION(sort_ind)(
+    TYPE *v, igraph_vector_int_t *inds,
+    int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)
+) {
+    igraph_integer_t i, n = FUNCTION(size)(v);
+    ITEM_TYPE **vind, *first;
+
+    IGRAPH_CHECK(igraph_vector_int_resize(inds, n));
+    if (n == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    vind = IGRAPH_CALLOC(n, ITEM_TYPE*);
+    if (vind == 0) {
+        IGRAPH_ERROR("igraph_vector_list_sort_ind failed", IGRAPH_ENOMEM);
+    }
+    for (i = 0; i < n; i++) {
+        vind[i] = v->stor_begin + i;
+    }
+    first = vind[0];
+    igraph_qsort_r(
+        vind, n, sizeof(ITEM_TYPE*), (void*) cmp,
+        (int(*)(void*, const void*, const void*)) INTERNAL_FUNCTION(sort_ind_cmp)
+    );
+    for (i = 0; i < n; i++) {
+        VECTOR(*inds)[i] = vind[i] - first;
+    }
+    IGRAPH_FREE(vind);
+
+    return IGRAPH_SUCCESS;
+}
+
+/* ************************************************************************ */
+
+#ifndef CUSTOM_INIT_DESTROY
+
+static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* item) {
+    IGRAPH_UNUSED(list);
+    return ITEM_FUNCTION(init)(item, 0);
+}
+
+static igraph_error_t INTERNAL_FUNCTION(init_item_from)(const TYPE* list, ITEM_TYPE* item, const ITEM_TYPE* other) {
+    IGRAPH_UNUSED(list);
+    return ITEM_FUNCTION(copy)(item, other);
+}
+
+static void INTERNAL_FUNCTION(destroy_item)(const TYPE* list, ITEM_TYPE* item) {
+    IGRAPH_UNUSED(list);
+    ITEM_FUNCTION(destroy)(item);
+}
+
+#endif
+
+/* ************************************************************************ */
+
+static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end) {
+    ITEM_TYPE* current;
+    igraph_error_t retval;
+
+    for (current = start; current < end; current++) {
+        retval = INTERNAL_FUNCTION(init_item)(list, current);
+        if (retval) {
+            INTERNAL_FUNCTION(destroy_slice)(list, start, current);
+            IGRAPH_CHECK(retval);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end) {
+    for (; start < end; start++) {
+        INTERNAL_FUNCTION(destroy_item)(list, start);
+    }
+}
+
+/**
+ * Ensures that the vector has at least one extra slot at the end of its
+ * allocated storage area.
+ */
+static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    if (v->stor_end == v->end) {
+        igraph_integer_t old_size = FUNCTION(size)(v);
+        igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to vector, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
+        if (new_size == 0) {
+            new_size = 1;
+        }
+        IGRAPH_CHECK(FUNCTION(reserve)(v, new_size));
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * Helper function passed to qsort from  igraph_vector_qsort_ind
+ */
+static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2) {
+    int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*) = (int (*)(const ITEM_TYPE*, const ITEM_TYPE*)) thunk;
+    ITEM_TYPE **pa = (ITEM_TYPE **) p1;
+    ITEM_TYPE **pb = (ITEM_TYPE **) p2;
+    return cmp(*pa, *pb);
+}
+
+#undef ITEM_FUNCTION

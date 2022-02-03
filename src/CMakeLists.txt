@@ -80,6 +80,7 @@ add_library(
   graph/attributes.c
   graph/basic_query.c
   graph/cattributes.c
+  graph/graph_list.c
   graph/iterators.c
   graph/type_common.c
   graph/type_indexededgelist.c

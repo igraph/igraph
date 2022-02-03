@@ -22,33 +22,33 @@
 */
 
 #include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_graph_list.h"
 #include "igraph_types.h"
-#include "igraph_vector_list.h"
 
-#define VECTOR_LIST
-
-#define BASE_IGRAPH_REAL
+#define GRAPH_LIST
+#define BASE_GRAPH
+#define CUSTOM_INIT_DESTROY
 #include "igraph_pmt.h"
-#include "typed_list.pmt"
+#include "../core/typed_list.pmt"
 #include "igraph_pmt_off.h"
-#undef BASE_IGRAPH_REAL
+#undef CUSTOM_INIT_DESTROY
+#undef BASE_GRAPH
+#undef GRAPH_LIST
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
+void igraph_graph_list_set_directed(igraph_graph_list_t* list, igraph_bool_t directed) {
+    IGRAPH_ASSERT(list != 0);
+    list->directed = directed;
+}
 
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
+static igraph_error_t igraph_i_graph_list_init_item(const igraph_graph_list_t* list, igraph_t* item) {
+    return igraph_empty(item, 0, list->directed);
+}
 
-#define BASE_INT
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_INT
+static igraph_error_t igraph_i_graph_list_init_item_from(const igraph_graph_list_t* list, igraph_t* item, const igraph_t* other) {
+    return igraph_copy(item, other);
+}
 
-#undef VECTOR_LIST
+static void igraph_i_graph_list_destroy_item(const igraph_graph_list_t* list, igraph_t* item) {
+    igraph_destroy(item);
+}

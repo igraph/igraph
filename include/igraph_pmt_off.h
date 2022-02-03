@@ -65,6 +65,14 @@
     #undef CONCAT4x
 #endif
 
+#ifdef CONCAT5
+    #undef CONCAT5
+#endif
+
+#ifdef CONCAT5x
+    #undef CONCAT5x
+#endif
+
 #ifdef FP
     #undef FP
 #endif
@@ -75,6 +83,10 @@
 
 #ifdef IN_FORMAT
     #undef IN_FORMAT
+#endif
+
+#ifdef INTERNAL_FUNCTION
+    #undef INTERNAL_FUNCTION
 #endif
 
 #ifdef MULTIPLICITY

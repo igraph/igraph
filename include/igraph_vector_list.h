@@ -34,31 +34,31 @@ __BEGIN_DECLS
 /* Flexible list of vectors                           */
 /* -------------------------------------------------- */
 
-/* Indicate to igraph_vector_list_pmt.h that we are going to work with _vectors_
+/* Indicate to igraph_typed_list_pmt.h that we are going to work with _vectors_
  * of the base type, not the base type directly */
 #define VECTOR_LIST
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "igraph_vector_list_pmt.h"
+#include "igraph_typed_list_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "igraph_vector_list_pmt.h"
+#include "igraph_typed_list_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 #define BASE_BOOL
 #include "igraph_pmt.h"
-#include "igraph_vector_list_pmt.h"
+#include "igraph_typed_list_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
 #define BASE_INT
 #include "igraph_pmt.h"
-#include "igraph_vector_list_pmt.h"
+#include "igraph_typed_list_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_INT
 
