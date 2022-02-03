@@ -92,12 +92,12 @@ STRVECTOR:
     FLAGS: BY_REF
 
 VECTOR_LIST:
-    # A vector containing vectors of floating-point numbers
+    # A list containing vectors of floating-point numbers
     CTYPE: igraph_vector_list_t
     FLAGS: BY_REF
 
 VECTOR_INT_LIST:
-    # A vector containing vectors of integers
+    # A list containing vectors of integers
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
@@ -199,7 +199,7 @@ EDGEWEIGHTS:
     FLAGS: BY_REF
 
 EDGESET_LIST:
-    # A vector containing vectors of igraph integers where each such
+    # A list containing vectors of igraph integers where each such
     # vector represents a sequence of edge indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because EDGESET is
@@ -211,6 +211,11 @@ EDGESET_LIST:
 GRAPHLIST:
     # A vector containing pointers to graph objects
     CTYPE: igraph_vector_ptr_t
+    FLAGS: BY_REF
+
+GRAPH_LIST:
+    # A list containing graphs
+    CTYPE: igraph_graph_list_t
     FLAGS: BY_REF
 
 VERTEX_QTY:
@@ -228,7 +233,7 @@ SIRLIST:
     FLAGS: BY_REF
 
 VERTEXSETLIST:
-    # A vector containing vectors of igraph integers where each such
+    # A list containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
@@ -238,7 +243,7 @@ VERTEXSETLIST:
     FLAGS: BY_REF
 
 VERTEXSET_LIST:
-    # A vector containing vectors of igraph integers where each such
+    # A list containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is

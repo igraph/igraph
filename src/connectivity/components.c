@@ -497,17 +497,18 @@ static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
 /**
  * \function igraph_decompose_destroy
- * \brief Free the memory allocated by \ref igraph_decompose().
+ * \brief Frees the contents of a pointer vector holding graphs.
  *
  * This function destroys and frees all <type>igraph_t</type>
  * objects held in \p complist. However, it does not destroy
- * \p complist itself, as it was not allocated by \ref igraph_decompose().
- * Use \ref igraph_vector_ptr_destroy() to destroy \p complist.
+ * \p complist itself. Use \ref igraph_vector_ptr_destroy() to destroy
+ * \p complist.
  *
- * \param complist The list of graph components, as returned by
- *        \ref igraph_decompose().
+ * \param complist The list of graphs to destroy.
  *
- * Time complexity: O(c), c is the number of components.
+ * Time complexity: O(n), n is the number of items.
+ *
+ * \deprecated 0.10.0
  */
 
 void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
@@ -523,11 +524,11 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
-                                   igraph_vector_ptr_t *components,
+                                   igraph_graph_list_t *components,
                                    igraph_integer_t maxcompno, igraph_integer_t minelements);
 
 static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
-                                     igraph_vector_ptr_t *components,
+                                     igraph_graph_list_t *components,
                                      igraph_integer_t maxcompno, igraph_integer_t minelements);
 
 /**
@@ -539,12 +540,9 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * graph. (Except if there is only one component in the original graph.)
  *
  * \param graph The original graph.
- * \param components This pointer vector will contain pointers to the
- *   subcomponent graphs. It should be initialized before calling this
- *   function and will be resized to hold the graphs. Don't forget to
- *   call \ref igraph_destroy() and \ref igraph_free() on the elements of
- *   this pointer vector to free unneeded memory. Alternatively, you can
- *   simply call \ref igraph_decompose_destroy() that does this for you.
+ * \param components This list of graphs will contain the individual components.
+ *   It should be initialized before calling this function and will be resized
+ *   to hold the graphs.
  * \param mode Either \c IGRAPH_WEAK or \c IGRAPH_STRONG for weakly
  *    and strongly connected components respectively.
  * \param maxcompno The maximum number of components to return. The
@@ -566,7 +564,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \example examples/simple/igraph_decompose.c
  */
 
-igraph_error_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
+igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                      igraph_connectedness_t mode,
                      igraph_integer_t maxcompno, igraph_integer_t minelements) {
     if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
@@ -579,7 +577,7 @@ igraph_error_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *comp
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
-                                   igraph_vector_ptr_t *components,
+                                   igraph_graph_list_t *components,
                                    igraph_integer_t maxcompno, igraph_integer_t minelements) {
 
     igraph_integer_t actstart;
@@ -598,8 +596,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         maxcompno = IGRAPH_INTEGER_MAX;
     }
 
-    igraph_vector_ptr_clear(components);
-    IGRAPH_FINALLY(igraph_decompose_destroy, components);
+    igraph_graph_list_clear(components);
 
     /* already_added keeps track of what nodes made it into a graph already */
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
@@ -663,12 +660,15 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         if (newg == 0) {
             IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
+        IGRAPH_FINALLY(igraph_free, newg);
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
             graph, newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
+        IGRAPH_FINALLY(igraph_destroy, newg);
+        IGRAPH_CHECK(igraph_graph_list_push_back(components, newg));
+        IGRAPH_FINALLY_CLEAN(2);  /* ownership of newg now taken by 'components' */
         resco++;
 
         /* vids_old2new does not have to be cleaned up here; since we are doing
@@ -683,13 +683,13 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_int_destroy(&verts);
     igraph_dqueue_int_destroy(&q);
     IGRAPH_FREE(already_added);
-    IGRAPH_FINALLY_CLEAN(6);  /* + components */
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
-                                     igraph_vector_ptr_t *components,
+                                     igraph_graph_list_t *components,
                                      igraph_integer_t maxcompno, igraph_integer_t minelements) {
 
 
@@ -717,8 +717,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
         maxcompno = IGRAPH_INTEGER_MAX;
     }
 
-    igraph_vector_ptr_clear(components);
-    IGRAPH_FINALLY(igraph_decompose_destroy, components);
+    igraph_graph_list_clear(components);
 
     /* The result */
 
@@ -876,12 +875,15 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
         if (newg == 0) {
             IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
         }
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
+        IGRAPH_FINALLY(igraph_free, newg);
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
             graph, newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
+        IGRAPH_FINALLY(igraph_destroy, newg);
+        IGRAPH_CHECK(igraph_graph_list_push_back(components, newg));
+        IGRAPH_FINALLY_CLEAN(2);  /* ownership of newg now taken by 'components' */
 
         /* vids_old2new has to be cleaned up here because a vertex may appear
          * in multiple strongly connected components. Simply calling
@@ -906,7 +908,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     igraph_vector_int_destroy(&out);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&next_nei);
-    IGRAPH_FINALLY_CLEAN(7);  /* + components */
+    IGRAPH_FINALLY_CLEAN(6);
 
     return IGRAPH_SUCCESS;
 

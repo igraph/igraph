@@ -28,10 +28,11 @@
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_graph_list.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_vector_ptr.h"  /* because of igraph_decompose_destroy() */
 
 __BEGIN_DECLS
 
@@ -48,8 +49,7 @@ IGRAPH_EXPORT igraph_error_t igraph_connected_components(const igraph_t *graph, 
                                   igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                                       igraph_connectedness_t mode);
-IGRAPH_EXPORT void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
-IGRAPH_EXPORT igraph_error_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
+IGRAPH_EXPORT igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                                    igraph_connectedness_t mode,
                                    igraph_integer_t maxcompno, igraph_integer_t minelements);
 IGRAPH_EXPORT igraph_error_t igraph_articulation_points(const igraph_t *graph,
@@ -61,6 +61,10 @@ IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph
                                                 igraph_vector_int_list_t *components,
                                                 igraph_vector_int_t *articulation_points);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
+
+/* Deprecated in igraph 0.10 when we switched to igraph_graph_list_t. Will be
+ * removed in 0.11 */
+IGRAPH_EXPORT IGRAPH_DEPRECATED void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
 
 __END_DECLS
 
