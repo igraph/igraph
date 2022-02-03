@@ -1,14 +1,16 @@
-Undirected graph degree sequence:  1 1 2 2 2 2 3 3 3 5
-Assortativity of undirected graph = 0.471611
-Assortativity of undirected graph = -0.362688
-Assortativity of undirected graph = -0.195829
-Assortativity of undirected graph = -0.251448
-Assortativity of undirected graph = 0.0266512
+Barabasi-Albert network with 100000 nodes
 
-Directed graph degree sequence:  0 0 0 1 1 1 1 2 2 4
-Directed graph degree sequence:  1 1 1 1 1 1 1 1 2 2
-Assortativity of undirected graph = 0.0842152
-Assortativity of undirected graph = 0.421076
-Assortativity of undirected graph = 0.589506
-Assortativity of undirected graph = 0.0842152
-Assortativity of undirected graph = -0.421076
+Assortativity before rewiring = -0.0204148
+Assortativity after rewiring = -0.00814841
+
+Assortativity before rewiring = -0.0247227
+Assortativity after rewiring = -0.00750824
+
+Assortativity before rewiring = -0.0308386
+Assortativity after rewiring = -0.00613711
+
+Assortativity before rewiring = -0.0345163
+Assortativity after rewiring = -0.00693056
+
+Assortativity before rewiring = -0.0231551
+Assortativity after rewiring = -0.00591497
