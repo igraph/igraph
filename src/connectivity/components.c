@@ -37,6 +37,7 @@
 #include "operators/subgraph.h"
 
 #include <limits.h>
+#include <string.h>  /* memset */
 
 static igraph_error_t igraph_i_connected_components_weak(
     const igraph_t *graph, igraph_vector_int_t *membership,
@@ -662,7 +663,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
         IGRAPH_FINALLY(igraph_destroy, &newg);
-        IGRAPH_CHECK(igraph_graph_list_push_back(components, newg));
+        IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
         memset(&newg, 0, sizeof(newg));
         resco++;
