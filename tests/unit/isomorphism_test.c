@@ -20,26 +20,26 @@ void random_permutation(igraph_vector_int_t *vec) {
 
 void test3() {
     int i, j;
-    igraph_vector_ptr_t graphs3;
+    igraph_graph_list_t graphs3;
+    igraph_t g;
 
     // Verify that no two 3-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
 
-    igraph_vector_ptr_init(&graphs3, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs3, igraph_destroy);
+    igraph_graph_list_init(&graphs3, 0);
 
     for (i = 0; i < 16; i++) {
-        igraph_t *g;
-        g = (igraph_t *) malloc(sizeof(igraph_t));
-        igraph_vector_ptr_push_back(&graphs3, g);
-        igraph_isoclass_create(g, 3, i, /* directed = */ 1);
+        igraph_isoclass_create(&g, 3, i, /* directed = */ 1);
+        igraph_graph_list_push_back(&graphs3, &g);
     }
 
     for (i = 0; i < 16; i++)
         for (j = i + 1; j < 16; j++) {
             igraph_bool_t iso;
             igraph_isomorphic_bliss(
-                (igraph_t *) VECTOR(graphs3)[i], (igraph_t *) VECTOR(graphs3)[j],
-                NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL);
+                igraph_graph_list_get_ptr(&graphs3, i),
+                igraph_graph_list_get_ptr(&graphs3, j),
+                NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL
+            );
             if (iso) {
                 printf("Bliss failure, 3 vertex directed graphs of isoclass %d and %d are not isomorphic. Bliss reports otherwise.\n", i, j);
             }
@@ -49,39 +49,41 @@ void test3() {
         for (j = i + 1; j < 16; j++) {
             igraph_bool_t iso;
             igraph_isomorphic_vf2(
-                (igraph_t *) VECTOR(graphs3)[i], (igraph_t *) VECTOR(graphs3)[j],
-                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL);
+                igraph_graph_list_get_ptr(&graphs3, i),
+                igraph_graph_list_get_ptr(&graphs3, j),
+                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
+            );
             if (iso) {
                 printf("VF2 failure, 3 vertex directed graphs of isoclass %d and %d are not isomorphic. VF2 reports otherwise.\n", i, j);
             }
         }
 
-    igraph_vector_ptr_destroy_all(&graphs3);
+    igraph_graph_list_destroy(&graphs3);
 }
 
 
 void test4() {
     int i, j;
-    igraph_vector_ptr_t graphs4;
+    igraph_graph_list_t graphs4;
+    igraph_t g;
 
     // Verify that no two 4-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
 
-    igraph_vector_ptr_init(&graphs4, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&graphs4, igraph_destroy);
+    igraph_graph_list_init(&graphs4, 0);
 
     for (i = 0; i < 218; i++) {
-        igraph_t *g;
-        g = (igraph_t *) malloc(sizeof(igraph_t));
-        igraph_vector_ptr_push_back(&graphs4, g);
-        igraph_isoclass_create(g, 4, i, /* directed = */ 1);
+        igraph_isoclass_create(&g, 4, i, /* directed = */ 1);
+        igraph_graph_list_push_back(&graphs4, &g);
     }
 
     for (i = 0; i < 218; i++)
         for (j = i + 1; j < 218; j++) {
             igraph_bool_t iso;
             igraph_isomorphic_bliss(
-                (igraph_t *) VECTOR(graphs4)[i], (igraph_t *) VECTOR(graphs4)[j],
-                NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL);
+                igraph_graph_list_get_ptr(&graphs4, i),
+                igraph_graph_list_get_ptr(&graphs4, j),
+                NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL
+            );
             if (iso) {
                 printf("Bliss failure, 4 vertex directed graphs of isoclass %d and %d are not isomorphic. Bliss reports otherwise.\n", i, j);
             }
@@ -91,14 +93,16 @@ void test4() {
         for (j = i + 1; j < 218; j++) {
             igraph_bool_t iso;
             igraph_isomorphic_vf2(
-                (igraph_t *) VECTOR(graphs4)[i], (igraph_t *) VECTOR(graphs4)[j],
-                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL);
+                igraph_graph_list_get_ptr(&graphs4, i),
+                igraph_graph_list_get_ptr(&graphs4, j),
+                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
+            );
             if (iso) {
                 printf("VF2 failure, 4 vertex directed graphs of isoclass %d and %d are not isomorphic. VF2 reports otherwise.\n", i, j);
             }
         }
 
-    igraph_vector_ptr_destroy_all(&graphs4);
+    igraph_graph_list_destroy(&graphs4);
 }
 
 
