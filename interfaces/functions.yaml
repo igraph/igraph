@@ -1379,10 +1379,50 @@ igraph_split_join_distance:
         VECTOR_INT comm1, VECTOR_INT comm2, OUT INTEGER distance12,
         OUT INTEGER distance21
 
+igraph_community_infomap:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS e_weights=NULL,
+        VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10,
+        OUT VECTOR_INT membership, OUT REAL codelength
+    DEPS: e_weights ON graph, v_weights ON graph
+
+#######################################
+# Graphlets
+#######################################
+
+igraph_graphlets:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT VERTEXSET_PTR_LIST cliques, OUT VECTOR Mu, INT niter=1000
+    DEPS: weights ON graph, cliques ON graph
+
+igraph_graphlets_candidate_basis:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT VERTEXSET_PTR_LIST cliques, OUT VECTOR thresholds
+    DEPS: weights ON graph, cliques ON graph
+
+igraph_graphlets_project:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        VERTEXSET_PTR_LIST cliques, INOUT VECTOR Muc,
+        BOOLEAN startMu=False, INT niter=1000
+    DEPS: weights ON graph
+
+#######################################
+# Hierarchical random graphs
+#######################################
+
 igraph_hrg_fit:
     PARAMS: |-
         GRAPH graph, INOUT HRG hrg=Default, BOOLEAN start=False,
         INTEGER steps=0
+
+igraph_hrg_sample:
+    PARAMS: HRG hrg, OUT GRAPH sample
+
+igraph_hrg_sample_many:
+    PARAMS: HRG hrg, OUT GRAPH_LIST samples, INTEGER num_samples
 
 igraph_hrg_game:
     PARAMS: OUT GRAPH graph, HRG hrg
@@ -1406,32 +1446,6 @@ igraph_hrg_predict:
 igraph_hrg_create:
     PARAMS: OUT HRG hrg, GRAPH graph, VECTOR prob
     DEPS: prob ON graph
-
-igraph_community_infomap:
-    PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS e_weights=NULL,
-        VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10,
-        OUT VECTOR_INT membership, OUT REAL codelength
-    DEPS: e_weights ON graph, v_weights ON graph
-
-igraph_graphlets:
-    PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL,
-        OUT VERTEXSET_PTR_LIST cliques, OUT VECTOR Mu, INT niter=1000
-    DEPS: weights ON graph, cliques ON graph
-
-igraph_graphlets_candidate_basis:
-    PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL,
-        OUT VERTEXSET_PTR_LIST cliques, OUT VECTOR thresholds
-    DEPS: weights ON graph, cliques ON graph
-
-igraph_graphlets_project:
-    PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL,
-        VERTEXSET_PTR_LIST cliques, INOUT VECTOR Muc,
-        BOOLEAN startMu=False, INT niter=1000
-    DEPS: weights ON graph
 
 #######################################
 # Conversion

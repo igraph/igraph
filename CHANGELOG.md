@@ -259,6 +259,11 @@
  - `igraph_hrg_predict()` now uses an `igraph_vector_int_t` for its
    `edges` parameter.
 
+ - `igraph_hrg_sample()` now always samples a single graph only. Use
+   `igraph_hrg_sample_many()` if you need more than one sample, and call
+   `igraph_hrg_fit()` beforehand if you do not have a HRG model but only a
+   single input graph.
+
  - `igraph_hrg_size()` now returns an `igraph_integer_t` instead of an `int`.
 
  - `igraph_incident()` now uses an `igraph_vector_int_t` for its
