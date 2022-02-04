@@ -205,6 +205,11 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
        Qptr is an integer and points to the next graph to work on.
     */
 
+    /* In theory, Q could be an igraph_graph_list_t; however, in that case
+     * we would not be able to pop off graphs from the front of the list as
+     * all elements of an igraph_graph_list_t are expected to be initialized,
+     * valid graphs. That's why we use an igraph_vector_ptr_t instead. */
+
     igraph_vector_ptr_t Q;
     igraph_vector_int_list_t Qmapping;
     igraph_vector_int_t Qparent;
