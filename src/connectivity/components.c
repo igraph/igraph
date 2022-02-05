@@ -422,8 +422,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
 }
 
-static int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
-
+static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
     igraph_integer_t added_count;
     char *already_added;
