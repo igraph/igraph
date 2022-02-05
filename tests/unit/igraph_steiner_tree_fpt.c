@@ -27,10 +27,22 @@ int main() {
 
     igraph_vector_init(&weights_empty, 0);
     
-    igraph_vector_init(&steiner_terminals,0,2,4);
+    igraph_vector_init(&steiner_terminals,0);
+   
+    VECTOR(steiner_terminals)[1] = 2;
+    VECTOR(steiner_terminals)[2] = 4;
 
 
-    igraph_vector_init_int(&weights_lm ,3, 1, 7, 5, 1, 2, 7);
+    igraph_vector_init_int(&weights_lm,0);
+    VECTOR(weights_lm)[0] = 3;
+    VECTOR(weights_lm)[1] = 1;
+    VECTOR(weights_lm)[2] = 7;
+    VECTOR(weights_lm)[3] = 5;
+    VECTOR(weights_lm)[4] = 1;
+    VECTOR(weights_lm)[5] = 2;
+    VECTOR(weights_lm)[6] = 7;
+    
+   
     
     igraph_small(&g_empty, 0, 0, -1);
  
