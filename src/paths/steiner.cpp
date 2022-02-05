@@ -81,7 +81,7 @@ igraph_matrix_t dp_cache; // dynamic programming table
 igraph_integer_t q;
 std::vector<std::set<igraph_integer_t>> allSubsets;
 igraph_matrix_t distance;
-igraph_vs_t vs;
+
 
 IGRAPH_VECTOR_INIT_FINALLY(&steiner_vertices, 0);
 
