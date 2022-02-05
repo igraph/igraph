@@ -20,7 +20,7 @@
 #include "test_utilities.inc"
 
 int main() {
-    igraph_matrix_t a, b, c, d;
+    igraph_matrix_t a, b, c, d, e;
 
     igraph_matrix_init(&c, 0, 0);
 
@@ -30,6 +30,7 @@ int main() {
     matrix_init_real_row_major(&a, 2, 2, elemA);
     matrix_init_real_row_major(&b, 2, 2, elemB);
     matrix_init_real_row_major(&d, 2, 3, elemD);
+    matrix_init_real_row_major(&e, 3, 2, elemD);
 
     printf("matrix multiplication, A={{1,2},{3,4}} B ={{5,6},{7,8}}\n");
     igraph_blas_dgemm(0, 0, 1, &a, &b, 0, &c);
@@ -67,11 +68,13 @@ int main() {
     CHECK_ERROR(igraph_blas_dgemm(0, 0, 1, &d, &a, 0, &c), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_blas_dgemm(0, 1, 1, &a, &d, 0, &c), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_blas_dgemm(0, 0, 1, &a, &b, 1, &d), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_blas_dgemm(0, 0, 1, &a, &b, 1, &e), IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&a);
     igraph_matrix_destroy(&b);
     igraph_matrix_destroy(&c);
     igraph_matrix_destroy(&d);
+    igraph_matrix_destroy(&e);
 
     VERIFY_FINALLY_STACK();
     return 0;
