@@ -16,6 +16,7 @@
 <!-- doxrox-include igraph_weighted_adjacency -->
 <!-- doxrox-include igraph_adjlist -->
 <!-- doxrox-include igraph_star -->
+<!-- doxrox-include igraph_wheel -->
 <!-- doxrox-include igraph_lattice -->
 <!-- doxrox-include igraph_ring -->
 <!-- doxrox-include igraph_kary_tree -->

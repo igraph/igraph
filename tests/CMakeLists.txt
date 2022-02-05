@@ -214,6 +214,7 @@ add_legacy_tests(
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
   igraph_static_power_law_game
+  igraph_wheel
   kary_tree
   symmetric_tree
   tree_game

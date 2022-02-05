@@ -48,6 +48,8 @@ IGRAPH_EXPORT igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const ig
                                             igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
                               igraph_integer_t center);
+IGRAPH_EXPORT igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
+                              igraph_integer_t center);
 IGRAPH_EXPORT igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
                                  igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular);
 IGRAPH_EXPORT igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
