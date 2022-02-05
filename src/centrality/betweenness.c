@@ -902,7 +902,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
  * \ref igraph_betweenness_cutoff() to calculate the range-limited vertex
  * betweenness.
  */
-int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_bool_t directed,
                               const igraph_vs_t sources, const igraph_vs_t targets,
                               const igraph_vector_t *weights) {
@@ -1127,7 +1127,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_edge_betweenness_cutoff() to compute the range-limited edge betweenness.
  */
-int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                                    const igraph_es_t eids, igraph_bool_t directed,
                                    const igraph_vs_t sources, const igraph_vs_t targets,
                                    const igraph_vector_t *weights) {
