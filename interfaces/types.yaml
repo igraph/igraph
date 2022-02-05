@@ -28,7 +28,7 @@ COMPLEX:
 
 ERROR:
     # An igraph error code
-    CTYPE: int
+    CTYPE: igraph_error_t
 
 ###############################################################################
 ## C data types

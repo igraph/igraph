@@ -28,6 +28,14 @@
 
 __BEGIN_DECLS
 
+/* GCC added support for enumerator attributes in version 6.
+ * Verified that clang 3.0 also supports them. */
+#if __GNUC__ >= 6 || defined(__clang__)
+#define IGRAPH_DEPRECATED_ENUMVAL __attribute__ ((deprecated))
+#else
+#define IGRAPH_DEPRECATED_ENUMVAL
+#endif
+
 /* -------------------------------------------------- */
 /* Constants                                          */
 /* -------------------------------------------------- */
@@ -87,10 +95,16 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER = 0,
                IGRAPH_GET_ADJACENCY_BOTH
              } igraph_get_adjacency_t;
 
-typedef enum { IGRAPH_DEGSEQ_SIMPLE = 0,
-               IGRAPH_DEGSEQ_VL,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM
+typedef enum { IGRAPH_DEGSEQ_CONFIGURATION = 0,     /* Configuration model, allowing non-simple graphs */
+               IGRAPH_DEGSEQ_VL,                    /* Viger-Latapy, generates simple connected graphs */
+               IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,      /* Fast heuristic, generates simple graphs */
+               IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE,  /* Configuration model, generates simple graphs */
+               IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE, /* Edge-switching MCMC, generates simple graphs */
+
+               /* Deprecated, kept for backwards compatibility: */
+               IGRAPH_DEGSEQ_SIMPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION,
+               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,
+               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE
              } igraph_degseq_t;
 
 typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,

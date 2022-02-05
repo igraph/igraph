@@ -137,7 +137,7 @@ struct igraph_i_graphml_parser_state {
 static void igraph_i_report_unhandled_attribute_target(const char* target,
         const char* file, int line) {
     igraph_warningf("Attribute target '%s' is not handled; ignoring corresponding "
-                    "attribute specifications", file, line, 0, target);
+                    "attribute specifications", file, line, target);
 }
 
 static igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
@@ -659,7 +659,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
     /* if the attribute type is missing, throw an error */
     if (!skip && rec->type == I_GRAPHML_UNKNOWN_TYPE) {
-        igraph_warningf("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute", IGRAPH_FILE_BASENAME, __LINE__, 0, rec->id);
+        IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute", rec->id);
         skip = 1;
     }
 

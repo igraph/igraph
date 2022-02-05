@@ -28,7 +28,7 @@ struct _clique_options {
 				 clique_options *);
 	FILE *output;
 
-	boolean (*user_function)(set_t,graph_t *,clique_options *);
+	igraph_error_t (*user_function)(set_t,graph_t *,clique_options *);
 	void *user_data;
 	set_t *clique_list;
 	int clique_list_length;

@@ -25,15 +25,6 @@
 
 #include "test_utilities.inc"
 
-void igraph_warnings_ignore(const char *reason, const char *file,
-                            int line, int igraph_errno) {
-    IGRAPH_UNUSED(reason);
-    IGRAPH_UNUSED(file);
-    IGRAPH_UNUSED(line);
-    IGRAPH_UNUSED(igraph_errno);
-    /* Do nothing */
-}
-
 int main() {
     igraph_t g;
     igraph_vector_int_t vpath, epath;
@@ -54,7 +45,7 @@ int main() {
     igraph_vector_int_print(&vpath);
     igraph_vector_int_print(&epath);
 
-    igraph_set_warning_handler(igraph_warnings_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
     igraph_get_shortest_path(&g, &vpath, &epath, 4, 0, IGRAPH_OUT);
     igraph_vector_int_print(&vpath);
     igraph_vector_int_print(&epath);
