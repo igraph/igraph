@@ -125,7 +125,7 @@ igraph_error_t igraph_blas_dgemm(igraph_bool_t transpose_a, igraph_bool_t transp
                " matrices cannot be multiplied, incompatible dimensions.", IGRAPH_EINVAL,
                nrow_oa, ncol_oa, nrow_ob, ncol_ob);
     }
-    if (beta && (ncol_oa != igraph_matrix_ncol(c) || nrow_oa != igraph_matrix_nrow(c))) {
+    if (beta != 0 && (ncol_oa != igraph_matrix_ncol(c) || nrow_oa != igraph_matrix_nrow(c))) {
         IGRAPH_ERRORF("%" IGRAPH_PRId "-by-%" IGRAPH_PRId " and %" IGRAPH_PRId "-by-%" IGRAPH_PRId
                " matrices cannot be added, incompatible dimensions.", IGRAPH_EINVAL,
                nrow_oa, ncol_ob, igraph_matrix_nrow(c), igraph_matrix_ncol(c));
@@ -136,7 +136,7 @@ igraph_error_t igraph_blas_dgemm(igraph_bool_t transpose_a, igraph_bool_t transp
     if (ncol_ob > INT_MAX) {
         IGRAPH_ERROR("Matrix B too large for BLAS.", IGRAPH_EOVERFLOW);
     }
-    if (!beta) {
+    if (beta == 0) {
         igraph_matrix_resize(c, nrow_oa, ncol_ob);
     }
 
