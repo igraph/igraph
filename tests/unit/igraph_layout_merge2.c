@@ -67,7 +67,7 @@ int main() {
     ncol = igraph_matrix_ncol(&merged_coords);
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
-            if (fabs((double)MATRIX(merged_coords, i, j)) < 1e-8) {
+            if (fabs(MATRIX(merged_coords, i, j)) < 1e-8) {
                 MATRIX(merged_coords, i, j) = 0;
             }
         }
