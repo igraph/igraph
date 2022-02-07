@@ -38,8 +38,8 @@ IGRAPH_EXPORT igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
                                                igraph_bool_t normalized);
 
 IGRAPH_EXPORT igraph_error_t igraph_assortativity(const igraph_t *graph,
-                                       const igraph_vector_t *types1,
-                                       const igraph_vector_t *types2,
+                                       const igraph_vector_t *values,
+                                       const igraph_vector_t *values_in,
                                        igraph_real_t *res,
                                        igraph_bool_t directed,
                                        igraph_bool_t normalized);
