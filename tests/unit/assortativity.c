@@ -45,7 +45,7 @@ int main() {
     igraph_vector_int_init(&int_types, 0);
     igraph_degree(&g, &int_types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1);
 
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0);
+    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0, /*normalized=*/ 1);
     printf("%.5f\n", res);
 
     igraph_destroy(&g);
@@ -60,7 +60,7 @@ int main() {
     igraph_strength(&g, &types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1, /* weights= */ 0);
     igraph_vector_add_constant(&types, -1);
 
-    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0);
+    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0, /*normalized=*/ 1);
     printf("%.5f\n", res);
 
     igraph_vector_destroy(&types);
@@ -145,7 +145,7 @@ int main() {
                  -1);
     igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 1, /*edge_comb=*/ 0);
     igraph_vector_int_view(&int_types, football_types, sizeof(football_types) / sizeof(football_types[0]));
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0);
+    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0, /*normalized=*/ 1);
     printf("%.5f\n", res);
 
     igraph_destroy(&g);
