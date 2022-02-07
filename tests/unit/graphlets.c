@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2022  The igraph development team
+   Copyright (C) 2022 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,34 +20,30 @@
 
 */
 
-#include "igraph_error.h"
-#include "igraph_types.h"
-#include "igraph_vector_list.h"
+#include <igraph.h>
 
-#define VECTOR_LIST
+#include "test_utilities.inc"
 
-#define BASE_IGRAPH_REAL
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_IGRAPH_REAL
+void test_graphlets_candidate_basis_simple() {
+    igraph_t g;
+    igraph_vector_int_list_t cliques;
+    igraph_vector_t thresholds;
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
+    igraph_full(&g, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_vector_int_list_init(&cliques, 0);
+    igraph_vector_init(&thresholds, 0);
 
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
+    igraph_graphlets_candidate_basis(&g, 0, &cliques, &thresholds);
 
-#define BASE_INT
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_INT
+    igraph_vector_int_list_destroy(&thresholds);
+    igraph_vector_destroy(&thresholds);
+    igraph_destroy(&g);
 
-#undef VECTOR_LIST
+    VERIFY_FINALLY_STACK();
+}
+
+int main() {
+    test_graphlet_basis_simple();
+
+    return 0;
+}

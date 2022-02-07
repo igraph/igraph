@@ -24,6 +24,10 @@
   /* It was indicated that every item in a list is a vector of the base type
    * so let's define ITEM_TYPE appropriately */
   #define ITEM_TYPE BASE_VECTOR
+#elif defined(MATRIX_LIST)
+  /* It was indicated that every item in a list is a matrix of the base type
+   * so let's define ITEM_TYPE appropriately */
+  #define ITEM_TYPE BASE_MATRIX
 #else
   #define ITEM_TYPE BASE
 #endif

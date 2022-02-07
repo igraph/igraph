@@ -42,8 +42,7 @@
  * last.
  * \param thegraphs Pointer vector containing the graph objects of
  *        which the layouts will be merged.
- * \param coords Pointer vector containing matrix objects with the 2d
- *        layouts of the graphs in \p thegraphs.
+ * \param coords List of matrices with the 2D layouts of the graphs in \p thegraphs.
  * \param res Pointer to an initialized matrix object, the result will
  *        be stored here. It will be resized if needed.
  * \return Error code.
@@ -54,10 +53,11 @@
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *thegraphs,
-                            const igraph_vector_ptr_t *coords,
-                            igraph_matrix_t *res) {
-    igraph_integer_t graphs = igraph_vector_ptr_size(coords);
+igraph_error_t igraph_layout_merge_dla(
+    const igraph_vector_ptr_t *thegraphs, const igraph_matrix_list_t *coords,
+    igraph_matrix_t *res
+) {
+    igraph_integer_t coords_len = igraph_matrix_list_size(coords);
     igraph_vector_t sizes;
     igraph_vector_t x, y, r;
     igraph_vector_t nx, ny, nr;
@@ -74,18 +74,18 @@ igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *thegraphs,
     /* Graphs are currently not used, only the coordinates */
     IGRAPH_UNUSED(thegraphs);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&sizes, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&x, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&y, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&r, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&nx, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&ny, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&nr, graphs);
+    IGRAPH_VECTOR_INIT_FINALLY(&sizes, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&x, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&y, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&r, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&nx, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&ny, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&nr, coords_len);
 
     RNG_BEGIN();
 
-    for (i = 0; i < igraph_vector_ptr_size(coords); i++) {
-        igraph_matrix_t *mat = VECTOR(*coords)[i];
+    for (i = 0; i < coords_len; i++) {
+        igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
         igraph_integer_t size = igraph_matrix_nrow(mat);
 
         if (igraph_matrix_ncol(mat) != 2) {
@@ -106,7 +106,6 @@ igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *thegraphs,
                                   igraph_vector_e_ptr(&nx, i),
                                   igraph_vector_e_ptr(&ny, i),
                                   igraph_vector_e_ptr(&nr, i));
-
     }
     igraph_vector_order2(&sizes); /* largest first */
 
@@ -124,10 +123,10 @@ igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *thegraphs,
     igraph_i_layout_merge_place_sphere(&grid, 0, 0, VECTOR(r)[actg], actg);
 
     IGRAPH_PROGRESS("Merging layouts via DLA", 0.0, NULL);
-    while (jpos < graphs) {
+    while (jpos < coords_len) {
         IGRAPH_ALLOW_INTERRUPTION();
         /*     fprintf(stderr, "comp: %li", jpos); */
-        IGRAPH_PROGRESS("Merging layouts via DLA", (100.0 * jpos) / graphs, NULL);
+        IGRAPH_PROGRESS("Merging layouts via DLA", (100.0 * jpos) / coords_len, NULL);
 
         actg = VECTOR(sizes)[jpos++];
         /* 2. random walk, TODO: tune parameters */
@@ -146,12 +145,12 @@ igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *thegraphs,
     /* Create the result */
     IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));
     respos = 0;
-    for (i = 0; i < graphs; i++) {
-        igraph_integer_t size = igraph_matrix_nrow(VECTOR(*coords)[i]);
+    for (i = 0; i < coords_len; i++) {
+        igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
+        igraph_integer_t size = igraph_matrix_nrow(mat);
         igraph_real_t xx = VECTOR(x)[i];
         igraph_real_t yy = VECTOR(y)[i];
         igraph_real_t rr = VECTOR(r)[i] / VECTOR(nr)[i];
-        igraph_matrix_t *mat = VECTOR(*coords)[i];
         IGRAPH_ALLOW_INTERRUPTION();
         if (VECTOR(nr)[i] == 0) {
             rr = 1;

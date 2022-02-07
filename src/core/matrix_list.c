@@ -22,32 +22,34 @@
 
 #include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_vector_list.h"
+#include "igraph_matrix_list.h"
 
-#define VECTOR_LIST
+#define MATRIX_LIST
 
 #define BASE_IGRAPH_REAL
+#define CUSTOM_INIT_DESTROY
 #include "igraph_pmt.h"
 #include "typed_list.pmt"
 #include "igraph_pmt_off.h"
+#undef CUSTOM_INIT_DESTROY
 #undef BASE_IGRAPH_REAL
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
+static igraph_error_t igraph_i_matrix_list_init_item(
+   const igraph_matrix_list_t* list, igraph_matrix_t* item
+) {
+    return igraph_matrix_init(item, 0, 0);
+}
 
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
+static igraph_error_t igraph_i_matrix_list_init_item_from(
+   const igraph_matrix_list_t* list, igraph_matrix_t* item, const igraph_matrix_t* other
+) {
+    return igraph_matrix_copy(item, other);
+}
 
-#define BASE_INT
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_INT
+static void igraph_i_matrix_list_destroy_item(
+   const igraph_matrix_list_t* list, igraph_matrix_t* item
+) {
+    igraph_matrix_destroy(item);
+}
 
-#undef VECTOR_LIST
+#undef MATRIX_LIST

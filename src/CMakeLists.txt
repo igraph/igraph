@@ -49,6 +49,7 @@ add_library(
   core/interruption.c
   core/marked_queue.c
   core/matrix.c
+  core/matrix_list.c
   core/memory.c
   core/printing.c
   core/progress.c

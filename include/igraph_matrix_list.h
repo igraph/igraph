@@ -20,34 +20,40 @@
 
 */
 
-#include "igraph_error.h"
-#include "igraph_types.h"
-#include "igraph_vector_list.h"
+#ifndef IGRAPH_MATRIX_LIST_H
+#define IGRAPH_MATRIX_LIST_H
 
-#define VECTOR_LIST
+#include "igraph_constants.h"
+#include "igraph_decls.h"
+#include "igraph_matrix.h"
+#include "igraph_types.h"
+
+__BEGIN_DECLS
+
+/* -------------------------------------------------- */
+/* Flexible list of matrices                          */
+/* -------------------------------------------------- */
+
+/* Indicate to igraph_typed_list_pmt.h that we are going to work with _matrices_
+ * of the base type, not the base type directly */
+#define MATRIX_LIST
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "typed_list.pmt"
+#include "igraph_typed_list_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
+#undef MATRIX_LIST
 
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
+/* -------------------------------------------------- */
+/* Helper macros                                      */
+/* -------------------------------------------------- */
 
-#define BASE_INT
-#include "igraph_pmt.h"
-#include "typed_list.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_INT
+#define IGRAPH_MATRIX_LIST_INIT_FINALLY(v, size) \
+    do { IGRAPH_CHECK(igraph_matrix_list_init(v, size)); \
+        IGRAPH_FINALLY(igraph_matrix_list_destroy, v); } while (0)
 
-#undef VECTOR_LIST
+__END_DECLS
+
+#endif

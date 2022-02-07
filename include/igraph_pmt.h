@@ -33,6 +33,7 @@
 #if defined(BASE_IGRAPH_REAL)
     #define BASE igraph_real_t
     #define BASE_VECTOR igraph_vector_t
+    #define BASE_MATRIX igraph_matrix_t
     #define SHORT
     #define OUT_FORMAT "%G"
     #define PRINTFUNC(val) igraph_real_printf(val)
@@ -44,6 +45,7 @@
 #elif defined(BASE_CHAR)
     #define BASE char
     #define BASE_VECTOR igraph_vector_char_t
+    #define BASE_MATRIX igraph_matrix_char_t
     #define SHORT char
     #define OUT_FORMAT "%d"
     #define ZERO 0
@@ -53,6 +55,7 @@
 #elif defined(BASE_BOOL)
     #define BASE igraph_bool_t
     #define BASE_VECTOR igraph_vector_bool_t
+    #define BASE_MATRIX igraph_matrix_bool_t
     #define SHORT bool
     #define OUT_FORMAT "%d"
     #define ZERO 0
@@ -65,6 +68,7 @@
 #elif defined(BASE_INT)
     #define BASE igraph_integer_t
     #define BASE_VECTOR igraph_vector_int_t
+    #define BASE_MATRIX igraph_matrix_int_t
     #define SHORT int
     #define OUT_FORMAT "%" IGRAPH_PRId
     #define ZERO 0
@@ -89,6 +93,7 @@
     #undef complex
     #define BASE igraph_complex_t
     #define BASE_VECTOR igraph_vector_complex_t
+    #define BASE_MATRIX igraph_matrix_complex_t
     #define SHORT complex
     #define ZERO igraph_complex(0,0)
     #define ONE {{1.0,0.0}}
@@ -124,6 +129,22 @@
         #define FUNCTION(c) CONCAT4(igraph_vector,SHORT,list,c)
         #define INTERNAL_FUNCTION(c) CONCAT4(igraph_i_vector,SHORT,list,c)
         #define TYPE CONCAT3(igraph_vector,SHORT,list_t)
+    #endif
+#elif defined(MATRIX_LIST)
+    #if defined(BASE_IGRAPH_REAL)
+        #define FUNCTION(c) CONCAT2x(igraph_matrix_list,c)
+        #define INTERNAL_FUNCTION(c) CONCAT2x(igraph_i_matrix_list,c)
+        #define TYPE igraph_matrix_list_t
+    #elif defined(BASE_BOOL)
+        /* Special case because stdbool.h defines bool as a macro to _Bool which would
+        * screw things up */
+        #define FUNCTION(c) CONCAT2x(igraph_matrix_bool_list,c)
+        #define INTERNAL_FUNCTION(c) CONCAT2x(igraph_i_matrix_bool_list,c)
+        #define TYPE igraph_matrix_bool_list_t
+    #else
+        #define FUNCTION(c) CONCAT4(igraph_matrix,SHORT,list,c)
+        #define INTERNAL_FUNCTION(c) CONCAT4(igraph_i_matrix,SHORT,list,c)
+        #define TYPE CONCAT3(igraph_matrix,SHORT,list_t)
     #endif
 #elif defined(GRAPH_LIST)
     #define FUNCTION(c) CONCAT2x(igraph_graph_list,c)

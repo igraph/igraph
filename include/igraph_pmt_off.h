@@ -37,6 +37,10 @@
     #undef BASE_EPSILON
 #endif
 
+#ifdef BASE_MATRIX
+    #undef BASE_MATRIX
+#endif
+
 #ifdef BASE_VECTOR
     #undef BASE_VECTOR
 #endif

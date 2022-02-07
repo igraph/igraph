@@ -124,8 +124,8 @@ MATRIX_COMPLEX:
     CTYPE: igraph_matrix_complex_t
 
 MATRIX_LIST:
-    # A vector containing pointers to matrices of floating-point numbers
-    CTYPE: igraph_vector_ptr_t
+    # A list containing matrices of floating-point numbers
+    CTYPE: igraph_matrix_list_t
     FLAGS: BY_REF
 
 SPARSEMAT:
