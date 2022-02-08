@@ -103,7 +103,9 @@ static igraph_error_t markovChainMonteCarlo(dendro *d, igraph_integer_t period,
     for (igraph_integer_t i = 0; i < period; i++) {
 
         // make a MCMC move
-        IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
+        if (!d->monteCarloMove(dL, flag_taken, 1.0)) {
+            return IGRAPH_FAILURE;
+        }
 
         // get likelihood of this D given G
         igraph_real_t cl = d->getLikelihood();
@@ -168,7 +170,9 @@ static igraph_error_t MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
         oldMeanL = newMeanL;
         newMeanL = 0.0;
         for (int i = 0; i < 65536; i++) {
-            IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
+            if (!d->monteCarloMove(dL, flag_taken, 1.0)) {
+                return IGRAPH_FAILURE;
+            }
             Likeli = d->getLikelihood();
             newMeanL += Likeli;
         }
@@ -334,7 +338,7 @@ igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
 
 igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     igraph_integer_t origsize = igraph_hrg_size(hrg);
-    igraph_error_t ret = IGRAPH_SUCCESS;
+    int ret = 0;
     igraph_error_handler_t *oldhandler =
         igraph_set_error_handler(igraph_error_handler_ignore);
 
@@ -352,7 +356,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
         igraph_vector_resize(&hrg->prob, origsize);
         igraph_vector_int_resize(&hrg->edges, origsize);
         igraph_vector_int_resize(&hrg->vertices, origsize);
-        IGRAPH_ERROR("Cannot resize HRG", ret);
+        IGRAPH_ERROR("Cannot resize HRG", IGRAPH_ENOMEM);
     }
 
     return IGRAPH_SUCCESS;

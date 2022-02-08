@@ -2547,7 +2547,7 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
  */
-int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
+igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
     igraph_integer_t e;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);

@@ -53,7 +53,7 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
 }
 
 
-igraph_bool_t handler_stop(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler_stop(igraph_vector_int_t *clique, void *arg) {
     /* Stop search as soon as a 3-clique is found. */
     /* Since there are two 3-cliques in the test graph, this will stop the search before it is complete. */
     IGRAPH_UNUSED(arg);

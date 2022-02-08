@@ -156,8 +156,12 @@
    takes an `igraph_vector_t`), use `igraph_strength()` instead with a null
    weight vector.
 
- - `igraph_degree_sequnce_game()` now takes degree sequences represented as
+ - `igraph_degree_sequence_game()` now takes degree sequences represented as
    `igraph_vector_int_t` instead of `igraph_vector_t`.
+
+ - `igraph_degseq_t`, used by `igraph_degree_sequence_game()`, uses new names
+   for its constants. The old names are deprecated, but retained for compatibility.
+   See `igraph_constants.h` to see which new name corresponds to which old one.
 
  - `igraph_delete_vertices_idx()` now uses `igraph_vector_int_t` vectors to
    return the mapping and the inverse mapping of old vertex IDs to new ones.
@@ -546,14 +550,21 @@
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28).
  - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica).
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
+ - `igraph_blas_dgemm()` to multiply two matrices.
  - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach).
  - `igraph_stack_capacity()` to query the capacity of a stack.
+
+### Removed
+
+ - The type `igraph_stack_ptr_t`, `igraph_stack_ptr_free_all()` and `igraph_stack_ptr_destroy_all()` are removed. Use `igraph_vector_ptr_t` and associated functions instead.
 
 ### Changed
 
  - `igraph_version()` no longer returns an error code.
  - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
  - The Pajek parser is now less strict and accepts more files.
+  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
+    and edge-switching MCMC sampler.
 
 ### Fixed
 

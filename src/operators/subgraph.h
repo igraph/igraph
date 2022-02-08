@@ -29,7 +29,7 @@
 
 __BEGIN_DECLS
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_induced_subgraph_map(
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_induced_subgraph_map(
     const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
     igraph_subgraph_implementation_t impl, igraph_vector_int_t *map,
     igraph_vector_int_t *invmap, igraph_bool_t map_is_prepared
