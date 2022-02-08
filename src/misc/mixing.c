@@ -50,7 +50,8 @@
  * and zero otherwise.
  *
  * </para><para>
- * The normalized assortativity coefficient is obtained through dividing by
+ * The normalized assortativity coefficient is obtained by dividing the
+ * previous expression by
  * </para><para>
  * <code>1/m sum_ij (m - k^out_i k^in_j d(i,j) / m)</code>.
  * </para><para>
@@ -76,7 +77,8 @@
  * https://doi.org/10.1093/acprof:oso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
- * \param types Integer vector giving the vertex types.
+ * \param types Integer vector giving the vertex types. The types
+ *    are represented by integers starting at zero.
  * \param res Pointer to a real variable, the result is stored here.
  * \param directed Boolean, it gives whether to consider edge
  *    directions in a directed graph. It is ignored for undirected
@@ -173,8 +175,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  *
  * This function calculates the assortativity coefficient of a
  * graph with given values \c x_i for each vertex \c i. This coefficient
- * is essentially the Pearson correllation of the values at the
- * two ends of the edges.
+ * equals the Pearson correlation of the values at the two ends of the edges.
  *
  * </para><para>
  * The unnormalized covariance of values, computed when \p normalized is
@@ -188,7 +189,8 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * the directed edges.
  *
  * </para><para>
- * The normalized covariance, i.e. Pearson correlation, is divided by
+ * The normalized covariance, i.e. Pearson correlation, is obtained by dividing
+ * the previous expression by
  * <code>sqrt(var(x_out)) sqrt(var(x_in))</code>, where
  * </para><para>
  * <code>var(x_out) = 1/m sum_i k^out_i x_i^2 - (1/m sum_i k^out_i x_i^2)^2</code>
@@ -246,7 +248,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * \sa \ref igraph_assortativity_nominal() if you have discrete vertex
  * categories instead of numeric labels, and \ref
  * igraph_assortativity_degree() for the special case of assortativity
- * based on vertex degree.
+ * based on vertex degrees.
  */
 
 igraph_error_t igraph_assortativity(const igraph_t *graph,
