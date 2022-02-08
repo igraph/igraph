@@ -132,6 +132,8 @@ int main() {
     igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
     printf("Degree assortativity, directed: %g\n", assort);
 
+    igraph_destroy(&g);
+
     /* Verify handling of self-loops */
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 0,3, 3,3, -1);
@@ -180,6 +182,8 @@ int main() {
 
     assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
     printf("Degree assortativity, directed: %g\n", assort);
+
+    igraph_destroy(&g);
 
     /* Verify handling of self-loops */
 
