@@ -19,16 +19,20 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_integer_t k, igraph_integer_t from, igraph_integer_t to, igraph_neimode_t mode) {
-    igraph_vector_ptr_t paths;
-    igraph_vector_ptr_init(&paths, 0);
+void call_and_print(
+    igraph_t *graph, igraph_vector_t *weights, igraph_integer_t k,
+    igraph_integer_t from, igraph_integer_t to, igraph_neimode_t mode
+) {
+    igraph_vector_int_list_t paths;
+
+    igraph_vector_int_list_init(&paths, 0);
     IGRAPH_ASSERT(igraph_k_shortest_paths(graph, weights, &paths, k, from, to, mode) == IGRAPH_SUCCESS);
     printf("result: \n");
-    for (int i = 0; i < igraph_vector_ptr_size(&paths); i++) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    igraph_vector_ptr_destroy_all(&paths);
+    print_vector_int_list(&paths);
+    igraph_vector_int_list_destroy(&paths);
     printf("\n");
+
+    VERIFY_FINALLY_STACK();
 }
 
 
@@ -36,9 +40,9 @@ int main() {
     /* Wiki example taken from https://en.wikipedia.org/wiki/Yen's_algorithm */
     igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u;
     igraph_vector_t weights, weights_wiki, weights_inf;
-    igraph_vector_ptr_t paths;
+    igraph_vector_int_list_t paths;
 
-    igraph_vector_ptr_init(&paths, 0);
+    igraph_vector_int_list_init(&paths, 0);
 
     igraph_small(&g_0, 0, 0, -1);
     igraph_small(&g_1, 1, 0, -1);
@@ -101,7 +105,7 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&weights_wiki);
     igraph_vector_destroy(&weights_inf);
-    igraph_vector_ptr_destroy_all(&paths);
+    igraph_vector_int_list_destroy(&paths);
 
     VERIFY_FINALLY_STACK();
     return 0;
