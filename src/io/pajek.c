@@ -40,6 +40,24 @@ void igraph_pajek_yylex_destroy (void *scanner );
 int igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
 void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
+void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
+    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(attrs); i++) {
+        igraph_attribute_record_t *rec = VECTOR(*attrs)[i];
+        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+            igraph_vector_t *vec = (igraph_vector_t*) rec->value;
+            igraph_vector_destroy(vec);
+            IGRAPH_FREE(vec);
+        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+            igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
+            igraph_strvector_destroy(strvec);
+            IGRAPH_FREE(strvec);
+        }
+        igraph_free( (char*)(rec->name));
+        IGRAPH_FREE(rec);
+    }
+    igraph_vector_ptr_destroy(attrs);
+}
+
 /**
  * \function igraph_read_graph_pajek
  * \brief Reads a file in Pajek format
@@ -143,9 +161,12 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&vattrnames, 1);
-    IGRAPH_VECTOR_PTR_INIT_FINALLY(&vattrs, 0);
+    igraph_vector_ptr_init(&vattrs, 0);
+    IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &vattrs);
+
     IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 1);
-    IGRAPH_VECTOR_PTR_INIT_FINALLY(&eattrs, 0);
+    igraph_vector_ptr_init(&eattrs, 0);
+    IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &eattrs);
 
     context.vector = &edges;
     context.mode = 0;
@@ -157,25 +178,37 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     context.edge_attributes = &eattrs;
     context.actedge = 0;
     context.eof = 0;
+    context.errmsg[0] = '\0';
+    context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_pajek_yylex_init_extra(&context, &context.scanner);
     IGRAPH_FINALLY(igraph_pajek_yylex_destroy, context.scanner);
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
-    if (igraph_pajek_yyparse(&context)) {
+    int err = igraph_pajek_yyparse(&context);
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
-            IGRAPH_ERROR("Cannot read Pajek file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_PARSEERROR);
         }
-    }
-
-    if (context.vcount < 0) {
-        IGRAPH_ERROR("invalid vertex count in Pajek file", IGRAPH_EINVAL);
-    }
-    if (context.vcount2 < 0) {
-        IGRAPH_ERROR("invalid 2-mode vertex count in Pajek file", IGRAPH_EINVAL);
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_ENOMEM);
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading Pajek file.", err);
     }
 
     for (i = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
@@ -202,44 +235,14 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_CHECK(igraph_add_vertices(graph, context.vcount, &vattrs));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
-    for (i = 0; i < igraph_vector_ptr_size(&vattrs); i++) {
-        igraph_attribute_record_t *rec = VECTOR(vattrs)[i];
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*) rec->value;
-            igraph_vector_destroy(vec);
-            IGRAPH_FREE(vec);
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
-            igraph_strvector_destroy(strvec);
-            IGRAPH_FREE(strvec);
-        }
-        igraph_free( (char*)(rec->name));
-        IGRAPH_FREE(rec);
-    }
-
-    for (i = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
-        igraph_attribute_record_t *rec = VECTOR(eattrs)[i];
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*) rec->value;
-            igraph_vector_destroy(vec);
-            IGRAPH_FREE(vec);
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
-            igraph_strvector_destroy(strvec);
-            IGRAPH_FREE(strvec);
-        }
-        igraph_free( (char*)(rec->name));
-        IGRAPH_FREE(rec);
-    }
-
     igraph_vector_int_destroy(&edges);
-    igraph_vector_ptr_destroy(&eattrs);
+    igraph_i_pajek_destroy_attr_vector(&eattrs);
     igraph_trie_destroy(&eattrnames);
-    igraph_vector_ptr_destroy(&vattrs);
+    igraph_i_pajek_destroy_attr_vector(&vattrs);
     igraph_trie_destroy(&vattrnames);
     igraph_pajek_yylex_destroy(context.scanner);
-
     IGRAPH_FINALLY_CLEAN(7);
+
     return IGRAPH_SUCCESS;
 }
 

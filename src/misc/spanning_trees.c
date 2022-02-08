@@ -476,7 +476,7 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
         IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
 
-        IGRAPH_CHECK(igraph_clusters(graph, &membership, &csize, &comp_count, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, &membership, &csize, &comp_count, IGRAPH_WEAK));
 
         /* for each component ... */
         for (i = 0; i < comp_count; ++i) {

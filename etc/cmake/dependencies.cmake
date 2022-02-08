@@ -8,7 +8,7 @@ include(FindThreads)
 
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored
-  set(VENDORABLE_DEPENDENCIES BLAS GLPK LAPACK ARPACK GMP)
+  set(VENDORABLE_DEPENDENCIES BLAS GLPK LAPACK ARPACK GMP PLFIT)
 
   # Declare optional dependencies associated with IGRAPH_..._SUPPORT flags
   # Note that GLPK is both vendorable and optional
@@ -20,6 +20,7 @@ macro(find_dependencies)
   tristate(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" AUTO)
   tristate(IGRAPH_USE_INTERNAL_GLPK "Compile igraph with internal GLPK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_PLFIT "Compile igraph with internal plfit" AUTO)
 
   # Declare dependencies
   set(REQUIRED_DEPENDENCIES "")
@@ -27,7 +28,8 @@ macro(find_dependencies)
   set(VENDORED_DEPENDENCIES "")
 
   # Declare minimum supported version for some dependencies
-  set(GLPK_VERSION_MIN "4.57") # 4.57 is the firt version providing glp_on_error()
+  set(GLPK_VERSION_MIN "4.57") # 4.57 is the first version providing glp_on_error()
+  set(PLFIT_VERSION_MIN "0.9.3")
 
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
@@ -35,7 +37,7 @@ macro(find_dependencies)
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
-      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} OFF)
       else()
@@ -56,7 +58,7 @@ macro(find_dependencies)
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
-    find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN})
+      find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
       if(${LIBNAME_UPPER}_FOUND)
         set(IGRAPH_${LIBNAME_UPPER}_SUPPORT ON)
       else()
@@ -67,7 +69,7 @@ macro(find_dependencies)
 
   # GraphML support is treated separately because the library name is different
   if(IGRAPH_GRAPHML_SUPPORT STREQUAL "AUTO")
-    find_package(LibXml2)
+    find_package(LibXml2 QUIET)
     if(LibXml2_FOUND)
       set(IGRAPH_GRAPHML_SUPPORT ON)
     else()
@@ -149,7 +151,7 @@ macro(find_dependencies)
       set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
     endif()
     unset(SINH_FUNCTION_EXISTS CACHE)
-	set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
+    set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
   endif()
 
   if(NEED_LINKING_AGAINST_LIBM)

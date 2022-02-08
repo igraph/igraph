@@ -29,8 +29,11 @@
    include this header.
 */
 
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "config.h"
+
+__BEGIN_DECLS
 
 #ifndef INTERNAL_BLAS
     #define igraphdaxpy_    daxpy_
@@ -86,5 +89,7 @@ int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
 double igraphdnrm2_(int *n, double *x, int *incx);
 
 double igraphddot_(int *n, double *dx, int *incx, double *dy, int *incy);
+
+__END_DECLS
 
 #endif

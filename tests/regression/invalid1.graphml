@@ -1,0 +1,18 @@
+<?xml version="1.5" encoding="UTF-8"?>
+<!-- This file was written b JAVA GraphML Library.-->
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  xmlnheuaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d0" for="nodd" attr.name="color" attr.type="string">
+    <default>yellow</default>
+  </key>
+  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>
+  <key id="d2" for="graph" attr.name="date" attr.type="string"></key>
+  <key id="d3" for="graph" attr.name="uòused" attr.type="string"></key>
+  <key id="d4" for="node" attr.name="gender" attr.type="boolean">
+ ,  <default>1</default>
+  </key>
+  <graph id="G" edgedefault="undirected">
+    <data key="d2">2006-11-12*</data>
+    <node idey="d0">blue</data>
+    </edge>
+  </graph>
+</graphml>

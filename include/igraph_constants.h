@@ -25,10 +25,16 @@
 #define IGRAPH_CONSTANTS_H
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
-#include "igraph_datatype.h"
 
 __BEGIN_DECLS
+
+/* GCC added support for enumerator attributes in version 6.
+ * Verified that clang 3.0 also supports them. */
+#if __GNUC__ >= 6 || defined(__clang__)
+#define IGRAPH_DEPRECATED_ENUMVAL __attribute__ ((deprecated))
+#else
+#define IGRAPH_DEPRECATED_ENUMVAL
+#endif
 
 /* -------------------------------------------------- */
 /* Constants                                          */
@@ -48,9 +54,7 @@ typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
 typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
 
-typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3,
-               IGRAPH_TOTAL = 3
-             } igraph_neimode_t;
+typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
 
 /* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
 #define IGRAPH_REVERSE_MODE(mode) \
@@ -73,6 +77,11 @@ typedef enum { IGRAPH_STAR_OUT = 0, IGRAPH_STAR_IN,
                IGRAPH_STAR_MUTUAL
              } igraph_star_mode_t;
 
+typedef enum { IGRAPH_WHEEL_OUT = 0, IGRAPH_WHEEL_IN,
+               IGRAPH_WHEEL_UNDIRECTED,
+               IGRAPH_WHEEL_MUTUAL
+             } igraph_wheel_mode_t;
+
 typedef enum { IGRAPH_TREE_OUT = 0, IGRAPH_TREE_IN,
                IGRAPH_TREE_UNDIRECTED
              } igraph_tree_mode_t;
@@ -86,10 +95,16 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER = 0,
                IGRAPH_GET_ADJACENCY_BOTH
              } igraph_get_adjacency_t;
 
-typedef enum { IGRAPH_DEGSEQ_SIMPLE = 0,
-               IGRAPH_DEGSEQ_VL,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM
+typedef enum { IGRAPH_DEGSEQ_CONFIGURATION = 0,     /* Configuration model, allowing non-simple graphs */
+               IGRAPH_DEGSEQ_VL,                    /* Viger-Latapy, generates simple connected graphs */
+               IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,      /* Fast heuristic, generates simple graphs */
+               IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE,  /* Configuration model, generates simple graphs */
+               IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE, /* Edge-switching MCMC, generates simple graphs */
+
+               /* Deprecated, kept for backwards compatibility: */
+               IGRAPH_DEGSEQ_SIMPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION,
+               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,
+               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE
              } igraph_degseq_t;
 
 typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,
@@ -180,13 +195,6 @@ typedef enum { IGRAPH_IMITATE_AUGMENTED = 0,
                IGRAPH_IMITATE_BLIND,
                IGRAPH_IMITATE_CONTRACTED
              } igraph_imitate_algorithm_t;
-
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
-        const igraph_vector_t *par,
-        void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t *var,
-                                      const igraph_vector_t *par,
-                                      igraph_vector_t* res, void* extra);
 
 typedef enum { IGRAPH_LAYOUT_GRID = 0,
                IGRAPH_LAYOUT_NOGRID,

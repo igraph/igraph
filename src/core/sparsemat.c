@@ -1330,41 +1330,6 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_get_sparsemat
- * \brief Converts an igraph graph to a sparse matrix.
- *
- * If the graph is undirected, then a symmetric matrix is created.
- * \param graph The input graph.
- * \param res Pointer to an uninitialized sparse matrix. The result
- *    will be stored here.
- * \return Error code.
- *
- * Time complexity: TODO.
- */
-
-igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t nzmax = directed ? no_of_edges : no_of_edges * 2;
-    igraph_integer_t i;
-
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-
-    for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, i);
-        igraph_integer_t to = IGRAPH_TO(graph, i);
-        IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
-        if (!directed && from != to) {
-            IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 #define CHECK(x) if ((x)<0) { IGRAPH_ERROR("Cannot write to file", IGRAPH_EFILE); }
 
 /**
@@ -2836,10 +2801,10 @@ igraph_error_t igraph_sparsemat_add_cols(igraph_sparsemat_t *A, igraph_integer_t
 
 /**
  * \function igraph_sparsemat_resize
- * \brief Resizes a sparse matrix.
+ * \brief Resizes a sparse matrix and clears all the elements.
  *
  * This function resizes a sparse matrix. The resized sparse matrix
- * will be empty.
+ * will become empty, even if it contained nonzero entries.
  *
  * \param A The initialized sparse matrix to resize.
  * \param nrow The new number of rows.

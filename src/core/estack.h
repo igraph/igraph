@@ -24,8 +24,11 @@
 #ifndef IGRAPH_ESTACK_H
 #define IGRAPH_ESTACK_H
 
+#include "igraph_decls.h"
 #include "igraph_stack.h"
 #include "igraph_vector.h"
+
+__BEGIN_DECLS
 
 typedef struct igraph_estack_t {
     igraph_stack_int_t stack;
@@ -43,5 +46,7 @@ IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_estack_iselement(const igraph_estack_
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_estack_size(const igraph_estack_t *s);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_print(const igraph_estack_t *s);
+
+__END_DECLS
 
 #endif

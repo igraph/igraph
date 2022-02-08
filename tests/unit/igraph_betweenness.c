@@ -76,7 +76,7 @@ int main() {
 
     printf("\nTree\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
 
     igraph_vector_init(&bet, 0);
 
@@ -138,7 +138,7 @@ int main() {
 
     printf("\nCorner case cutoff 0.0\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
 
     /* unweighted */
     igraph_vector_init(&bet, 0);

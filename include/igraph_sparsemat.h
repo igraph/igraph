@@ -154,8 +154,6 @@ IGRAPH_EXPORT igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const ig
                                             igraph_bool_t directed, const char *attr,
                                             igraph_bool_t loops);
 
-IGRAPH_EXPORT igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
-
 IGRAPH_EXPORT igraph_error_t igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
                                              const igraph_matrix_t *mat,
                                              igraph_real_t tol);

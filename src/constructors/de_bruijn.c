@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_de_bruijn
  * \brief Generate a de Bruijn graph.
@@ -75,11 +77,22 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = pow(m, n);
-    no_of_edges = no_of_nodes * m;
+    {
+        igraph_real_t no_of_nodes_real = pow(m, n);
+        no_of_nodes = no_of_nodes_real;
+        if (no_of_nodes != no_of_nodes_real) {
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for De Bruijn graph.", IGRAPH_EINVAL,
+                          m, n);
+        }
+    }
+    IGRAPH_SAFE_MULT(no_of_nodes, m, &no_of_edges);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
+    }
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t basis = (i * mm) % no_of_nodes;

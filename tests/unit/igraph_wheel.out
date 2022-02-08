@@ -1,0 +1,104 @@
+-- Test graph with 1 vertex --
+directed: false
+vcount: 0
+edges: {
+}
+
+-- Test graph with 2 vertices --
+directed: false
+vcount: 2
+edges: {
+0 1
+1 1
+}
+
+-- Test graph with OUT mode --
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 2
+2 3
+3 1
+}
+
+-- Test graph with IN mode --
+directed: true
+vcount: 4
+edges: {
+1 0
+1 2
+2 0
+2 3
+3 0
+3 1
+}
+
+-- Test graph with MUTUAL mode --
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 0
+1 2
+1 3
+2 0
+2 1
+2 3
+3 0
+3 1
+3 2
+}
+
+-- Test graph with UNDIRECTED mode 
+directed: false
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 2
+1 3
+2 3
+}
+
+-- Test graph with center equal to n/2 --
+directed: true
+vcount: 4
+edges: {
+0 1
+1 3
+2 0
+2 1
+2 3
+3 0
+}
+
+-- Test graph with center equal to n - 1: --
+directed: true
+vcount: 4
+edges: {
+0 1
+1 2
+2 0
+3 0
+3 1
+3 2
+}
+
+-- Test graph with center equal to 1: --
+directed: true
+vcount: 4
+edges: {
+0 2
+1 0
+1 2
+1 3
+2 3
+3 0
+}
+

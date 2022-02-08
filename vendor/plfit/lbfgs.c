@@ -74,6 +74,7 @@ licence.
 #include <math.h>
 
 #include "lbfgs.h"
+#include "platform.h"
 
 #ifdef  _MSC_VER
 #define inline  __inline

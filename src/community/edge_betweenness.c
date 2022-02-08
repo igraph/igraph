@@ -83,8 +83,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     }
 
     if (modularity || res || bridges) {
-        IGRAPH_CHECK(igraph_clusters(graph, 0, 0, &no_comps,
-                                     IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
 
         if (modularity) {
             IGRAPH_CHECK(igraph_vector_resize(modularity,
@@ -255,7 +254,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                 res, bridges, modularity, membership);
     }
 
-    IGRAPH_CHECK(igraph_clusters(graph, 0, 0, &no_comps, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
     if (res) {

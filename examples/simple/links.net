@@ -1,3 +1,5 @@
+% Example Pajek file
+
 *Network TRALALA
 *vertices 4
    1 "1"                                           0.0938 0.0896   ellipse x_fact 1 y_fact 1

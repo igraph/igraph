@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,23 +20,34 @@
 
 */
 
-#include <igraph.h>
+#include "igraph_error.h"
+#include "igraph_types.h"
+#include "igraph_vector_list.h"
 
-int main() {
-    igraph_t graph;
-    igraph_bool_t res;
+#define VECTOR_LIST
 
-    /* Create a directed binary tree on 15 nodes,
-       with edges pointing towards the root. */
-    igraph_tree(&graph, 15, 2, IGRAPH_TREE_IN);
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "typed_list.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-    igraph_is_tree(&graph, &res, NULL, IGRAPH_IN);
-    printf("Is it an in-tree? %s\n", res ? "Yes" : "No");
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "typed_list.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
 
-    igraph_is_tree(&graph, &res, NULL, IGRAPH_OUT);
-    printf("Is it an out-tree? %s\n", res ? "Yes" : "No");
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "typed_list.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
 
-    igraph_destroy(&graph);
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "typed_list.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
 
-    return 0;
-}
+#undef VECTOR_LIST

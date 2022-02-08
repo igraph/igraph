@@ -10,6 +10,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   set(TEST_NAME "${NAMESPACE}::${NAME}")
 
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/${FOLDER}/${NAME}.c)
+  use_all_warnings(${TARGET_NAME})
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
@@ -21,7 +22,12 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   # Some tests depend on internal igraph headers so we also have to add src/
   # to the include path even though it's not part of the public API
   target_include_directories(
-    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/vendor ${CMAKE_BINARY_DIR}/src
+    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
+  )
+
+  # Some tests include cs.h from CXSparse
+  target_include_directories(
+    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/cs
   )
 
   if (MSVC)

@@ -70,17 +70,19 @@
 %option reentrant
 %option bison-bridge
 %option bison-locations
+%option yylineno
 
 digit       [0-9]
-whitespace  [ \r\n\t]
+whitespace  [ \r\n\t\v\f]
 
 %%
 
-^#[^\n\r]*[\n]|[\r]     { /* comments ignored */ }
+^#[^\0\n\r]*            { /* comments ignored */ }
 
-\"[^\x00\"]*\"                                  { return STRING; }
+\"[^\0\"]*\"            { return STRING; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 [a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
+\-                      { return MINUS; }
 \[                      {
                           yyextra->depth++;
                           if (yyextra->depth >= 32) {
@@ -97,7 +99,6 @@ whitespace  [ \r\n\t]
                             return LISTCLOSE;
                           }
                         }
-\n\r|\r\n|\r|\n         { }
 {whitespace}            { /* other whitespace ignored */ }
 
 <<EOF>>                 {

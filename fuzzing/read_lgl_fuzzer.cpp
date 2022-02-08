@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team
+   Copyright (C) 2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,21 +18,21 @@
    02110-1301 USA
 */
 
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
 #include "igraph.h"
-#include <stdio.h>
+#include <cstdio>
 
 extern "C"
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
-    if(size<5) return 0;
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
+
+    // Turn on attribute handling
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     // Create input file
     char filename[256];
-    sprintf(filename, "/tmp/libfuzzer.gml");
+    sprintf(filename, "/tmp/libfuzzer.lgl");
     FILE *fp = fopen(filename, "wb");
     if (!fp) return 0;
     fwrite(data, size, 1, fp);
@@ -40,7 +40,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
 
     // Read input file
     FILE *ifile;
-    ifile = fopen("/tmp/libfuzzer.gml", "r");
+    ifile = fopen("/tmp/libfuzzer.lgl", "r");
     if(ifile == 0){
         remove(filename);
         return 0;
@@ -48,15 +48,18 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
 
     // Do the fuzzing
     igraph_t g;
-    if (igraph_read_graph_gml(&g, ifile) == IGRAPH_SUCCESS) {
+    if (igraph_read_graph_lgl(&g, ifile, 1, IGRAPH_ADD_WEIGHTS_IF_PRESENT, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
         // Clean up
         igraph_destroy(&g);
     }
 
-    // no need to call igraph_destroy() if igraph_raed_graph_gml() returns an
+    // no need to call igraph_destroy() if igraph_read_graph_lgl() returns an
     // error code as we don't have a valid graph object in that case
 
     fclose(ifile);
     remove(filename);
+
+    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
     return 0;
 }

@@ -66,7 +66,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
      * the Eulerian nature only if there is a self-loop AND another edge
      * somewhere else in the graph */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
-    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize, NULL, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, NULL, &csize, NULL, IGRAPH_WEAK));
     cluster_count = 0;
     vsize = igraph_vector_int_size(&csize);
     for (i = 0; i < vsize; i++) {
@@ -192,7 +192,7 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
      * somewhere else in the graph */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
 
-    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize, NULL, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, NULL, &csize, NULL, IGRAPH_WEAK));
     cluster_count = 0;
     vsize = igraph_vector_int_size(&csize);
     for (i = 0; i < vsize; i++) {

@@ -64,23 +64,23 @@ __BEGIN_DECLS
 
 typedef igraph_error_t igraph_motifs_handler_t(const igraph_t *graph,
         igraph_vector_int_t *vids,
-        int isoclass,
+        igraph_integer_t isoclass,
         void* extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
-                                        int size, const igraph_vector_t *cut_prob);
+                                        igraph_integer_t size, const igraph_vector_t *cut_prob);
 
-IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, int size,
+IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_integer_t size,
                                                  const igraph_vector_t *cut_prob,
                                                  igraph_motifs_handler_t *callback,
                                                  void* extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-                                                 int size, const igraph_vector_t *cut_prob,
+                                                 igraph_integer_t size, const igraph_vector_t *cut_prob,
                                                  igraph_integer_t sample_size,
                                                  const igraph_vector_int_t *sample);
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-                                           int size, const igraph_vector_t *cut_prob);
+                                           igraph_integer_t size, const igraph_vector_t *cut_prob);
 
 IGRAPH_EXPORT igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                                      igraph_integer_t *asym, igraph_integer_t *null);

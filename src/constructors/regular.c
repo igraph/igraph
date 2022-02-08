@@ -26,6 +26,7 @@
 #include "igraph_operators.h"
 
 #include "core/interruption.h"
+#include "math/safe_intop.h"
 
 /**
  * \ingroup generators
@@ -65,7 +66,7 @@
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_tree()
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_star.c
@@ -77,20 +78,24 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
     igraph_integer_t i;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVVID);
     }
     if (center < 0 || center > n - 1) {
-        IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid center vertex.", IGRAPH_EINVAL);
     }
     if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN &&
         mode != IGRAPH_STAR_MUTUAL && mode != IGRAPH_STAR_UNDIRECTED) {
-        IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid star mode.", IGRAPH_EINVMODE);
     }
 
     if (mode != IGRAPH_STAR_MUTUAL) {
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, (n - 1) * 2);
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(n-1, 2, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
     } else {
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, (n - 1) * 2 * 2);
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(n-1, 4, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
     }
 
     if (mode == IGRAPH_STAR_OUT) {
@@ -131,6 +136,152 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_wheel
+ * \brief Creates a \em wheel graph, a union of a star and a cycle graph.
+ *
+ * A wheel graph on \p n vertices can be thought of as a wheel with
+ * <code>n - 1</code> spokes. The cycle graph part makes up the rim,
+ * while the star graph part adds the spokes.
+ *
+ * </para><para>
+ * Note that the two and three-vertex wheel graphs are non-simple:
+ * The two-vertex wheel graph contains a self-loop, while the three-vertex
+ * wheel graph contains parallel edges (a 1-cycle and a 2-cycle, respectively).
+ *
+ * \param graph Pointer to an uninitialized graph object, this will
+ *        be the result.
+ * \param n Integer constant, the number of vertices in the graph.
+ * \param mode Constant, gives the type of the star graph to
+ *        create. Possible values:
+ *        \clist
+ *        \cli IGRAPH_WHEEL_OUT
+ *          directed wheel graph, edges point
+ *          \em from the center to the other vertices.
+ *        \cli IGRAPH_WHEEL_IN
+ *          directed wheel graph, edges point
+ *          \em to the center from the other vertices.
+ *        \cli IGRAPH_WHEEL_MUTUAL
+ *          directed wheel graph with mutual edges.
+ *        \cli IGRAPH_WHEEL_UNDIRECTED
+ *          an undirected wheel graph is
+ *          created.
+ *        \endclist
+ * \param center Id of the vertex which will be the center of the
+ *          graph.
+ * \return Error code:
+ *         \clist
+ *         \cli IGRAPH_EINVVID
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVAL
+ *           invalid center vertex.
+ *         \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *         \endclist
+ *
+ * Time complexity: O(|V|), the
+ * number of vertices in the graph.
+ *
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star(), 
+ * \ref igraph_kary_tree() for creating other regular structures.
+ *
+ */
+
+igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
+                igraph_integer_t center) {
+
+    igraph_star_mode_t star_mode;
+    igraph_vector_int_t rim_edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i;
+
+    /* Firstly creates a star by the function \ref igraph_star() and makes
+     * use of its existing input parameter checking ability, it can check
+     * "Invalid number of vertices" and "Invalid center vertex". */
+    switch (mode)
+    {
+        case IGRAPH_WHEEL_OUT:
+            star_mode = IGRAPH_STAR_OUT;
+            break;
+        case IGRAPH_WHEEL_IN:
+            star_mode = IGRAPH_STAR_IN;
+            break;
+        case IGRAPH_WHEEL_MUTUAL:
+            star_mode = IGRAPH_STAR_MUTUAL;
+            break;
+        case IGRAPH_WHEEL_UNDIRECTED:
+            star_mode = IGRAPH_STAR_UNDIRECTED;
+            break;
+        default:
+            IGRAPH_ERROR("Invalid wheel graph mode.", IGRAPH_EINVMODE);
+    }
+
+    IGRAPH_CHECK(igraph_star(graph, n, star_mode, center));
+
+    /* If n <= 1, wheel graph is identical with star graph,
+     * no further processing is needed. */
+    if (n <= 1) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Register the star for deallocation in case of error flow before 
+     * the entire wheel is successfully created. */
+    IGRAPH_FINALLY(igraph_destroy, graph);
+
+    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices, 
+     * it will have n - 1 edges. For MUTUAL mode, number of edges
+     * will be double. */
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 4 * (n-1));
+    } else {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&rim_edges, 2 * (n-1));
+    }
+
+    /* Assign first n-1 edges (MUTUAL will be handled later). */
+    for (i = 0; i < n-2; i++) {
+        if ( i < center ) {
+            VECTOR(rim_edges)[2 * i] = i;
+            if ( i + 1 < center ) {
+                VECTOR(rim_edges)[2 * i + 1] = i + 1;
+            } else {
+                VECTOR(rim_edges)[2 * i + 1] = i + 2;
+            }
+        } else {
+            VECTOR(rim_edges)[2 * i] = i + 1;
+            VECTOR(rim_edges)[2 * i + 1] = i + 2;
+        }
+    }
+
+    /* Assign the last edge (MUTUAL will be handled later). */
+    if ( n - 2 < center ) {
+        VECTOR(rim_edges)[2 * n - 4] = n - 2;
+    } else {
+        VECTOR(rim_edges)[2 * n - 4] = n - 1;
+    }
+    if ( center > 0 ) {
+        VECTOR(rim_edges)[2 * n - 3] = 0;
+    } else {
+        VECTOR(rim_edges)[2 * n - 3] = 1;
+    }
+
+    /* For MUTUAL mode, add reverse-direction edges. */
+    if (mode == IGRAPH_WHEEL_MUTUAL) {
+        for (i=0; i < 2 * (n-1); i++) {
+            VECTOR(rim_edges)[4 * (n-1) - 1 - i] = VECTOR(rim_edges)[i];
+        }
+    }
+
+    /* Combine the rim into the star to make it a wheel graph. */
+    IGRAPH_CHECK(igraph_add_edges(graph, &rim_edges, NULL));
+
+    igraph_vector_int_destroy(&rim_edges);
+
+    /* 2 instead of 1 because the star graph is registered before. */
+    IGRAPH_FINALLY_CLEAN(2);
+    
     return IGRAPH_SUCCESS;
 }
 
@@ -180,26 +331,29 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                    igraph_bool_t circular) {
 
     igraph_integer_t dims = igraph_vector_int_size(dimvector);
-    igraph_integer_t no_of_nodes = igraph_vector_int_prod(dimvector);
+    igraph_integer_t no_of_nodes;
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t *coords, *weights;
     igraph_integer_t i, j;
     int carry, pos;
 
     if (igraph_vector_int_any_smaller(dimvector, 0)) {
-        IGRAPH_ERROR("Invalid dimension vector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
     }
+
+    /* compute no. of nodes in overflow-safe manner */
+    IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
 
     /* init coords & weights */
 
     coords = IGRAPH_CALLOC(dims, igraph_integer_t);
     if (coords == 0) {
-        IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, coords);
     weights = IGRAPH_CALLOC(dims, igraph_integer_t);
     if (weights == 0) {
-        IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, weights);
     if (dims > 0) {
@@ -211,9 +365,14 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     if (mutual && directed) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_nodes * dims));
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(no_of_nodes, dims, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
     } else {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_nodes * dims));
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(no_of_nodes, dims, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -315,7 +474,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
 
     if (n < 0) {
-        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", n, IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 1);
@@ -331,8 +490,8 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 
 /**
  * \ingroup generators
- * \function igraph_tree
- * \brief Creates a tree in which almost all vertices have the same number of children.
+ * \function igraph_kary_tree
+ * \brief Creates a k-ary tree in which almost all vertices have k children.
  *
  * To obtain a completely symmetric tree with \c l layers, where each
  * vertex has precisely \p children descendants, use
@@ -371,9 +530,9 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
- * \example examples/simple/igraph_tree.c
+ * \example examples/simple/igraph_kary_tree.c
  */
-igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
                 igraph_tree_mode_t type) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
@@ -392,7 +551,15 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
         IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
+    {
+        igraph_integer_t no_of_edges2;
+        if (n > 0) {
+            IGRAPH_SAFE_MULT(n-1, 2, &no_of_edges2);
+        } else {
+            no_of_edges2 = 0;
+        }
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
 
     i = 0;
     if (type == IGRAPH_TREE_OUT) {
@@ -497,6 +664,18 @@ igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, igraph_vector_int
 
 /**
  * \ingroup generators
+ * \function igraph_tree
+ * \brief Creates a k-ary tree in which almost all vertices have k children (deprecated alias).
+ *
+ * \deprecated-by igraph_kary_tree 0.10.0
+ */
+igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+                igraph_tree_mode_t type) {
+    return igraph_kary_tree(graph, n, children, type);
+}
+
+/**
+ * \ingroup generators
  * \function igraph_symmetric_tree
  * \brief Creates a symmetric tree with the specified number of branches at each level.
  *
@@ -524,7 +703,7 @@ igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, igraph_vector_int
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_tree() and \ref igraph_star() for creating regular tree
+ * \sa \ref igraph_kary_tree() and \ref igraph_star() for creating regular tree
  * structures; \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
@@ -535,7 +714,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
                 igraph_tree_mode_t type) {
 
     igraph_vector_int_t edges;
-    igraph_integer_t j, k, temp, vertex_count, idx, parent, child, level_end;
+    igraph_integer_t j, k, temp, no_of_nodes, idx, parent, child, level_end;
     igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
 
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN && type != IGRAPH_TREE_UNDIRECTED) {
@@ -545,17 +724,20 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
         IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
     }
 
-    /* Compute the number of vertices in the tree.
-     * TODO: add integer overflow check. */
-    vertex_count = 1;
+    /* Compute the number of vertices in the tree. */
+    no_of_nodes = 1;
     temp = 1;
-    for(j = 0; j < branching_counts_size; ++j) {
-        temp *= VECTOR(*branching_counts)[j];
-        vertex_count += temp;
+    for (j = 0; j < branching_counts_size; ++j) {
+        IGRAPH_SAFE_MULT(temp, VECTOR(*branching_counts)[j], &temp);
+        IGRAPH_SAFE_ADD(no_of_nodes, temp, &no_of_nodes);
     }
 
     /* Trees have precisely |E| = |V| - 1 edges. */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (vertex_count - 1));
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(no_of_nodes - 1, 2, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
 
     idx = 0;
 
@@ -579,7 +761,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
         }
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, vertex_count, type != IGRAPH_TREE_UNDIRECTED));
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, type != IGRAPH_TREE_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -635,15 +817,22 @@ igraph_error_t igraph_extended_chordal_ring(
     igraph_integer_t i, j, mpos = 0, epos = 0;
 
     if (nodes < 3) {
-        IGRAPH_ERROR("An extended chordal ring has at least 3 nodes", IGRAPH_EINVAL);
+        IGRAPH_ERROR("An extended chordal ring has at least 3 nodes.", IGRAPH_EINVAL);
     }
 
     if (nodes % period != 0) {
-        IGRAPH_ERROR("The period (number of columns in W) should divide the "
-                     "number of nodes", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The period (number of columns in W) should divide the number of nodes.",
+                     IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (nodes + nodes * nrow));
+    {
+        /* ecount = nodes + nodes * nrow */
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(nodes, nrow, &no_of_edges2);
+        IGRAPH_SAFE_ADD(no_of_edges2, nodes, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
 
     for (i = 0; i < nodes - 1; i++) {
         VECTOR(edges)[epos++] = i;

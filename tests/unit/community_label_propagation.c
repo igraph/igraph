@@ -58,8 +58,7 @@ int main() {
                  -1);
 
     igraph_vector_int_init(&membership, 0);
-    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0,
-                                       /*modularity=*/ 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
 
     igraph_destroy(&g);
 
@@ -74,13 +73,13 @@ int main() {
     VECTOR(fixed)[4] = 1;
     VECTOR(fixed)[5] = 1;
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                       &initial, &fixed, /*modularity=*/ 0);
+                                       &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
         if (VECTOR(membership)[i] != (i < 2 ? 0 : 1)) {
             return 3;
         }
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0,
-                                       &initial, &fixed, /*modularity=*/ 0);
+                                       &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
         if (VECTOR(membership)[i] != 0) {
             return 4;
@@ -90,7 +89,7 @@ int main() {
      * while an initial configuration is given -- see bug
      * #570902 in Launchpad. This is a simple smoke test only. */
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                       &initial, 0, /*modularity=*/ 0);
+                                       &initial, 0);
 
     igraph_vector_bool_destroy(&fixed);
     igraph_vector_destroy(&weights);

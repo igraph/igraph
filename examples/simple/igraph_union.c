@@ -26,14 +26,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int print_free_vector_ptr(igraph_vector_ptr_t *v) {
-    igraph_integer_t i, l = igraph_vector_ptr_size(v);
+int print_and_clear_vector_int_list(igraph_vector_int_list_t *list) {
+    igraph_integer_t i, l = igraph_vector_int_list_size(list);
     printf("---\n");
     for (i = 0; i < l; i++) {
-        igraph_vector_int_print(VECTOR(*v)[i]);
-        igraph_vector_int_destroy(VECTOR(*v)[i]);
-        IGRAPH_FREE(VECTOR(*v)[i]);
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(list, i));
     }
+    igraph_vector_int_list_clear(list);
     printf("===\n");
     return 0;
 }
@@ -44,7 +43,7 @@ int main() {
     igraph_vector_int_t v;
     igraph_vector_ptr_t glist;
     igraph_vector_int_t edge_map1, edge_map2;
-    igraph_vector_ptr_t edgemaps;
+    igraph_vector_int_list_t edgemaps;
     igraph_integer_t i;
 
     igraph_vector_int_init(&edge_map1, 0);
@@ -71,12 +70,12 @@ int main() {
 
     /* Empty graph list */
     igraph_vector_ptr_init(&glist, 0);
-    igraph_vector_ptr_init(&edgemaps, 0);
+    igraph_vector_int_list_init(&edgemaps, 0);
     igraph_union_many(&uni, &glist, &edgemaps);
     if (!igraph_is_directed(&uni) || igraph_vcount(&uni) != 0) {
         return 1;
     }
-    print_free_vector_ptr(&edgemaps);
+    print_and_clear_vector_int_list(&edgemaps);
     igraph_vector_ptr_destroy(&glist);
     igraph_destroy(&uni);
 
@@ -96,7 +95,7 @@ int main() {
         igraph_destroy(VECTOR(glist)[i]);
         free(VECTOR(glist)[i]);
     }
-    print_free_vector_ptr(&edgemaps);
+    print_and_clear_vector_int_list(&edgemaps);
     igraph_vector_ptr_destroy(&glist);
     igraph_destroy(&uni);
 
@@ -116,7 +115,7 @@ int main() {
         igraph_destroy(VECTOR(glist)[i]);
         free(VECTOR(glist)[i]);
     }
-    print_free_vector_ptr(&edgemaps);
+    print_and_clear_vector_int_list(&edgemaps);
     igraph_vector_ptr_destroy(&glist);
     igraph_destroy(&uni);
 
@@ -136,11 +135,11 @@ int main() {
         igraph_destroy(VECTOR(glist)[i]);
         free(VECTOR(glist)[i]);
     }
-    print_free_vector_ptr(&edgemaps);
+    print_and_clear_vector_int_list(&edgemaps);
     igraph_vector_ptr_destroy(&glist);
     igraph_destroy(&uni);
 
-    igraph_vector_ptr_destroy(&edgemaps);
+    igraph_vector_int_list_destroy(&edgemaps);
 
     return 0;
 }

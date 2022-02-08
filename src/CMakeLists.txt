@@ -49,6 +49,7 @@ add_library(
   core/interruption.c
   core/marked_queue.c
   core/matrix.c
+  core/matrix_list.c
   core/memory.c
   core/printing.c
   core/progress.c
@@ -60,11 +61,13 @@ add_library(
   core/statusbar.c
   core/strvector.c
   core/trie.c
-  core/vector_ptr.c
   core/vector.c
+  core/vector_list.c
+  core/vector_ptr.c
 
   math/bfgs.c
   math/complex.c
+  math/safe_intop.c
   math/utils.c
 
   linalg/arpack.c
@@ -78,7 +81,9 @@ add_library(
   graph/attributes.c
   graph/basic_query.c
   graph/cattributes.c
+  graph/graph_list.c
   graph/iterators.c
+  graph/type_common.c
   graph/type_indexededgelist.c
   graph/visitors.c
 
@@ -181,6 +186,7 @@ add_library(
   io/lgl.c
   io/ncol.c
   io/pajek.c
+  io/parse_utils.c
   ${PARSER_SOURCES}
 
   layout/circular.c
@@ -289,6 +295,7 @@ add_library(
   $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_OBJECTS:glpk_vendored>,>
   $<IF:$<BOOL:${GMP_IS_VENDORED}>,$<TARGET_OBJECTS:gmp_vendored>,>
   $<IF:$<BOOL:${LAPACK_IS_VENDORED}>,$<TARGET_OBJECTS:lapack_vendored>,>
+  $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
 # Set soname for the library
@@ -328,12 +335,13 @@ target_include_directories(
 
   # Vendored library include paths
   $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
+  $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
 
   # Include paths for dependencies
-  $<$<BOOL:${CXSPARSE_INCLUDE_DIRS}>:${CXSPARSE_INCLUDE_DIRS}>
   $<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>
   $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
   $<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>
+  $<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>
 )
 
 if(MATH_LIBRARY)
@@ -346,10 +354,6 @@ endif()
 
 if(BLAS_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${BLAS_LIBRARIES})
-endif()
-
-if(CXSPARSE_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${CXSPARSE_LIBRARIES})
 endif()
 
 if(GLPK_LIBRARIES)
@@ -368,11 +372,15 @@ if(LIBXML2_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${LIBXML2_LIBRARIES})
 endif()
 
+if(PLFIT_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${PLFIT_LIBRARIES})
+endif()
+
 # Link igraph statically to some of the libraries from the subdirectories
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored plfit prpack
+  bliss cliquer cxsparse_vendored prpack
 )
 
 if (NOT BUILD_SHARED_LIBS)
@@ -421,7 +429,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer cxsparse_vendored plfit prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

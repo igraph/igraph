@@ -1377,21 +1377,20 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  */
 
 igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                 long int nev) {
+                                 igraph_integer_t nev) {
 
     igraph_integer_t nodes = igraph_matrix_nrow(vectors);
     igraph_integer_t no_evs = igraph_matrix_nrow(values);
-    long int i, j;
-    long int new_vector_pos;
-    long int vector_pos;
+    igraph_integer_t i, j;
+    igraph_integer_t new_vector_pos, vector_pos;
     igraph_matrix_t new_vectors;
 
     /* Error checks */
     if (nev < 0) {
-        IGRAPH_ERROR("`nev' cannot be negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`nev' cannot be negative.", IGRAPH_EINVAL);
     }
     if (nev > no_evs) {
-        IGRAPH_ERROR("`nev' too large, we don't have that many in `values'",
+        IGRAPH_ERROR("`nev' too large, we don't have that many in `values'.",
                      IGRAPH_EINVAL);
     }
 

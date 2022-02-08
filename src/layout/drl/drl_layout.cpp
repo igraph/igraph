@@ -438,14 +438,6 @@ igraph_error_t igraph_layout_drl_options_init(igraph_layout_drl_options_t *optio
  * \param options The parameters to pass to the layout generator.
  * \param weights Edge weights, pointer to a vector. If this is a null
  *    pointer then every edge will have the same weight.
- * \param fixed Pointer to a logical vector, or a null pointer. Originally,
- *    this argument was used in the DrL algorithm to keep the nodes marked
- *    with this argument as fixed; fixed nodes would then keep their
- *    positions in the initial stages of the algorithm. However, due to how
- *    the DrL code imported into igraph is organized, it seems that the
- *    argument does not do anything and we are not sure whether this is a
- *    bug or a feature in DrL. We are leaving the argument here in order not
- *    to break the API, but note that at the present stage it has no effect.
  * \return Error code.
  *
  * Time complexity: ???.
@@ -454,8 +446,7 @@ igraph_error_t igraph_layout_drl_options_init(igraph_layout_drl_options_t *optio
 igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_bool_t use_seed,
                       const igraph_layout_drl_options_t *options,
-                      const igraph_vector_t *weights,
-                      const igraph_vector_bool_t *fixed) {
+                      const igraph_vector_t *weights) {
     const char msg[] = "Damping multipliers cannot be negative, got %f.";
 
     if (options->init_damping_mult < 0) {
@@ -484,7 +475,7 @@ igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
         neighbors.init_parms(options);
         if (use_seed) {
             IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 2));
-            neighbors.read_real(res, fixed);
+            neighbors.read_real(res);
         }
         neighbors.draw_graph(res);
 

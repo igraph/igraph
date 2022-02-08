@@ -42,6 +42,7 @@ set(
     "${CMAKE_SOURCE_DIR}/etc/cmake;/etc/cmake"
     "${CMAKE_SOURCE_DIR}/examples;/examples"
     "${CMAKE_SOURCE_DIR}/include;/include"
+    "${CMAKE_SOURCE_DIR}/interfaces;/interfaces"
     "${CMAKE_SOURCE_DIR}/msvc/include;/msvc/include"
     "${CMAKE_SOURCE_DIR}/src;/src"
     "${CMAKE_SOURCE_DIR}/tests;/tests"

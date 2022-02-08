@@ -22,7 +22,7 @@
 
 #include <igraph.h>
 
-igraph_bool_t bfs_callback(const igraph_t *graph,
+igraph_error_t bfs_callback(const igraph_t *graph,
                            igraph_integer_t vid,
                            igraph_integer_t pred,
                            igraph_integer_t succ,

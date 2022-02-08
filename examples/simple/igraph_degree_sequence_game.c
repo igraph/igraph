@@ -14,8 +14,8 @@ int main() {
     igraph_vector_int_init_int(&indeg, 10, 4, 4, 2, 2, 4, 4, 2, 2, 3, 3);
     igraph_vector_int_init(&vec, 0);
 
-    /* checking the simple method, undirected graphs */
-    igraph_degree_sequence_game(&g, &outdeg, 0, IGRAPH_DEGSEQ_SIMPLE);
+    /* checking the configuration model, undirected graphs */
+    igraph_degree_sequence_game(&g, &outdeg, 0, IGRAPH_DEGSEQ_CONFIGURATION);
     if (igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 1;
     }
@@ -39,8 +39,8 @@ int main() {
     igraph_vector_int_print(&vec);
     igraph_destroy(&g);
 
-    /* checking the simple method, directed graphs */
-    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_SIMPLE);
+    /* checking the configuration model, directed graphs */
+    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_CONFIGURATION);
     if (!igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 6;
     }
@@ -54,8 +54,8 @@ int main() {
     igraph_vector_int_print(&vec);
     igraph_destroy(&g);
 
-    /* checking the no multiple edges method, undirected graphs */
-    igraph_degree_sequence_game(&g, &outdeg, 0, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE);
+    /* checking the fast heuristic method, undirected graphs */
+    igraph_degree_sequence_game(&g, &outdeg, 0, IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE);
     if (igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 9;
     }
@@ -68,8 +68,8 @@ int main() {
     igraph_vector_int_print(&vec);
     igraph_destroy(&g);
 
-    /* checking the no multiple edges method, directed graphs */
-    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE);
+    /* checking the fast heuristic method, directed graphs */
+    igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE);
     if (!igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 12;
     }

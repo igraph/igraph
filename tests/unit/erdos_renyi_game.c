@@ -46,6 +46,22 @@ int main() {
     igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
+    /* Singleton with loop */
+
+    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 1, 1.0,
+                            IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 1);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(! simple);
+    igraph_destroy(&g);
+
+    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 1, 1.0,
+                            IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 1);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(! simple);
+    igraph_destroy(&g);
+
     /* Complete graph */
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 1.0,
@@ -123,6 +139,27 @@ int main() {
 
     /* --------------------------------------------------------------------- */
     /* G(n,m) */
+
+    /* singleton with loop */
+
+    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 1, 1,
+                            IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 1);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 1);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+
+    igraph_destroy(&g);
+
+    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 1, 1,
+                            IGRAPH_DIRECTED, IGRAPH_LOOPS);
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 1);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 1);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+
+    igraph_destroy(&g);
+
 
     /* directed with loops */
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 10, 10 * 10 - 1,
