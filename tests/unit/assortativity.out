@@ -2,6 +2,7 @@ Karate club, normalized assortativity based on degree categories: -0.077745
 Karate club, non-normalized assortativity based on degree categories: -0.0693623
 Assortativity based on values: 0.448049
 Assortativity based on values, unnormalized: 69.3478
+
 Degree assortativity, NORMALIZED
 Degree assortativity: -0.475613
 Degree assortativity, directed: -0.666667
