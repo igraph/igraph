@@ -801,12 +801,12 @@ igraph_centralization_eigenvector_centrality_tmax:
 igraph_assortativity_nominal:
     PARAMS: |-
         GRAPH graph, INDEX_VECTOR types, OUT REAL res,
-        BOOLEAN directed=True
+        BOOLEAN directed=True, BOOLEAN normalized=True
 
 igraph_assortativity:
     PARAMS: |-
-        GRAPH graph, VECTOR types1, OPTIONAL VECTOR types2,
-        OUT REAL res, BOOLEAN directed=True
+        GRAPH graph, VECTOR values, OPTIONAL VECTOR values_in,
+        OUT REAL res, BOOLEAN directed=True, BOOLEAN normalized=True
 
 igraph_assortativity_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN directed=True
