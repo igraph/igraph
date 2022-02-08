@@ -174,29 +174,31 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * This function calculates the assortativity coefficient of a
  * graph with given values \c x_i for each vertex \c i. This coefficient
  * is essentially the Pearson correllation of the values at the
- * two ends of the edges. In undirected graphs, self-loops
- * are taken into account twice.
+ * two ends of the edges.
  *
  * </para><para>
  * The unnormalized covariance of values, computed when \p normalized is
  * set to false, is defined as follows in a directed graph:
  * </para><para>
- * <code>cov(x_i, x_j) = 1/m sum_ij (A_ij - k^out_i k^in_j / m) x_i x_j</code>,
+ * <code>cov(x_out, x_in) = 1/m sum_ij (A_ij - k^out_i k^in_j / m) x_i x_j</code>,
  * </para><para>
  * where \c m denotes the number of edges, \c A_ij is the adjacency matrix, and
  * <code>k^out</code> and <code>k^in</code> are the out- and in-degrees.
+ * \c x_out and \c x_in refer to the vertex values at the start and end of
+ * the directed edges.
  *
  * </para><para>
  * The normalized covariance, i.e. Pearson correlation, is divided by
- * <code>sqrt(var(x_i)) sqrt(var(x_j))</code>, where
+ * <code>sqrt(var(x_out)) sqrt(var(x_in))</code>, where
  * </para><para>
- * <code>var(x_i) = 1/m sum_i k^out_i x_i^2 - (1/m sum_i k^out_i x_i^2)^2</code>
+ * <code>var(x_out) = 1/m sum_i k^out_i x_i^2 - (1/m sum_i k^out_i x_i^2)^2</code>
  * </para><para>
- * <code>var(x_j) = 1/m sum_j k^in_j x_j^2 - (1/m sum_j k^in_j x_j^2)^2</code>
+ * <code>var(x_in) = 1/m sum_j k^in_j x_j^2 - (1/m sum_j k^in_j x_j^2)^2</code>
  *
  * </para><para>
  * Undirected graphs are effectively treated as directed graphs where all edges
- * are reciprocal.
+ * are reciprocal. Therefore, self-loops are effectively considered twice in
+ * undirected graphs.
  *
  * </para><para>
  * References:
@@ -347,6 +349,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  * the documentation of \ref igraph_assortativity() for details.
  * This function simply calls \ref igraph_assortativity() with
  * the degrees as the vertex values and normalization enabled.
+ * In the directed case, it uses out-degrees as out-values and
+ * in-degrees as in-values.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to a real variable, the result is stored here.
@@ -377,8 +381,8 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
         igraph_vector_t indegree, outdegree;
         IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
-        IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, 0));
-        IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, 0));
+        IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, NULL));
+        IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, NULL));
         IGRAPH_CHECK(igraph_assortativity(graph, &outdegree, &indegree, res, /* directed */ 1, /* normalized */ 1));
         igraph_vector_destroy(&indegree);
         igraph_vector_destroy(&outdegree);
