@@ -32,17 +32,56 @@ __BEGIN_DECLS
     #define _GNU_SOURCE 1
 #endif
 
+#ifdef __cplusplus
+    #define __STDC_FORMAT_MACROS   /* needed for PRId32 and PRId64 from inttypes.h on Linux */
+#endif
+
+#include "igraph_config.h"
 #include "igraph_error.h"
+
+#include <inttypes.h>
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>
 
-typedef int    igraph_integer_t;
+#if !defined(IGRAPH_INTEGER_SIZE)
+#  error "igraph integer size not defined; check the value of IGRAPH_INTEGER_SIZE when compiling"
+#elif IGRAPH_INTEGER_SIZE == 64
+typedef int64_t igraph_integer_t;
+#elif IGRAPH_INTEGER_SIZE == 32
+typedef int32_t igraph_integer_t;
+#else
+#  error "Invalid igraph integer size; check the value of IGRAPH_INTEGER_SIZE when compiling"
+#endif
+
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
 
 /* printf format specifier for igraph_integer_t */
-#define IGRAPH_PRId "d"
+#if IGRAPH_INTEGER_SIZE == 64
+#  define IGRAPH_PRId PRId64
+#else
+#  define IGRAPH_PRId PRId32
+#endif
+
+/* maximum and minimum allowed values for igraph_integer_t */
+#if IGRAPH_INTEGER_SIZE == 64
+#  define IGRAPH_INTEGER_MAX INT64_MAX
+#  define IGRAPH_INTEGER_MIN INT64_MIN
+#else
+#  define IGRAPH_INTEGER_MAX INT32_MAX
+#  define IGRAPH_INTEGER_MIN INT32_MIN
+#endif
+
+/* Maximum vertex count for igraph_t
+ * The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
+ * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1 */
+#define IGRAPH_VCOUNT_MAX (IGRAPH_INTEGER_MAX-1)
+
+/* Maximum edge count for igraph_t
+ * The endpoints of edges are often stored in a vector twice the length
+ * of the edge count, thus this cannot be larger than IGRAPH_INTEGER_MAX/2 */
+#define IGRAPH_ECOUNT_MAX (IGRAPH_INTEGER_MAX/2)
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */

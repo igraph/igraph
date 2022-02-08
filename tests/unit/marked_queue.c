@@ -27,38 +27,38 @@
 #include "test_utilities.inc"
 
 int main() {
-    igraph_marked_queue_t Q;
-    long int i;
+    igraph_marked_queue_int_t Q;
+    igraph_integer_t i;
 
-    igraph_marked_queue_init(&Q, 100);
+    igraph_marked_queue_int_init(&Q, 100);
     for (i = 0; i < 50; i++) {
-        igraph_marked_queue_push(&Q, i);
-        if (!igraph_marked_queue_iselement(&Q, i)) {
+        igraph_marked_queue_int_push(&Q, i);
+        if (!igraph_marked_queue_int_iselement(&Q, i)) {
             return 4;
         }
         if (! ((i + 1) % 5)) {
-            igraph_marked_queue_start_batch(&Q);
+            igraph_marked_queue_int_start_batch(&Q);
         }
     }
 
     for (i = 1; i < 50; i++) {
-        if (!igraph_marked_queue_iselement(&Q, i)) {
-            printf("Problem with %li.\n", i);
+        if (!igraph_marked_queue_int_iselement(&Q, i)) {
+            printf("Problem with %" IGRAPH_PRId ".\n", i);
             return 3;
         }
     }
 
     for (i = 0; i <= 50 / 5; i++) {
-        if (igraph_marked_queue_empty(&Q)) {
+        if (igraph_marked_queue_int_empty(&Q)) {
             return 1;
         }
-        igraph_marked_queue_pop_back_batch(&Q);
+        igraph_marked_queue_int_pop_back_batch(&Q);
     }
-    if (!igraph_marked_queue_empty(&Q)) {
+    if (!igraph_marked_queue_int_empty(&Q)) {
         return 2;
     }
 
-    igraph_marked_queue_destroy(&Q);
+    igraph_marked_queue_int_destroy(&Q);
 
     VERIFY_FINALLY_STACK();
 

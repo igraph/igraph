@@ -58,11 +58,10 @@ void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
  * \example examples/simple/igraph_read_graph_dl.c
  */
 
-int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
-    int i;
-    long int n, n2;
+    igraph_integer_t n, n2;
     const igraph_strvector_t *namevec = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
@@ -75,8 +74,10 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     context.n = -1;
     context.from = 0;
     context.to = 0;
+    context.errmsg[0] = '\0';
+    context.igraph_errno = IGRAPH_SUCCESS;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&context.edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&context.edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&context.weights, 0);
     IGRAPH_CHECK(igraph_strvector_init(&context.labels, 0));
     IGRAPH_FINALLY(igraph_strvector_destroy, &context.labels);
@@ -87,18 +88,34 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_dl_yyset_in(instream, context.scanner);
 
-    i = igraph_dl_yyparse(&context);
-    if (i != 0) {
+    int err = igraph_dl_yyparse(&context);
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
-            IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read DL file.", IGRAPH_PARSEERROR);
         }
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM);
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading DL file.", err);
     }
 
     /* Extend the weight vector, if needed */
     n = igraph_vector_size(&context.weights);
-    n2 = igraph_vector_size(&context.edges) / 2;
+    n2 = igraph_vector_int_size(&context.edges) / 2;
     if (n != 0) {
         igraph_vector_resize(&context.weights, n2);
         for (; n < n2; n++) {
@@ -108,7 +125,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     /* Check number of vertices */
     if (n2 > 0) {
-        n = (long int) igraph_vector_max(&context.edges);
+        n = igraph_vector_int_max(&context.edges);
     } else {
         n = 0;
     }
@@ -148,7 +165,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
-    IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) context.n, pname));
+    IGRAPH_CHECK(igraph_add_vertices(graph, context.n, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 
     if (pweight) {
@@ -166,10 +183,10 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_trie_destroy(&context.trie);
     igraph_strvector_destroy(&context.labels);
-    igraph_vector_destroy(&context.edges);
+    igraph_vector_int_destroy(&context.edges);
     igraph_vector_destroy(&context.weights);
     igraph_dl_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

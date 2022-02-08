@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Layout">
-<title>Generating Layouts for Graph Drawing</title>
+<title>Generating layouts for graph drawing</title>
 
 <section id="two-d-layout-generators"><title>2D layout generators</title>
 <!-- doxrox-include about_layouts -->

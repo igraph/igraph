@@ -28,9 +28,11 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t membership, weights, initial;
+    igraph_vector_int_t membership;
+    igraph_vector_t weights;
+    igraph_vector_int_t initial;
     igraph_vector_bool_t fixed;
-    long int i;
+    igraph_integer_t i;
 
     /* label propagation is a stochastic method */
     igraph_rng_seed(igraph_rng_default(), 765);
@@ -55,9 +57,8 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_vector_init(&membership, 0);
-    igraph_community_label_propagation(&g, &membership, 0, 0, 0,
-                                       /*modularity=*/ 0);
+    igraph_vector_int_init(&membership, 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
 
     igraph_destroy(&g);
 
@@ -66,19 +67,19 @@ int main() {
                  0,  1,  0,  2,  0,  3,  0,  4,  0,  5,
                  2,  3,  2,  4,  3,  4,  3,  5,  4,  5,  -1);
     igraph_vector_init_int_end(&weights, -1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1);
-    igraph_vector_init_int_end(&initial, -1, 0, 0, 1, 1, 1, 1, -1);
+    igraph_vector_int_init_int_end(&initial, -1, 0, 0, 1, 1, 1, 1, -1);
     igraph_vector_bool_init(&fixed, 6);
     VECTOR(fixed)[3] = 1;
     VECTOR(fixed)[4] = 1;
     VECTOR(fixed)[5] = 1;
-    igraph_community_label_propagation(&g, &membership, &weights,
-                                       &initial, &fixed, /*modularity=*/ 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
+                                       &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
         if (VECTOR(membership)[i] != (i < 2 ? 0 : 1)) {
             return 3;
         }
-    igraph_community_label_propagation(&g, &membership, 0,
-                                       &initial, &fixed, /*modularity=*/ 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0,
+                                       &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
         if (VECTOR(membership)[i] != 0) {
             return 4;
@@ -87,15 +88,15 @@ int main() {
     /* Check whether it works with no fixed vertices at all
      * while an initial configuration is given -- see bug
      * #570902 in Launchpad. This is a simple smoke test only. */
-    igraph_community_label_propagation(&g, &membership, &weights,
-                                       &initial, 0, /*modularity=*/ 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
+                                       &initial, 0);
 
     igraph_vector_bool_destroy(&fixed);
     igraph_vector_destroy(&weights);
-    igraph_vector_destroy(&initial);
+    igraph_vector_int_destroy(&initial);
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
 
     VERIFY_FINALLY_STACK();
 

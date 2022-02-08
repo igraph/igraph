@@ -22,7 +22,7 @@
 
 int main() {
     igraph_t graph;
-    igraph_vector_t res;
+    igraph_vector_int_t res;
 
     /* Test graph taken from http://en.wikipedia.org/wiki/Topological_sorting
      * @ 05.03.2006 */
@@ -30,20 +30,20 @@ int main() {
                  0, 3, 0, 4, 1, 3, 2, 4, 2, 7, 3, 5, 3, 6, 3, 7, 4, 6,
                  -1);
 
-    igraph_vector_init(&res, 0);
+    igraph_vector_int_init(&res, 0);
 
     /* Sort the vertices in "increasing" order. */
     igraph_topological_sorting(&graph, &res, IGRAPH_OUT);
-    igraph_vector_print(&res);
+    igraph_vector_int_print(&res);
     printf("\n");
 
     /* Sort the vertices in "decreasing" order. */
     igraph_topological_sorting(&graph, &res, IGRAPH_IN);
-    igraph_vector_print(&res);
+    igraph_vector_int_print(&res);
 
     /* Destroy data structures when done using them. */
     igraph_destroy(&graph);
-    igraph_vector_destroy(&res);
+    igraph_vector_int_destroy(&res);
 
     return 0;
 }

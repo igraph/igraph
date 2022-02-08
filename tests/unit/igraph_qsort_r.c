@@ -27,8 +27,8 @@
 
 int comp(void *extra, const void *a, const void *b) {
     igraph_vector_t *v = (igraph_vector_t*) extra;
-    int *aa = (int*) a;
-    int *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t aaa = VECTOR(*v)[*aa];
     igraph_real_t bbb = VECTOR(*v)[*bb];
 

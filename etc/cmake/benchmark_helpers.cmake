@@ -4,6 +4,7 @@ function(add_benchmark NAME NAMESPACE)
   set(TARGET_NAME ${NAMESPACE}_${NAME})
 
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/tests/benchmarks/${NAME}.c)
+  use_all_warnings(${TARGET_NAME})
   add_dependencies(build_benchmarks ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
@@ -11,6 +12,14 @@ function(add_benchmark NAME NAMESPACE)
     # Add a compiler definition required to compile igraph in static mode
     target_compile_definitions(${TARGET_NAME} PRIVATE IGRAPH_STATIC)
   endif()
+
+  # Some benchmarks include plfit_sampling.h from plfit. The following ensures
+  # that the correct version is included, depending on whether plfit is vendored
+  target_include_directories(
+    ${TARGET_NAME} PRIVATE
+    $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
+    $<$<BOOL:${PLFIT_INCLUDE_DIR}>:${PLFIT_INCLUDE_DIR}>
+  )
 
   if (MSVC)
     # Add MSVC-specific include path for some headers that are missing on Windows

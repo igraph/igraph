@@ -40,10 +40,10 @@
  * Time complexity: O(|V|), the
  * number of vertices.
  */
-int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
+igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
 
@@ -56,7 +56,7 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -77,10 +77,10 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
+igraph_error_t igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
 

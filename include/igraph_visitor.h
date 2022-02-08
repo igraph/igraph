@@ -78,18 +78,18 @@ typedef igraph_error_t igraph_bfshandler_t(const igraph_t *graph,
         void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_bfs(const igraph_t *graph,
-                             igraph_integer_t root, const igraph_vector_t *roots,
+                             igraph_integer_t root, const igraph_vector_int_t *roots,
                              igraph_neimode_t mode, igraph_bool_t unreachable,
-                             const igraph_vector_t *restricted,
-                             igraph_vector_t *order, igraph_vector_t *rank,
-                             igraph_vector_t *father,
-                             igraph_vector_t *pred, igraph_vector_t *succ,
-                             igraph_vector_t *dist, igraph_bfshandler_t *callback,
+                             const igraph_vector_int_t *restricted,
+                             igraph_vector_int_t *order, igraph_vector_int_t *rank,
+                             igraph_vector_int_t *parents,
+                             igraph_vector_int_t *pred, igraph_vector_int_t *succ,
+                             igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                              void *extra);
 
-IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                                    igraph_vector_t *vids, igraph_vector_t *layers,
-                                    igraph_vector_t *parents);
+IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+                                    igraph_vector_int_t *order, igraph_vector_int_t *layers,
+                                    igraph_vector_int_t *parents);
 
 /**
  * \function igraph_dfshandler_t
@@ -125,9 +125,9 @@ typedef igraph_error_t igraph_dfshandler_t(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                              igraph_neimode_t mode, igraph_bool_t unreachable,
-                             igraph_vector_t *order,
-                             igraph_vector_t *order_out, igraph_vector_t *father,
-                             igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
+                             igraph_vector_int_t *order,
+                             igraph_vector_int_t *order_out, igraph_vector_int_t *parents,
+                             igraph_vector_int_t *dist, igraph_dfshandler_t *in_callback,
                              igraph_dfshandler_t *out_callback,
                              void *extra);
 

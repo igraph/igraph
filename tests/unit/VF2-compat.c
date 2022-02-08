@@ -34,6 +34,9 @@ igraph_bool_t compat_parity(const igraph_t *graph1,
                             const igraph_integer_t g1_num,
                             const igraph_integer_t g2_num,
                             void *arg) {
+    IGRAPH_UNUSED(graph1);
+    IGRAPH_UNUSED(graph2);
+    IGRAPH_UNUSED(arg);
     return (g1_num % 2) == (g2_num % 2);
 }
 
@@ -43,6 +46,10 @@ igraph_bool_t compat_not0(const igraph_t *graph1,
                           const igraph_integer_t g1_num,
                           const igraph_integer_t g2_num,
                           void *arg) {
+    IGRAPH_UNUSED(graph1);
+    IGRAPH_UNUSED(graph2);
+    IGRAPH_UNUSED(arg);
+    IGRAPH_UNUSED(g2_num);
     return g1_num != 0;
 }
 

@@ -273,6 +273,21 @@ int igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
 }
 
+/* Use value-safe floating point math for igraph_cmp_epsilon() with
+ * the Intel compiler.
+ *
+ * The Intel compiler rewrites arithmetic expressions for faster
+ * evaluation by default. In the below function, it will evaluate
+ * (eps * fabs(a) + eps * fabs(b)) as eps*(fabs(a) + fabs(b)).
+ * However, this code path is taken precisely when fabs(a) + fabs(b)
+ * overflows, thus this rearrangement of the expression causes
+ * the function to return incorrect results, and some test failures.
+ * To avoid this, we switch the Intel compiler to "precise" mode.
+ */
+#ifdef __INTEL_COMPILER
+#pragma float_control(push)
+#pragma float_control (precise, on)
+#endif
 
 /**
  * \function igraph_cmp_epsilon
@@ -294,6 +309,7 @@ int igraph_almost_equals(double a, double b, double eps) {
 int igraph_cmp_epsilon(double a, double b, double eps) {
     double diff;
     double abs_diff;
+    double sum;
 
     if (a == b) {
         /* shortcut, handles infinities */
@@ -302,14 +318,22 @@ int igraph_cmp_epsilon(double a, double b, double eps) {
 
     diff = a - b;
     abs_diff = fabs(diff);
+    sum = fabs(a) + fabs(b);
 
-    if (a == 0 || b == 0 || diff < DBL_MIN) {
+    if (a == 0 || b == 0 || sum < DBL_MIN) {
         /* a or b is zero or both are extremely close to it; relative
          * error is less meaningful here so just compare it with
          * epsilon */
         return abs_diff < (eps * DBL_MIN) ? 0 : (diff < 0 ? -1 : 1);
+    } else if (!isfinite(sum)) {
+        /* addition overflow, so presumably |a| and |b| are both large; use a
+         * different formulation */
+        return (abs_diff < (eps * fabs(a) + eps * fabs(b))) ? 0 : (diff < 0 ? -1 : 1);
     } else {
-        /* use relative error */
-        return (abs_diff / (fabs(a) + fabs(b)) < eps) ? 0 : (diff < 0 ? -1 : 1);
+        return (abs_diff / sum < eps) ? 0 : (diff < 0 ? -1 : 1);
     }
 }
+
+#ifdef __INTEL_COMPILER
+#pragma float_control(pop)
+#endif

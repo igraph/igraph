@@ -37,10 +37,10 @@
 #define LEFTCHILD(x)  (((x)+1)*2-1)
 #define RIGHTCHILD(x) (((x)+1)*2)
 
-static void igraph_indheap_i_build(igraph_indheap_t* h, long int head);
-static void igraph_indheap_i_shift_up(igraph_indheap_t* h, long int elem);
-static void igraph_indheap_i_sink(igraph_indheap_t* h, long int head);
-static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2);
+static void igraph_indheap_i_build(igraph_indheap_t* h, igraph_integer_t head);
+static void igraph_indheap_i_shift_up(igraph_indheap_t* h, igraph_integer_t elem);
+static void igraph_indheap_i_sink(igraph_indheap_t* h, igraph_integer_t head);
+static void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_integer_t e1, igraph_integer_t e2);
 
 /**
  * \ingroup indheap
@@ -50,7 +50,7 @@ static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_indheap_init(igraph_indheap_t* h, long int alloc_size) {
+igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
@@ -59,7 +59,7 @@ int igraph_indheap_init(igraph_indheap_t* h, long int alloc_size) {
         h->index_begin = 0;
         IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
     }
-    h->index_begin = IGRAPH_CALLOC(alloc_size, long int);
+    h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (h->index_begin == 0) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
@@ -70,12 +70,11 @@ int igraph_indheap_init(igraph_indheap_t* h, long int alloc_size) {
     h->end = h->stor_begin;
     h->destroy = 1;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_indheap_clear(igraph_indheap_t *h) {
+void igraph_indheap_clear(igraph_indheap_t *h) {
     h->end = h->stor_begin;
-    return 0;
 }
 
 /**
@@ -86,15 +85,15 @@ int igraph_indheap_clear(igraph_indheap_t *h) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, long int len) {
-    long int i;
+igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* data, igraph_integer_t len) {
+    igraph_integer_t i;
 
     h->stor_begin = IGRAPH_CALLOC(len, igraph_real_t);
     if (h->stor_begin == 0) {
         h->index_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
     }
-    h->index_begin = IGRAPH_CALLOC(len, long int);
+    h->index_begin = IGRAPH_CALLOC(len, igraph_integer_t);
     if (h->index_begin == 0) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
@@ -111,7 +110,7 @@ int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, lon
 
     igraph_indheap_i_build (h, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -119,7 +118,7 @@ int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, lon
  * \brief Destroys an initialized indexed heap.
  */
 
-void igraph_indheap_destroy        (igraph_indheap_t* h) {
+void igraph_indheap_destroy(igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     if (h->destroy) {
         if (h->stor_begin != 0) {
@@ -138,7 +137,7 @@ void igraph_indheap_destroy        (igraph_indheap_t* h) {
  * \brief Checks whether a heap is empty.
  */
 
-igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
+igraph_bool_t igraph_indheap_empty(igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->stor_begin == h->end;
@@ -149,13 +148,13 @@ igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
  * \brief Adds an element to an indexed heap.
  */
 
-int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
+igraph_error_t igraph_indheap_push(igraph_indheap_t* h, igraph_real_t elem) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        long int new_size = igraph_indheap_size(h) * 2;
+        igraph_integer_t new_size = igraph_indheap_size(h) * 2;
         if (new_size == 0) {
             new_size = 1;
         }
@@ -169,7 +168,7 @@ int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
     /* maintain indheap */
     igraph_indheap_i_shift_up(h, igraph_indheap_size(h) - 1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -177,13 +176,13 @@ int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
  * \brief Adds an element to an indexed heap with a given index.
  */
 
-int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
+igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        long int new_size = igraph_indheap_size(h) * 2;
+        igraph_integer_t new_size = igraph_indheap_size(h) * 2;
         if (new_size == 0) {
             new_size = 1;
         }
@@ -197,7 +196,7 @@ int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_rea
     /* maintain indheap */
     igraph_indheap_i_shift_up(h, igraph_indheap_size(h) - 1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -205,8 +204,8 @@ int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_rea
  * \brief Modifies an element in an indexed heap.
  */
 
-int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
-    long int i, n;
+igraph_error_t igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem) {
+    igraph_integer_t i, n;
 
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
@@ -219,13 +218,13 @@ int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem)
         }
 
     if (i == n) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* maintain indheap */
     igraph_indheap_i_build(h, 0);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -233,7 +232,7 @@ int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem)
  * \brief Returns the largest element in an indexed heap.
  */
 
-igraph_real_t igraph_indheap_max       (igraph_indheap_t* h) {
+igraph_real_t igraph_indheap_max(igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     IGRAPH_ASSERT(h->stor_begin != h->end);
@@ -265,7 +264,7 @@ igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
  * \brief Gives the number of elements in an indexed heap.
  */
 
-long int igraph_indheap_size      (igraph_indheap_t* h) {
+igraph_integer_t igraph_indheap_size(igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
@@ -279,15 +278,15 @@ long int igraph_indheap_size      (igraph_indheap_t* h) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
-    long int actual_size = igraph_indheap_size(h);
+igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_integer_t size) {
+    igraph_integer_t actual_size = igraph_indheap_size(h);
     igraph_real_t *tmp1;
-    long int *tmp2;
+    igraph_integer_t *tmp2;
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
@@ -295,13 +294,13 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp1);
-    tmp2 = IGRAPH_CALLOC(size, long int);
+    tmp2 = IGRAPH_CALLOC(size, igraph_integer_t);
     if (tmp2 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp2);
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
-    memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));
+    memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(igraph_integer_t));
     IGRAPH_FREE(h->stor_begin);
     IGRAPH_FREE(h->index_begin);
 
@@ -311,7 +310,7 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
     h->end = h->stor_begin + actual_size;
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -319,7 +318,7 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
  * \brief Returns the index of the largest element in an indexed heap.
  */
 
-long int igraph_indheap_max_index(igraph_indheap_t *h) {
+igraph_integer_t igraph_indheap_max_index(igraph_indheap_t *h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->index_begin[0];
@@ -331,9 +330,9 @@ long int igraph_indheap_max_index(igraph_indheap_t *h) {
  * directly.
  */
 
-static void igraph_indheap_i_build(igraph_indheap_t* h, long int head) {
+static void igraph_indheap_i_build(igraph_indheap_t* h, igraph_integer_t head) {
 
-    long int size = igraph_indheap_size(h);
+    igraph_integer_t size = igraph_indheap_size(h);
     if (RIGHTCHILD(head) < size) {
         /* both subtrees */
         igraph_indheap_i_build(h, LEFTCHILD(head) );
@@ -354,7 +353,7 @@ static void igraph_indheap_i_build(igraph_indheap_t* h, long int head) {
  * directly.
  */
 
-static void igraph_indheap_i_shift_up(igraph_indheap_t *h, long int elem) {
+static void igraph_indheap_i_shift_up(igraph_indheap_t *h, igraph_integer_t elem) {
 
     if (elem == 0 || h->stor_begin[elem] < h->stor_begin[PARENT(elem)]) {
         /* at the top */
@@ -370,9 +369,9 @@ static void igraph_indheap_i_shift_up(igraph_indheap_t *h, long int elem) {
  * directly.
  */
 
-static void igraph_indheap_i_sink(igraph_indheap_t* h, long int head) {
+static void igraph_indheap_i_sink(igraph_indheap_t* h, igraph_integer_t head) {
 
-    long int size = igraph_indheap_size(h);
+    igraph_integer_t size = igraph_indheap_size(h);
     if (LEFTCHILD(head) >= size) {
         /* no subtrees */
     } else if (RIGHTCHILD(head) == size ||
@@ -397,7 +396,7 @@ static void igraph_indheap_i_sink(igraph_indheap_t* h, long int head) {
  * directly.
  */
 
-static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
+static void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_integer_t e1, igraph_integer_t e2) {
     if (e1 != e2) {
         igraph_real_t tmp = h->stor_begin[e1];
         h->stor_begin[e1] = h->stor_begin[e2];
@@ -405,7 +404,7 @@ static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e
 
         tmp = h->index_begin[e1];
         h->index_begin[e1] = h->index_begin[e2];
-        h->index_begin[e2] = (long int) tmp;
+        h->index_begin[e2] = tmp;
     }
 }
 
@@ -415,10 +414,10 @@ static void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e
 /* Doubly indexed heap                                */
 /* -------------------------------------------------- */
 
-/* static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head); */ /* Unused function */
-static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, long int elem);
-static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head);
-static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2);
+/* static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, igraph_integer_t head); */ /* Unused function */
+static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, igraph_integer_t elem);
+static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, igraph_integer_t head);
+static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_integer_t e1, igraph_integer_t e2);
 
 /**
  * \ingroup doubleindheap
@@ -428,7 +427,7 @@ static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long i
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size) {
+igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
@@ -441,14 +440,14 @@ int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size)
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
     h->destroy = 1;
-    h->index_begin = IGRAPH_CALLOC(alloc_size, long int);
+    h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (h->index_begin == 0) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         h->index2_begin = 0;
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
     }
-    h->index2_begin = IGRAPH_CALLOC(alloc_size, long int);
+    h->index2_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (h->index2_begin == 0) {
         IGRAPH_FREE(h->stor_begin);
         IGRAPH_FREE(h->index_begin);
@@ -457,7 +456,7 @@ int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size)
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -465,7 +464,7 @@ int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size)
  * \brief Destroys an initialized doubly indexed heap object.
  */
 
-void igraph_d_indheap_destroy        (igraph_d_indheap_t* h) {
+void igraph_d_indheap_destroy(igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     if (h->destroy) {
         if (h->stor_begin != 0) {
@@ -488,7 +487,7 @@ void igraph_d_indheap_destroy        (igraph_d_indheap_t* h) {
  * \brief Decides whether a heap is empty.
  */
 
-igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
+igraph_bool_t igraph_d_indheap_empty(igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->stor_begin == h->end;
@@ -499,14 +498,14 @@ igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
  * \brief Adds an element to the heap.
  */
 
-int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
-                                     long int idx, long int idx2) {
+igraph_error_t igraph_d_indheap_push(igraph_d_indheap_t* h, igraph_real_t elem,
+                                     igraph_integer_t idx, igraph_integer_t idx2) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        long int new_size = igraph_d_indheap_size(h) * 2;
+        igraph_integer_t new_size = igraph_d_indheap_size(h) * 2;
         if (new_size == 0) {
             new_size = 1;
         }
@@ -521,7 +520,7 @@ int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
     /* maintain d_indheap */
     igraph_d_indheap_i_shift_up(h, igraph_d_indheap_size(h) - 1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -529,7 +528,7 @@ int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
  * \brief Returns the largest element in the heap.
  */
 
-igraph_real_t igraph_d_indheap_max       (igraph_d_indheap_t* h) {
+igraph_real_t igraph_d_indheap_max(igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     IGRAPH_ASSERT(h->stor_begin != h->end);
@@ -561,7 +560,7 @@ igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
  * \brief Gives the number of elements in the heap.
  */
 
-long int igraph_d_indheap_size      (igraph_d_indheap_t* h) {
+igraph_integer_t igraph_d_indheap_size(igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
@@ -575,15 +574,15 @@ long int igraph_d_indheap_size      (igraph_d_indheap_t* h) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
-    long int actual_size = igraph_d_indheap_size(h);
+igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, igraph_integer_t size) {
+    igraph_integer_t actual_size = igraph_d_indheap_size(h);
     igraph_real_t *tmp1;
-    long int *tmp2, *tmp3;
+    igraph_integer_t *tmp2, *tmp3;
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
     if (size <= actual_size) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
@@ -591,20 +590,20 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp1);
-    tmp2 = IGRAPH_CALLOC(size, long int);
+    tmp2 = IGRAPH_CALLOC(size, igraph_integer_t);
     if (tmp2 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp2);
-    tmp3 = IGRAPH_CALLOC(size, long int);
+    tmp3 = IGRAPH_CALLOC(size, igraph_integer_t);
     if (tmp3 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp3);
 
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
-    memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));
-    memcpy(tmp3, h->index2_begin, (size_t) actual_size * sizeof(long int));
+    memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(igraph_integer_t));
+    memcpy(tmp3, h->index2_begin, (size_t) actual_size * sizeof(igraph_integer_t));
     IGRAPH_FREE(h->stor_begin);
     IGRAPH_FREE(h->index_begin);
     IGRAPH_FREE(h->index2_begin);
@@ -616,7 +615,7 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
     h->index2_begin = tmp3;
 
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -624,7 +623,7 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
  * \brief Gives the indices of the maximal element in the heap.
  */
 
-void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *idx2) {
+void igraph_d_indheap_max_index(igraph_d_indheap_t *h, igraph_integer_t *idx, igraph_integer_t *idx2) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     (*idx) = h->index_begin[0];
@@ -638,9 +637,9 @@ void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *
 
 /* Unused function, temporarily disabled */
 #if 0
-static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head) {
+static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, igraph_integer_t head) {
 
-    long int size = igraph_d_indheap_size(h);
+    igraph_integer_t size = igraph_d_indheap_size(h);
     if (RIGHTCHILD(head) < size) {
         /* both subtrees */
         igraph_d_indheap_i_build(h, LEFTCHILD(head) );
@@ -661,7 +660,7 @@ static void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head) {
  * \brief Moves an element up in the heap, don't call it directly.
  */
 
-static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t *h, long int elem) {
+static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t *h, igraph_integer_t elem) {
 
     if (elem == 0 || h->stor_begin[elem] < h->stor_begin[PARENT(elem)]) {
         /* at the top */
@@ -676,9 +675,9 @@ static void igraph_d_indheap_i_shift_up(igraph_d_indheap_t *h, long int elem) {
  * \brief Moves an element down in the heap, don't call it directly.
  */
 
-static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head) {
+static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, igraph_integer_t head) {
 
-    long int size = igraph_d_indheap_size(h);
+    igraph_integer_t size = igraph_d_indheap_size(h);
     if (LEFTCHILD(head) >= size) {
         /* no subtrees */
     } else if (RIGHTCHILD(head) == size ||
@@ -702,9 +701,9 @@ static void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head) {
  * \brief Switches two elements in the heap, don't call it directly.
  */
 
-static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) {
+static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_integer_t e1, igraph_integer_t e2) {
     if (e1 != e2) {
-        long int tmpi;
+        igraph_integer_t tmpi;
         igraph_real_t tmp = h->stor_begin[e1];
         h->stor_begin[e1] = h->stor_begin[e2];
         h->stor_begin[e2] = tmp;
@@ -738,9 +737,9 @@ static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long i
    normal heap does this in O(n) time.... */
 
 static void igraph_i_2wheap_switch(igraph_2wheap_t *h,
-                                   long int e1, long int e2) {
+                                   igraph_integer_t e1, igraph_integer_t e2) {
     if (e1 != e2) {
-        long int tmp1, tmp2;
+        igraph_integer_t tmp1, tmp2;
         igraph_real_t tmp3 = VECTOR(h->data)[e1];
         VECTOR(h->data)[e1] = VECTOR(h->data)[e2];
         VECTOR(h->data)[e2] = tmp3;
@@ -757,7 +756,7 @@ static void igraph_i_2wheap_switch(igraph_2wheap_t *h,
 }
 
 static void igraph_i_2wheap_shift_up(igraph_2wheap_t *h,
-                                     long int elem) {
+                                     igraph_integer_t elem) {
     if (elem == 0 || VECTOR(h->data)[elem] < VECTOR(h->data)[PARENT(elem)]) {
         /* at the top */
     } else {
@@ -767,8 +766,8 @@ static void igraph_i_2wheap_shift_up(igraph_2wheap_t *h,
 }
 
 static void igraph_i_2wheap_sink(igraph_2wheap_t *h,
-                                 long int head) {
-    long int size = igraph_2wheap_size(h);
+                                 igraph_integer_t head) {
+    igraph_integer_t size = igraph_2wheap_size(h);
     if (LEFTCHILD(head) >= size) {
         /* no subtrees */
     } else if (RIGHTCHILD(head) == size ||
@@ -791,56 +790,54 @@ static void igraph_i_2wheap_sink(igraph_2wheap_t *h,
 /* These are public   */
 /* ------------------ */
 
-int igraph_2wheap_init(igraph_2wheap_t *h, long int size) {
+igraph_error_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_integer_t size) {
     h->size = size;
     /* We start with the biggest */
-    IGRAPH_CHECK(igraph_vector_long_init(&h->index2, size));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &h->index2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&h->index2, size);
     IGRAPH_VECTOR_INIT_FINALLY(&h->data, 0);
-    IGRAPH_CHECK(igraph_vector_long_init(&h->index, 0));
-    /* IGRAPH_FINALLY(igraph_vector_long_destroy, &h->index); */
+    IGRAPH_CHECK(igraph_vector_int_init(&h->index, 0));
+    /* IGRAPH_FINALLY(igraph_vector_int_destroy, &h->index); */
 
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_2wheap_destroy(igraph_2wheap_t *h) {
     igraph_vector_destroy(&h->data);
-    igraph_vector_long_destroy(&h->index);
-    igraph_vector_long_destroy(&h->index2);
+    igraph_vector_int_destroy(&h->index);
+    igraph_vector_int_destroy(&h->index2);
 }
 
-int igraph_2wheap_clear(igraph_2wheap_t *h) {
+void igraph_2wheap_clear(igraph_2wheap_t *h) {
     igraph_vector_clear(&h->data);
-    igraph_vector_long_clear(&h->index);
-    igraph_vector_long_null(&h->index2);
-    return 0;
+    igraph_vector_int_clear(&h->index);
+    igraph_vector_int_null(&h->index2);
 }
 
 igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h) {
     return igraph_vector_empty(&h->data);
 }
 
-int igraph_2wheap_push_with_index(igraph_2wheap_t *h,
-                                  long int idx, igraph_real_t elem) {
+igraph_error_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
+                                  igraph_integer_t idx, igraph_real_t elem) {
 
     /*   printf("-> %.2g [%li]\n", elem, idx); */
 
-    long int size = igraph_vector_size(&h->data);
+    igraph_integer_t size = igraph_vector_size(&h->data);
     IGRAPH_CHECK(igraph_vector_push_back(&h->data, elem));
-    IGRAPH_CHECK(igraph_vector_long_push_back(&h->index, idx));
+    IGRAPH_CHECK(igraph_vector_int_push_back(&h->index, idx));
     VECTOR(h->index2)[idx] = size + 2;
 
     /* maintain heap */
     igraph_i_2wheap_shift_up(h, size);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-long int igraph_2wheap_size(const igraph_2wheap_t *h) {
+igraph_integer_t igraph_2wheap_size(const igraph_2wheap_t *h) {
     return igraph_vector_size(&h->data);
 }
 
-long int igraph_2wheap_max_size(const igraph_2wheap_t *h) {
+igraph_integer_t igraph_2wheap_max_size(const igraph_2wheap_t *h) {
     return h->size;
 }
 
@@ -848,30 +845,30 @@ igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h) {
     return VECTOR(h->data)[0];
 }
 
-long int igraph_2wheap_max_index(const igraph_2wheap_t *h) {
+igraph_integer_t igraph_2wheap_max_index(const igraph_2wheap_t *h) {
     return VECTOR(h->index)[0];
 }
 
-igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, long int idx) {
+igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, igraph_integer_t idx) {
     return VECTOR(h->index2)[idx] != 0;
 }
 
-igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, long int idx) {
+igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, igraph_integer_t idx) {
     return VECTOR(h->index2)[idx] > 1;
 }
 
-igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx) {
-    long int i = VECTOR(h->index2)[idx] - 2;
+igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, igraph_integer_t idx) {
+    igraph_integer_t i = VECTOR(h->index2)[idx] - 2;
     return VECTOR(h->data)[i];
 }
 
 igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h) {
 
     igraph_real_t tmp = VECTOR(h->data)[0];
-    long int tmpidx = VECTOR(h->index)[0];
+    igraph_integer_t tmpidx = VECTOR(h->index)[0];
     igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h) - 1);
     igraph_vector_pop_back(&h->data);
-    igraph_vector_long_pop_back(&h->index);
+    igraph_vector_int_pop_back(&h->index);
     VECTOR(h->index2)[tmpidx] = 0;
     igraph_i_2wheap_sink(h, 0);
 
@@ -883,23 +880,23 @@ igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h) {
 igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
 
     igraph_real_t tmp = VECTOR(h->data)[0];
-    long int tmpidx = VECTOR(h->index)[0];
+    igraph_integer_t tmpidx = VECTOR(h->index)[0];
     igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h) - 1);
     igraph_vector_pop_back(&h->data);
-    igraph_vector_long_pop_back(&h->index);
+    igraph_vector_int_pop_back(&h->index);
     VECTOR(h->index2)[tmpidx] = 1;
     igraph_i_2wheap_sink(h, 0);
 
     return tmp;
 }
 
-igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx) {
+igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, igraph_integer_t *idx) {
 
     igraph_real_t tmp = VECTOR(h->data)[0];
-    long int tmpidx = VECTOR(h->index)[0];
+    igraph_integer_t tmpidx = VECTOR(h->index)[0];
     igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h) - 1);
     igraph_vector_pop_back(&h->data);
-    igraph_vector_long_pop_back(&h->index);
+    igraph_vector_int_pop_back(&h->index);
     VECTOR(h->index2)[tmpidx] = 0;
     igraph_i_2wheap_sink(h, 0);
 
@@ -909,9 +906,9 @@ igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx) 
     return tmp;
 }
 
-int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem) {
+igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem) {
 
-    long int pos = VECTOR(h->index2)[idx] - 2;
+    igraph_integer_t pos = VECTOR(h->index2)[idx] - 2;
 
     /*   printf("-- %.2g -> %.2g\n", VECTOR(h->data)[pos], elem); */
 
@@ -919,14 +916,14 @@ int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem) {
     igraph_i_2wheap_sink(h, pos);
     igraph_i_2wheap_shift_up(h, pos);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* Check that the heap is in a consistent state */
 
-int igraph_2wheap_check(igraph_2wheap_t *h) {
-    long int size = igraph_2wheap_size(h);
-    long int i;
+igraph_error_t igraph_2wheap_check(igraph_2wheap_t *h) {
+    igraph_integer_t size = igraph_2wheap_size(h);
+    igraph_integer_t i;
     igraph_bool_t error = 0;
 
     /* Check the heap property */
@@ -949,5 +946,5 @@ int igraph_2wheap_check(igraph_2wheap_t *h) {
         IGRAPH_ERROR("Inconsistent heap", IGRAPH_EINTERNAL);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

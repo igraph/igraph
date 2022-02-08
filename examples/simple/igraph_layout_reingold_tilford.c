@@ -29,7 +29,7 @@ int main() {
     igraph_t g;
     FILE *f;
     igraph_matrix_t coords;
-    /* long int i, n; */
+    /* igraph_integer_t i, n; */
 
     f = fopen("igraph_layout_reingold_tilford.in", "r");
     igraph_read_graph_edgelist(&g, f, 0, 1);

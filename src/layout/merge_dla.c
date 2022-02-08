@@ -40,10 +40,9 @@
  * largest graph is placed at the origin. Then the other layouts are
  * placed by the DLA algorithm, larger ones first and smaller ones
  * last.
- * \param thegraphs Pointer vector containing the graph object of
+ * \param thegraphs Pointer vector containing the graph objects of
  *        which the layouts will be merged.
- * \param coords Pointer vector containing matrix objects with the 2d
- *        layouts of the graphs in \p thegraphs.
+ * \param coords List of matrices with the 2D layouts of the graphs in \p thegraphs.
  * \param res Pointer to an initialized matrix object, the result will
  *        be stored here. It will be resized if needed.
  * \return Error code.
@@ -54,39 +53,40 @@
  * Time complexity: TODO.
  */
 
-int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
-                            igraph_vector_ptr_t *coords,
-                            igraph_matrix_t *res) {
-    long int graphs = igraph_vector_ptr_size(coords);
+igraph_error_t igraph_layout_merge_dla(
+    const igraph_vector_ptr_t *thegraphs, const igraph_matrix_list_t *coords,
+    igraph_matrix_t *res
+) {
+    igraph_integer_t coords_len = igraph_matrix_list_size(coords);
     igraph_vector_t sizes;
     igraph_vector_t x, y, r;
     igraph_vector_t nx, ny, nr;
-    long int allnodes = 0;
-    long int i, j;
-    long int actg;
+    igraph_integer_t allnodes = 0;
+    igraph_integer_t i, j;
+    igraph_integer_t actg;
     igraph_i_layout_mergegrid_t grid;
-    long int jpos = 0;
+    igraph_integer_t jpos = 0;
     igraph_real_t minx, maxx, miny, maxy;
     igraph_real_t area = 0;
     igraph_real_t maxr = 0;
-    long int respos;
+    igraph_integer_t respos;
 
     /* Graphs are currently not used, only the coordinates */
     IGRAPH_UNUSED(thegraphs);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&sizes, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&x, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&y, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&r, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&nx, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&ny, graphs);
-    IGRAPH_VECTOR_INIT_FINALLY(&nr, graphs);
+    IGRAPH_VECTOR_INIT_FINALLY(&sizes, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&x, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&y, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&r, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&nx, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&ny, coords_len);
+    IGRAPH_VECTOR_INIT_FINALLY(&nr, coords_len);
 
     RNG_BEGIN();
 
-    for (i = 0; i < igraph_vector_ptr_size(coords); i++) {
-        igraph_matrix_t *mat = VECTOR(*coords)[i];
-        long int size = igraph_matrix_nrow(mat);
+    for (i = 0; i < coords_len; i++) {
+        igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
+        igraph_integer_t size = igraph_matrix_nrow(mat);
 
         if (igraph_matrix_ncol(mat) != 2) {
             IGRAPH_ERROR("igraph_layout_merge_dla works for 2D layouts only",
@@ -106,7 +106,6 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
                                   igraph_vector_e_ptr(&nx, i),
                                   igraph_vector_e_ptr(&ny, i),
                                   igraph_vector_e_ptr(&nr, i));
-
     }
     igraph_vector_order2(&sizes); /* largest first */
 
@@ -120,16 +119,16 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     /*   fprintf(stderr, "Ok, starting DLA\n"); */
 
     /* 1. place the largest  */
-    actg = (long int) VECTOR(sizes)[jpos++];
+    actg = VECTOR(sizes)[jpos++];
     igraph_i_layout_merge_place_sphere(&grid, 0, 0, VECTOR(r)[actg], actg);
 
     IGRAPH_PROGRESS("Merging layouts via DLA", 0.0, NULL);
-    while (jpos < graphs) {
+    while (jpos < coords_len) {
         IGRAPH_ALLOW_INTERRUPTION();
         /*     fprintf(stderr, "comp: %li", jpos); */
-        IGRAPH_PROGRESS("Merging layouts via DLA", (100.0 * jpos) / graphs, NULL);
+        IGRAPH_PROGRESS("Merging layouts via DLA", (100.0 * jpos) / coords_len, NULL);
 
-        actg = (long int) VECTOR(sizes)[jpos++];
+        actg = VECTOR(sizes)[jpos++];
         /* 2. random walk, TODO: tune parameters */
         igraph_i_layout_merge_dla(&grid, actg,
                                   igraph_vector_e_ptr(&x, actg),
@@ -146,12 +145,12 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     /* Create the result */
     IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));
     respos = 0;
-    for (i = 0; i < graphs; i++) {
-        long int size = igraph_matrix_nrow(VECTOR(*coords)[i]);
+    for (i = 0; i < coords_len; i++) {
+        igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
+        igraph_integer_t size = igraph_matrix_nrow(mat);
         igraph_real_t xx = VECTOR(x)[i];
         igraph_real_t yy = VECTOR(y)[i];
         igraph_real_t rr = VECTOR(r)[i] / VECTOR(nr)[i];
-        igraph_matrix_t *mat = VECTOR(*coords)[i];
         IGRAPH_ALLOW_INTERRUPTION();
         if (VECTOR(nr)[i] == 0) {
             rr = 1;
@@ -176,14 +175,14 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     igraph_vector_destroy(&ny);
     igraph_vector_destroy(&nr);
     IGRAPH_FINALLY_CLEAN(8);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
+igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r) {
-    long int nodes = igraph_matrix_nrow(coords);
-    long int i;
+    igraph_integer_t nodes = igraph_matrix_nrow(coords);
+    igraph_integer_t i;
     igraph_real_t xmin, xmax, ymin, ymax;
 
     xmin = xmax = MATRIX(*coords, 0, 0);
@@ -206,16 +205,16 @@ int igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
 
     *x = (xmin + xmax) / 2;
     *y = (ymin + ymax) / 2;
-    *r = sqrt( (xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) ) / 2;
+    *r = hypot(xmax - xmin, ymax - ymin) / 2;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
+igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *z, igraph_real_t *r) {
-    long int nodes = igraph_matrix_nrow(coords);
-    long int i;
+    igraph_integer_t nodes = igraph_matrix_nrow(coords);
+    igraph_integer_t i;
     igraph_real_t xmin, xmax, ymin, ymax, zmin, zmax;
 
     xmin = xmax = MATRIX(*coords, 0, 0);
@@ -249,18 +248,18 @@ int igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
     *r = sqrt( (xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) +
                (zmax - zmin) * (zmax - zmin) ) / 2;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
 
-int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                              long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
+                              igraph_integer_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                               igraph_real_t killr) {
-    long int sp = -1;
+    igraph_integer_t sp = -1;
     igraph_real_t angle, len;
-    long int steps = 0;
+    igraph_integer_t steps = 0;
 
     /* The graph is not used, only its coordinates */
     IGRAPH_UNUSED(actg);
@@ -291,5 +290,5 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     }
 
     /*   fprintf(stderr, "%li ", steps); */
-    return 0;
+    return IGRAPH_SUCCESS;
 }

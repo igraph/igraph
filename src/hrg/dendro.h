@@ -252,7 +252,7 @@ private:
     int computeEdgeCount(const int, const short int, const int,
                          const short int);
     // (consensus tree) counts children
-    int countChildren(const std::string);
+    size_t countChildren(const std::string);
     // find internal node of D that is common ancestor of i,j
     elementd* findCommonAncestor(list**, const int, const int);
     // return reverse of path to leaf from root
@@ -290,7 +290,7 @@ public:
     // make single MCMC move
     bool monteCarloMove(double&, bool&, const double);
     // record consensus tree from splithist
-    void recordConsensusTree(igraph_vector_t *parents,
+    void recordConsensusTree(igraph_vector_int_t *parents,
                              igraph_vector_t *weights);
     // record D structure
     void recordDendrogramStructure(igraph_hrg_t *hrg);
@@ -303,7 +303,7 @@ public:
     // reset the dendrograph structures
     void resetDendrograph();
     // sample dendrogram's splits and update the split histogram
-    bool sampleSplitLikelihoods(int&);
+    bool sampleSplitLikelihoods(igraph_integer_t&);
     // reset splits histogram
     void resetAllSplits();
 };

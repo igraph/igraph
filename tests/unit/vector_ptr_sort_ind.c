@@ -35,16 +35,16 @@ static int compare_first_items(const void* a, const void* b) {
 int main() {
     igraph_vector_ptr_t vectors;
     igraph_vector_t* vec;
-    igraph_vector_t indices;
+    igraph_vector_int_t indices;
     int values[] = { 3, 5, 0, 7, 9, 6, 2, 8, 1, 4, -1 };
     int i, *ptr;
 
     /* Special case: empty vector */
     igraph_vector_ptr_init(&vectors, 0);
-    igraph_vector_init(&indices, 0);
+    igraph_vector_int_init(&indices, 0);
     igraph_vector_ptr_sort_ind(&vectors, &indices, compare_first_items);
-    print_vector(&indices);
-    igraph_vector_destroy(&indices);
+    print_vector_int(&indices);
+    igraph_vector_int_destroy(&indices);
     igraph_vector_ptr_destroy_all(&vectors);
 
     /* Create vectors of length 1, each containing a value from 'values', and
@@ -59,9 +59,9 @@ int main() {
 
     /* Sort the vector of vectors by the first item of each vector, and get
      * the index vector */
-    igraph_vector_init(&indices, 0);
+    igraph_vector_int_init(&indices, 0);
     igraph_vector_ptr_sort_ind(&vectors, &indices, compare_first_items);
-    print_vector(&indices);
+    print_vector_int(&indices);
 
     /* Permute the vector of vectors by the index vector */
     igraph_vector_ptr_permute(&vectors, &indices);
@@ -72,7 +72,7 @@ int main() {
         igraph_vector_destroy(VECTOR(vectors)[i]);
     }
     igraph_vector_ptr_destroy_all(&vectors);
-    igraph_vector_destroy(&indices);
+    igraph_vector_int_destroy(&indices);
 
     /* Check finalizer stack */
     VERIFY_FINALLY_STACK();

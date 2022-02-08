@@ -51,6 +51,7 @@
  * whitespace. The integers represent vertex IDs. Placing each edge (i.e. pair of integers)
  * on a separate line is not required, but it is recommended for readability.
  * Edges of directed graphs are assumed to be in "from, to" order.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
  * \param n The number of vertices in the graph. If smaller than the
@@ -65,52 +66,51 @@
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges. It is assumed that
- * reading an integer requires O(1)
- * time.
+ * reading an integer requires O(1) time.
  */
-int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
                                igraph_integer_t n, igraph_bool_t directed) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int from, to;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t from, to;
     int c;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, 100));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 100));
 
     /* skip all whitespace */
     do {
         c = getc (instream);
-    } while (isspace (c));
-    ungetc (c, instream);
+    } while (isspace(c));
+    ungetc(c, instream);
 
     while (!feof(instream)) {
         int read;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        read = fscanf(instream, "%li", &from);
+        read = fscanf(instream, "%" IGRAPH_PRId "", &from);
         if (read != 1) {
-            IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Parsing edgelist file failed.", IGRAPH_PARSEERROR);
         }
-        read = fscanf(instream, "%li", &to);
+        read = fscanf(instream, "%" IGRAPH_PRId "", &to);
         if (read != 1) {
-            IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Parsing edgelist file failed.", IGRAPH_PARSEERROR);
         }
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-        IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
         /* skip all whitespace */
         do {
-            c = getc (instream);
-        } while (isspace (c));
-        ungetc (c, instream);
+            c = getc(instream);
+        } while (isspace(c));
+        ungetc(c, instream);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -119,8 +119,10 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  * \brief Writes the edge list of a graph to a file.
  *
  * </para><para>
+ * Edges are represented as pairs of 0-based vertex indices.
  * One edge is written per line, separated by a single space.
  * For directed graphs edges are written in from, to order.
+ *
  * \param graph The graph object to write.
  * \param outstream Pointer to a stream, it should be writable.
  * \return Error code:
@@ -132,7 +134,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  * integer to the file requires O(1)
  * time.
  */
-int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
+igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
 
     igraph_eit_t it;
 
@@ -144,16 +146,16 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
         igraph_integer_t from, to;
         int ret;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-        ret = fprintf(outstream, "%li %li\n",
-                      (long int) from,
-                      (long int) to);
+        ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",
+                      from,
+                      to);
         if (ret < 0) {
-            IGRAPH_ERROR("Write error", IGRAPH_EFILE);
+            IGRAPH_ERROR("Failed writing edgelist.", IGRAPH_EFILE);
         }
         IGRAPH_EIT_NEXT(it);
     }
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

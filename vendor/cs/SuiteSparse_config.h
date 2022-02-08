@@ -49,7 +49,12 @@ extern "C" {
 /* === SuiteSparse_long ===================================================== */
 /* ========================================================================== */
 
+/* Disable SuiteSparse_long machinery -- we will set things up in a way that
+ * we always use igraph_integer_t as the "long" datatype in SuiteSparse */
+
 #ifndef SuiteSparse_long
+
+#if 0 /* start comment */
 
 #ifdef _WIN64
 
@@ -64,6 +69,15 @@ extern "C" {
 #define SuiteSparse_long_idd "ld"
 
 #endif
+
+#endif /* end comment */
+
+#include "igraph_types.h"
+
+#define SuiteSparse_long igraph_integer_t
+#define SuiteSparse_long_max IGRAPH_INTEGER_MAX
+#define SuiteSparse_long_idd IGRAPH_PRId
+
 #define SuiteSparse_long_id "%" SuiteSparse_long_idd
 #endif
 

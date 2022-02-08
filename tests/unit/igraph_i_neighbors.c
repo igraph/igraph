@@ -21,11 +21,11 @@
 #include "../../src/graph/neighbors.h"
 
 void call_and_print(igraph_t *graph, igraph_integer_t pnode, igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
-    igraph_vector_t neis;
-    igraph_vector_init(&neis, 0);
+    igraph_vector_int_t neis;
+    igraph_vector_int_init(&neis, 0);
     IGRAPH_ASSERT(igraph_i_neighbors(graph, &neis, pnode, mode, loops, multiple) == IGRAPH_SUCCESS);
-    print_vector(&neis);
-    igraph_vector_destroy(&neis);
+    print_vector_int(&neis);
+    igraph_vector_int_destroy(&neis);
 }
 
 
@@ -38,8 +38,8 @@ int main() {
     igraph_small(&g_s1, 2, 1, 0,1, 0,1, 1,0, 1,0, -1);
     igraph_small(&g_s2, 2, 1, 0,1, 1,0, 1,0, -1);
 
-    igraph_vector_t neis;
-    igraph_vector_init(&neis, 0);
+    igraph_vector_int_t neis;
+    igraph_vector_int_init(&neis, 0);
 
     printf("One vertex:\n");
     call_and_print(&g_1, 0, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
@@ -115,7 +115,7 @@ int main() {
     igraph_destroy(&g_lmu);
     igraph_destroy(&g_s1);
     igraph_destroy(&g_s2);
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
 
     VERIFY_FINALLY_STACK();
     return 0;

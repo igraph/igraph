@@ -56,12 +56,12 @@
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
 #include "io/parsers/ncol-lexer.h"
+#include "io/parse_utils.h"
 #include "internal/hacks.h"
 
 int igraph_ncol_yyerror(YYLTYPE* locp,
-			igraph_i_ncol_parsedata_t *context,
-			const char *s);
-igraph_real_t igraph_ncol_get_number(const char *str, long int len);
+                        igraph_i_ncol_parsedata_t *context,
+                        const char *s);
 
 #define scanner context->scanner
 %}
@@ -77,8 +77,8 @@ igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 %lex-param { void *scanner }
 
 %union {
-  long int edgenum;
-  double weightnum;
+  igraph_integer_t edgenum;
+  igraph_real_t weightnum;
 }
 
 %type <edgenum>   edgeid
@@ -96,44 +96,43 @@ input :    /* empty */
 ;
 
 edge :   edgeid edgeid NEWLINE        {
-           igraph_vector_push_back(context->vector, $1);
-           igraph_vector_push_back(context->vector, $2);
-           igraph_vector_push_back(context->weights, 0);
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 0.0));
        }
        | edgeid edgeid weight NEWLINE {
-           igraph_vector_push_back(context->vector, $1);
-           igraph_vector_push_back(context->vector, $2);
-           igraph_vector_push_back(context->weights, $3);
-	   context->has_weights = 1;
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
+           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, $3));
+           context->has_weights = 1;
        }
 ;
 
-edgeid : ALNUM  { igraph_trie_get2(context->trie,
-				   igraph_ncol_yyget_text(scanner),
-				   igraph_ncol_yyget_leng(scanner),
-				   &$$); };
+edgeid : ALNUM  {
+  igraph_integer_t trie_id;
+  igraph_trie_get2(context->trie,
+    igraph_ncol_yyget_text(scanner),
+    igraph_ncol_yyget_leng(scanner),
+    &trie_id
+  );
+  $$ = trie_id;
+};
 
-weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yyget_text(scanner),
-					    igraph_ncol_yyget_leng(scanner)); } ;
+weight : ALNUM  {
+    igraph_real_t val;
+    IGRAPH_YY_CHECK(igraph_i_parse_real(igraph_ncol_yyget_text(scanner),
+                                        igraph_ncol_yyget_leng(scanner),
+                                        &val));
+    $$=val;
+} ;
 
 %%
 
 int igraph_ncol_yyerror(YYLTYPE* locp,
-			igraph_i_ncol_parsedata_t *context,
-			const char *s) {
-  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
-	   "Parse error in NCOL file, line %i (%s)",
-	   locp->first_line, s);
-  return 0;
-}
-
-igraph_real_t igraph_ncol_get_number(const char *str, long int length) {
-  igraph_real_t num;
-  char *tmp=IGRAPH_CALLOC(length+1, char);
-
-  strncpy(tmp, str, length);
-  tmp[length]='\0';
-  sscanf(tmp, "%lf", &num);
-  IGRAPH_FREE(tmp);
-  return num;
+            igraph_i_ncol_parsedata_t *context,
+            const char *s) {
+    snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
+            "Parse error in NCOL file, line %i (%s)",
+            locp->first_line, s);
+    return 0;
 }

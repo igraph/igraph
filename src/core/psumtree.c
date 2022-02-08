@@ -89,11 +89,11 @@ static double igraph_i_log2(double f) {
  *
  * Time complexity: O(n) for a tree containing n elements
  */
-int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
+igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size) {
     t->size = size;
-    t->offset = (long int) (pow(2, ceil(igraph_i_log2(size))) - 1);
+    t->offset = (pow(2, ceil(igraph_i_log2(size))) - 1);
     IGRAPH_CHECK(igraph_vector_init(&t->v, t->offset + t->size));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -138,7 +138,7 @@ void igraph_psumtree_destroy(igraph_psumtree_t *t) {
  *
  * Time complexity: O(1)
  */
-igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
+igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_integer_t idx) {
     const igraph_vector_t *tree = &t->v;
     return VECTOR(*tree)[t->offset + idx];
 }
@@ -167,11 +167,11 @@ igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
  *
  * Time complexity: O(log n), where n is the number of items in the tree.
  */
-int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_integer_t *idx,
                            igraph_real_t search) {
     const igraph_vector_t *tree = &t->v;
-    long int i = 1;
-    long int size = igraph_vector_size(tree);
+    igraph_integer_t i = 1;
+    igraph_integer_t size = igraph_vector_size(tree);
 
     while ( 2 * i + 1 <= size) {
         if ( search <= VECTOR(*tree)[i * 2 - 1] ) {
@@ -203,7 +203,7 @@ int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
  *
  * Time complexity: O(log n), where n is the number of items in the tree.
  */
-int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
+igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_integer_t idx,
                            igraph_real_t new_value) {
     const igraph_vector_t *tree = &t->v;
     igraph_real_t difference;
@@ -234,7 +234,7 @@ int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
  *
  * Time complexity: O(1).
  */
-long int igraph_psumtree_size(const igraph_psumtree_t *t) {
+igraph_integer_t igraph_psumtree_size(const igraph_psumtree_t *t) {
     return t->size;
 }
 

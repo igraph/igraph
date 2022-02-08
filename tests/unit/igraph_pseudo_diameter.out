@@ -1,4 +1,4 @@
-No vertices, no allowed starting vertex id.
+No vertices, no allowed starting vertex ID.
 
 Null graph without explicit start vertex:
 result: NaN, from -1 to -1

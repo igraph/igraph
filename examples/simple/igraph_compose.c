@@ -26,11 +26,11 @@
 int main() {
 
     igraph_t g1, g2, res;
-    igraph_vector_t v;
-    igraph_vector_t map1, map2;
+    igraph_vector_int_t v;
+    igraph_vector_int_t map1, map2;
 
-    igraph_vector_init(&map1, 0);
-    igraph_vector_init(&map2, 0);
+    igraph_vector_int_init(&map1, 0);
+    igraph_vector_int_init(&map2, 0);
 
     /* composition with the empty graph */
     igraph_empty(&g1, 5, IGRAPH_DIRECTED);
@@ -39,7 +39,7 @@ int main() {
     if (igraph_ecount(&res) != 0) {
         return 1;
     }
-    if (igraph_vector_size(&map1) != 0 || igraph_vector_size(&map2) != 0) {
+    if (igraph_vector_int_size(&map1) != 0 || igraph_vector_int_size(&map2) != 0) {
         return 11;
     }
     igraph_destroy(&res);
@@ -47,7 +47,7 @@ int main() {
     if (igraph_ecount(&res) != 0) {
         return 2;
     }
-    if (igraph_vector_size(&map1) != 0 || igraph_vector_size(&map2) != 0) {
+    if (igraph_vector_int_size(&map1) != 0 || igraph_vector_int_size(&map2) != 0) {
         return 12;
     }
     igraph_destroy(&res);
@@ -61,7 +61,7 @@ int main() {
     if (igraph_ecount(&res) != 0) {
         return 1;
     }
-    if (igraph_vector_size(&map1) != 0 || igraph_vector_size(&map2) != 0) {
+    if (igraph_vector_int_size(&map1) != 0 || igraph_vector_int_size(&map2) != 0) {
         return 11;
     }
     igraph_destroy(&res);
@@ -69,7 +69,7 @@ int main() {
     if (igraph_ecount(&res) != 0) {
         return 2;
     }
-    if (igraph_vector_size(&map1) != 0 || igraph_vector_size(&map2) != 0) {
+    if (igraph_vector_int_size(&map1) != 0 || igraph_vector_int_size(&map2) != 0) {
         return 12;
     }
     igraph_destroy(&res);
@@ -77,41 +77,41 @@ int main() {
     igraph_destroy(&g2);
 
     /* proper directed graph */
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
     igraph_create(&g1, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 2, 4, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 2, 4, 5, 6, -1);
     igraph_create(&g2, &v, 0, IGRAPH_DIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_compose(&res, &g1, &g2, &map1, &map2);
     igraph_write_graph_edgelist(&res, stdout);
-    igraph_vector_print(&map1);
-    igraph_vector_print(&map2);
+    igraph_vector_int_print(&map1);
+    igraph_vector_int_print(&map2);
     igraph_destroy(&res);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
     /* undirected graph */
-    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 5, 6, -1);
     igraph_create(&g1, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
-    igraph_vector_init_int_end(&v, -1, 0, 1, 0, 4, 5, 6, -1);
+    igraph_vector_int_init_int_end(&v, -1, 0, 1, 0, 4, 5, 6, -1);
     igraph_create(&g2, &v, 0, IGRAPH_UNDIRECTED);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_compose(&res, &g1, &g2, &map1, &map2);
     igraph_write_graph_edgelist(&res, stdout);
-    igraph_vector_print(&map1);
-    igraph_vector_print(&map2);
+    igraph_vector_int_print(&map1);
+    igraph_vector_int_print(&map2);
     igraph_destroy(&res);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
-    igraph_vector_destroy(&map2);
-    igraph_vector_destroy(&map1);
+    igraph_vector_int_destroy(&map2);
+    igraph_vector_int_destroy(&map1);
 
     return 0;
 }

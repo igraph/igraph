@@ -22,7 +22,7 @@
 int main() {
     igraph_t g;
     igraph_matrix_t pref_empty, pref_bipartite, pref_line;
-    igraph_vector_t types_empty, types_bipartite, types_line;
+    igraph_vector_int_t types_empty, types_bipartite, types_line;
     igraph_bool_t bipartite;
     int bipartite_elem[] = {0, 1, 1, 0};
     int line_elem[] = {0, 0, 1, 0, 0,
@@ -35,13 +35,13 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_matrix_init(&pref_empty, 0, 0);
-    igraph_vector_init(&types_empty, 0);
+    igraph_vector_int_init(&types_empty, 0);
 
     matrix_init_int_row_major(&pref_bipartite, 2, 2, bipartite_elem);
-    igraph_vector_init_int(&types_bipartite, 10, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0);
+    igraph_vector_int_init_int(&types_bipartite, 10, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0);
 
     matrix_init_int_row_major(&pref_line, 5, 5, line_elem);
-    igraph_vector_init_int(&types_line, 5, 0, 1, 2, 3, 4);
+    igraph_vector_int_init_int(&types_line, 5, 0, 1, 2, 3, 4);
 
     printf("No nodes.\n");
     IGRAPH_ASSERT(igraph_citing_cited_type_game(&g, /*nodes*/ 0, &types_empty, &pref_empty, /*edges_per_step*/ 5, /*directed*/ 0) == IGRAPH_SUCCESS);
@@ -77,11 +77,11 @@ int main() {
     IGRAPH_ASSERT(igraph_citing_cited_type_game(&g, /*nodes*/ 5, &types_line, &pref_empty, /*edges_per_step*/ 1, /*directed*/ 1) == IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&pref_empty);
-    igraph_vector_destroy(&types_empty);
+    igraph_vector_int_destroy(&types_empty);
     igraph_matrix_destroy(&pref_bipartite);
-    igraph_vector_destroy(&types_bipartite);
+    igraph_vector_int_destroy(&types_bipartite);
     igraph_matrix_destroy(&pref_line);
-    igraph_vector_destroy(&types_line);
+    igraph_vector_int_destroy(&types_line);
     VERIFY_FINALLY_STACK();
     return 0;
 }

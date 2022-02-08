@@ -3,6 +3,16 @@ set(IGRAPH_VERSION "@PACKAGE_VERSION_BASE@")
 
 include("${CMAKE_CURRENT_LIST_DIR}/igraph-targets.cmake")
 
+# Check whether C++ support is enabled; this is needed to ensure that programs
+# that are dependent on igraph will get linked with the C++ linker and not the
+# "plain" C linker
+get_property(LANGUAGES GLOBAL PROPERTY ENABLED_LANGUAGES)
+if("CXX" IN_LIST LANGUAGES)
+  # This is okay
+else()
+  message(FATAL_ERROR "Please enable C++ support in your project if you are linking to igraph.")
+endif()
+
 # Turn on CMP0012 because the following if() conditionals will use "ON" and
 # "OFF" verbatim and they must be evaluated as booleans
 cmake_policy(PUSH)

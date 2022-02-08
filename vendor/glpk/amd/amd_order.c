@@ -13,9 +13,6 @@
  * documentation.
  */
 
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshorten-64-to-32"
-
 #include "amd_internal.h"
 
 /* ========================================================================= */

@@ -32,7 +32,7 @@ int main() {
 
     igraph_vector_t elems;
     igraph_2wheap_t Q;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t prev = IGRAPH_INFINITY;
 
     srand(42); /* make tests deterministic */
@@ -58,7 +58,7 @@ int main() {
     /*****/
 
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        long int j;
+        igraph_integer_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 2;
@@ -91,7 +91,7 @@ int main() {
     }
     prev = IGRAPH_INFINITY;
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        long int j;
+        igraph_integer_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 7;

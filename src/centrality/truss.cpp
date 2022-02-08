@@ -42,10 +42,10 @@
 using namespace std;
 
 /* helper functions */
-static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri);
-static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support);
-static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
-                              igraph_vector_int_t *trussness);
+static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_int_t *unpacked_tri);
+static void igraph_truss_i_compute_support(const igraph_vector_int_t *eid, igraph_vector_int_t *support);
+static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+                                         igraph_vector_int_t *trussness);
 
 /**
  * \function igraph_trussness
@@ -79,9 +79,8 @@ static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *suppor
  * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
  * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
  */
-int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
-    igraph_vector_int_t triangles, support;
-    igraph_vector_t eid, unpacked_triangles;
+igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
+    igraph_vector_int_t triangles, support, unpacked_triangles, eid;
     igraph_bool_t is_multigraph;
 
     /* Check whether the graph is a multigraph; trussness will not work for these */
@@ -94,8 +93,8 @@ int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
     /* Manage the stack to make it memory safe: do not change the order of
      * initialization of the following four vectors */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&support, igraph_ecount(graph));
-    IGRAPH_VECTOR_INIT_FINALLY(&eid, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&unpacked_triangles, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eid, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&unpacked_triangles, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&triangles, 0);
 
     // List the triangles as vertex triplets.
@@ -106,15 +105,15 @@ int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
     igraph_vector_int_destroy(&triangles);
     IGRAPH_FINALLY_CLEAN(1);
 
-    // Get the edge ids of the unpacked triangles. Note: a given eid can occur
+    // Get the edge IDs of the unpacked triangles. Note: a given eid can occur
     // multiple times in this list if it is in multiple triangles.
-    IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1));
-    igraph_vector_destroy(&unpacked_triangles);
+    IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, /* directed = */ 0, /* error = */ 1));
+    igraph_vector_int_destroy(&unpacked_triangles);
     IGRAPH_FINALLY_CLEAN(1);
 
     // Compute the support of the edges.
     igraph_truss_i_compute_support(&eid, &support);
-    igraph_vector_destroy(&eid);
+    igraph_vector_int_destroy(&eid);
     IGRAPH_FINALLY_CLEAN(1);
 
     // Compute the trussness of the edges.
@@ -128,12 +127,12 @@ int igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trussness) {
 // Unpack the triangles as a vector of vertices to be a vector of edges.
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
-static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t *unpacked_tri) {
-    long int i, j, num_triangles;
+static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_int_t *unpacked_tri) {
+    igraph_integer_t i, j, num_triangles;
 
     num_triangles = igraph_vector_int_size(tri);
 
-    IGRAPH_CHECK(igraph_vector_resize(unpacked_tri, 2 * num_triangles));
+    IGRAPH_CHECK(igraph_vector_int_resize(unpacked_tri, 2 * num_triangles));
 
     for (i = 0, j = 0; i < num_triangles; i += 3, j += 6) {
         VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
@@ -146,36 +145,37 @@ static int igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_t
 
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
-static void igraph_truss_i_compute_support(const igraph_vector_t *eid, igraph_vector_int_t *support) {
-    long int m = igraph_vector_size(eid);
-    for (long int i = 0; i < m; ++i) {
-        VECTOR(*support)[(long int) VECTOR(*eid)[i]] += 1;
+static void igraph_truss_i_compute_support(const igraph_vector_int_t *eid, igraph_vector_int_t *support) {
+    igraph_integer_t m = igraph_vector_int_size(eid);
+    for (igraph_integer_t i = 0; i < m; ++i) {
+        VECTOR(*support)[VECTOR(*eid)[i]] += 1;
     }
 }
 
 
 /* internal function doing the computations once the support is defined */
-static int igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
-                              igraph_vector_int_t *trussness) {
+static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
+                                         igraph_vector_int_t *trussness) {
 
     igraph_integer_t fromVertex, toVertex, e1, e2;
     igraph_adjlist_t adjlist;
     igraph_vector_int_t *fromNeighbors, *toNeighbors, *q1, *q2;
     igraph_vector_int_t commonNeighbors;
     bool e1_complete, e2_complete;
-    int j, n, level, newLevel, max;
-    long int i, seed, ncommon, nedges;
+    igraph_integer_t j, n, level, newLevel, max;
+    igraph_integer_t i, seed, ncommon, nedges;
 
     // C++ data structures
     vector<bool> completed;
-    vector< unordered_set<long int> > vec;
-    unordered_set<long int>::iterator it;
+    vector< unordered_set<igraph_integer_t> > vec;
+    unordered_set<igraph_integer_t>::iterator it;
 
     // Allocate memory for result
     nedges = igraph_vector_int_size(support);
     IGRAPH_CHECK(igraph_vector_int_resize(trussness, nedges));
-    if (nedges == 0)
+    if (nedges == 0) {
         return IGRAPH_SUCCESS;
+    }
 
     // Get max possible value = max entry in support.
     // This cannot be computed if there are no edges, hence the above if

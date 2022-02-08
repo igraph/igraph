@@ -33,7 +33,7 @@ void check(igraph_t *graph, igraph_es_t *es) {
 int main() {
     igraph_t g, g_no_vertices, g_no_edges;
     igraph_es_t es;
-    igraph_vector_t v, check_as_vector;
+    igraph_vector_int_t v, check_as_vector;
     igraph_eit_t eit;
 
     igraph_small(&g, 5, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, -1);
@@ -43,18 +43,18 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking es_vector:\n");
-    igraph_vector_init_int(&v, 3, 2, 3, 4);
+    igraph_vector_int_init_int(&v, 3, 2, 3, 4);
     IGRAPH_ASSERT(igraph_es_vector(&es, &v) == IGRAPH_SUCCESS);
     check(&g, &es);
     IGRAPH_ASSERT(igraph_eit_create(&g_no_edges, es, &eit) == IGRAPH_EINVAL);
     IGRAPH_ASSERT(igraph_eit_create(&g_no_vertices, es, &eit) == IGRAPH_EINVAL);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     printf("es_vector with negative entry should fail.\n");
-    igraph_vector_init_int(&v, 3, -2, 3, 4);
+    igraph_vector_int_init_int(&v, 3, -2, 3, 4);
     IGRAPH_ASSERT(igraph_es_vector(&es, &v) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_eit_create(&g, es, &eit) == IGRAPH_EINVAL);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     printf("Fromto not implemented.\n");
     IGRAPH_ASSERT(igraph_es_fromto(&es, igraph_vss_all(), igraph_vss_all()) == IGRAPH_UNIMPLEMENTED);
@@ -67,10 +67,10 @@ int main() {
 
     printf("Checking eit_as_vector using seq:\n");
     IGRAPH_ASSERT(igraph_eit_create(&g, es, &eit) == IGRAPH_SUCCESS);
-    igraph_vector_init_int(&check_as_vector, 0);
+    igraph_vector_int_init_int(&check_as_vector, 0);
     igraph_eit_as_vector(&eit, &check_as_vector);
-    igraph_vector_print(&check_as_vector);
-    igraph_vector_destroy(&check_as_vector);
+    igraph_vector_int_print(&check_as_vector);
+    igraph_vector_int_destroy(&check_as_vector);
 
     printf("Checking ess_seq using es_seq parameters:\n");
     es = igraph_ess_seq(2, 4);
@@ -79,7 +79,7 @@ int main() {
     IGRAPH_ASSERT(igraph_eit_create(&g_no_vertices, es, &eit) == IGRAPH_EINVAL);
 
     printf("Checking es_path:\n");
-    igraph_vector_init_int(&v, 3, 4, 3, 2);
+    igraph_vector_int_init_int(&v, 3, 4, 3, 2);
     IGRAPH_ASSERT(igraph_es_path(&es, &v, /*directed*/0) == IGRAPH_SUCCESS);
     check(&g, &es);
     IGRAPH_ASSERT(igraph_eit_create(&g_no_vertices, es, &eit) == IGRAPH_EINVVID);
@@ -88,18 +88,18 @@ int main() {
 
     IGRAPH_ASSERT(igraph_es_path(&es, &v, /*directed*/1) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_eit_create(&g, es, &eit) == IGRAPH_EINVAL);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_es_destroy(&es);
 
     printf("es_path with negative entry should fail.\n");
-    igraph_vector_init_int(&v, 3, -4, 3, 2);
+    igraph_vector_int_init_int(&v, 3, -4, 3, 2);
     IGRAPH_ASSERT(igraph_es_path(&es, &v, /*directed*/0) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_eit_create(&g, es, &eit) == IGRAPH_EINVVID);
 
     printf("Checking es_type.\n");
     IGRAPH_ASSERT(igraph_es_type(&es) == IGRAPH_ES_PATH);
     igraph_es_destroy(&es);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
 
     igraph_destroy(&g);
     igraph_destroy(&g_no_vertices);

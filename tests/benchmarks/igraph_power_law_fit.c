@@ -1,25 +1,25 @@
 #include <igraph.h>
+#include <plfit_sampling.h>
 
 #include "bench.h"
-#include "../../vendor/plfit/sampling.h"
 
 igraph_vector_t data;
 
-inline double rpareto(double xmin, double alpha) {
+double rpareto(double xmin, double alpha) {
     /* 1-u is used in the base here because we want to avoid the case of
      * sampling zero */
     return pow(1 - RNG_UNIF01(), -1.0 / alpha) * xmin;
 }
 
-inline double rzeta(long int xmin, double alpha) {
+double rzeta(igraph_integer_t xmin, double alpha) {
     double u, v, t;
-    long int x;
+    igraph_integer_t x;
     double alpha_minus_1 = alpha-1;
     double minus_1_over_alpha_minus_1 = -1.0 / (alpha-1);
     double b;
     double one_over_b_minus_1;
 
-    xmin = (long int) round(xmin);
+    xmin = (igraph_integer_t) round(xmin);
 
     /* Rejection sampling for the win. We use Y=floor(U^{-1/alpha} * xmin) as the
      * envelope distribution, similarly to Chapter X.6 of Luc Devroye's book
@@ -61,7 +61,7 @@ inline double rzeta(long int xmin, double alpha) {
             v = RNG_UNIF01();
             /* 1-u is used in the base here because we want to avoid the case of
              * having zero in x */
-            x = (long int) floor(pow(1-u, minus_1_over_alpha_minus_1) * xmin);
+            x = (igraph_integer_t) floor(pow(1-u, minus_1_over_alpha_minus_1) * xmin);
         } while (x < xmin);
         t = pow((x+1.0)/x, alpha_minus_1);
     } while (v*x*(t-1)*one_over_b_minus_1*b > t*xmin);
@@ -113,42 +113,42 @@ int main() {
     BENCH_INIT();
 
     generate_continuous(1, 3, 100000);
-	BENCH(" 1 Continuous, xmin = 1, alpha = 3, samples = 100K, fitting alpha only", fit_continuous(1));
+    BENCH(" 1 Continuous, xmin = 1, alpha = 3, samples = 100K, fitting alpha only", fit_continuous(1));
 
     generate_continuous(1, 3, 200000);
-	BENCH(" 2 Continuous, xmin = 1, alpha = 3, samples = 200K, fitting alpha only", fit_continuous(1));
+    BENCH(" 2 Continuous, xmin = 1, alpha = 3, samples = 200K, fitting alpha only", fit_continuous(1));
 
     generate_continuous(1, 3, 500000);
-	BENCH(" 3 Continuous, xmin = 1, alpha = 3, samples = 500K, fitting alpha only", fit_continuous(1));
+    BENCH(" 3 Continuous, xmin = 1, alpha = 3, samples = 500K, fitting alpha only", fit_continuous(1));
 
     generate_continuous(1, 3, 5000);
-	BENCH(" 4 Continuous, xmin = 1, alpha = 3, samples = 5K, fitting xmin and alpha", fit_continuous(-1));
+    BENCH(" 4 Continuous, xmin = 1, alpha = 3, samples = 5K, fitting xmin and alpha", fit_continuous(-1));
 
     generate_continuous(1, 3, 10000);
-	BENCH(" 5 Continuous, xmin = 1, alpha = 3, samples = 10K, fitting xmin and alpha", fit_continuous(-1));
+    BENCH(" 5 Continuous, xmin = 1, alpha = 3, samples = 10K, fitting xmin and alpha", fit_continuous(-1));
 
     generate_continuous(1, 3, 15000);
-	BENCH(" 6 Continuous, xmin = 1, alpha = 3, samples = 15K, fitting xmin and alpha", fit_continuous(-1));
+    BENCH(" 6 Continuous, xmin = 1, alpha = 3, samples = 15K, fitting xmin and alpha", fit_continuous(-1));
 
     generate_discrete(3, 3, 1000000);
-	BENCH(" 7 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting alpha only", fit_discrete(3));
+    BENCH(" 7 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting alpha only", fit_discrete(3));
 
     generate_discrete(3, 3, 5000000);
-	BENCH(" 8 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting alpha only", fit_discrete(3));
+    BENCH(" 8 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting alpha only", fit_discrete(3));
 
     generate_discrete(3, 3, 10000000);
-	BENCH(" 9 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting alpha only", fit_discrete(3));
+    BENCH(" 9 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting alpha only", fit_discrete(3));
 
     generate_discrete(3, 3, 1000000);
-	BENCH("10 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting xmin and alpha", fit_discrete(-1));
+    BENCH("10 Discrete, xmin = 3, alpha = 3, samples = 1M, fitting xmin and alpha", fit_discrete(-1));
 
     generate_discrete(3, 3, 5000000);
-	BENCH("11 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting xmin and alpha", fit_discrete(-1));
+    BENCH("11 Discrete, xmin = 3, alpha = 3, samples = 5M, fitting xmin and alpha", fit_discrete(-1));
 
     generate_discrete(3, 3, 10000000);
-	BENCH("12 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting xmin and alpha", fit_discrete(-1));
+    BENCH("12 Discrete, xmin = 3, alpha = 3, samples = 10M, fitting xmin and alpha", fit_discrete(-1));
 
     igraph_vector_destroy(&data);
 
-	return 0;
+    return 0;
 }

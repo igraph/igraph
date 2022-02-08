@@ -38,7 +38,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_ncol
- * \brief Reads a <code>.ncol</code> file used by LGL.
+ * \brief Reads an <code>.ncol</code> file used by LGL.
  *
  * Also useful for creating graphs from \quote named\endquote (and
  * optionally weighted) edge lists.
@@ -48,8 +48,8 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * (http://lgl.sourceforge.net), and it is simply a
  * symbolic weighted edge list. It is a simple text file with one edge
  * per line. An edge is defined by two symbolic vertex names separated
- * by whitespace. (The symbolic vertex names themselves cannot contain
- * whitespace. They might follow by an optional number, this will be
+ * by whitespace. The vertex names themselves cannot contain
+ * whitespace. They may be followed by an optional number,
  * the weight of the edge; the number can be negative and can be in
  * scientific notation. If there is no weight specified to an edge it
  * is assumed to be zero.
@@ -59,13 +59,14 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * LGL cannot deal with files which contain multiple or loop edges,
  * this is however not checked here, as \a igraph is happy with
  * these.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
  * \param predefnames Pointer to the symbolic names of the vertices in
- *        the file. If \c NULL is given here then vertex ids will be
+ *        the file. If \c NULL is given here then vertex IDs will be
  *        assigned to vertex names in the order of their appearance in
- *        the \c .ncol file. If it is not \c NULL and some unknown
- *        vertex names are found in the \c .ncol file then new vertex
+ *        the <code>.ncol</code> file. If it is not \c NULL and some unknown
+ *        vertex names are found in the <code>.ncol</code> file then new vertex
  *        ids will be assigned to them.
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
@@ -96,16 +97,17 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
-int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
-                           igraph_strvector_t *predefnames,
+igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
+                           const igraph_strvector_t *predefnames,
                            igraph_bool_t names,
                            igraph_add_weights_t weights,
                            igraph_bool_t directed) {
 
-    igraph_vector_t edges, ws;
+    igraph_vector_int_t edges;
+    igraph_vector_t ws;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
     igraph_integer_t no_of_nodes;
-    long int no_predefined = 0;
+    igraph_integer_t no_predefined = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
     igraph_attribute_record_t namerec, weightrec;
@@ -114,21 +116,21 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     IGRAPH_CHECK(igraph_empty(graph, 0, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
     IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
 
     /* Add the predefined names, if any */
     if (predefnames != 0) {
-        long int i, id, n;
+        igraph_integer_t i, id, n;
         char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
             igraph_strvector_get(predefnames, i, &key);
             igraph_trie_get(&trie, key, &id);
             if (id != i) {
-                IGRAPH_WARNING("reading NCOL file, duplicate entry in predefnames");
+                IGRAPH_WARNING("Reading NCOL file, duplicate entry in predefined names.");
                 no_predefined--;
             }
         }
@@ -139,30 +141,49 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     context.weights = &ws;
     context.trie = &trie;
     context.eof = 0;
+    context.errmsg[0] = '\0';
+    context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_ncol_yylex_init_extra(&context, &context.scanner);
     IGRAPH_FINALLY(igraph_ncol_yylex_destroy, context.scanner);
 
     igraph_ncol_yyset_in(instream, context.scanner);
 
-    if (igraph_ncol_yyparse(&context)) {
+    int err = igraph_ncol_yyparse(&context);
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
-            IGRAPH_ERROR("Cannot read NCOL file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read NCOL file.", IGRAPH_PARSEERROR);
         }
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read NCOL file.", IGRAPH_ENOMEM);
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading NCOL file.", err);
     }
 
     if (predefnames != 0 &&
         igraph_trie_size(&trie) != no_predefined) {
-        IGRAPH_WARNING("unknown vertex/vertices found, predefnames extended");
+        IGRAPH_WARNING("Unknown vertex/vertices found in NCOL file, predefined names extended.");
     }
 
     if (names) {
         const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
         pname = &name;
-        igraph_trie_getkeys(&trie, &namevec); /* dirty */
+        IGRAPH_CHECK(igraph_trie_getkeys(&trie, &namevec)); /* dirty */
         namerec.name = namestr;
         namerec.type = IGRAPH_ATTRIBUTE_STRING;
         namerec.value = namevec;
@@ -179,10 +200,10 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
-    if (igraph_vector_empty(&edges)) {
+    if (igraph_vector_int_empty(&edges)) {
         no_of_nodes = 0;
     } else {
-        no_of_nodes = igraph_vector_max(&edges) + 1;
+        no_of_nodes = igraph_vector_int_max(&edges) + 1;
     }
 
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, pname));
@@ -196,17 +217,17 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     }
     igraph_vector_destroy(&ws);
     igraph_trie_destroy(&trie);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_ncol_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_ncol
- * \brief Writes the graph to a file in <code>.ncol</code> format
+ * \brief Writes the graph to a file in <code>.ncol</code> format.
  *
  * </para><para>
  * <code>.ncol</code> is a format used by LGL, see \ref
@@ -216,14 +237,19 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  * Note that having multiple or loop edges in an
  * <code>.ncol</code> file breaks the  LGL software but
  * \a igraph does not check for this condition.
+ *
+ * </para><para>
+ * This format cannot represent zero-degree vertices.
+ *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
- * \param names The name of the vertex attribute, if symbolic names
- *        are written to the file. If not, supply 0 here.
- * \param weights The name of the edge attribute, if they are also
- *        written to the file. If you don't want weights, supply 0
- *        here.
+ * \param names The name of a string vertex attribute, if symbolic names
+ *        are to be written to the file. Supply \c NULL to write vertex
+ *        ids instead.
+ * \param weights The name of a numerical edge attribute, which will be
+ *        written as weights to the file. Supply \c NULL to skip writing
+ *        edge weights.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error writing the
  *         file.
@@ -234,42 +260,43 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  *
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
  */
-int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                             const char *names, const char *weights) {
     igraph_eit_t it;
     igraph_attribute_type_t nametype, weighttype;
 
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
                                    &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
 
     /* Check if we have the names attribute */
     if (names && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
             names)) {
-        names = 0;
-        IGRAPH_WARNING("names attribute does not exists");
+        IGRAPH_WARNINGF("Names attribute '%s' does not exists.", names);
+        names = NULL;
     }
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
-        if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
-            IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
-            names = 0;
+        if (nametype != IGRAPH_ATTRIBUTE_STRING) {
+            IGRAPH_WARNINGF("Ignoring names attribute '%s', "
+                    "attribute type is not a string.", names);
+            names = NULL;
         }
     }
 
     /* Check the weights as well */
-    if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-            weights)) {
-        weights = 0;
-        IGRAPH_WARNING("weights attribute does not exists");
+    if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, weights)) {
+        IGRAPH_WARNINGF("Weights attribute '%s' does not exists.", weights);
+        weights = NULL;
     }
     if (weights) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
         if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
-            IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
-            weights = 0;
+            IGRAPH_WARNINGF("Ignoring weights attribute '%s', "
+                    "attribute type is not numeric.", weights);
+            weights = NULL;
         }
     }
 
@@ -279,11 +306,9 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t from, to;
             int ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-            ret = fprintf(outstream, "%li %li\n",
-                          (long int) from,
-                          (long int) to);
+            ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n", from, to);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -305,7 +330,7 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_strvector_get(&nvec, to, &str2);
             ret = fprintf(outstream, "%s %s\n", str1, str2);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -323,12 +348,11 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t from, to;
             int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
-            ret1 = fprintf(outstream, "%li %li ",
-                           (long int)from, (long int)to);
-            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret1 = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " ", from, to);
+            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret3 = fputc('\n', outstream);
             if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -357,12 +381,12 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_strvector_get(&nvec, to, &str2);
             ret = fprintf(outstream, "%s %s ", str1, str2);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
             }
-            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(long int)edge]);
+            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret2 = fputc('\n', outstream);
             if (ret < 0 || ret2 == EOF) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -373,5 +397,5 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
 
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

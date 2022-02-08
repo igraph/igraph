@@ -1499,6 +1499,9 @@ AbstractGraph::search(const bool canonical,
           child_node.cr_cep_stack_size = cr_cep_stack.size();
           child_node.cr_cep_index = cr_cep_index;
 
+          /* Initialize needs_long_prune to prevent a gcc-ubsan warning */
+          child_node.needs_long_prune = true;
+
           search_stack.push_back(child_node);
           continue;
         }

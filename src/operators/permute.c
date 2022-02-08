@@ -39,58 +39,57 @@
  * \param res Pointer to an uninitialized graph object. The new graph
  *    is created here.
  * \param permutation The permutation to apply. Vertex 0 is mapped to
- *    the first element of the vector, vertex 1 to the second,
- * etc. Note that it is not checked that the vector contains every
+ *    the first element of the vector, vertex 1 to the second, etc. Note that
+ *    it is not checked that the vector contains every
  *    element only once, and no range checking is performed either.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in terms of the number of
  * vertices and edges.
  */
-int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
-                            const igraph_vector_t *permutation) {
+igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+                            const igraph_vector_int_t *permutation) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    igraph_vector_t edges;
-    long int i, p = 0;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_vector_int_t edges;
+    igraph_integer_t i, p = 0;
 
-    if (igraph_vector_size(permutation) != no_of_nodes) {
+    if (igraph_vector_int_size(permutation) != no_of_nodes) {
         IGRAPH_ERROR("Permute vertices: invalid permutation vector size", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (i = 0; i < no_of_edges; i++) {
-        VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_FROM(graph, i) ];
-        VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_TO(graph, i) ];
+        VECTOR(edges)[p++] = VECTOR(*permutation)[ IGRAPH_FROM(graph, i) ];
+        VECTOR(edges)[p++] = VECTOR(*permutation)[ IGRAPH_TO(graph, i) ];
     }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
-                               igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, igraph_is_directed(graph)));
 
     /* Attributes */
     if (graph->attr) {
-        igraph_vector_t index;
-        igraph_vector_t vtypes;
+        igraph_vector_int_t index;
+        igraph_vector_int_t vtypes;
         IGRAPH_I_ATTRIBUTE_DESTROY(res);
         IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/1, /*vertex=*/0, /*edge=*/1);
-        IGRAPH_VECTOR_INIT_FINALLY(&vtypes, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
         IGRAPH_CHECK(igraph_i_attribute_get_info(graph, 0, 0, 0, &vtypes, 0, 0));
-        if (igraph_vector_size(&vtypes) != 0) {
-            IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
+        if (igraph_vector_int_size(&vtypes) != 0) {
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_nodes);
             for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(index)[ (long int) VECTOR(*permutation)[i] ] = i;
+                VECTOR(index)[VECTOR(*permutation)[i]] = i;
             }
             IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &index));
-            igraph_vector_destroy(&index);
+            igraph_vector_int_destroy(&index);
             IGRAPH_FINALLY_CLEAN(1);
         }
-        igraph_vector_destroy(&vtypes);
+        igraph_vector_int_destroy(&vtypes);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

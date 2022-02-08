@@ -33,7 +33,7 @@
 #define MIN 0
 #define MAX 10
 
-typedef int fun(igraph_sparsemat_t *A, igraph_vector_t *res);
+typedef igraph_error_t fun(igraph_sparsemat_t *A, igraph_vector_t *res);
 
 int doit(int which) {
 

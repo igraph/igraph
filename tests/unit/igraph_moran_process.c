@@ -29,9 +29,9 @@ typedef struct {
     igraph_t *graph;
     igraph_vector_t *weights;
     igraph_vector_t *quantities;
-    igraph_vector_t *strategies;
+    igraph_vector_int_t *strategies;
     igraph_neimode_t mode;
-    int retval;
+    igraph_error_t retval;
 } strategy_test_t;
 
 /* Error tests, i.e. we expect errors to be raised for each test.
@@ -39,7 +39,7 @@ typedef struct {
 int error_tests() {
     igraph_t g, gzero, h;
     igraph_vector_t quant, quantnvert, quantzero;
-    igraph_vector_t strat, stratnvert, stratzero;
+    igraph_vector_int_t strat, stratnvert, stratzero;
     igraph_vector_t wgt, wgtnedge, wgtzero;
     int i, n, nvert, ret;
     strategy_test_t *test;
@@ -55,14 +55,14 @@ int error_tests() {
     igraph_vector_init(&quant, 1);
     igraph_vector_init_real(&quantnvert, nvert, 0.1, 0.2, 0.3);
     /* strategies vectors */
-    igraph_vector_init(&strat, 2);
-    igraph_vector_init_real(&stratnvert, nvert, 0.0, 1.0, 2.0);
+    igraph_vector_int_init(&strat, 2);
+    igraph_vector_int_init_int(&stratnvert, nvert, 0, 1, 2);
 
     igraph_small(&gzero, /* n= */ 0, IGRAPH_UNDIRECTED,
                  0, 3, 0, 4, 1, 2, 1, 4, 1, 5, 2, 3, 2, 4, 3, 4, -1);
     nvert = igraph_vcount(&gzero);
     igraph_vector_init(&quantzero, nvert);                /* vector of zeros */
-    igraph_vector_init(&stratzero, nvert);                /* vector of zeros */
+    igraph_vector_int_init(&stratzero, nvert);            /* vector of zeros */
     igraph_vector_init(&wgtzero, igraph_ecount(&gzero));  /* vector of zeros */
     /* igraph_vector_init_real(&stratzero, nvert, 1.0, 0.0, 1.0, 2.0, 0.0, 3.0); */
 
@@ -121,9 +121,9 @@ int error_tests() {
     igraph_vector_destroy(&quant);
     igraph_vector_destroy(&quantnvert);
     igraph_vector_destroy(&quantzero);
-    igraph_vector_destroy(&strat);
-    igraph_vector_destroy(&stratnvert);
-    igraph_vector_destroy(&stratzero);
+    igraph_vector_int_destroy(&strat);
+    igraph_vector_int_destroy(&stratnvert);
+    igraph_vector_int_destroy(&stratzero);
     igraph_vector_destroy(&wgt);
     igraph_vector_destroy(&wgtnedge);
     igraph_vector_destroy(&wgtzero);
@@ -140,9 +140,9 @@ int moran_one_test() {
     igraph_integer_t nedge, nvert;
     igraph_real_t q = 0.0;
     igraph_vector_t quant, quantcp;
-    igraph_vector_t strat, stratcp;
+    igraph_vector_int_t strat, stratcp;
     igraph_vector_t wgt;
-    long int i;
+    igraph_integer_t i;
 
     /* graph representing the game network; quantities and strategies vectors */
     igraph_small(&g, /*nvert*/ 0, IGRAPH_DIRECTED,
@@ -150,7 +150,7 @@ int moran_one_test() {
     nvert = igraph_vcount(&g);
     nedge = igraph_ecount(&g);
     igraph_vector_init_real(&quant, nvert, 0.77, 0.83, 0.64, 0.81, 0.05);
-    igraph_vector_init_real(&strat, nvert, 2.0, 0.0, 0.0, 1.0, 2.0);
+    igraph_vector_int_init_real(&strat, nvert, 2.0, 0.0, 0.0, 1.0, 2.0);
     /* Set the edge weights. Here we assume the following correspondence */
     /* between edge IDs and directed edges: */
     /* edge 0: 0 -> 1 */
@@ -165,7 +165,7 @@ int moran_one_test() {
 
     /* play game */
     igraph_vector_copy(&quantcp, &quant);
-    igraph_vector_copy(&stratcp, &strat);
+    igraph_vector_int_copy(&stratcp, &strat);
     igraph_moran_process(&g, &wgt, &quantcp, &stratcp, IGRAPH_OUT);
 
     /* Determine which vertex was chosen for death. The original quantities */
@@ -174,8 +174,8 @@ int moran_one_test() {
     for (i = 0; i < igraph_vector_size(&quant); i++) {
         if (VECTOR(quant)[i] != VECTOR(quantcp)[i]) {
             /* found the new clone vertex */
-            v = (igraph_integer_t)i;
-            q = (igraph_real_t)VECTOR(quantcp)[i];
+            v = i;
+            q = VECTOR(quantcp)[i];
             break;
         }
     }
@@ -187,7 +187,7 @@ int moran_one_test() {
     for (i = 0; i < igraph_vector_size(&quant); i++) {
         if (VECTOR(quant)[i] == q) {
             /* found the vertex chosen for reproduction */
-            u = (igraph_integer_t)i;
+            u = i;
             break;
         }
     }
@@ -204,8 +204,8 @@ int moran_one_test() {
     igraph_destroy(&g);
     igraph_vector_destroy(&quant);
     igraph_vector_destroy(&quantcp);
-    igraph_vector_destroy(&strat);
-    igraph_vector_destroy(&stratcp);
+    igraph_vector_int_destroy(&strat);
+    igraph_vector_int_destroy(&stratcp);
     igraph_vector_destroy(&wgt);
 
     return IGRAPH_SUCCESS;

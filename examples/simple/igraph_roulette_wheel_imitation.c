@@ -30,29 +30,31 @@ typedef struct {
     igraph_integer_t vertex;
     igraph_bool_t islocal;
     igraph_vector_t *quantities;
-    igraph_vector_t *strategies;
-    igraph_vector_t *known_strats;
+    igraph_vector_int_t *strategies;
+    igraph_vector_int_t *known_strats;
     igraph_neimode_t mode;
-    int retval;
+    igraph_error_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-int error_tests() {
+igraph_error_t error_tests() {
     igraph_t g, gzero, h;
-    igraph_vector_t quant, quantzero, strat, stratzero;
-    int i, n, nvert, ret;
+    igraph_vector_t quant, quantzero;
+    igraph_vector_int_t strat, stratzero;
+    igraph_integer_t i, n, nvert;
+    igraph_error_t ret;
     strategy_test_t *test;
 
     /* nonempty graph */
     igraph_small(&g, /*nvert=*/ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
     igraph_empty(&h, 0, 0);         /* empty graph */
     igraph_vector_init(&quant, 1);  /* quantities vector */
-    igraph_vector_init(&strat, 2);  /* strategies vector */
+    igraph_vector_int_init(&strat, 2);  /* strategies vector */
     igraph_small(&gzero, /*nvert=*/ 0, IGRAPH_UNDIRECTED,
                  0, 3, 0, 4, 1, 2, 1, 4, 1, 5, 2, 3, 2, 4, 3, 4, -1);
     nvert = igraph_vcount(&gzero);
-    igraph_vector_init_real(&stratzero, nvert, 1.0, 0.0, 1.0, 2.0, 0.0, 3.0);
+    igraph_vector_int_init_int(&stratzero, nvert, 1, 0, 1, 2, 0, 3);
     igraph_vector_init(&quantzero, nvert);  /* vector of zeros */
 
     /* test parameters */
@@ -90,7 +92,7 @@ int error_tests() {
                                               test->islocal, test->quantities,
                                               test->strategies, test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (int)(i + 1));
+            printf("Error test no. %" IGRAPH_PRId " failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
         i++;
@@ -101,8 +103,8 @@ int error_tests() {
     igraph_destroy(&h);
     igraph_vector_destroy(&quant);
     igraph_vector_destroy(&quantzero);
-    igraph_vector_destroy(&strat);
-    igraph_vector_destroy(&stratzero);
+    igraph_vector_int_destroy(&strat);
+    igraph_vector_int_destroy(&stratzero);
 
     return IGRAPH_SUCCESS;
 }
@@ -112,12 +114,14 @@ int error_tests() {
  * perspective (whether local or global) could affect the range of
  * possible strategies a vertex could adopt.
  */
-int roulette_test() {
+igraph_error_t roulette_test() {
     igraph_t g;
     igraph_bool_t success;
-    igraph_vector_t *known, quant, strat, stratcopy;
-    igraph_vector_t known0, known1, known2, known3, known4, known5;
-    int i, k, n, nvert, ret;;
+    igraph_vector_t quant;
+    igraph_vector_int_t *known, strat, stratcopy;
+    igraph_vector_int_t known0, known1, known2, known3, known4, known5;
+    igraph_integer_t i, k, n, nvert;
+    igraph_error_t ret;
     strategy_test_t *test;
 
     /* the game network */
@@ -126,16 +130,16 @@ int roulette_test() {
     nvert = igraph_vcount(&g);
     /* strategies vector; the strategy space is {0, 1, 2, 3} */
     /* V[i] is strategy of vertex i */
-    igraph_vector_init_real(&strat, nvert, 1.0, 0.0, 1.0, 2.0, 0.0, 3.0);
+    igraph_vector_int_init_int(&strat, nvert, 1, 0, 1, 2, 0, 3);
     /* quantities vector; V[i] is quantity of vertex i */
     igraph_vector_init_real(&quant, nvert, 0.56, 0.13, 0.26, 0.73, 0.67, 0.82);
     /* possible strategies each vertex can adopt */
-    igraph_vector_init_real(&known0, /*n=*/ 3, 0.0, 1.0, 2.0);       /* local */
-    igraph_vector_init_real(&known1, /*n=*/ 3, 0.0, 1.0, 3.0);       /* local */
-    igraph_vector_init_real(&known2, /*n=*/ 3, 0.0, 1.0, 2.0);       /* local */
-    igraph_vector_init_real(&known3, /*n=*/ 3, 0.0, 1.0, 2.0);       /* local */
-    igraph_vector_init_real(&known4, /*n=*/ 3, 0.0, 1.0, 2.0);       /* local */
-    igraph_vector_init_real(&known5, /*n=*/ 4, 0.0, 1.0, 2.0, 3.0);  /* global */
+    igraph_vector_int_init_int(&known0, /*n=*/ 3, 0, 1, 2);       /* local */
+    igraph_vector_int_init_int(&known1, /*n=*/ 3, 0, 1, 3);       /* local */
+    igraph_vector_int_init_int(&known2, /*n=*/ 3, 0, 1, 2);       /* local */
+    igraph_vector_int_init_int(&known3, /*n=*/ 3, 0, 1, 2);       /* local */
+    igraph_vector_int_init_int(&known4, /*n=*/ 3, 0, 1, 2);       /* local */
+    igraph_vector_int_init_int(&known5, /*n=*/ 4, 0, 1, 2, 3);    /* global */
 
     /* test parameters */
     /*graph--vert--islocal--quantities--strategies--known_strats--mode-retval*/
@@ -158,12 +162,12 @@ int roulette_test() {
     i = 0;
     while (i < n) {
         test = all_checks[i];
-        igraph_vector_copy(&stratcopy, &strat);
+        igraph_vector_int_copy(&stratcopy, &strat);
         ret = igraph_roulette_wheel_imitation(test->graph, test->vertex,
                                               test->islocal, test->quantities,
                                               &stratcopy, test->mode);
         if (ret != test->retval) {
-            printf("Test no. %d failed.\n", i + 1);
+            printf("Test no. %" IGRAPH_PRId " failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
         /* If the revised strategy s matches one of the candidate strategies, */
@@ -171,30 +175,29 @@ int roulette_test() {
         /* failure. Default to failure. */
         success = 0;
         known = test->known_strats;
-        for (k = 0; k < igraph_vector_size(known); k++) {
+        for (k = 0; k < igraph_vector_int_size(known); k++) {
             if (VECTOR(*known)[k] == VECTOR(stratcopy)[test->vertex]) {
                 success = 1;
                 break;
             }
         }
         if (!success) {
-            printf("Roulette wheel imitation failed for vertex %d.\n",
-                   (int)test->vertex);
+            printf("Roulette wheel imitation failed for vertex %" IGRAPH_PRId ".\n", test->vertex);
             return IGRAPH_FAILURE;
         }
-        igraph_vector_destroy(&stratcopy);
+        igraph_vector_int_destroy(&stratcopy);
         i++;
     }
     /* game finished; pack up */
     igraph_destroy(&g);
-    igraph_vector_destroy(&known0);
-    igraph_vector_destroy(&known1);
-    igraph_vector_destroy(&known2);
-    igraph_vector_destroy(&known3);
-    igraph_vector_destroy(&known4);
-    igraph_vector_destroy(&known5);
+    igraph_vector_int_destroy(&known0);
+    igraph_vector_int_destroy(&known1);
+    igraph_vector_int_destroy(&known2);
+    igraph_vector_int_destroy(&known3);
+    igraph_vector_int_destroy(&known4);
+    igraph_vector_int_destroy(&known5);
     igraph_vector_destroy(&quant);
-    igraph_vector_destroy(&strat);
+    igraph_vector_int_destroy(&strat);
 
     return IGRAPH_SUCCESS;
 }
@@ -202,11 +205,12 @@ int roulette_test() {
 /* It is possible for a vertex to retain its current strategy. This can
  * happen both in the local and global perspectives.
  */
-int retain_strategy_test() {
+igraph_error_t retain_strategy_test() {
     igraph_t g;
     igraph_integer_t max, min, v;
-    igraph_vector_t quant, strat, stratcp;
-    int i, ntry, nvert;
+    igraph_vector_t quant;
+    igraph_vector_int_t strat, stratcp;
+    igraph_integer_t i, ntry, nvert;
 
     /* the game network */
     igraph_small(&g, /*nvert=*/ 0, IGRAPH_UNDIRECTED,
@@ -214,7 +218,7 @@ int retain_strategy_test() {
     nvert = igraph_vcount(&g);
     /* strategies vector; the strategy space is {0, 1, 2, 3} */
     /* V[i] is strategy of vertex i */
-    igraph_vector_init_real(&strat, nvert, 1.0, 0.0, 1.0, 2.0, 0.0, 3.0);
+    igraph_vector_int_init_int(&strat, nvert, 1, 0, 1, 2, 0, 3);
     /* quantities vector; V[i] is quantity of vertex i */
     igraph_vector_init_real(&quant, nvert, 0.56, 0.13, 0.26, 0.73, 0.67, 0.82);
 
@@ -230,14 +234,14 @@ int retain_strategy_test() {
     /* With local perspective. */
     i = 0;
     ntry = 100;
-    igraph_vector_init(&stratcp, 0);
+    igraph_vector_int_init(&stratcp, 0);
     do {
         i++;
         if (i > ntry) {
             return IGRAPH_FAILURE;    /* ideally this should never happen */
         }
-        igraph_vector_destroy(&stratcp);
-        igraph_vector_copy(&stratcp, &strat);
+        igraph_vector_int_destroy(&stratcp);
+        igraph_vector_int_copy(&stratcp, &strat);
         igraph_roulette_wheel_imitation(&g, v, /*is local?*/ 1, &quant, &stratcp,
                                         IGRAPH_ALL);
     } while (VECTOR(stratcp)[v] != VECTOR(strat)[v]);
@@ -250,16 +254,16 @@ int retain_strategy_test() {
         if (i > ntry) {
             return IGRAPH_FAILURE;    /* ideally this should never happen */
         }
-        igraph_vector_destroy(&stratcp);
-        igraph_vector_copy(&stratcp, &strat);
+        igraph_vector_int_destroy(&stratcp);
+        igraph_vector_int_copy(&stratcp, &strat);
         igraph_roulette_wheel_imitation(&g, v, /*is local?*/ 0, &quant, &stratcp,
                                         IGRAPH_ALL);
     } while (VECTOR(stratcp)[v] != VECTOR(strat)[v]);
     /* nothing further to do, but housekeeping */
     igraph_destroy(&g);
     igraph_vector_destroy(&quant);
-    igraph_vector_destroy(&strat);
-    igraph_vector_destroy(&stratcp);
+    igraph_vector_int_destroy(&strat);
+    igraph_vector_int_destroy(&stratcp);
 
     return IGRAPH_SUCCESS;
 }

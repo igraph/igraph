@@ -25,6 +25,7 @@
 #include <pthread.h>
 
 void *thread_function(void *arg) {
+    IGRAPH_UNUSED(arg);
     IGRAPH_FINALLY(igraph_free, NULL);
     return 0;
 }

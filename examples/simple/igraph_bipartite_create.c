@@ -25,16 +25,16 @@
 
 int main() {
 
-    igraph_real_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
-    igraph_real_t edges3[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };
+    igraph_integer_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
+    igraph_integer_t edges3[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };
     igraph_t g;
     igraph_vector_bool_t types;
-    igraph_vector_t edges;
-    long int i;
+    igraph_vector_int_t edges;
+    igraph_integer_t i;
     int ret;
 
-    igraph_vector_view(&edges, edges2, sizeof(edges2) / sizeof(igraph_real_t));
-    igraph_vector_bool_init(&types, igraph_vector_max(&edges) + 1);
+    igraph_vector_int_view(&edges, edges2, sizeof(edges2) / sizeof(edges2[0]));
+    igraph_vector_bool_init(&types, igraph_vector_int_max(&edges) + 1);
     for (i = 0; i < igraph_vector_bool_size(&types); i++) {
         VECTOR(types)[i] = i % 2;
     }
@@ -46,8 +46,8 @@ int main() {
     /* Error handling */
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    igraph_vector_view(&edges, edges3, sizeof(edges3) / sizeof(igraph_real_t));
-    igraph_vector_bool_init(&types, igraph_vector_max(&edges) + 1);
+    igraph_vector_int_view(&edges, edges3, sizeof(edges3) / sizeof(edges3[0]));
+    igraph_vector_bool_init(&types, igraph_vector_int_max(&edges) + 1);
     for (i = 0; i < igraph_vector_bool_size(&types); i++) {
         VECTOR(types)[i] = i % 2;
     }

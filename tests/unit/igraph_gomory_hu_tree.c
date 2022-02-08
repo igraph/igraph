@@ -28,17 +28,20 @@
 int validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
     igraph_integer_t n = igraph_vcount(graph);
-    igraph_vector_t edges;
+    igraph_integer_t no_of_clusters, min_weight_edge_index;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t membership;
     igraph_real_t min_weight, flow_value;
-    long int i, j, k, m;
+    igraph_t copy;
+    igraph_integer_t i, j, k, m;
 
     if (igraph_vcount(tree) != n) {
-        printf("Gomory-Hu tree should have %ld vertices\n", (long int)n);
+        printf("Gomory-Hu tree should have %" IGRAPH_PRId " vertices\n", n);
         return IGRAPH_EINVAL;
     }
 
     if (igraph_ecount(tree) != n - 1) {
-        printf("Gomory-Hu tree should have %ld edges\n", (long int)n - 1);
+        printf("Gomory-Hu tree should have %" IGRAPH_PRId " edges\n", n - 1);
         return IGRAPH_EINVAL;
     }
 
@@ -51,34 +54,105 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
 
     for (i = 0; i < n; i++) {
         for (j = i + 1; j < n; j++) {
             IGRAPH_CHECK(igraph_get_shortest_path(tree, 0, &edges, i, j, IGRAPH_ALL));
-            m = igraph_vector_size(&edges);
+            m = igraph_vector_int_size(&edges);
             if (m == 0) {
                 continue;
             }
 
-            min_weight = VECTOR(*flow)[(long int)VECTOR(edges)[0]];
+            /* first, check whether the minimum weight along the shortest path
+             * from i to j is the same as the maximum flow between i and j in
+             * the original graph */
+            min_weight = VECTOR(*flow)[VECTOR(edges)[0]];
+            min_weight_edge_index = VECTOR(edges)[0];
             for (k = 1; k < m; k++) {
-                if (VECTOR(*flow)[(long int)VECTOR(edges)[k]] < min_weight) {
-                    min_weight = VECTOR(*flow)[(long int)VECTOR(edges)[k]];
+                if (VECTOR(*flow)[VECTOR(edges)[k]] < min_weight) {
+                    min_weight = VECTOR(*flow)[VECTOR(edges)[k]];
+                    min_weight_edge_index = VECTOR(edges)[k];
                 }
             }
 
             IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, 0, 0, i, j, capacity, 0));
             if (flow_value != min_weight) {
-                printf("Min weight of path %ld --> %ld in Gomory-Hu tree is %.4f, "
+                printf("Min weight of path %" IGRAPH_PRId " -- %" IGRAPH_PRId " in Gomory-Hu tree is %.4f, "
                        "expected %.4f from flow calculation\n", i, j, min_weight, flow_value);
                 return IGRAPH_EINVAL;
             }
+
+            /* next, check whether removing an edge s-t from the Gomory-Hu tree would
+             * partition it exactly the same way as a minimum cut between s and t in
+             * the original graph */
+            IGRAPH_CHECK(igraph_copy(&copy, tree));
+            IGRAPH_FINALLY(igraph_destroy, &copy);
+
+            IGRAPH_CHECK(igraph_delete_edges(&copy, igraph_ess_1(min_weight_edge_index)));
+            IGRAPH_CHECK(igraph_connected_components(&copy, &membership, 0, &no_of_clusters, IGRAPH_WEAK));
+
+            if (no_of_clusters != 2) {
+                printf(
+                    "Removing edge %" IGRAPH_PRId " -- %" IGRAPH_PRId
+                    " (index %" IGRAPH_PRId ") from the Gomory-Hu tree cuts it "
+                    "in %" IGRAPH_PRId " clusters, expected 2\n",
+                    IGRAPH_FROM(tree, min_weight_edge_index),
+                    IGRAPH_TO(tree, min_weight_edge_index),
+                    min_weight_edge_index,
+                    no_of_clusters
+                );
+                return IGRAPH_EINVAL;
+            }
+
+            /* finally, check the total capacity of the edges that go between the
+             * partitions in the original graph; it should be the same as the
+             * weight of the edge in the Gomory-Hu tree that corresponds to the
+             * minimum weight along the path we found above */
+            m = igraph_ecount(graph);
+            flow_value = 0.0;
+            for (j = 0; j < m; j++) {
+                if (VECTOR(membership)[IGRAPH_FROM(graph, j)] != VECTOR(membership)[IGRAPH_TO(graph, j)]) {
+                    flow_value += capacity ? VECTOR(*capacity)[j] : 1;
+                }
+            }
+
+            if (flow_value != VECTOR(*flow)[min_weight_edge_index]) {
+                printf(
+                    "Edge %" IGRAPH_PRId " -- %" IGRAPH_PRId
+					" (index %" IGRAPH_PRId ") in the Gomory-Hu tree has weight = %.2f, but "
+                    "the corresponding flow in the original graph has value = %.2f\n",
+                    IGRAPH_FROM(tree, min_weight_edge_index),
+                    IGRAPH_TO(tree, min_weight_edge_index),
+                    min_weight_edge_index,
+                    VECTOR(*flow)[min_weight_edge_index], flow_value
+                );
+                printf("Edge list of original graph:\n");
+                print_graph(graph);
+                if (capacity) {
+                    printf("Capacities of original graph: ");
+                    print_vector(capacity);
+                } else {
+                    printf("All edges have capacity = 1\n");
+                }
+                printf("Edge list of Gomory-Hu tree:\n");
+                print_graph(tree);
+                printf("Weights of the Gomory-Hu tree: ");
+                print_vector(flow);
+                printf("Partition of original graph corresponding to this cut:\n");
+                print_vector_int(&membership);
+                return IGRAPH_EINVAL;
+            }
+
+            igraph_destroy(&copy);
+            IGRAPH_FINALLY_CLEAN(1);
         }
     }
 
-    igraph_vector_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_destroy(&edges);
+    igraph_vector_int_destroy(&membership);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -117,8 +191,16 @@ int main() {
     IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, &flow, &capacity) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(validate_tree(&g, &tree, &flow, &capacity) == IGRAPH_SUCCESS);
     igraph_destroy(&tree);
+
     /* Make sure we don't blow up without an outgoing flow vector */
     IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, 0, &capacity) == IGRAPH_SUCCESS);
+    igraph_destroy(&tree);
+    igraph_destroy(&g);
+
+    /* example from Github issue #1810 */
+    igraph_full(&g, 4, /* directed = */ 0, /* loops = */ 0);
+    IGRAPH_ASSERT(igraph_gomory_hu_tree(&g, &tree, &flow, 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(validate_tree(&g, &tree, &flow, 0) == IGRAPH_SUCCESS);
     igraph_destroy(&tree);
     igraph_destroy(&g);
 

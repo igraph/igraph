@@ -7,12 +7,24 @@ endif()
 
 if (NOT MSVC)
   check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
+  check_c_compiler_flag("-Wno-unknown-warning-option" COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG)
 endif()
 
 set(
   IGRAPH_WARNINGS_AS_ERRORS ON CACHE BOOL
   "Treat warnings as errors with GCC-like compilers"
 )
+
+option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+if(FORCE_COLORED_OUTPUT)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   add_compile_options(-fdiagnostics-color=always)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+   add_compile_options(-fcolor-diagnostics)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+   add_compile_options(-fcolor-diagnostics)
+  endif()
+endif()
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
@@ -31,9 +43,11 @@ macro(use_all_warnings TARGET_NAME)
       # GCC-style compilers:
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
-        -Wall -Wextra -pedantic -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        -Wall -Wextra -pedantic
+        -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
       >
       $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
+      $<$<BOOL:${COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
         # disable #279: controlling expression is constant; affecting assert(condition && "message")

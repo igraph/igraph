@@ -37,7 +37,7 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
 
 
-    printf("No vertices, no allowed starting vertex id.\n\n");
+    printf("No vertices, no allowed starting vertex ID.\n\n");
     igraph_small(&g, 0, 0, -1);
     ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
     IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &result, 0, NULL, NULL, 1, 1) == IGRAPH_EINVAL);

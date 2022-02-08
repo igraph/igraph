@@ -138,18 +138,18 @@ using namespace gengraph;
 extern "C" {
 
     int igraph_degree_sequence_game_vl(igraph_t *graph,
-                                       const igraph_vector_t *out_seq,
-                                       const igraph_vector_t *in_seq) {
+                                       const igraph_vector_int_t *out_seq,
+                                       const igraph_vector_int_t *in_seq) {
         IGRAPH_HANDLE_EXCEPTIONS(
             igraph_bool_t is_graphical;
 
-            if (in_seq && igraph_vector_size(in_seq) != 0) {
-                IGRAPH_ERROR("This generator works with undirected graphs only", IGRAPH_EINVAL);
+            if (in_seq && igraph_vector_int_size(in_seq) != 0) {
+                IGRAPH_ERROR("The Viger-Latapy sampler support only undirected graphs.", IGRAPH_EINVAL);
             }
 
             IGRAPH_CHECK(igraph_is_graphical(out_seq, 0, IGRAPH_SIMPLE_SW, &is_graphical));
             if (!is_graphical) {
-                IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph",
+                IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph.",
                              IGRAPH_EINVAL);
             }
 
@@ -169,11 +169,11 @@ extern "C" {
             if (!g->make_connected()) {
                 delete g;
                 RNG_END();
-                IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence",
+                IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence.",
                              IGRAPH_EINVAL);
             }
 
-            int *hc = g->hard_copy();
+            igraph_integer_t *hc = g->hard_copy();
             delete g;
             graph_molloy_hash *gh = new graph_molloy_hash(hc);
             delete [] hc;

@@ -27,7 +27,9 @@
 #define DIM 10
 
 void igraph_print_warning(const char *reason, const char *file,
-                          int line, int igraph_errno) {
+                          int line) {
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
     printf("Warning: %s\n", reason);
 }
 

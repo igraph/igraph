@@ -53,14 +53,14 @@
  *
  * Time complexity: worst case exponenital, often faster in practice.
  */
-int igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
+igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) {
 
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
     igraph_integer_t girth, comp_girth;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t start;
-    long int cycle_len;
+    igraph_integer_t cycle_len;
     igraph_t comp_graph, cycle;
 
     // If the graph is directed return error.

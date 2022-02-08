@@ -30,18 +30,19 @@ typedef struct {
     igraph_integer_t low;
     igraph_integer_t high;
     igraph_integer_t length;
-    int retval;
+    igraph_error_t retval;
 } sampling_test_t;
 
 /* Error tests. Don't be afraid to crash the library function.
  */
 int error_test() {
-    igraph_vector_t V;
-    int i, n, ret;
+    igraph_vector_int_t V;
+    int i, n;
+    igraph_error_t ret;
     sampling_test_t *test;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
-    igraph_vector_init(&V, /*size*/ 0);
+    igraph_vector_int_init(&V, /*size*/ 0);
 
     /* test parameters */
     /*----------low----high----length----retval----------*/
@@ -60,13 +61,13 @@ int error_test() {
         test = all_checks[i];
         ret = igraph_random_sample(&V, test->low, test->high, test->length);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (int)(i + 1));
+            printf("Error test no. %d failed.\n", i + 1);
             return IGRAPH_FAILURE;
         }
     }
     igraph_set_error_handler(igraph_error_handler_abort);
 
-    igraph_vector_destroy(&V);
+    igraph_vector_int_destroy(&V);
 
     return IGRAPH_SUCCESS;
 }
@@ -82,13 +83,13 @@ int random_sample_test() {
     igraph_integer_t poolsize;  /* size of candidate pool */
     igraph_real_t sP;           /* population total sum */
     igraph_real_t ss;           /* sample total sum */
-    igraph_vector_t V;
+    igraph_vector_int_t V;
     int i;
 
     igraph_rng_seed(igraph_rng_default(), 57); /* make tests deterministic */
 
     /* The generated sequence of numbers must be in increasing order. */
-    igraph_vector_init(&V, /*size*/ 0);
+    igraph_vector_int_init(&V, /*size*/ 0);
     do {
         high = (igraph_integer_t)R_INTEGER(min, max);
     } while (high == min);
@@ -100,7 +101,7 @@ int random_sample_test() {
         length = (igraph_integer_t)R_INTEGER(1, max);
     } while (length > poolsize);
     igraph_random_sample(&V, low, high, length);
-    if (length != igraph_vector_size(&V)) {
+    if (length != igraph_vector_int_size(&V)) {
         printf("Requested vector length and resulting length mismatch.\n");
         return IGRAPH_FAILURE;
     }
@@ -110,12 +111,12 @@ int random_sample_test() {
             return IGRAPH_FAILURE;
         }
     }
-    igraph_vector_destroy(&V);
+    igraph_vector_int_destroy(&V);
 
     /* Let P be a candidate pool of positive integers with total sum s_P. */
     /* Let S be a random sample from P and having total sum s_S. Then we */
     /* have the bound s_s <= s_P. */
-    igraph_vector_init(&V, /*size*/ 0);
+    igraph_vector_int_init(&V, /*size*/ 0);
     low = 1;
     do {
         high = (igraph_integer_t)R_INTEGER(low, max);
@@ -129,24 +130,24 @@ int random_sample_test() {
     /* up to and including an upper limit. In LaTeX, Gauss' formula is */
     /* \sum_{i=1}^n i = \frac{n(n+1)}{2} where n is the upper limit. */
     sP = (high * (high + 1)) / 2;
-    ss = igraph_vector_sum(&V);
+    ss = igraph_vector_int_sum(&V);
     if (ss > sP) {
         printf("Sum of sampled sequence exceeds sum of whole population.\n");
         return IGRAPH_FAILURE;
     }
-    igraph_vector_destroy(&V);
+    igraph_vector_int_destroy(&V);
 
     return IGRAPH_SUCCESS;
 }
 
 int equal_test() {
-    igraph_vector_t V;
+    igraph_vector_int_t V;
     int i;
 
-    igraph_vector_init(&V, 0);
+    igraph_vector_int_init(&V, 0);
 
     igraph_random_sample(&V, 0, 0, 1);
-    if (igraph_vector_size(&V) != 1) {
+    if (igraph_vector_int_size(&V) != 1) {
         return 1;
     }
     if (VECTOR(V)[0] != 0) {
@@ -154,7 +155,7 @@ int equal_test() {
     }
 
     igraph_random_sample(&V, 10, 10, 1);
-    if (igraph_vector_size(&V) != 1) {
+    if (igraph_vector_int_size(&V) != 1) {
         return 3;
     }
     if (VECTOR(V)[0] != 10) {
@@ -162,7 +163,7 @@ int equal_test() {
     }
 
     igraph_random_sample(&V, 2, 12, 11);
-    if (igraph_vector_size(&V) != 11) {
+    if (igraph_vector_int_size(&V) != 11) {
         return 5;
     }
     for (i = 0; i < 11; i++)
@@ -170,17 +171,17 @@ int equal_test() {
             return 6;
         }
 
-    igraph_vector_destroy(&V);
+    igraph_vector_int_destroy(&V);
     return 0;
 }
 
 int rare_test() {
-    igraph_vector_t V;
+    igraph_vector_int_t V;
 
-    igraph_vector_init(&V, 0);
+    igraph_vector_int_init(&V, 0);
 
     igraph_random_sample(&V, 0, 0, 1);
-    if (igraph_vector_size(&V) != 1) {
+    if (igraph_vector_int_size(&V) != 1) {
         return 1;
     }
     if (VECTOR(V)[0] != 0) {
@@ -188,14 +189,14 @@ int rare_test() {
     }
 
     igraph_random_sample(&V, 10, 10, 1);
-    if (igraph_vector_size(&V) != 1) {
+    if (igraph_vector_int_size(&V) != 1) {
         return 3;
     }
     if (VECTOR(V)[0] != 10) {
         return 4;
     }
 
-    igraph_vector_destroy(&V);
+    igraph_vector_int_destroy(&V);
     return 0;
 }
 

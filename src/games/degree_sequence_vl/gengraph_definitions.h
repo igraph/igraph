@@ -25,6 +25,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "igraph_types.h"
 #include "internal/hacks.h"
 
 namespace gengraph {
@@ -46,17 +47,11 @@ void SET_VERBOSE(int v);
 
 // Random number generator
 void my_srandom(int);
-int my_random();
+long my_random();
 int my_binomial(double pp, int n);
 double my_random01(); // (0,1]
 
 #define MY_RAND_MAX 0x7FFFFFFF
-
-// IPv4 address direct translation into 32-bit uint + special IP defs
-typedef unsigned int ip_addr;
-#define IP_NONE   0x7FFFFFFF
-#define IP_STAR   0x00000000
-#define IP_MYSELF 0x7F000001
 
 //inline double round(double x) throw () { return (floor(0.5+x)); }
 
@@ -66,18 +61,15 @@ typedef unsigned int ip_addr;
     defmin(int)
     defmin(double)
     defmin(unsigned long)
+    defmin(long long)
 #endif //min
 #ifndef max
     #define defmax(type) inline type max(type a, type b) { return a>b ? a : b; }
     defmax(int)
     defmax(double)
     defmax(unsigned long)
+    defmax(long long)
 #endif //max
-
-// Traceroute Sampling
-#define MODE_USP 0
-#define MODE_ASP 1
-#define MODE_RSP 2
 
 // Debug definitions
 //#define PERFORMANCE_MONITOR
@@ -90,8 +82,8 @@ typedef unsigned int ip_addr;
 
 //Edge type
 typedef struct {
-    int from;
-    int to;
+    igraph_integer_t from;
+    igraph_integer_t to;
 } edge;
 
 // Tag Int
@@ -113,18 +105,20 @@ inline double logp(double x) {
 
 
 //Fast search or replace
-inline int* fast_rpl(int *m, const int a, const int b) {
+inline igraph_integer_t* fast_rpl(igraph_integer_t *m, igraph_integer_t a, igraph_integer_t b) {
     while (*m != a) {
         m++;
     }
     *m = b;
     return m;
 }
-inline int* fast_search(int *m, const int size, const int a) {
-    int *p = m + size;
-    while (m != p--) if (*p == a) {
+inline igraph_integer_t* fast_search(igraph_integer_t *m, igraph_integer_t size, igraph_integer_t a) {
+    igraph_integer_t *p = m + size;
+    while (m != p--) {
+        if (*p == a) {
             return p;
         }
+    }
     return NULL;
 }
 
@@ -164,7 +158,7 @@ inline unsigned char prev_dist(const unsigned char c) {
 
 // random number in ]0,1[, _very_ accurate around 0
 inline double random_float() {
-    int r = my_random();
+    long r = my_random();
     double mul = inv_RANDMAX;
     while (r <= 0x7FFFFF) {
         r <<= 8;
@@ -179,10 +173,10 @@ inline double random_float() {
 
 // Random bit generator, sparwise.
 static int _random_bits_stored = 0;
-static int _random_bits = 0;
+static long _random_bits = 0;
 
 inline int random_bit() {
-    int a = _random_bits;
+    long a = _random_bits;
     _random_bits = a >> 1;
     if (_random_bits_stored--) {
         return a & 0x1;

@@ -23,10 +23,6 @@
 
 #include <igraph.h>
 
-void null_warning_handler (const char *reason, const char *file,
-                           int line, int igraph_errno) {
-}
-
 int main() {
 
     igraph_t g;
@@ -64,7 +60,7 @@ int main() {
     /* Turn off the warning handler temporarily because the GML writer will
      * print warnings about boolean attributes being converted to numbers, and
      * we don't care about these */
-    oldwarnhandler = igraph_set_warning_handler(null_warning_handler);
+    oldwarnhandler = igraph_set_warning_handler(igraph_warning_handler_ignore);
     igraph_write_graph_gml(&g, stdout, 0, "");
     igraph_set_warning_handler(oldwarnhandler);
 

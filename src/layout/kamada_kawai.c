@@ -27,15 +27,34 @@
 #include "igraph_paths.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 /**
  * \ingroup layout
  * \function igraph_layout_kamada_kawai
- * \brief Places the vertices on a plane according the Kamada-Kawai algorithm.
+ * \brief Places the vertices on a plane according to the Kamada-Kawai algorithm.
+ *
+ * This is a force-directed layout. A spring is inserted between all pairs
+ * of vertices, both those which are directly connected and those that are not.
+ * The unstretched length of springs is chosen based on the graph distance
+ * between the corresponding pair of vertices. Thus, in a weighted graph, increasing
+ * the weight between two vertices pushes them apart. The Young modulus of springs
+ * is inversely proportional to the graph distance, ensuring that springs between
+ * far-apart veritces will have a smaller effect on the layout.
  *
  * </para><para>
- * This is a force directed layout, see  Kamada, T. and Kawai, S.: An
- * Algorithm for Drawing General Undirected Graphs. Information
- * Processing Letters, 31/1, 7--15, 1989.
+ * This layout algorithm is not suitable for large graphs. The memory
+ * requirements are of the order O(|V|^2).
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Kamada, T. and Kawai, S.:
+ * An Algorithm for Drawing General Undirected Graphs.
+ * Information Processing Letters, 31/1, 7--15, 1989.
+ * https://doi.org/10.1016/0020-0190(89)90102-6
+ *
  * \param graph A graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result (x-positions in column zero and
@@ -71,7 +90,7 @@
  * graph.
  */
 
-int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
                                igraph_bool_t use_seed, igraph_integer_t maxiter,
                                igraph_real_t epsilon, igraph_real_t kkconst,
                                const igraph_vector_t *weights,
@@ -155,7 +174,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (no_nodes <= 1) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -216,7 +235,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
             }
             dx = MATRIX(*res, m, 0) - MATRIX(*res, i, 0);
             dy = MATRIX(*res, m, 1) - MATRIX(*res, i, 1);
-            mi_dist = sqrt(dx * dx + dy * dy);
+            mi_dist = hypot(dx, dy);
             myD1 += MATRIX(kij, m, i) * (dx - MATRIX(lij, m, i) * dx / mi_dist);
             myD2 += MATRIX(kij, m, i) * (dy - MATRIX(lij, m, i) * dy / mi_dist);
         }
@@ -228,6 +247,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t myD1, myD2, A, B, C;
         igraph_real_t max_delta, delta_x, delta_y;
         igraph_real_t old_x, old_y, new_x, new_y;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         myD1 = 0.0, myD2 = 0.0, A = 0.0, B = 0.0, C = 0.0;
 
@@ -254,7 +275,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
             }
             dx = old_x - MATRIX(*res, i, 0);
             dy = old_y - MATRIX(*res, i, 1);
-            dist = sqrt(dx * dx + dy * dy);
+            dist = hypot(dx, dy);
             den = dist * (dx * dx + dy * dy);
             A += MATRIX(kij, m, i) * (1 - MATRIX(lij, m, i) * dy * dy / den);
             B += MATRIX(kij, m, i) * MATRIX(lij, m, i) * dx * dy / den;
@@ -293,10 +314,10 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
             }
             old_dx = old_x - MATRIX(*res, i, 0);
             old_dy = old_y - MATRIX(*res, i, 1);
-            old_mi_dist = sqrt(old_dx * old_dx + old_dy * old_dy);
+            old_mi_dist = hypot(old_dx, old_dy);
             new_dx = new_x - MATRIX(*res, i, 0);
             new_dy = new_y - MATRIX(*res, i, 1);
-            new_mi_dist = sqrt(new_dx * new_dx + new_dy * new_dy);
+            new_mi_dist = hypot(new_dx, new_dy);
 
             VECTOR(D1)[i] -= MATRIX(kij, m, i) *
                              (-old_dx + MATRIX(lij, m, i) * old_dx / old_mi_dist);
@@ -325,25 +346,28 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     igraph_matrix_destroy(&dij);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \ingroup layout
  * \function igraph_layout_kamada_kawai_3d
- * \brief 3D version of the Kamada-Kawai layout generator
+ * \brief 3D version of the Kamada-Kawai layout generator.
+ *
+ * This is the 3D version of igraph_layout_kamada_kawai().
+ * See the documentation of that function for more information.
  *
  * </para><para>
- * This is a force directed layout, see  Kamada, T. and Kawai, S.: An
- * Algorithm for Drawing General Undirected Graphs. Information
- * Processing Letters, 31/1, 7--15, 1989.
+ * This layout algorithm is not suitable for large graphs. The memory
+ * requirements are of the order O(|V|^2).
+ *
  * \param graph A graph object.
  * \param res Pointer to an initialized matrix object. This will
- *        contain the result (x-positions in column zero and
- *        y-positions in column one) and will be resized if needed.
+ *        contain the result (x-, y- and z-positions in columns one
+ *        through three) and will be resized if needed.
  * \param use_seed Boolean, whether to use the values supplied in the
  *        \p res argument as the initial configuration. If zero and there
- *        are any limits on the X, Y or Z coordinates, then a random initial
+ *        are any limits on the z, y or z coordinates, then a random initial
  *        configuration is used. Otherwise the vertices are placed uniformly
  *        on a sphere of radius 1 as the initial configuration.
  * \param maxiter The maximum number of iterations to perform. A reasonable
@@ -377,7 +401,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * graph.
  */
 
-int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
                                   igraph_bool_t use_seed, igraph_integer_t maxiter,
                                   igraph_real_t epsilon, igraph_real_t kkconst,
                                   const igraph_vector_t *weights,
@@ -480,7 +504,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (no_nodes <= 1) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -552,6 +576,8 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t max_delta, delta_x, delta_y, delta_z;
         igraph_real_t old_x, old_y, old_z, new_x, new_y, new_z;
         igraph_real_t detnum;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         /* Select maximal delta */
         m = 0; max_delta = -1;
@@ -688,5 +714,5 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
     igraph_matrix_destroy(&dij);
     IGRAPH_FINALLY_CLEAN(6);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

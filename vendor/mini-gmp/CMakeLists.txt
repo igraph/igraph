@@ -10,6 +10,8 @@ target_include_directories(
   gmp_vendored
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
 )
 
 if (BUILD_SHARED_LIBS)

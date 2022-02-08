@@ -1,0 +1,32 @@
+No vertices:
+( )
+
+One vertex:
+( 0 )
+
+Directed disconnected graph with loops and multiple edges, no weights, k = 0, IGRAPH_IN:
+( 1 2 1 2 2 0 )
+
+Same graph, k=1:
+( 2 2 2 3 2 0 )
+
+Same graph, without loops, k=1:
+( 2 1 2 2 2 0 )
+
+Same graph with loop, k=1, undirected:
+( 4 3 3 5 2 0 )
+
+Checking if calling igraph_local_scan_1_ecount properly redirects:
+( 4 3 3 5 2 0 )
+
+Same graph, directed, k=2:
+( 2 4 2 6 5 0 )
+
+Same graph, undirected, k=2:
+( 6 8 8 8 5 0 )
+
+Same graph, weighted:
+( 0.9 2 2 2 1.8 0 )
+
+Wrong size weights.
+Negative k.

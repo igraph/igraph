@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Motifs">
-<title>Graph Motifs, Dyad Census and Triad Census</title>
+<title>Graph motifs, dyad census and triad census</title>
 
 <para>
 This section deals with functions which find small induced subgraphs in a

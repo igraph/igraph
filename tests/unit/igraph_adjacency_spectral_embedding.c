@@ -42,15 +42,14 @@ int main() {
     igraph_arpack_options_t options;
     igraph_vector_t cvec;
 
-    igraph_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
 
     igraph_matrix_init(&U, 0, 0);
     igraph_matrix_init(&V, 0, 0);
     igraph_arpack_options_init(&options);
 
     igraph_vector_init(&cvec, 0);
-    igraph_degree(&graph, &cvec, igraph_vss_all(), IGRAPH_ALL,
-                  IGRAPH_LOOPS);
+    igraph_strength(&graph, &cvec, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, 0);
     igraph_vector_scale(&cvec, .5);
 
     igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,

@@ -23,9 +23,9 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_t degree;
+    igraph_vector_int_t degree;
     igraph_bool_t tree;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -46,13 +46,13 @@ int main() {
     /* out degree of citation equals edges per vertex */
 
     igraph_growing_random_game(&g, /* n: vertices */ 10, /* m: edges_per_vertex */ 7, /* directed */ 1, /* citation */ 1);
-    igraph_vector_init(&degree, 0);
+    igraph_vector_int_init(&degree, 0);
     igraph_degree(&g, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
-    for(i = 1; i < 10; i++) {
+    for (i = 1; i < 10; i++) {
         IGRAPH_ASSERT(VECTOR(degree)[i] == 7);
     }
     IGRAPH_ASSERT(igraph_is_directed(&g));
-    igraph_vector_destroy(&degree);
+    igraph_vector_int_destroy(&degree);
     igraph_destroy(&g);
 
     /* total number of edges is (vertices - 1) * edges */

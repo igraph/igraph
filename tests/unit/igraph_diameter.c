@@ -26,9 +26,10 @@ int main() {
     igraph_t g;
     igraph_real_t result;
     igraph_integer_t from, to;
-    igraph_vector_t path_edge, path_vertex, weights_vec, edge_vec;
+    igraph_vector_int_t path_edge, path_vertex, edge_vec;
+    igraph_vector_t weights_vec;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1};
-    igraph_real_t vec[] = {2,8};
+    igraph_integer_t vec[] = {2,8};
     igraph_es_t edge_sele;
 
     printf("diameter of Barabasi graph:\n");
@@ -39,27 +40,27 @@ int main() {
                          /*start_from=*/ 0);
     igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
 
-    printf("Diameter: %li\n", (long int) result);
+    printf("Diameter: %" IGRAPH_PRId "\n", (igraph_integer_t) result);
 
     igraph_destroy(&g);
 
     printf("diameter of ring and the path in terms of edges and vertices \n");
 
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 0);
-    igraph_vector_init(&path_vertex, 0);
-    igraph_vector_init(&path_edge, 0);
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(igraph_real_t));
+    igraph_vector_int_init(&path_vertex, 0);
+    igraph_vector_int_init(&path_edge, 0);
+    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
-    printf("diameter: %g, from %d to %d\n", result,
+    printf("diameter: %g, from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", result,
             from, to);
-    print_vector_round(&path_vertex);
-    print_vector_round(&path_edge);
-    igraph_vector_destroy(&path_vertex);
-    igraph_vector_destroy(&path_edge);
+    print_vector_int(&path_vertex);
+    print_vector_int(&path_edge);
+    igraph_vector_int_destroy(&path_vertex);
+    igraph_vector_int_destroy(&path_edge);
 
     //disconnected graph
     printf("disconnected ring graph\n");
-    igraph_vector_view(&edge_vec, vec, sizeof(vec) / sizeof(igraph_real_t));
+    igraph_vector_int_view(&edge_vec, vec, sizeof(vec) / sizeof(vec[0]));
     igraph_es_vector(&edge_sele, &edge_vec);
     igraph_delete_edges(&g, edge_sele);
     printf("The largest path in one connected component\n");

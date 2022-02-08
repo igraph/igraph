@@ -23,30 +23,30 @@
 int main() {
     igraph_t g, g_rev, g_test;
     igraph_bool_t same;
-    igraph_matrix_t W;
+    igraph_matrix_int_t W;
     int i, j;
 
     /*    Directed, pentagram with ring, both clockwise    */
-    igraph_matrix_init(&W, 1, 1);
-    igraph_matrix_set(&W, 0, 0, 2);
+    igraph_matrix_int_init(&W, 1, 1);
+    igraph_matrix_int_set(&W, 0, 0, 2);
     IGRAPH_ASSERT(igraph_extended_chordal_ring(&g, /* nodes */ 5, &W, 1 /*directed*/) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 2, 1, 3, 2, 4, 3, 0, 4, 1, -1);
     IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(same);
 
     /*     Use negative matrix value for same specification    */
-    igraph_matrix_set(&W, 0, 0, -3);
+    igraph_matrix_int_set(&W, 0, 0, -3);
     IGRAPH_ASSERT(igraph_extended_chordal_ring(&g_rev, /* nodes */ 5, &W, 1 /*directed*/) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_is_same_graph(&g_rev, &g_test, &same) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_rev);
     igraph_destroy(&g_test);
-    igraph_matrix_destroy(&W);
+    igraph_matrix_int_destroy(&W);
 
 
     /*    From article, should give double edges for chords in igraph   */
-    igraph_matrix_init(&W, 2, 2);
+    igraph_matrix_int_init(&W, 2, 2);
     int m[2][2] = {{4, 2},
                    {8, 10}};
     for (i=0; i < 2; i++) {
@@ -67,7 +67,7 @@ int main() {
     IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
-    igraph_matrix_destroy(&W);
+    igraph_matrix_int_destroy(&W);
 
     VERIFY_FINALLY_STACK();
     return 0;

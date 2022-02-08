@@ -31,26 +31,26 @@
 #include "core/interruption.h"
 #include "core/indheap.h"
 
-/* When vid_ecc is not NULL, only one vertex id should be passed in vids.
+/* When vid_ecc is not NULL, only one vertex ID should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
  * vids. If unconn == FALSE and not all other vertices were reachable from
  * the single given vertex, -1 is returned in vid_ecc. */
-static int igraph_i_eccentricity(const igraph_t *graph,
+static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
                                  igraph_lazy_adjlist_t *adjlist,
                                  igraph_integer_t *vid_ecc,
                                  igraph_bool_t unconn) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_long_t q;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_dqueue_int_t q;
     igraph_vit_t vit;
     igraph_vector_int_t counted;
-    long int i, mark = 1;
+    igraph_integer_t i, mark = 1;
     igraph_integer_t min_degree = 0;
 
-    IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -65,33 +65,33 @@ static int igraph_i_eccentricity(const igraph_t *graph,
          !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), mark++, i++) {
 
-        long int source;
-        long int nodes_reached = 1;
+        igraph_integer_t source;
+        igraph_integer_t nodes_reached = 1;
         source = IGRAPH_VIT_GET(vit);
-        IGRAPH_CHECK(igraph_dqueue_long_push(&q, source));
-        IGRAPH_CHECK(igraph_dqueue_long_push(&q, 0));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         VECTOR(counted)[source] = mark;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_long_empty(&q)) {
-            long int act = igraph_dqueue_long_pop(&q);
-            long int dist = igraph_dqueue_long_pop(&q);
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            igraph_integer_t dist = igraph_dqueue_int_pop(&q);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(adjlist, act);
-            long int j, n;
+            igraph_integer_t j, n;
 
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                long int nei = VECTOR(*neis)[j];
+                igraph_integer_t nei = VECTOR(*neis)[j];
                 if (VECTOR(counted)[nei] != mark) {
                     VECTOR(counted)[nei] = mark;
                     nodes_reached++;
-                    IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
-                    IGRAPH_CHECK(igraph_dqueue_long_push(&q, dist + 1));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, dist + 1));
                 }
             }
             if (vid_ecc) {
-                /* Return the vertex id of the vertex which has the lowest
+                /* Return the vertex ID of the vertex which has the lowest
                  * degree of the vertices most distant from the starting
                  * vertex. Assumes there is only 1 vid in vids. Used for
                  * pseudo_diameter calculations. */
@@ -103,7 +103,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
             } else if (dist > VECTOR(*res)[i]) {
                 VECTOR(*res)[i] = dist;
             }
-        } /* while !igraph_dqueue_long_empty(dqueue) */
+        } /* while !igraph_dqueue_int_empty(dqueue) */
 
         if (nodes_reached != no_of_nodes && !unconn && vid_ecc) {
             *vid_ecc = -1;
@@ -113,7 +113,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
 
     igraph_vector_int_destroy(&counted);
     igraph_vit_destroy(&vit);
-    igraph_dqueue_long_destroy(&q);
+    igraph_dqueue_int_destroy(&q);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -151,7 +151,7 @@ static int igraph_i_eccentricity(const igraph_t *graph,
  * \example examples/simple/igraph_eccentricity.c
  */
 
-int igraph_eccentricity(const igraph_t *graph,
+igraph_error_t igraph_eccentricity(const igraph_t *graph,
                         igraph_vector_t *res,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
@@ -193,10 +193,10 @@ int igraph_eccentricity(const igraph_t *graph,
  * \example examples/simple/igraph_radius.c
  */
 
-int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
+igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                   igraph_neimode_t mode) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes == 0) {
         *radius = IGRAPH_NAN;
@@ -210,7 +210,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -254,7 +254,7 @@ int igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * \sa \ref igraph_eccentricity(), \ref igraph_diameter().
  *
  */
-int igraph_pseudo_diameter(const igraph_t *graph,
+igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_real_t *diameter,
                            igraph_integer_t vid_start,
                            igraph_integer_t *from,
@@ -262,7 +262,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
                            igraph_bool_t directed,
                            igraph_bool_t unconn) {
 
-    int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
@@ -270,7 +270,7 @@ int igraph_pseudo_diameter(const igraph_t *graph,
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
     /* We will reach here when vid_start < 0 and the graph has no vertices. */
@@ -451,10 +451,10 @@ int igraph_pseudo_diameter(const igraph_t *graph,
  * wil be set to infinity, and \p vid_ecc to -1;
  */
 int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_lazy_inclist_t *inclist) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_2wheap_t Q;
     igraph_vector_t vec_dist;
-    long int i;
+    igraph_integer_t i;
 
     IGRAPH_VECTOR_INIT_FINALLY(&vec_dist, no_of_nodes);
     igraph_vector_fill(&vec_dist, IGRAPH_INFINITY);
@@ -465,19 +465,19 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
     igraph_2wheap_push_with_index(&Q, vid_start, -1.0);
 
     while (!igraph_2wheap_empty(&Q)) {
-        long int minnei = igraph_2wheap_max_index(&Q);
+        igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
         igraph_vector_int_t *neis;
-        long int nlen;
+        igraph_integer_t nlen;
 
         VECTOR(vec_dist)[minnei] = mindist - 1.0;
 
         /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
+        neis = igraph_lazy_inclist_get(inclist, minnei);
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            long int edge = (long int) VECTOR(*neis)[i];
-            long int tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_integer_t edge = VECTOR(*neis)[i];
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
             igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
@@ -495,7 +495,7 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
     *ecc = 0;
     *vid_ecc = vid_start;
     double degree_ecc = 0;
-    long int degree_i;
+    igraph_integer_t degree_i;
     for (i = 0; i < no_of_nodes; i++) {
         if (i == vid_start) {
             continue;
@@ -573,7 +573,7 @@ int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t 
  *
  * \sa \ref igraph_diameter_dijkstra()
  */
-int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                                     const igraph_vector_t *weights,
                                     igraph_real_t *diameter,
                                     igraph_integer_t vid_start,
@@ -583,8 +583,8 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
                                     igraph_bool_t unconn) {
 
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
@@ -592,7 +592,7 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     igraph_bool_t inf = 0;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex id for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
     if (!weights) {
@@ -600,8 +600,8 @@ int igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match number "
-                      " of edges (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {

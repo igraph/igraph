@@ -37,6 +37,8 @@
     #include <glpk.h>
 #endif
 
+#include <limits.h>
+
 /**
  * \function igraph_community_optimal_modularity
  * Calculate the community structure with the highest modularity value
@@ -77,9 +79,9 @@
  * \example examples/simple/igraph_community_optimal_modularity.c
  */
 
-int igraph_community_optimal_modularity(const igraph_t *graph,
+igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
                                         igraph_real_t *modularity,
-                                        igraph_vector_t *membership,
+                                        igraph_vector_int_t *membership,
                                         const igraph_vector_t *weights) {
 
 #ifndef HAVE_GLPK
@@ -87,11 +89,12 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
                  IGRAPH_UNIMPLEMENTED);
 #else
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    int no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
-    int i, j, k, l, st;
+    igraph_integer_t no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
+    igraph_integer_t i, j, k, l;
+    int st;
     int idx[] = { 0, 0, 0, 0 };
     double coef[] = { 0.0, 1.0, 1.0, -2.0 };
     igraph_real_t total_weight;
@@ -120,13 +123,17 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     /* Avoid problems with the null graph */
     if (no_of_nodes < 2) {
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_fill(membership, 0);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
         }
         return IGRAPH_SUCCESS;
+    }
+
+    if (no_of_variables > INT_MAX) {
+        IGRAPH_ERROR("Problem too large for GLPK.", IGRAPH_EOVERFLOW);
     }
 
     if (weights) {
@@ -144,8 +151,8 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
             *modularity = IGRAPH_NAN;
         }
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-            igraph_vector_null(membership);
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+            igraph_vector_int_null(membership);
         }
     }
 
@@ -162,14 +169,14 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_glp_delete_prob, ip);
 
     glp_set_obj_dir(ip, GLP_MAX);
-    st = glp_add_cols(ip, no_of_variables);
+    st = glp_add_cols(ip, (int) no_of_variables);
 
     /* variables are binary */
     for (i = 0; i < no_of_variables; i++) {
-        glp_set_col_kind(ip, (st + i), GLP_BV);
+        glp_set_col_kind(ip, (int)(st + i), GLP_BV);
     }
 
-#define IDX(a,b) ((b)*((b)+1)/2+(a))
+#define IDX(a,b) (int)((b)*((b)+1)/2+(a))
 
     /* reflexivity */
     for (i = 0; i < no_of_nodes; i++) {
@@ -248,8 +255,8 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     }
 
     if (membership) {
-        long int comm = 0;   /* id of the last community that was found */
-        IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+        igraph_integer_t comm = 0;   /* id of the last community that was found */
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
 
             IGRAPH_ALLOW_INTERRUPTION();

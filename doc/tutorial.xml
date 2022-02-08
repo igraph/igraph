@@ -47,7 +47,7 @@ following contents:
 
 <programlisting>
 cmake_minimum_required(VERSION 3.16)
-project(igraph_test C)
+project(igraph_test)
 
 find_package(igraph REQUIRED)
 
@@ -57,7 +57,8 @@ target_link_libraries(igraph_test PUBLIC igraph::igraph)
 </para>
 
 <para>
-To compile the project, create a new directory called build, and switch to it:
+To compile the project, create a new directory called <filename>build</filename> in
+the root of the igraph source tree, and switch to it:
 <programlisting>
 mkdir build
 cd build
@@ -84,6 +85,14 @@ If configuration has succeeded, build the program using
 cmake --build .
 </programlisting>
 </para>
+
+<note><title>C++ has to be enabled in igraph projects</title>
+<para>Parts of igraph are implemented in C++; therefore, any CMake target that
+depends on igraph should use the C++ linker. Furthermore, OpenMP support in
+igraph works correctly only if C++ is enabled in the CMake project. The script
+that finds igraph on the host machine will throw an error if C++ support is
+not enabled in the CMake project.</para>
+</note>
 
 </section>
 
@@ -169,7 +178,7 @@ graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>),
 ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices
 (<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>) or trees
-(<link linkend="igraph_tree"><function>igraph_tree()</function></link>).
+(<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>).
 </para>
 
 <para>
@@ -218,8 +227,8 @@ as in the example).
 The <link
 linkend="igraph_add_edges"><function>igraph_add_edges()</function></link>
 function simply takes a graph and a vector of
-vertex ids defining the new edges. The first edge is between the first
-two vertex ids in the vector, the second edge is between the second
+vertex IDs defining the new edges. The first edge is between the first
+two vertex IDs in the vector, the second edge is between the second
 two, etc. This way we add ten random edges to the lattice.
 </para>
 

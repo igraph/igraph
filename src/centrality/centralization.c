@@ -21,6 +21,7 @@
 #include "igraph_centrality.h"
 
 #include "igraph_interface.h"
+#include "igraph_structural.h"
 #include "igraph_vector.h"
 
 #include "core/math.h"
@@ -74,7 +75,7 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
                                     igraph_real_t theoretical_max,
                                     igraph_bool_t normalized) {
 
-    long int no_of_nodes = igraph_vector_size(scores);
+    igraph_integer_t no_of_nodes = igraph_vector_size(scores);
     igraph_real_t maxscore = 0.0;
     igraph_real_t cent = 0.0;
 
@@ -125,7 +126,7 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  * score.
  */
 
-int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
                                  igraph_neimode_t mode, igraph_bool_t loops,
                                  igraph_real_t *centralization,
                                  igraph_real_t *theoretical_max,
@@ -144,10 +145,8 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
     }
 
-    IGRAPH_CHECK(igraph_degree(graph, scores, igraph_vss_all(), mode, loops));
-
-    IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops,
-                 tmax));
+    IGRAPH_CHECK(igraph_strength(graph, scores, igraph_vss_all(), mode, loops, 0));
+    IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops, tmax));
 
     *centralization = igraph_centralization(scores, *tmax, normalized);
 
@@ -156,7 +155,7 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -203,7 +202,7 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
  * igraph_centralization().
  */
 
-int igraph_centralization_degree_tmax(const igraph_t *graph,
+igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
                                       igraph_integer_t nodes,
                                       igraph_neimode_t mode,
                                       igraph_bool_t loops,
@@ -245,7 +244,7 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -279,7 +278,7 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
  * centralization score.
  */
 
-int igraph_centralization_betweenness(const igraph_t *graph,
+igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
                                       igraph_vector_t *res,
                                       igraph_bool_t directed,
                                       igraph_real_t *centralization,
@@ -310,7 +309,7 @@ int igraph_centralization_betweenness(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -351,7 +350,7 @@ int igraph_centralization_betweenness(const igraph_t *graph,
  * igraph_centralization().
  */
 
-int igraph_centralization_betweenness_tmax(const igraph_t *graph,
+igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
         igraph_integer_t nodes,
         igraph_bool_t directed,
         igraph_real_t *res) {
@@ -370,7 +369,7 @@ int igraph_centralization_betweenness_tmax(const igraph_t *graph,
         *res = (real_nodes - 1) * (real_nodes - 1) * (real_nodes - 2) / 2.0;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -406,7 +405,7 @@ int igraph_centralization_betweenness_tmax(const igraph_t *graph,
  * centralization score.
  */
 
-int igraph_centralization_closeness(const igraph_t *graph,
+igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
                                     igraph_vector_t *res,
                                     igraph_neimode_t mode,
                                     igraph_real_t *centralization,
@@ -439,7 +438,7 @@ int igraph_centralization_closeness(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -482,7 +481,7 @@ int igraph_centralization_closeness(const igraph_t *graph,
  * igraph_centralization().
  */
 
-int igraph_centralization_closeness_tmax(const igraph_t *graph,
+igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
         igraph_integer_t nodes,
         igraph_neimode_t mode,
         igraph_real_t *res) {
@@ -503,7 +502,7 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
         *res = (real_nodes - 1) * (real_nodes - 2) / (2.0 * real_nodes - 3);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -544,7 +543,7 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
  * for the calculating the centralization.
  */
 
-int igraph_centralization_eigenvector_centrality(
+igraph_error_t igraph_centralization_eigenvector_centrality(
     const igraph_t *graph,
     igraph_vector_t *vector,
     igraph_real_t *value,
@@ -588,7 +587,7 @@ int igraph_centralization_eigenvector_centrality(
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -632,7 +631,7 @@ int igraph_centralization_eigenvector_centrality(
  * igraph_centralization().
  */
 
-int igraph_centralization_eigenvector_centrality_tmax(
+igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     const igraph_t *graph,
     igraph_integer_t nodes,
     igraph_bool_t directed,
@@ -654,5 +653,5 @@ int igraph_centralization_eigenvector_centrality_tmax(
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

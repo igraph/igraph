@@ -16,42 +16,42 @@ types they currently support:
 
 <glossentry><glossterm>vector</glossterm><glossdef><para>
   Vector is currently defined for <type>igraph_real_t</type>,
-  <type>long int</type> (long), <type>char</type> (char),
-  <type>igraph_bool_t</type> (bool). The default is
-  <type>igraph_real_t</type>.
+  <type>igraph_integer_t</type> (int), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool) and <type>igraph_complex_t</type>
+  (complex). The default is <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
 <glossentry><glossterm>matrix</glossterm><glossdef><para>
   Matrix is currently defined for <type>igraph_real_t</type>,
-  <type>long int</type> (long), <type>char</type> (char),
-  <type>igraph_bool_t</type> (bool). The default is
-  <type>igraph_real_t</type>.
+  <type>igraph_integer_t</type> (int), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool) and <type>igraph_complex_t</type>
+  (complex). The default is <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
 <glossentry><glossterm>array3</glossterm><glossdef><para>
   Array3 is currently defined for <type>igraph_real_t</type>,
-  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_integer_t</type> (int), <type>char</type> (char) and
   <type>igraph_bool_t</type> (bool). The default is
   <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
 <glossentry><glossterm>stack</glossterm><glossdef><para>
   Stack is currently defined for <type>igraph_real_t</type>,
-  <type>long int</type> (long), <type>char</type> (char),
-  <type>igraph_bool_t</type> (bool). The default is
-  <type>igraph_real_t</type>.
+  <type>igraph_integer_t</type> (int), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool) and <type>void*</type> (ptr).
+  The default is <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
 <glossentry><glossterm>double-ended queue</glossterm><glossdef><para>
   Dqueue is currently defined for <type>igraph_real_t</type>,
-  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_integer_t</type> (int), <type>char</type> (char) and
   <type>igraph_bool_t</type> (bool). The default is
   <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
 <glossentry><glossterm>heap</glossterm><glossdef><para>
   Heap is currently defined for <type>igraph_real_t</type>,
-  <type>long int</type> (long), <type>char</type> (char).
+  <type>igraph_integer_t</type> (int), <type>char</type> (char).
   In addition both maximum and minimum heaps are available.
   The default is the <type>igraph_real_t</type> maximum heap.
 </para></glossdef></glossentry>
@@ -77,7 +77,7 @@ Some examples:
 
 <listitem><para>
   <type>igraph_vector_bool_t</type> is a vector of
-  <type>igraph_bool_t</type> elements, initialize it with
+  <type>igraph_bool_t</type> elements; initialize it with
   <function>igraph_vector_bool_init</function>, destroy it with
   <function>igraph_vector_bool_destroy</function>, etc.
 </para></listitem>
@@ -97,15 +97,14 @@ Some examples:
 </para></listitem>
 
 <listitem><para>
-  <type>igraph_heap_long_t</type> is a maximum heap with <type>long
-  int</type> elements. Its function have the
-  <function>igraph_heap_long_</function> prefix.
+  <type>igraph_heap_int_t</type> is a maximum heap with <type>igraph_integer_t</type>
+  elements. Its functions have the <function>igraph_heap_int_</function> prefix.
 </para></listitem>
 
 <listitem><para>
-  <type>igraph_heap_min_long_t</type> is a minimum heap containing
-  <type>long int</type> elements. Its functions have the
-  <function>igraph_heap_min_long_</function> prefix.
+  <type>igraph_heap_min_int_t</type> is a minimum heap containing
+  <type>igraph_integer_t</type> elements. Its functions have the
+  <function>igraph_heap_min_int_</function> prefix.
 </para></listitem>
 
 </itemizedlist>

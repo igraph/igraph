@@ -44,7 +44,7 @@ IGRAPH_EXPORT igraph_error_t igraph_full_bipartite(igraph_t *graph,
                                         igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_create_bipartite(igraph_t *g, const igraph_vector_bool_t *types,
-                                          const igraph_vector_t *edges,
+                                          const igraph_vector_int_t *edges,
                                           igraph_bool_t directed);
 
 IGRAPH_EXPORT igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
@@ -58,8 +58,8 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                               const igraph_vector_bool_t *types,
                                               igraph_t *proj1,
                                               igraph_t *proj2,
-                                              igraph_vector_t *multiplicity1,
-                                              igraph_vector_t *multiplicity2,
+                                              igraph_vector_int_t *multiplicity1,
+                                              igraph_vector_int_t *multiplicity2,
                                               igraph_integer_t probe1);
 
 IGRAPH_EXPORT igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
@@ -69,8 +69,8 @@ IGRAPH_EXPORT igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_boo
 IGRAPH_EXPORT igraph_error_t igraph_get_incidence(const igraph_t *graph,
                                        const igraph_vector_bool_t *types,
                                        igraph_matrix_t *res,
-                                       igraph_vector_t *row_ids,
-                                       igraph_vector_t *col_ids);
+                                       igraph_vector_int_t *row_ids,
+                                       igraph_vector_int_t *col_ids);
 
 IGRAPH_EXPORT igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                                       igraph_bool_t *res,

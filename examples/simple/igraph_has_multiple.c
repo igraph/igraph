@@ -23,14 +23,6 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_bool_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_bool_size(v); i++) {
-        fprintf(f, " %i", (int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
-
 int main() {
 
     igraph_t graph;

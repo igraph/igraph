@@ -21,11 +21,9 @@
 #include "test_utilities.inc"
 #include <stdlib.h>
 
-void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igraph_vector_t *weights) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int i;
-    igraph_es_t edges;
+void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch, igraph_vector_t *weights) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_t spanner_graph;
     igraph_vector_t spanner_weights;
     igraph_matrix_t res_spanner, res_graph;
@@ -36,7 +34,7 @@ void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igr
         igraph_cattribute_EAN_setv(graph, "weight", weights);
     }
     igraph_subgraph_edges(graph, &spanner_graph, igraph_ess_vector(spanner), 0);
-    igraph_vector_init(&spanner_weights, igraph_vector_size(spanner));
+    igraph_vector_init(&spanner_weights, igraph_vector_int_size(spanner));
     if (weights){
         igraph_cattribute_EANV(&spanner_graph, "weight", igraph_ess_all(IGRAPH_EDGEORDER_ID), &spanner_weights);
     } else {
@@ -55,15 +53,18 @@ void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igr
     // print the number of nodes, the number of original edges and the new edge
     // count. This is not validated (there is no expected output) but it helps
     // to gauge whether the algorithm is not simply keeping most of the edges
-    printf("%ld, %ld --> %ld\n", no_of_nodes, no_of_edges, (long int) igraph_ecount(&spanner_graph));
+    printf(
+        "%" IGRAPH_PRId ", %" IGRAPH_PRId " --> %" IGRAPH_PRId "\n",
+        no_of_nodes, no_of_edges, igraph_ecount(&spanner_graph)
+    );
 
     // Validate the stretch factor
     igraph_matrix_init(&res_spanner, 0, 0);
     igraph_matrix_init(&res_graph, 0, 0);
     igraph_shortest_paths_dijkstra(graph, &res_graph, igraph_vss_all(), igraph_vss_all(), weights, IGRAPH_ALL);
     igraph_shortest_paths_dijkstra(&spanner_graph, &res_spanner, igraph_vss_all(), igraph_vss_all(), &spanner_weights, IGRAPH_ALL);
-    for (int x = 0; x < no_of_nodes; x++) {
-        for (int y = 0; y < no_of_nodes; y++) {
+    for (igraph_integer_t x = 0; x < no_of_nodes; x++) {
+        for (igraph_integer_t y = 0; y < no_of_nodes; y++) {
             if (x == y) {
                 continue;
             }
@@ -80,8 +81,9 @@ void test_spanner(igraph_t *graph, igraph_vector_t *spanner, double stretch, igr
 
 int main () {
     igraph_t graph;
-    igraph_vector_t spanner, weights;
-    long int no_of_nodes, no_of_edges, no_of_edges_spanner;
+    igraph_vector_t weights;
+    igraph_vector_int_t spanner;
+    igraph_integer_t no_of_edges;
 
     /* Initialize attribute handler; we will use edge attributes in test_spanner() */
     igraph_set_attribute_table(&igraph_cattribute_table);
@@ -90,7 +92,7 @@ int main () {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     /* Create the output vector -- this will be re-used several times */
-    igraph_vector_init(&spanner, 0);
+    igraph_vector_int_init(&spanner, 0);
 
     /* Trivial spanner with stretch of one */
     printf("Complete graph with stretch of one\n");
@@ -125,7 +127,7 @@ int main () {
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.25, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (int i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
@@ -163,7 +165,7 @@ int main () {
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.9, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (int i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
@@ -188,7 +190,7 @@ int main () {
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 
-    igraph_vector_destroy(&spanner);
+    igraph_vector_int_destroy(&spanner);
 
     return IGRAPH_SUCCESS;
 }

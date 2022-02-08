@@ -4,13 +4,14 @@
 
 int main() {
     igraph_t graph;
-    igraph_vector_t walk, weights;
+    igraph_vector_int_t walk;
+    igraph_vector_t weights;
     igraph_integer_t ec, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
     BENCH_INIT();
 
-    igraph_vector_init(&walk, 0);
+    igraph_vector_int_init(&walk, 0);
     igraph_vector_init(&weights, 0);
 
     /* create a small graph, and a compatible weight vector */
@@ -34,18 +35,16 @@ int main() {
           igraph_random_walk(&graph, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
-    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_EACH, NULL);
-
     BENCH(" 4 Random edge walk,   undirected, unweighted, small graph  ",
-          igraph_random_edge_walk(&graph, NULL, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_edge_walk(&graph, NULL, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH(" 5 Random edge walk,   undirected, weighted,   small graph  ",
-          igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH(" 6 Random vertex walk, undirected, unweighted, small graph  ",
-          igraph_random_walk(&graph, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_walk(&graph, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     igraph_destroy(&graph);
@@ -71,24 +70,38 @@ int main() {
           igraph_random_walk(&graph, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
-    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_EACH, NULL);
-
     BENCH("10 Random edge walk,   undirected, unweighted, large graph  ",
-          igraph_random_edge_walk(&graph, NULL, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_edge_walk(&graph, NULL, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH("11 Random edge walk,   undirected, weighted,   large graph  ",
-          igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH("12 Random vertex walk, undirected, unweighted, large graph  ",
-          igraph_random_walk(&graph, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_walk(&graph, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
+
+    BENCH("13 Short edge walk,    directed,   unweighted, large graph, x 100",
+          REPEAT(igraph_random_edge_walk(&graph, NULL, &walk, 0, IGRAPH_OUT, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
+          );
+
+    BENCH("14 Short edge walk,    directed,   weighted,   large graph, x 100",
+          REPEAT(igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_OUT, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
+          );
+
+    BENCH("15 Short edge walk,    undirected, unweighted, large graph, x 100",
+          REPEAT(igraph_random_edge_walk(&graph, NULL, &walk, 0, IGRAPH_ALL, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
+          );
+
+    BENCH("16 Short edge walk,    undirected, weighted,   large graph, x 100",
+          REPEAT(igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_ALL, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
+          );
 
     igraph_destroy(&graph);
 
     igraph_vector_destroy(&weights);
-    igraph_vector_destroy(&walk);
+    igraph_vector_int_destroy(&walk);
 
     return 0;
 }

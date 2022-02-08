@@ -29,8 +29,11 @@
    include this header.
 */
 
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "config.h"
+
+__BEGIN_DECLS
 
 #ifndef INTERNAL_LAPACK
     #define igraphdgeevx_   dgeevx_
@@ -179,5 +182,7 @@ int igraphdgehrd_(int *n, int *ilo, int *ihi, igraph_real_t *A, int *lda,
 
 igraph_real_t igraphddot_(int *n, igraph_real_t *dx, int *incx,
                           igraph_real_t *dy, int *incy);
+
+__END_DECLS
 
 #endif

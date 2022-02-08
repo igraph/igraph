@@ -39,20 +39,26 @@ __BEGIN_DECLS
 /* Conversion                                         */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
-                                       igraph_get_adjacency_t type, igraph_bool_t eids);
-IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
-                                              igraph_get_adjacency_t type);
+IGRAPH_EXPORT igraph_error_t igraph_get_adjacency(
+   const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type);
+IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_sparse(
+   const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_stochastic(const igraph_t *graph,
                                         igraph_matrix_t *matrix,
                                         igraph_bool_t column_wise);
 
-IGRAPH_EXPORT igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
                                                   igraph_sparsemat_t *sparsemat,
                                                   igraph_bool_t column_wise);
 
-IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
+/* Deprecated alias to igraph_get_stochastic_sparse(), will be removed in 0.11 */
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
+                                                  igraph_sparsemat_t *sparsemat,
+                                                  igraph_bool_t column_wise);
+
+
+IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol);
 
 IGRAPH_EXPORT igraph_error_t igraph_to_directed(igraph_t *graph,
                                      igraph_to_directed_t flags);

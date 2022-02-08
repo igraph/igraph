@@ -62,7 +62,7 @@
  * vertices.
  */
 
-int igraph_get_all_simple_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                 igraph_vector_int_t *res,
                                 igraph_integer_t from,
                                 const igraph_vs_t to,
@@ -116,14 +116,14 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_push_back(&dist, 0);
     VECTOR(added)[from] = 1;
     while (!igraph_vector_int_empty(&stack)) {
-        int act = igraph_vector_int_tail(&stack);
-        int curdist = igraph_vector_int_tail(&dist);
+        igraph_integer_t act = igraph_vector_int_tail(&stack);
+        igraph_integer_t curdist = igraph_vector_int_tail(&dist);
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        int n = igraph_vector_int_size(neis);
-        int *ptr = igraph_vector_int_e_ptr(&nptr, act);
+        igraph_integer_t n = igraph_vector_int_size(neis);
+        igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
-        int nei;
+        igraph_integer_t nei;
 
         if (iteration == 0) {
             IGRAPH_ALLOW_INTERRUPTION();
@@ -134,7 +134,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
             /* Search for a neighbor that was not yet visited */
             any = 0;
             while (!any && (*ptr) < n) {
-                nei = (int) VECTOR(*neis)[(*ptr)];
+                nei = VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];
                 (*ptr) ++;
             }
@@ -151,7 +151,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
             }
         } else {
             /* There is no such neighbor, finished with the subtree */
-            int up = igraph_vector_int_pop_back(&stack);
+            igraph_integer_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
             VECTOR(added)[up] = 0;
             VECTOR(nptr)[up] = 0;
@@ -175,5 +175,5 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

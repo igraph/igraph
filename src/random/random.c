@@ -30,6 +30,7 @@
 #include "igraph_memory.h"
 
 #include "core/math.h"
+#include "random/random_internal.h"
 
 #include "config.h"
 #include <math.h>
@@ -176,11 +177,11 @@ static void igraph_i_rng_glibc2_init(long int *x, int n,
             s = (unsigned long) t ;
         }
 
-        x[i] = (long int) s ;
+        x[i] = s ;
     }
 }
 
-static int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     int i;
@@ -197,7 +198,7 @@ static int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_rng_glibc2_init(void **state) {
+static igraph_error_t igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
@@ -261,13 +262,13 @@ static igraph_real_t igraph_rng_rand_get_real(void *vstate) {
     return igraph_rng_rand_get (vstate) / 2147483648.0 ;
 }
 
-static int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = seed;
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_rng_rand_init(void **state) {
+static igraph_error_t igraph_rng_rand_init(void **state) {
     igraph_i_rng_rand_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_rand_state_t);
@@ -391,7 +392,7 @@ static igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
     return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
 }
 
-static int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     igraph_i_rng_mt19937_state_t *state = vstate;
     int i;
 
@@ -415,7 +416,7 @@ static int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_rng_mt19937_init(void **state) {
+static igraph_error_t igraph_rng_mt19937_init(void **state) {
     igraph_i_rng_mt19937_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_mt19937_state_t);
@@ -663,7 +664,7 @@ static double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
  * it should be O(1).
  */
 
-int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
+igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
     rng->type = type;
     IGRAPH_CHECK(rng->type->init(&rng->state));
     return IGRAPH_SUCCESS;
@@ -694,7 +695,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  * Time complexity: usually O(1), but may depend on the type of the
  * RNG.
  */
-int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
+igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
     const igraph_rng_type_t *type = rng->type;
     rng->def = 0;
     IGRAPH_CHECK(type->seed(rng->state, seed));
@@ -768,10 +769,10 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
                                 long int l, long int h) {
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
-        return (long int)(type->get_real(rng->state) * (h - l + 1) + l);
+        return (type->get_real(rng->state) * (h - l + 1) + l);
     } else if (type->get) {
         unsigned long int max = type->max;
-        return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
+        return (type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
     }
     IGRAPH_FATAL("Internal random generator error");
 }
@@ -983,15 +984,15 @@ float rintf (float x) {
  * result vector.
  */
 
-static int igraph_i_random_sample_alga(igraph_vector_t *res,
+static igraph_error_t igraph_i_random_sample_alga(igraph_vector_int_t *res,
                                        igraph_integer_t l, igraph_integer_t h,
                                        igraph_integer_t length) {
-    igraph_real_t N = h - l + 1;
-    igraph_real_t n = length;
+    igraph_integer_t N = h - l + 1;
+    igraph_integer_t n = length;
 
-    igraph_real_t top = N - n;
+    igraph_integer_t top = N - n;
     igraph_real_t Nreal = N;
-    igraph_real_t S = 0;
+    igraph_integer_t S = 0;
     igraph_real_t V, quot;
 
     l = l - 1;
@@ -1007,13 +1008,13 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
             quot = (quot * top) / Nreal;
         }
         l += S;
-        igraph_vector_push_back(res, l);    /* allocated */
+        igraph_vector_int_push_back(res, l);    /* allocated */
         Nreal = -1.0 + Nreal; n = -1 + n;
     }
 
     S = floor(round(Nreal) * RNG_UNIF01());
     l += S + 1;
-    igraph_vector_push_back(res, l);  /* allocated */
+    igraph_vector_int_push_back(res, l);  /* allocated */
 
     return IGRAPH_SUCCESS;
 }
@@ -1066,11 +1067,169 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
  * \example examples/simple/igraph_random_sample.c
  */
 
-int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l, igraph_integer_t h,
                          igraph_integer_t length) {
+    igraph_integer_t N = h - l + 1;
+    igraph_integer_t n = length;
+    igraph_error_t retval;
+
+    igraph_real_t nreal = length;
+    igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
+    igraph_real_t Nreal = N;
+    igraph_real_t Vprime;
+    igraph_integer_t qu1 = -n + 1 + N;
+    igraph_real_t qu1real = -nreal + 1.0 + Nreal;
+    igraph_real_t negalphainv = -13;
+    igraph_real_t threshold = -negalphainv * n;
+    igraph_integer_t S;
+
+    /* getting back some sense of sanity */
+    if (l > h) {
+        IGRAPH_ERROR("Lower limit is greater than upper limit", IGRAPH_EINVAL);
+    }
+    /* now we know that l <= h */
+    if (length > N) {
+        IGRAPH_ERROR("Sample size exceeds size of candidate pool", IGRAPH_EINVAL);
+    }
+
+    /* treat rare cases quickly */
+    if (l == h) {
+        IGRAPH_CHECK(igraph_vector_int_resize(res, 1));
+        VECTOR(*res)[0] = l;
+        return IGRAPH_SUCCESS;
+    }
+    if (length == 0) {
+        igraph_vector_int_clear(res);
+        return IGRAPH_SUCCESS;
+    }
+    if (length == N) {
+        igraph_integer_t i = 0;
+        IGRAPH_CHECK(igraph_vector_int_resize(res, length));
+        for (i = 0; i < length; i++) {
+            VECTOR(*res)[i] = l++;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_clear(res);
+    IGRAPH_CHECK(igraph_vector_int_reserve(res, length));
+
+    RNG_BEGIN();
+
+    Vprime = exp(log(RNG_UNIF01()) * ninv);
+    l = l - 1;
+
+    while (n > 1 && threshold < N) {
+        igraph_real_t X, U;
+        igraph_real_t limit, t;
+        igraph_real_t negSreal, y1, y2, top, bottom;
+        igraph_real_t nmin1inv = 1.0 / (-1.0 + nreal);
+        while (1) {
+            while (1) {
+                X = Nreal * (-Vprime + 1.0);
+                S = floor(X);
+                /* if (S==0) { S=1; } */
+                if (S < qu1) {
+                    break;
+                }
+                Vprime = exp(log(RNG_UNIF01()) * ninv);
+            }
+            U = RNG_UNIF01();
+            negSreal = -S;
+
+            y1 = exp(log(U * Nreal / qu1real) * nmin1inv);
+            Vprime = y1 * (-X / Nreal + 1.0) * (qu1real / (negSreal + qu1real));
+            if (Vprime <= 1.0) {
+                break;
+            }
+
+            y2 = 1.0;
+            top = -1.0 + Nreal;
+            if (-1 + n > S) {
+                bottom = -nreal + Nreal;
+                limit = -S + N;
+            } else {
+                bottom = -1.0 + negSreal + Nreal;
+                limit = qu1;
+            }
+            for (t = -1 + N; t >= limit; t--) {
+                y2 = (y2 * top) / bottom;
+                top = -1.0 + top;
+                bottom = -1.0 + bottom;
+            }
+            if (Nreal / (-X + Nreal) >= y1 * exp(log(y2)*nmin1inv)) {
+                Vprime = exp(log(RNG_UNIF01()) * nmin1inv);
+                break;
+            }
+            Vprime = exp(log(RNG_UNIF01()) * ninv);
+        }
+
+        l += S + 1;
+        igraph_vector_int_push_back(res, l);    /* allocated */
+        N = -S + (-1 + N);   Nreal = negSreal + (-1.0 + Nreal);
+        n = -1 + n;   nreal = -1.0 + nreal; ninv = nmin1inv;
+        qu1 = -S + qu1; qu1real = negSreal + qu1real;
+        threshold = threshold + negalphainv;
+    }
+
+    if (n > 1) {
+        retval = igraph_i_random_sample_alga(res, l + 1, h, n);
+    } else {
+        retval = 0;
+        S = floor(N * Vprime);
+        l += S + 1;
+        igraph_vector_int_push_back(res, l);    /* allocated */
+    }
+
+    RNG_END();
+
+    return retval;
+}
+
+static igraph_error_t igraph_i_random_sample_alga_real(igraph_vector_t *res,
+                                       igraph_integer_t l, igraph_integer_t h,
+                                       igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
-    int retval;
+
+    igraph_real_t top = N - n;
+    igraph_real_t Nreal = N;
+    igraph_real_t S = 0;
+    igraph_real_t V, quot;
+
+    l = l - 1;
+
+    while (n >= 2) {
+        V = RNG_UNIF01();
+        S = 1;
+        quot = top / Nreal;
+        while (quot > V) {
+            S += 1;
+            top = -1.0 + top;
+            Nreal = -1.0 + Nreal;
+            quot = (quot * top) / Nreal;
+        }
+        l += S;
+        igraph_vector_push_back(res, l);    /* allocated */
+        Nreal = -1.0 + Nreal; n = -1 + n;
+    }
+
+    S = floor(round(Nreal) * RNG_UNIF01());
+    l += S + 1;
+    igraph_vector_push_back(res, l);  /* allocated */
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
+                    igraph_real_t h, igraph_integer_t length) {
+/* This function is the 'real' version of igraph_random_sample, and was added
+ * so erdos_renyi_game can use a random sample of doubles instead of integers
+ * to prevent overflows on systems with 32-bits igraph_integer_t.
+ */
+    igraph_real_t N = h - l + 1;
+    igraph_real_t n = length;
+    igraph_error_t retval;
 
     igraph_real_t nreal = length;
     igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
@@ -1172,11 +1331,11 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
     }
 
     if (n > 1) {
-        retval = igraph_i_random_sample_alga(res, (igraph_integer_t) l + 1,
+        retval = igraph_i_random_sample_alga_real(res, (igraph_integer_t) l + 1,
                                              (igraph_integer_t) h,
                                              (igraph_integer_t) n);
     } else {
-        retval = 0;
+        retval = IGRAPH_SUCCESS;
         S = floor(N * Vprime);
         l += S + 1;
         igraph_vector_push_back(res, l);    /* allocated */
@@ -2396,7 +2555,7 @@ static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
 
 #endif
 
-int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                              const igraph_vector_t *alpha,
                              igraph_vector_t *result) {
 

@@ -72,6 +72,10 @@ find_dependencies()
 include(CheckSymbolExists)
 
 # First we check for some functions and symbols
+set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+if(NEED_LINKING_AGAINST_LIBM)
+  list(APPEND CMAKE_REQUIRED_LIBRARIES m)
+endif()
 check_symbol_exists(expm1 math.h HAVE_EXPM1)
 check_symbol_exists(fmin math.h HAVE_FMIN)
 check_symbol_exists(finite math.h HAVE_FINITE)
@@ -85,6 +89,7 @@ check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
 check_symbol_exists(strdup string.h HAVE_STRDUP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
+set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
@@ -108,6 +113,10 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.h
 )
 configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_config.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_config.h
+)
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_threading.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_threading.h
 )
@@ -126,6 +135,7 @@ endif()
 # src/CMakeLists.txt depends on targets in vendor/
 add_subdirectory(vendor)
 add_subdirectory(src)
+add_subdirectory(interfaces)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()

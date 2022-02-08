@@ -1,0 +1,4 @@
+name: "igraph CodeQL config"
+
+# paths-ignore only influences interpreted languages so we cannot use that to
+# exclude parts of the source tree

@@ -24,10 +24,13 @@
 #ifndef IGRAPH_MARKED_QUEUE_H
 #define IGRAPH_MARKED_QUEUE_H
 
+#include "igraph_decls.h"
 #include "igraph_vector.h"
 #include "igraph_dqueue.h"
 
 #include <stdio.h>
+
+__BEGIN_DECLS
 
 /* This is essentially a double ended queue, with some extra features:
    (1) The is-element? operation is fast, O(1). This requires that we
@@ -39,32 +42,34 @@
   is essentially a stack.
 */
 
-typedef struct igraph_marked_queue_t {
-    igraph_dqueue_t Q;
-    igraph_vector_long_t set;
-    long int mark;
-    long int size;
-} igraph_marked_queue_t;
+typedef struct igraph_marked_queue_int_t {
+    igraph_dqueue_int_t Q;
+    igraph_vector_int_t set;
+    igraph_integer_t mark;
+    igraph_integer_t size;
+} igraph_marked_queue_int_t;
 
-IGRAPH_PRIVATE_EXPORT int igraph_marked_queue_init(igraph_marked_queue_t *q,
-                                                   long int size);
-IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_destroy(igraph_marked_queue_t *q);
-IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_reset(igraph_marked_queue_t *q);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_init(igraph_marked_queue_int_t *q,
+                                                              igraph_integer_t size);
+IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_int_destroy(igraph_marked_queue_int_t *q);
+IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_int_reset(igraph_marked_queue_int_t *q);
 
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_marked_queue_empty(const igraph_marked_queue_t *q);
-IGRAPH_PRIVATE_EXPORT long int igraph_marked_queue_size(const igraph_marked_queue_t *q);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_marked_queue_int_empty(const igraph_marked_queue_int_t *q);
+IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_marked_queue_int_size(const igraph_marked_queue_int_t *q);
 
-IGRAPH_PRIVATE_EXPORT int igraph_marked_queue_print(const igraph_marked_queue_t *q);
-IGRAPH_PRIVATE_EXPORT int igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_print(const igraph_marked_queue_int_t *q);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_fprint(const igraph_marked_queue_int_t *q, FILE *file);
 
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q,
-                                                                  long int elem);
-IGRAPH_PRIVATE_EXPORT int igraph_marked_queue_push(igraph_marked_queue_t *q, long int elem);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_marked_queue_int_iselement(const igraph_marked_queue_int_t *q,
+                                                                  igraph_integer_t elem);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_push(igraph_marked_queue_int_t *q, igraph_integer_t elem);
 
-IGRAPH_PRIVATE_EXPORT int igraph_marked_queue_start_batch(igraph_marked_queue_t *q);
-IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_start_batch(igraph_marked_queue_int_t *q);
+IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_int_pop_back_batch(igraph_marked_queue_int_t *q);
 
-IGRAPH_PRIVATE_EXPORT int igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
-                                                        igraph_vector_t *vec);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_as_vector(const igraph_marked_queue_int_t *q,
+                                                                   igraph_vector_int_t *vec);
+
+__END_DECLS
 
 #endif

@@ -62,7 +62,7 @@
  * Note that some of the other #ifndef USING_R's in this file are still needed
  * to avoid references to fprintf and stderr.
  */
-static IGRAPH_NORETURN void igraph_abort() {
+static IGRAPH_FUNCATTR_NORETURN void igraph_abort() {
 #ifndef USING_R
 #ifdef IGRAPH_SANITIZER_AVAILABLE
     fprintf(stderr, "\nStack trace:\n");
@@ -92,7 +92,7 @@ static const char *igraph_i_error_strings[] = {
     /*  4 */ "Invalid value",
     /*  5 */ "Already exists",
     /*  6 */ "Invalid edge vector",
-    /*  7 */ "Invalid vertex id",
+    /*  7 */ "Invalid vertex ID",
     /*  8 */ "Non-square matrix",
     /*  9 */ "Invalid mode",
     /* 10 */ "File operation error",
@@ -150,7 +150,8 @@ static const char *igraph_i_error_strings[] = {
     /* 58 */ "Integer or double underflow",
     /* 59 */ "Random walk got stuck",
     /* 60 */ "Search stopped; this error should never be visible to the user, "
-    "please report this error along with the steps to reproduce it."
+    "please report this error along with the steps to reproduce it.",
+    /* 61 */ "Result too large"
 };
 
 const char* igraph_strerror(const igraph_error_t igraph_errno) {
@@ -161,7 +162,7 @@ const char* igraph_strerror(const igraph_error_t igraph_errno) {
     return igraph_i_error_strings[igraph_errno];
 }
 
-int igraph_error(const char *reason, const char *file, int line,
+igraph_error_t igraph_error(const char *reason, const char *file, int line,
                  igraph_error_t igraph_errno) {
 
     if (igraph_i_error_handler) {
@@ -174,7 +175,7 @@ int igraph_error(const char *reason, const char *file, int line,
     return igraph_errno;
 }
 
-int igraph_errorf(const char *reason, const char *file, int line,
+igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
                   igraph_error_t igraph_errno, ...) {
     va_list ap;
     va_start(ap, igraph_errno);
@@ -183,7 +184,7 @@ int igraph_errorf(const char *reason, const char *file, int line,
     return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
 
-int igraph_errorvf(const char *reason, const char *file, int line,
+igraph_error_t igraph_errorvf(const char *reason, const char *file, int line,
                    igraph_error_t igraph_errno, va_list ap) {
     vsnprintf(igraph_i_errormsg_buffer,
               sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
@@ -212,9 +213,9 @@ void igraph_error_handler_ignore(const char *reason, const char *file,
 #ifndef USING_R
 void igraph_error_handler_printignore(const char *reason, const char *file,
                                       int line, igraph_error_t igraph_errno) {
-    IGRAPH_FINALLY_FREE();
     fprintf(stderr, "Error at %s:%i : %s - %s.\n",
             file, line, reason, igraph_strerror(igraph_errno));
+    IGRAPH_FINALLY_FREE();
 }
 #endif
 
@@ -235,8 +236,12 @@ IGRAPH_THREAD_LOCAL struct igraph_i_protectedPtr igraph_i_finally_stack[100];
 
 void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
     int no = igraph_i_finally_stack[0].all;
-    IGRAPH_ASSERT(no < 100);
-    IGRAPH_ASSERT(no >= 0);
+    if (no < 0) {
+        IGRAPH_FATALF("Corrupt finally stack: it contains %d elements.", no);
+    }
+    if (no >= 100) {
+        IGRAPH_FATALF("Finally stack too large: it contains %d elements.", no);
+    }
     igraph_i_finally_stack[no].ptr = ptr;
     igraph_i_finally_stack[no].func = func;
     igraph_i_finally_stack[0].all ++;
@@ -285,12 +290,10 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
  *        but this is currently not used in igraph.
  */
 
-void igraph_warning_handler_ignore(const char *reason, const char *file,
-                                   int line, igraph_error_t igraph_errno) {
+void igraph_warning_handler_ignore(const char *reason, const char *file, int line) {
     IGRAPH_UNUSED(reason);
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
-    IGRAPH_UNUSED(igraph_errno);
 }
 
 #ifndef USING_R
@@ -309,34 +312,29 @@ void igraph_warning_handler_ignore(const char *reason, const char *file,
  *        but this is currently not used in igraph.
  */
 
-void igraph_warning_handler_print(const char *reason, const char *file,
-                                  int line, igraph_error_t igraph_errno) {
-    IGRAPH_UNUSED(igraph_errno);
+void igraph_warning_handler_print(const char *reason, const char *file, int line) {
     fprintf(stderr, "Warning at %s:%i : %s\n", file, line, reason);
 }
 #endif
 
-int igraph_warning(const char *reason, const char *file, int line,
-                   igraph_error_t igraph_errno) {
+void igraph_warning(const char *reason, const char *file, int line) {
 
     if (igraph_i_warning_handler) {
-        igraph_i_warning_handler(reason, file, line, igraph_errno);
+        igraph_i_warning_handler(reason, file, line);
 #ifndef USING_R
     }  else {
-        igraph_warning_handler_print(reason, file, line, igraph_errno);
+        igraph_warning_handler_print(reason, file, line);
 #endif
     }
-    return igraph_errno;
 }
 
-int igraph_warningf(const char *reason, const char *file, int line,
-                    igraph_error_t igraph_errno, ...) {
+void igraph_warningf(const char *reason, const char *file, int line,
+                    ...) {
     va_list ap;
-    va_start(ap, igraph_errno);
+    va_start(ap, line);
     vsnprintf(igraph_i_warningmsg_buffer,
               sizeof(igraph_i_warningmsg_buffer) / sizeof(char), reason, ap);
-    return igraph_warning(igraph_i_warningmsg_buffer, file, line,
-                          igraph_errno);
+    igraph_warning(igraph_i_warningmsg_buffer, file, line);
 }
 
 igraph_warning_handler_t *igraph_set_warning_handler(igraph_warning_handler_t *new_handler) {

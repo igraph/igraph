@@ -55,25 +55,25 @@ We strive to:
 
     * Sexist, racist, or otherwise discriminatory jokes and language.
 
-	* Posting sexually explicit or violent material.
+   * Posting sexually explicit or violent material.
 
-	* Posting (or threatening to post) other people’s personally identifying
-	  information (“doxing”).
+   * Posting (or threatening to post) other people’s personally identifying
+     information (“doxing”).
 
-	* Sharing private content, such as emails sent privately or non-publicly,
+   * Sharing private content, such as emails sent privately or non-publicly,
       or unlogged forums, such as IRC channel history, without the sender’s consent.
 
     * Personal insults, especially those using racist or sexist terms.
 
-	* Unwelcome sexual attention.
+   * Unwelcome sexual attention.
 
-	* Excessive profanity. Please avoid swearwords; people differ greatly in
-	  their sensitivity to swearing.
+   * Excessive profanity. Please avoid swearwords; people differ greatly in
+     their sensitivity to swearing.
 
-	* Repeated harassment of others. In general, if someone asks you to stop,
-	  then stop.
+   * Repeated harassment of others. In general, if someone asks you to stop,
+     then stop.
 
-	* Advocating for, or encouraging, any of the above behavior.
+   * Advocating for, or encouraging, any of the above behavior.
 
 ## Diversity statement
 

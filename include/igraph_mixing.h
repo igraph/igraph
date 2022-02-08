@@ -32,7 +32,7 @@
 __BEGIN_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
-                                               const igraph_vector_t *types,
+                                               const igraph_vector_int_t *types,
                                                igraph_real_t *res,
                                                igraph_bool_t directed);
 

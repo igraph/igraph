@@ -26,11 +26,11 @@
 int main() {
 
     igraph_t g;
-    igraph_vector_t v;
+    igraph_vector_int_t v;
     int ret;
     igraph_es_t es;
 
-    igraph_vector_init(&v, 8);
+    igraph_vector_int_init(&v, 8);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 1;
@@ -58,7 +58,7 @@ int main() {
         return 3;
     }
 
-    /* error test, invalid vertex id */
+    /* error test, invalid vertex ID */
     igraph_es_destroy(&es);
     igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 10, 2, -1);
     ret = igraph_delete_edges(&g, es);
@@ -81,7 +81,7 @@ int main() {
     }
 
     igraph_es_destroy(&es);
-    igraph_vector_destroy(&v);
+    igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 
     return 0;

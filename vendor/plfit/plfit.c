@@ -24,13 +24,13 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "error.h"
+#include "plfit_error.h"
 #include "gss.h"
 #include "lbfgs.h"
 #include "platform.h"
 #include "plfit.h"
 #include "kolmogorov.h"
-#include "sampling.h"
+#include "plfit_sampling.h"
 #include "hzeta.h"
 
 /* #define PLFIT_DEBUG */
@@ -50,10 +50,10 @@
     }
 
 static int plfit_i_resample_continuous(double* xs_head, size_t num_smaller,
-        size_t n, double alpha, double xmin, size_t num_samples, mt_rng_t* rng,
+        size_t n, double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result);
 static int plfit_i_resample_discrete(double* xs_head, size_t num_smaller,
-        size_t n, double alpha, double xmin, size_t num_samples, mt_rng_t* rng,
+        size_t n, double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result);
 
 static int double_comparator(const void *a, const void *b) {
@@ -141,7 +141,8 @@ static double* extract_smaller(double* begin, double* end, double xmin,
  * \param  begin          pointer to the beginning of the array
  * \param  end            pointer to the first element after the end of the array
  * \param  result_length  if not \c NULL, the number of unique elements in the
- *                        given array is returned here
+ *                        given array is returned here. It is left unchanged if
+ *                        the function returns with an error.
  *
  * \return pointer to the head of the new array or 0 if there is not enough
  * memory
@@ -158,6 +159,9 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
         result = calloc(1, sizeof(double*));
         if (result != 0) {
             result[0] = 0;
+            if (result_length != 0) {
+                *result_length = 0;
+            }
         }
         return result;
     }
@@ -328,9 +332,9 @@ static int plfit_i_calculate_p_value_continuous(double* xs, size_t n,
          * the master RNG. This section must be critical to ensure that only one
          * thread is using the master RNG at the same time. */
 #ifdef _OPENMP
-        mt_rng_t private_rng;
+        plfit_mt_rng_t private_rng;
 #endif
-        mt_rng_t *p_rng;
+        plfit_mt_rng_t *p_rng;
         double *ys;
         long int i;
         plfit_result_t result_synthetic;
@@ -339,7 +343,7 @@ static int plfit_i_calculate_p_value_continuous(double* xs, size_t n,
 #pragma omp critical
         {
             p_rng = &private_rng;
-            mt_init_from_rng(p_rng, options->rng);
+            plfit_mt_init_from_rng(p_rng, options->rng);
         }
 #else
         p_rng = options->rng;
@@ -483,10 +487,10 @@ static int plfit_i_continuous_xmin_opt_progress(void* instance, double x, double
 static int plfit_i_continuous_xmin_opt_linear_scan(
         plfit_continuous_xmin_opt_data_t* opt_data, plfit_result_t* best_result,
         size_t* best_n) {
-    /* i must be signed, otherwise OpenMP on Windows will complain as it
-     * supports signed types only. ssize_t is a POSIX extension so it won't
-     * work */
-    ptrdiff_t i = 0; /* initialize to work around incorrect warning issued by clang 9.0 */
+    /* this must be signed because OpenMP with Windows MSVC needs signed for
+     * loop index variables. ssize_t will not work because that is a POSIX
+     * extension */
+    ptrdiff_t i = 0; /* initialize to work around incorrect warning issued by Clang 9.0 */
     plfit_result_t global_best_result;
     size_t global_best_n;
 
@@ -518,7 +522,8 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
         local_best_result.D = DBL_MAX;
         local_best_result.xmin = 0;
         local_best_result.alpha = 0;
-        local_best_result.p = 0;
+        local_best_result.p = NAN;
+        local_best_result.L = NAN;
 
         /* The range of the for loop below is divided among the threads.
          * nowait means that there will be no implicit barrier at the end
@@ -629,6 +634,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                 const size_t subdivision_length = 10;
                 size_t num_strata = num_uniques / subdivision_length;
                 double **strata = calloc(num_strata, sizeof(double*));
+                int error_code;
 
                 for (i = 0; i < num_strata; i++) {
                     strata[i] = uniques[i * subdivision_length];
@@ -636,7 +642,11 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
 
                 opt_data.probes = strata;
                 opt_data.num_probes = num_strata;
-                plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+                error_code = plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+                if (error_code != PLFIT_SUCCESS) {
+                    free(strata);
+                    return error_code;
+                }
 
                 opt_data.num_probes = 0;
                 for (i = 0; i < num_strata; i++) {
@@ -657,8 +667,11 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                 free(strata);
                 if (opt_data.num_probes > 0) {
                     /* Do a strict linear scan in the subrange determined above */
-                    plfit_i_continuous_xmin_opt_linear_scan(&opt_data,
-                            &best_result, &best_n);
+                    PLFIT_CHECK(
+                        plfit_i_continuous_xmin_opt_linear_scan(
+                            &opt_data, &best_result, &best_n
+                        )
+                    ); 
                     success = 1;
                 } else {
                     /* This should not happen, but we handle it anyway */
@@ -676,7 +689,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
         /* More advanced search methods failed or were skipped; try linear search */
         opt_data.probes = uniques;
         opt_data.num_probes = num_uniques;
-        plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+        PLFIT_CHECK(plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n));
         success = 1;
     }
 
@@ -1009,9 +1022,9 @@ static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
          * the master RNG. This section must be critical to ensure that only one
          * thread is using the master RNG at the same time. */
 #ifdef _OPENMP
-        mt_rng_t private_rng;
+        plfit_mt_rng_t private_rng;
 #endif
-        mt_rng_t *p_rng;
+        plfit_mt_rng_t *p_rng;
         double *ys;
         long int i;
         plfit_result_t result_synthetic;
@@ -1020,7 +1033,7 @@ static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
 #pragma omp critical
         {
             p_rng = &private_rng;
-            mt_init_from_rng(p_rng, options->rng);
+            plfit_mt_init_from_rng(p_rng, options->rng);
         }
 #else
         p_rng = options->rng;
@@ -1158,24 +1171,39 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
     best_result.alpha = 1;
     best_n = 0;
 
+    /* Skip initial values from xs_copy until we get to a positive element or
+     * until we reach the end of the array */
+    px = xs_copy; end = px + n; end_xmin = end - 1;
+    while (px < end && *px < 1) {
+        px++;
+    }
+
     /* Make sure there are at least three distinct values if possible */
-    px = xs_copy; end = px + n; end_xmin = end - 1; m = 0;
+    m = px - xs_copy;
     prev_x = *end_xmin;
-    while (*end_xmin == prev_x && end_xmin > px)
+    while (end_xmin > px && *end_xmin == prev_x) {
         end_xmin--;
+    }
     prev_x = *end_xmin;
-    while (*end_xmin == prev_x && end_xmin > px)
+    while (end_xmin > px && *end_xmin == prev_x) {
         end_xmin--;
+    }
 
     prev_x = 0;
+    end_xmin++;
     while (px < end_xmin) {
         while (px < end_xmin && *px == prev_x) {
             px++; m++;
         }
 
-        plfit_i_estimate_alpha_discrete(px, n-m, *px, &curr_alpha, options,
-                /* sorted = */ 1);
-        plfit_i_ks_test_discrete(px, end, curr_alpha, *px, &curr_D);
+        PLFIT_CHECK(
+            plfit_i_estimate_alpha_discrete(
+                px, n-m, *px, &curr_alpha, options, /* sorted = */ 1
+            )
+        );
+        PLFIT_CHECK(
+            plfit_i_ks_test_discrete(px, end, curr_alpha, *px, &curr_D)
+        );
 
         if (curr_D < best_result.D) {
             best_result.alpha = curr_alpha;
@@ -1204,7 +1232,7 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
 /***** resampling routines to generate synthetic replicates ****/
 
 static int plfit_i_resample_continuous(double* xs_head, size_t num_smaller,
-        size_t n, double alpha, double xmin, size_t num_samples, mt_rng_t* rng,
+        size_t n, double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result)
 {
     size_t num_orig_samples, i;
@@ -1225,7 +1253,7 @@ static int plfit_i_resample_continuous(double* xs_head, size_t num_smaller,
 }
 
 int plfit_resample_continuous(double* xs, size_t n, double alpha, double xmin,
-        size_t num_samples, mt_rng_t* rng, double* result) {
+        size_t num_samples, plfit_mt_rng_t* rng, double* result) {
     double *xs_head;
     size_t num_smaller = 0;
     int retval;
@@ -1245,7 +1273,7 @@ int plfit_resample_continuous(double* xs, size_t n, double alpha, double xmin,
 }
 
 static int plfit_i_resample_discrete(double* xs_head, size_t num_smaller, size_t n,
-        double alpha, double xmin, size_t num_samples, mt_rng_t* rng,
+        double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result)
 {
     size_t num_orig_samples, i;
@@ -1266,7 +1294,7 @@ static int plfit_i_resample_discrete(double* xs_head, size_t num_smaller, size_t
 }
 
 int plfit_resample_discrete(double* xs, size_t n, double alpha, double xmin,
-        size_t num_samples, mt_rng_t* rng, double* result) {
+        size_t num_samples, plfit_mt_rng_t* rng, double* result) {
     double *xs_head;
     size_t num_smaller = 0;
     int retval;

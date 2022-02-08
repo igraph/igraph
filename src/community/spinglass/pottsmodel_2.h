@@ -69,11 +69,11 @@ class PottsModel {
 private:
     //  HugeArray<double> neg_gammalookup;
     //  HugeArray<double> pos_gammalookup;
-    DL_Indexed_List<unsigned int*> *new_spins;
-    DL_Indexed_List<unsigned int*> *previous_spins;
+    DL_Indexed_List<unsigned long*> *new_spins;
+    DL_Indexed_List<unsigned long*> *previous_spins;
     HugeArray<HugeArray<double>*> correlation;
     network *net;
-    unsigned int q;
+    unsigned long q;
     unsigned int operation_mode;
     // FILE *Qfile, *Magfile;
     SimpleMatrix Qmatrix;
@@ -87,10 +87,10 @@ private:
     double acceptance;
     double *neighbours;
 public:
-    PottsModel(network *net, unsigned int q, int norm_by_degree);
+    PottsModel(network *net, unsigned long q, int norm_by_degree);
     ~PottsModel();
     double* color_field;
-    unsigned long assign_initial_conf(int spin);
+    unsigned long assign_initial_conf(igraph_integer_t spin);
     unsigned long initialize_lookup(double kT, double gamma);
     double initialize_Qmatrix();
     double calculate_Q();
@@ -106,14 +106,14 @@ public:
     double calculate_energy(double gamma);
     long   WriteClusters(igraph_real_t *modularity,
                          igraph_real_t *temperature,
-                         igraph_vector_t *csize, igraph_vector_t *membership,
+                         igraph_vector_int_t *csize, igraph_vector_int_t *membership,
                          double kT, double gamma);
     // long   WriteSoftClusters(char *filename, double threshold);
     double Get_Energy() const {
         return energy;
     }
     double FindCommunityFromStart(double gamma, double prob, char *nodename,
-                                  igraph_vector_t *result,
+                                  igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
                                   igraph_integer_t *inner_links,
@@ -130,10 +130,10 @@ private:
     HugeArray<HugeArray<double>*> correlation;
     network *net;
 
-    unsigned int q; //number of communities
+    unsigned long q; //number of communities
     double m_p; //number of positive ties (or sum of degrees), this equals the number of edges only if it is undirected and each edge has a weight of 1
     double m_n; //number of negative ties (or sum of degrees)
-    unsigned int num_nodes; //number of nodes
+    unsigned long num_nodes; //number of nodes
     bool is_directed;
 
     bool is_init;
@@ -148,14 +148,14 @@ private:
     double *degree_community_pos_out; //Positive sum of outegree for communities
     double *degree_community_neg_out; //Negative sum of outdegree for communities
 
-    unsigned int *csize; //The number of nodes in each community
-    unsigned int *spin; //The membership of each node
+    unsigned long *csize; //The number of nodes in each community
+    unsigned long *spin; //The membership of each node
 
     double *neighbours; //Array of neighbours of a vertex in each community
     double *weights; //Weights of all possible transitions to another community
 
 public:
-    PottsModelN(network *n, unsigned int num_communities, bool directed);
+    PottsModelN(network *n, unsigned long num_communities, bool directed);
     ~PottsModelN();
     void assign_initial_conf(bool init_spins);
     double FindStartTemp(double gamma, double lambda, double ts);
@@ -164,8 +164,8 @@ public:
     // double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
     long WriteClusters(igraph_real_t *modularity,
                        igraph_real_t *temperature,
-                       igraph_vector_t *community_size,
-                       igraph_vector_t *membership,
+                       igraph_vector_int_t *community_size,
+                       igraph_vector_int_t *membership,
                        igraph_matrix_t *adhesion,
                        igraph_matrix_t *normalised_adhesion,
                        igraph_real_t *polarization,

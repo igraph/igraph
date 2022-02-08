@@ -5,20 +5,22 @@
 ]>
 
 <chapter id="igraph-Generators">
-<title>Graph Generators</title>
+<title>Graph generators</title>
 
 <!-- doxrox-include about_generators -->
 
-<section id="deterministic-graph-generators"><title>Deterministic Graph Generators</title>
+<section id="deterministic-graph-generators"><title>Deterministic graph generators</title>
 <!-- doxrox-include igraph_create -->
 <!-- doxrox-include igraph_small -->
 <!-- doxrox-include igraph_adjacency -->
 <!-- doxrox-include igraph_weighted_adjacency -->
 <!-- doxrox-include igraph_adjlist -->
 <!-- doxrox-include igraph_star -->
+<!-- doxrox-include igraph_wheel -->
 <!-- doxrox-include igraph_lattice -->
 <!-- doxrox-include igraph_ring -->
-<!-- doxrox-include igraph_tree -->
+<!-- doxrox-include igraph_kary_tree -->
+<!-- doxrox-include igraph_symmetric_tree -->
 <!-- doxrox-include igraph_full -->
 <!-- doxrox-include igraph_full_citation -->
 <!-- doxrox-include igraph_realize_degree_sequence -->
@@ -29,10 +31,12 @@
 <!-- doxrox-include igraph_atlas -->
 <!-- doxrox-include igraph_de_bruijn -->
 <!-- doxrox-include igraph_kautz -->
+<!-- doxrox-include igraph_circulant -->
+<!-- doxrox-include igraph_generalized_petersen -->
 <!-- doxrox-include igraph_extended_chordal_ring -->
 </section>
 
-<section id="games-randomized-graph-generators"><title>Games: Randomized Graph Generators</title>
+<section id="games-randomized-graph-generators"><title>Games: Randomized graph generators</title>
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->

@@ -319,10 +319,10 @@ int main() {
     /* Graph with more than 127 vertices. PRPACK uses a different method above this size. */
 
     {
-        igraph_vector_t edges_to_delete;
+        igraph_vector_int_t edges_to_delete;
         igraph_vector_t res_arpack, res_prpack;
         igraph_vector_t weights;
-        long int i, n;
+        igraph_integer_t i, n;
 
         printf("\nLarge test graph, unweighted\n");
 
@@ -331,9 +331,9 @@ int main() {
 
         /* We delete some edges to break the symmetry of the graph.
          * Otherwise all vertices would have the same PageRank. */
-        igraph_vector_init_seq(&edges_to_delete, 0, 37);
+        igraph_vector_int_init_seq(&edges_to_delete, 0, 37);
         igraph_delete_edges(&g, igraph_ess_vector(&edges_to_delete));
-        igraph_vector_destroy(&edges_to_delete);
+        igraph_vector_int_destroy(&edges_to_delete);
 
         /* Note: This test graph is not connected and has self-loops. */
 
@@ -353,7 +353,7 @@ int main() {
             igraph_real_t ar = VECTOR(res_arpack)[i];
             igraph_real_t pr = VECTOR(res_prpack)[i];
             if (fabs(ar - pr) > 1e-12) {
-                printf("Unexpected difference between ARPACK and PRPACK results for vertex %ld:\n"
+                printf("Unexpected difference between ARPACK and PRPACK results for vertex %" IGRAPH_PRId ":\n"
                        "ARPACK: %g\n"
                        "PRPACK: %g\n"
                        "Difference: %g\n",
@@ -378,7 +378,7 @@ int main() {
             igraph_real_t ar = VECTOR(res_arpack)[i];
             igraph_real_t pr = VECTOR(res_prpack)[i];
             if (fabs(ar - pr) > 1e-12) {
-                printf("Unexpected difference between ARPACK and PRPACK results for vertex %ld:\n"
+                printf("Unexpected difference between ARPACK and PRPACK results for vertex %" IGRAPH_PRId ":\n"
                        "ARPACK: %g\n"
                        "PRPACK: %g\n"
                        "Difference: %g\n",

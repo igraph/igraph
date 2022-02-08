@@ -28,27 +28,27 @@
 
 using namespace std;
 
-void FlowGraph::init(int n, const igraph_vector_t *v_weights) {
+void FlowGraph::init(igraph_integer_t n, const igraph_vector_t *v_weights) {
     alpha = 0.15;
     beta  = 1.0 - alpha;
     Nnode = n;
     node = new Node*[Nnode];
     if (v_weights) {
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             node[i] = new Node(i, (double)VECTOR(*v_weights)[i]);
         }
     } else {
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             node[i] = new Node(i, 1.0);
         }
     }
 }
 
-FlowGraph::FlowGraph(int n) {
+FlowGraph::FlowGraph(igraph_integer_t n) {
     init(n, NULL);
 }
 
-FlowGraph::FlowGraph(int n, const igraph_vector_t *v_weights) {
+FlowGraph::FlowGraph(igraph_integer_t n, const igraph_vector_t *v_weights) {
     init(n, v_weights);
 }
 
@@ -58,19 +58,19 @@ FlowGraph::FlowGraph(const igraph_t * graph,
                      const igraph_vector_t *e_weights,
                      const igraph_vector_t *v_weights) {
 
-    int n = (int)igraph_vcount(graph);
+    igraph_integer_t n = igraph_vcount(graph);
     init(n, v_weights);
 
-    int directed = (int) igraph_is_directed(graph);
+    int directed = igraph_is_directed(graph) ? 1 : 0;
 
     double linkWeight = 1.0;
     igraph_integer_t from, to;
 
-    long int Nlinks = (long int) igraph_ecount(graph);
+    igraph_integer_t Nlinks = igraph_ecount(graph);
     if (!directed) {
         Nlinks = Nlinks * 2 ;
     }
-    for (int i = 0; i < Nlinks; i++) {
+    for (igraph_integer_t i = 0; i < Nlinks; i++) {
         if (!directed) { // not directed
             if (i % 2 == 0) {
                 linkWeight = e_weights ? (double)VECTOR(*e_weights)[i / 2] : 1.0;
@@ -94,9 +94,9 @@ FlowGraph::FlowGraph(const igraph_t * graph,
 }
 
 FlowGraph::FlowGraph(FlowGraph * fgraph) {
-    int n = fgraph->Nnode;
+    igraph_integer_t n = fgraph->Nnode;
     init(n, NULL);
-    for (int i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         cpyNode(node[i], fgraph->node[i]);
     }
 
@@ -116,40 +116,40 @@ FlowGraph::FlowGraph(FlowGraph * fgraph) {
 
 /** construct a graph by extracting a subgraph from the given graph
  */
-FlowGraph::FlowGraph(FlowGraph * fgraph, int sub_Nnode, int * sub_members) {
+FlowGraph::FlowGraph(FlowGraph * fgraph, igraph_integer_t sub_Nnode, igraph_integer_t * sub_members) {
     init(sub_Nnode, NULL);
 
     //XXX: use set of integer to ensure that elements are sorted
-    set<int> sub_mem;
-    for (int j = 0 ; j < sub_Nnode ; j++) {
+    set<igraph_integer_t> sub_mem;
+    for (igraph_integer_t j = 0 ; j < sub_Nnode ; j++) {
         sub_mem.insert(sub_members[j]);
     }
-    set<int>::iterator it_mem = sub_mem.begin();
+    set<igraph_integer_t>::iterator it_mem = sub_mem.begin();
 
-    vector<int> sub_renumber = vector<int>(fgraph->Nnode);
+    vector<igraph_integer_t> sub_renumber = vector<igraph_integer_t>(fgraph->Nnode);
     // id --> sub_id
 
-    for (int j = 0; j < fgraph->Nnode; j++) {
+    for (igraph_integer_t j = 0; j < fgraph->Nnode; j++) {
         sub_renumber[j] = -1;
     }
 
 
-    for (int j = 0; j < sub_Nnode; j++) {
+    for (igraph_integer_t j = 0; j < sub_Nnode; j++) {
         //int orig_nr = sub_members[j];
-        int orig_nr = (*it_mem);
+        igraph_integer_t orig_nr = (*it_mem);
 
         node[j]->teleportWeight = fgraph->node[orig_nr]->teleportWeight;
         node[j]->selfLink       = fgraph->node[orig_nr]->selfLink;
         // Take care of self-link
 
-        int orig_NoutLinks = fgraph->node[orig_nr]->outLinks.size();
-        int orig_NinLinks  = fgraph->node[orig_nr]->inLinks.size();
+        size_t orig_NoutLinks = fgraph->node[orig_nr]->outLinks.size();
+        size_t orig_NinLinks  = fgraph->node[orig_nr]->inLinks.size();
 
         sub_renumber[orig_nr] = j;
 
-        for (int k = 0; k < orig_NoutLinks; k++) {
-            int to = fgraph->node[orig_nr]->outLinks[k].first;
-            int to_newnr = sub_renumber[to];
+        for (size_t k = 0; k < orig_NoutLinks; k++) {
+            igraph_integer_t to = fgraph->node[orig_nr]->outLinks[k].first;
+            igraph_integer_t to_newnr = sub_renumber[to];
             double link_weight = fgraph->node[orig_nr]->outLinks[k].second;
 
             if (to < orig_nr) {
@@ -166,9 +166,9 @@ FlowGraph::FlowGraph(FlowGraph * fgraph, int sub_Nnode, int * sub_members) {
             }
         }
 
-        for (int k = 0; k < orig_NinLinks; k++) {
-            int to = fgraph->node[orig_nr]->inLinks[k].first;
-            int to_newnr = sub_renumber[to];
+        for (size_t k = 0; k < orig_NinLinks; k++) {
+            igraph_integer_t to = fgraph->node[orig_nr]->inLinks[k].first;
+            igraph_integer_t to_newnr = sub_renumber[to];
             double link_weight = fgraph->node[orig_nr]->inLinks[k].second;
             if (to < orig_nr) {
                 if (sub_mem.find(to) != sub_mem.end()) {
@@ -184,7 +184,7 @@ FlowGraph::FlowGraph(FlowGraph * fgraph, int sub_Nnode, int * sub_members) {
 
 FlowGraph::~FlowGraph() {
     //printf("delete FlowGraph !\n");
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         delete node[i];
     }
     delete [] node;
@@ -201,7 +201,7 @@ void delete_FlowGraph(FlowGraph *fgraph) {
  */
 void FlowGraph::swap(FlowGraph * fgraph) {
     Node ** node_tmp = fgraph->node;
-    int Nnode_tmp    = fgraph->Nnode;
+    igraph_integer_t Nnode_tmp    = fgraph->Nnode;
 
     fgraph->node = node;
     fgraph->Nnode = Nnode;
@@ -223,11 +223,11 @@ void FlowGraph::initiate() {
     // total teleport weight
     Ndanglings = 0;
     double totTeleportWeight = 0.0;
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         totTeleportWeight += node[i]->teleportWeight;
     }
 
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         node[i]->teleportWeight /= totTeleportWeight;
         // normalize teleportation weight
 
@@ -235,13 +235,13 @@ void FlowGraph::initiate() {
             danglings.push_back(i);
             Ndanglings++;
         } else { // Normalize the weights
-            int NoutLinks = node[i]->outLinks.size();
+            size_t NoutLinks = node[i]->outLinks.size();
             double sum = node[i]->selfLink; // Take care of self-links
-            for (int j = 0; j < NoutLinks; j++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
                 sum += node[i]->outLinks[j].second;
             }
             node[i]->selfLink /= sum;
-            for (int j = 0; j < NoutLinks; j++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
                 node[i]->outLinks[j].second /= sum;
             }
         }
@@ -251,22 +251,22 @@ void FlowGraph::initiate() {
     eigenvector();
 
     // Update links to represent flow
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         node[i]->selfLink = beta * node[i]->size * node[i]->selfLink;
         //            (1 - \tau) *     \pi_i     *      P_{ii}
 
         if (!node[i]->outLinks.empty()) {
-            int NoutLinks = node[i]->outLinks.size();
-            for (int j = 0; j < NoutLinks; j++) {
+            size_t NoutLinks = node[i]->outLinks.size();
+            for (size_t j = 0; j < NoutLinks; j++) {
                 node[i]->outLinks[j].second = beta * node[i]->size *
                                               node[i]->outLinks[j].second;
                 //                      (1 - \tau) *     \pi_i     *          P_{ij}
             }
 
             // Update values for corresponding inlink
-            for (int j = 0; j < NoutLinks; j++) {
-                int NinLinks = node[node[i]->outLinks[j].first]->inLinks.size();
-                for (int k = 0; k < NinLinks; k++) {
+            for (size_t j = 0; j < NoutLinks; j++) {
+                size_t NinLinks = node[node[i]->outLinks[j].first]->inLinks.size();
+                for (size_t k = 0; k < NinLinks; k++) {
                     if (node[node[i]->outLinks[j].first]->inLinks[k].first == i) {
                         node[node[i]->outLinks[j].first]->inLinks[k].second =
                             node[i]->outLinks[j].second;
@@ -278,7 +278,7 @@ void FlowGraph::initiate() {
     }
 
     // To be able to handle dangling nodes efficiently
-    for (int i = 0; i < Nnode; i++)
+    for (igraph_integer_t i = 0; i < Nnode; i++)
         if (node[i]->outLinks.empty() && (node[i]->selfLink <= 0.0)) {
             node[i]->danglingSize = node[i]->size;
         } else {
@@ -287,7 +287,7 @@ void FlowGraph::initiate() {
 
     nodeSize_log_nodeSize = 0.0 ;
     // The exit flow from each node at initiation
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         node[i]->exit = node[i]->size // Proba to be on i
                         - (alpha * node[i]->size + beta * node[i]->danglingSize) *
                         node[i]->teleportWeight // Proba teleport back to i
@@ -316,32 +316,32 @@ void FlowGraph::eigenvector() {
     do {
         // Calculate dangling size
         danglingSize = 0.0;
-        for (int i = 0; i < Ndanglings; i++) {
+        for (igraph_integer_t i = 0; i < Ndanglings; i++) {
             danglingSize += size_tmp[danglings[i]];
         }
 
         // Flow from teleportation
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             node[i]->size = (alpha + beta * danglingSize) * node[i]->teleportWeight;
         }
 
         // Flow from network steps
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             node[i]->size += beta * node[i]->selfLink * size_tmp[i];
-            int Nlinks = node[i]->outLinks.size();
-            for (int j = 0; j < Nlinks; j++)
+            size_t Nlinks = node[i]->outLinks.size();
+            for (size_t j = 0; j < Nlinks; j++)
                 node[node[i]->outLinks[j].first]->size += beta *
                         node[i]->outLinks[j].second * size_tmp[i];
         }
 
         // Normalize
         sum = 0.0;
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             sum += node[i]->size;
         }
         sqdiff_old = sqdiff;
         sqdiff = 0.0;
-        for (int i = 0; i < Nnode; i++) {
+        for (igraph_integer_t i = 0; i < Nnode; i++) {
             node[i]->size /= sum;
             sqdiff += fabs(node[i]->size - size_tmp[i]);
             size_tmp[i] = node[i]->size;
@@ -372,7 +372,7 @@ void FlowGraph::calibrate() {
     exitFlow = 0.0;
     size_log_size = 0.0;
 
-    for (int i = 0; i < Nnode; i++) { // For each module
+    for (igraph_integer_t i = 0; i < Nnode; i++) { // For each module
         // own node/module codebook
         size_log_size         += plogp(node[i]->exit + node[i]->size);
 
@@ -392,7 +392,7 @@ void FlowGraph::calibrate() {
  */
 void FlowGraph::back_to(FlowGraph * fgraph) {
     // delete current nodes
-    for (int i = 0 ; i < Nnode ; i++) {
+    for (igraph_integer_t i = 0 ; i < Nnode ; i++) {
         delete node[i];
     }
     delete [] node;
@@ -401,7 +401,7 @@ void FlowGraph::back_to(FlowGraph * fgraph) {
 
     // copy original ones
     node = new Node*[Nnode];
-    for (int i = 0; i < Nnode; i++) {
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
         node[i] = new Node();
         cpyNode(node[i], fgraph->node[i]);
     }

@@ -49,6 +49,7 @@ add_library(
   core/interruption.c
   core/marked_queue.c
   core/matrix.c
+  core/matrix_list.c
   core/memory.c
   core/printing.c
   core/progress.c
@@ -60,11 +61,13 @@ add_library(
   core/statusbar.c
   core/strvector.c
   core/trie.c
-  core/vector_ptr.c
   core/vector.c
+  core/vector_list.c
+  core/vector_ptr.c
 
   math/bfgs.c
   math/complex.c
+  math/safe_intop.c
   math/utils.c
 
   linalg/arpack.c
@@ -78,16 +81,20 @@ add_library(
   graph/attributes.c
   graph/basic_query.c
   graph/cattributes.c
+  graph/graph_list.c
   graph/iterators.c
+  graph/type_common.c
   graph/type_indexededgelist.c
   graph/visitors.c
 
   constructors/adjacency.c
   constructors/atlas.c
   constructors/basic_constructors.c
+  constructors/circulant.c
   constructors/de_bruijn.c
   constructors/famous.c
   constructors/full.c
+  constructors/generalized_petersen.c
   constructors/kautz.c
   constructors/lcf.c
   constructors/linegraph.c
@@ -98,12 +105,10 @@ add_library(
   games/callaway_traits.c
   games/citations.c
   games/correlated.c
-  games/degree_sequence_vl/gengraph_box_list.cpp
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
   games/degree_sequence_vl/gengraph_graph_molloy_hash.cpp
   games/degree_sequence_vl/gengraph_graph_molloy_optimized.cpp
   games/degree_sequence_vl/gengraph_mr-connected.cpp
-  games/degree_sequence_vl/gengraph_powerlaw.cpp
   games/degree_sequence.c
   games/dotproduct.c
   games/erdos_renyi.c
@@ -125,6 +130,9 @@ add_library(
   centrality/centralization.c
   centrality/closeness.c
   centrality/coreness.c
+  centrality/eigenvector.c
+  centrality/hub_authority.c
+  centrality/pagerank.c
   centrality/truss.cpp
   centrality/prpack.cpp
 
@@ -178,6 +186,7 @@ add_library(
   io/lgl.c
   io/ncol.c
   io/pajek.c
+  io/parse_utils.c
   ${PARSER_SOURCES}
 
   layout/circular.c
@@ -283,10 +292,10 @@ add_library(
   $<IF:$<OR:$<BOOL:${ARPACK_IS_VENDORED}>,$<BOOL:${BLAS_IS_VENDORED}>,$<BOOL:${LAPACK_IS_VENDORED}>>,$<TARGET_OBJECTS:f2c_vendored>,>
   $<IF:$<BOOL:${ARPACK_IS_VENDORED}>,$<TARGET_OBJECTS:arpack_vendored>,>
   $<IF:$<BOOL:${BLAS_IS_VENDORED}>,$<TARGET_OBJECTS:blas_vendored>,>
-  $<IF:$<BOOL:${CXSPARSE_IS_VENDORED}>,$<TARGET_OBJECTS:cxsparse_vendored>,>
   $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_OBJECTS:glpk_vendored>,>
   $<IF:$<BOOL:${GMP_IS_VENDORED}>,$<TARGET_OBJECTS:gmp_vendored>,>
   $<IF:$<BOOL:${LAPACK_IS_VENDORED}>,$<TARGET_OBJECTS:lapack_vendored>,>
+  $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
 # Set soname for the library
@@ -299,6 +308,10 @@ target_compile_definitions(
   PRIVATE
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
+# target_compile_options(
+#   # -Wconversion could be useful?
+#   igraph PRIVATE -Wshorten-64-to-32
+# )
 
 # Make sure that a macro named IGRAPH_FILE_BASENAME is provided in every
 # compiler call so we can use these in debug messages without revealing the
@@ -321,14 +334,14 @@ target_include_directories(
   ${PROJECT_SOURCE_DIR}/vendor
 
   # Vendored library include paths
-  $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
   $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
+  $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
 
   # Include paths for dependencies
-  $<$<BOOL:${CXSPARSE_INCLUDE_DIRS}>:${CXSPARSE_INCLUDE_DIRS}>
   $<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>
   $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
   $<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>
+  $<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>
 )
 
 if(MATH_LIBRARY)
@@ -341,10 +354,6 @@ endif()
 
 if(BLAS_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${BLAS_LIBRARIES})
-endif()
-
-if(CXSPARSE_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${CXSPARSE_LIBRARIES})
 endif()
 
 if(GLPK_LIBRARIES)
@@ -363,19 +372,16 @@ if(LIBXML2_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${LIBXML2_LIBRARIES})
 endif()
 
+if(PLFIT_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${PLFIT_LIBRARIES})
+endif()
+
 # Link igraph statically to some of the libraries from the subdirectories
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer plfit prpack
+  bliss cliquer cxsparse_vendored prpack
 )
-
-# Disable complex number support for CXSparse because:
-#   - It is necessary to compile with MSVC
-#   - igraph does not need complex number support from CXSparse on any platform
-# This is needed here (in addition to the cxsparse_vendored target) because
-# igraph may be compiled with an external CXSparse.
-target_compile_definitions(igraph PRIVATE NCOMPLEX)
 
 if (NOT BUILD_SHARED_LIBS)
   target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
@@ -423,7 +429,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer plfit prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

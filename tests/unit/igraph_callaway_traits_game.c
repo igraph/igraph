@@ -39,7 +39,8 @@ void init_vm(igraph_vector_t *type_dist,
 
 int main() {
     igraph_t g;
-    igraph_vector_t type_dist, node_types;
+    igraph_vector_t type_dist;
+    igraph_vector_int_t node_types;
     igraph_matrix_t pref_matrix;
     igraph_bool_t bipartite;
 
@@ -61,28 +62,28 @@ int main() {
 
     /*Two types with only cross terms makes a bipartite graph*/
     init_vm(&type_dist, 2, 1, &pref_matrix, 0, 1, 1, 0);
-    igraph_vector_init(&node_types, 0);
+    igraph_vector_int_init(&node_types, 0);
     IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 1, &node_types) == IGRAPH_SUCCESS);
     igraph_is_bipartite(&g, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_is_directed(&g));
-    IGRAPH_ASSERT(igraph_vector_size(&node_types) == igraph_vcount(&g));
-    IGRAPH_ASSERT(igraph_vector_min(&node_types) == 0);
-    IGRAPH_ASSERT(igraph_vector_max(&node_types) == 1);
-    igraph_vector_destroy(&node_types);
+    IGRAPH_ASSERT(igraph_vector_int_size(&node_types) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_int_min(&node_types) == 0);
+    IGRAPH_ASSERT(igraph_vector_int_max(&node_types) == 1);
+    igraph_vector_int_destroy(&node_types);
     DESTROY_GVM();
 
     /*Automatically determined type_dist*/
     init_vm(&type_dist, 0, 0, &pref_matrix, 0, 1, 1, 0);
-    igraph_vector_init(&node_types, 0);
+    igraph_vector_int_init(&node_types, 0);
     IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 3, /*type_dist*/ NULL, &pref_matrix, /*directed*/ 0, &node_types) == IGRAPH_SUCCESS);
     igraph_is_bipartite(&g, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(!igraph_is_directed(&g));
-    IGRAPH_ASSERT(igraph_vector_size(&node_types) == igraph_vcount(&g));
-    IGRAPH_ASSERT(igraph_vector_min(&node_types) == 0);
-    IGRAPH_ASSERT(igraph_vector_max(&node_types) == 1);
-    igraph_vector_destroy(&node_types);
+    IGRAPH_ASSERT(igraph_vector_int_size(&node_types) == igraph_vcount(&g));
+    IGRAPH_ASSERT(igraph_vector_int_min(&node_types) == 0);
+    IGRAPH_ASSERT(igraph_vector_int_max(&node_types) == 1);
+    igraph_vector_int_destroy(&node_types);
     DESTROY_GVM();
 
     VERIFY_FINALLY_STACK();
