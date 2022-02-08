@@ -128,7 +128,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
 static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    const igraph_vector_int_t *ids,
-                                   const igraph_vector_ptr_t *cliques,
+                                   const igraph_vector_int_list_t *cliques,
                                    igraph_t **result,
                                    igraph_vector_t **resultweights,
                                    igraph_vector_int_t **resultids,
@@ -142,7 +142,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     igraph_vector_int_t mark, map;
     igraph_vector_int_t edges;
     igraph_vector_int_t neis, newedges;
-    igraph_integer_t c, nc = igraph_vector_ptr_size(cliques);
+    igraph_integer_t c, nc = igraph_vector_int_list_size(cliques);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_i_subclique_next_free_t freedata = { 0, 0, 0, nc };
@@ -189,7 +189,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
        subgraphs defined by the cliques. */
 
     for (c = 0; c < nc; c++) {
-        igraph_vector_int_t *clique = VECTOR(*cliques)[c];
+        igraph_vector_int_t *clique = igraph_vector_int_list_get_ptr(cliques, c);
         igraph_real_t minweight = IGRAPH_INFINITY, nextweight = IGRAPH_INFINITY;
         igraph_integer_t e, v, clsize = igraph_vector_int_size(clique);
         igraph_integer_t noe, nov = 0;
@@ -292,12 +292,13 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
+static void igraph_i_graphlets_destroy_clique_list(igraph_vector_ptr_t *vl) {
     igraph_integer_t i, n = igraph_vector_ptr_size(vl);
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = (igraph_vector_int_t*) VECTOR(*vl)[i];
         if (v) {
             igraph_vector_int_destroy(v);
+            IGRAPH_FREE(v);
         }
     }
     igraph_vector_ptr_destroy(vl);
@@ -315,19 +316,18 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
        results to 'cliques' and 'thresholds' and uses the supplied
        'startthr' */
 
-    igraph_vector_ptr_t mycliques;
+    igraph_vector_int_list_t mycliques;
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t subv;
     igraph_t subg;
-    igraph_integer_t i, nographs, nocliques;
+    igraph_integer_t i, j, nocliques;
     igraph_t *newgraphs = 0;
     igraph_vector_t *newweights = 0;
     igraph_vector_int_t *newids = 0;
     igraph_vector_t clique_thr, next_thr;
     igraph_i_subclique_next_free_t freedata = { 0, 0, 0, 0 };
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&mycliques, 0));
-    IGRAPH_FINALLY(igraph_i_graphlets_destroy_vectorlist, &mycliques);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&mycliques, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&subv, 0);
 
     /* We start by finding cliques at the lowest threshold */
@@ -338,14 +338,12 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_subgraph_edges(graph, &subg, igraph_ess_vector(&subv), /*delete_vertices=*/ 0));
     IGRAPH_FINALLY(igraph_destroy, &subg);
-    /* TODO(ntamas): migrate to igraph_vector_int_list_t! */
-    // IGRAPH_CHECK(igraph_maximal_cliques(&subg, &mycliques, /*min_size=*/ 0, /*max_size=*/ 0));
+    IGRAPH_CHECK(igraph_maximal_cliques(&subg, &mycliques, /*min_size=*/ 0, /*max_size=*/ 0));
     igraph_destroy(&subg);
-    IGRAPH_FINALLY_CLEAN(1);
-    nocliques = igraph_vector_ptr_size(&mycliques);
-
     igraph_vector_int_destroy(&subv);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    nocliques = igraph_vector_int_list_size(&mycliques);
 
     /* Get the next cliques and thresholds */
     IGRAPH_VECTOR_INIT_FINALLY(&next_thr, 0);
@@ -364,20 +362,31 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
 
     /* Store cliques at the current level */
     IGRAPH_CHECK(igraph_vector_append(thresholds, &clique_thr));
-    for (i = 0; i < nocliques; i++) {
-        igraph_vector_int_t *cl = (igraph_vector_int_t*) VECTOR(mycliques)[i];
-        igraph_integer_t j, n = igraph_vector_int_size(cl);
-        for (j = 0; j < n; j++) {
-            igraph_integer_t node = VECTOR(*cl)[j];
-            VECTOR(*cl)[j] = VECTOR(*ids)[node];
+    IGRAPH_CHECK(igraph_vector_ptr_resize(cliques, igraph_vector_ptr_size(cliques) + nocliques));
+    for (i = 0, j = igraph_vector_ptr_size(cliques) - 1; i < nocliques; i++, j--) {
+        igraph_vector_int_t *cl = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        if (!cl) {
+            IGRAPH_ERROR("Cannot find graphlets", IGRAPH_ENOMEM);
+        }
+        IGRAPH_FINALLY(igraph_free, cl);
+
+        igraph_vector_int_list_pop_back(&mycliques, cl);
+
+        /* From this point onwards, _we_ own the clique and not `mycliques'.
+         * We pass on the ownership to `cliques' */
+        VECTOR(*cliques)[j] = cl;
+        IGRAPH_FINALLY_CLEAN(1);
+
+        igraph_integer_t k, n = igraph_vector_int_size(cl);
+        for (k = 0; k < n; k++) {
+            igraph_integer_t node = VECTOR(*cl)[k];
+            VECTOR(*cl)[k] = VECTOR(*ids)[node];
         }
         igraph_vector_int_sort(cl);
     }
-    IGRAPH_CHECK(igraph_vector_ptr_append(cliques, &mycliques));
 
     /* Recursive calls for cliques found */
-    nographs = igraph_vector_ptr_size(&mycliques);
-    for (i = 0; i < nographs; i++) {
+    for (i = 0; i < nocliques; i++) {
         igraph_t *g = newgraphs + i;
         if (igraph_vcount(g) > 1) {
             igraph_vector_t *w_sub = newweights + i;
@@ -389,7 +398,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     igraph_vector_destroy(&clique_thr);
     igraph_vector_destroy(&next_thr);
     igraph_i_subclique_next_free(&freedata);
-    igraph_vector_ptr_destroy(&mycliques); /* contents was copied over */
+    igraph_vector_int_list_destroy(&mycliques); /* contents was copied over to `cliques' */
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -524,10 +533,9 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \param graph The input graph, it must be a simple graph, edge directions are
  *        ignored.
  * \param weights Weights of the edges, a vector.
- * \param cliques An initialized vector of pointers.
- *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be an integer vector of vertex IDs. Each elements must be
- *        destroyed using \ref igraph_vector_int_destroy() and \ref igraph_free().
+ * \param cliques An initialized list of integer vectors. The graphlet basis is
+ *        stored here. Each element of the list is an integer vector of
+ *        vertex IDs, encoding a single basis subgraph.
  * \param thresholds An initialized vector, the (highest possible)
  *        weight thresholds for finding the basis subgraphs are stored
  *        here.
@@ -538,7 +546,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
 igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
                                      const igraph_vector_t *weights,
-                                     igraph_vector_ptr_t *cliques,
+                                     igraph_vector_int_list_t *cliques,
                                      igraph_vector_t *thresholds) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -546,7 +554,8 @@ igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
     igraph_real_t minthr;
     igraph_vector_int_t ids;
     igraph_bool_t simple;
-    igraph_integer_t i;
+    igraph_integer_t i, no_of_cliques;
+    igraph_vector_ptr_t mycliques;
 
     /* Some checks */
     if (weights == NULL) {
@@ -562,20 +571,42 @@ igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
         IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
     }
 
-    minthr = igraph_vector_min(weights);
-    igraph_vector_ptr_clear(cliques);
-    igraph_vector_clear(thresholds);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ids, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(ids)[i] = i;
-    }
+    /* Internally, we will still use igraph_vector_ptr_t instead of
+     * igraph_vector_int_list_t to manage the list of cliques; this is because
+     * we are going to append & filter the list and it's more complicated to
+     * do with an igraph_vector_int_list_t */
+    IGRAPH_CHECK(igraph_vector_ptr_init(&mycliques, 0));
+    IGRAPH_FINALLY(igraph_i_graphlets_destroy_clique_list, &mycliques);
 
-    IGRAPH_CHECK(igraph_i_graphlets(graph, weights, cliques, thresholds, &ids, minthr));
+    igraph_vector_int_list_clear(cliques);
+    igraph_vector_clear(thresholds);
+
+    minthr = igraph_vector_min(weights);
+
+    IGRAPH_CHECK(igraph_vector_int_init_seq(&ids, 0, no_of_nodes - 1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &ids);
+
+    IGRAPH_CHECK(igraph_i_graphlets(graph, weights, &mycliques, thresholds, &ids, minthr));
 
     igraph_vector_int_destroy(&ids);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_i_graphlets_filter(cliques, thresholds));
+    IGRAPH_CHECK(igraph_i_graphlets_filter(&mycliques, thresholds));
+
+    /* Pass ownership of cliques in `mycliques' to `cliques' so the user does
+     * not have to work with igraph_vector_ptr_t */
+    no_of_cliques = igraph_vector_ptr_size(&mycliques);
+    for (i = 0; i < no_of_cliques; i++) {
+        IGRAPH_CHECK(igraph_vector_int_list_push_back(
+            cliques, VECTOR(mycliques)[i]
+        ));
+        IGRAPH_FREE(VECTOR(mycliques)[i]);
+    }
+
+    /* `mycliques' is now empty so we can clear and destroy */
+    igraph_vector_ptr_clear(&mycliques);
+    igraph_vector_ptr_destroy(&mycliques);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -583,13 +614,13 @@ igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
 /* TODO: not made static because it is used by the R interface */
 igraph_error_t igraph_i_graphlets_project(
     const igraph_t *graph, const igraph_vector_t *weights,
-    const igraph_vector_ptr_t *cliques, igraph_vector_t *Mu, igraph_bool_t startMu,
-    int niter, igraph_integer_t vid1
+    const igraph_vector_int_list_t *cliques, igraph_vector_t *Mu, igraph_bool_t startMu,
+    igraph_integer_t niter, igraph_integer_t vid1
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_cliques = igraph_vector_ptr_size(cliques);
+    igraph_integer_t no_cliques = igraph_vector_int_list_size(cliques);
     igraph_vector_int_t vcl, vclidx, ecl, eclidx, cel, celidx;
     igraph_vector_int_t edgelist;
     igraph_vector_t newweights, normfact;
@@ -624,7 +655,7 @@ igraph_error_t igraph_i_graphlets_project(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vclidx, no_of_nodes + 2);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&celidx, no_cliques + 3);
     for (i = 0, total_vertices = 0, total_edges = 0; i < no_cliques; i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_integer_t j, n = igraph_vector_int_size(v);
         total_vertices += n;
         total_edges += n * (n - 1) / 2;
@@ -644,7 +675,7 @@ igraph_error_t igraph_i_graphlets_project(
     /* Create vertex-clique list, the cliques for each vertex. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vcl, total_vertices);
     for (i = 0; i < no_cliques; i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_integer_t j, n = igraph_vector_int_size(v);
         for (j = 0; j < n; j++) {
             igraph_integer_t vv = VECTOR(*v)[j] - vid1;
@@ -700,7 +731,7 @@ igraph_error_t igraph_i_graphlets_project(
     /* Normalizing factors for the iteration */
     IGRAPH_VECTOR_INIT_FINALLY(&normfact, no_cliques);
     for (i = 0; i < no_cliques; i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_integer_t n = igraph_vector_int_size(v);
         VECTOR(normfact)[i] = n * (n + 1) / 2;
     }
@@ -753,8 +784,9 @@ igraph_error_t igraph_i_graphlets_project(
  * \param graph The input graph, it must be a simple graph, edge directions are
  *        ignored.
  * \param weights Weights of the edges in the input graph, a vector.
- * \param cliques The graphlet basis, a pointer vector, in which each
- *        element is an \ref igraph_vector_int_t of vertex IDs.
+ * \param cliques An initialized list of integer vectors. The graphlet basis is
+ *        stored here. Each element of the list is an integer vector of
+ *        vertex IDs, encoding a single basis subgraph.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here. This vector is also used to initialize the
  *        the weight vector for the iterative algorithm, if the
@@ -771,16 +803,16 @@ igraph_error_t igraph_i_graphlets_project(
 
 igraph_error_t igraph_graphlets_project(const igraph_t *graph,
                              const igraph_vector_t *weights,
-                             const igraph_vector_ptr_t *cliques,
+                             const igraph_vector_int_list_t *cliques,
                              igraph_vector_t *Mu, igraph_bool_t startMu,
-                             int niter) {
+                             igraph_integer_t niter) {
 
     return igraph_i_graphlets_project(graph, weights, cliques, Mu, startMu,
                                       niter, /*vid1=*/ 0);
 }
 
 typedef struct igraph_i_graphlets_order_t {
-    const igraph_vector_ptr_t *cliques;
+    const igraph_vector_int_list_t *cliques;
     const igraph_vector_t *Mu;
 } igraph_i_graphlets_order_t;
 
@@ -810,9 +842,9 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \param graph The input graph, it must be a simple graph, edge directions are
  *        ignored.
  * \param weights Weights of the edges, a vector.
- * \param cliques An initialized vector of pointers.
- *        The graphlet basis is stored here. Each element of the pointer
- *        vector will be an \ref igraph_vector_int_t  of vertex IDs.
+ * \param cliques An initialized list of integer vectors. The graphlet basis is
+ *        stored here. Each element of the list is an integer vector of
+ *        vertex IDs, encoding a single basis subgraph.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here.
  * \param niter Integer scalar, the number of iterations to perform
@@ -825,8 +857,8 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
 
 igraph_error_t igraph_graphlets(const igraph_t *graph,
                      const igraph_vector_t *weights,
-                     igraph_vector_ptr_t *cliques,
-                     igraph_vector_t *Mu, int niter) {
+                     igraph_vector_int_list_t *cliques,
+                     igraph_vector_t *Mu, igraph_integer_t niter) {
 
     igraph_integer_t i, nocliques;
     igraph_vector_t thresholds;
@@ -840,7 +872,7 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_graphlets_project(graph, weights, cliques, Mu, /*startMu=*/ 0, niter));
 
-    nocliques = igraph_vector_ptr_size(cliques);
+    nocliques = igraph_vector_int_list_size(cliques);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, nocliques);
     for (i = 0; i < nocliques; i++) {
         VECTOR(order)[i] = i;
@@ -848,7 +880,7 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
     igraph_qsort_r(VECTOR(order), nocliques, sizeof(VECTOR(order)[0]), &sortdata,
                    igraph_i_graphlets_order_cmp);
 
-    IGRAPH_CHECK(igraph_vector_ptr_index_int(cliques, &order));
+    IGRAPH_CHECK(igraph_vector_int_list_permute(cliques, &order));
     IGRAPH_CHECK(igraph_vector_index_int(Mu, &order));
 
     igraph_vector_int_destroy(&order);

@@ -242,16 +242,6 @@ VERTEXSET_LIST:
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
-VERTEXSET_PTR_LIST:
-    # A list containing vectors of igraph integers where each such
-    # vector represents a sequence of vertex indices.
-    #
-    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
-    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
-    # vector of igraph_vs_t objects
-    CTYPE: igraph_vector_ptr_t
-    FLAGS: BY_REF
-
 VERTEX_COLOR:
     # A vector containing vertex colors
     CTYPE: igraph_vector_int_t

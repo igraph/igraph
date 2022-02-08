@@ -177,11 +177,22 @@ void FUNCTION(clear)(TYPE* v) {
     v->end = v->stor_begin;
 }
 
-igraph_error_t FUNCTION(push_back) (TYPE* v, ITEM_TYPE* e) {
+igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
     IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
     *(v->end) = *e;
     v->end += 1;
     return IGRAPH_SUCCESS;
+}
+
+igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* e) {
+    igraph_integer_t size = FUNCTION(size)(v);
+    if (size > 0) {
+        v->end -= 1;
+        *e = *(v->end);
+        return IGRAPH_SUCCESS;
+    } else {
+        return IGRAPH_FAILURE;
+    }
 }
 
 ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {

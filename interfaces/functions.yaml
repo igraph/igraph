@@ -1393,20 +1393,20 @@ igraph_community_infomap:
 igraph_graphlets:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
-        OUT VERTEXSET_PTR_LIST cliques, OUT VECTOR Mu, INT niter=1000
+        OUT VERTEXSET_LIST cliques, OUT VECTOR Mu, INTEGER niter=1000
     DEPS: weights ON graph, cliques ON graph
 
 igraph_graphlets_candidate_basis:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
-        OUT VERTEXSET_PTR_LIST cliques, OUT VECTOR thresholds
+        OUT VERTEXSET_LIST cliques, OUT VECTOR thresholds
     DEPS: weights ON graph, cliques ON graph
 
 igraph_graphlets_project:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
-        VERTEXSET_PTR_LIST cliques, INOUT VECTOR Muc,
-        BOOLEAN startMu=False, INT niter=1000
+        VERTEXSET_LIST cliques, INOUT VECTOR Muc,
+        BOOLEAN startMu=False, INTEGER niter=1000
     DEPS: weights ON graph
 
 #######################################
