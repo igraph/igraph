@@ -23,7 +23,7 @@ int main(){
         printf("Assortativity before rewiring = %g\n", assortativity);
         
         /* Rewire graph */
-        igraph_rewire(&g, 10 * edge_count, IGRAPH_REWIRING_SIMPLE);
+        igraph_rewire(&g, 10 * igraph_ecount(&g), IGRAPH_REWIRING_SIMPLE);
         
         igraph_assortativity(&g, &degree, NULL, &assortativity, /* ignore edge directions */ IGRAPH_UNDIRECTED);
         printf("Assortativity after rewiring = %g\n\n", assortativity);
