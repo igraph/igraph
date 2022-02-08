@@ -56,14 +56,6 @@ int main() {
     igraph_vector_t values;
     igraph_vector_int_t types;
 
-    igraph_integer_t football_types[] = {
-        7, 0, 2, 3, 7, 3, 2, 8, 8, 7, 3, 10, 6, 2, 6, 2, 7, 9, 6, 1, 9, 8, 8, 7, 10, 0, 6, 9,
-        11, 1, 1, 6, 2, 0, 6, 1, 5, 0, 6, 2, 3, 7, 5, 6, 4, 0, 11, 2, 4, 11, 10, 8, 3, 11, 6,
-        1, 9, 4, 11, 10, 2, 6, 9, 10, 2, 9, 4, 11, 8, 10, 9, 6, 3, 11, 3, 4, 9, 8, 8, 1, 5, 3,
-        5, 11, 3, 6, 4, 9, 11, 0, 5, 4, 4, 7, 1, 9, 9, 10, 3, 6, 2, 1, 3, 0, 7, 0, 2, 3, 8, 0,
-        4, 8, 4, 9, 11
-    };
-
     /* Assortativity based on vertex categories */
 
     igraph_famous(&g, "zachary");
@@ -116,7 +108,7 @@ int main() {
     /* Assortativity based on degrees */
 
     /* Normalized case */
-    printf("Degree assortativity, NORMALIZED\n");
+    printf("\nDegree assortativity, NORMALIZED\n");
 
     igraph_famous(&g, "zachary");
 
@@ -217,9 +209,18 @@ int main() {
 
     igraph_destroy(&g);
 
-    /*---------------------*/
+    /*------------------*/
+    /* Football network */
 
-    printf("\n\nFootball network: ");
+    igraph_integer_t football_types[] = {
+        7, 0, 2, 3, 7, 3, 2, 8, 8, 7, 3, 10, 6, 2, 6, 2, 7, 9, 6, 1, 9, 8, 8, 7, 10, 0, 6, 9,
+        11, 1, 1, 6, 2, 0, 6, 1, 5, 0, 6, 2, 3, 7, 5, 6, 4, 0, 11, 2, 4, 11, 10, 8, 3, 11, 6,
+        1, 9, 4, 11, 10, 2, 6, 9, 10, 2, 9, 4, 11, 8, 10, 9, 6, 3, 11, 3, 4, 9, 8, 8, 1, 5, 3,
+        5, 11, 3, 6, 4, 9, 11, 0, 5, 4, 4, 7, 1, 9, 9, 10, 3, 6, 2, 1, 3, 0, 7, 0, 2, 3, 8, 0,
+        4, 8, 4, 9, 11
+    };
+
+    printf("\nFootball network: ");
     igraph_small(&g, sizeof(football_types) / sizeof(football_types[0]),
                  IGRAPH_UNDIRECTED,
                  0, 1, 2, 3, 0, 4, 4, 5, 3, 5, 2, 6, 6, 7, 7, 8, 8, 9, 0, 9, 4, 9, 5, 10, 10, 11, 5, 11,
