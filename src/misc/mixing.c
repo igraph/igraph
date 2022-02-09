@@ -74,7 +74,7 @@
  * For an educational overview of assortativity, see
  * M. E. J. Newman,
  * Networks: An Introduction, Oxford University Press (2010).
- * https://doi.org/10.1093/acprof:oso/9780199206650.001.0001.
+ * https://doi.org/10.1093/acprof%3Aoso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param types Integer vector giving the vertex categories. The types
