@@ -38,16 +38,16 @@
  * randomly connected network it is (asymptotically) zero.
  *
  * </para><para>
- * The unnormalized version, computed when \p normalization is set to false,
- * is identical to the modularity, and is computed as follows for
+ * The unnormalized version, computed when \p normalized is set to false,
+ * is identical to the modularity, and is defined as follows for
  * directed networks:
  * </para><para>
  * <code>1/m sum_ij (A_ij - k^out_i k^in_j / m) d(i,j)</code>,
  * </para><para>
  * where \c m denotes the number of edges, \c A_ij is the adjacency matrix,
  * <code>k^out</code> and <code>k^in</code> are the out- and in-degrees,
- * and <code>d(i,j)</code> is one if vertices \c i and \c j have the same type
- * and zero otherwise.
+ * and <code>d(i,j)</code> is one if vertices \c i and \c j are in the same
+ * category and zero otherwise.
  *
  * </para><para>
  * The normalized assortativity coefficient is obtained by dividing the
@@ -68,16 +68,16 @@
  * M. E. J. Newman: Mixing patterns in networks,
  * Phys. Rev. E 67, 026126 (2003)
  * https://doi.org/10.1103/PhysRevE.67.026126.
- * See equation (2) for the definition.
+ * See section II and equation (2) for the definition of the concept.
  *
  * </para><para>
- * For an educational overview of the concept of assortativity, see
+ * For an educational overview of assortativity, see
  * M. E. J. Newman,
  * Networks: An Introduction, Oxford University Press (2010).
  * https://doi.org/10.1093/acprof:oso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
- * \param types Integer vector giving the vertex types. The types
+ * \param types Integer vector giving the vertex categories. The types
  *    are represented by integers starting at zero.
  * \param res Pointer to a real variable, the result is stored here.
  * \param directed Boolean, it gives whether to consider edge
@@ -174,8 +174,9 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * \brief Assortativity based on numeric properties of vertices.
  *
  * This function calculates the assortativity coefficient of a
- * graph with given values \c x_i for each vertex \c i. This coefficient
- * equals the Pearson correlation of the values at the two ends of the edges.
+ * graph based on given values \c x_i for each vertex \c i. This type of
+ * assortativity coefficient equals the Pearson correlation of the values
+ * at the two ends of the edges.
  *
  * </para><para>
  * The unnormalized covariance of values, computed when \p normalized is
@@ -185,7 +186,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * </para><para>
  * where \c m denotes the number of edges, \c A_ij is the adjacency matrix, and
  * <code>k^out</code> and <code>k^in</code> are the out- and in-degrees.
- * \c x_out and \c x_in refer to the vertex values at the start and end of
+ * \c x_out and \c x_in refer to the sets of vertex values at the start and end of
  * the directed edges.
  *
  * </para><para>
@@ -195,7 +196,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * </para><para>
  * <code>var(x_out) = 1/m sum_i k^out_i x_i^2 - (1/m sum_i k^out_i x_i^2)^2</code>
  * </para><para>
- * <code>var(x_in) = 1/m sum_j k^in_j x_j^2 - (1/m sum_j k^in_j x_j^2)^2</code>
+ * <code>var(x_in)  = 1/m sum_j k^in_j x_j^2 - (1/m sum_j k^in_j x_j^2)^2</code>
  *
  * </para><para>
  * Undirected graphs are effectively treated as directed graphs where all edges
@@ -209,15 +210,15 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * M. E. J. Newman: Mixing patterns
  * in networks, Phys. Rev. E 67, 026126 (2003)
  * https://doi.org/10.1103/PhysRevE.67.026126.
- * See equation (21) in for the definition, and equation (26) for
- * performing the calculation in directed graphs.
+ * See section III and equation (21) for the definition, and equation (26) for
+ * performing the calculation in directed graphs with the degrees as values.
  *
  * </para><para>
  * M. E. J. Newman: Assortative mixing in networks,
  * Phys. Rev. Lett. 89, 208701 (2002)
  * http://doi.org/10.1103/PhysRevLett.89.208701.
  * See equation (4) for performing the calculation in undirected
- * graphs.
+ * graphs with the degrees as values.
  *
  * </para><para>
  * For an educational overview of the concept of assortativity, see
@@ -230,9 +231,9 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  *     values.
  * \param values_in A second value vector to be used for the incoming
  *     edges when calculating assortativity for a directed graph.
- *     Supply a null pointer here if you want to use the same values
+ *     Supply \c NULL here if you want to use the same values
  *     for outgoing and incoming edges. This argument is ignored
- *     (with a warning) if it is not a null pointer and undirected
+ *     (with a warning) if it is not a null pointer and the undirected
  *     assortativity coefficient is being calculated.
  * \param res Pointer to a real variable, the result is stored here.
  * \param directed Boolean, whether to consider edge directions for
@@ -392,7 +393,7 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
     } else {
         igraph_vector_t degree;
         IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-        IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, 0));
+        IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, NULL));
         IGRAPH_CHECK(igraph_assortativity(graph, &degree, 0, res, /* directed */ 0, /* normalized */ 1));
         igraph_vector_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
