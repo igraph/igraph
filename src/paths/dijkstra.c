@@ -739,7 +739,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *parent_vec, *parent_edge_vec;
 
-        parent_vec = igraph_Calloc(1, igraph_vector_int_t);
+        parent_vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (parent_vec == 0) {
             IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
         }
@@ -748,7 +748,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         VECTOR(parents)[i] = parent_vec;
         IGRAPH_FINALLY_CLEAN(1);
 
-        parent_edge_vec = igraph_Calloc(1, igraph_vector_int_t);
+        parent_edge_vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (parent_edge_vec == 0) {
             IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
         }
@@ -986,7 +986,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         } else {
             /* If the 'vertices' vector doesn't exist, then create one, in order
              * for the algorithm to work. */
-            vertices = igraph_Calloc(1, igraph_vector_int_list_t);
+            vertices = IGRAPH_CALLOC(1, igraph_vector_int_list_t);
             if (vertices == 0) {
                 IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
             }

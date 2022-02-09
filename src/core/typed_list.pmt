@@ -325,7 +325,7 @@ igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
 
     memcpy(v->stor_begin, work, sizeof(ITEM_TYPE) * size);
 
-    igraph_Free(work);
+    IGRAPH_FREE(work);
 
     return IGRAPH_SUCCESS;
 }

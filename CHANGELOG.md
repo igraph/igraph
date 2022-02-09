@@ -588,6 +588,10 @@
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
    deprecated and will be removed in 0.11.
 
+ - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
+   deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
+   to simplify the API. The deprecated variants will be removed in 0.11.
+
 ## [Unreleased 0.9.7]
 
 ### Changed
