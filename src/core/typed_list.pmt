@@ -622,7 +622,7 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
 
 /**
  * \ingroup vector_list
- * \function igraph_vector_list_remove_back
+ * \function igraph_vector_list_pop_back
  * \brief Remove the last item from the vector list and transfer ownership to the caller.
  *
  * </para><para>
@@ -638,7 +638,7 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
  *
  * Time complexity: O(1).
  */
-igraph_error_t FUNCTION(remove_back)(TYPE* v, ITEM_TYPE* result) {
+igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* result) {
     igraph_integer_t size = FUNCTION(size)(v);
     if (size > 0) {
         v->end -= 1;
