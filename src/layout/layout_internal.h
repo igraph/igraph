@@ -23,7 +23,9 @@
 #ifndef IGRAPH_LAYOUT_INTERNAL_H
 #define IGRAPH_LAYOUT_INTERNAL_H
 
+#include "igraph_decls.h"
 #include "igraph_types.h"
+#include "igraph_matrix.h"
 
 #include "layout/merge_grid.h"
 

@@ -22,6 +22,7 @@
 */
 
 #include "igraph_structural.h"
+#include "igraph_topology.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_constructors.h"
@@ -243,7 +244,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  *
  * \sa igraph_is_weakly_connected()
  *
- * \example examples/simple/igraph_tree.c
+ * \example examples/simple/igraph_kary_tree.c
  */
 igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
     igraph_integer_t iroot = 0;
@@ -394,7 +395,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
 
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(*neis)[i];
-            
+
             if (mode == IGRAPH_ALL) {
                 /* In the undirected case, we avoid returning to the predecessor
                  * vertex of 'v' in the DFS tree by skipping visited vertices.
@@ -475,7 +476,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
     if (roots) {
         igraph_vector_int_clear(roots);
     }
-    
+
     /* Any graph with 0 edges is a forest. */
     if (ecount == 0) {
         if (res) {
@@ -550,7 +551,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
             igraph_vector_int_t degree;
 
             IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
-            IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
+            IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                             IGRAPH_REVERSE_MODE(mode), /* loops = */ 1));
 
             for (v = 0; v < vcount; ++v) {
@@ -600,4 +601,27 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_is_acyclic
+ * \brief Checks whether a graph is acyclic or not.
+ *
+ * This function checks whether a graph is acyclic or not.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to a boolean constant, the result
+        is stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
+ * vertices and edges in the original input graph.
+ */
+igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res) {
+    if (igraph_is_directed(graph)) {
+        return igraph_is_dag(graph, res);
+    } else {
+        return igraph_is_forest(graph, res, NULL, IGRAPH_ALL);
+    }
 }

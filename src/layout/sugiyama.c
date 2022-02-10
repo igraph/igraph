@@ -155,7 +155,7 @@ static void debug(const char* fmt, ...) {
  * Data structure to store a layering of the graph.
  */
 typedef struct {
-    igraph_vector_ptr_t layers;
+    igraph_vector_int_list_t layers;
 } igraph_i_layering_t;
 
 /**
@@ -171,21 +171,12 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
         num_layers = igraph_vector_int_max(membership) + 1;
     }
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&layering->layers, num_layers));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layering->layers);
-
-    for (i = 0; i < num_layers; i++) {
-        igraph_vector_int_t* vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
-        VECTOR(layering->layers)[i] = vec;
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layering->layers, igraph_vector_int_destroy);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&layering->layers, num_layers);
 
     n = igraph_vector_int_size(membership);
     for (i = 0; i < n; i++) {
         igraph_integer_t l = VECTOR(*membership)[i];
-        igraph_vector_int_t* vec = VECTOR(layering->layers)[l];
+        igraph_vector_int_t* vec = igraph_vector_int_list_get_ptr(&layering->layers, l);
         IGRAPH_CHECK(igraph_vector_int_push_back(vec, i));
     }
 
@@ -198,14 +189,14 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
  * Destroys a layering.
  */
 static void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
-    igraph_vector_ptr_destroy_all(&layering->layers);
+    igraph_vector_int_list_destroy(&layering->layers);
 }
 
 /**
  * Returns the number of layers in a layering.
  */
 static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
-    return igraph_vector_ptr_size(&layering->layers);
+    return igraph_vector_int_list_size(&layering->layers);
 }
 
 /**
@@ -213,7 +204,7 @@ static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* 
  */
 static igraph_vector_int_t* igraph_i_layering_get(const igraph_i_layering_t* layering,
                                        igraph_integer_t index) {
-    return (igraph_vector_int_t*)VECTOR(layering->layers)[index];
+    return igraph_vector_int_list_get_ptr(&layering->layers, index);
 }
 
 
@@ -353,7 +344,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     if (no_of_nodes > 0) {
         igraph_vector_int_t inds;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
-        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&layers_own, &inds, 0));
+        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&layers_own, &inds, IGRAPH_ASCENDING));
         j = -1; dx = VECTOR(layers_own)[VECTOR(inds)[0]] - 1;
         for (i = 0; i < no_of_nodes; i++) {
             k = VECTOR(inds)[i];
@@ -370,8 +361,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     }
 
     /* 2. Find the connected components. */
-    IGRAPH_CHECK(igraph_clusters(graph, &membership, 0, &no_of_components,
-                                 IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, &membership, 0, &no_of_components, IGRAPH_WEAK));
 
     /* 3. For each component... */
     dx = 0;
@@ -801,7 +791,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
             printf("Vertices: "); igraph_vector_int_print(layer_members);
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
-            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
+            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
             for (i = 0; i < n; i++) {
                 nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(new_layer_members)[i] = nei;
@@ -835,7 +825,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
 
-            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, 0));
+            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
             for (i = 0; i < n; i++) {
                 nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(new_layer_members)[i] = nei;
@@ -1152,7 +1142,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
                 for (k = 0; k < n; k++) {
                     VECTOR(xs)[k] = X_POS(VECTOR(neis)[k]);
                 }
-                IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, 0));
+                IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, IGRAPH_ASCENDING));
 
                 if (n % 2 == 1) {
                     /* Odd number of neighbors, so the median is unique */

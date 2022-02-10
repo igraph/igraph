@@ -40,7 +40,7 @@ int main() {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_full(&full, 10, /*directed=*/ 0, /*loops=*/ 0);
-    igraph_tree(&tree, 15, /*children=*/ 2, /*type=*/ IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&tree, 15, /*children=*/ 2, /*type=*/ IGRAPH_TREE_UNDIRECTED);
     igraph_disjoint_union(&graph, &full, &tree);
     igraph_add_edge(&graph, 0, 10);
 

@@ -27,7 +27,7 @@
 #include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
@@ -36,8 +36,7 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 typedef struct igraph_fixed_vectorlist_t {
-    igraph_vector_int_t *vecs;
-    igraph_vector_ptr_t v;
+    igraph_vector_int_list_t vecs;
     igraph_integer_t length;
 } igraph_fixed_vectorlist_t;
 

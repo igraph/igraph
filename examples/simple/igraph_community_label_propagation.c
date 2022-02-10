@@ -35,9 +35,14 @@ int main() {
        an already initialized vector. */
     igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(
-                &graph, &membership, /* mode = */ IGRAPH_ALL,
-                /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
-                &modularity);
+        &graph, &membership, /* mode = */ IGRAPH_ALL,
+        /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL
+        );
+
+    /* Also calculate the modularity of the partition */
+    igraph_modularity(
+        &graph, &membership, /* weights= */ NULL, /* resolution = */ 1,
+        /* directed= */ 0, &modularity);
 
     printf("%" IGRAPH_PRId " communities found; modularity score is %g.\n",
            igraph_vector_int_max(&membership) + 1, modularity);

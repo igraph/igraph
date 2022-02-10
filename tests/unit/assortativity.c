@@ -24,13 +24,193 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
+void assortativity_unnormalized(const igraph_t *graph, igraph_real_t *res, igraph_bool_t directed) {
+    if (! igraph_is_directed(graph)) {
+        directed = 0;
+    }
+
+    if (directed) {
+        igraph_vector_t outdeg, indeg;
+        igraph_vector_init(&outdeg, 0);
+        igraph_vector_init(&indeg, 0);
+        igraph_strength(graph, &outdeg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, NULL);
+        igraph_strength(graph, &indeg, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, NULL);
+        igraph_assortativity(graph, &outdeg, &indeg, res, directed, 0);
+        igraph_vector_destroy(&outdeg);
+        igraph_vector_destroy(&indeg);
+    } else {
+        igraph_vector_t deg;
+        igraph_vector_init(&deg, 0);
+        igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, NULL);
+        igraph_assortativity(graph, &deg, NULL, res, directed, 0);
+        igraph_vector_destroy(&deg);
+    }
+}
+
 int main() {
 
     igraph_t g;
-    FILE *karate, *neural;
-    igraph_real_t res;
-    igraph_vector_t types, outtypes, intypes;
-    igraph_vector_int_t int_types;
+    igraph_real_t assort, assort2, assort_unnorm, modularity;
+    igraph_vector_t values;
+    igraph_vector_int_t types;
+
+    /* Assortativity based on vertex categories */
+
+    igraph_famous(&g, "zachary");
+
+    igraph_vector_int_init(&types, 0);
+    igraph_degree(&g, &types, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+
+    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Karate club, normalized assortativity based on degree categories: %g\n", assort);
+
+    igraph_assortativity_nominal(&g, &types, &assort_unnorm, IGRAPH_UNDIRECTED, /* normalized */ 0);
+    printf("Karate club, non-normalized assortativity based on degree categories: %g\n", assort_unnorm);
+
+    /* unnormalized assortativity based on categories is the same as modularity */
+    igraph_modularity(&g, &types, NULL, 1, 0, &modularity);
+    IGRAPH_ASSERT(assort_unnorm == modularity);
+
+    igraph_destroy(&g);
+    igraph_vector_int_destroy(&types);
+
+    /*--------------------------------------*/
+    /* Assortativity based on vertex values */
+
+    igraph_famous(&g, "zachary");
+
+    igraph_vector_init_seq(&values, 0, igraph_vcount(&g) - 1);
+
+    igraph_assortativity(&g, &values, 0, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ 1);
+    printf("Assortativity based on values: %g\n", assort);
+
+    /* Assortativity is a Pearson correlation, thus it must be invariant to
+     * a constant shift in the values. */
+    igraph_vector_add_constant(&values, -5);
+    igraph_assortativity(&g, &values, 0, &assort2, IGRAPH_UNDIRECTED, /*normalized=*/ 1);
+    IGRAPH_ASSERT(assort == assort2);
+
+    igraph_assortativity(&g, &values, 0, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ 0);
+    printf("Assortativity based on values, unnormalized: %g\n", assort);
+
+    /* Assortativity is a Pearson correlation, thus it must be invariant to
+     * a constant shift in the values. */
+    igraph_vector_add_constant(&values, -5);
+    igraph_assortativity(&g, &values, 0, &assort2, IGRAPH_UNDIRECTED, /*normalized=*/ 0);
+    IGRAPH_ASSERT(assort == assort2);
+
+    igraph_vector_destroy(&values);
+    igraph_destroy(&g);
+
+    /*--------------------------------*/
+    /* Assortativity based on degrees */
+
+    /* Normalized case */
+    printf("\nDegree assortativity, NORMALIZED\n");
+
+    igraph_famous(&g, "zachary");
+
+    igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Directed graph */
+
+    igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 0,3, 3,2, -1);
+
+    igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, directed: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Verify handling of self-loops */
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 0,3, 3,3, -1);
+
+    igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, undirected, with self-loop: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 0,3, 3,2, 2,2, -1);
+
+    igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, directed, with self-loop: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Verify handling of multi-edges */
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 0,3, 1,2, -1);
+
+    igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, undirected, with multi-edges: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 0,3, 3,2, 0,2, -1);
+
+    igraph_assortativity_degree(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, directed, with multi-edges: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Unnormalized case */
+    printf("\nDegree assortativity, UNNORMALIZED\n");
+
+    igraph_famous(&g, "zachary");
+
+    assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Directed graph */
+
+    igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 0,3, 3,2, -1);
+
+    assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, directed: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Verify handling of self-loops */
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 0,3, 3,3, -1);
+
+    assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, undirected, with self-loop: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 0,3, 3,2, 2,2, -1);
+
+    assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, directed, with self-loop: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /* Verify handling of multi-edges */
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 0,3, 1,2, -1);
+
+    assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, undirected, with multi-edges: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    igraph_small(&g, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, 0,3, 3,2, 0,2, -1);
+
+    assortativity_unnormalized(&g, &assort, /*directed=*/ 1);
+    printf("Degree assortativity, directed, with multi-edges: %g\n", assort);
+
+    igraph_destroy(&g);
+
+    /*------------------*/
+    /* Football network */
 
     igraph_integer_t football_types[] = {
         7, 0, 2, 3, 7, 3, 2, 8, 8, 7, 3, 10, 6, 2, 6, 2, 7, 9, 6, 1, 9, 8, 8, 7, 10, 0, 6, 9,
@@ -40,102 +220,7 @@ int main() {
         4, 8, 4, 9, 11
     };
 
-    karate = fopen("karate.gml", "r");
-    igraph_read_graph_gml(&g, karate);
-    fclose(karate);
-
-    igraph_vector_int_init(&int_types, 0);
-    igraph_degree(&g, &int_types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1);
-
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
-
-    igraph_destroy(&g);
-    igraph_vector_int_destroy(&int_types);
-
-    /*---------------------*/
-
-    neural = fopen("celegansneural.gml", "r");
-    igraph_read_graph_gml(&g, neural);
-    fclose(neural);
-
-    igraph_vector_int_init(&int_types, 0);
-    igraph_degree(&g, &int_types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1);
-
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
-
-    igraph_destroy(&g);
-    igraph_vector_int_destroy(&int_types);
-
-    /*---------------------*/
-
-    karate = fopen("karate.gml", "r");
-    igraph_read_graph_gml(&g, karate);
-    fclose(karate);
-
-    igraph_vector_init(&types, 0);
-
-    igraph_strength(&g, &types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1, /* weights= */ 0);
-    igraph_vector_add_constant(&types, -1);
-
-    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
-
-    igraph_destroy(&g);
-
-    /*---------------------*/
-
-    neural = fopen("celegansneural.gml", "r");
-    igraph_read_graph_gml(&g, neural);
-    fclose(neural);
-
-    igraph_strength(&g, &types, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1, /* weights=*/ 0);
-    igraph_vector_add_constant(&types, -1);
-
-    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-    igraph_assortativity(&g, &types, 0, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
-
-    igraph_vector_destroy(&types);
-
-    /*---------------------*/
-
-    igraph_vector_init(&outtypes, igraph_vcount(&g));
-    igraph_vector_init(&intypes, igraph_vcount(&g));
-    igraph_strength(&g, &intypes, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1, /* weights=*/ 0);
-    igraph_strength(&g, &outtypes, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1, /* weights=*/ 0);
-    igraph_vector_add_constant(&intypes, -1);
-    igraph_vector_add_constant(&outtypes, -1);
-
-    igraph_assortativity(&g, &outtypes, &intypes, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-
-    igraph_vector_destroy(&intypes);
-    igraph_vector_destroy(&outtypes);
-    /*---------------------*/
-
-    igraph_assortativity_degree(&g, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-
-    igraph_destroy(&g);
-
-    /*---------------------*/
-
-    karate = fopen("karate.gml", "r");
-    igraph_read_graph_gml(&g, karate);
-    fclose(karate);
-
-    igraph_assortativity_degree(&g, &res, /*directed=*/ 1);
-    printf("%.5f\n", res);
-
-    igraph_destroy(&g);
-
-    /*---------------------*/
-
+    printf("\nFootball network: ");
     igraph_small(&g, sizeof(football_types) / sizeof(football_types[0]),
                  IGRAPH_UNDIRECTED,
                  0, 1, 2, 3, 0, 4, 4, 5, 3, 5, 2, 6, 6, 7, 7, 8, 8, 9, 0, 9, 4, 9, 5, 10, 10, 11, 5, 11,
@@ -203,11 +288,13 @@ int main() {
                  114, 53, 114, 49, 114, 73, 114, 46, 114, 67, 114, 58, 114, 15, 114, 104, 114,
                  -1);
     igraph_simplify(&g, /*multiple=*/ 1, /*loops=*/ 1, /*edge_comb=*/ 0);
-    igraph_vector_int_view(&int_types, football_types, sizeof(football_types) / sizeof(football_types[0]));
-    igraph_assortativity_nominal(&g, &int_types, &res, /*directed=*/ 0);
-    printf("%.5f\n", res);
+    igraph_vector_int_view(&types, football_types, sizeof(football_types) / sizeof(football_types[0]));
+    igraph_assortativity_nominal(&g, &types, &assort, /*directed=*/ 0, /*normalized=*/ 1);
+    printf("%g\n", assort);
 
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

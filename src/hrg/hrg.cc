@@ -103,7 +103,9 @@ static igraph_error_t markovChainMonteCarlo(dendro *d, igraph_integer_t period,
     for (igraph_integer_t i = 0; i < period; i++) {
 
         // make a MCMC move
-        IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
+        if (!d->monteCarloMove(dL, flag_taken, 1.0)) {
+            return IGRAPH_FAILURE;
+        }
 
         // get likelihood of this D given G
         igraph_real_t cl = d->getLikelihood();
@@ -168,7 +170,9 @@ static igraph_error_t MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
         oldMeanL = newMeanL;
         newMeanL = 0.0;
         for (int i = 0; i < 65536; i++) {
-            IGRAPH_CHECK(! d->monteCarloMove(dL, flag_taken, 1.0));
+            if (!d->monteCarloMove(dL, flag_taken, 1.0)) {
+                return IGRAPH_FAILURE;
+            }
             Likeli = d->getLikelihood();
             newMeanL += Likeli;
         }
@@ -334,7 +338,7 @@ igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
 
 igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     igraph_integer_t origsize = igraph_hrg_size(hrg);
-    igraph_error_t ret = IGRAPH_SUCCESS;
+    int ret = 0;
     igraph_error_handler_t *oldhandler =
         igraph_set_error_handler(igraph_error_handler_ignore);
 
@@ -352,7 +356,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
         igraph_vector_resize(&hrg->prob, origsize);
         igraph_vector_int_resize(&hrg->edges, origsize);
         igraph_vector_int_resize(&hrg->vertices, origsize);
-        IGRAPH_ERROR("Cannot resize HRG", ret);
+        IGRAPH_ERROR("Cannot resize HRG", IGRAPH_ENOMEM);
     }
 
     return IGRAPH_SUCCESS;
@@ -369,7 +373,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
  *   function, that can be used as the starting point of the Markov
  *   Chain Monte Carlo fitting, if the \c start argument is true.
  * \param start Logical, whether to start the fitting from the given
- *   HRG.
+ *   HRG model.
  * \param steps Integer, the number of MCMC steps to take in the
  *   fitting procedure. If this is zero, then the fitting stop is a
  *   convergence criteria is fulfilled.
@@ -425,119 +429,79 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
  * \function igraph_hrg_sample
  * Sample from a hierarchical random graph model
  *
- * Sample from a hierarchical random graph ensemble. The ensemble can
- * be given as a graph (\c input_graph), or as a HRG object (\c hrg).
- * If a graph is given, then first an MCMC optimization is performed
- * to find the optimal fitting model; then the MCMC is used to sample
- * the graph(s).
- * \param input_graph An igraph graph, or a null pointer. If not a
- *   null pointer, then a HRG is first fitted to the graph, possibly
- *   starting from the given HRG, if the \c start argument is true. If
- *   is is a null pointer, then the given HRG is used as a starting
- *   point, to  find the optimum of the Markov chain, before the
- *   sampling.
- * \param sample Pointer to an uninitialized graph, or a null
- *   pointer. If only one sample is requested, and it is not a null
- *   pointer, then the sample is stored here.
- * \param samples An initialized vector of pointers. If more than one
- *   samples are requested, then they are stored here. Note that to
- *   free this data structure, you need to call \ref igraph_destroy() on
- *   each graph first, then \ref igraph_free() on all pointers, and finally
- *   \ref igraph_vector_ptr_destroy.
- * \param no_samples The number of samples to generate.
- * \param hrg A HRG. It is modified during the sampling.
- * \param start Logical, whether to start the MCMC from the given
- *   HRG.
+ * This function draws a single sample from a hierarchical random graph model.
+ *
+ * \param hrg A HRG model to sample from
+ * \param sample Pointer to an uninitialized graph; the sample is stored here.
  * \return Error code.
  *
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_hrg_sample(const igraph_t *input_graph,
-                      igraph_t *sample,
-                      igraph_vector_ptr_t *samples,
-                      igraph_integer_t no_samples,
-                      igraph_hrg_t *hrg,
-                      igraph_bool_t start) {
+igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
+    dendro d;
 
-    igraph_integer_t i;
-    dendro *d;
+    // TODO: error handling
 
-    if (no_samples < 0) {
+    RNG_BEGIN();
+
+    d.clearDendrograph();
+    d.importDendrogramStructure(hrg);
+    d.makeRandomGraph();
+    d.recordGraphStructure(sample);
+
+    RNG_END();
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_hrg_sample_many
+ * Draw multiple samples from a hierarchical random graph model
+ *
+ * This function draws multiple samples from a hierarchical random graph
+ * ensemble. The ensemble can be given as a graph (\c input_graph), or as an
+ * HRG object (\c hrg). If a graph is given, then first an MCMC optimization is
+ * performed to find the optimal fitting model; then the MCMC is used to sample
+ * the new graph.
+ *
+ * \param hrg A HRG model to sample from
+ * \param samples An initialized graph list that will contain the sampled
+ *   graphs. Note that existing graphs in the graph list are \em not removed
+ *   so make sure you supply an empty list if you do not need the old contents
+ *   of the list.
+ * \param num_samples The number of samples to generate.
+ * \return Error code.
+ *
+ * Time complexity: TODO.
+ */
+
+igraph_error_t igraph_hrg_sample_many(
+    const igraph_hrg_t *hrg, igraph_graph_list_t *samples,
+    igraph_integer_t num_samples
+) {
+    igraph_t g;
+    dendro d;
+
+    if (num_samples < 0) {
         IGRAPH_ERROR("Number of samples must be non-negative", IGRAPH_EINVAL);
     }
 
-    if (!sample && !samples) {
-        IGRAPH_ERROR("Give at least one of `sample' and `samples'",
-                     IGRAPH_EINVAL);
-    }
-
-    if (no_samples != 1 && sample) {
-        IGRAPH_ERROR("Number of samples should be one if `sample' is given",
-                     IGRAPH_EINVAL);
-    }
-
-    if (no_samples > 1 && !samples) {
-        IGRAPH_ERROR("`samples' must be non-null if number of samples "
-                     "is larger than 1", IGRAPH_EINVAL);
-    }
-
-    if (!start && !input_graph) {
-        IGRAPH_ERROR("Input graph must be given if initial HRG is not used",
-                     IGRAPH_EINVAL);
-    }
-
-    if (!start) {
-        IGRAPH_CHECK(igraph_hrg_resize(hrg, igraph_vcount(input_graph)));
-    }
-
-    if (input_graph && igraph_hrg_size(hrg) != igraph_vcount(input_graph)) {
-        IGRAPH_ERROR("Invalid HRG size, should match number of nodes",
-                     IGRAPH_EINVAL);
+    if (num_samples == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     RNG_BEGIN();
 
-    d = new dendro;
-
-    // Need to find equilibrium first?
-    if (start) {
-        d->clearDendrograph();
-        d->importDendrogramStructure(hrg);
-    } else {
-        IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
+    d.clearDendrograph();
+    d.importDendrogramStructure(hrg);
+    while (num_samples > 0) {
+        d.makeRandomGraph();
+        d.recordGraphStructure(&g);
+        IGRAPH_FINALLY(igraph_destroy, &g);
+        IGRAPH_CHECK(igraph_graph_list_push_back(samples, &g));
+        IGRAPH_FINALLY_CLEAN(1);
     }
-
-    // TODO: free on error
-
-    if (sample) {
-        // A single graph
-        d->makeRandomGraph();
-        d->recordGraphStructure(sample);
-        if (samples) {
-            igraph_t *G = IGRAPH_CALLOC(1, igraph_t);
-            if (!G) {
-                IGRAPH_ERROR("Cannot sample HRG graphs", IGRAPH_ENOMEM);
-            }
-            d->recordGraphStructure(G);
-            IGRAPH_CHECK(igraph_vector_ptr_resize(samples, 1));
-            VECTOR(*samples)[0] = G;
-        }
-    } else {
-        // Sample many
-        IGRAPH_CHECK(igraph_vector_ptr_resize(samples, no_samples));
-        for (i = 0; i < no_samples; i++) {
-            igraph_t *G = IGRAPH_CALLOC(1, igraph_t);
-            if (!G) {
-                IGRAPH_ERROR("Cannot sample HRG graphs", IGRAPH_ENOMEM);
-            }
-            d->makeRandomGraph();
-            d->recordGraphStructure(G);
-            VECTOR(*samples)[i] = G;
-        }
-    }
-
-    delete d;
 
     RNG_END();
 
@@ -549,11 +513,11 @@ igraph_error_t igraph_hrg_sample(const igraph_t *input_graph,
  * Generate a hierarchical random graph
  *
  * This function is a simple shortcut to \ref igraph_hrg_sample.
- * It creates a single graph, from the given HRG.
+ * It creates a single graph from the given HRG.
+ *
  * \param graph Pointer to an uninitialized graph, the new graph is
  *   created here.
- * \param hrg The hierarchical random graph model to sample from. It
- *   is modified during the MCMC process.
+ * \param hrg The hierarchical random graph model to sample from.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -561,10 +525,7 @@ igraph_error_t igraph_hrg_sample(const igraph_t *input_graph,
 
 igraph_error_t igraph_hrg_game(igraph_t *graph,
                     const igraph_hrg_t *hrg) {
-    return igraph_hrg_sample(/* input_graph= */ 0, /* sample= */ graph,
-            /* samples= */ 0, /* no_samples=*/ 1,
-            /* hrg= */ (igraph_hrg_t*) hrg,
-            /* start= */ 1);
+    return igraph_hrg_sample(hrg, graph);
 }
 
 /**
@@ -581,12 +542,13 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
  * Time complexity: O(n), the number of vertices in the graph.
  */
 
-igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
-                          const igraph_hrg_t *hrg) {
+igraph_error_t igraph_hrg_dendrogram(
+    igraph_t *graph, const igraph_hrg_t *hrg
+) {
 
     igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
     igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
-    igraph_integer_t no_of_edges = no_of_nodes - 1;
+    igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     igraph_vector_int_t edges;
     igraph_integer_t i, idx = 0;
     igraph_vector_ptr_t vattrs;
@@ -928,7 +890,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                       const igraph_vector_t *prob) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_internal = (no_of_nodes - 1) / 2;
+    igraph_integer_t no_of_internal = no_of_nodes > 0 ? (no_of_nodes - 1) / 2 : 0;
     igraph_vector_int_t deg, idx;
     igraph_integer_t root = 0;
     igraph_integer_t d0 = 0, d1 = 0, d2 = 0;

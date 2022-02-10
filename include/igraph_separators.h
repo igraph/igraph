@@ -25,12 +25,13 @@
 #define IGRAPH_SEPARATORS_H
 
 #include "igraph_decls.h"
+
 #include "igraph_constants.h"
-#include "igraph_types.h"
-#include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
@@ -39,14 +40,14 @@ IGRAPH_EXPORT igraph_error_t igraph_is_separator(const igraph_t *graph,
                                       igraph_bool_t *res);
 
 IGRAPH_EXPORT igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
-                                                   igraph_vector_ptr_t *separators);
+                                                   igraph_vector_int_list_t *separators);
 
 IGRAPH_EXPORT igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
                                               const igraph_vs_t candidate,
                                               igraph_bool_t *res);
 
 IGRAPH_EXPORT igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
-                                                 igraph_vector_ptr_t *separators);
+                                                 igraph_vector_int_list_t *separators);
 
 __END_DECLS
 

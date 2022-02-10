@@ -36,7 +36,7 @@ int main() {
 
     srand(42); /* make tests deterministic */
 
-    igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
     igraph_layout_mds(&g, &coords, 0, 2);
     if (MATRIX(coords, 0, 0) > 0) {

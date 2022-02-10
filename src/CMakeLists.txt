@@ -49,6 +49,7 @@ add_library(
   core/interruption.c
   core/marked_queue.c
   core/matrix.c
+  core/matrix_list.c
   core/memory.c
   core/printing.c
   core/progress.c
@@ -60,11 +61,13 @@ add_library(
   core/statusbar.c
   core/strvector.c
   core/trie.c
-  core/vector_ptr.c
   core/vector.c
+  core/vector_list.c
+  core/vector_ptr.c
 
   math/bfgs.c
   math/complex.c
+  math/safe_intop.c
   math/utils.c
 
   linalg/arpack.c
@@ -78,6 +81,7 @@ add_library(
   graph/attributes.c
   graph/basic_query.c
   graph/cattributes.c
+  graph/graph_list.c
   graph/iterators.c
   graph/type_common.c
   graph/type_indexededgelist.c

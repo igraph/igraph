@@ -1256,8 +1256,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         igraph_integer_t no;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&memb, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
-        IGRAPH_CHECK(igraph_clusters(graph, &memb, &csize, &no,
-                                     /*mode=*/ IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, &memb, &csize, &no, IGRAPH_WEAK));
         if (no != 1) {
             if (res) {
                 *res = 0;

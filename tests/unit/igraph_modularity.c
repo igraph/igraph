@@ -32,7 +32,7 @@ int main() {
     igraph_real_t modularity, resolution;
     igraph_attribute_combination_t comb;
 
-    /* turn on attribute handling */
+    /* Turn on attribute handling */
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_attribute_combination(&comb,
@@ -46,15 +46,13 @@ int main() {
     igraph_vector_int_init(&membership, 0);
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
-    if (!igraph_is_nan(modularity)) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_is_nan(modularity));
+
     igraph_destroy(&graph);
     igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
-    if (!igraph_is_nan(modularity)) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_is_nan(modularity));
+
     /* Should not crash if we omit 'modularity' */
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, /* modularity = */ 0);
     igraph_destroy(&graph);
@@ -72,36 +70,25 @@ int main() {
     SETEANV(&graph, "weight", &weights);
 
     /* Set membership */
-    igraph_vector_int_init(&membership, igraph_vcount(&graph));
-    VECTOR(membership)[0] = 0;
-    VECTOR(membership)[1] = 0;
-    VECTOR(membership)[2] = 0;
-    VECTOR(membership)[3] = 0;
-    VECTOR(membership)[4] = 0;
-    VECTOR(membership)[5] = 1;
-    VECTOR(membership)[6] = 1;
-    VECTOR(membership)[7] = 1;
-    VECTOR(membership)[8] = 1;
-    VECTOR(membership)[9] = 1;
+    igraph_vector_int_init_int(&membership, igraph_vcount(&graph),
+                               0, 0, 0, 0, 0, 1, 1, 1, 1, 1);
 
     /* Calculate modularity */
-    for (resolution = 0.5; resolution <= 1.5; resolution += 0.5)
-    {
+    for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,
                         /* resolution */ resolution,
                         /* directed */ 1, &modularity);
-        printf("Modularity (resolution %.2f) is %f.\n", resolution, modularity);
+        printf("Modularity (resolution %.2f) is %g.\n", resolution, modularity);
     }
 
     igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_MUTUAL);
     igraph_vector_resize(&weights, igraph_ecount(&graph));
     igraph_vector_fill(&weights, 1.0);
-    for (resolution = 0.5; resolution <= 1.5; resolution += 0.5)
-    {
+    for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,
                         /* resolution */ resolution,
                         /* directed */ 1, &modularity);
-        printf("Modularity (resolution %.2f) is %f on directed graph.\n", resolution, modularity);
+        printf("Modularity (resolution %.2f) is %g on directed graph.\n", resolution, modularity);
     }
 
     /* Recalculate modularity on contracted graph */
@@ -112,12 +99,11 @@ int main() {
 
     igraph_vector_int_init_seq(&membership, 0, igraph_vcount(&graph) - 1);
     EANV(&graph, "weight", &weights);
-    for (resolution = 0.5; resolution <= 1.5; resolution += 0.5)
-    {
+    for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,
                         /* resolution */ resolution,
                         /* directed */ 1, &modularity);
-        printf("Modularity (resolution %.2f) is %f after aggregation.\n", resolution, modularity);
+        printf("Modularity (resolution %.2f) is %g after aggregation.\n", resolution, modularity);
     }
 
     igraph_vector_int_destroy(&membership);

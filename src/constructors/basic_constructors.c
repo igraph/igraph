@@ -66,14 +66,18 @@
 igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
                   igraph_integer_t n, igraph_bool_t directed) {
     igraph_bool_t has_edges = igraph_vector_int_size(edges) > 0;
-    igraph_integer_t max = has_edges ? igraph_vector_int_max(edges) + 1 : 0;
+    igraph_integer_t max;
 
     if (igraph_vector_int_size(edges) % 2 != 0) {
-        IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
+        IGRAPH_ERROR("Invalid (odd) edges vector.", IGRAPH_EINVEVECTOR);
     }
-    if (has_edges && !igraph_vector_int_isininterval(edges, 0, max - 1)) {
-        IGRAPH_ERROR("Invalid (negative) vertex ID", IGRAPH_EINVVID);
+    if (has_edges && !igraph_vector_int_isininterval(edges, 0, IGRAPH_VCOUNT_MAX-1)) {
+        IGRAPH_ERROR("Invalid (negative or too large) vertex ID.", IGRAPH_EINVVID);
     }
+
+    /* The + 1 here cannot overflow as above we have already
+     * checked that vertex IDs are within range. */
+    max = has_edges ? igraph_vector_int_max(edges) + 1 : 0;
 
     IGRAPH_CHECK(igraph_empty(graph, n, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);

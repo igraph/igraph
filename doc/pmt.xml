@@ -55,6 +55,18 @@ types they currently support:
   In addition both maximum and minimum heaps are available.
   The default is the <type>igraph_real_t</type> maximum heap.
 </para></glossdef></glossentry>
+
+<glossentry><glossterm>list of vectors</glossterm><glossdef><para>
+  Lists of vectors are currently defined for vectors holding
+  <type>igraph_real_t</type> and <type>igraph_integer_t</type> (int).
+  The default is <type>igraph_real_t</type>.
+</para></glossdef></glossentry>
+
+<glossentry><glossterm>list of matrices</glossterm><glossdef><para>
+  Lists of matrices are currently defined for matrices holding
+  <type>igraph_real_t</type> only.
+</para></glossdef></glossentry>
+
 </glosslist>
 </para>
 
@@ -107,13 +119,27 @@ Some examples:
   <function>igraph_heap_min_int_</function> prefix.
 </para></listitem>
 
+<listitem><para>
+  <type>igraph_vector_list_t</type> is a list of (floating-point) vectors; each
+  element in this data structure is an <type>igraph_vector_t</type>.
+  Similarly, <type>igraph_matrix_list_t</type> is a list of (floating-point)
+  matrices; each element in this data structure is an <type>igraph_matrix_t</type>.
+</para></listitem>
+
+<listitem><para>
+  <type>igraph_vector_int_list_t</type> is a list of integer vectors; each
+  element in this data structure is an <type>igraph_vector_int_t</type>.
+</para></listitem>
+
 </itemizedlist>
 </para>
 
 <para>
 Note that the <link linkend="VECTOR">VECTOR</link> and the <link
 linkend="MATRIX">MATRIX</link> macros can be used on <emphasis>all</emphasis>
-vector and matrix types.
+vector and matrix types. <link linkend="VECTOR">VECTOR</link> cannot be used
+on <emphasis>lists</emphasis> of vectors, though, only on the individial
+vectors in the list.
 </para>
 
 </section>

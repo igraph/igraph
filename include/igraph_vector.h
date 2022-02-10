@@ -24,6 +24,7 @@
 #ifndef IGRAPH_VECTOR_H
 #define IGRAPH_VECTOR_H
 
+#include "igraph_constants.h"
 #include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_complex.h"

@@ -28,7 +28,7 @@ COMPLEX:
 
 ERROR:
     # An igraph error code
-    CTYPE: int
+    CTYPE: igraph_error_t
 
 ###############################################################################
 ## C data types
@@ -91,9 +91,14 @@ STRVECTOR:
     CTYPE: igraph_strvector_t
     FLAGS: BY_REF
 
-VECTORLIST:
-    # A vector containing pointers to vectors of floating-point numbers
-    CTYPE: igraph_vector_ptr_t
+VECTOR_LIST:
+    # A list containing vectors of floating-point numbers
+    CTYPE: igraph_vector_list_t
+    FLAGS: BY_REF
+
+VECTOR_INT_LIST:
+    # A list containing vectors of integers
+    CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
 VECTORM1:
@@ -118,21 +123,13 @@ MATRIX_COMPLEX:
     # A matrix of igraph complex numbers
     CTYPE: igraph_matrix_complex_t
 
-MATRIXLIST:
-    # A vector containing pointers to matrices of floating-point numbers
-    CTYPE: igraph_vector_ptr_t
+MATRIX_LIST:
+    # A list containing matrices of floating-point numbers
+    CTYPE: igraph_matrix_list_t
     FLAGS: BY_REF
 
 SPARSEMAT:
     # A sparse matrix of floating-point numbers
-    CTYPE: igraph_sparsemat_t
-    FLAGS: BY_REF
-
-SPARSEMATPTR:
-    # A sparse matrix of floating-point numbers. The specialty of this type
-    # is that it is uninitialized upon calling the function that uses it; the
-    # function will initialize it instead.
-    # TODO(ntamas): check whether we could merge this with SPARSEMAT in 0.10
     CTYPE: igraph_sparsemat_t
     FLAGS: BY_REF
 
@@ -201,18 +198,23 @@ EDGEWEIGHTS:
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-EDGESETLIST:
-    # A vector containing vectors of igraph integers where each such
+EDGESET_LIST:
+    # A list containing vectors of igraph integers where each such
     # vector represents a sequence of edge indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because EDGESET is
-    # the abstract type for igraph_es_t, but an EDGESETLIST is _not_ a
+    # the abstract type for igraph_es_t, but an EDGESET_LIST is _not_ a
     # vector of igraph_es_t objects
-    CTYPE: igraph_vector_ptr_t
+    CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
-GRAPHLIST:
-    # A vector containing pointers to graph objects
+GRAPH_LIST:
+    # A list containing graphs (owned by the list itself)
+    CTYPE: igraph_graph_list_t
+    FLAGS: BY_REF
+
+GRAPH_PTR_LIST:
+    # A vector containing pointers to graph objects (not owned by the vector)
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
@@ -225,19 +227,19 @@ VERTEX_QTY:
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-SIRLIST:
+SIR_LIST:
     # A vector containing pointers to igraph_sir_t objects
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEXSETLIST:
-    # A vector containing vectors of igraph integers where each such
+VERTEXSET_LIST:
+    # A list containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
     #
     # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
-    # the abstract type for igraph_vs_t, but a VERTEXSETLIST is _not_ a
+    # the abstract type for igraph_vs_t, but a VERTEXSET_LIST is _not_ a
     # vector of igraph_vs_t objects
-    CTYPE: igraph_vector_ptr_t
+    CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
 VERTEX_COLOR:
@@ -279,7 +281,7 @@ ADD_WEIGHTS:
     CTYPE: igraph_add_weights_t
     FLAGS: ENUM
 
-ADJACENCYMODE:
+ADJACENCY_MODE:
     # Enum that describes how an adjacency matrix should be constructed
     CTYPE: igraph_adjacency_t
     FLAGS: ENUM
@@ -305,7 +307,7 @@ CONNECTEDNESS:
     CTYPE: igraph_connectedness_t
     FLAGS: ENUM
 
-DEGSEQMODE:
+DEGSEQ_MODE:
     # Enum that describes the various implementations of generating a graph
     # with an arbitrary degree sequence
     CTYPE: igraph_degseq_t
@@ -374,7 +376,7 @@ RECIP:
     CTYPE: igraph_reciprocity_t
     FLAGS: ENUM
 
-REWIRINGMODE:
+REWIRING_MODE:
     # Enum for the rewiring modes of igraph_rewire()
     CTYPE: igraph_rewiring_t
     FLAGS: ENUM
@@ -397,7 +399,7 @@ SPINGLASS_IMPLEMENTATION:
     CTYPE: igraph_spinglass_implementation_t
     FLAGS: ENUM
 
-STARMODE:
+STAR_MODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_star_mode_t
     FLAGS: ENUM
@@ -420,15 +422,20 @@ TOUNDIRECTED:
     CTYPE: igraph_to_undirected_t
     FLAGS: ENUM
 
-TRANSITIVITYMODE:
+TRANSITIVITY_MODE:
     # Enum that specifies how isolated vertices should be handled in transitivity
     # calcuations
     CTYPE: igraph_transitivity_mode_t
     FLAGS: ENUM
 
-TREEMODE:
+TREE_MODE:
     # Enum that describes how a tree graph should be constructed
     CTYPE: igraph_tree_mode_t
+    FLAGS: ENUM
+
+WHEEL_MODE:
+    # Enum that describes how a star graph should be constructed
+    CTYPE: igraph_wheel_mode_t
     FLAGS: ENUM
 
 ###############################################################################

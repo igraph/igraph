@@ -241,7 +241,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     if (i >= 0 &&
         igraph_gml_tree_type(context.tree, i) == IGRAPH_I_GML_TREE_INTEGER &&
         igraph_gml_tree_get_integer(context.tree, i) != 1) {
-        IGRAPH_ERRORF("Unknown GML version: %"IGRAPH_PRId".",
+        IGRAPH_ERRORF("Unknown GML version: %" IGRAPH_PRId ".",
                       IGRAPH_UNIMPLEMENTED,
                       igraph_gml_tree_get_integer(context.tree, i));
         /* RETURN HERE!!!! */

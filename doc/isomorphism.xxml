@@ -28,13 +28,19 @@
 <!-- doxrox-include igraph_isomorphic_vf2 -->
 <!-- doxrox-include igraph_count_isomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_isomorphisms_vf2 -->
+<!-- doxrox-include igraph_get_isomorphisms_vf2_callback -->
 <!-- doxrox-include igraph_isohandler_t -->
 <!-- doxrox-include igraph_isocompat_t -->
-<!-- doxrox-include igraph_isomorphic_function_vf2 -->
 <!-- doxrox-include igraph_subisomorphic_vf2 -->
 <!-- doxrox-include igraph_count_subisomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_subisomorphisms_vf2 -->
+<!-- doxrox-include igraph_get_subisomorphisms_vf2_callback -->
+
+<section id="vf2-algorithm-deprecated"><title>Deprecated aliases</title>
+<!-- doxrox-include igraph_isomorphic_function_vf2 -->
 <!-- doxrox-include igraph_subisomorphic_function_vf2 -->
+</section>
+
 </section>
 
 <section id="lad-algorithm"><title>The LAD algorithm</title>

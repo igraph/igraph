@@ -25,11 +25,12 @@
 #define IGRAPH_COMMUNITY_H
 
 #include "igraph_decls.h"
+
+#include "igraph_arpack.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
-#include "igraph_arpack.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
@@ -204,23 +205,21 @@ IGRAPH_EXPORT igraph_error_t igraph_community_leading_eigenvector(const igraph_t
                                                        igraph_real_t *modularity,
                                                        igraph_bool_t start,
                                                        igraph_vector_t *eigenvalues,
-                                                       igraph_vector_ptr_t *eigenvectors,
+                                                       igraph_vector_list_t *eigenvectors,
                                                        igraph_vector_t *history,
                                                        igraph_community_leading_eigenvector_callback_t *callback,
                                                        void *callback_extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                                      igraph_integer_t no_of_communities,
-                                                     igraph_vector_int_t *membership,
-                                                     igraph_real_t *modularity);
+                                                     igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_int_t *membership,
                                                      igraph_neimode_t mode,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_int_t *initial,
-                                                     const igraph_vector_bool_t *fixed,
-                                                     igraph_real_t *modularity);
+                                                     const igraph_vector_bool_t *fixed);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               const igraph_vector_t *weights,

@@ -25,14 +25,16 @@
 #define IGRAPH_LAYOUT_H
 
 #include "igraph_decls.h"
+
+#include "igraph_arpack.h"
 #include "igraph_constants.h"
+#include "igraph_datatype.h"
+#include "igraph_iterators.h"
+#include "igraph_matrix_list.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_matrix.h"
-#include "igraph_datatype.h"
-#include "igraph_arpack.h"
-#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
@@ -235,7 +237,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_drl_3d(const igraph_t *graph, igraph_
                                        const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *graphs,
-                                          const igraph_vector_ptr_t *coords,
+                                          const igraph_matrix_list_t *coords,
                                           igraph_matrix_t *res);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,

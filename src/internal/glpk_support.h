@@ -33,10 +33,13 @@
 
 #ifdef HAVE_GLPK
 
+#include "igraph_decls.h"
 #include "igraph_error.h"
 
 #include <glpk.h>
 #include <setjmp.h>
+
+__BEGIN_DECLS
 
 typedef struct igraph_i_glpk_error_info_s {
     jmp_buf jmp;            /* used for bailing when there is a GLPK error */
@@ -134,6 +137,8 @@ void igraph_i_glp_delete_prob(glp_prob *p);
         } \
     } while (0)
 
-#endif
+__END_DECLS
 
-#endif
+#endif /* HAVE_GLPK */
+
+#endif /* IGRAPH_GLPK_SUPPORT_H */

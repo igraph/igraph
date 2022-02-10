@@ -25,9 +25,10 @@
 #define IGRAPH_HRG_H
 
 #include "igraph_decls.h"
-#include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
+
 #include "igraph_datatype.h"
+#include "igraph_graph_list.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
@@ -77,20 +78,23 @@ IGRAPH_EXPORT void igraph_hrg_destroy(igraph_hrg_t *hrg);
 IGRAPH_EXPORT igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg);
 IGRAPH_EXPORT igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize);
 
-IGRAPH_EXPORT igraph_error_t igraph_hrg_fit(const igraph_t *graph,
-                                 igraph_hrg_t *hrg,
-                                 igraph_bool_t start,
-                                 igraph_integer_t steps);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_fit(
+    const igraph_t *graph, igraph_hrg_t *hrg, igraph_bool_t start,
+    igraph_integer_t steps
+);
 
-IGRAPH_EXPORT igraph_error_t igraph_hrg_sample(const igraph_t *graph,
-                                    igraph_t *sample,
-                                    igraph_vector_ptr_t *samples,
-                                    igraph_integer_t no_samples,
-                                    igraph_hrg_t *hrg,
-                                    igraph_bool_t start);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_sample(
+    const igraph_hrg_t *hrg, igraph_t *sample
+);
 
-IGRAPH_EXPORT igraph_error_t igraph_hrg_game(igraph_t *graph,
-                                  const igraph_hrg_t *hrg);
+IGRAPH_EXPORT igraph_error_t igraph_hrg_sample_many(
+    const igraph_hrg_t *hrg, igraph_graph_list_t *samples,
+    igraph_integer_t num_samples
+);
+
+IGRAPH_EXPORT igraph_error_t igraph_hrg_game(
+    igraph_t *graph, const igraph_hrg_t *hrg
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
                                         const igraph_hrg_t *hrg);

@@ -37,10 +37,6 @@ endif()
 
 # tutorial examples and other snippets from the documentation
 add_examples(
-  FOLDER examples/simple NAMES
-  igraph_free
-)
-add_examples(
   FOLDER examples/tutorial NAMES
   tutorial1
   tutorial2
@@ -64,7 +60,7 @@ add_examples(
   igraph_sparsemat7
   igraph_sparsemat8
   igraph_strvector
-  igraph_vector_ptr_sort
+  igraph_vector_int_list_sort
 )
 
 add_legacy_tests(
@@ -171,11 +167,11 @@ add_examples(
   igraph_erdos_renyi_game
   igraph_full
   igraph_grg_game
+  igraph_kary_tree
   igraph_lcf
   igraph_ring
   igraph_small
   igraph_star
-  igraph_tree
   igraph_symmetric_tree
   igraph_weighted_adjacency
 )
@@ -214,7 +210,8 @@ add_legacy_tests(
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
   igraph_static_power_law_game
-  tree
+  igraph_wheel
+  kary_tree
   symmetric_tree
   tree_game
   ring
@@ -225,7 +222,6 @@ add_legacy_tests(
 # structural_properties.at
 add_examples(
   FOLDER examples/simple NAMES
-  assortativity
   bellman_ford
   dijkstra
   igraph_average_path_length
@@ -254,12 +250,14 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_feedback_arc_set_undirected
   igraph_rewire # Uses internal igraph_i_rewire
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
+  assortativity
   efficiency
   global_transitivity
   hub_and_authority
@@ -287,6 +285,7 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
@@ -458,6 +457,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_almost_equals
+  overflow
 )
 
 # operators.at
@@ -548,6 +548,7 @@ add_legacy_tests(
   community_label_propagation
   community_label_propagation2
   community_label_propagation3
+  graphlets
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
@@ -604,6 +605,7 @@ add_examples(
   cattributes2
   cattributes3
   cattributes4
+  igraph_attribute_combination
 )
 
 add_legacy_tests(
@@ -621,6 +623,7 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   blas
+  blas_dgemm
   eigenvector_centrality
   igraph_lapack_dgeev
   igraph_lapack_dgeevx
@@ -633,6 +636,7 @@ add_legacy_tests(
   dgemv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
+  igraph_blas_dgemm
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs

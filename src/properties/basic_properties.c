@@ -35,17 +35,23 @@
 
 /**
  * \function igraph_density
- * Calculate the density of a graph.
+ * \brief Calculate the density of a graph.
  *
- * </para><para>The density of a graph is simply the ratio number of
- * edges and the number of possible edges. Note that density is
- * ill-defined for graphs with multiple and/or loop edges, so consider
- * calling \ref igraph_simplify() on the graph if you know that it
- * contains multiple or loop edges.
+ * The density of a graph is simply the ratio of the actual number of its
+ * edges and the largest possible number of edges it could have.
+ * The maximum number of edges depends on interpretation: are vertices
+ * allowed to have a connected to themselves? This is controlled by the
+ * \p loops parameter.
+ *
+ * </para><para>
+ * Note that density is ill-defined for graphs which have multiple edges
+ * between some pairs of vertices. Consider calling \ref igraph_simplify()
+ * on such graphs.
+ *
  * \param graph The input graph object.
  * \param res Pointer to a real number, the result will be stored
  *   here.
- * \param loops Logical constant, whether to include loops in the
+ * \param loops Logical constant, whether to include self-loops in the
  *   calculation. If this constant is TRUE then
  *   loop edges are thought to be possible in the graph (this does not
  *   necessarily mean that the graph really contains any loops). If

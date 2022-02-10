@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \ingroup generators
  * \function igraph_from_prufer
@@ -47,7 +49,7 @@
  *             invalid Pr&uuml;fer sequence given
  *          \endclist
  *
- * \sa \ref igraph_to_prufer(), \ref igraph_tree(), \ref igraph_tree_game()
+ * \sa \ref igraph_to_prufer(), \ref igraph_kary_tree(), \ref igraph_tree_game()
  *
  */
 igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
@@ -58,16 +60,20 @@ igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *pr
     igraph_integer_t u, v; /* vertices */
     igraph_integer_t ec;
 
-    n = igraph_vector_int_size(prufer) + 2;
+    IGRAPH_SAFE_ADD(igraph_vector_int_size(prufer), 2, &n);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, n); /* initializes vector to zeros */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(n - 1, 2, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
 
     /* build out-degree vector (i.e. number of child vertices) and verify Prufer sequence */
     for (i = 0; i < n - 2; ++i) {
         igraph_integer_t u = VECTOR(*prufer)[i];
         if (u >= n || u < 0) {
-            IGRAPH_ERROR("Invalid Prufer sequence", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid Prufer sequence.", IGRAPH_EINVAL);
         }
         VECTOR(degree)[u] += 1;
     }
@@ -109,7 +115,7 @@ igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *pr
     VECTOR(edges)[ec++] = v;
     VECTOR(edges)[ec++] = u;
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, n, /* directed = */ 0));
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&degree);

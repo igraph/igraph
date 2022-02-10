@@ -35,14 +35,14 @@ int main() {
     size_t n = sizeof(vectors) / sizeof(igraph_vector_t *);
 
     printf("Lexicographical ordering:\n");
-    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_lex_cmp);
+    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_lex_cmp_untyped);
 
     for (size_t i = 0; i < n; i++) {
         print_vector(vectors[i]);
     }
 
     printf("\nColexicographical ordering:\n");
-    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_colex_cmp);
+    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_colex_cmp_untyped);
 
     for (size_t i = 0; i < n; i++) {
         print_vector(vectors[i]);

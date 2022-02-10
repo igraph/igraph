@@ -279,7 +279,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
         if (nametype != IGRAPH_ATTRIBUTE_STRING) {
-            IGRAPH_WARNINGF("Ignoring names attribute '%s', unknown attribute type.", names);
+            IGRAPH_WARNINGF("Ignoring names attribute '%s', "
+                    "attribute type is not a string.", names);
             names = NULL;
         }
     }
@@ -293,7 +294,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
         if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
-            IGRAPH_WARNINGF("Ignoring weights attribute '%s', unknown attribute type.", weights);
+            IGRAPH_WARNINGF("Ignoring weights attribute '%s', "
+                    "attribute type is not numeric.", weights);
             weights = NULL;
         }
     }

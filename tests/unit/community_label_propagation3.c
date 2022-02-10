@@ -30,7 +30,7 @@ int main() {
     igraph_t g;
     igraph_vector_int_t membership, initial;
     igraph_vector_bool_t fixed;
-    long int i;
+    igraph_integer_t i;
 
     /* label propagation is a stochastic method */
     igraph_rng_seed(igraph_rng_default(), 765);
@@ -49,8 +49,7 @@ int main() {
 
     igraph_vector_int_init(&membership, 0);
 
-    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, 0, &initial, &fixed,
-                                       /*modularity=*/ 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, 0, &initial, &fixed);
 
     for (i = 0; i < igraph_vcount(&g); i++) {
         /* Check that the "fixed" vector has not been changed */
