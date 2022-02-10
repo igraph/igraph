@@ -254,6 +254,37 @@ igraph_integer_t FUNCTION(size)(const TYPE* v) {
     return v->end - v->stor_begin;
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_resize
+ * \brief Resize the list of vectors.
+ *
+ * </para><para>
+ * Note that this function does not free any memory, just sets the
+ * size of the list to the given one. It can on the other hand
+ * allocate more memory if the new size is larger than the previous
+ * one.
+ *
+ * </para><para>
+ * When the new size is larger than the current size, the newly added
+ * vectors in the list are initialized to empty vectors. When the new
+ * size is smaller than the current size, the vectors that were removed
+ * from the end of the list are destroyed automatically.
+ *
+ * \param v The list object
+ * \param new_size The new size of the list.
+ * \return Error code,
+ *         \c IGRAPH_ENOMEM if there is not enough
+ *         memory. Note that this function \em never returns an error
+ *         if the list is made smaller.
+ * \sa \ref igraph_vector_list_reserve() for allocating memory for future
+ * extensions of a list.
+ *
+ * Time complexity: O(m) if the new size is smaller (m is the number of items
+ * that were removed from the list), operating system dependent if the new
+ * size is larger. In the latter case it is usually around O(n), where n is the
+ * new size of the vector.
+ */
 igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
     igraph_integer_t old_size;
     igraph_error_t retval;
@@ -304,7 +335,7 @@ void FUNCTION(clear)(TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_push_back
- * \brief Appends a new vector to the list, taking ownership.
+ * \brief Appends a new vector to the list.
  *
  * </para><para>
  * This function resizes the list to be one element longer, sets the very last
@@ -355,7 +386,7 @@ ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_set
- * \brief Sets the vector at the given index in the list, taking ownership.
+ * \brief Sets the vector at the given index in the list.
  *
  * </para><para>
  * This function destroys the vector that is already at the given index \p pos
@@ -379,7 +410,7 @@ void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_swap
- * \brief Swaps the vector at the given index in the list with another one, taking ownership.
+ * \brief Swaps the vector at the given index in the list with another one.
  *
  * </para><para>
  * This function replaces the vector that is already at the given index \p pos
@@ -446,11 +477,11 @@ void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
 
 /**
  * \ingroup vector_list
- * \function igraph_vector_list_back
+ * \function igraph_vector_list_discard_back
  * \brief Discard the last item in the vector list.
  *
  * </para><para>
- * This function removes last vector from the list and destroys it.
+ * This function removes the last vector from the list and destroys it.
  *
  * \param v The \type igraph_vector_list_t object.
  *
@@ -550,7 +581,7 @@ igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_remove
- * \brief Remove the item at the given index from the vector list and obtain ownership.
+ * \brief Remove the item at the given index from the vector list and transfer ownership to the caller.
  *
  * </para><para>
  * This function removes the vector at the given index from the list, and
@@ -589,6 +620,24 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_remove_back
+ * \brief Remove the last item from the vector list and transfer ownership to the caller.
+ *
+ * </para><para>
+ * This function removes the last vector from the list. The vector that was
+ * removed from the list is returned in \p e and its ownership is passed back
+ * to the caller; in other words, the caller becomes responsible for destroying
+ * the vector when it is not needed any more.
+ *
+ * \param v The \type igraph_vector_list_t object.
+ * \param result Pointer to an \c igraph_vector_t; it will be updated to the
+ *        item that was removed from the list. Ownership of this vector is
+ *        passed on to the caller.
+ *
+ * Time complexity: O(1).
+ */
 igraph_error_t FUNCTION(remove_back)(TYPE* v, ITEM_TYPE* result) {
     igraph_integer_t size = FUNCTION(size)(v);
     if (size > 0) {
@@ -600,6 +649,25 @@ igraph_error_t FUNCTION(remove_back)(TYPE* v, ITEM_TYPE* result) {
     }
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_remove_fast
+ * \brief Remove the item at the given index in the vector list, move the last item to its place and transfer ownership to the caller.
+ *
+ * </para><para>
+ * This function removes the vector at the given index from the list,
+ * moves the last item in the list to \p index to fill the gap, and then
+ * transfers ownership of th removed vector back to the caller; in other words,
+ * the caller becomes responsible for destroying the vector when it is not
+ * needed any more.
+ *
+ * \param v The \type igraph_vector_list_t object.
+ * \param index Index of the item to be discarded and destroyed.
+ * \sa \ref igraph_vector_list_discard() if you care about the order of the
+ * items in the list.
+ *
+ * Time complexity: O(1).
+ */
 igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* result) {
     igraph_integer_t size = FUNCTION(size)(v);
 
@@ -620,6 +688,34 @@ igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE*
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_permute
+ * \brief Permutes the elements of a list in place according to an index vector.
+ *
+ * </para><para>
+ * This function takes a list \c v and a corresponding index vector \c index,
+ * and permutes the elements of \c v such that \c v[index[i]] is moved to become
+ * \c v[i] after the function is executed.
+ *
+ * </para><para>
+ * It is an error to call this function with an index vector that does not
+ * represent a valid permutation. Each element in the index vector must be
+ * between 0 and the length of the list minus one (inclusive), and each such
+ * element must appear only once. The function does not attempt to validate the
+ * index vector. Memory may be leaked if the index vector does not satisfy these
+ * conditions.
+ *
+ * </para><para>
+ * The index vector that this function takes is compatible with the index vector
+ * returned from \ref igraph_vector_list_sort_ind(); passing in the index vector
+ * from \ref igraph_vector_list_sort_ind() will sort the original vector.
+ *
+ * \param v     the list to permute
+ * \param index the index vector
+ *
+ * Time complexity: O(n), the number of items in the list.
+ */
 igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
     ITEM_TYPE* work;
     igraph_integer_t i, size;
@@ -648,6 +744,20 @@ igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_sort
+ * \brief Sorts the elements of the list into ascending order.
+ *
+ * \param v Pointer to an initialized list object.
+ * \param cmp A comparison function that takes pointers to two vectors and
+ *        returns zero if the two vectors are considered equal, any negative
+ *        number if the first vector is smaller and any positive number if the
+ *        second vector is smaller.
+ * \return Error code.
+ *
+ * Time complexity: O(n log n) for n elements.
+ */
 void FUNCTION(sort)(TYPE *v, int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
@@ -657,6 +767,27 @@ void FUNCTION(sort)(TYPE *v, int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)) {
     );
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_sort_ind
+ * \brief Return a permutation of indices that sorts the list
+ *
+ * Takes an unsorted list \p v as input and computes an array of
+ * indices \p inds such that v[ inds[i] ], with i increasing from 0, is
+ * an ordered array according to the comparison function \p cmp. The order of
+ * indices for identical elements is not defined.
+ *
+ * \param v the list to be sorted
+ * \param inds the output array of indices. This must be initialized,
+ *        but will be resized
+ * \param cmp A comparison function that takes pointers to two vectors and
+ *        returns zero if the two vectors are considered equal, any negative
+ *        number if the first vector is smaller and any positive number if the
+ *        second vector is smaller.
+ * \return Error code.
+ *
+ * Time complexity: O(n log n) for n elements.
+ */
 igraph_error_t FUNCTION(sort_ind)(
     TYPE *v, igraph_vector_int_t *inds,
     int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)

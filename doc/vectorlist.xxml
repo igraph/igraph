@@ -25,13 +25,13 @@
 <!-- doxrox-include igraph_vector_list_tail_ptr -->
 </section>
 
-<section id="vector-properties"><title>Vector properties</title>
+<section id="vector-list-properties"><title>Vector properties</title>
 <!-- doxrox-include igraph_vector_list_empty -->
 <!-- doxrox-include igraph_vector_list_size -->
 <!-- doxrox-include igraph_vector_list_capacity -->
 </section>
 
-<section id="vector-resizing-operations"><title>Resizing operations</title>
+<section id="vector-list-resizing-operations"><title>Resizing operations</title>
 <!-- doxrox-include igraph_vector_list_clear -->
 <!-- doxrox-include igraph_vector_list_reserve -->
 <!-- doxrox-include igraph_vector_list_resize -->
@@ -46,7 +46,7 @@
 <!-- doxrox-include igraph_vector_list_remove_fast -->
 </section>
 
-<section id="vector-sorting"><title>Sorting and reordering</title>
+<section id="vector-list-sorting"><title>Sorting and reordering</title>
 <!-- doxrox-include igraph_vector_list_permute -->
 <!-- doxrox-include igraph_vector_list_sort -->
 <!-- doxrox-include igraph_vector_list_sort_ind -->
