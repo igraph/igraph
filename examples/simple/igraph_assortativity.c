@@ -14,7 +14,7 @@ int main(){
         igraph_real_t assortativity;
 
         /* Generate undirected graph with 100000 nodes */
-        igraph_barabasi_game(&g, nodes, power, m, NULL, IGRAPH_UNDIRECTED, A, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE, /* start from */ NULL);
+        igraph_barabasi_game(&g, nodes, power, m, NULL, /* outpref */ 0, A, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE, /* start from */ NULL);
 
         /* Get degree sequence */
         igraph_strength(&g, &degree, igraph_vss_all(), IGRAPH_ALL, /* consider self-loops */ IGRAPH_LOOPS, /* no weights */ NULL);
