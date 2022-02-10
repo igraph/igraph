@@ -250,6 +250,8 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * categories instead of numeric labels, and \ref
  * igraph_assortativity_degree() for the special case of assortativity
  * based on vertex degrees.
+ * 
+ * \example examples/simple/igraph_assortativity_degree
  */
 
 igraph_error_t igraph_assortativity(const igraph_t *graph,
