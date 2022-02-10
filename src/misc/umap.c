@@ -278,7 +278,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
 static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights,
         igraph_matrix_t *layout) {
     igraph_integer_t epochs = 5000;
-    igraph_real_t learning_rate = 0.001;
+    igraph_real_t learning_rate = 1;
     igraph_matrix_t gradient;
     igraph_layout_random(umap_graph, layout);
     IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
@@ -293,6 +293,8 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
         //printf("layout:\n");
         //igraph_matrix_print(layout);
         //printf("\n");
+         /* Adjust learning rate */
+        learning_rate = 1.0 - (e + 1) / epochs;
     }
 
     igraph_matrix_destroy(&gradient);
