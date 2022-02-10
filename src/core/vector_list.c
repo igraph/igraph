@@ -41,7 +41,7 @@
 #undef VECTOR_LIST
 
 /**
- * \ingroup vector
+ * \ingroup vector_list
  * \section about_igraph_vector_list_t_objects About \type igraph_vector_list_t objects
  *
  * <para>The \type igraph_vector_list_t data type is essentially a list of
@@ -103,7 +103,7 @@
  */
 
 /**
- * \ingroup vector
+ * \ingroup vector_list
  * \section igraph_vector_list_constructors_and_destructors Constructors and
  * Destructors
  *
@@ -122,4 +122,38 @@
  * \ref igraph_vector_update(), or you need to remove them from the list and
  * take ownership by calling \c igraph_vector_list_remove() or
  * \c igraph_vector_list_remove_fast() .</para>
+ */
+
+
+/**
+ * \ingroup vector_list
+ * \section igraph_vector_list_accessing_elements Accessing elements
+ *
+ * <para>Elements of a vector list may be accessed with the
+ * \ref igraph_vector_list_get_ptr() function. The function returns a \em pointer
+ * to the vector with a given index inside the list, and you may then pass
+ * this pointer onwards to other functions that can query or manipulate
+ * vectors. The pointer itself is guaranteed to stay valid as long as the
+ * list itself is not modified; however, \em any modification to the list
+ * will invalidate the pointer, even modifications that are seemingly unrelated
+ * to the vector that the pointer points to (such as adding a new vector at
+ * the end of the list). This is because the list data structure may be forced
+ * to re-allocate its internal storage if a new element does not fit into the
+ * already allocated space, and there are no guarantees that the re-allocated
+ * block remains at the same memory location (typically it gets moved elsewhere).
+ * </para>
+ *
+ * <para>Note that the standard \ref VECTOR macro that works for ordinary vectors
+ * does not work for lists of vectors to access the i-th element (but of course
+ * you can use it to index into an existing vector that you retrieved from the
+ * vector list with \ref igraph_vector_list_get_ptr() . This is because the
+ * macro notation would allow one to overwrite the vector in the list with
+ * another one without the list knowing about it, so the list would not be able
+ * to destroy the vector that was overwritten by a new one.
+ * </para>
+ *
+ * <para> \ref igraph_vector_list_tail_ptr() returns a pointer to the last
+ * vector in the list, or \c NULL if the list is empty. There is no
+ * <function>igraph_vector_list_head_ptr()</function>, however, as it is easy to
+ * write <code>igraph_vector_list_get_ptr(v, 0)</code> instead.</para>
  */
