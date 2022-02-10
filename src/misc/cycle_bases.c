@@ -42,7 +42,7 @@
  * queued for processing, but not processed yet. mark+2 indicates that it has
  * been processed.
  */
-static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
+static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
                                            igraph_integer_t start_vid,
                                            const igraph_inclist_t *inclist,
                                            igraph_vector_int_t *visited,
@@ -50,7 +50,7 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
                                            igraph_integer_t cutoff,
                                            igraph_vector_ptr_t *result) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vector_int_t pred_edge;
     igraph_vector_int_t u_back, v_back;
@@ -72,18 +72,18 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
     VECTOR(pred_edge)[start_vid] = -1; /* non-valid predecessor edge id for root vertex */
 
     while (! igraph_dqueue_int_empty(&q)) {
-        long int v = igraph_dqueue_int_pop(&q);
-        long int vdist = igraph_dqueue_int_pop(&q);
+        igraph_integer_t v = igraph_dqueue_int_pop(&q);
+        igraph_integer_t vdist = igraph_dqueue_int_pop(&q);
 
         igraph_vector_int_t *incs = igraph_inclist_get(inclist, v);
-        long int n = igraph_vector_int_size(incs);
-        long int i, j;
+        igraph_integer_t n = igraph_vector_int_size(incs);
+        igraph_integer_t i, j;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         for (i=0; i < n; ++i) {
-            long int e = VECTOR(*incs)[i];
-            long int u = IGRAPH_OTHER(graph, e, v);
+            igraph_integer_t e = VECTOR(*incs)[i];
+            igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
 
             if (e == VECTOR(pred_edge)[v]) {
                 /* do not follow the edge through which we came to v */
@@ -101,13 +101,13 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
                  * that the distance of u from the start vertex is either the
                  * same as that of v, or one greater. */
 
-                long int up = u, vp = v;
-                long int u_back_len, v_back_len;
-                igraph_vector_t *cycle;
+                igraph_integer_t up = u, vp = v;
+                igraph_integer_t u_back_len, v_back_len;
+                igraph_vector_int_t *cycle;
 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&v_back, e));
                 for (;;) {
-                    long int upe, vpe;
+                    igraph_integer_t upe, vpe;
 
                     if (up == vp) {
                         break;
@@ -126,7 +126,7 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
                     vp = IGRAPH_OTHER(graph, vpe, vp);
                 }
 
-                cycle = IGRAPH_CALLOC(1, igraph_vector_t);
+                cycle = IGRAPH_CALLOC(1, igraph_vector_int_t);
                 if (! cycle) {
                     IGRAPH_ERROR("Insufficient memory for fundamental cycles.", IGRAPH_ENOMEM);
                 }
@@ -134,8 +134,8 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
 
                 u_back_len = igraph_vector_int_size(&u_back);
                 v_back_len = igraph_vector_int_size(&v_back);
-                IGRAPH_CHECK(igraph_vector_init(cycle, u_back_len + v_back_len));
-                IGRAPH_FINALLY(igraph_vector_destroy, cycle);
+                IGRAPH_CHECK(igraph_vector_int_init(cycle, u_back_len + v_back_len));
+                IGRAPH_FINALLY(igraph_vector_int_destroy, cycle);
 
                 for (j=0; j < v_back_len; ++j) {
                     VECTOR(*cycle)[j] = VECTOR(v_back)[j];
@@ -177,13 +177,13 @@ static int igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
 
 
 static void destroy_and_free_cycles(igraph_vector_ptr_t *list) {
-    long int n = igraph_vector_ptr_size(list);
-    long int i;
-    igraph_vector_t **l = (igraph_vector_t **) VECTOR(*list);
+    igraph_integer_t n = igraph_vector_ptr_size(list);
+    igraph_integer_t i;
+    igraph_vector_int_t **l = (igraph_vector_int_t **) VECTOR(*list);
 
     for (i=0; i < n; ++i) {
         if (l[i]) {
-            igraph_vector_destroy(l[i]);
+            igraph_vector_int_destroy(l[i]);
             IGRAPH_FREE(l[i]); /* also sets it to NULL */
         }
     }
@@ -209,21 +209,21 @@ static void destroy_and_free_cycles(igraph_vector_ptr_t *list) {
  *   cycles of length <code>2*cutoff + 1</code> or shorter are included. \p cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
  * \param result An initialized pointer vector. The result will be stored here as
- *   a list of \type igraph_vector_t objects, each containing the edge ids of a
+ *   a list of \type igraph_vector_int_t objects, each containing the edge ids of a
  *   basis element.
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
  */
-int igraph_fundamental_cycles(const igraph_t *graph,
+igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                               igraph_integer_t start_vid,
                               igraph_integer_t cutoff,
                               igraph_vector_ptr_t *result) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int estimated_rank;
-    long int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t estimated_rank;
+    igraph_integer_t i;
     igraph_inclist_t inclist;
     igraph_vector_int_t visited;
 
@@ -273,47 +273,47 @@ int igraph_fundamental_cycles(const igraph_t *graph,
  * order for equal length ones. Lexicographic order helps keep row insertion into the reduced matrix
  * efficient during Gaussian elimination, by ensuring that insertions usually happen near the end. */
 static int cycle_cmp(const void *c1, const void *c2) {
-    const igraph_vector_t *v1 = * (igraph_vector_t **) c1, *v2 = * (igraph_vector_t **) c2;
-    long int n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
+    const igraph_vector_int_t *v1 = * (igraph_vector_int_t **) c1, *v2 = * (igraph_vector_int_t **) c2;
+    igraph_integer_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
 
     if (n1 < n2) {
         return -1;
     } else if (n1 > n2) {
         return 1;
     } else {
-        return igraph_vector_lex_cmp(c1, c2);
+        return igraph_vector_int_lex_cmp(v1, v2);
     }
 }
 
 /* Adding cycle vectors produces the symmetric difference of the corresponding edge sets. */
-static int cycle_add(const igraph_vector_t *a, const igraph_vector_t *b, igraph_vector_t *res) {
-    long int na = igraph_vector_size(a), nb = igraph_vector_size(b);
-    const igraph_real_t *pa = VECTOR(*a), *pb = VECTOR(*b);
-    const igraph_real_t *pa_end = pa + na, *pb_end = pb + nb;
+static igraph_error_t cycle_add(const igraph_vector_int_t *a, const igraph_vector_int_t *b, igraph_vector_int_t *res) {
+    igraph_integer_t na = igraph_vector_int_size(a), nb = igraph_vector_int_size(b);
+    const igraph_integer_t *pa = VECTOR(*a), *pb = VECTOR(*b);
+    const igraph_integer_t *pa_end = pa + na, *pb_end = pb + nb;
 
-    igraph_vector_clear(res);
+    igraph_vector_int_clear(res);
     for (;;) {
         while (pa != pa_end && pb != pb_end && *pa < *pb) {
-            IGRAPH_CHECK(igraph_vector_push_back(res, *pa));
+            IGRAPH_CHECK(igraph_vector_int_push_back(res, *pa));
             pa++;
         }
         while (pa != pa_end && pb != pb_end && *pa == *pb) {
             pa++; pb++;
         }
         while (pa != pa_end && pb != pb_end && *pb < *pa) {
-            IGRAPH_CHECK(igraph_vector_push_back(res, *pb));
+            IGRAPH_CHECK(igraph_vector_int_push_back(res, *pb));
             pb++;
         }
         if (pa == pa_end) {
             while (pb != pb_end) {
-                IGRAPH_CHECK(igraph_vector_push_back(res, *pb));
+                IGRAPH_CHECK(igraph_vector_int_push_back(res, *pb));
                 pb++;
             }
             break;
         }
         if (pb == pb_end) {
             while (pa != pa_end) {
-                IGRAPH_CHECK(igraph_vector_push_back(res, *pa));
+                IGRAPH_CHECK(igraph_vector_int_push_back(res, *pa));
                 pa++;
             }
             break;
@@ -324,58 +324,58 @@ static int cycle_add(const igraph_vector_t *a, const igraph_vector_t *b, igraph_
 }
 
 
-#define MATROW(m, i) ((igraph_vector_t *) VECTOR(m)[i])
+#define MATROW(m, i) ((igraph_vector_int_t *) VECTOR(m)[i])
 #define MATEL(m, i, j) VECTOR(*MATROW(m, i))[j]
 #define SWAPVECS(p1, p2) \
     do { \
-        igraph_vector_t *t = p1; \
+        igraph_vector_int_t *t = p1; \
         p1 = p2; \
         p2 = t; \
     } while (0)
 
-static void destroy_work_ptr(igraph_vector_t **ptr) {
-    igraph_vector_destroy(*ptr);
+static void destroy_work_ptr(igraph_vector_int_t **ptr) {
+    igraph_vector_int_destroy(*ptr);
     IGRAPH_FREE(*ptr);
 }
 
 /* Gaussian elimination for sparse cycle vectors. 'reduced_matrix' is always maintained
  * in row-echelon form. This function decides if 'cycle' is linearly independent of this
  * matrix, and if not, it adds it to the matrix. */
-static int gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
-                                const igraph_vector_t *cycle,
+static igraph_error_t gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
+                                const igraph_vector_int_t *cycle,
                                 igraph_bool_t *independent) {
 
-    long int nrow = igraph_vector_ptr_size(reduced_matrix);
-    long int i;
+    igraph_integer_t nrow = igraph_vector_ptr_size(reduced_matrix);
+    igraph_integer_t i;
 
-    igraph_vector_t *work, *tmp;
+    igraph_vector_int_t *work, *tmp;
 
-    work = IGRAPH_CALLOC(1, igraph_vector_t);
+    work = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (! work) {
         IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, work);
-    IGRAPH_CHECK(igraph_vector_copy(work, cycle));
+    IGRAPH_CHECK(igraph_vector_int_copy(work, cycle));
     IGRAPH_FINALLY(destroy_work_ptr, &work);
     IGRAPH_FINALLY_CLEAN(1);
 
-    tmp = IGRAPH_CALLOC(1, igraph_vector_t);
+    tmp = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (! tmp) {
         IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, tmp);
-    IGRAPH_CHECK(igraph_vector_init(tmp, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(tmp, 0));
     IGRAPH_FINALLY(destroy_work_ptr, &tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     for (i=0; i < nrow; ++i) {
-        igraph_vector_t *row = MATROW(*reduced_matrix, i);
+        igraph_vector_int_t *row = MATROW(*reduced_matrix, i);
 
         if ( VECTOR(*row)[0] < VECTOR(*work)[0] ) {
             continue;
         } else if ( VECTOR(*row)[0] == VECTOR(*work)[0] ) {
             IGRAPH_CHECK(cycle_add(row, work, tmp));
-            if (igraph_vector_empty(tmp)) {
+            if (igraph_vector_int_empty(tmp)) {
                 *independent = 0;
                 destroy_work_ptr(&work);
                 destroy_work_ptr(&tmp);
@@ -405,16 +405,16 @@ static int gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
 /* Remove duplicates from the list of candidate elements.
  * The list is assumed to be sorted. */
 static void remove_duplicate_candidates(igraph_vector_ptr_t *candidates) {
-    long int i, j, n = igraph_vector_ptr_size(candidates);
-    igraph_vector_t **c = (igraph_vector_t **) VECTOR(*candidates);
+    igraph_integer_t i, j, n = igraph_vector_ptr_size(candidates);
+    igraph_vector_int_t **c = (igraph_vector_int_t **) VECTOR(*candidates);
 
     if (n < 2) {
         return;
     }
 
     for (i=0, j=0; i < n-1; ++i) {
-        if (igraph_vector_all_e(c[i], c[i+1])) {
-            igraph_vector_destroy(c[i]);
+        if (igraph_vector_int_all_e(c[i], c[i+1])) {
+            igraph_vector_int_destroy(c[i]);
             IGRAPH_FREE(c[i]);
         } else {
             c[j++] = c[i];
@@ -443,14 +443,14 @@ static void remove_duplicate_candidates(igraph_vector_ptr_t *candidates) {
  * \param result
  * \return Error code.
  */
-int igraph_minimum_cycle_basis(const igraph_t *graph,
+igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                igraph_integer_t cutoff,
                                igraph_bool_t complete,
                                igraph_vector_ptr_t *result) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i;
     igraph_integer_t rank;
     igraph_vector_ptr_t candidates;
 
@@ -458,16 +458,16 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     {
         igraph_inclist_t inclist;
         igraph_vector_int_t visited;
-        igraph_vector_t degrees;
+        igraph_vector_int_t degrees;
         igraph_integer_t no_of_comps;
         igraph_integer_t mark;
 
         /* We use the degrees to avoid doing a BFS from vertices with d < 3, except in special cases.
          * Degrees cannot be computed from the inclist because there we use IGRAPH_LOOPS_ONCE. */
-        IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
-        IGRAPH_CHECK(igraph_clusters(graph, NULL, NULL, &no_of_comps, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, NULL, NULL, &no_of_comps, IGRAPH_WEAK));
         rank = no_of_edges - no_of_nodes + no_of_comps;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);
@@ -479,11 +479,11 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
          /* TODO: estimate space to reserve. 'rank' is a lower bound only. */
         IGRAPH_CHECK(igraph_vector_ptr_reserve(&candidates, rank));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &candidates);
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&candidates, igraph_vector_destroy);
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&candidates, igraph_vector_int_destroy);
 
         mark = 0;
         for (i=0; i < no_of_nodes; ++i) {
-            long int degree = VECTOR(degrees)[i];
+            igraph_integer_t degree = VECTOR(degrees)[i];
             igraph_bool_t vis = VECTOR(visited)[i] % 3;
 
             /* Generally, we only need to run a BFS from vertices of degree 3 or greater.
@@ -505,17 +505,17 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
         igraph_inclist_destroy(&inclist);
         igraph_vector_int_destroy(&visited);
-        igraph_vector_destroy(&degrees);
+        igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(3);
     }
 
     /* Sort candidates by size (= weight) and remove duplicates. */
     {
-        long int cand_count = igraph_vector_ptr_size(&candidates);
+        igraph_integer_t cand_count = igraph_vector_ptr_size(&candidates);
 
         for (i=0; i < cand_count; ++i) {
-            igraph_vector_t *cand = VECTOR(candidates)[i];
-            igraph_vector_sort(cand);
+            igraph_vector_int_t *cand = VECTOR(candidates)[i];
+            igraph_vector_int_sort(cand);
         }
         igraph_vector_ptr_sort(&candidates, &cycle_cmp);
         remove_duplicate_candidates(&candidates);
@@ -529,30 +529,30 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     /* Find a complete basis, starting with smallest elements. */
     /* This is typically the slowest part of the algorithm. */
     {
-        long int cand_len = igraph_vector_ptr_size(&candidates);
+        igraph_integer_t cand_len = igraph_vector_ptr_size(&candidates);
         igraph_vector_ptr_t reduced_matrix;
         igraph_bool_t independent;        
 
         IGRAPH_CHECK(igraph_vector_ptr_init(&reduced_matrix, 0));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &reduced_matrix);
         IGRAPH_CHECK(igraph_vector_ptr_reserve(&reduced_matrix, rank));
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&reduced_matrix, igraph_vector_destroy);
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&reduced_matrix, igraph_vector_int_destroy);
 
         for (i=0; i < cand_len; ++i) {
-            const igraph_vector_t *cycle = VECTOR(candidates)[i];
+            const igraph_vector_int_t *cycle = VECTOR(candidates)[i];
 
             IGRAPH_ALLOW_INTERRUPTION();
 
             IGRAPH_CHECK(gaussian_elimination(&reduced_matrix, cycle, &independent));
             if (independent) {
-                igraph_vector_t *v;
-                v = IGRAPH_CALLOC(1, igraph_vector_t);
+                igraph_vector_int_t *v;
+                v = IGRAPH_CALLOC(1, igraph_vector_int_t);
                 if (! v) {
                     IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
                 }
                 IGRAPH_FINALLY(igraph_free, v);
-                IGRAPH_CHECK(igraph_vector_copy(v, cycle));
-                IGRAPH_FINALLY(igraph_vector_destroy, v);
+                IGRAPH_CHECK(igraph_vector_int_copy(v, cycle));
+                IGRAPH_FINALLY(igraph_vector_int_destroy, v);
                 IGRAPH_CHECK(igraph_vector_ptr_push_back(result, v));
                 IGRAPH_FINALLY_CLEAN(2); /* pass ownership of 'v' to 'result' */
             }
