@@ -32,6 +32,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_matrix.h"
 #include "igraph_iterators.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
