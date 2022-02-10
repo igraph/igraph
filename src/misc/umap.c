@@ -50,7 +50,7 @@ static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
                 VECTOR(*open_set_sizes)[i] = VECTOR(*distances)[VECTOR(eids)[j]];
             }
         }
-        /* TODO: according to the paper finding the decay (signma ) should be
+        /* TODO: according to the paper finding the decay (sigma) should be
          * done with a binary search? */
         for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
             sum += exp(VECTOR(*open_set_sizes)[i] - VECTOR(*distances)[VECTOR(eids)[j]]);
@@ -93,7 +93,7 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_fit(igraph_real_t min_dist, float *a_p, float *b_p)
+static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *a_p, float *b_p)
 {
     /*We're fitting a and b, such that
      * (1 + a*d^2b)^-1
@@ -102,43 +102,75 @@ static igraph_error_t igraph_fit(igraph_real_t min_dist, float *a_p, float *b_p)
      * plain e^-d fuzzyness
      * */
 
-    igraph_vector_t residuals;
+    /* Residuals */
     igraph_vector_t x;
+    igraph_vector_t residuals;
+    igraph_real_t squared_sum_res;
+     /* Make a lattice from 0 to this distance */
     igraph_integer_t nr_points = 100;
-    igraph_real_t end_point = min_dist*1000;
+    igraph_real_t end_point = min_dist*30; /* Need to sample decently around the kink I guess? */
+    /* Initial values */
     igraph_real_t a = 1.;
     igraph_real_t b = 1.;
+    /* Needed for the Gauss-Newton search */
     igraph_matrix_t jacobian;
     igraph_matrix_t jacobian_T;
     igraph_matrix_t jTj_i;
     igraph_real_t delta = 0.00001;
+    igraph_real_t tol = 0.001;
+    igraph_real_t maxiter = 100;
+    /* Auxiliary vars */
+    igraph_real_t tmp;
+    igraph_vector_t powf_vec;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&residuals, nr_points);
+    /* Distance lattice */
     IGRAPH_VECTOR_INIT_FINALLY(&x, nr_points);
+    /* Squared residuals, to minimize */
+    IGRAPH_VECTOR_INIT_FINALLY(&residuals, nr_points);
+    /* First derivatives, for the fitting (direction) */
     IGRAPH_MATRIX_INIT_FINALLY(&jacobian, nr_points, 2);
     IGRAPH_MATRIX_INIT_FINALLY(&jacobian_T, 0, 0);
+    /* Second derivatives, for the fitting (speed/brakes) */
     IGRAPH_MATRIX_INIT_FINALLY(&jTj_i, 0, 0);
+    /* Auxiliary vars for convenience */
+    IGRAPH_VECTOR_INIT_FINALLY(&powf, nr_points);
 
+    /* Distance |x-y| (this is a lattice, there are no actual x and y) */
     for (int i = 0; i < nr_points; i++) {
         VECTOR(x)[i] = (end_point / nr_points) * i;
     }
-    for (int i = 0; i < nr_points; i++) {
-        VECTOR(residuals)[i] =
-            (1 / (1 + a* powf(VECTOR(x)[i], 2 * b))) -
-            exp(-VECTOR(x)[i]);
-    }
-    for (int i = 0; i < nr_points; i++) {
-        MATRIX(jacobian, i, 0) =
-            ((1 / (1 + (a + delta) * powf(VECTOR(x)[i], 2 * b))) -
-            (1 / (1 + a * powf(VECTOR(x)[i], 2 * b)))) / (2 * delta);
-        MATRIX(jacobian, i, 1) =
-            ((1 / (1 + a * powf(VECTOR(x)[i], 2 * (b + delta)))) -
-            (1 / (1 + a * powf(VECTOR(x)[i], 2 * b)))) / (2 * delta);
+
+    for (int iter = 0; (iter < maxiter) && (squared_sum_res > tol * tol); iter++) {
+        /* Auxiliaries vars */
+        for (int i = 0; i < nr_points; i++) {
+            VECTOR(powf_vec)[i] = powf(VECTOR(x)[i], 2 * b);
+        }
+        /* Residuals and sum of squared residuals at (a, b) */
+        squared_sum_res = 0;
+        for (int i = 0; i < nr_points; i++) {
+            tmp = 1 / (1 + a* VECTOR(powf_vec)[i];
+            tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
+            VECTOR(residuals)[i] = tmp;
+            squared_sum_res += tmp * tmp;
+        }
+        /* First derivatives of squared residuals at (a, b) */
+        for (int i = 0; i < nr_points; i++) {
+            tmp = 1 + a * VECTOR(powf_vec)[i];
+            /* df/da * delta */
+            MATRIX(jacobian, i, 0) = - 2 * VECTOR(powf_vec)[i] / tmp / tmp;
+            /* df/db * delta */
+            MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(2 * VECTOR(x)[i]);
+        }
+
+        /* Second derivatives */
+
+        igraph_matrix_copy(&jacobian_T, &jacobian);
+        igraph_matrix_transpose(&jacobian_T);
+        //TODO inversion, etc.
     }
 
-    igraph_matrix_copy(&jacobian_T, &jacobian);
-    igraph_matrix_transpose(&jacobian_T);
-    //TODO inversion, etc.
+    *a_p = a;
+    *b_p = b;
 }
 
 /*xd is difference in x direction, w is a weight */
@@ -243,7 +275,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_umap_layout(igraph_t *umap_graph, igraph_vector_t *umap_weights,
+static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights,
         igraph_matrix_t *layout) {
     igraph_integer_t epochs = 5000;
     igraph_real_t learning_rate = 0.001;
@@ -273,6 +305,9 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_vector_t open_set_decays;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t umap_weights;
+    igraph_real_t min_dist = 0.01; /* This is empyrical */
+    float sigma = 1; /* TODO: this should come from the data, but let's set to 1 for now */
+    float a, b; /* The smoothing parameters given sigma and min_dist */
 
     RNG_BEGIN();
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_sizes, no_of_nodes);
@@ -283,7 +318,15 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
                 &open_set_decays));
     IGRAPH_CHECK(igraph_umap_edge_weights(graph, distances, &umap_weights, &open_set_sizes,
                 &open_set_decays));
-    IGRAPH_CHECK(igraph_umap_layout(graph, &umap_weights, layout));
+
+    /* TODO: algo 3 will set the proper sigma */
+
+    /* Skip spectral embedding for now */
+
+    /* Definition 11 */
+    IGRAPH_CHECK(igraph_fit_ab(min_dist, sigma, &a, &b));
+    /* Algorithm 5 */
+    IGRAPH_CHECK(igraph_optimize_layout_stochastic_gradient(graph, &umap_weights, layout));
 
     igraph_vector_destroy(&open_set_sizes);
     igraph_vector_destroy(&open_set_decays);
