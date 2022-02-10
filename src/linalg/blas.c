@@ -83,6 +83,84 @@ igraph_error_t igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
 }
 
 /**
+ * \function igraph_blas_dgemm
+ * \brief Matrix-matrix multiplication using BLAS.
+ *
+ * This function is a somewhat more user-friendly interface to
+ * the \c dgemm function in BLAS. \c dgemm calculates
+ * alpha*a*b + beta*c, where a, b and c are matrices, of which a and b
+ * can be transposed.
+ *
+ * \param transpose_a whether to transpose the matrix \p a
+ * \param transpose_b whether to transpose the matrix \p b
+ * \param alpha       the constant \c alpha
+ * \param a           the matrix \c a
+ * \param b           the matrix \c b
+ * \param beta        the constant \c beta
+ * \param c           the matrix \c c. The result will also be stored here.
+ *                    If beta is zero, c will be resized to fit the result.
+ *
+ * Time complexity: O(n m k) where matrix a is of size n × k, and matrix b is of
+ * size k × m.
+ *
+ * \return \c IGRAPH_EOVERFLOW if the matrix is too large for BLAS,
+ *         \c IGRAPH_EINVAL if the matrices have incompatible sizes,
+ *         \c IGRAPH_SUCCESS otherwise.
+ *
+ * \example examples/simple/blas_dgemm.c
+ */
+igraph_error_t igraph_blas_dgemm(igraph_bool_t transpose_a, igraph_bool_t transpose_b,
+        igraph_real_t alpha, const igraph_matrix_t *a, const igraph_matrix_t *b,
+        igraph_real_t beta, igraph_matrix_t *c) {
+    char trans_a = transpose_a ? 'T' : 'N';
+    char trans_b = transpose_b ? 'T' : 'N';
+    int m, n, k, lda, ldb, ldc;
+    igraph_integer_t nrow_oa = transpose_a ? igraph_matrix_ncol(a) : igraph_matrix_nrow(a);
+    igraph_integer_t ncol_oa = transpose_a ? igraph_matrix_nrow(a) : igraph_matrix_ncol(a);
+    igraph_integer_t nrow_ob = transpose_b ? igraph_matrix_ncol(b) : igraph_matrix_nrow(b);
+    igraph_integer_t ncol_ob = transpose_b ? igraph_matrix_nrow(b) : igraph_matrix_ncol(b);
+
+    if (ncol_oa != nrow_ob) {
+        IGRAPH_ERRORF("%" IGRAPH_PRId "-by-%" IGRAPH_PRId " and %" IGRAPH_PRId "-by-%" IGRAPH_PRId
+               " matrices cannot be multiplied, incompatible dimensions.", IGRAPH_EINVAL,
+               nrow_oa, ncol_oa, nrow_ob, ncol_ob);
+    }
+    if (beta != 0 && (ncol_oa != igraph_matrix_ncol(c) || nrow_oa != igraph_matrix_nrow(c))) {
+        IGRAPH_ERRORF("%" IGRAPH_PRId "-by-%" IGRAPH_PRId " and %" IGRAPH_PRId "-by-%" IGRAPH_PRId
+               " matrices cannot be added, incompatible dimensions.", IGRAPH_EINVAL,
+               nrow_oa, ncol_ob, igraph_matrix_nrow(c), igraph_matrix_ncol(c));
+    }
+    if (nrow_oa > INT_MAX || ncol_oa > INT_MAX) {
+        IGRAPH_ERROR("Matrix A too large for BLAS.", IGRAPH_EOVERFLOW);
+    }
+    if (ncol_ob > INT_MAX) {
+        IGRAPH_ERROR("Matrix B too large for BLAS.", IGRAPH_EOVERFLOW);
+    }
+    if (beta == 0) {
+        igraph_matrix_resize(c, nrow_oa, ncol_ob);
+    }
+
+    m = (int) nrow_oa;
+    k = (int) ncol_oa;
+    n = (int) ncol_ob;
+    lda = (int) igraph_matrix_nrow(a);
+    ldb = (int) igraph_matrix_nrow(b);
+    ldc = (int) igraph_matrix_nrow(c);
+
+
+#ifdef HAVE_GFORTRAN
+    igraphdgemm_(&trans_a, &trans_b, &m, &n, &k, &alpha, VECTOR(a->data),
+                 &lda, VECTOR(b->data), &ldb, &beta, VECTOR(c->data), &ldc,
+                 /*trans_a_len*/ 1, /*trans_b_len*/ 1);
+#else
+    igraphdgemm_(&trans_a, &trans_b, &m, &n, &k, &alpha, VECTOR(a->data),
+                 &lda, VECTOR(b->data), &ldb, &beta, VECTOR(c->data), &ldc);
+#endif
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_blas_dgemv_array
  * \brief Matrix-vector multiplication using BLAS, array version.
  *

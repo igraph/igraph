@@ -232,11 +232,11 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
         IGRAPH_CHECK(igraph_i_layout_mds_single(graph, res, &m, dim));
     } else {
         /* The graph is not connected, lay out the components one by one */
-        igraph_vector_ptr_t layouts;
+        igraph_matrix_list_t layouts;
         igraph_vector_int_t vertex_order;
         igraph_vector_int_t comp;
         igraph_t subgraph;
-        igraph_matrix_t *layout;
+        igraph_matrix_t layout;
         igraph_matrix_t dist_submatrix;
         igraph_bool_t *seen_vertices;
         igraph_integer_t j, n, processed_vertex_count = 0;
@@ -244,9 +244,8 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&comp, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_order, no_of_nodes);
 
-        IGRAPH_CHECK(igraph_vector_ptr_init(&layouts, 0));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layouts);
-        igraph_vector_ptr_set_item_destructor(&layouts, (igraph_finally_func_t*)igraph_matrix_destroy);
+        IGRAPH_MATRIX_LIST_INIT_FINALLY(&layouts, 0);
+        IGRAPH_MATRIX_INIT_FINALLY(&layout, 0, 0);
 
         IGRAPH_CHECK(igraph_matrix_init(&dist_submatrix, 0, 0));
         IGRAPH_FINALLY(igraph_matrix_destroy, &dist_submatrix);
@@ -270,19 +269,10 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
             IGRAPH_FINALLY(igraph_destroy, &subgraph);
             /* Calculate the submatrix of the distances */
             IGRAPH_CHECK(igraph_matrix_select_rows_cols(&m, &dist_submatrix, &comp, &comp));
-            /* Allocate a new matrix for storing the layout */
-            layout = IGRAPH_CALLOC(1, igraph_matrix_t);
-            if (layout == 0) {
-                IGRAPH_ERROR("cannot calculate MDS layout", IGRAPH_ENOMEM);
-            }
-            IGRAPH_FINALLY(igraph_free, layout);
-            IGRAPH_CHECK(igraph_matrix_init(layout, 0, 0));
-            IGRAPH_FINALLY(igraph_matrix_destroy, layout);
             /* Lay out the subgraph */
-            IGRAPH_CHECK(igraph_i_layout_mds_single(&subgraph, layout, &dist_submatrix, dim));
+            IGRAPH_CHECK(igraph_i_layout_mds_single(&subgraph, &layout, &dist_submatrix, dim));
             /* Store the layout */
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(&layouts, layout));
-            IGRAPH_FINALLY_CLEAN(2);  /* ownership of layout taken by layouts */
+            IGRAPH_CHECK(igraph_matrix_list_push_back_copy(&layouts, &layout));
             /* Free the newly created subgraph */
             igraph_destroy(&subgraph);
             IGRAPH_FINALLY_CLEAN(1);
@@ -300,10 +290,11 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
 
         igraph_free(seen_vertices);
         igraph_matrix_destroy(&dist_submatrix);
-        igraph_vector_ptr_destroy_all(&layouts);
+        igraph_matrix_destroy(&layout);
+        igraph_matrix_list_destroy(&layouts);
         igraph_vector_int_destroy(&vertex_order);
         igraph_vector_int_destroy(&comp);
-        IGRAPH_FINALLY_CLEAN(5);
+        IGRAPH_FINALLY_CLEAN(6);
     }
 
     RNG_END();

@@ -24,23 +24,22 @@
  * Decompose into connected components and check that each one is a tree */
 igraph_bool_t is_forest(const igraph_t *graph) {
     igraph_bool_t res = 1;
+    igraph_graph_list_t components;
 
-    igraph_vector_ptr_t components;
-    igraph_vector_ptr_init(&components, 0);
+    igraph_graph_list_init(&components, 0);
 
     igraph_decompose(graph, &components, IGRAPH_WEAK, -1, 0);
 
-    igraph_integer_t n = igraph_vector_ptr_size(&components);
+    igraph_integer_t n = igraph_graph_list_size(&components);
     for (igraph_integer_t i=0; i < n; ++i) {
-        igraph_is_tree(VECTOR(components)[i], &res, NULL, IGRAPH_ALL);
+        igraph_is_tree(igraph_graph_list_get_ptr(&components, i), &res, NULL, IGRAPH_ALL);
 
         if (! res) {
             break;
         }
     }
 
-    igraph_decompose_destroy(&components);
-    igraph_vector_ptr_destroy(&components);
+    igraph_graph_list_destroy(&components);
 
     return res;
 }

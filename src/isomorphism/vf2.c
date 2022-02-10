@@ -860,33 +860,14 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(data);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *vec = VECTOR(*data)[i];
-        igraph_vector_int_destroy(vec);
-        igraph_free(vec);
-    }
-}
-
-static igraph_error_t igraph_i_get_isomorphisms_vf2(
+static igraph_error_t igraph_i_store_mapping_vf2(
         const igraph_vector_int_t *map12,
         const igraph_vector_int_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
-    igraph_vector_ptr_t *ptrvector = data->arg;
-    igraph_vector_int_t *newvector = IGRAPH_CALLOC(1, igraph_vector_int_t);
+    igraph_vector_int_list_t *ptrvector = data->arg;
     IGRAPH_UNUSED(map12);
-    if (!newvector) {
-        IGRAPH_ERROR("", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, newvector);
-    IGRAPH_CHECK(igraph_vector_int_copy(newvector, map21));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, newvector);
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, newvector));
-    IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
+    return igraph_vector_int_list_push_back_copy(ptrvector, map21);
 }
 
 /**
@@ -912,14 +893,10 @@ static igraph_error_t igraph_i_get_isomorphisms_vf2(
  *   colors as well. Supply a null pointer here if your graphs are not
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
- * \param maps Pointer vector. On return it is empty if the input graphs
- *   are not isomorphic. Otherwise it contains pointers to
+ * \param maps Pointer to a list of integer vectors. On return it is empty if
+ *   the input graphs are not isomorphic. Otherwise it contains pointers to
  *   \ref igraph_vector_int_t objects, each vector is an
- *   isomorphic mapping of \p graph2 to \p graph1. Please note that
- *   you need to 1) Destroy the vectors via \ref igraph_vector_int_destroy(),
- *   2) free them via \ref igraph_free() and then 3) call \ref
- *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
- *   memory when \p maps is no longer needed.
+ *   isomorphic mapping of \p graph2 to \p graph1.
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.
@@ -939,7 +916,7 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
                                 const igraph_vector_int_t *vertex_color2,
                                 const igraph_vector_int_t *edge_color1,
                                 const igraph_vector_int_t *edge_color2,
-                                igraph_vector_ptr_t *maps,
+                                igraph_vector_int_list_t *maps,
                                 igraph_isocompat_t *node_compat_fn,
                                 igraph_isocompat_t *edge_compat_fn,
                                 void *arg) {
@@ -948,16 +925,14 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : NULL;
 
-    igraph_vector_ptr_clear(maps);
-    IGRAPH_FINALLY(igraph_i_get_isomorphisms_free, maps);
+    igraph_vector_int_list_clear(maps);
     IGRAPH_CHECK(igraph_get_isomorphisms_vf2_callback(graph1, graph2,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  NULL, NULL,
                  (igraph_isohandler_t*)
-                 igraph_i_get_isomorphisms_vf2,
+                 igraph_i_store_mapping_vf2,
                  ncb, ecb, &data));
-    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
@@ -1663,35 +1638,6 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(data);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *vec = VECTOR(*data)[i];
-        igraph_vector_int_destroy(vec);
-        igraph_free(vec);
-    }
-}
-
-static igraph_error_t igraph_i_get_subisomorphisms_vf2(
-        const igraph_vector_int_t *map12,
-        const igraph_vector_int_t *map21,
-        void *arg) {
-    igraph_i_iso_cb_data_t *data = arg;
-    igraph_vector_ptr_t *vector = data->arg;
-    igraph_vector_int_t *newvector = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    IGRAPH_UNUSED(map12);
-    if (!newvector) {
-        IGRAPH_ERROR("", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, newvector);
-    IGRAPH_CHECK(igraph_vector_int_copy(newvector, map21));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, newvector);
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(vector, newvector));
-    IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \function igraph_get_subisomorphisms_vf2
  * \brief Return all subgraph isomorphic mappings.
@@ -1716,13 +1662,9 @@ static igraph_error_t igraph_i_get_subisomorphisms_vf2(
  *   colors as well. Supply a null pointer here if your graphs are not
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
- * \param maps Pointer vector. On return it contains pointers to
- *   \ref igraph_vector_int_t objects, each vector is an isomorphic mapping of
- *   \p graph2 to a subgraph of \p graph1. Please note that you need to
- *   1) Destroy the vectors via \ref igraph_vector_int_destroy(), 2) free them
- *   via \ref igraph_free() and then 3) call \ref
- *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
- *   memory when \p maps is no longer needed.
+ * \param maps Pointer to a list of integer vectors. On return it contains
+ *   pointers to \ref igraph_vector_int_t objects, each vector is an isomorphic
+ *   mapping of \p graph2 to a subgraph of \p graph1.
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.
@@ -1742,7 +1684,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                                    const igraph_vector_int_t *vertex_color2,
                                    const igraph_vector_int_t *edge_color1,
                                    const igraph_vector_int_t *edge_color2,
-                                   igraph_vector_ptr_t *maps,
+                                   igraph_vector_int_list_t *maps,
                                    igraph_isocompat_t *node_compat_fn,
                                    igraph_isocompat_t *edge_compat_fn,
                                    void *arg) {
@@ -1751,15 +1693,14 @@ igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : NULL;
 
-    igraph_vector_ptr_clear(maps);
-    IGRAPH_FINALLY(igraph_i_get_subisomorphisms_free, maps);
+    igraph_vector_int_list_clear(maps);
     IGRAPH_CHECK(igraph_get_subisomorphisms_vf2_callback(graph1, graph2,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  NULL, NULL,
                  (igraph_isohandler_t*)
-                 igraph_i_get_subisomorphisms_vf2,
+                 igraph_i_store_mapping_vf2,
                  ncb, ecb, &data));
-    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }

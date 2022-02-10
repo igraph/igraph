@@ -37,10 +37,6 @@ endif()
 
 # tutorial examples and other snippets from the documentation
 add_examples(
-  FOLDER examples/simple NAMES
-  igraph_free
-)
-add_examples(
   FOLDER examples/tutorial NAMES
   tutorial1
   tutorial2
@@ -64,7 +60,7 @@ add_examples(
   igraph_sparsemat7
   igraph_sparsemat8
   igraph_strvector
-  igraph_vector_ptr_sort
+  igraph_vector_int_list_sort
 )
 
 add_legacy_tests(
@@ -552,6 +548,7 @@ add_legacy_tests(
   community_label_propagation
   community_label_propagation2
   community_label_propagation3
+  graphlets
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
@@ -626,6 +623,7 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   blas
+  blas_dgemm
   eigenvector_centrality
   igraph_lapack_dgeev
   igraph_lapack_dgeevx
@@ -638,6 +636,7 @@ add_legacy_tests(
   dgemv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
+  igraph_blas_dgemm
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs

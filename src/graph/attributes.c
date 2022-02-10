@@ -80,7 +80,7 @@ igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
 
 igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
-                                        const igraph_vector_ptr_t *merges,
+                                        const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_vertices(graph, newgraph,
@@ -112,7 +112,7 @@ igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
 
 igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
-                                     const igraph_vector_ptr_t *merges,
+                                     const igraph_vector_int_list_t *merges,
                                      const igraph_attribute_combination_t *comb) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_edges(graph, newgraph,

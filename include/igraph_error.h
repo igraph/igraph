@@ -1038,7 +1038,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason, co
  * This macro is meant for internal use by \a igraph.
  *
  * </para><para>
- * Since a typial fatal error handler does a <code>longjmp()</code>, avoid using this
+ * Since a typical fatal error handler does a <code>longjmp()</code>, avoid using this
  * macro in C++ code. With most compilers, destructor will not be called when
  * <code>longjmp()</code> leaves the current scope.
  *

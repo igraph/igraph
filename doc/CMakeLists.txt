@@ -54,6 +54,7 @@ set(
   strvector.xxml
   threading.xxml
   vector.xxml
+  vectorlist.xxml
   visitors.xxml
 )
 

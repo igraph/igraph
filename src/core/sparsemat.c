@@ -328,7 +328,7 @@ igraph_error_t igraph_sparsemat_permute(const igraph_sparsemat_t *A,
     }
 
     /* We invert the permutation by hand */
-    pinv = igraph_Calloc(nrow, CS_INT);
+    pinv = IGRAPH_CALLOC(nrow, CS_INT);
     if (pinv == 0) {
         IGRAPH_ERROR("Cannot allocate index vector for permutation.", IGRAPH_ENOMEM);
     }
@@ -343,7 +343,7 @@ igraph_error_t igraph_sparsemat_permute(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot index sparse matrix", IGRAPH_FAILURE);
     }
 
-    igraph_Free(pinv);
+    IGRAPH_FREE(pinv);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
