@@ -9,12 +9,12 @@
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT int igraph_fundamental_cycles(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                             igraph_integer_t start_vid,
                                             igraph_integer_t cutoff,
                                             igraph_vector_ptr_t *result);
 
-IGRAPH_EXPORT int igraph_minimum_cycle_basis(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                              igraph_integer_t cutoff,
                                              igraph_bool_t complete,
                                              igraph_vector_ptr_t *result);
