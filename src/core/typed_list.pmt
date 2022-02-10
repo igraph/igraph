@@ -77,6 +77,31 @@ static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start,
 static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* list);
 static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2);
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_list_init
+ * \brief Initializes a list of vectors (constructor).
+ *
+ * </para><para>
+ * This function constructs a list of vectors of the given size, and initializes
+ * each vector in the newly created list to become an empty vector.
+ *
+ * </para><para>
+ * Vector objects initialized by this function are \em owned by the list, and
+ * they will be destroyed automatically when the list is destroyed with
+ * \ref igraph_vector_list_destroy().
+ *
+ * \param v Pointer to a not yet initialized list of vectors.
+ * \param size The size of the list.
+ * \return error code:
+ *       \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, the amount of
+ * \quote time \endquote required to allocate
+ * O(n) elements and initialize the corresponding vectors;
+ * n is the number of elements.
+ */
+
 igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
     igraph_integer_t alloc_size = size > 0 ? size : 1;
     IGRAPH_ASSERT(size >= 0);
@@ -91,6 +116,26 @@ igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_list_destroy
+ * \brief Destroys a list of vectors object.
+ *
+ * </para><para>
+ * All lists initialized by \ref igraph_vector_list_init() should be properly
+ * destroyed by this function. A destroyed list of vectors needs to be
+ * reinitialized by \ref igraph_vector_list_init() if you want to use it again.
+ *
+ * </para><para>
+ * Vectors that are in the list when it is destroyed are also destroyed
+ * implicitly.
+ *
+ * \param v Pointer to the (previously initialized) list object to
+ *        destroy.
+ *
+ * Time complexity: operating system dependent.
+ */
 
 void FUNCTION(destroy)(TYPE* v) {
     IGRAPH_ASSERT(v != 0);
@@ -184,17 +229,6 @@ igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* e) {
-    igraph_integer_t size = FUNCTION(size)(v);
-    if (size > 0) {
-        v->end -= 1;
-        *e = *(v->end);
-        return IGRAPH_SUCCESS;
-    } else {
-        return IGRAPH_FAILURE;
-    }
-}
-
 ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
@@ -280,6 +314,17 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
     v->end -= 1;
 
     return IGRAPH_SUCCESS;
+}
+
+igraph_error_t FUNCTION(remove_back)(TYPE* v, ITEM_TYPE* result) {
+    igraph_integer_t size = FUNCTION(size)(v);
+    if (size > 0) {
+        v->end -= 1;
+        *result = *(v->end);
+        return IGRAPH_SUCCESS;
+    } else {
+        return IGRAPH_FAILURE;
+    }
 }
 
 igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* result) {

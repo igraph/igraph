@@ -50,7 +50,7 @@
  * numbers or infinities.</para>
  *
  * <para>The \type igraph_vector_t type and its variants usually use O(n) space
- * to store n elements. Sometimes they uses more, this is because vectors can
+ * to store n elements. Sometimes they use more, this is because vectors can
  * shrink, but even if they shrink, the current implementation does not free a
  * single bit of memory.</para>
  *
@@ -63,7 +63,7 @@
  * with standard mathematical libraries, like the GNU Scientific
  * Library.</para>
  *
- * <para>Almost all of the functions desccribed below for \type igraph_vector_t
+ * <para>Almost all of the functions described below for \type igraph_vector_t
  * also exist for all the other vector type variants. These variants are not
  * documented separately; you can simply replace \c vector with \c vector_int,
  * \c vector_bool or something similar if you need a function for another
