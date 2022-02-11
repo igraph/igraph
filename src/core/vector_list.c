@@ -72,9 +72,9 @@
  * \c igraph_vector_int_list_init() and not \ref igraph_vector_list_init().</para>
  *
  * <para>Before diving into a detailed description of the functions related to
- * lists of vectors, we must also talk about the \em "ownership rules" of these
+ * lists of vectors, we must also talk about the \em ownership rules of these
  * objects. The most important rule is that the vectors in the list are
- * \em owned by the list itself, meaning that the user is \em not responsible
+ * owned by the list itself, meaning that the user is \em not responsible
  * for allocating memory for the vectors or for freeing the memory associated
  * to the vectors. It is the responsibility of the list to allocate and initialize
  * the vectors when new items are created in the list, and it is also the
@@ -85,13 +85,13 @@
  * one million vectors, you are not only allocating memory for one million
  * \ref igraph_vector_t object but you are also initializing one million
  * vectors. Also, if you have a list containing one million vectors and you
- * clear the list by calling \c igraph_vector_list_clear(), the list will
+ * clear the list by calling \ref igraph_vector_list_clear(), the list will
  * implicitly destroy these lists, and any pointers that you may hold to the
  * items become invalid at once.</para>
  *
  * <para>Speaking about pointers, the typical way of working with vectors in
  * a list is to obtain a pointer to one of the items via the
- * \c igraph_vector_list_get_ptr() method and then passing this pointer
+ * \ref igraph_vector_list_get_ptr() method and then passing this pointer
  * onwards to functions that manipulate \ref igraph_vector_t objects. However,
  * note that the pointers are \em ephemeral in the sense that they may be
  * invalidated any time when the list is modified because a modification may
@@ -120,8 +120,8 @@
  * list due to the ownership rules. If you want to keep a few of the vectors
  * in the vector list, you need to copy them with \ref igraph_vector_copy() or
  * \ref igraph_vector_update(), or you need to remove them from the list and
- * take ownership by calling \c igraph_vector_list_remove() or
- * \c igraph_vector_list_remove_fast() .</para>
+ * take ownership by calling \ref igraph_vector_list_pop_back(),
+ * \ref igraph_vector_list_remove() or \ref igraph_vector_list_remove_fast() .</para>
  */
 
 
@@ -146,7 +146,7 @@
  * <para>Note that the standard \ref VECTOR macro that works for ordinary vectors
  * does not work for lists of vectors to access the i-th element (but of course
  * you can use it to index into an existing vector that you retrieved from the
- * vector list with \ref igraph_vector_list_get_ptr() . This is because the
+ * vector list with \ref igraph_vector_list_get_ptr() ). This is because the
  * macro notation would allow one to overwrite the vector in the list with
  * another one without the list knowing about it, so the list would not be able
  * to destroy the vector that was overwritten by a new one.
