@@ -50,19 +50,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     if (! igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED)) {
         {
-            igraph_vector_ptr_t separators;
-            check_err(igraph_vector_ptr_init(&separators, 0));
+            igraph_vector_int_list_t separators;
+            check_err(igraph_vector_int_list_init(&separators, 0));
             check_err(igraph_all_minimal_st_separators(&graph, &separators));
-            IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&separators, igraph_vector_int_destroy);
-            igraph_vector_ptr_destroy_all(&separators);
+            igraph_vector_int_list_destroy(&separators);
         }
 
         {
-            igraph_vector_ptr_t separators;
-            check_err(igraph_vector_ptr_init(&separators, 0));
+            igraph_vector_int_list_t separators;
+            check_err(igraph_vector_int_list_init(&separators, 0));
             check_err(igraph_minimum_size_separators(&graph, &separators));
-            IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&separators, igraph_vector_int_destroy);
-            igraph_vector_ptr_destroy_all(&separators);
+            igraph_vector_int_list_destroy(&separators);
         }
 
         igraph_destroy(&graph);
