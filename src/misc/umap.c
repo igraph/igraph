@@ -201,7 +201,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
                 MATRIX(jTr, j1) += MATRIX(jacobian, i, j1) * VECTOR(residuals)[i];
             }
         }
-        /* LAPACK puts solution into jTr */
+        /* LAPACK puts solution into jTr, sometimes with row swapping (stored in ipiv) */
         igraph_lapack_dgesv(jTj, &ipiv, jTr, *lapack_info);
 
         /* Assign deltas (LAPACK can swap rows of the solution for convenience) */
@@ -213,12 +213,13 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
             db = MATRIX(jTr, 1, 0);
         }
 
-        /* Improvement over GN: linear search for best delta */
-        da /= 32;
-        db /= 32;
+        /* Improvement over GN: rough exponential line search for best delta
+         * start from largest change, and keep shrinking as long as we are going down
+         * */
         for (int k = 0; k = 5 ; k++) {
-            da *= 2;
-            db *= 2;
+            /* Try new parameters */
+            da /= 2.0;
+            db /= 2.0;
             squared_sum_res_old = squared_sum_res;
             /* Compute new sum of squared residuals */
             squared_sum_res = 0;
@@ -229,10 +230,10 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
                 VECTOR(residuals)[i] = tmp;
                 squared_sum_res += tmp * tmp;
             }
-            /* Compare and stop if not decreasing */
+            /* Compare and if we are going back uphill, undo last step and break */
             if (squared_sum_res > squared_sum_res_old) {
-                da /= 2;
-                db /= 2;
+                da *= 2;
+                db *= 2;
                 break;
             }
         }
