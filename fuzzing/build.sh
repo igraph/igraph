@@ -9,12 +9,14 @@ make -j$(nproc)
 # Create seed corpus
 zip $OUT/read_gml_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.gml \
+        $SRC/igraph/tests/regression/*.gml \
         $SRC/igraph/fuzzing/test_inputs/*.gml
 
 zip $OUT/read_pajek_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/links.net \
         $SRC/igraph/tests/unit/bipartite.net \
         $SRC/igraph/tests/unit/pajek*.net \
+        $SRC/igraph/tests/regression/*.net \
         $SRC/igraph/fuzzing/test_inputs/*.net
 
 zip $OUT/read_dl_fuzzer_seed_corpus.zip \
