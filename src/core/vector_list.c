@@ -52,7 +52,21 @@
  * <para>There are multiple variants of \type igraph_vector_list_t; the basic variant
  * stores vectors of doubles (i.e. each item is an \ref igraph_vector_t), but
  * there is also \type igraph_vector_int_list_t for integers (where each item is
- * an \type igraph_vector_int_t). Lists of vectors are used in \a igraph in many
+ * an \type igraph_vector_int_t), \type igraph_matrix_list_t for matrices of
+ * doubles and so on. The following list summarizes the variants that are
+ * currently available in the library:</para>
+ *
+ * \ilist
+ * \ili \type igraph_vector_list_t for lists of vectors of floating-point numbers
+ *      (\type igraph_vector_t)
+ * \ili \type igraph_vector_int_list_t for lists of integer vectors
+ *      (\type igraph_vector_int_t)
+ * \ili \type igraph_matrix_list_t for lists of matrices of floating-point numbers
+ *      (\type igraph_matrix_t)
+ * \ili \type igraph_graph_list_t for lists of graphs (\type igraph_t)
+ * \endilist
+ *
+ * <para>Lists of vectors are used in \a igraph in many
  * cases, e.g., when returning lists of paths, cliques or vertex sets.
  * Functions that expect or return a list of numeric vectors typically use
  * \type igraph_vector_list_t or \type igraph_vector_int_list_t to achieve this.

@@ -335,14 +335,14 @@ void FUNCTION(clear)(TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_push_back
- * \brief Appends a new vector to the list.
+ * \brief Append an existing vector to the list, transferring ownership.
  *
  * </para><para>
- * This function resizes the list to be one element longer, sets the very last
- * element in the list to the specified vector to \p e and takes ownership of
- * it so the user is not responsible for freeing \p e any more; it will be
- * destroyed when the list itself is destroyed or if \p e gets removed from the
- * list without passing on the ownership to somewhere else.
+ * This function resizes the list to be one element longer, and sets the very last
+ * element in the list to the specified vector \p e . The list takes ownership
+ * of the vector so the user is not responsible for freeing \p e any more;
+ * the vector will be destroyed when the list itself is destroyed or if \p e gets
+ * removed from the list without passing on the ownership to somewhere else.
  *
  * \param v The list object.
  * \param e Pointer to the vector to append to the list.
@@ -419,7 +419,7 @@ void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
  * destroying \p e any more. At the same time, the ownership of the vector that
  * \em was in the list at position \p pos will be transferred to the caller and
  * \p e will be updated to point to it, so the caller becomes responsible for
- * destroying it when it no longer needs the vector.
+ * destroying it when it does not need the vector any more.
  *
  * \param v The list object.
  * \param pos The index to modify in the list.
@@ -507,7 +507,7 @@ void FUNCTION(discard_back)(TYPE* v) {
  *
  * \param v The list object.
  * \param index Index of the item to be discarded and destroyed.
- * \sa \ref igraph_vector_list_discard() if you care about the order of the
+ * \sa \ref igraph_vector_list_discard() if you want to preserve the order of the
  * items in the list.
  *
  * Time complexity: O(1).
@@ -592,7 +592,7 @@ igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
  *
  * \param v The list object.
  * \param index Index of the item to be removed.
- * \param result Pointer to an \c igraph_vector_t; it will be updated to the
+ * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
  *        item that was removed from the list. Ownership of this vector is
  *        passed on to the caller.
  * \sa \ref igraph_vector_list_remove_fast() if you do not care about the
@@ -632,7 +632,7 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
  * the vector when it is not needed any more.
  *
  * \param v The list object.
- * \param result Pointer to an \c igraph_vector_t; it will be updated to the
+ * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
  *        item that was removed from the list. Ownership of this vector is
  *        passed on to the caller.
  *
@@ -657,13 +657,13 @@ igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* result) {
  * </para><para>
  * This function removes the vector at the given index from the list,
  * moves the last item in the list to \p index to fill the gap, and then
- * transfers ownership of th removed vector back to the caller; in other words,
+ * transfers ownership of the removed vector back to the caller; in other words,
  * the caller becomes responsible for destroying the vector when it is not
  * needed any more.
  *
  * \param v The list object.
  * \param index Index of the item to be discarded and destroyed.
- * \sa \ref igraph_vector_list_discard() if you care about the order of the
+ * \sa \ref igraph_vector_list_discard() if you want to preserve the order of the
  * items in the list.
  *
  * Time complexity: O(1).
