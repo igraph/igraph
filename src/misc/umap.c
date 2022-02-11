@@ -116,7 +116,8 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
     igraph_real_t da, db;
     /* Needed for the Gauss-Newton search */
     igraph_matrix_t jacobian;
-    igraph_matrix_t jTj, jTj_i;
+    igraph_matrix_t jTj, jTj_i, jTr;
+    igraph_vector_int_t ipiv; // Pivot for LAPACK
     igraph_matrix_t grad;
     igraph_real_t detjTj;
     igraph_real_t delta = 0.00001;
@@ -133,9 +134,11 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
     /* First derivatives, for the fitting (direction) */
     IGRAPH_MATRIX_INIT_FINALLY(&jacobian, nr_points, 2);
     IGRAPH_MATRIX_INIT_FINALLY(&jTj, 2, 2);
+    IGRAPH_MATRIX_INIT_FINALLY(&jTr, 2, 1);
     IGRAPH_MATRIX_INIT_FINALLY(&jTj_i, 2, 2);
     IGRAPH_MATRIX_INIT_FINALLY(&grad, 2, nr_points);
     /* Auxiliary vars for convenience */
+    IGRAPH_VECTOR_INIT_FINALLY(&ipiv, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&powf, nr_points);
 
     /* Distance |x-y| (this is a lattice, there are no actual x and y) */
@@ -170,40 +173,44 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
             /* df/db * delta */
             MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(2 * VECTOR(x)[i]);
         }
-
-        /* Multiply Jacobian by its negative transpose */
-        /* FIXME: is this fine or is it the transpose?? In that case inversion is a little more tricky */
-        for (int j1 = 0; j1 < 2; j1++) {
-            for (int j2 = 0; j2 < 2; j2++) {
-                for (int i = 0; i < nr_points; i++) {
-                    MATRIX(jTj, j1, j2) -= MATRIX(jacobian, i, j1) * MATRIX(jacobian, i, j2);
-                }
-            }
-        }
-
-        /* Invert 2x2 matrix */
-        detjTj = MATRIX(jTj, 0, 0) * MATRIX(jTj, 1, 1) - MATRIX(jTj, 0, 1) * MATRIX(jTj, 1, 0);
-        MATRIX(jTj_i, 0, 0) = 1.0 / detjTj * MATRIX(jTj, 1, 1);
-        MATRIX(jTj_i, 1, 1) = 1.0 / detjTj * MATRIX(jTj, 0, 0);
-        MATRIX(jTj_i, 0, 1) = - 1.0 / detjTj * MATRIX(jTj, 1, 0);
-        MATRIX(jTj_i, 1, 0) = - 1.0 / detjTj * MATRIX(jTj, 0, 1);
-
-        /* Multiply inverse by Jacobian transpose, this is the gradient */
+        
+        /* At each iteration, we want to minimize the linear approximation of the sum of squared residuals:
+         *
+         * sum_i (Ji @ d(a,b) -r_i)^2
+         *
+         * Purring the first derivative to zero results in a linear system of 2 equations (for a and b):
+         *
+         * sum_i J_i^T @ J_i @ d(a,b) = sum_i J_i^T r_i
+         * *
+         * or more compactly:
+         *
+         * J^T @ J @ d(a,b) = J^T @ r
+         *
+         * where J_T is the transpose of the Jacobian. Defining A := J^T @ J, B = J^T @ r:
+         *
+         * A @ d(a,b) = B
+         *
+         * This can be solved for d(a,b) using LAPACK within igraph
+         * */
+        /* Compute A and B, i.e. J^T @ J and J^T @ r */
         for (int i = 0; i < nr_points; i++) {
             for (int j1 = 0; j1 < 2; j1++) {
                 for (int j2 = 0; j2 < 2; j2++) {
-                    MATRIX(grad, j1, i) += MATRIX(jTj_i, j1, j2) * MATRIX(jacobian, i, j2);
+                    MATRIX(jTj, j1, j2) += MATRIX(jacobian, i, j1) * MATRIX(jacobian, i, j2);
                 }
-
+                MATRIX(jTr, j1) += MATRIX(jacobian, i, j1) * VECTOR(residuals)[i];
             }
         }
+        /* LAPACK puts solution into jTr */
+        igraph_lapack_dgesv(jTj, &ipiv, jTr, *lapack_info);
 
-        /* Deltas for a and b */
-        da = 0;
-        db = 0;
-        for (int i = 0; i < nr_points; i++) {
-            da -= VECTOR(residuals)[i] * MATRIX(grad, 0, i);
-            db -= VECTOR(residuals)[i] * MATRIX(grad, 1, i);
+        /* Assign deltas (LAPACK can swap rows of the solution for convenience) */
+        if (VECTOR(ipiv)[0] == 1) {
+            da = MATRIX(jTr, 1, 0);
+            db = MATRIX(jTr, 0, 0);
+        } else {
+            da = MATRIX(jTr, 0, 0);
+            db = MATRIX(jTr, 1, 0);
         }
 
         /* Improvement over GN: linear search for best delta */
