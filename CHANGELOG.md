@@ -563,8 +563,9 @@
  - `igraph_version()` no longer returns an error code.
  - `igraph_write_graph_ncol()` now preserves the edge ordering of the graph when writing an NCOL file.
  - The Pajek parser is now less strict and accepts more files.
-  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
+ - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
     and edge-switching MCMC sampler.
+ - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
 
 ### Fixed
 
