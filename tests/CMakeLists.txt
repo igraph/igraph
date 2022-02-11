@@ -224,6 +224,7 @@ add_examples(
   FOLDER examples/simple NAMES
   bellman_ford
   dijkstra
+  igraph_assortativity_degree
   igraph_average_path_length
   igraph_cocitation
   igraph_diameter
