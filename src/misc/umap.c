@@ -102,10 +102,8 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
      * plain e^-d fuzzyness
      * */
 
-    /* Residuals */
+    /* Grid points */
     igraph_vector_t x;
-    igraph_vector_t residuals;
-    igraph_real_t squared_sum_res, squared_sum_res_old;
      /* Make a lattice from 0 to this distance */
     igraph_integer_t nr_points = 100;
     igraph_real_t end_point = min_dist*30; /* Need to sample decently around the kink I guess? */
@@ -114,29 +112,27 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
     igraph_real_t b = 1.;
     /* deltas */
     igraph_real_t da, db;
+    /* Residuals */
+    igraph_vector_t residuals;
+    igraph_real_t squared_sum_res, squared_sum_res_old;
     /* Needed for the Gauss-Newton search */
-    igraph_matrix_t jacobian;
-    igraph_matrix_t jTj, jTj_i, jTr;
-    igraph_vector_int_t ipiv; // Pivot for LAPACK
-    igraph_matrix_t grad;
-    igraph_real_t detjTj;
-    igraph_real_t delta = 0.00001;
+    igraph_matrix_t jacobian, jTj, jTr;
     igraph_real_t tol = 0.001;
     igraph_real_t maxiter = 100;
     /* Auxiliary vars */
+    igraph_vector_int_t ipiv; // Pivot for LAPACK
     igraph_real_t tmp;
     igraph_vector_t powb;
 
     /* Distance lattice */
     IGRAPH_VECTOR_INIT_FINALLY(&x, nr_points);
-    /* Squared residuals, to minimize */
+    /* Residuals */
     IGRAPH_VECTOR_INIT_FINALLY(&residuals, nr_points);
     /* First derivatives, for the fitting (direction) */
     IGRAPH_MATRIX_INIT_FINALLY(&jacobian, nr_points, 2);
+    /* Composite matrices/vectors for linear least squares at each iteration */
     IGRAPH_MATRIX_INIT_FINALLY(&jTj, 2, 2);
     IGRAPH_MATRIX_INIT_FINALLY(&jTr, 2, 1);
-    IGRAPH_MATRIX_INIT_FINALLY(&jTj_i, 2, 2);
-    IGRAPH_MATRIX_INIT_FINALLY(&grad, 2, nr_points);
     /* Auxiliary vars for convenience */
     IGRAPH_VECTOR_INIT_FINALLY(&ipiv, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&powf, nr_points);
@@ -160,8 +156,12 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
             squared_sum_res += tmp * tmp;
         }
 
-        /* break if converged */
+        /* break if good fit (conergence to truth) */
         if (squared_sum_res < tol * tol) {
+            break;
+        }
+        /* break if no change (convergence) */
+        if ((iter > 0) && fabs(sqrt(squared_sum_res_old) - sqrt(squared_sum_res)) < tol) {
             break;
         }
 
@@ -204,6 +204,19 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
         /* LAPACK puts solution into jTr, sometimes with row swapping (stored in ipiv) */
         igraph_lapack_dgesv(jTj, &ipiv, jTr, *lapack_info);
 
+        /* This might go wrong, in which case we should fail graciously */
+        if (lapack_info > 0) {
+            igraph_vector_destroy(&x);
+            igraph_vector_destroy(&residuals);
+            igraph_matrix_destroy(&jacobian);
+            igraph_matrix_destroy(&jTj);
+            igraph_matrix_destroy(&jTr);
+            igraph_vector_int_destroy(&ipiv);
+            igraph_vector_destroy(&powb);
+            IGRAPH_FINALLY_CLEAN(7);
+            IGRAPH_ERROR("Singular matrix in the estimation of a and b for UMAP",  IGRAPH_EINVAL);
+        }
+
         /* Assign deltas (LAPACK can swap rows of the solution for convenience) */
         if (VECTOR(ipiv)[0] == 1) {
             da = MATRIX(jTr, 1, 0);
@@ -234,14 +247,30 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
             if (squared_sum_res > squared_sum_res_old) {
                 da *= 2;
                 db *= 2;
+                /* set the current sum of squared residuals to check for convergence
+                 * at the beginning of the next GN iteration */
+                squared_sum_res_old = squared_sum_res;
                 break;
             }
         }
 
     }
 
+    /* Free memory and tidy up stack */
+    igraph_vector_destroy(&x);
+    igraph_vector_destroy(&residuals);
+    igraph_matrix_destroy(&jacobian);
+    igraph_matrix_destroy(&jTj);
+    igraph_matrix_destroy(&jTr);
+    igraph_vector_int_destroy(&ipiv);
+    igraph_vector_destroy(&powb);
+    IGRAPH_FINALLY_CLEAN(7);
+
     *a_p = a;
     *b_p = b;
+
+    return IGRAPH_SUCCESS;
+
 }
 
 /*xd is difference in x direction, w is a weight */
