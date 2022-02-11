@@ -105,23 +105,26 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
     /* Residuals */
     igraph_vector_t x;
     igraph_vector_t residuals;
-    igraph_real_t squared_sum_res;
+    igraph_real_t squared_sum_res, squared_sum_res_old;
      /* Make a lattice from 0 to this distance */
     igraph_integer_t nr_points = 100;
     igraph_real_t end_point = min_dist*30; /* Need to sample decently around the kink I guess? */
     /* Initial values */
     igraph_real_t a = 1.;
     igraph_real_t b = 1.;
+    /* deltas */
+    igraph_real_t da, db;
     /* Needed for the Gauss-Newton search */
     igraph_matrix_t jacobian;
-    igraph_matrix_t jacobian_T;
-    igraph_matrix_t jTj_i;
+    igraph_matrix_t jTj, jTj_i;
+    igraph_matrix_t grad;
+    igraph_real_t detjTj;
     igraph_real_t delta = 0.00001;
     igraph_real_t tol = 0.001;
     igraph_real_t maxiter = 100;
     /* Auxiliary vars */
     igraph_real_t tmp;
-    igraph_vector_t powf_vec;
+    igraph_vector_t powb;
 
     /* Distance lattice */
     IGRAPH_VECTOR_INIT_FINALLY(&x, nr_points);
@@ -129,9 +132,9 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
     IGRAPH_VECTOR_INIT_FINALLY(&residuals, nr_points);
     /* First derivatives, for the fitting (direction) */
     IGRAPH_MATRIX_INIT_FINALLY(&jacobian, nr_points, 2);
-    IGRAPH_MATRIX_INIT_FINALLY(&jacobian_T, 0, 0);
-    /* Second derivatives, for the fitting (speed/brakes) */
-    IGRAPH_MATRIX_INIT_FINALLY(&jTj_i, 0, 0);
+    IGRAPH_MATRIX_INIT_FINALLY(&jTj, 2, 2);
+    IGRAPH_MATRIX_INIT_FINALLY(&jTj_i, 2, 2);
+    IGRAPH_MATRIX_INIT_FINALLY(&grad, 2, nr_points);
     /* Auxiliary vars for convenience */
     IGRAPH_VECTOR_INIT_FINALLY(&powf, nr_points);
 
@@ -140,33 +143,92 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
         VECTOR(x)[i] = (end_point / nr_points) * i;
     }
 
-    for (int iter = 0; (iter < maxiter) && (squared_sum_res > tol * tol); iter++) {
+    for (int iter = 0; iter < maxiter; iter++) {
         /* Auxiliaries vars */
         for (int i = 0; i < nr_points; i++) {
-            VECTOR(powf_vec)[i] = powf(VECTOR(x)[i], 2 * b);
+            VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * b);
         }
         /* Residuals and sum of squared residuals at (a, b) */
         squared_sum_res = 0;
         for (int i = 0; i < nr_points; i++) {
-            tmp = 1 / (1 + a* VECTOR(powf_vec)[i];
+            tmp = 1 / (1 + a * VECTOR(powb)[i];
             tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
             VECTOR(residuals)[i] = tmp;
             squared_sum_res += tmp * tmp;
         }
-        /* First derivatives of squared residuals at (a, b) */
+
+        /* break if converged */
+        if (squared_sum_res < tol * tol) {
+            break;
+        }
+
+        /* Jacobian (first derivatives) of squared residuals at (a, b) */
         for (int i = 0; i < nr_points; i++) {
-            tmp = 1 + a * VECTOR(powf_vec)[i];
+            tmp = 1 + a * VECTOR(powb)[i];
             /* df/da * delta */
-            MATRIX(jacobian, i, 0) = - 2 * VECTOR(powf_vec)[i] / tmp / tmp;
+            MATRIX(jacobian, i, 0) = - 2 * VECTOR(powb)[i] / tmp / tmp;
             /* df/db * delta */
             MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(2 * VECTOR(x)[i]);
         }
 
-        /* Second derivatives */
+        /* Multiply Jacobian by its negative transpose */
+        for (int j1 = 0; j1 < 2; j1++) {
+            for (int j2 = 0; j2 < 2; j2++) {
+                for (int i = 0; i < nr_points; i++) {
+                    MATRIX(jTj, j1, j2) -= MATRIX(jacobian, i, j1) * MATRIX(jacobian, i, j2);
+                }
+            }
+        }
 
-        igraph_matrix_copy(&jacobian_T, &jacobian);
-        igraph_matrix_transpose(&jacobian_T);
-        //TODO inversion, etc.
+        /* Invert 2x2 matrix */
+        detjTj = MATRIX(jTj, 0, 0) * MATRIX(jTj, 1, 1) - MATRIX(jTj, 0, 1) * MATRIX(jTj, 1, 0);
+        MATRIX(jTj_i, 0, 0) = 1.0 / detjTj * MATRIX(jTj, 1, 1);
+        MATRIX(jTj_i, 1, 1) = 1.0 / detjTj * MATRIX(jTj, 0, 0);
+        MATRIX(jTj_i, 0, 1) = - 1.0 / detjTj * MATRIX(jTj, 1, 0);
+        MATRIX(jTj_i, 1, 0) = - 1.0 / detjTj * MATRIX(jTj, 0, 1);
+
+        /* Multiply inverse by Jacobian transpose, this is the gradient */
+        for (int i = 0; i < nr_points; i++) {
+            for (int j1 = 0; j1 < 2; j1++) {
+                for (int j2 = 0; j2 < 2; j2++) {
+                    MATRIX(grad, j1, i) += MATRIX(jTj_i, j1, j2) * MATRIX(jacobian, i, j2);
+                }
+
+            }
+        }
+
+        /* Deltas for a and b */
+        da = 0;
+        db = 0;
+        for (int i = 0; i < nr_points; i++) {
+            da -= VECTOR(residuals)[i] * MATRIX(grad, 0, i);
+            db -= VECTOR(residuals)[i] * MATRIX(grad, 1, i);
+        }
+
+        /* Improvement over GN: linear search for best delta */
+        da /= 32;
+        db /= 32;
+        for (int k = 0; k = 5 ; k++) {
+            da *= 2;
+            db *= 2;
+            squared_sum_res_old = squared_sum_res;
+            /* Compute new sum of squared residuals */
+            squared_sum_res = 0;
+            for (int i = 0; i < nr_points; i++) {
+                VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * (b + db));
+                tmp = 1 / (1 + (a + da) * VECTOR(powb)[i]);
+                tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
+                VECTOR(residuals)[i] = tmp;
+                squared_sum_res += tmp * tmp;
+            }
+            /* Compare and stop if not decreasing */
+            if (squared_sum_res > squared_sum_res_old) {
+                da /= 2;
+                db /= 2;
+                break;
+            }
+        }
+
     }
 
     *a_p = a;
