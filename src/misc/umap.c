@@ -172,6 +172,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
         }
 
         /* Multiply Jacobian by its negative transpose */
+        /* FIXME: is this fine or is it the transpose?? In that case inversion is a little more tricky */
         for (int j1 = 0; j1 < 2; j1++) {
             for (int j2 = 0; j2 < 2; j2++) {
                 for (int i = 0; i < nr_points; i++) {
@@ -284,12 +285,15 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
 
 static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
 {
-    /* TODO: we can also sample the edges ranomly, instead of taking them all */
-    /* TODO: we can scale the learning rate with the epochs, so it goes from 1 to zero */
+    /* TODO: we should sample the edges ranomly, instead of taking them all */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
     igraph_real_t fx, fy;
-    /* TODO: what should we use for the number of random vertices? */
+
+
+    /* TODO: what should we use for the number of random vertices?
+     * this is called "negative sampling" and it should be probably computed at every iteration
+     * */
     igraph_integer_t n_random_verices = sqrt(no_of_nodes);
     igraph_integer_t other;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
@@ -346,15 +350,23 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
     IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
+        /* Compute (stochastic) gradient */
         igraph_get_gradient(&gradient, layout, umap_graph, umap_weights);
+
         //printf("gradient:\n");
         //igraph_matrix_print(&gradient);
         //printf("\n");
+
+        /* Delta is the gradient times the current (decreasing) learning rate */
         igraph_matrix_scale(&gradient, learning_rate);
+
+        /* Shift the layout by the delta */
         igraph_matrix_sub(layout, &gradient);
+
         //printf("layout:\n");
         //igraph_matrix_print(layout);
         //printf("\n");
+
          /* Adjust learning rate */
         learning_rate = 1.0 - (e + 1) / epochs;
     }
