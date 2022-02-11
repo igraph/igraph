@@ -447,8 +447,9 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
  * in the path graph <code>P_n</code>. This function can generate both.
  *
  * </para><para>
- * This function is a convenience wrapper for the one-dimensional case of
- * \ref igraph_lattice().
+ * When \p n is 1 or 2, the result may not be a simple graph:
+ * the one-cycle contains a self-loop and the undirected or reciprocally
+ * connected directed two-cycle contains parallel edges.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
@@ -471,18 +472,54 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                 igraph_bool_t mutual, igraph_bool_t circular) {
 
-    igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges;
+    igraph_integer_t no_of_edges, no_of_edges2;
+    igraph_integer_t i;
 
     if (n < 0) {
         IGRAPH_ERRORF("The number of vertices must be non-negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 1);
-    VECTOR(v)[0] = n;
+    if (n == 0) {
+        return igraph_empty(graph, 0, directed);
+    }
 
-    IGRAPH_CHECK(igraph_lattice(graph, &v, 1, directed, mutual, circular));
+    no_of_edges = circular ? n : n-1;
+    if (directed && mutual) {
+        IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges);
+    }
+    IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
 
-    igraph_vector_int_destroy(&v);
+    if (directed && mutual) {
+        for (i=0; i < n-1; ++i) {
+            VECTOR(edges)[4*i]   = i;
+            VECTOR(edges)[4*i+1] = i+1;
+            VECTOR(edges)[4*i+2] = i+1;
+            VECTOR(edges)[4*i+3] = i;
+        }
+        if (circular) {
+            /* Now i == n-1 */
+            VECTOR(edges)[4*i]   = i;
+            VECTOR(edges)[4*i+1] = 0;
+            VECTOR(edges)[4*i+2] = 0;
+            VECTOR(edges)[4*i+3] = i;
+        }
+    } else {
+        for (i=0; i < n-1; ++i) {
+            VECTOR(edges)[2*i]   = i;
+            VECTOR(edges)[2*i+1] = i+1;
+        }
+        if (circular) {
+            /* Now i == n-1 */
+            VECTOR(edges)[2*i]   = i;
+            VECTOR(edges)[2*i+1] = 0;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
