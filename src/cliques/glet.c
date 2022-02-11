@@ -370,7 +370,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
         }
         IGRAPH_FINALLY(igraph_free, cl);
 
-        igraph_vector_int_list_remove_back(&mycliques, cl);
+        igraph_vector_int_list_pop_back(&mycliques, cl);
 
         /* From this point onwards, _we_ own the clique and not `mycliques'.
          * We pass on the ownership to `cliques' */
