@@ -139,12 +139,14 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ipiv, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&powb, nr_points);
 
+    printf("start fit_ab\n");
     /* Distance |x-y| (this is a lattice, there are no actual x and y) */
     for (int i = 0; i < nr_points; i++) {
-        VECTOR(x)[i] = (end_point / nr_points) * i;
+        VECTOR(x)[i] = (end_point / nr_points) * i + 0.001; /* added a 0.001 to prevent NaNs */
     }
 
     for (int iter = 0; iter < maxiter; iter++) {
+        printf("start iteration\n");
         /* Auxiliaries vars */
         for (int i = 0; i < nr_points; i++) {
             VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * b);
@@ -245,6 +247,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
                 VECTOR(residuals)[i] = tmp;
                 squared_sum_res += tmp * tmp;
             }
+            printf("3: res:%f old:%f\n", squared_sum_res, squared_sum_res_old);
             /* Compare and if we are going back uphill, undo last step and break */
             if (squared_sum_res > squared_sum_res_old) {
                 da *= 2;
