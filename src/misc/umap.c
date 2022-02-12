@@ -326,6 +326,8 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_vector_int_t eids;
     igraph_real_t fx, fy;
+    igraph_integer_t eid;
+    igraph_real_t weight;
 
 
     /* TODO: what should we use for the number of random vertices?
@@ -335,39 +337,66 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     igraph_integer_t other;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_incident(umap_graph, &eids, i, IGRAPH_ALL);
+
+        /* Initialize the gradient for this vertex */
         MATRIX(*gradient, i, 0) = 0;
         MATRIX(*gradient, i, 1) = 0;
+
+        /* Current coordinates of the vertex */
         igraph_real_t x = MATRIX(*layout, i, 0);
         igraph_real_t y = MATRIX(*layout, i, 1);
+
+
+        /* Edges that contact this vertex are attracted */
+        igraph_incident(umap_graph, &eids, i, IGRAPH_ALL);
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(&eids); j++) {
+            /* Get neighboring vertex */
             igraph_integer_t eid = VECTOR(eids)[j];
             other = IGRAPH_OTHER(umap_graph, eid, i);
+
+            /* Coordinates of the neighbor */
             igraph_real_t other_x = MATRIX(*layout, other, 0) ;
             igraph_real_t other_y = MATRIX(*layout, other, 1) ;
+
+            /* Gradient in embedding space */
             igraph_real_t x_diff = (x - other_x);
             igraph_real_t y_diff = (y - other_y);
+
+            /* Apply attractive force since they are neighbors */
             IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], &fx, &fy));
             MATRIX(*gradient, i, 0) += fx;
             MATRIX(*gradient, i, 1) += fy;
         }
+
+        /* Random other nodes are repelled */
         for (igraph_integer_t j = 0; j < n_random_verices; j++) {
+            /* Get random neighbor */
             other = RNG_INTEGER(0, no_of_nodes - 1);
+            /* Obviously, you cannot repel yourself, no need for a substitute in
+             * the grand scheme of things */
             if (other == i) {
                 continue;
             }
-            igraph_real_t other_x = MATRIX(*layout, other, 0) ;
-            igraph_real_t other_y = MATRIX(*layout, other, 1) ;
-            igraph_real_t x_diff = (x - other_x);
-            igraph_real_t y_diff = (y - other_y);
-            igraph_integer_t eid;
-            igraph_real_t weight;
+            /* This repels the neighbor according to whether there is an edge
+             * and how strong it is.
+             * FIXME: I think we could just use negative sampling
+             * and "assume" it's not a strong edge... if we get it wrong we can
+             * fix it in the next iteration anyway */
             IGRAPH_CHECK(igraph_get_eid(umap_graph, &eid, i, j, 0, 0));
             if (eid == -1) {
                 weight = 0;
             } else {
                 weight = VECTOR(*umap_weights)[j];
             }
+
+            /* Get layout of random neighbor and gradient in embedding */
+            igraph_real_t other_x = MATRIX(*layout, other, 0) ;
+            igraph_real_t other_y = MATRIX(*layout, other, 1) ;
+            igraph_real_t x_diff = (x - other_x);
+            igraph_real_t y_diff = (y - other_y);
+
+
+            /* Apply repulsive force */
             IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, weight, &fx, &fy));
             MATRIX(*gradient, i, 0) -= fx;
             MATRIX(*gradient, i, 1) -= fy;
