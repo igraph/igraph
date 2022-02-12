@@ -93,7 +93,7 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *a_p, float *b_p)
+static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
 {
     /*We're fitting a and b, such that
      * (1 + a*d^2b)^-1
@@ -173,7 +173,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float sigma, float *
             /* df/db * delta */
             MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(2 * VECTOR(x)[i]);
         }
-        
+
         /* At each iteration, we want to minimize the linear approximation of the sum of squared residuals:
          *
          * sum_i (Ji @ d(a,b) -r_i)^2
@@ -448,8 +448,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t umap_weights;
     igraph_real_t min_dist = 0.01; /* This is empyrical */
-    float sigma = 1; /* TODO: this should come from the data, but let's set to 1 for now */
-    float a, b; /* The smoothing parameters given sigma and min_dist */
+    float a, b; /* The smoothing parameters given min_dist */
 
     RNG_BEGIN();
     IGRAPH_VECTOR_INIT_FINALLY(&open_set_sizes, no_of_nodes);
@@ -461,12 +460,10 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     IGRAPH_CHECK(igraph_umap_edge_weights(graph, distances, &umap_weights, &open_set_sizes,
                 &open_set_decays));
 
-    /* TODO: algo 3 will set the proper sigma */
-
     /* Skip spectral embedding for now */
 
     /* Definition 11 */
-    IGRAPH_CHECK(igraph_fit_ab(min_dist, sigma, &a, &b));
+    IGRAPH_CHECK(igraph_fit_ab(min_dist, &a, &b));
     /* Algorithm 5 */
     IGRAPH_CHECK(igraph_optimize_layout_stochastic_gradient(graph, &umap_weights, layout));
 
