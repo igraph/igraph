@@ -231,7 +231,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
         /* Improvement over GN: rough exponential line search for best delta
          * start from largest change, and keep shrinking as long as we are going down
          * */
-        for (int k = 0; k == 5 ; k++) {
+        for (int k = 0; k < 5 ; k++) {
             /* Try new parameters */
             da /= 2.0;
             db /= 2.0;
