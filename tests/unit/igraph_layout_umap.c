@@ -26,14 +26,16 @@ int main() {
     igraph_matrix_t layout;
 
     igraph_rng_seed(igraph_rng_default(), 42);
-    igraph_small(&graph, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
-    igraph_vector_init_real(&distances, 2, 1.0, 1.0);
+    igraph_small(&graph, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 0,3, 1,2, 1,3, 2,3,
+            3,4, 3,5, 4,5, -1);
+    igraph_vector_init_real(&distances, 9, 0.1, 0.1, 10.0, 0.1, 10.0, 10.0,
+            0.1, 0.1, 0.1);
 
     igraph_matrix_init(&layout, 0, 0);
 
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout) == IGRAPH_SUCCESS);
 
-    printf("layout:\n");
+    printf("layout of two clusters of 3 vertices close together:\n");
     igraph_matrix_print(&layout);
 
     VERIFY_FINALLY_STACK();
