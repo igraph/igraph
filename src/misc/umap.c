@@ -23,6 +23,7 @@
 #include "igraph_constructors.h"
 #include "igraph_layout.h"
 #include "igraph_random.h"
+#include "igraph_lapack.h"
 
 /*open set size is just the size of the distance to the closest neighbor*/
 /*the decay depends on the rest of the neighbors */
@@ -123,6 +124,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
     igraph_vector_int_t ipiv; // Pivot for LAPACK
     igraph_real_t tmp;
     igraph_vector_t powb;
+    int lapack_info;
 
     /* Distance lattice */
     IGRAPH_VECTOR_INIT_FINALLY(&x, nr_points);
@@ -134,8 +136,8 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
     IGRAPH_MATRIX_INIT_FINALLY(&jTj, 2, 2);
     IGRAPH_MATRIX_INIT_FINALLY(&jTr, 2, 1);
     /* Auxiliary vars for convenience */
-    IGRAPH_VECTOR_INIT_FINALLY(&ipiv, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&powf, nr_points);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ipiv, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&powb, nr_points);
 
     /* Distance |x-y| (this is a lattice, there are no actual x and y) */
     for (int i = 0; i < nr_points; i++) {
@@ -150,7 +152,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
         /* Residuals and sum of squared residuals at (a, b) */
         squared_sum_res = 0;
         for (int i = 0; i < nr_points; i++) {
-            tmp = 1 / (1 + a * VECTOR(powb)[i];
+            tmp = 1 / (1 + a * VECTOR(powb)[i]);
             tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
             VECTOR(residuals)[i] = tmp;
             squared_sum_res += tmp * tmp;
@@ -178,7 +180,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
          *
          * sum_i (Ji @ d(a,b) -r_i)^2
          *
-         * Purring the first derivative to zero results in a linear system of 2 equations (for a and b):
+         * Putting the first derivative to zero results in a linear system of 2 equations (for a and b):
          *
          * sum_i J_i^T @ J_i @ d(a,b) = sum_i J_i^T r_i
          * *
@@ -198,11 +200,11 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
                 for (int j2 = 0; j2 < 2; j2++) {
                     MATRIX(jTj, j1, j2) += MATRIX(jacobian, i, j1) * MATRIX(jacobian, i, j2);
                 }
-                MATRIX(jTr, j1) += MATRIX(jacobian, i, j1) * VECTOR(residuals)[i];
+                MATRIX(jTr, j1, 0) += MATRIX(jacobian, i, j1) * VECTOR(residuals)[i];
             }
         }
         /* LAPACK puts solution into jTr, sometimes with row swapping (stored in ipiv) */
-        igraph_lapack_dgesv(jTj, &ipiv, jTr, *lapack_info);
+        igraph_lapack_dgesv(&jTj, &ipiv, &jTr, &lapack_info);
 
         /* This might go wrong, in which case we should fail graciously */
         if (lapack_info > 0) {
@@ -229,7 +231,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
         /* Improvement over GN: rough exponential line search for best delta
          * start from largest change, and keep shrinking as long as we are going down
          * */
-        for (int k = 0; k = 5 ; k++) {
+        for (int k = 0; k == 5 ; k++) {
             /* Try new parameters */
             da /= 2.0;
             db /= 2.0;
