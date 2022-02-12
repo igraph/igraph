@@ -146,7 +146,6 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
     }
 
     for (int iter = 0; iter < maxiter; iter++) {
-        printf("start iteration\n");
         /* Auxiliaries vars */
         for (int i = 0; i < nr_points; i++) {
             VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * b);
@@ -247,7 +246,6 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
                 VECTOR(residuals)[i] = tmp;
                 squared_sum_res += tmp * tmp;
             }
-            printf("3: res:%f old:%f\n", squared_sum_res, squared_sum_res_old);
             /* Compare and if we are going back uphill, undo last step and break */
             if (squared_sum_res > squared_sum_res_old) {
                 da *= 2;
@@ -258,6 +256,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
                 break;
             }
         }
+        printf("squared_sum_res: %f \n", squared_sum_res);
 
     }
 
@@ -271,6 +270,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
     igraph_vector_destroy(&powb);
     IGRAPH_FINALLY_CLEAN(7);
 
+    printf("a, b: %f %f\n", a, b);
     *a_p = a;
     *b_p = b;
 
