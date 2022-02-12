@@ -33,14 +33,6 @@
 
 __BEGIN_DECLS
 
-/**
- * \def IGRAPH_SHORTEST_PATH_EPSILON
- *
- * Relative error threshold used in weighted shortest path calculations
- * to decide whether two shortest paths are of equal length.
- */
-#define IGRAPH_SHORTEST_PATH_EPSILON 1e-10
-
 /*
  * Compiler-related hacks, mostly because of Microsoft Visual C++
  */
@@ -79,9 +71,6 @@ double igraph_fmin(double a, double b);
     #define M_LN_SQRT_2PI   0.918938533204672741780329736406 /* log(sqrt(2*pi))
     == log(2*pi)/2 */
 #endif
-
-IGRAPH_PRIVATE_EXPORT int igraph_almost_equals(double a, double b, double eps);
-IGRAPH_PRIVATE_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
 
 __END_DECLS
 

@@ -22,6 +22,7 @@
 */
 
 #include "igraph_types.h"
+#include "igraph_nongraph.h"
 
 #include "core/math.h"
 
@@ -269,7 +270,7 @@ int igraph_is_neginf(double x) {
  * \return nonzero if the two floats are nearly equal to each other within
  *         the given level of tolerance, zero otherwise
  */
-int igraph_almost_equals(double a, double b, double eps) {
+igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
 }
 
