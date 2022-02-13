@@ -254,7 +254,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     running = 1;
     while (running) {
         igraph_integer_t v1, num_neis;
-        igraph_real_t max_count;
+        igraph_integer_t max_count;
         igraph_vector_int_t *neis;
         igraph_vector_int_t *ineis;
         igraph_bool_t was_zero;
@@ -272,7 +272,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             /* Count the weights corresponding to different labels */
             igraph_vector_int_clear(&dominant_labels);
             igraph_vector_int_clear(&nonzero_labels);
-            max_count = 0.0;
+            max_count = 0;
             if (weights) {
                 ineis = igraph_inclist_get(&il, v1);
                 num_neis = igraph_vector_int_size(ineis);
