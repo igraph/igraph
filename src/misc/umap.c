@@ -94,6 +94,21 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     return IGRAPH_SUCCESS;
 }
 
+igraph_error_t igraph_get_residuals(igraph_vector_t *residuals, igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a, igraph_real_t b, igraph_vector_t *powb, igraph_vector_t *x, igraph_real_t min_dist)
+{
+    igraph_real_t tmp;
+
+    *squared_sum_res = 0;
+    for (int i = 0; i < nr_points; i++) {
+        VECTOR(*powb)[i] = powf(VECTOR(*x)[i], 2 * b);
+        tmp = 1 / (1 + a * VECTOR(*powb)[i]);
+        tmp -= VECTOR(*x)[i] <= min_dist ? 1 : exp(-(VECTOR(*x)[i] - min_dist));
+        VECTOR(*residuals)[i] = tmp;
+        *squared_sum_res += tmp * tmp;
+    }
+    return (IGRAPH_SUCCESS);
+}
+
 /* FIXME this fnuction should be static after we made sure it works */
 igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
 {
@@ -148,18 +163,7 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
     }
 
     for (int iter = 0; iter < maxiter; iter++) {
-        /* Auxiliaries vars */
-        for (int i = 0; i < nr_points; i++) {
-            VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * b);
-        }
-        /* Residuals and sum of squared residuals at (a, b) */
-        squared_sum_res = 0;
-        for (int i = 0; i < nr_points; i++) {
-            tmp = 1 / (1 + a * VECTOR(powb)[i]);
-            tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
-            VECTOR(residuals)[i] = tmp;
-            squared_sum_res += tmp * tmp;
-        }
+        igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a, b, &powb, &x, min_dist);
 
         /* break if good fit (conergence to truth) */
         if (squared_sum_res < tol * tol) {
@@ -241,29 +245,16 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
          * start from largest change, and keep shrinking as long as we are going down
          * */
         squared_sum_res_old = squared_sum_res;
-        squared_sum_res = 0;
-        for (int i = 0; i < nr_points; i++) {
-            VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * (b + db));
-            tmp = 1 / (1 + (a + da) * VECTOR(powb)[i]);
-            tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
-            VECTOR(residuals)[i] = tmp;
-            squared_sum_res += tmp * tmp;
-        }
+        igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist);
+
         printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old, squared_sum_res);
         for (int k = 0; k < 10; k++) {
             /* Try new parameters */
             da /= 2.0;
             db /= 2.0;
             squared_sum_res_tmp = squared_sum_res;
-            /* Compute new sum of squared residuals */
-            squared_sum_res = 0;
-            for (int i = 0; i < nr_points; i++) {
-                VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * (b + db));
-                tmp = 1 / (1 + (a + da) * VECTOR(powb)[i]);
-                tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
-                VECTOR(residuals)[i] = tmp;
-                squared_sum_res += tmp * tmp;
-            }
+            igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist);
+
             /* Compare and if we are going back uphill, undo last step and break */
             printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k, squared_sum_res_old, squared_sum_res);
             if (squared_sum_res > squared_sum_res_tmp) {
