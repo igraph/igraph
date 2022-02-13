@@ -35,9 +35,9 @@ int main() {
     igraph_matrix_init(&layout, 0, 0);
 
 
-    IGRAPH_CHECK(igraph_fit_ab(1, &a, &b));
+    //IGRAPH_CHECK(igraph_fit_ab(1, &a, &b));
     
-    //IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout) == IGRAPH_SUCCESS);
 
     printf("layout of two clusters of 3 vertices close together:\n");
     igraph_matrix_print(&layout);

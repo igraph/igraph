@@ -163,12 +163,12 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
 
         /* break if good fit (conergence to truth) */
         if (squared_sum_res < tol * tol) {
-            printf("good convergence\n");
+            printf("convergence to zero (wow!)\n");
             break;
         }
         /* break if no change (convergence) */
         if ((iter > 0) && fabs(sqrt(squared_sum_res_old) - sqrt(squared_sum_res)) < tol) {
-            printf("bad convergence\n");
+            printf("no-change absolute convergence\n");
             break;
         }
 
@@ -428,14 +428,38 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     return IGRAPH_SUCCESS;
 }
 
+
+static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t *cross_entropy) {
+
+    igraph_real_t weight;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+    /* Measure the (variable part of the) cross-entropy terms for debugging:
+     * 1. - sum_edge_e mu(e) * log(nu(e))
+     * 2. + sum_edge_e (1 - mu(e)) * log(1 - nu(e))
+     * */
+    *cross_entropy = 0;
+    for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
+        weight = VECTOR(*umap_weights)[i];
+
+    return IGRAPH_SUCCESS;
+}
+
+
 static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
         igraph_matrix_t *layout) {
-    igraph_integer_t epochs = 5000;
+    igraph_integer_t epochs = 5; //FIXME
     igraph_real_t learning_rate = 1;
     igraph_matrix_t gradient;
+    igraph_real_t cross_entropy, cross_entropy_old;
     igraph_layout_random(umap_graph, layout);
     IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
+    /* Measure the (variable part of the) cross-entropy terms for debugging:
+     * 1. - sum_edge_e mu(e) * log(nu(e))
+     * 2. + sum_edge_e (1 - mu(e)) * log(1 - nu(e))
+     * */
+    igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
     for (igraph_integer_t e = 0; e < epochs; e++) {
         /* Compute (stochastic) gradient */
         igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, a, b);
@@ -449,6 +473,12 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
 
         /* Shift the layout by the delta */
         igraph_matrix_sub(layout, &gradient);
+
+        /* Recompute CE and check how it's going*/
+        cross_entropy_old = cross_entropy;
+        igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
+
+        printf("Cross-entropy before shift: %f, after shift: %f\n", cross_entropy_old, cross_entropy);
 
         //printf("layout:\n");
         //igraph_matrix_print(layout);
