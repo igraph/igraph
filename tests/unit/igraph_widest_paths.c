@@ -499,12 +499,8 @@ int main() {
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     check_and_print_matrices(&res1, &res2);
 
-    igraph_vector_destroy(&w);
-    igraph_vs_destroy(&to);
-    igraph_vs_destroy(&from);
-    igraph_matrix_destroy(&res2);
-    igraph_matrix_destroy(&res1);
-    igraph_destroy(&g);
+    destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
+                &vertices2, &edges2);
 
     /* ==================================================================== */
     /* 13. 7 Node Wikipedia Graph                                           */
