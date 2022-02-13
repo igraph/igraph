@@ -346,7 +346,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
     igraph_integer_t from, to;
-    igraph_real_t from_x, from_y, to_x, to_y, x_diff, y_diff, fx, fy, weight;
+    igraph_real_t from_x, from_y, to_x, to_y, x_diff, y_diff, fx, fy;
 
 
     /* TODO: what should we use for the number of random vertices?
@@ -429,7 +429,7 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
         IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
         /* Find distance in layout space */
         dx = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
-        dy = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1)); 
+        dy = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1));
         sqdist = dx * dx + dy * dy;
         /* Find probability associated with distance using fitted Phi */
         /* NOT 2 * b since it's already squared */
