@@ -341,89 +341,71 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b)
+static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b, igraph_real_t prob)
 {
-    /* TODO: we should sample the edges ranomly, instead of taking them all */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
-    igraph_vector_int_t eids;
-    igraph_real_t fx, fy;
-    igraph_integer_t eid;
-    igraph_real_t weight;
+    igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
+    igraph_integer_t from, to;
+    igraph_real_t from_x, from_y, to_x, to_y, x_diff, y_diff, fx, fy, weight;
 
 
     /* TODO: what should we use for the number of random vertices?
-     * this is called "negative sampling" and it should be probably computed at every iteration
+     * might/should change at every iteration?
      * */
     igraph_integer_t n_random_verices = sqrt(no_of_nodes);
-    igraph_integer_t other;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
 
-        /* Initialize the gradient for this vertex */
+    /* Zero the gradient */
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         MATRIX(*gradient, i, 0) = 0;
         MATRIX(*gradient, i, 1) = 0;
+    }
 
-        /* Current coordinates of the vertex */
-        igraph_real_t x = MATRIX(*layout, i, 0);
-        igraph_real_t y = MATRIX(*layout, i, 1);
-
-
-        /* Edges that contact this vertex are attracted */
-        igraph_incident(umap_graph, &eids, i, IGRAPH_ALL);
-        for (igraph_integer_t j = 0; j < igraph_vector_int_size(&eids); j++) {
-            /* Get neighboring vertex */
-            igraph_integer_t eid = VECTOR(eids)[j];
-            other = IGRAPH_OTHER(umap_graph, eid, i);
-
-            /* Coordinates of the neighbor */
-            igraph_real_t other_x = MATRIX(*layout, other, 0) ;
-            igraph_real_t other_y = MATRIX(*layout, other, 1) ;
-
-            /* Gradient in embedding space */
-            igraph_real_t x_diff = (x - other_x);
-            igraph_real_t y_diff = (y - other_y);
-
-            /* Apply attractive force since they are neighbors */
-            IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], a, b, &fx, &fy));
-            MATRIX(*gradient, i, 0) += fx;
-            MATRIX(*gradient, i, 1) += fy;
+    /* iterate over a random subsample of edges */
+    for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
+        if (RNG_UNIF01() > prob) {
+            continue;
         }
 
-        /* Random other nodes are repelled */
+        IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
+
+        /* Current coordinates of both vertices */
+        from_x = MATRIX(*layout, from, 0);
+        from_y = MATRIX(*layout, from, 1);
+        to_x = MATRIX(*layout, to, 0) ;
+        to_y = MATRIX(*layout, to, 1) ;
+
+        /* Distance in embedding space */
+        x_diff = from_x - to_x;
+        y_diff = from_y - to_y;
+
+        /* Apply attractive force since they are neighbors */
+        IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[eid], a, b, &fx, &fy));
+        /* FIXME: Is this correct? Or the other way? */
+        MATRIX(*gradient, from, 0) += fx;
+        MATRIX(*gradient, from, 1) += fy;
+
+        /* Random other nodes are repelled from one (the first) vertex */
         for (igraph_integer_t j = 0; j < n_random_verices; j++) {
-            /* Get random neighbor */
-            other = RNG_INTEGER(0, no_of_nodes - 1);
-            /* Obviously, you cannot repel yourself, no need for a substitute in
-             * the grand scheme of things */
-            if (other == i) {
-                continue;
-            }
-            /* This repels the neighbor according to whether there is an edge
-             * and how strong it is.
-             * FIXME: I think we could just use negative sampling
-             * and "assume" it's not a strong edge... if we get it wrong we can
-             * fix it in the next iteration anyway */
-            IGRAPH_CHECK(igraph_get_eid(umap_graph, &eid, i, j, 0, 0));
-            if (eid == -1) {
-                weight = 0;
-            } else {
-                weight = VECTOR(*umap_weights)[j];
+            /* Get random neighbor, obviously you cannot repel yourself */
+            to = RNG_INTEGER(0, no_of_nodes - 2);
+            if (to >= from) {
+                to++;
             }
 
             /* Get layout of random neighbor and gradient in embedding */
-            igraph_real_t other_x = MATRIX(*layout, other, 0) ;
-            igraph_real_t other_y = MATRIX(*layout, other, 1) ;
-            igraph_real_t x_diff = (x - other_x);
-            igraph_real_t y_diff = (y - other_y);
+            to_x = MATRIX(*layout, to, 0) ;
+            to_y = MATRIX(*layout, to, 1) ;
+            x_diff = from_x - to_x;
+            y_diff = from_y - to_y;
 
-
-            /* Apply repulsive force */
-            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, weight, a, b, &fx, &fy));
-            MATRIX(*gradient, i, 0) -= fx;
-            MATRIX(*gradient, i, 1) -= fy;
+            /* Apply repulsive force FIXME: check sign */
+            /* This repels the other vertex assuming it's a negative example
+             * that is no weight, no edge */
+            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, 0, a, b, &fx, &fy));
+            MATRIX(*gradient, from, 0) += fx;
+            MATRIX(*gradient, from, 1) += fy;
         }
     }
-    igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
@@ -467,9 +449,12 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
         igraph_matrix_t *layout) {
     igraph_integer_t epochs = 5; //FIXME
     igraph_real_t learning_rate = 1;
+    igraph_real_t sampling_prob = 1.0; // between 0 and 1, fraction of edges sampled for gradient at each epoch
     igraph_matrix_t gradient;
     igraph_real_t cross_entropy, cross_entropy_old;
     igraph_layout_random(umap_graph, layout);
+
+    /* Initialize gradient */
     IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
@@ -479,7 +464,7 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
     igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
     for (igraph_integer_t e = 0; e < epochs; e++) {
         /* Compute (stochastic) gradient */
-        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, a, b);
+        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, a, b, sampling_prob);
 
         //printf("gradient:\n");
         //igraph_matrix_print(&gradient);
@@ -487,6 +472,8 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
 
         /* Delta is the gradient times the current (decreasing) learning rate */
         igraph_matrix_scale(&gradient, learning_rate);
+        /* FIXME: Perhaps a sign? */
+        igraph_matrix_scale(&gradient, -1);
 
         /* Shift the layout by the delta */
         igraph_matrix_sub(layout, &gradient);
