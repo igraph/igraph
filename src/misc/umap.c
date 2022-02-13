@@ -94,7 +94,8 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
+/* FIXME this fnuction should be static after we made sure it works */
+igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
 {
     /*We're fitting a and b, such that
      * (1 + a*d^2b)^-1
@@ -108,14 +109,15 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
      /* Make a lattice from 0 to this distance */
     igraph_integer_t nr_points = 100;
     igraph_real_t end_point = min_dist*30; /* Need to sample decently around the kink I guess? */
-    /* Initial values */
-    igraph_real_t a = 1.;
+    /* Initial values: a^-2b is the point where f(x) = 0.5, so around min_dist
+     * Therefore, initial a is 1/sqrt(min_dist) */
     igraph_real_t b = 1.;
+    igraph_real_t a = 1. / sqrt(min_dist);
     /* deltas */
     igraph_real_t da, db;
     /* Residuals */
     igraph_vector_t residuals;
-    igraph_real_t squared_sum_res, squared_sum_res_old;
+    igraph_real_t squared_sum_res, squared_sum_res_old, squared_sum_res_tmp;
     /* Needed for the Gauss-Newton search */
     igraph_matrix_t jacobian, jTj, jTr;
     igraph_real_t tol = 0.001;
@@ -161,10 +163,12 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
 
         /* break if good fit (conergence to truth) */
         if (squared_sum_res < tol * tol) {
+            printf("good convergence\n");
             break;
         }
         /* break if no change (convergence) */
         if ((iter > 0) && fabs(sqrt(squared_sum_res_old) - sqrt(squared_sum_res)) < tol) {
+            printf("bad convergence\n");
             break;
         }
 
@@ -229,14 +233,28 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
             db = MATRIX(jTr, 1, 0);
         }
 
+        /* FIXME: perhaps wrong sign? */
+        da *= -1;
+        db *= -1;
+
         /* Improvement over GN: rough exponential line search for best delta
          * start from largest change, and keep shrinking as long as we are going down
          * */
-        for (int k = 0; k < 5 ; k++) {
+        squared_sum_res_old = squared_sum_res;
+        squared_sum_res = 0;
+        for (int i = 0; i < nr_points; i++) {
+            VECTOR(powb)[i] = powf(VECTOR(x)[i], 2 * (b + db));
+            tmp = 1 / (1 + (a + da) * VECTOR(powb)[i]);
+            tmp -= VECTOR(x)[i] <= min_dist ? 1 : exp(-(VECTOR(x)[i] - min_dist));
+            VECTOR(residuals)[i] = tmp;
+            squared_sum_res += tmp * tmp;
+        }
+        printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old, squared_sum_res);
+        for (int k = 0; k < 10; k++) {
             /* Try new parameters */
             da /= 2.0;
             db /= 2.0;
-            squared_sum_res_old = squared_sum_res;
+            squared_sum_res_tmp = squared_sum_res;
             /* Compute new sum of squared residuals */
             squared_sum_res = 0;
             for (int i = 0; i < nr_points; i++) {
@@ -247,16 +265,18 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
                 squared_sum_res += tmp * tmp;
             }
             /* Compare and if we are going back uphill, undo last step and break */
-            if (squared_sum_res > squared_sum_res_old) {
+            printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k, squared_sum_res_old, squared_sum_res);
+            if (squared_sum_res > squared_sum_res_tmp) {
                 da *= 2;
                 db *= 2;
-                /* set the current sum of squared residuals to check for convergence
-                 * at the beginning of the next GN iteration */
-                squared_sum_res_old = squared_sum_res;
                 break;
             }
         }
-        printf("squared_sum_res: %f \n", squared_sum_res);
+        printf("end of line search and iteration, squared_sum_res: %f \n\n", squared_sum_res);
+
+        /* assign a, b*/
+        a += da;
+        b += db;
 
     }
 
@@ -279,7 +299,7 @@ static igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b
 }
 
 /*xd is difference in x direction, w is a weight */
-static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
+static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     /* the paper says on page 16: "where a and b are hyper-parameters",
      * which I understood to mean that it cannot be inferred from the data.
@@ -297,8 +317,6 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
      * I guess? I'll just fit them at some random points
      * TODO:
      * we should do non-linear least squares fitting for a and b */
-    igraph_real_t a = 1; //hyperparameter
-    igraph_real_t b = 1; //hyperparameter
     igraph_real_t dsq;
     igraph_real_t force;
 
@@ -310,10 +328,8 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
 }
 
 /*xd is difference in x direction, w is a weight */
-static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t *force_x, igraph_real_t *force_y)
+static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
-    igraph_real_t a = 1; //hyperparameter
-    igraph_real_t b = 1; //hyperparameter
     igraph_real_t dsq;
     igraph_real_t force;
     igraph_real_t epsilon = 0.001;
@@ -325,7 +341,7 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights)
+static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b)
 {
     /* TODO: we should sample the edges ranomly, instead of taking them all */
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
@@ -368,7 +384,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             igraph_real_t y_diff = (y - other_y);
 
             /* Apply attractive force since they are neighbors */
-            IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], &fx, &fy));
+            IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[j], a, b, &fx, &fy));
             MATRIX(*gradient, i, 0) += fx;
             MATRIX(*gradient, i, 1) += fy;
         }
@@ -402,7 +418,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
 
 
             /* Apply repulsive force */
-            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, weight, &fx, &fy));
+            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, weight, a, b, &fx, &fy));
             MATRIX(*gradient, i, 0) -= fx;
             MATRIX(*gradient, i, 1) -= fy;
         }
@@ -412,7 +428,7 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights,
+static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
         igraph_matrix_t *layout) {
     igraph_integer_t epochs = 5000;
     igraph_real_t learning_rate = 1;
@@ -422,7 +438,7 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
         /* Compute (stochastic) gradient */
-        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights);
+        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, a, b);
 
         //printf("gradient:\n");
         //igraph_matrix_print(&gradient);
@@ -470,7 +486,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     /* Definition 11 */
     IGRAPH_CHECK(igraph_fit_ab(min_dist, &a, &b));
     /* Algorithm 5 */
-    IGRAPH_CHECK(igraph_optimize_layout_stochastic_gradient(graph, &umap_weights, layout));
+    IGRAPH_CHECK(igraph_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b, layout));
 
     igraph_vector_destroy(&open_set_sizes);
     igraph_vector_destroy(&open_set_decays);
