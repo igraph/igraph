@@ -406,7 +406,6 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             MATRIX(*gradient, from, 1) += fy;
         }
     }
-    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
