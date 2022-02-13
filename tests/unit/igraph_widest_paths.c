@@ -122,22 +122,22 @@ void print_results(igraph_integer_t n, igraph_matrix_t *res1, igraph_matrix_t *r
 }
 
 /* confirm that all widest paths algorithms fail */
-void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1,
+void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res,
                         igraph_vs_t *from, igraph_vs_t *to,
                         igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
                         igraph_vector_int_t *predecessors, igraph_vector_int_t *inbound_edges,
                         igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
-    CHECK_ERROR(igraph_widest_paths_dijkstra(/* graph */ g, res1,
-                            *from, *to, /* weights */ NULL,
+    CHECK_ERROR(igraph_widest_paths_dijkstra(/* graph */ g, res,
+                            *from, *to, /* weights */ w,
                             /* mode */ IGRAPH_OUT), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_widest_paths_floyd_warshall(/* graph */ g, res1,
-                            *from, *to, /* weights */ NULL,
+    CHECK_ERROR(igraph_widest_paths_floyd_warshall(/* graph */ g, res,
+                            *from, *to, /* weights */ w,
                             /* mode */ IGRAPH_OUT), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_get_widest_paths(/* graph */ g, vertices, edges,
-                            /* from */ 0, *to, /* weights */ NULL, /* mode */ IGRAPH_OUT,
+                            /* from */ 0, *to, /* weights */ w, /* mode */ IGRAPH_OUT,
                             predecessors, inbound_edges), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_get_widest_path(/* graph */ g, vertices2, edges2,
-                            /* from */ 0, /* to */ 2, /* weights */ NULL,
+                            /* from */ 0, /* to */ 2, /* weights */ w,
                             /* mode */ IGRAPH_OUT), IGRAPH_EINVAL);
 }
 
@@ -156,10 +156,10 @@ void run_get_widest_paths(igraph_t *g, igraph_vector_t *w,
                         igraph_vector_int_t *predecessors, igraph_vector_int_t *inbound_edges,
                         igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
     IGRAPH_ASSERT(igraph_get_widest_paths(/* graph */ g, vertices, edges,
-                    /* from */ 0, /* to */ *to, /* weights */ w, mode,
+                    /* from */ source, /* to */ *to, /* weights */ w, mode,
                     predecessors, inbound_edges) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_get_widest_path(/* graph */ g, vertices2, edges2,
-                    /* from */ 0, /* to */ 0, /* weights */ w, mode) == IGRAPH_SUCCESS);
+                    /* from */ source, /* to */ destination, /* weights */ w, mode) == IGRAPH_SUCCESS);
 }
 
 
@@ -324,7 +324,7 @@ int main() {
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 3, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     IGRAPH_ASSERT(MATRIX(res1, 0, 3) == IGRAPH_NEGINFINITY);
@@ -350,7 +350,7 @@ int main() {
 
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 2, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
@@ -376,7 +376,7 @@ int main() {
 
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 1, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     IGRAPH_ASSERT(MATRIX(res1, 0, 1) == 10.0);
@@ -402,7 +402,7 @@ int main() {
 
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 1, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     IGRAPH_ASSERT(MATRIX(res1, 0, 1) == 1.0);
@@ -429,7 +429,7 @@ int main() {
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_IN);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_IN,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 1, &to, IGRAPH_IN,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     IGRAPH_ASSERT(MATRIX(res1, 0, 1) == 200.0);
@@ -456,7 +456,7 @@ int main() {
 
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 7, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     check_and_print_matrices(&res1, &res2);
@@ -490,10 +490,13 @@ int main() {
 
     igraph_matrix_init(&res1, 5, 5);
     igraph_matrix_init(&res2, 5, 5);
-    igraph_vs_seq(&from, 0, 4);
-    igraph_vs_seq(&to, 0, 4);
+    igraph_vs_seq(&from, 0, n-1);
+    igraph_vs_seq(&to, 0, n-1);
 
+    init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 4, &to, IGRAPH_OUT,
+                            &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     check_and_print_matrices(&res1, &res2);
 
     igraph_vector_destroy(&w);
@@ -549,7 +552,7 @@ int main() {
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 2, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
@@ -574,7 +577,7 @@ int main() {
     init_vertices_and_edges(n, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
-    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 0, &to, IGRAPH_OUT,
+    run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 4, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 

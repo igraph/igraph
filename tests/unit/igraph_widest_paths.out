@@ -31,7 +31,7 @@ path to node 3:
 predecessors:  ( 0 0 1 -1 )
 inbound_edges: ( -1 1 2 -1 )
 
-vertex path:   ( 0 )
+vertex path:   ( )
 edge path:     ( )
 
 
@@ -51,8 +51,8 @@ path to node 2:
 predecessors:  ( 0 0 1 )
 inbound_edges: ( -1 1 2 )
 
-vertex path:   ( 0 )
-edge path:     ( )
+vertex path:   ( 0 1 2 )
+edge path:     ( 1 2 )
 
 
 === 8. Testing Multiple Edges ===
@@ -68,8 +68,8 @@ path to node 1:
 predecessors:  ( 0 0 )
 inbound_edges: ( -1 3 )
 
-vertex path:   ( 0 )
-edge path:     ( )
+vertex path:   ( 0 1 )
+edge path:     ( 3 )
 
 
 === 9. Testing Directed Graphs ===
@@ -85,8 +85,8 @@ path to node 1:
 predecessors:  ( 0 0 )
 inbound_edges: ( -1 4 )
 
-vertex path:   ( 0 )
-edge path:     ( )
+vertex path:   ( 0 1 )
+edge path:     ( 4 )
 
 
 === 10. Testing Mode ===
@@ -102,8 +102,8 @@ path to node 1:
 predecessors:  ( 0 0 )
 inbound_edges: ( -1 5 )
 
-vertex path:   ( 0 )
-edge path:     ( )
+vertex path:   ( 0 1 )
+edge path:     ( 5 )
 
 
 === 11. Testing Multiple Widest Paths ===
@@ -127,32 +127,32 @@ inbound_edges:
 [ 40.000000 46.000000 40.000000 Inf 31.000000 29.000000 29.000000 ]
 
 path to node 0:
-  vertices: ( 0 )
-  edges:    ( )
+  vertices: ( 3 1 2 0 )
+  edges:    ( 3 2 1 )
 path to node 1:
-  vertices: ( 0 2 1 )
-  edges:    ( 1 2 )
+  vertices: ( 3 1 )
+  edges:    ( 3 )
 path to node 2:
-  vertices: ( 0 2 )
-  edges:    ( 1 )
+  vertices: ( 3 1 2 )
+  edges:    ( 3 2 )
 path to node 3:
-  vertices: ( 0 2 1 3 )
-  edges:    ( 1 2 3 )
+  vertices: ( 3 )
+  edges:    ( )
 path to node 4:
-  vertices: ( 0 2 4 )
-  edges:    ( 1 4 )
+  vertices: ( 3 1 2 4 )
+  edges:    ( 3 2 4 )
 path to node 5:
-  vertices: ( 0 2 4 5 )
-  edges:    ( 1 4 8 )
+  vertices: ( 3 1 2 4 5 )
+  edges:    ( 3 2 4 8 )
 path to node 6:
-  vertices: ( 0 2 4 5 6 )
-  edges:    ( 1 4 8 10 )
+  vertices: ( 3 1 2 4 5 6 )
+  edges:    ( 3 2 4 8 10 )
 
-predecessors:  ( 0 2 0 1 2 4 5 )
-inbound_edges: ( -1 2 1 3 4 8 10 )
+predecessors:  ( 2 3 1 3 2 4 5 )
+inbound_edges: ( 1 3 2 -1 4 8 10 )
 
-vertex path:   ( 0 )
-edge path:     ( )
+vertex path:   ( 3 1 2 4 5 6 )
+edge path:     ( 3 2 4 8 10 )
 
 
 === 14. Testing Negative Weights ===
@@ -174,8 +174,8 @@ path to node 3:
 predecessors:  ( 0 0 3 0 )
 inbound_edges: ( -1 0 3 2 )
 
-vertex path:   ( 0 )
-edge path:     ( )
+vertex path:   ( 0 1 2 )
+edge path:     ( 0 1 )
 
 
 === 15. Testing Disconnected Graphs ===
@@ -204,6 +204,6 @@ path to node 4:
 predecessors:  ( 0 2 0 -1 -1 )
 inbound_edges: ( -1 1 2 -1 -1 )
 
-vertex path:   ( 0 )
+vertex path:   ( )
 edge path:     ( )
 
