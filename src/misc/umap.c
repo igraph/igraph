@@ -138,7 +138,6 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
     igraph_real_t tol = 0.001;
     igraph_real_t maxiter = 100;
     /* Auxiliary vars */
-    igraph_vector_int_t ipiv; // Pivot for LAPACK
     igraph_real_t tmp;
     igraph_vector_t powb;
     int lapack_info;
@@ -153,15 +152,36 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
     IGRAPH_MATRIX_INIT_FINALLY(&jTj, 2, 2);
     IGRAPH_MATRIX_INIT_FINALLY(&jTr, 2, 1);
     /* Auxiliary vars for convenience */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ipiv, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&powb, nr_points);
 
-    printf("start fit_ab\n");
     /* Distance |x-y| (this is a lattice, there are no actual x and y) */
     for (int i = 0; i < nr_points; i++) {
         VECTOR(x)[i] = (end_point / nr_points) * i + 0.001; /* added a 0.001 to prevent NaNs */
     }
 
+    //printf("start guess ab\n");
+    //squared_sum_res_old = 10000000;
+    //da = 0.1; db = 0.1;
+    //for(int i = 0; i < nr_points; i++) {
+    //    for(int j = 0; j < nr_points; j++) {
+    //        a = min_dist / 30 * (i+1);
+    //        b = 0.1 * (j + 1);
+    //        igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a, b, &powb, &x, min_dist);
+    //        if (squared_sum_res < squared_sum_res_old) {
+    //            printf("lower SSR: %f, a = %f, b = %f\n", squared_sum_res, a, b);
+    //            da = a;
+    //            db = b;
+    //            squared_sum_res_old = squared_sum_res;
+    //        }
+    //    }
+    //}
+    //a = da;
+    //b = db;
+    //printf("guess SSR: %f, a = %f, b = %f\n", squared_sum_res_old, a, b);
+    //b = 1.;
+    //a = 1. / sqrt(min_dist);
+
+    printf("start fit_ab\n");
     for (int iter = 0; iter < maxiter; iter++) {
         igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a, b, &powb, &x, min_dist);
 
@@ -179,10 +199,8 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
         /* Jacobian (first derivatives) of squared residuals at (a, b) */
         for (int i = 0; i < nr_points; i++) {
             tmp = 1 + a * VECTOR(powb)[i];
-            /* df/da * delta */
             MATRIX(jacobian, i, 0) = - 2 * VECTOR(powb)[i] / tmp / tmp;
-            /* df/db * delta */
-            MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(2 * VECTOR(x)[i]);
+            MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(VECTOR(x)[i]) * 2;
         }
 
         /* At each iteration, we want to minimize the linear approximation of the sum of squared residuals:
@@ -204,6 +222,8 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
          * This can be solved for d(a,b) using LAPACK within igraph
          * */
         /* Compute A and B, i.e. J^T @ J and J^T @ r */
+        MATRIX(jTj, 0, 0) = MATRIX(jTj, 0, 1) = MATRIX(jTj, 1, 0) = MATRIX(jTj, 1, 1) = 0;
+        MATRIX(jTr, 0, 0) = MATRIX(jTr, 1, 0) = 0;
         for (int i = 0; i < nr_points; i++) {
             for (int j1 = 0; j1 < 2; j1++) {
                 for (int j2 = 0; j2 < 2; j2++) {
@@ -212,34 +232,23 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
                 MATRIX(jTr, j1, 0) += MATRIX(jacobian, i, j1) * VECTOR(residuals)[i];
             }
         }
-        /* LAPACK puts solution into jTr, sometimes with row swapping (stored in ipiv) */
-        igraph_lapack_dgesv(&jTj, &ipiv, &jTr, &lapack_info);
+        /* LAPACK puts solution into jTr */
+        IGRAPH_CHECK(igraph_lapack_dgesv(&jTj, 0, &jTr, &lapack_info));
 
         /* This might go wrong, in which case we should fail graciously */
-        if (lapack_info > 0) {
+        if (lapack_info != 0) {
             igraph_vector_destroy(&x);
             igraph_vector_destroy(&residuals);
             igraph_matrix_destroy(&jacobian);
             igraph_matrix_destroy(&jTj);
             igraph_matrix_destroy(&jTr);
-            igraph_vector_int_destroy(&ipiv);
             igraph_vector_destroy(&powb);
-            IGRAPH_FINALLY_CLEAN(7);
+            IGRAPH_FINALLY_CLEAN(6);
             IGRAPH_ERROR("Singular matrix in the estimation of a and b for UMAP",  IGRAPH_EINVAL);
         }
 
-        /* Assign deltas (LAPACK can swap rows of the solution for convenience) */
-        if (VECTOR(ipiv)[0] == 1) {
-            da = MATRIX(jTr, 1, 0);
-            db = MATRIX(jTr, 0, 0);
-        } else {
-            da = MATRIX(jTr, 0, 0);
-            db = MATRIX(jTr, 1, 0);
-        }
-
-        /* FIXME: perhaps wrong sign? */
-        da *= -1;
-        db *= -1;
+        da = -MATRIX(jTr, 0, 0);
+        db = -MATRIX(jTr, 1, 0);
 
         /* Improvement over GN: rough exponential line search for best delta
          * start from largest change, and keep shrinking as long as we are going down
@@ -248,7 +257,7 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
         igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist);
 
         printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old, squared_sum_res);
-        for (int k = 0; k < 10; k++) {
+        for (int k = 0; k < 30; k++) {
             /* Try new parameters */
             da /= 2.0;
             db /= 2.0;
@@ -256,8 +265,8 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
             igraph_get_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist);
 
             /* Compare and if we are going back uphill, undo last step and break */
-            printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k, squared_sum_res_old, squared_sum_res);
-            if (squared_sum_res > squared_sum_res_tmp) {
+            printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k, squared_sum_res_tmp, squared_sum_res);
+            if (squared_sum_res > squared_sum_res_tmp - tol) {
                 da *= 2;
                 db *= 2;
                 break;
@@ -277,9 +286,8 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
     igraph_matrix_destroy(&jacobian);
     igraph_matrix_destroy(&jTj);
     igraph_matrix_destroy(&jTr);
-    igraph_vector_int_destroy(&ipiv);
     igraph_vector_destroy(&powb);
-    IGRAPH_FINALLY_CLEAN(7);
+    IGRAPH_FINALLY_CLEAN(6);
 
     printf("a, b: %f %f\n", a, b);
     *a_p = a;
