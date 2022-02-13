@@ -431,9 +431,9 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
 
 static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t *cross_entropy) {
 
-    igraph_real_t mu, nu, sqdist;
+    igraph_real_t mu, nu, dx, dy, sqdist;
     igraph_integer_t from, to;
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
      * 1. - sum_edge_e mu(e) * log(nu(e))
@@ -441,13 +441,14 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
      * */
     *cross_entropy = 0;
     for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
-        mu = VECTOR(*umap_weights)[i];
+        mu = VECTOR(*umap_weights)[eid];
 
         /* Find vertices */
         IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
         /* Find distance in layout space */
-        sqdist = (MATRIX(layout, from, 0) - MATRIX(layout, to, 0)) * (MATRIX(layout, from, 0) - MATRIX(layout, to, 0)); 
-        sqdist += (MATRIX(layout, from, 1) - MATRIX(layout, to, 1)) * (MATRIX(layout, from, 1) - MATRIX(layout, to, 1)); 
+        dx = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
+        dy = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1)); 
+        sqdist = dx * dx + dy * dy;
         /* Find probability associated with distance using fitted Phi */
         /* NOT 2 * b since it's already squared */
         nu = 1.0 / (1 + a * powf(sqdist, b));
