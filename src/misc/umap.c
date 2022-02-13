@@ -263,7 +263,7 @@ igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
                 break;
             }
         }
-        printf("end of line search and iteration, squared_sum_res: %f \n\n", squared_sum_res);
+        printf("end of line search and iteration, squared_sum_res: %f \n\n", squared_sum_res_tmp);
 
         /* assign a, b*/
         a += da;
@@ -442,7 +442,7 @@ static igraph_error_t igraph_optimize_layout_stochastic_gradient(igraph_t *umap_
     igraph_real_t sampling_prob = 1.0; // between 0 and 1, fraction of edges sampled for gradient at each epoch
     igraph_matrix_t gradient;
     igraph_real_t cross_entropy, cross_entropy_old;
-    igraph_layout_random(umap_graph, layout);
+
 
     /* Initialize gradient */
     IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
@@ -505,7 +505,8 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     IGRAPH_CHECK(igraph_umap_edge_weights(graph, distances, &umap_weights, &open_set_sizes,
                 &open_set_decays));
 
-    /* Skip spectral embedding for now */
+    /* Skip spectral embedding for now, initialize at random */
+    igraph_layout_random(graph, layout);
 
     /* Definition 11 */
     IGRAPH_CHECK(igraph_fit_ab(min_dist, &a, &b));
