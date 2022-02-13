@@ -52,11 +52,14 @@ static igraph_error_t igraph_umap_find_open_sets(igraph_t *knn_graph,
             }
         }
         /* TODO: according to the paper finding the decay (sigma) should be
-         * done with a binary search? */
+         * done with a binary search?
+         * FIXME: The current approach is just plain incorrect and leads to
+         * negative decays */
         for (igraph_integer_t j = 1; j < igraph_vector_int_size(&eids); j++) {
             sum += exp(VECTOR(*open_set_sizes)[i] - VECTOR(*distances)[VECTOR(eids)[j]]);
         }
         VECTOR(*open_set_decays)[i] = log(sum / l2k);
+        printf("decay: %f\n", VECTOR(*open_set_decays)[i]);
     }
     igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(1);
@@ -70,7 +73,7 @@ igraph_error_t igraph_umap_decay(igraph_real_t *probability, igraph_real_t dista
         *probability = 1.0;
         return (IGRAPH_SUCCESS);
     }
-    *probability = exp(open_set_size - distance / open_set_decay);
+    *probability = exp((open_set_size - distance) / open_set_decay);
     return (IGRAPH_SUCCESS);
 }
 
@@ -85,7 +88,8 @@ static igraph_error_t igraph_umap_edge_weights(igraph_t *graph, igraph_vector_t 
     igraph_vector_resize(umap_weights, igraph_vector_size(distances));
     igraph_vector_null(umap_weights);
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {
-        IGRAPH_CHECK(igraph_umap_decay(&weight,  VECTOR(*distances)[i],  VECTOR(*open_set_sizes)[i], VECTOR(*open_set_decays)[i]));
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        IGRAPH_CHECK(igraph_umap_decay(&weight,  VECTOR(*distances)[i],  VECTOR(*open_set_sizes)[from], VECTOR(*open_set_decays)[from]));
         weight_previous = VECTOR(*umap_weights)[i];
         weight = weight + weight_previous - weight * weight_previous;
         VECTOR(*umap_weights)[i] = weight;
