@@ -130,7 +130,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_bool_t unlabelled_left;
     igraph_neimode_t reversed_mode;
 
-    igraph_vector_int_t label_counters, dominant_labels, nonzero_labels, node_order;
+    igraph_vector_int_t label_counters, dominant_labels, nonzero_labels, new_labels, node_order;
 
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
      * away the constness, and promise ourselves that we will make a proper
@@ -237,6 +237,9 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&dominant_labels, 2));
 
+    /* Create storage space for new labels */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&new_labels, no_of_not_fixed_nodes);
+
     /* Initialize node ordering vector with only the not fixed nodes */
     if (fixed_copy) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
@@ -265,7 +268,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
 
         RNG_BEGIN();
-        /* In the prescribed order, loop over the vertices and reassign labels */
+        /* In the prescribed order, loop over the vertices and choose new labels */
         for (i = 0; i < no_of_not_fixed_nodes; i++) {
             v1 = VECTOR(node_order)[i];
 
@@ -323,11 +326,13 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                 k = RNG_INTEGER(0, igraph_vector_int_size(&dominant_labels) - 1);
                 k = VECTOR(dominant_labels)[k];
                 /* Check if the _current_ label of the node is also dominant */
-                if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
+                if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] < max_count) {
                     /* Nope, we need at least one more iteration */
                     running = 1;
                 }
-                VECTOR(*membership)[v1] = k;
+                VECTOR(new_labels)[i] = k;
+            } else {
+                VECTOR(new_labels)[i] = -1; 
             }
 
             /* Clear the nonzero elements in label_counters */
@@ -336,6 +341,20 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                 VECTOR(label_counters)[VECTOR(nonzero_labels)[j]] = 0;
             }
         }
+
+        /* If we are going to do next iteration */
+        if (running) {
+            /* In the prescribed order, loop over the vertices and reassign labels */
+            for (i = 0; i < no_of_not_fixed_nodes; i++) {
+                printf("%ld ",VECTOR(new_labels)[i]);
+                v1 = VECTOR(node_order)[i];
+                if (VECTOR(new_labels)[i] != -1) {
+                    VECTOR(*membership)[v1] = VECTOR(new_labels)[i];
+                }
+            }
+            printf("\n");
+        }
+
         RNG_END();
     }
 
@@ -430,7 +449,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_vector_int_destroy(&label_counters);
     igraph_vector_int_destroy(&dominant_labels);
     igraph_vector_int_destroy(&nonzero_labels);
-    IGRAPH_FINALLY_CLEAN(4);
+    igraph_vector_int_destroy(&new_labels);
+    IGRAPH_FINALLY_CLEAN(5);
 
     if (fixed != fixed_copy) {
         igraph_vector_bool_destroy(fixed_copy);
