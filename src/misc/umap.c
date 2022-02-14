@@ -410,9 +410,12 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
 
     /* NOTE: in practice, in negative sampling mu is always zero because we
      * *assume* the sample to be negative i.e. never a true edge */
+    // FIXME: probably the force was already correct, but just in case
     //force = (1 - mu) * (-2 * b) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
     phi = 1.0 / (1.0 + a * pow(dsq, b));
     force = (1 - mu) * (2 * a * b * pow(dsq, b - 1)) * phi * phi / (1 - phi);
+    // FIXME: OMG, this makes the cross-entropy descent monotonic!!
+    force = 0.2;
     *force_x = force * xd;
     *force_y = force * yd;
 
@@ -430,11 +433,14 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
     igraph_integer_t from, to;
     igraph_real_t from_x, from_y, to_x, to_y, x_diff, y_diff, fx, fy;
 
+    // FIXME
+    igraph_vector_int_t neis;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     /* TODO: what should we use for the number of random vertices?
      * might/should change at every iteration?
      * */
-    igraph_integer_t n_random_verices = sqrt(no_of_nodes);
+    igraph_integer_t n_random_vertices = sqrt(no_of_nodes);
 
     /* Zero the gradient */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
@@ -466,12 +472,29 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
         MATRIX(*gradient, from, 1) += fy;
 
         /* Random other nodes are repelled from one (the first) vertex */
-        for (igraph_integer_t j = 0; j < n_random_verices; j++) {
+        for (igraph_integer_t j = 0; j < n_random_vertices; j++) {
             /* Get random neighbor, obviously you cannot repel yourself */
             to = RNG_INTEGER(0, no_of_nodes - 2);
             if (to >= from) {
                 to++;
             }
+            /* FIXME: for now, avoid repelling neighbors */
+            /* This is terribly inefficient, but just for testing anyway */
+            int skip = 0;
+            igraph_incident(umap_graph, &neis, from, IGRAPH_ALL);
+            for (int k = 0; k < igraph_vector_int_size(&neis); k++) {
+                igraph_integer_t eid2 = VECTOR(neis)[k];
+                igraph_integer_t from2, to2;
+                igraph_edge(umap_graph, eid2, &from2, &to2);
+                if (((from2 == from) && (to2 == to)) || ((from2 == to) && (from == to2))) {
+                    skip = 1;
+                    break;
+                }
+            }
+            if (skip == 1) {
+                continue;
+            }
+
 
             /* Get layout of random neighbor and gradient in embedding */
             to_x = MATRIX(*layout, to, 0) ;
@@ -487,6 +510,10 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             MATRIX(*gradient, from, 1) += fy;
         }
     }
+
+    igraph_vector_int_destroy(&neis);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -494,7 +521,7 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
         igraph_matrix_t *layout) {
     igraph_integer_t epochs = 50; //FIXME
     igraph_real_t learning_rate = 1;
-    igraph_real_t sampling_prob = 1.0; // between 0 and 1, fraction of edges sampled for gradient at each epoch
+    igraph_real_t sampling_prob = 0.2; // between 0 and 1, fraction of edges sampled for gradient at each epoch
     igraph_matrix_t gradient;
     igraph_real_t cross_entropy, cross_entropy_old;
 
@@ -516,12 +543,12 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
         /* Compute (stochastic) gradient */
         igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, a, b, sampling_prob);
 
+        /* Delta is the gradient times the current (decreasing) learning rate */
+        igraph_matrix_scale(&gradient, learning_rate / 10);
+
         //printf("gradient:\n");
         //igraph_matrix_print(&gradient);
         //printf("\n");
-
-        /* Delta is the gradient times the current (decreasing) learning rate */
-        igraph_matrix_scale(&gradient, learning_rate);
 
         /* Shift the layout by the delta: the forces already have the right directions,
          * i.e. towards neighbors and away from strangers */
