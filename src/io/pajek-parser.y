@@ -347,6 +347,12 @@ arcsdefs: /* empty */ | arcsdefs arcsline;
 arcsline: NEWLINE |
           arcfrom arcto { context->actedge++;
                           context->mode=2; } weight edgeparams NEWLINE  {
+  if ($1 < 1) {
+      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
+  }
+  if ($2 < 1) {
+      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $2);
+  }
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
@@ -363,6 +369,12 @@ edgesdefs: /* empty */ | edgesdefs edgesline;
 edgesline: NEWLINE |
           edgefrom edgeto { context->actedge++;
                             context->mode=2; } weight edgeparams NEWLINE {
+  if ($1 < 1) {
+      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
+  }
+  if ($2 < 1) {
+      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $2);
+  }
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;

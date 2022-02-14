@@ -25,13 +25,13 @@
 
 int doit(igraph_t *g) {
 
-    igraph_vector_ptr_t blocks;
+    igraph_vector_int_list_t blocks;
     igraph_vector_int_t cohesion;
     igraph_vector_int_t parent;
     igraph_t block_tree;
     igraph_integer_t i;
 
-    igraph_vector_ptr_init(&blocks, 0);
+    igraph_vector_int_list_init(&blocks, 0);
     igraph_vector_int_init(&cohesion, 0);
     igraph_vector_int_init(&parent, 0);
 
@@ -39,12 +39,10 @@ int doit(igraph_t *g) {
                            &block_tree);
 
     printf("Blocks:\n");
-    for (i = 0; i < igraph_vector_ptr_size(&blocks); i++) {
-        igraph_vector_int_t *sg = VECTOR(blocks)[i];
+    for (i = 0; i < igraph_vector_int_list_size(&blocks); i++) {
+        igraph_vector_int_t *sg = igraph_vector_int_list_get_ptr(&blocks, i);
         printf("  ");
         igraph_vector_int_print(sg);
-        igraph_vector_int_destroy(sg);
-        igraph_free(sg);
     }
     printf("Cohesion:\n  ");
     igraph_vector_int_print(&cohesion);
@@ -53,7 +51,7 @@ int doit(igraph_t *g) {
     printf("Block graph:\n");
     igraph_write_graph_edgelist(&block_tree, stdout);
 
-    igraph_vector_ptr_destroy(&blocks);
+    igraph_vector_int_list_destroy(&blocks);
     igraph_vector_int_destroy(&cohesion);
     igraph_vector_int_destroy(&parent);
     igraph_destroy(&block_tree);

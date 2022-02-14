@@ -115,7 +115,6 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_multiple_t multiple;
-    igraph_vector_int_t dummy;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
@@ -135,9 +134,11 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlis
  * result is stored in the adjacency list and no further query
  * operations are needed when the neighbors of the same vertex are
  * queried again.
+ *
  * \param al The lazy adjacency list.
  * \param no The vertex ID to query.
- * \return Pointer to a vector. It is allowed to modify it and
+ * \return Pointer to a vector, or \c NULL upon error.
+ *   It is safe to modify this vector,
  *   modification does not affect the original graph.
  *
  * Time complexity: O(d), the number of neighbor vertices for the
@@ -153,7 +154,6 @@ typedef struct igraph_lazy_inclist_t {
     igraph_integer_t length;
     igraph_vector_int_t **incs;
     igraph_neimode_t mode;
-    igraph_vector_int_t dummy;
     igraph_loops_t loops;
 } igraph_lazy_inclist_t;
 
@@ -173,9 +173,11 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  * result is stored in the incidence list and no further query
  * operations are needed when the incident edges of the same vertex are
  * queried again.
+ *
  * \param al The lazy incidence list object.
  * \param no The vertex ID to query.
- * \return Pointer to a vector. It is allowed to modify it and
+ * \return Pointer to a vector, or \c NULL upon error.
+ *   It is safe to modify this vector,
  *   modification does not affect the original graph.
  *
  * Time complexity: O(d), the number of incident edges for the first

@@ -25,11 +25,12 @@
 #define IGRAPH_COMMUNITY_H
 
 #include "igraph_decls.h"
+
+#include "igraph_arpack.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
-#include "igraph_arpack.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
@@ -204,7 +205,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_leading_eigenvector(const igraph_t
                                                        igraph_real_t *modularity,
                                                        igraph_bool_t start,
                                                        igraph_vector_t *eigenvalues,
-                                                       igraph_vector_ptr_t *eigenvectors,
+                                                       igraph_vector_list_t *eigenvectors,
                                                        igraph_vector_t *history,
                                                        igraph_community_leading_eigenvector_callback_t *callback,
                                                        void *callback_extra);

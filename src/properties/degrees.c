@@ -353,11 +353,12 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 
 /**
  * \function igraph_strength
- * Strength of the vertices, weighted vertex degree in other words.
+ * \brief Strength of the vertices, also called weighted vertex degree.
  *
  * In a weighted network the strength of a vertex is the sum of the
  * weights of all incident edges. In a non-weighted network this is
  * exactly the vertex degree.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *   here. It will be resized as needed.
@@ -365,7 +366,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * \param mode Gives whether to count only outgoing (\c IGRAPH_OUT),
  *   incoming (\c IGRAPH_IN) edges or both (\c IGRAPH_ALL).
  * \param loops A logical scalar, whether to count loop edges as well.
- * \param weights A vector giving the edge weights. If this is a NULL
+ * \param weights A vector giving the edge weights. If this is a \c NULL
  *   pointer, then \ref igraph_degree() is called to perform the
  *   calculation.
  * \return Error code.
@@ -400,7 +401,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));

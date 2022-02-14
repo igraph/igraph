@@ -37,7 +37,7 @@
  * of its vertices where each vertex comes before all nodes to which it has
  * edges. Every DAG has at least one topological sort, and may have many.
  * This function returns one possible topological sort among them. If the
- * graph is not acyclic (it has at least one cycle), an error is raised.
+ * graph contains any cycles that are not self-loops, an error is raised.
  *
  * \param graph The input graph.
  * \param res Pointer to a vector, the result will be stored here.
@@ -125,7 +125,7 @@ igraph_error_t igraph_topological_sorting(
 
 /**
  * \function igraph_is_dag
- * Checks whether a graph is a directed acyclic graph (DAG) or not.
+ * \brief Checks whether a graph is a directed acyclic graph (DAG).
  *
  * </para><para>
  * A directed acyclic graph (DAG) is a directed graph with no cycles.

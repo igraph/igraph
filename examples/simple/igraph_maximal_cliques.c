@@ -38,15 +38,13 @@ void permutation(igraph_vector_int_t *vec) {
     }
 }
 
-int sort_cmp(const void *a, const void *b) {
-    const igraph_vector_int_t **da = (const igraph_vector_int_t **) a;
-    const igraph_vector_int_t **db = (const igraph_vector_int_t **) b;
-    igraph_integer_t i, alen = igraph_vector_int_size(*da), blen = igraph_vector_int_size(*db);
+int sort_cmp(const igraph_vector_int_t *a, const igraph_vector_int_t *b) {
+    igraph_integer_t i, alen = igraph_vector_int_size(a), blen = igraph_vector_int_size(b);
     if (alen != blen) {
         return (alen < blen) - (alen > blen);
     }
     for (i = 0; i < alen; i++) {
-        igraph_integer_t ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
+        igraph_integer_t ea = VECTOR(*a)[i], eb = VECTOR(*b)[i];
         if (ea != eb) {
             return (ea > eb) - (ea < eb);
         }
@@ -54,24 +52,21 @@ int sort_cmp(const void *a, const void *b) {
     return 0;
 }
 
-void sort_cliques(igraph_vector_ptr_t *cliques) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(cliques);
+void sort_cliques(igraph_vector_int_list_t *cliques) {
+    igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_vector_int_sort(v);
     }
-    igraph_qsort(VECTOR(*cliques), (size_t) n,
-                 sizeof(igraph_vector_t *), sort_cmp);
+    igraph_vector_int_list_sort(cliques, sort_cmp);
 }
 
-void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
-    int i;
+void print_cliques(igraph_vector_int_list_t *cliques) {
+    igraph_integer_t i;
     sort_cliques(cliques);
-    for (i = 0; i < igraph_vector_ptr_size(cliques); i++) {
-        igraph_vector_int_t *v = VECTOR(*cliques)[i];
+    for (i = 0; i < igraph_vector_int_list_size(cliques); i++) {
+        igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(cliques, i);
         igraph_vector_int_print(v);
-        igraph_vector_int_destroy(v);
-        igraph_free(v);
     }
 }
 
@@ -79,7 +74,7 @@ int main() {
 
     igraph_t g, g2, cli;
     igraph_vector_int_t perm;
-    igraph_vector_ptr_t cliques;
+    igraph_vector_int_list_t cliques;
     igraph_integer_t no;
     igraph_integer_t i;
 
@@ -112,23 +107,23 @@ int main() {
 
     /* Find the maximal cliques */
 
-    igraph_vector_ptr_init(&cliques, 0);
+    igraph_vector_int_list_init(&cliques, 0);
     igraph_maximal_cliques(&g, &cliques, /*min_size=*/ 3,
                            /*max_size=*/ 0 /*no limit*/);
     igraph_maximal_cliques_count(&g, &no, /*min_size=*/ 3,
                                  /*max_size=*/ 0 /*no limit*/);
 
-    if (no != igraph_vector_ptr_size(&cliques)) {
+    if (no != igraph_vector_int_list_size(&cliques)) {
         return 1;
     }
 
-    /* Print and destroy them */
+    /* Print them */
 
-    print_and_destroy_cliques(&cliques);
+    print_cliques(&cliques);
 
     /* Clean up */
 
-    igraph_vector_ptr_destroy(&cliques);
+    igraph_vector_int_list_destroy(&cliques);
     igraph_destroy(&g);
 
     /* Build a triangle with a loop (thanks to Emmanuel Navarro) */
@@ -137,23 +132,23 @@ int main() {
 
     /* Find the maximal cliques */
 
-    igraph_vector_ptr_init(&cliques, 0);
+    igraph_vector_int_list_init(&cliques, 0);
     igraph_maximal_cliques(&g, &cliques, /*min_size=*/ 3,
                            /*max_size=*/ 0 /*no limit*/);
     igraph_maximal_cliques_count(&g, &no, /*min_size=*/ 3,
                                  /*max_size=*/ 0 /*no limit*/);
 
-    if (no != igraph_vector_ptr_size(&cliques)) {
+    if (no != igraph_vector_int_list_size(&cliques)) {
         return 2;
     }
 
-    /* Print and destroy them */
+    /* Print them */
 
-    print_and_destroy_cliques(&cliques);
+    print_cliques(&cliques);
 
     /* Clean up */
 
-    igraph_vector_ptr_destroy(&cliques);
+    igraph_vector_int_list_destroy(&cliques);
     igraph_destroy(&g);
 
     return 0;

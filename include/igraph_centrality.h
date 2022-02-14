@@ -70,11 +70,11 @@ IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igra
 IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
                                                  igraph_bool_t directed,
                                                  const igraph_vector_t *weights, igraph_real_t cutoff);
-IGRAPH_EXPORT int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                                             const igraph_vs_t vids, igraph_bool_t directed,
                                             const igraph_vs_t sources, const igraph_vs_t targets,
                                             const igraph_vector_t *weights);
-IGRAPH_EXPORT int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                                             const igraph_es_t eids, igraph_bool_t directed,
                                             const igraph_vs_t sources, const igraph_vs_t targets,
                                             const igraph_vector_t *weights);

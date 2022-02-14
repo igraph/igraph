@@ -22,22 +22,16 @@
 */
 
 #ifdef IGRAPH_MC_ORIG
-#define RESTYPE igraph_vector_ptr_t *res
+#define RESTYPE igraph_vector_int_list_t *res
 #define RESNAME res
 #define SUFFIX
 #define RECORD do {                         \
-        igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t);      \
-        if (!cl) {                              \
-            IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
-        }                                   \
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));             \
-        IGRAPH_CHECK(igraph_vector_int_copy(cl, R));                   \
+        IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R));     \
     } while (0)
-#define FINALLY do {                    \
-        igraph_vector_ptr_clear(res);           \
-        IGRAPH_FINALLY(igraph_i_maximal_cliques_free, res); \
+#define PREPARE do {                    \
+        igraph_vector_int_list_clear(res);           \
     } while (0)
-#define CLEANUP do { IGRAPH_FINALLY_CLEAN(1); } while (0) /* res */
+#define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
@@ -47,7 +41,7 @@
     #define RESNAME res
     #define SUFFIX _count
     #define RECORD (*res)++
-    #define FINALLY *res=0;
+    #define PREPARE *res=0;
     #define CLEANUP
     #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
     #define FOR_LOOP_OVER_VERTICES_PREPARE
@@ -58,7 +52,7 @@
     #define RESNAME res
     #define SUFFIX _file
     #define RECORD igraph_vector_int_fprint(R, res)
-    #define FINALLY
+    #define PREPARE
     #define CLEANUP
     #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
     #define FOR_LOOP_OVER_VERTICES_PREPARE
@@ -67,31 +61,25 @@
 #ifdef IGRAPH_MC_FULL
 #define RESTYPE                 \
     igraph_vector_int_t *subset,            \
-    igraph_vector_ptr_t *res,           \
+    igraph_vector_int_list_t *res,           \
     igraph_integer_t *no,           \
     FILE *outfile
 #define RESNAME subset, res, no, outfile
 #define SUFFIX _subset
 #define RECORD do {                         \
         if (res) {                                \
-            igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t);      \
-            if (!cl) {                              \
-                IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);   \
-            }                                   \
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));             \
-            IGRAPH_CHECK(igraph_vector_int_copy(cl, R));                    \
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R));      \
         }                                 \
         if (no) { (*no)++; }                              \
         if (outfile) { igraph_vector_int_fprint(R, outfile); }        \
     } while (0)
-#define FINALLY do {                        \
-        if (res) {                            \
-            igraph_vector_ptr_clear(res);               \
-            IGRAPH_FINALLY(igraph_i_maximal_cliques_free_full, res);    \
+#define PREPARE do {                        \
+        if (res) {                                 \
+            igraph_vector_int_list_clear(res);     \
         }                             \
         if (no) { *no=0; }                        \
     } while (0)
-#define CLEANUP do { if(res) { IGRAPH_FINALLY_CLEAN(1); } } while (0) /* res */
+#define CLEANUP
 #define FOR_LOOP_OVER_VERTICES                  \
     nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;    \
     for (ii=0; ii<nn; ii++)
@@ -120,7 +108,7 @@
             IGRAPH_ERROR("Cannot list maximal cliques", cliquehandler_retval); \
         } \
     } while (0)
-#define FINALLY
+#define PREPARE
 #define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
@@ -146,44 +134,12 @@
         } \
         VECTOR(*hist)[clsize-1] += 1; \
     } while (0)
-#define FINALLY \
+#define PREPARE \
     igraph_vector_clear(hist); \
-    igraph_vector_reserve(hist, 50); /* initially reserve space for 50 elements */
+    IGRAPH_CHECK(igraph_vector_reserve(hist, 50)); /* initially reserve space for 50 elements */
 #define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE
-#endif
-
-#ifdef IGRAPH_MC_ORIG
-static void igraph_i_maximal_cliques_free(void *ptr) {
-    igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
-    igraph_integer_t i, n = igraph_vector_ptr_size(res);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*res)[i];
-        if (v) {
-            IGRAPH_FREE(v);
-            igraph_vector_int_destroy(v);
-        }
-    }
-    igraph_vector_ptr_clear(res);
-}
-#endif
-
-#ifdef IGRAPH_MC_FULL
-static void igraph_i_maximal_cliques_free_full(void *ptr) {
-    if (ptr) {
-        igraph_vector_ptr_t *res = (igraph_vector_ptr_t*) ptr;
-        igraph_integer_t i, n = igraph_vector_ptr_size(res);
-        for (i = 0; i < n; i++) {
-            igraph_vector_int_t *v = VECTOR(*res)[i];
-            if (v) {
-                IGRAPH_FREE(v);
-                igraph_vector_int_destroy(v);
-            }
-        }
-        igraph_vector_ptr_clear(res);
-    }
-}
 #endif
 
 static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
@@ -294,7 +250,7 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&pos, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nextv, 100);
 
-    FINALLY;
+    PREPARE;
 
     FOR_LOOP_OVER_VERTICES {
         igraph_integer_t v;
@@ -409,7 +365,7 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
 #undef RESNAME
 #undef SUFFIX
 #undef RECORD
-#undef FINALLY
+#undef PREPARE
 #undef CLEANUP
 #undef FOR_LOOP_OVER_VERTICES
 #undef FOR_LOOP_OVER_VERTICES_PREPARE

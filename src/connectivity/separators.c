@@ -314,13 +314,14 @@ static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlis
     return IGRAPH_SUCCESS;
 }
 
-static igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps,
-                                                const igraph_vector_int_t *newc) {
+static igraph_bool_t igraph_i_separators_is_not_seen_yet(
+    const igraph_vector_int_list_t *comps, const igraph_vector_int_t *newc
+) {
 
-    igraph_integer_t co, nocomps = igraph_vector_ptr_size(comps);
+    igraph_integer_t co, nocomps = igraph_vector_int_list_size(comps);
 
     for (co = 0; co < nocomps; co++) {
-        igraph_vector_int_t *act = VECTOR(*comps)[co];
+        igraph_vector_int_t *act = igraph_vector_int_list_get_ptr(comps, co);
         if (igraph_vector_int_all_e(act, newc)) {
             return 0;
         }
@@ -330,7 +331,7 @@ static igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps
     return 1;
 }
 
-static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
+static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separators,
                                      const igraph_adjlist_t *adjlist,
                                      igraph_vector_int_t *components,
                                      igraph_vector_int_t *leaveout,
@@ -370,32 +371,12 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_ptr_t *separators,
         UPDATEMARK();
 
         /* Add it to the list of separators, if it is new */
-
-        if (igraph_i_separators_newsep(separators, sorter)) {
-            igraph_vector_int_t *newc = IGRAPH_CALLOC(1, igraph_vector_int_t);
-            if (!newc) {
-                IGRAPH_ERROR("Cannot calculate minimal separators", IGRAPH_ENOMEM);
-            }
-            IGRAPH_FINALLY(igraph_free, newc);
-            igraph_vector_int_copy(newc, sorter);
-            IGRAPH_FINALLY(igraph_vector_int_destroy, newc);
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(separators, newc));
-            IGRAPH_FINALLY_CLEAN(2);
+        if (igraph_i_separators_is_not_seen_yet(separators, sorter)) {
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(separators, sorter));
         }
     } /* while cptr < complen */
 
     return IGRAPH_SUCCESS;
-}
-
-static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(separators);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *vec = VECTOR(*separators)[i];
-        if (vec) {
-            igraph_vector_int_destroy(vec);
-            IGRAPH_FREE(vec);
-        }
-    }
 }
 
 /**
@@ -442,8 +423,9 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
  * \example examples/simple/igraph_minimal_separators.c
  */
 
-igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
-                                     igraph_vector_ptr_t *separators) {
+igraph_error_t igraph_all_minimal_st_separators(
+    const igraph_t *graph, igraph_vector_int_list_t *separators
+) {
 
     /*
      * Some notes about the tricks used here. For finding the components
@@ -475,8 +457,7 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     igraph_dqueue_int_t Q;
     igraph_vector_int_t sorter;
 
-    igraph_vector_ptr_clear(separators);
-    IGRAPH_FINALLY(igraph_i_separators_free, separators);
+    igraph_vector_int_list_clear(separators);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&leaveout, no_of_nodes);
     IGRAPH_CHECK(igraph_vector_bool_init(&already_tried, 0));
@@ -522,17 +503,20 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
      * basis and see if they generate more separators
      */
 
-    while (try_next < igraph_vector_ptr_size(separators)) {
-        igraph_vector_int_t *basis = VECTOR(*separators)[try_next];
-        igraph_integer_t b, basislen = igraph_vector_int_size(basis);
+    while (try_next < igraph_vector_int_list_size(separators)) {
+        /* copy "basis" out of the vector_list because we are going to
+         * mutate the vector_list later, and this can potentially invalidate
+         * the pointer */
+        igraph_vector_int_t basis = *(igraph_vector_int_list_get_ptr(separators, try_next));
+        igraph_integer_t b, basislen = igraph_vector_int_size(&basis);
         for (b = 0; b < basislen; b++) {
 
             /* Remove N(x) U basis */
-            igraph_integer_t x = VECTOR(*basis)[b];
+            igraph_integer_t x = VECTOR(basis)[b];
             igraph_vector_int_t *neis = igraph_adjlist_get(&adjlist, x);
             igraph_integer_t i, n = igraph_vector_int_size(neis);
             for (i = 0; i < basislen; i++) {
-                igraph_integer_t sn = VECTOR(*basis)[i];
+                igraph_integer_t sn = VECTOR(basis)[i];
                 VECTOR(leaveout)[sn] = mark;
             }
             for (i = 0; i < n; i++) {
@@ -561,39 +545,41 @@ igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
     igraph_vector_int_destroy(&components);
     igraph_vector_bool_destroy(&already_tried);
     igraph_vector_int_destroy(&leaveout);
-    IGRAPH_FINALLY_CLEAN(7);  /* +1 for separators */
+    IGRAPH_FINALLY_CLEAN(6);
 
     return IGRAPH_SUCCESS;
 }
 
 #undef UPDATEMARK
 
-static igraph_error_t igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
-                                                   igraph_vector_ptr_t *new) {
+static igraph_error_t igraph_i_minimum_size_separators_append(
+    igraph_vector_int_list_t *old, igraph_vector_int_list_t *new
+) {
 
-    igraph_integer_t olen = igraph_vector_ptr_size(old);
-    igraph_integer_t nlen = igraph_vector_ptr_size(new);
-    igraph_integer_t i;
+    igraph_integer_t olen = igraph_vector_int_list_size(old);
+    igraph_integer_t j;
 
-    for (i = 0; i < nlen; i++) {
-        igraph_vector_int_t *newvec = VECTOR(*new)[i];
-        igraph_integer_t j;
+    while (!igraph_vector_int_list_empty(new)) {
+        igraph_vector_int_t *newvec = igraph_vector_int_list_tail_ptr(new);
+
+        /* Check whether the separator is already in `old' */
         for (j = 0; j < olen; j++) {
-            igraph_vector_int_t *oldvec = VECTOR(*old)[j];
+            igraph_vector_int_t *oldvec = igraph_vector_int_list_get_ptr(old, j);
             if (igraph_vector_int_all_e(oldvec, newvec)) {
                 break;
             }
         }
+
         if (j == olen) {
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(old, newvec));
+            /* We have found a new separator, append it to `old' */
+            /* TODO: we should have a more efficient method for moving a vector
+             * from one vector_list to another */
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(old, newvec));
             olen++;
-        } else {
-            igraph_vector_int_destroy(newvec);
-            igraph_free(newvec);
         }
-        VECTOR(*new)[i] = 0;
+
+        igraph_vector_int_list_discard_back(new);
     }
-    igraph_vector_ptr_clear(new);
 
     return IGRAPH_SUCCESS;
 }
@@ -623,19 +609,6 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(p);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*p)[i];
-        if (v) {
-            igraph_vector_int_destroy(v);
-            igraph_free(v);
-            VECTOR(*p)[i] = 0;
-        }
-    }
-    igraph_vector_ptr_destroy(p);
-}
-
 /**
  * \function igraph_minimum_size_separators
  * \brief Find all minimum size separating vertex sets.
@@ -649,13 +622,10 @@ static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  * a graph, Networks 23, 533--541, 1993.
  *
  * \param graph The input graph, which must be undirected.
- * \param separators An initialized pointer vector, the separators
+ * \param separators An initialized list of integer vectors, the separators
  *        are stored here. It is a list of pointers to igraph_vector_int_t
  *        objects. Each vector will contain the IDs of the vertices in
- *        the separator.
- *        To free all memory allocated for \c separators, you need call
- *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
- *        each element, before destroying the pointer vector itself.
+ *        the separator. The separators are returned in an arbitrary order.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -663,8 +633,9 @@ static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  * \example examples/simple/igraph_minimum_size_separators.c
  */
 
-igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
-                                   igraph_vector_ptr_t *separators) {
+igraph_error_t igraph_minimum_size_separators(
+    const igraph_t *graph, igraph_vector_int_list_t *separators
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -683,8 +654,7 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    igraph_vector_ptr_clear(separators);
-    IGRAPH_FINALLY(igraph_i_separators_free, separators);
+    igraph_vector_int_list_clear(separators);
 
     /* ---------------------------------------------------------------- */
     /* 1 Find the vertex connectivity of 'graph' */
@@ -694,46 +664,31 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
     /* Special cases for low connectivity, two exits here! */
     if (conn == 0) {
         /* Nothing to do */
-        IGRAPH_FINALLY_CLEAN(1);    /* separators */
         return IGRAPH_SUCCESS;
     } else if (conn == 1) {
         igraph_vector_int_t ap;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&ap, 0);
         IGRAPH_CHECK(igraph_articulation_points(graph, &ap));
         n = igraph_vector_int_size(&ap);
-        IGRAPH_CHECK(igraph_vector_ptr_resize(separators, n));
-        igraph_vector_ptr_null(separators);
+        IGRAPH_CHECK(igraph_vector_int_list_resize(separators, n));
         for (i = 0; i < n; i++) {
-            igraph_vector_int_t *v = IGRAPH_CALLOC(1, igraph_vector_int_t);
-            if (!v) {
-                IGRAPH_ERROR("Minimum size separators failed", IGRAPH_ENOMEM);
-            }
-            IGRAPH_VECTOR_INT_INIT_FINALLY(v, 1);
-            VECTOR(*v)[0] = VECTOR(ap)[i];
-            VECTOR(*separators)[i] = v;
-            IGRAPH_FINALLY_CLEAN(1);
+            igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
+            IGRAPH_CHECK(igraph_vector_int_push_back(v, VECTOR(ap)[i]));
         }
         igraph_vector_int_destroy(&ap);
-        IGRAPH_FINALLY_CLEAN(2);    /* +1 for separators */
+        IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     } else if (conn == no_of_nodes - 1) {
-        IGRAPH_CHECK(igraph_vector_ptr_resize(separators, no_of_nodes));
-        igraph_vector_ptr_null(separators);
+        IGRAPH_CHECK(igraph_vector_int_list_resize(separators, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_vector_int_t *v = IGRAPH_CALLOC(1, igraph_vector_int_t);
-            if (!v) {
-                IGRAPH_ERROR("Cannot list minimum size separators", IGRAPH_ENOMEM);
-            }
-            IGRAPH_VECTOR_INT_INIT_FINALLY(v, no_of_nodes - 1);
+            igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
+            IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes - 1));
             for (j = 0, k = 0; j < no_of_nodes; j++) {
                 if (j != i) {
                     VECTOR(*v)[k++] = j;
                 }
             }
-            VECTOR(*separators)[i] = v;
-            IGRAPH_FINALLY_CLEAN(1);
         }
-        IGRAPH_FINALLY_CLEAN(1);    /* separators */
         return IGRAPH_SUCCESS;
     }
 
@@ -751,16 +706,7 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
     IGRAPH_CHECK(igraph_is_separator(&graph_copy, igraph_vss_vector(&X),
                                      &issepX));
     if (issepX) {
-        igraph_vector_int_t *v = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (!v) {
-            IGRAPH_ERROR("Cannot find minimal size separators", IGRAPH_ENOMEM);
-        }
-        IGRAPH_VECTOR_INT_INIT_FINALLY(v, k);
-        for (i = 0; i < k; i++) {
-            VECTOR(*v)[i] = VECTOR(X)[i];
-        }
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(separators, v));
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(separators, &X));
     }
 
     /* Create Gbar, the Even-Tarjan reduction of graph */
@@ -802,9 +748,8 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
 
                 /* ------------------------------------------------------------- */
                 /* 5-6-7. Find all k-sets separating x[i] and v[j]. */
-                igraph_vector_ptr_t stcuts;
-                IGRAPH_CHECK(igraph_vector_ptr_init(&stcuts, 0));
-                IGRAPH_FINALLY(igraph_i_separators_stcuts_free, &stcuts);
+                igraph_vector_int_list_t stcuts;
+                IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&stcuts, 0);
                 IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ 0,
                                                    /*cuts=*/ &stcuts,
                                                    /*partition1s=*/ 0,
@@ -812,9 +757,8 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
                                                    /*target=*/ j,
                                                    /*capacity=*/ &capacity));
 
-                IGRAPH_CHECK(igraph_i_minimum_size_separators_append(separators,
-                             &stcuts));
-                igraph_vector_ptr_destroy(&stcuts);
+                IGRAPH_CHECK(igraph_i_minimum_size_separators_append(separators, &stcuts));
+                igraph_vector_int_list_destroy(&stcuts);
                 IGRAPH_FINALLY_CLEAN(1);
 
             } /* if phivalue == k */
@@ -835,7 +779,7 @@ igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
     igraph_vector_destroy(&capacity);
     igraph_vector_int_destroy(&X);
     igraph_destroy(&graph_copy);
-    IGRAPH_FINALLY_CLEAN(6);  /* +1 for separators */
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }
