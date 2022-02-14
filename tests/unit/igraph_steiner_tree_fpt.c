@@ -1,4 +1,4 @@
- 
+
 /*
    IGraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
@@ -17,56 +17,54 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-int main() {
+int main()
+{
     igraph_t g_empty, g_empty_dir, g_lm;
-    
+
     igraph_vector_t steiner_terminals;
     igraph_vector_t weights_empty, weights_lm;
     igraph_integer_t dreyfus_wagner_out;
-   
 
     igraph_vector_init(&weights_empty, 0);
-    
-    igraph_vector_init(&steiner_terminals,0);
-   
-    VECTOR(steiner_terminals)[1] = 2;
-    VECTOR(steiner_terminals)[2] = 4;
 
+    igraph_vector_init(&steiner_terminals, 0);
 
-    igraph_vector_init_int(&weights_lm,0);
-    VECTOR(weights_lm)[0] = 3;
-    VECTOR(weights_lm)[1] = 1;
-    VECTOR(weights_lm)[2] = 7;
-    VECTOR(weights_lm)[3] = 5;
-    VECTOR(weights_lm)[4] = 1;
-    VECTOR(weights_lm)[5] = 2;
-    VECTOR(weights_lm)[6] = 7;
-    
-   
-    
+    VECTOR(steiner_terminals)
+    [1] = 2;
+    VECTOR(steiner_terminals)
+    [2] = 4;
+
+    igraph_vector_init_int(&weights_lm, 0);
+    VECTOR(weights_lm)
+    [0] = 3;
+    VECTOR(weights_lm)
+    [1] = 1;
+    VECTOR(weights_lm)
+    [2] = 7;
+    VECTOR(weights_lm)
+    [3] = 5;
+    VECTOR(weights_lm)
+    [4] = 1;
+    VECTOR(weights_lm)
+    [5] = 2;
+    VECTOR(weights_lm)
+    [6] = 7;
+
     igraph_small(&g_empty, 0, 0, -1);
- 
-    igraph_small(&g_lm, 5,IGRAPH_UNDIRECTED,0,1, 0,2, 1,2, 1,3, 1,4, 2,3, 3,4 -1);
 
-  
+    igraph_small(&g_lm, 5, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 3, 3, 4 - 1);
+
     printf("No vertices, not directed:\n");
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals,IGRAPH_ALL,&weights_empty ) == IGRAPH_SUCCESS);
-    
-    
-    
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals, IGRAPH_ALL, &weights_empty) == IGRAPH_SUCCESS);
+
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    igraph_error_t dreyfus_wagner_out = igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals,IGRAPH_ALL,&weights_lm);
-  
-   
-    
+    igraph_error_t dreyfus_wagner_out = igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals, IGRAPH_ALL, &weights_lm);
+
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
     igraph_vector_destroy(&weights_empty);
     igraph_vector_destroy(&weights_lm);
-  
 
     VERIFY_FINALLY_STACK();
     return 0;
 }
-
-   
