@@ -343,16 +343,23 @@ igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p
 
 }
 
-/* cross-entropy and derivatives */
+/* cross-entropy */
 static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t *cross_entropy) {
 
     igraph_real_t mu, nu, xd, yd, sqd;
     igraph_integer_t from, to;
     igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(umap_graph);
+    igraph_matrix_t edge_seen;
+
+    IGRAPH_MATRIX_INIT_FINALLY(&edge_seen, no_of_nodes, no_of_nodes);
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
      * 1. - sum_edge_e mu(e) * log(nu(e))
      * 2. - sum_edge_e (1 - mu(e)) * log(1 - nu(e))
+     * NOTE: the sum goes over the whole adjacency matrix, i.e. all potential edges,
+     * not just the actual edges. That is because otherwise there's no benefit from
+     * repelling unconnected edges.
      * */
     *cross_entropy = 0;
     for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
@@ -372,7 +379,34 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
         *cross_entropy -= mu * log(nu);
         /* Term 2*/
         *cross_entropy -= (1 - mu) * log(1 - nu);
+
+        MATRIX(edge_seen, from, to) = MATRIX(edge_seen, to, from) = 1;
     }
+    /* Add the entropy from the missing edges */
+    for (int from = 0; from < no_of_nodes; from++) {
+        for (int to = 0; to < from; to++) {
+            if (MATRIX(edge_seen, from, to) > 0) {
+                continue;
+            }
+
+            /* Find distance in layout space */
+            xd = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
+            yd = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1));
+            sqd = xd * xd + yd * yd;
+
+            /* Find probability associated with distance using fitted Phi */
+            /* NOT 2 * b since it's already squared */
+            nu = 1.0 / (1 + a * powf(sqd, b));
+
+            /* Term 2*/
+            *cross_entropy -= log(1 - nu);
+
+            MATRIX(edge_seen, from, to) = MATRIX(edge_seen, to, from) = 1;
+        }
+    }
+
+    igraph_matrix_destroy(&edge_seen);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -508,7 +542,7 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
         igraph_matrix_t *layout) {
     igraph_integer_t epochs = 500; //FIXME
     igraph_real_t learning_rate = 1;
-    igraph_real_t sampling_prob = 0.8; // between 0 and 1, fraction of edges sampled for gradient at each epoch
+    igraph_real_t sampling_prob = 0.5; // between 0 and 1, fraction of edges sampled for gradient at each epoch
     igraph_real_t cross_entropy, cross_entropy_old;
 
 
@@ -544,6 +578,30 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
 }
 
 
+igraph_error_t igraph_umap_center_layout(igraph_matrix_t *layout) {
+    igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
+    igraph_real_t xm = 0, ym = 0;
+
+    /* Compute center */
+    xm = 0;
+    ym = 0;
+    for (int i = 0; i < no_of_nodes; i++) {
+        xm += MATRIX(*layout, i, 0);
+        ym += MATRIX(*layout, i, 1);
+    }
+    xm /= no_of_nodes;
+    ym /= no_of_nodes;
+
+    /* Shift vertices */
+    for (int i = 0; i < no_of_nodes; i++) {
+        MATRIX(*layout, i, 0) -= xm;
+        MATRIX(*layout, i, 1) -= ym;
+    }
+
+    return (IGRAPH_SUCCESS);
+}
+
+
 igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, igraph_matrix_t *layout) {
 
 
@@ -570,6 +628,9 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
 
     /* Algorithm 5 */
     IGRAPH_CHECK(igraph_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b, layout));
+
+    /* Center layout */
+    IGRAPH_CHECK(igraph_umap_center_layout(layout));
 
     igraph_vector_destroy(&umap_weights);
     IGRAPH_FINALLY_CLEAN(1);
