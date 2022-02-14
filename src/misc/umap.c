@@ -33,9 +33,9 @@ igraph_error_t igraph_umap_find_sigma(igraph_t *graph, igraph_vector_t *distance
 
     igraph_real_t sigma = 1;
     igraph_real_t sigma_new, sum;
-    igraph_real_t tol = 0.1;
-    igraph_integer_t maxiter = 10;
-    igraph_integer_t no_of_neis = igraph_vector_int_size(&eids);
+    igraph_real_t tol = 0.01;
+    igraph_integer_t maxiter = 100;
+    igraph_integer_t no_of_neis = igraph_vector_int_size(eids);
     igraph_integer_t eid;
     igraph_real_t step = sigma;
     int seen_max = 0;
@@ -47,6 +47,8 @@ igraph_error_t igraph_umap_find_sigma(igraph_t *graph, igraph_vector_t *distance
             eid = VECTOR(*eids)[j];
             sum += exp(-(VECTOR(*distances)[eid] - rho) / sigma);
         }
+
+        printf("SIGMA function (i = %d, no_of_neis = %d)- sum: %f, target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
 
         /* Adjust sigma FIXME: this is strictly a little optimistic? */
         if (sum < target) {
@@ -65,7 +67,7 @@ igraph_error_t igraph_umap_find_sigma(igraph_t *graph, igraph_vector_t *distance
         }
 
         /* Check for convergence */
-        if (fabs(step) < tol) {
+        if (fabs(sum - target) < tol) {
             break;
         }
     }
@@ -100,7 +102,6 @@ igraph_error_t igraph_umap_find_prob_graph(const igraph_t *graph, const igraph_v
     /* Iterate over vertices x, like in the paper */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         /* Edges into this vertex */
-        igraph_vector_int_clear(&eids); // Do we need this?
         igraph_incident(graph, &eids, i, IGRAPH_ALL);
         no_of_neis = igraph_vector_int_size(&eids);
 
@@ -342,30 +343,83 @@ igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p
 
 }
 
-/*xd is difference in x direction, w is a weight */
-static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
-{
-    igraph_real_t dsq;
-    igraph_real_t force;
+/* cross-entropy and derivatives */
+static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t *cross_entropy) {
 
-    dsq = xd * xd + yd * yd;
-    force = (- 2 * a * b * pow(dsq, (b - 1)) * w) / (1 + dsq);
-    *force_x = force * xd;
-    *force_y = force * yd;
+    igraph_real_t mu, nu, xd, yd, sqd;
+    igraph_integer_t from, to;
+    igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
+
+    /* Measure the (variable part of the) cross-entropy terms for debugging:
+     * 1. - sum_edge_e mu(e) * log(nu(e))
+     * 2. + sum_edge_e (1 - mu(e)) * log(1 - nu(e))
+     * */
+    *cross_entropy = 0;
+    for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
+        mu = VECTOR(*umap_weights)[eid];
+
+        /* Find vertices */
+        IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
+        /* Find distance in layout space */
+        xd = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
+        yd = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1));
+        sqd = xd * xd + yd * yd;
+        /* Find probability associated with distance using fitted Phi */
+        /* NOT 2 * b since it's already squared */
+        nu = 1.0 / (1 + a * powf(sqd, b));
+
+        /* Term 1*/
+        *cross_entropy -= mu * log(nu);
+        /* Term 2*/
+        *cross_entropy += (1 - mu) * log(1 - nu);
+    }
+
     return IGRAPH_SUCCESS;
 }
 
-/*xd is difference in x direction, w is a weight */
-static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t w, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
+/*xd is difference in x direction, mu is a weight */
+/* NOTE: mu is the probability of a true edge in high dimensions, not affected
+ * by the embedding (in particular, xd and yd), so it's a constant for the
+ * derivative/force. Same applies for the repulsion */
+static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t dsq;
     igraph_real_t force;
     igraph_real_t epsilon = 0.001;
 
     dsq = xd * xd + yd * yd;
-    force = ((-2 * b) * (1 - w)) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
+
+    force = mu * (- 2 * a * b * pow(dsq, b - 1)) / (1 + a * pow(dsq, b));
     *force_x = force * xd;
     *force_y = force * yd;
+
+    //printf("force attractive: xd = %f, fx = %f\n", xd, *force_x);
+    //printf("force attractive: yd = %f, fy = %f\n", yd, *force_y);
+
+    return IGRAPH_SUCCESS;
+}
+
+/*xd is difference in x direction, mu is a weight */
+static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
+{
+    igraph_real_t dsq;
+    igraph_real_t force, phi;
+    igraph_real_t epsilon = 0.001;
+
+    dsq = xd * xd + yd * yd;
+
+    /* NOTE: in practice, in negative sampling mu is always zero because we
+     * *assume* the sample to be negative i.e. never a true edge */
+    //force = (1 - mu) * (-2 * b) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
+    phi = 1.0 / (1.0 + a * pow(dsq, b));
+    force = (1 - mu) * (2 * a * b * pow(dsq, b - 1)) * phi * phi / (1 - phi);
+    *force_x = force * xd;
+    *force_y = force * yd;
+
+    //printf("force repulsive: xd = %f, fx = %f\n", xd, *force_x);
+    //printf("force repulsive: yd = %f, fy = %f\n", yd, *force_y);
+
+
     return IGRAPH_SUCCESS;
 }
 
@@ -408,7 +462,6 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
 
         /* Apply attractive force since they are neighbors */
         IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[eid], a, b, &fx, &fy));
-        /* FIXME: Is this correct? Or the other way? */
         MATRIX(*gradient, from, 0) += fx;
         MATRIX(*gradient, from, 1) += fy;
 
@@ -426,55 +479,20 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
             x_diff = from_x - to_x;
             y_diff = from_y - to_y;
 
-            /* Apply repulsive force FIXME: check sign */
             /* This repels the other vertex assuming it's a negative example
              * that is no weight, no edge */
             IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, 0, a, b, &fx, &fy));
-            MATRIX(*gradient, from, 0) -= fx;
-            MATRIX(*gradient, from, 1) -= fy;
+            /* The repulsive force is already *away* from the other (non-neighbor) vertex */
+            MATRIX(*gradient, from, 0) += fx;
+            MATRIX(*gradient, from, 1) += fy;
         }
     }
     return IGRAPH_SUCCESS;
 }
 
-
-static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t *cross_entropy) {
-
-    igraph_real_t mu, nu, dx, dy, sqdist;
-    igraph_integer_t from, to;
-    igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
-
-    /* Measure the (variable part of the) cross-entropy terms for debugging:
-     * 1. - sum_edge_e mu(e) * log(nu(e))
-     * 2. + sum_edge_e (1 - mu(e)) * log(1 - nu(e))
-     * */
-    *cross_entropy = 0;
-    for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
-        mu = VECTOR(*umap_weights)[eid];
-
-        /* Find vertices */
-        IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
-        /* Find distance in layout space */
-        dx = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
-        dy = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1));
-        sqdist = dx * dx + dy * dy;
-        /* Find probability associated with distance using fitted Phi */
-        /* NOT 2 * b since it's already squared */
-        nu = 1.0 / (1 + a * powf(sqdist, b));
-
-        /* Term 1*/
-        *cross_entropy -= mu * log(nu);
-        /* Term 2*/
-        *cross_entropy += (1 - mu) * log(1 - nu);
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-
 static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
         igraph_matrix_t *layout) {
-    igraph_integer_t epochs = 500; //FIXME
+    igraph_integer_t epochs = 50; //FIXME
     igraph_real_t learning_rate = 1;
     igraph_real_t sampling_prob = 1.0; // between 0 and 1, fraction of edges sampled for gradient at each epoch
     igraph_matrix_t gradient;
@@ -487,6 +505,11 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
     /* Measure the (variable part of the) cross-entropy terms for debugging:
      * 1. - sum_edge_e mu(e) * log(nu(e))
      * 2. + sum_edge_e (1 - mu(e)) * log(1 - nu(e))
+     * The latter is approximated by negative sampling as:
+     * 2b. + sum_random_ij 1 * log(1 - nu_ij)
+     * whereby the mu = 0 because we assume there's no edge between i and j, and nu_ij
+     * is basically their distance in embedding space, lensed through the probability
+     * function Phi.
      * */
     igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
     for (igraph_integer_t e = 0; e < epochs; e++) {
@@ -499,11 +522,10 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
 
         /* Delta is the gradient times the current (decreasing) learning rate */
         igraph_matrix_scale(&gradient, learning_rate);
-        /* FIXME: Perhaps a sign? */
-        //igraph_matrix_scale(&gradient, -1);
 
-        /* Shift the layout by the delta */
-        igraph_matrix_sub(layout, &gradient);
+        /* Shift the layout by the delta: the forces already have the right directions,
+         * i.e. towards neighbors and away from strangers */
+        igraph_matrix_add(layout, &gradient);
 
         /* Recompute CE and check how it's going*/
         cross_entropy_old = cross_entropy;
