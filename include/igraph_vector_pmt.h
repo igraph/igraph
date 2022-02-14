@@ -144,10 +144,12 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_le)(const TYPE(igraph_ve
                                                             const TYPE(igraph_vector) *rhs);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
                                                             const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp)(const void *lhs,
-                                                   const void *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp)(const void *lhs,
-                                                       const void *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp)(
+        const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp)(
+        const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp_untyped)(const void *lhs, const void *rhs);
+IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs);
 #endif
 
 /*------------------------------*/
@@ -211,10 +213,10 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
 
 IGRAPH_EXPORT void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize)(
-        TYPE(igraph_vector)* v, igraph_integer_t newsize);
+        TYPE(igraph_vector)* v, igraph_integer_t new_size);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reserve)(
-        TYPE(igraph_vector)* v, igraph_integer_t size);
+        TYPE(igraph_vector)* v, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vector)* v, BASE e);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, insert)(

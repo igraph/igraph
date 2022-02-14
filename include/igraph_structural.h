@@ -25,14 +25,15 @@
 #define IGRAPH_STRUCTURAL_H
 
 #include "igraph_decls.h"
+
+#include "igraph_attributes.h"
 #include "igraph_constants.h"
-#include "igraph_types.h"
-#include "igraph_vector.h"
-#include "igraph_matrix.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
-#include "igraph_attributes.h"
+#include "igraph_matrix.h"
 #include "igraph_sparsemat.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
@@ -57,7 +58,8 @@ IGRAPH_EXPORT igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_ve
 IGRAPH_EXPORT igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res, 
+IGRAPH_EXPORT igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
                                     igraph_vector_int_t *roots, igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,

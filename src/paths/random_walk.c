@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
+#include "igraph_vector_ptr.h"
 
 #include "core/interruption.h"
 
@@ -215,7 +216,9 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&weight_temp, 0);
 
-    /* cdf vectors will be computed lazily */
+    /* cdf vectors will be computed lazily; that's why we are still using
+     * igraph_vector_ptr_t as it does not require us to pre-initialize all
+     * the vectors in the vector list */
     IGRAPH_CHECK(igraph_vector_ptr_init(&cdfs, vc));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &cdfs);
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cdfs, vec_destr);

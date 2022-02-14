@@ -1,0 +1,237 @@
+n=0, undirected, path, unidirectional
+directed: false
+vcount: 0
+edges: {
+}
+
+n=0, undirected, path, bidirectional
+directed: false
+vcount: 0
+edges: {
+}
+
+n=0, undirected, cycle, unidirectional
+directed: false
+vcount: 0
+edges: {
+}
+
+n=0, undirected, cycle, bidirectional
+directed: false
+vcount: 0
+edges: {
+}
+
+n=0, directed, path, unidirectional
+directed: true
+vcount: 0
+edges: {
+}
+
+n=0, directed, path, bidirectional
+directed: true
+vcount: 0
+edges: {
+}
+
+n=0, directed, cycle, unidirectional
+directed: true
+vcount: 0
+edges: {
+}
+
+n=0, directed, cycle, bidirectional
+directed: true
+vcount: 0
+edges: {
+}
+
+n=1, undirected, path, unidirectional
+directed: false
+vcount: 1
+edges: {
+}
+
+n=1, undirected, path, bidirectional
+directed: false
+vcount: 1
+edges: {
+}
+
+n=1, undirected, cycle, unidirectional
+directed: false
+vcount: 1
+edges: {
+0 0
+}
+
+n=1, undirected, cycle, bidirectional
+directed: false
+vcount: 1
+edges: {
+0 0
+}
+
+n=1, directed, path, unidirectional
+directed: true
+vcount: 1
+edges: {
+}
+
+n=1, directed, path, bidirectional
+directed: true
+vcount: 1
+edges: {
+}
+
+n=1, directed, cycle, unidirectional
+directed: true
+vcount: 1
+edges: {
+0 0
+}
+
+n=1, directed, cycle, bidirectional
+directed: true
+vcount: 1
+edges: {
+0 0
+0 0
+}
+
+n=2, undirected, path, unidirectional
+directed: false
+vcount: 2
+edges: {
+0 1
+}
+
+n=2, undirected, path, bidirectional
+directed: false
+vcount: 2
+edges: {
+0 1
+}
+
+n=2, undirected, cycle, unidirectional
+directed: false
+vcount: 2
+edges: {
+0 1
+0 1
+}
+
+n=2, undirected, cycle, bidirectional
+directed: false
+vcount: 2
+edges: {
+0 1
+0 1
+}
+
+n=2, directed, path, unidirectional
+directed: true
+vcount: 2
+edges: {
+0 1
+}
+
+n=2, directed, path, bidirectional
+directed: true
+vcount: 2
+edges: {
+0 1
+1 0
+}
+
+n=2, directed, cycle, unidirectional
+directed: true
+vcount: 2
+edges: {
+0 1
+1 0
+}
+
+n=2, directed, cycle, bidirectional
+directed: true
+vcount: 2
+edges: {
+0 1
+0 1
+1 0
+1 0
+}
+
+n=3, undirected, path, unidirectional
+directed: false
+vcount: 3
+edges: {
+0 1
+1 2
+}
+
+n=3, undirected, path, bidirectional
+directed: false
+vcount: 3
+edges: {
+0 1
+1 2
+}
+
+n=3, undirected, cycle, unidirectional
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+}
+
+n=3, undirected, cycle, bidirectional
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+}
+
+n=3, directed, path, unidirectional
+directed: true
+vcount: 3
+edges: {
+0 1
+1 2
+}
+
+n=3, directed, path, bidirectional
+directed: true
+vcount: 3
+edges: {
+0 1
+1 0
+1 2
+2 1
+}
+
+n=3, directed, cycle, unidirectional
+directed: true
+vcount: 3
+edges: {
+0 1
+1 2
+2 0
+}
+
+n=3, directed, cycle, bidirectional
+directed: true
+vcount: 3
+edges: {
+0 1
+0 2
+1 0
+1 2
+2 0
+2 1
+}
+

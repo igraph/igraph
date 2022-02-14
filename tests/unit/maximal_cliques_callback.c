@@ -6,17 +6,14 @@
 
 struct userdata {
     int i;
-    igraph_vector_ptr_t *list;
+    igraph_vector_int_list_t *list;
 };
 
-int compare_vectors(const void *p1, const void *p2) {
-    igraph_vector_t *v1, *v2;
+int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
     igraph_integer_t s1, s2, i;
 
-    v1 = *((igraph_vector_t **) p1);
-    v2 = *((igraph_vector_t **) p2);
-    s1 = igraph_vector_size(v1);
-    s2 = igraph_vector_size(v2);
+    s1 = igraph_vector_int_size(v1);
+    s2 = igraph_vector_int_size(v2);
     if (s1 < s2) {
         return -1;
     }
@@ -42,7 +39,7 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
     ud = (struct userdata *) arg;
     cont = 1; /* true */
 
-    if (compare_vectors(&clique, &(VECTOR(*(ud->list))[ud->i])) != 0) {
+    if (compare_vectors(clique, igraph_vector_int_list_get_ptr(ud->list, ud->i)) != 0) {
         printf("igraph_maximal_cliques() and igraph_maximal_cliques_callback() give different results.\n");
         cont = 0; /* false */
     }
@@ -56,7 +53,7 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
 }
 
 
-igraph_bool_t handler_stop(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler_stop(igraph_vector_int_t *clique, void *arg) {
     /* Stop search as soon as a 3-clique is found. */
     /* Since there are two 3-cliques in the test graph, this will stop the search before it is complete. */
     IGRAPH_UNUSED(arg);
@@ -76,14 +73,14 @@ igraph_bool_t handler_stop(igraph_vector_int_t *clique, void *arg) {
 
 int main() {
     igraph_t graph;
-    igraph_vector_ptr_t list;
+    igraph_vector_int_list_t list;
     struct userdata ud;
 
     igraph_small(&graph, 6, 0,
                  1, 2, 2, 3, 3, 4, 4, 5, 5, 2, 2, 4,
                  -1);
 
-    igraph_vector_ptr_init(&list, 0);
+    igraph_vector_int_list_init(&list, 0);
     igraph_maximal_cliques(&graph, &list, 0, 0);
 
     ud.i = 0;
@@ -95,8 +92,7 @@ int main() {
     /* Check that the search can be stopped correctly */
     igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0);
 
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
-    igraph_vector_ptr_destroy_all(&list);
+    igraph_vector_int_list_destroy(&list);
 
     igraph_destroy(&graph);
 

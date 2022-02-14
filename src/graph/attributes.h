@@ -51,7 +51,7 @@ igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         const igraph_vector_int_t *idx);
 igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
-                                        const igraph_vector_ptr_t *merges,
+                                        const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb);
 igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
                                  const igraph_vector_int_t *edges, void *attr);
@@ -60,7 +60,7 @@ igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      const igraph_vector_int_t *idx);
 igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
-                                     const igraph_vector_ptr_t *merges,
+                                     const igraph_vector_int_list_t *merges,
                                      const igraph_attribute_combination_t *comb);
 
 igraph_error_t igraph_i_attribute_get_info(const igraph_t *graph,

@@ -69,7 +69,9 @@
 <!-- doxrox-include igraph_vector_all_le -->
 <!-- doxrox-include igraph_vector_all_ge -->
 <!-- doxrox-include igraph_vector_lex_cmp -->
+<!-- doxrox-include igraph_vector_lex_cmp_untyped -->
 <!-- doxrox-include igraph_vector_colex_cmp -->
+<!-- doxrox-include igraph_vector_colex_cmp_untyped -->
 </section>
 
 <section id="vector-finding-minimum-and-maximum"><title>Finding minimum and maximum</title>

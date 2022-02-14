@@ -31,12 +31,7 @@
  * containing pointers to other igraph or other data types. These data
  * types are dynamically allocated and have to be deallocated
  * manually when the user does not need them any more. This can be done
- * by calling igraph_free on them.
- *
- * </para><para>
- * Here is a complete example on how to use \c igraph_free properly.
- *
- * \example examples/simple/igraph_free.c
+ * by calling \c igraph_free() on them.
  *
  * \param p Pointer to the piece of memory to be deallocated.
  * \return Error code, currently always zero, meaning success.

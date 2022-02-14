@@ -936,12 +936,18 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * </para><para>
  * This function calculates the in-, out- or total degree of the
  * specified vertices.
+ *
+ * </para><para>
+ * This function returns the result as a vector of \c igraph_integer_t
+ * values. In applications where \c igraph_real_t is desired, use
+ * \ref igraph_strength() with \c NULL weights.
+ *
  * \param graph The graph.
- * \param res Vector, this will contain the result. It should be
+ * \param res Integer vector, this will contain the result. It should be
  *        initialized and will be resized to be the appropriate size.
- * \param vids Vector, giving the vertex IDs of which the degree will
+ * \param vids Vertex selector, giving the vertex IDs of which the degree will
  *        be calculated.
- * \param mode Defines the type of the degree. Valid modes are:
+ * \param mode Defines the type of the degree for directed graphs. Valid modes are:
  *        \c IGRAPH_OUT, out-degree;
  *        \c IGRAPH_IN, in-degree;
  *        \c IGRAPH_ALL, total degree (sum of the
@@ -978,7 +984,7 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("degree calculation failed", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode for degree calculation.", IGRAPH_EINVMODE);
     }
 
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);

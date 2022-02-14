@@ -353,17 +353,6 @@ static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(igraph_re
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
-    for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*ptr)[i];
-        if (v) {
-            igraph_vector_destroy(v);
-            igraph_free(v);
-        }
-    }
-}
-
 static void igraph_i_error_handler_none(const char *reason, const char *file,
                                         int line, igraph_error_t igraph_errno) {
     IGRAPH_UNUSED(reason);
@@ -426,12 +415,9 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    non-positive eigenvalues, that do not result a split, are stored
  *    as well.
  * \param eigenvectors If not a null pointer, then the eigenvectors
- *    that are calculated in each step of the algorithm, are stored here,
- *    in a pointer vector. Each eigenvector is stored in an
- *    \ref igraph_vector_t object. The user is responsible of
- *    deallocating the memory that belongs to the individual vectors,
- *    by calling first \ref igraph_vector_destroy(), and then
- *    \ref igraph_free() on them.
+ *    that are calculated in each step of the algorithm are stored here,
+ *    in a list of vectors. Each eigenvector is stored in an
+ *    \ref igraph_vector_t object.
  * \param history Pointer to an initialized vector or a null pointer.
  *    If not a null pointer, then a trace of the algorithm is stored
  *    here, encoded numerically. The various operations:
@@ -484,7 +470,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         igraph_real_t *modularity,
         igraph_bool_t start,
         igraph_vector_t *eigenvalues,
-        igraph_vector_ptr_t *eigenvectors,
+        igraph_vector_list_t *eigenvectors,
         igraph_vector_t *history,
         igraph_community_leading_eigenvector_callback_t *callback,
         void *callback_extra) {
@@ -555,8 +541,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         igraph_vector_clear(eigenvalues);
     }
     if (eigenvectors) {
-        igraph_vector_ptr_clear(eigenvectors);
-        IGRAPH_FINALLY(igraph_i_levc_free, eigenvectors);
+        igraph_vector_list_clear(eigenvectors);
     }
 
     IGRAPH_STATUS("Starting leading eigenvector method.\n", 0);
@@ -603,15 +588,10 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_push_back(eigenvalues, IGRAPH_NAN));
         }
         if (eigenvectors) {
-            igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
-            if (!v) {
-                IGRAPH_ERROR("Cannot do leading eigenvector community detection",
-                             IGRAPH_ENOMEM);
-            }
-            IGRAPH_FINALLY(igraph_free, v);
-            IGRAPH_VECTOR_INIT_FINALLY(v, 0);
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(eigenvectors, v));
-            IGRAPH_FINALLY_CLEAN(2);
+            /* There are no eigenvectors associated to these steps because the
+             * splits were given by the user (or by the components of the graph)
+             * so we push empty vectors */
+            IGRAPH_CHECK(igraph_vector_list_push_back_new(eigenvectors, NULL));
         }
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
@@ -827,18 +807,13 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         }
 
         if (eigenvectors) {
-            igraph_vector_t *v = IGRAPH_CALLOC(1, igraph_vector_t);
-            if (!v) {
-                IGRAPH_ERROR("Cannot do leading eigenvector community detection",
-                             IGRAPH_ENOMEM);
-            }
-            IGRAPH_FINALLY(igraph_free, v);
-            IGRAPH_VECTOR_INIT_FINALLY(v, size);
+            igraph_vector_t *v;
+            /* TODO: this would be faster if we had an igraph_vector_list_push_back_new_with_size_hint */
+            IGRAPH_CHECK(igraph_vector_list_push_back_new(eigenvectors, &v));
+            IGRAPH_CHECK(igraph_vector_resize(v, size));
             for (i = 0; i < size; i++) {
                 VECTOR(*v)[i] = storage.v[i];
             }
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(eigenvectors, v));
-            IGRAPH_FINALLY_CLEAN(2);
         }
 
         if (storage.d[0] <= 0) {
@@ -968,9 +943,6 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         }
     }
 
-    if (eigenvectors) {
-        IGRAPH_FINALLY_CLEAN(1);
-    }
     igraph_vector_int_destroy(&idx);
     igraph_vector_destroy(&mymerges);
     IGRAPH_FINALLY_CLEAN(2);

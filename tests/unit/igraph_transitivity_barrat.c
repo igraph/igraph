@@ -20,8 +20,7 @@
 #include "test_utilities.inc"
 
 void warning_handler_print_stdout(const char *reason, const char *file,
-                                  int line, int igraph_errno) {
-    IGRAPH_UNUSED(igraph_errno);
+                                  int line) {
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
     fprintf(stdout, "Warning: %s\n", reason);

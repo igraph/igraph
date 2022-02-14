@@ -155,7 +155,7 @@ static void debug(const char* fmt, ...) {
  * Data structure to store a layering of the graph.
  */
 typedef struct {
-    igraph_vector_ptr_t layers;
+    igraph_vector_int_list_t layers;
 } igraph_i_layering_t;
 
 /**
@@ -171,21 +171,12 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
         num_layers = igraph_vector_int_max(membership) + 1;
     }
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&layering->layers, num_layers));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &layering->layers);
-
-    for (i = 0; i < num_layers; i++) {
-        igraph_vector_int_t* vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
-        VECTOR(layering->layers)[i] = vec;
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&layering->layers, igraph_vector_int_destroy);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&layering->layers, num_layers);
 
     n = igraph_vector_int_size(membership);
     for (i = 0; i < n; i++) {
         igraph_integer_t l = VECTOR(*membership)[i];
-        igraph_vector_int_t* vec = VECTOR(layering->layers)[l];
+        igraph_vector_int_t* vec = igraph_vector_int_list_get_ptr(&layering->layers, l);
         IGRAPH_CHECK(igraph_vector_int_push_back(vec, i));
     }
 
@@ -198,14 +189,14 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
  * Destroys a layering.
  */
 static void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
-    igraph_vector_ptr_destroy_all(&layering->layers);
+    igraph_vector_int_list_destroy(&layering->layers);
 }
 
 /**
  * Returns the number of layers in a layering.
  */
 static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
-    return igraph_vector_ptr_size(&layering->layers);
+    return igraph_vector_int_list_size(&layering->layers);
 }
 
 /**
@@ -213,7 +204,7 @@ static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* 
  */
 static igraph_vector_int_t* igraph_i_layering_get(const igraph_i_layering_t* layering,
                                        igraph_integer_t index) {
-    return (igraph_vector_int_t*)VECTOR(layering->layers)[index];
+    return igraph_vector_int_list_get_ptr(&layering->layers, index);
 }
 
 

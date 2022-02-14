@@ -36,46 +36,42 @@ void sort_and_print_vector(igraph_vector_int_t *v) {
 int main() {
 
     igraph_t g;
-    igraph_vector_ptr_t result;
+    igraph_vector_int_list_t result;
     igraph_integer_t no;
     igraph_integer_t i;
 
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
-    igraph_vector_ptr_init(&result, 0);
+    igraph_vector_int_list_init(&result, 0);
     igraph_small(&g, 7, 0, 0, 1, 1, 2, 2, 3, 3, 0, 2, 4, 4, 5, 2, 5, -1);
 
     igraph_biconnected_components(&g, &no, 0, 0, &result, 0);
-    if (no != 2 || no != igraph_vector_ptr_size(&result)) {
+    if (no != 2 || no != igraph_vector_int_list_size(&result)) {
         return 1;
     }
     for (i = 0; i < no; i++) {
-        sort_and_print_vector((igraph_vector_int_t*)VECTOR(result)[i]);
-        igraph_vector_int_destroy((igraph_vector_int_t*)VECTOR(result)[i]);
-        igraph_free((igraph_vector_int_t*)VECTOR(result)[i]);
+        sort_and_print_vector(igraph_vector_int_list_get_ptr(&result, i));
     }
+    igraph_vector_int_list_clear(&result);
 
     igraph_biconnected_components(&g, &no, 0, &result, 0, 0);
-    if (no != 2 || no != igraph_vector_ptr_size(&result)) {
+    if (no != 2 || no != igraph_vector_int_list_size(&result)) {
         return 2;
     }
     for (i = 0; i < no; i++) {
-        sort_and_print_vector((igraph_vector_int_t*)VECTOR(result)[i]);
-        igraph_vector_int_destroy((igraph_vector_int_t*)VECTOR(result)[i]);
-        igraph_free((igraph_vector_int_t*)VECTOR(result)[i]);
+        sort_and_print_vector(igraph_vector_int_list_get_ptr(&result, i));
     }
+    igraph_vector_int_list_clear(&result);
 
     igraph_biconnected_components(&g, &no, &result, 0, 0, 0);
-    if (no != 2 || no != igraph_vector_ptr_size(&result)) {
+    if (no != 2 || no != igraph_vector_int_list_size(&result)) {
         return 3;
     }
     for (i = 0; i < no; i++) {
-        sort_and_print_vector((igraph_vector_int_t*)VECTOR(result)[i]);
-        igraph_vector_int_destroy((igraph_vector_int_t*)VECTOR(result)[i]);
-        igraph_free((igraph_vector_int_t*)VECTOR(result)[i]);
+        sort_and_print_vector(igraph_vector_int_list_get_ptr(&result, i));
     }
 
-    igraph_vector_ptr_destroy(&result);
+    igraph_vector_int_list_destroy(&result);
     igraph_destroy(&g);
 
     return 0;
