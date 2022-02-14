@@ -2446,19 +2446,19 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
 
 igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
 
-    TYPE(igraph_vector) *tmp;
+    TYPE(igraph_vector) tmp;
 
-    tmp->stor_begin = v1->stor_begin;
-    tmp->stor_end = v1->stor_end;
-    tmp->end = v1->end;
+    tmp.stor_begin = (*v1).stor_begin;
+    tmp.stor_end = (*v1).stor_end;
+    tmp.end = (*v1).end;
 
-    v1->stor_begin = v2->stor_begin;
-    v1->stor_end = v2->stor_end;
-    v1->end = v2->end;
+    (*v1).stor_begin = (*v2).stor_begin;
+    (*v1).stor_end = (*v2).stor_end;
+    (*v1).end = (*v2).end;
 
-    v2->stor_begin = tmp->stor_begin;
-    v2->stor_end = tmp->stor_end;
-    v2->end = tmp->end;
+    (*v2).stor_begin = tmp.stor_begin;
+    (*v2).stor_end = tmp.stor_end;
+    (*v2).end = tmp.end;
 
     return IGRAPH_SUCCESS;
 }
