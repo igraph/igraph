@@ -352,7 +352,7 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
      * 1. - sum_edge_e mu(e) * log(nu(e))
-     * 2. + sum_edge_e (1 - mu(e)) * log(1 - nu(e))
+     * 2. - sum_edge_e (1 - mu(e)) * log(1 - nu(e))
      * */
     *cross_entropy = 0;
     for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
@@ -383,13 +383,12 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
  * derivative/force. Same applies for the repulsion */
 static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
-    igraph_real_t dsq;
-    igraph_real_t force;
-    igraph_real_t epsilon = 0.001;
+    igraph_real_t dsq, phi, force;
 
     dsq = xd * xd + yd * yd;
 
-    force = mu * (- 2 * a * b * pow(dsq, b - 1)) / (1 + dsq);
+    phi = 1. / (1. + a * pow(dsq, b));
+    force = - mu * (2 * a * b * pow(dsq, b - 1)) * phi;
     *force_x = force * xd;
     *force_y = force * yd;
 
@@ -402,21 +401,14 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
 /*xd is difference in x direction, mu is a weight */
 static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
-    igraph_real_t dsq;
-    igraph_real_t force, phi;
-    igraph_real_t epsilon = 0.001;
+    igraph_real_t dsq, force;
+    igraph_real_t min_dist = 0.01;
 
-    dsq = xd * xd + yd * yd;
+    dsq = fmax(min_dist * min_dist, xd * xd + yd * yd);
 
     /* NOTE: in practice, in negative sampling mu is always zero because we
      * *assume* the sample to be negative i.e. never a true edge */
-    // FIXME: probably the force was already correct, but just in case
-    //force = (1 - mu) * (-2 * b) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
-    //phi = 1.0 / (1.0 + a * pow(dsq, b));
-    //force = (1 - mu) * (2 * a * b * pow(dsq, b - 1)) * phi * phi / (1 - phi);
-    force = (1 - mu) * (2 * b) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
-    // FIXME: OMG, this makes the cross-entropy descent monotonic!!
-    //force = 0.2;
+    force = (1 - mu) * (2 * b) / dsq / (1 + a * pow(dsq, b));
     *force_x = force * xd;
     *force_y = force * yd;
 
@@ -427,7 +419,7 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matrix_t *layout, igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b, igraph_real_t prob)
+static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob, igraph_real_t learning_rate)
 {
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
@@ -442,12 +434,6 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
      * might/should change at every iteration?
      * */
     igraph_integer_t n_random_vertices = sqrt(no_of_nodes);
-
-    /* Zero the gradient */
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        MATRIX(*gradient, i, 0) = 0;
-        MATRIX(*gradient, i, 1) = 0;
-    }
 
     /* iterate over a random subsample of edges */
     for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
@@ -469,8 +455,8 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
 
         /* Apply attractive force since they are neighbors */
         IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[eid], a, b, &fx, &fy));
-        MATRIX(*gradient, from, 0) += fx;
-        MATRIX(*gradient, from, 1) += fy;
+        MATRIX(*layout, from, 0) += learning_rate * fx;
+        MATRIX(*layout, from, 1) += learning_rate * fy;
 
         /* Random other nodes are repelled from one (the first) vertex */
         for (igraph_integer_t j = 0; j < n_random_vertices; j++) {
@@ -507,8 +493,8 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
              * that is no weight, no edge */
             IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, 0, a, b, &fx, &fy));
             /* The repulsive force is already *away* from the other (non-neighbor) vertex */
-            MATRIX(*gradient, from, 0) += fx;
-            MATRIX(*gradient, from, 1) += fy;
+            MATRIX(*layout, from, 0) += learning_rate * fx;
+            MATRIX(*layout, from, 1) += learning_rate * fy;
         }
     }
 
@@ -520,15 +506,11 @@ static igraph_error_t igraph_get_gradient(igraph_matrix_t *gradient, igraph_matr
 
 static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
         igraph_matrix_t *layout) {
-    igraph_integer_t epochs = 50; //FIXME
+    igraph_integer_t epochs = 500; //FIXME
     igraph_real_t learning_rate = 1;
-    igraph_real_t sampling_prob = 0.2; // between 0 and 1, fraction of edges sampled for gradient at each epoch
-    igraph_matrix_t gradient;
+    igraph_real_t sampling_prob = 0.8; // between 0 and 1, fraction of edges sampled for gradient at each epoch
     igraph_real_t cross_entropy, cross_entropy_old;
 
-
-    /* Initialize gradient */
-    IGRAPH_MATRIX_INIT_FINALLY(&gradient, igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
      * 1. - sum_edge_e mu(e) * log(nu(e))
@@ -541,19 +523,8 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
      * */
     igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
     for (igraph_integer_t e = 0; e < epochs; e++) {
-        /* Compute (stochastic) gradient */
-        igraph_get_gradient(&gradient, layout, umap_graph, umap_weights, a, b, sampling_prob);
-
-        /* Delta is the gradient times the current (decreasing) learning rate */
-        igraph_matrix_scale(&gradient, learning_rate / 10);
-
-        //printf("gradient:\n");
-        //igraph_matrix_print(&gradient);
-        //printf("\n");
-
-        /* Shift the layout by the delta: the forces already have the right directions,
-         * i.e. towards neighbors and away from strangers */
-        igraph_matrix_add(layout, &gradient);
+        /* Apply (stochastic) forces */
+        igraph_apply_forces(umap_graph, umap_weights, layout, a, b, sampling_prob, learning_rate);
 
         /* Recompute CE and check how it's going*/
         cross_entropy_old = cross_entropy;
@@ -569,8 +540,6 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
         learning_rate = 1.0 - (e + 1) / epochs;
     }
 
-    igraph_matrix_destroy(&gradient);
-    IGRAPH_FINALLY_CLEAN(1);
     return (IGRAPH_SUCCESS);
 }
 
