@@ -34,7 +34,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap(igraph_t *graph,
                                                 igraph_matrix_t *layout);
 
 /* FIXME: DEBUG ONLY */
-IGRAPH_EXPORT igraph_error_t igraph_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p);
+IGRAPH_EXPORT igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p);
 
 __END_DECLS
 
