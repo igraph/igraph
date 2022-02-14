@@ -65,7 +65,7 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 	return key;
 }
 
-igraph_integer_t igraph_steiner_dreyfus_wagner(const igraph_t graph,
+igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t graph,
 											   igraph_vector_t steiner_terminals,
 											   igraph_neimode_t mode, const igraph_vector_t weights)
 {
