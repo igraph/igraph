@@ -55,9 +55,9 @@ int main() {
     
     
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    dreyfus_wagner_out = igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals,IGRAPH_ALL,&weights_lm);
+    igraph_error_t dreyfus_wagner_out = igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals,IGRAPH_ALL,&weights_lm);
   
-    printf("%ld",dreyfus_wagner_out);
+   
     
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
