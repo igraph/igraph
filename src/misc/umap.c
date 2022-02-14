@@ -389,7 +389,7 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
 
     dsq = xd * xd + yd * yd;
 
-    force = mu * (- 2 * a * b * pow(dsq, b - 1)) / (1 + a * pow(dsq, b));
+    force = mu * (- 2 * a * b * pow(dsq, b - 1)) / (1 + dsq);
     *force_x = force * xd;
     *force_y = force * yd;
 
@@ -412,10 +412,11 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
      * *assume* the sample to be negative i.e. never a true edge */
     // FIXME: probably the force was already correct, but just in case
     //force = (1 - mu) * (-2 * b) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
-    phi = 1.0 / (1.0 + a * pow(dsq, b));
-    force = (1 - mu) * (2 * a * b * pow(dsq, b - 1)) * phi * phi / (1 - phi);
+    //phi = 1.0 / (1.0 + a * pow(dsq, b));
+    //force = (1 - mu) * (2 * a * b * pow(dsq, b - 1)) * phi * phi / (1 - phi);
+    force = (1 - mu) * (2 * b) / ((epsilon + dsq) * (1 + a * pow(dsq, b)));
     // FIXME: OMG, this makes the cross-entropy descent monotonic!!
-    force = 0.2;
+    //force = 0.2;
     *force_x = force * xd;
     *force_y = force * yd;
 
