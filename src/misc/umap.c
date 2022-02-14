@@ -371,7 +371,7 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
         /* Term 1*/
         *cross_entropy -= mu * log(nu);
         /* Term 2*/
-        *cross_entropy += (1 - mu) * log(1 - nu);
+        *cross_entropy -= (1 - mu) * log(1 - nu);
     }
 
     return IGRAPH_SUCCESS;
