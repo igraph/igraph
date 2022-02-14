@@ -29,7 +29,7 @@
 /* sigma is the the decay from each vertex, depends on its rho and the rest of its neighbor distances */
 
 /* Find sigma for this vertex by binary search */
-igraph_error_t igraph_umap_find_sigma(igraph_t *graph, igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids, igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
+igraph_error_t igraph_umap_find_sigma(const igraph_t *graph, const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids, igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
 
     igraph_real_t sigma = 1;
     igraph_real_t sigma_new, sum;
@@ -48,7 +48,7 @@ igraph_error_t igraph_umap_find_sigma(igraph_t *graph, igraph_vector_t *distance
             sum += exp(-(VECTOR(*distances)[eid] - rho) / sigma);
         }
 
-        printf("SIGMA function (i = %d, no_of_neis = %d)- sum: %f, target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
+        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %f, target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
 
         /* Adjust sigma FIXME: this is strictly a little optimistic? */
         if (sum < target) {
