@@ -42,7 +42,7 @@ zip $OUT/read_graphml_fuzzer_seed_corpus.zip \
 
 cd $SRC/igraph
 
-XML2_FLAGS = -Wl,-Bstatic -lxml2 -lz -llzma -licuuc -licudata -Wl,-Bdynamic -ldl
+XML2_FLAGS="-Wl,-Bstatic -lxml2 -lz -llzma -licuuc -licudata -Wl,-Bdynamic -ldl"
 
 for TARGET in read_gml_fuzzer read_pajek_fuzzer read_dl_fuzzer read_lgl_fuzzer read_ncol_fuzzer read_graphml_fuzzer bliss_fuzzer vertex_connectivity_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
 do
