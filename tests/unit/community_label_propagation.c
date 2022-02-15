@@ -32,7 +32,25 @@ int main() {
     igraph_vector_t weights;
     igraph_vector_int_t initial;
     igraph_vector_bool_t fixed;
-    igraph_integer_t i;
+    igraph_integer_t i, j;
+
+    /* Triangle graph */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,  1,  0,  2,  1,  2, -1);
+
+    for (j = 0; j < 300; j++) {
+        /* label propagation is a stochastic method */
+        igraph_rng_seed(igraph_rng_default(), j);
+
+        igraph_vector_int_init(&membership, 0);
+        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
+
+        for (i = 0; i < 3; i++)
+            if (VECTOR(membership)[i] != VECTOR(membership)[0]) {
+                return 2;
+            }
+    }
+
+    igraph_destroy(&g);
 
     /* label propagation is a stochastic method */
     igraph_rng_seed(igraph_rng_default(), 765);
