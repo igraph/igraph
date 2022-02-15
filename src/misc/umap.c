@@ -31,21 +31,36 @@
  * \function igraph_layout_umap
  * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
  *
- * UMAP is a commonly used technique used to embed high-dimensional vectors in 2D in a nonlinear fashion (unlike e.g. PCA), similar to T-distributed Stochastic Neighbor Embedding (t-SNE). The first step of that procedure is to reduce the list of high-dimensional vectors into a similarity graph, with each vertex signifying a vector/observation and edges drawn between vectors that are "similar" in some metric, most commonly Pearson correlation. This function aligns with the original description of the algorithm in requiring not a similarity metric between vertices but a "distance" metric. For correlation similarity, the associated distance is often defined as:
+ * UMAP is a commonly used technique used to embed high-dimensional vectors in 
+ * 2D in a nonlinear fashion (unlike e.g. PCA), similar to T-distributed Stochastic Neighbor 
+ * Embedding (t-SNE). The first step of that procedure is to reduce the list of high-dimensional
+ * vectors into a similarity graph, with each vertex signifying a vector/observation and edges
+ * drawn between vectors that are "similar" in some metric, most commonly Pearson correlation.
+ * This function aligns with the original description of the algorithm in requiring not a
+ * similarity metric between vertices but a "distance" metric. For correlation similarity, the
+ * associated distance is often defined as:
  *
  * d(v1, v2) = max(0, 1 - corr(v1, v2))
  *
- * This implementation can also work with unweighted similarity graphs, in which case the distance parameter should be a null pointer.
+ * This implementation can also work with unweighted similarity graphs, in which case the distance
+ * parameter should be a null pointer.
  *
- * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient descent really shines when the graph is sparse. In practice, most people feed a k-nearest neighbor (either exact or approximated) similarity graph with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain distance (e.g. correlation <0.2).
+ * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient descent
+ * really shines when the graph is sparse. In practice, most people feed a k-nearest neighbor
+ * (either exact or approximated) similarity graph with some additional cutoff to exclude
+ * "quasi-neighbors" that lie beyond a certain distance (e.g. correlation <0.2).
  *
- * Therefore, if you are trying to use this function to embed high-dimensional vectors, the steps are:
+ * Therefore, if you are trying to use this function to embed high-dimensional vectors, the steps
+ * are:
  *
- * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors, weighted or unweighted
+ * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors, weighted
+ * or unweighted
  * 2. If you keep the weights, convert them into distances (e.g. see above for correlation)
  * 3. Feed graph (and weights, if you have them) into this function.
  *
- * Note that step 1 above involves deciding if two high-dimensional vectors "look similar" which, because of the curse of dimensionality, is in many cases a highly subjective and potentially controversial operation: thread with care and at your own risk.
+ * Note that step 1 above involves deciding if two high-dimensional vectors "look similar" which,
+ * because of the curse of dimensionality, is in many cases a highly subjective and potentially
+ * controversial operation: thread with care and at your own risk.
  *
  * </para><para>
  * References:
@@ -53,23 +68,37 @@
  * </para><para>
  * Leland McInnes, John Healy, and James Melville, arXiv:1802.03426v3
  *
- * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed). Weights in this graph object are currently ignored.
- * \param distances Pointer to a vector of "distances" between vertices. Similarity graphs for UMAP are often originally meant in terms of similarity weights (e.g. correlation between high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is fine here too. If this argument is an empty pointer (NULL), connected vertices are assumed to be very similar.
- * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D embedding are currently supported, as they are by far more common than any higher dimensions.
- * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the embedding before feeling a repulsive force. Typically, 0.01 is a good number. If this is negative or zero, 0.01 is assumed.
- * \param epochs Number of iterations of the main stochastic gradient descent loop on the cross-entropy. If negative or zero, 500 epochs are used if the graph is the graph is small (less than 50k edges), 50 epochs are used for larger graphs.
+ * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed). Weights in
+ *   this graph object are currently ignored.
+ * \param distances Pointer to a vector of "distances" between vertices. Similarity graphs for
+ *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
+ *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is 
+ *   fine here too. If this argument is an empty pointer (NULL), connected vertices are assumed
+ *   to be very similar.
+ * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D
+ *   embedding are currently supported, as they are by far more common than any higher dimensions.
+ * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
+ *   embedding before feeling a repulsive force. Typically, 0.01 is a good number. If this is
+ *   negative or zero, 0.01 is assumed.
+ * \param epochs Number of iterations of the main stochastic gradient descent loop on the
+ *   cross-entropy. If negative or zero, 500 epochs are used if the graph is the graph is small
+ *   (less than 50k edges), 50 epochs are used for larger graphs.
  *
  * \return Error code.
  *
  */
-igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs);
+igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, 
+    igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs);
 
 
 /* rho is just the size of the distance from each vertex and its closest neighbor */
-/* sigma is the the decay from each vertex, depends on its rho and the rest of its neighbor distances */
+/* sigma is the the decay from each vertex, depends on its rho and the rest of its neighbor
+ * distances */
 
 /* Find sigma for this vertex by binary search */
-static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph, const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids, igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
+static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph, 
+        const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids,
+        igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
 
     igraph_real_t sigma = 1;
     igraph_real_t sum;
@@ -89,7 +118,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph, const igra
         }
 
 #ifdef UMAP_DEBUG
-        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %f, target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
+        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %f,
+                target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
 #endif
 
         /* TODO: this seems fine, but is probably a little off for some corner cases */
@@ -122,7 +152,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph, const igra
 
 /* Convert the graph with distances into a probability graph with exponential decay */
 /* NOTE: this is funny because the distance was a correlation to start with... ?? */
-static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph, const igraph_vector_t *distances, igraph_vector_t *umap_weights) {
+static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
+        const igraph_vector_t *distances, igraph_vector_t *umap_weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_neis, eid;
@@ -172,7 +203,8 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph, const
         /* Else, find sigma for this vertex, from its rho plus binary search */
         } else {
             sigma_target = log(no_of_neis) / log(2);
-            IGRAPH_CHECK(igraph_i_umap_find_sigma(graph, distances, i, &eids, rho, &sigma, sigma_target));
+            IGRAPH_CHECK(igraph_i_umap_find_sigma(graph, distances, i, &eids, rho, &sigma,
+                        sigma_target));
         }
 
         /* Convert to umap_weight
@@ -219,7 +251,9 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph, const
 }
 
 /* Helper function to compute a and b parameters (smoothing probability metric in embedding space) */
-static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals, igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a, igraph_real_t b, igraph_vector_t *powb, igraph_vector_t *x, igraph_real_t min_dist)
+static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals, 
+        igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a, 
+        igraph_real_t b, igraph_vector_t *powb, igraph_vector_t *x, igraph_real_t min_dist)
 {
     igraph_real_t tmp;
 
@@ -290,7 +324,8 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b
     printf("start fit_ab\n");
 #endif
     for (int iter = 0; iter < maxiter; iter++) {
-        IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a, b, &powb, &x, min_dist));
+        IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a, b,
+                    &powb, &x, min_dist));
 
         /* break if good fit (conergence to truth) */
         if (squared_sum_res < tol * tol) {
@@ -314,11 +349,13 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b
             MATRIX(jacobian, i, 1) = MATRIX(jacobian, i, 0) * a * log(VECTOR(x)[i]) * 2;
         }
 
-        /* At each iteration, we want to minimize the linear approximation of the sum of squared residuals:
+        /* At each iteration, we want to minimize the linear approximation of the sum of squared
+         * residuals:
          *
          * sum_i (Ji @ d(a,b) -r_i)^2
          *
-         * Putting the first derivative to zero results in a linear system of 2 equations (for a and b):
+         * Putting the first derivative to zero results in a linear system of 2 equations
+         * (for a and b):
          *
          * sum_i J_i^T @ J_i @ d(a,b) = sum_i J_i^T r_i
          * *
@@ -365,21 +402,25 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b
          * start from largest change, and keep shrinking as long as we are going down
          * */
         squared_sum_res_old = squared_sum_res;
-        IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist));
+        IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da,
+                    b + db, &powb, &x, min_dist));
 
 #ifdef UMAP_DEBUG
-        printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old, squared_sum_res);
+        printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old,
+                squared_sum_res);
 #endif
         for (int k = 0; k < 30; k++) {
             /* Try new parameters */
             da /= 2.0;
             db /= 2.0;
             squared_sum_res_tmp = squared_sum_res;
-            IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist));
+            IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points,
+                        a + da, b + db, &powb, &x, min_dist));
 
             /* Compare and if we are going back uphill, undo last step and break */
 #ifdef UMAP_DEBUG
-            printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k, squared_sum_res_tmp, squared_sum_res);
+            printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k,
+                    squared_sum_res_tmp, squared_sum_res);
 #endif
             if (squared_sum_res > squared_sum_res_tmp - tol) {
                 da *= 2;
@@ -418,7 +459,9 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b
 }
 
 /* cross-entropy */
-static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t *cross_entropy) {
+static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph,
+       igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b,
+       igraph_real_t *cross_entropy) {
 
     igraph_real_t mu, nu, xd, yd, sqd;
     igraph_integer_t from, to;
@@ -489,7 +532,8 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph, igraph_
 /* NOTE: mu is the probability of a true edge in high dimensions, not affected
  * by the embedding (in particular, xd and yd), so it's a constant for the
  * derivative/force. Same applies for the repulsion */
-static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
+static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
+       igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t dsq, phi, force;
 
@@ -509,7 +553,8 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
 }
 
 /*xd is difference in x direction, mu is a weight */
-static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu, igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
+static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
+       igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t dsq, force;
     igraph_real_t min_dist = 0.01;
@@ -531,7 +576,9 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
     return (IGRAPH_SUCCESS);
 }
 
-static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob, igraph_real_t learning_rate)
+static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t *umap_weights,
+       igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob,
+       igraph_real_t learning_rate)
 {
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
@@ -580,7 +627,8 @@ static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t
             /* do not repel neighbors for small graphs, for big graphs this
              * does not matter as long as the k in knn << number of vertices */
             if (no_of_nodes < 1000) {
-                /* FIXME: This is terribly inefficient, try to improve using adjacency lists or somethingbut just for testing anyway */
+                /* FIXME: This is terribly inefficient, try to improve using adjacency lists or
+                 * somethingbut just for testing anyway */
                 int skip = 0;
                 igraph_incident(umap_graph, &neis, from, IGRAPH_ALL);
                 for (int k = 0; k < igraph_vector_int_size(&neis); k++) {
@@ -618,10 +666,12 @@ static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t
     return (IGRAPH_SUCCESS);
 }
 
-static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
-        igraph_matrix_t *layout, igraph_integer_t epochs) {
+static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph,
+       igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
+       igraph_matrix_t *layout, igraph_integer_t epochs) {
     igraph_real_t learning_rate = 1;
-    igraph_real_t sampling_prob = 0.5; // between 0 and 1, fraction of edges sampled for gradient at each epoch
+    /* between 0 and 1, fraction of edges sampled for gradient at each epoch */
+    igraph_real_t sampling_prob = 0.5;
     igraph_real_t cross_entropy, cross_entropy_old;
 
 
@@ -682,7 +732,8 @@ igraph_error_t igraph_i_umap_center_layout(igraph_matrix_t *layout) {
 }
 
 
-igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs) {
+igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances,
+        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs) {
 
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -725,7 +776,8 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     IGRAPH_CHECK(igraph_i_umap_fit_ab(min_dist, &a, &b));
 
     /* Algorithm 5 */
-    IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b, layout, epochs));
+    IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b,
+                layout, epochs));
 
     /* Center layout */
     IGRAPH_CHECK(igraph_i_umap_center_layout(layout));
