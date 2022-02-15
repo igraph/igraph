@@ -209,5 +209,4 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t graph,
 
 	IGRAPH_FINALLY_CLEAN(2);
 
-	return v;
 }

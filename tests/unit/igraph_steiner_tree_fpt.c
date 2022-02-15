@@ -23,8 +23,7 @@ int main()
 
     igraph_vector_t steiner_terminals;
     igraph_vector_t weights_empty, weights_lm;
-    igraph_integer_t dreyfus_wagner_out;
-
+    
     igraph_vector_init(&weights_empty, 0);
 
     igraph_vector_init(&steiner_terminals, 0);
@@ -58,7 +57,7 @@ int main()
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals, IGRAPH_ALL, &weights_empty) == IGRAPH_SUCCESS);
 
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    igraph_error_t dreyfus_wagner_out = igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals, IGRAPH_ALL, &weights_lm);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals, IGRAPH_ALL, &weights_lm == IGRAPH_SUCCESS);
 
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
