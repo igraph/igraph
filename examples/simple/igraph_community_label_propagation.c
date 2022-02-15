@@ -25,6 +25,7 @@ int main() {
     igraph_t graph;
     igraph_vector_int_t membership;
     igraph_real_t modularity;
+    igraph_integer_t i;
 
     igraph_famous(&graph, "Zachary"); /* We use Zachary's karate club network. */
 
@@ -46,6 +47,12 @@ int main() {
 
     printf("%" IGRAPH_PRId " communities found; modularity score is %g.\n",
            igraph_vector_int_max(&membership) + 1, modularity);
+
+    printf("Communities membership: ");
+    for (i = 0; i < igraph_vcount(&graph); i++) {
+        printf("%ld ", VECTOR(membership)[i]);
+    }
+    printf("\n");
 
     /* Destroy data structures at the end. */
     igraph_vector_int_destroy(&membership);
