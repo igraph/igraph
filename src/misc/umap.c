@@ -32,7 +32,7 @@
 igraph_error_t igraph_umap_find_sigma(const igraph_t *graph, const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids, igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
 
     igraph_real_t sigma = 1;
-    igraph_real_t sigma_new, sum;
+    igraph_real_t sum;
     igraph_real_t tol = 0.01;
     igraph_integer_t maxiter = 100;
     igraph_integer_t no_of_neis = igraph_vector_int_size(eids);
