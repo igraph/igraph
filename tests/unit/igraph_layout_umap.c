@@ -41,9 +41,11 @@ int main() {
 
     igraph_matrix_init(&layout, 0, 0);
 
+#ifdef UMAP_DEBUG
     IGRAPH_CHECK(igraph_umap_fit_ab(1, &a, &b));
     IGRAPH_CHECK(igraph_umap_fit_ab(0.1, &a, &b));
     IGRAPH_CHECK(igraph_umap_fit_ab(5, &a, &b));
+#endif
     
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout) == IGRAPH_SUCCESS);
 
