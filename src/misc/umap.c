@@ -29,7 +29,7 @@
 /* sigma is the the decay from each vertex, depends on its rho and the rest of its neighbor distances */
 
 /* Find sigma for this vertex by binary search */
-igraph_error_t igraph_umap_find_sigma(const igraph_t *graph, const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids, igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
+static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph, const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids, igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
 
     igraph_real_t sigma = 1;
     igraph_real_t sum;
@@ -82,7 +82,7 @@ igraph_error_t igraph_umap_find_sigma(const igraph_t *graph, const igraph_vector
 
 /* Convert the graph with distances into a probability graph with exponential decay */
 /* NOTE: this is funny because the distance was a correlation to start with... ?? */
-igraph_error_t igraph_umap_find_prob_graph(const igraph_t *graph, const igraph_vector_t *distances, igraph_vector_t *umap_weights) {
+static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph, const igraph_vector_t *distances, igraph_vector_t *umap_weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_neis, eid;
@@ -132,7 +132,7 @@ igraph_error_t igraph_umap_find_prob_graph(const igraph_t *graph, const igraph_v
         /* Else, find sigma for this vertex, from its rho plus binary search */
         } else {
             sigma_target = log(no_of_neis) / log(2);
-            IGRAPH_CHECK(igraph_umap_find_sigma(graph, distances, i, &eids, rho, &sigma, sigma_target));
+            IGRAPH_CHECK(igraph_i_umap_find_sigma(graph, distances, i, &eids, rho, &sigma, sigma_target));
         }
 
         /* Convert to umap_weight
@@ -179,7 +179,7 @@ igraph_error_t igraph_umap_find_prob_graph(const igraph_t *graph, const igraph_v
 }
 
 /* Helper function to compute a and b parameters (smoothing probability metric in embedding space) */
-igraph_error_t igraph_umap_get_ab_residuals(igraph_vector_t *residuals, igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a, igraph_real_t b, igraph_vector_t *powb, igraph_vector_t *x, igraph_real_t min_dist)
+static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals, igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a, igraph_real_t b, igraph_vector_t *powb, igraph_vector_t *x, igraph_real_t min_dist)
 {
     igraph_real_t tmp;
 
@@ -197,7 +197,7 @@ igraph_error_t igraph_umap_get_ab_residuals(igraph_vector_t *residuals, igraph_r
 #ifndef UMAP_DEBUG
 static
 #endif
-igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
+igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p)
 {
     /*We're fitting a and b, such that
      * (1 + a*d^2b)^-1
@@ -250,7 +250,7 @@ igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p
     printf("start fit_ab\n");
 #endif
     for (int iter = 0; iter < maxiter; iter++) {
-        igraph_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a, b, &powb, &x, min_dist);
+        IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a, b, &powb, &x, min_dist));
 
         /* break if good fit (conergence to truth) */
         if (squared_sum_res < tol * tol) {
@@ -325,7 +325,7 @@ igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p
          * start from largest change, and keep shrinking as long as we are going down
          * */
         squared_sum_res_old = squared_sum_res;
-        igraph_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist);
+        IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist));
 
 #ifdef UMAP_DEBUG
         printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old, squared_sum_res);
@@ -335,7 +335,7 @@ igraph_error_t igraph_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b_p
             da /= 2.0;
             db /= 2.0;
             squared_sum_res_tmp = squared_sum_res;
-            igraph_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist);
+            IGRAPH_CHECK(igraph_i_umap_get_ab_residuals(&residuals, &squared_sum_res, nr_points, a + da, b + db, &powb, &x, min_dist));
 
             /* Compare and if we are going back uphill, undo last step and break */
 #ifdef UMAP_DEBUG
@@ -578,7 +578,7 @@ static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t
     return (IGRAPH_SUCCESS);
 }
 
-static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
+static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph, igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
         igraph_matrix_t *layout, igraph_integer_t epochs) {
     igraph_real_t learning_rate = 1;
     igraph_real_t sampling_prob = 0.5; // between 0 and 1, fraction of edges sampled for gradient at each epoch
@@ -618,7 +618,7 @@ static igraph_error_t igraph_umap_optimize_layout_stochastic_gradient(igraph_t *
 }
 
 /* Center layout around (0,0) at the end, just for convenience */
-igraph_error_t igraph_umap_center_layout(igraph_matrix_t *layout) {
+igraph_error_t igraph_i_umap_center_layout(igraph_matrix_t *layout) {
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_real_t xm = 0, ym = 0;
 
@@ -642,14 +642,26 @@ igraph_error_t igraph_umap_center_layout(igraph_matrix_t *layout) {
 }
 
 
-igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, igraph_matrix_t *layout) {
+igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs) {
 
 
-    igraph_integer_t epochs = 500; //FIXME
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t umap_weights; /* probabilities of each edge being a real connection */
-    igraph_real_t min_dist = 0.01; /* This is empyrical */
     float a, b; /* The smoothing parameters given min_dist */
+
+    /* Default parameters */
+    if (min_dist <= 0) {
+        min_dist = 0.01; /* This is empyrical */
+    }
+
+    /* This could be improved, but roughly */
+    if (epochs <= 0) {
+        if (no_of_edges < 50000) {
+            epochs = 500; /* This is reasonable usually */
+        } else {
+            epochs = 50;
+        }
+    }
 
     /* UMAP is sometimes used on unweighted graphs, that means
      * distances are always zero */
@@ -661,7 +673,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     IGRAPH_VECTOR_INIT_FINALLY(&umap_weights, no_of_edges);
 
     /* Make combined graph with smoothed probabilities */
-    IGRAPH_CHECK(igraph_umap_find_prob_graph(graph, distances, &umap_weights));
+    IGRAPH_CHECK(igraph_i_umap_find_prob_graph(graph, distances, &umap_weights));
 
     /* From now on everything lives in probability space, it does not matter whether
      * the original graph was weighted/distanced or unweighted */
@@ -670,13 +682,13 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, i
     igraph_layout_random(graph, layout);
 
     /* Definition 11 */
-    igraph_umap_fit_ab(min_dist, &a, &b);
+    IGRAPH_CHECK(igraph_i_umap_fit_ab(min_dist, &a, &b));
 
     /* Algorithm 5 */
-    IGRAPH_CHECK(igraph_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b, layout));
+    IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b, layout, epochs));
 
     /* Center layout */
-    IGRAPH_CHECK(igraph_umap_center_layout(layout));
+    IGRAPH_CHECK(igraph_i_umap_center_layout(layout));
 
     igraph_vector_destroy(&umap_weights);
     IGRAPH_FINALLY_CLEAN(1);
