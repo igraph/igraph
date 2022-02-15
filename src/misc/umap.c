@@ -25,6 +25,46 @@
 #include "igraph_random.h"
 #include "igraph_lapack.h"
 
+
+
+/**
+ * \function igraph_layout_umap
+ * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
+ *
+ * UMAP is a commonly used technique used to embed high-dimensional vectors in 2D in a nonlinear fashion (unlike e.g. PCA), similar to T-distributed Stochastic Neighbor Embedding (t-SNE). The first step of that procedure is to reduce the list of high-dimensional vectors into a similarity graph, with each vertex signifying a vector/observation and edges drawn between vectors that are "similar" in some metric, most commonly Pearson correlation. This function aligns with the original description of the algorithm in requiring not a similarity metric between vertices but a "distance" metric. For correlation similarity, the associated distance is often defined as:
+ *
+ * d(v1, v2) = max(0, 1 - corr(v1, v2))
+ *
+ * This implementation can also work with unweighted similarity graphs, in which case the distance parameter should be a null pointer.
+ *
+ * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient descent really shines when the graph is sparse. In practice, most people feed a k-nearest neighbor (either exact or approximated) similarity graph with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain distance (e.g. correlation <0.2).
+ *
+ * Therefore, if you are trying to use this function to embed high-dimensional vectors, the steps are:
+ *
+ * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors, weighted or unweighted
+ * 2. If you keep the weights, convert them into distances (e.g. see above for correlation)
+ * 3. Feed graph (and weights, if you have them) into this function.
+ *
+ * Note that step 1 above involves deciding if two high-dimensional vectors "look similar" which, because of the curse of dimensionality, is in many cases a highly subjective and potentially controversial operation: thread with care and at your own risk.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Leland McInnes, John Healy, and James Melville, arXiv:1802.03426v3
+ *
+ * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed). Weights in this graph object are currently ignored.
+ * \param distances Pointer to a vector of "distances" between vertices. Similarity graphs for UMAP are often originally meant in terms of similarity weights (e.g. correlation between high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is fine here too. If this argument is an empty pointer (NULL), connected vertices are assumed to be very similar.
+ * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D embedding are currently supported, as they are by far more common than any higher dimensions.
+ * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the embedding before feeling a repulsive force. Typically, 0.01 is a good number. If this is negative or zero, 0.01 is assumed.
+ * \param epochs Number of iterations of the main stochastic gradient descent loop on the cross-entropy. If negative or zero, 500 epochs are used if the graph is the graph is small (less than 50k edges), 50 epochs are used for larger graphs.
+ *
+ * \return Error code.
+ *
+ */
+igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs);
+
+
 /* rho is just the size of the distance from each vertex and its closest neighbor */
 /* sigma is the the decay from each vertex, depends on its rho and the rest of its neighbor distances */
 
