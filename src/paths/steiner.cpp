@@ -65,9 +65,8 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 	return key;
 }
 
-igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,
-											   igraph_vector_t steiner_terminals,
-											   igraph_neimode_t mode, const igraph_vector_t weights)
+igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,igraph_vector_t steiner_terminals,
+igraph_neimode_t mode, const igraph_vector_t *weights)
 {
 
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
@@ -81,12 +80,12 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,
 
 	IGRAPH_VECTOR_INIT_FINALLY(&steiner_vertices, 0);
 
-	if (igraph_vector_size(&weights) != no_of_edges)
+	if (igraph_vector_size(weights) != no_of_edges)
 	{
 		IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
 	}
 
-	igraph_shortest_paths_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), &weights);
+	igraph_shortest_paths_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights);
 
 	igraph_vector_sort(&steiner_terminals);
 

@@ -54,10 +54,10 @@ int main()
     igraph_small(&g_lm, 5, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 3, 3, 4 - 1);
 
     printf("No vertices, not directed:\n");
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals, IGRAPH_ALL, &weights_empty) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, steiner_terminals, IGRAPH_ALL, &weights_empty) == IGRAPH_SUCCESS);
 
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals, IGRAPH_ALL, &weights_lm == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm, steiner_terminals, IGRAPH_ALL, &weights_lm == IGRAPH_SUCCESS);
 
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
