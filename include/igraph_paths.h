@@ -47,7 +47,7 @@ IGRAPH_EXPORT igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                                            igraph_bool_t directed,
                                            igraph_bool_t unconn);
 
-IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t graph,
+IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,
                                                            igraph_vector_t steiner_terminals,
                                                            igraph_neimode_t mode, const igraph_vector_t weights);
 
