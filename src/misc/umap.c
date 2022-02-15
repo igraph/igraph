@@ -700,7 +700,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t
 #endif
 
          /* Adjust learning rate */
-        learning_rate = 1.0 - (e + 1) / epochs;
+        learning_rate = 1.0 - (float)(e + 1) / epochs;
     }
 
     return (IGRAPH_SUCCESS);
