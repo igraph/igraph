@@ -36,12 +36,12 @@ int main() {
 
     /* Simple triangle graph, the output should be always one community */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,  1,  0,  2,  1,  2, -1);
+    igraph_vector_int_init(&membership, 0);
 
     for (j = 0; j < 100; j++) {
         /* label propagation is a stochastic method */
         igraph_rng_seed(igraph_rng_default(), j);
 
-        igraph_vector_int_init(&membership, 0);
         igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
 
         for (i = 0; i < 3; i++) {
@@ -76,7 +76,6 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
 
     igraph_destroy(&g);

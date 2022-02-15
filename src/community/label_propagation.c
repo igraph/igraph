@@ -262,10 +262,10 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
 
         if (control_iteration) {
             running = 0;
+        } else {
+            /* Shuffle the node ordering vector */
+            IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
         }
-
-        /* Shuffle the node ordering vector */
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
 
         RNG_BEGIN();
         /* In the prescribed order, loop over the vertices and reassign labels */

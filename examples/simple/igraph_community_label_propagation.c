@@ -49,10 +49,7 @@ int main() {
            igraph_vector_int_max(&membership) + 1, modularity);
 
     printf("Communities membership: ");
-    for (i = 0; i < igraph_vcount(&graph); i++) {
-        printf("%ld ", VECTOR(membership)[i]);
-    }
-    printf("\n");
+    igraph_vector_int_print(&membership);
 
     /* Destroy data structures at the end. */
     igraph_vector_int_destroy(&membership);
