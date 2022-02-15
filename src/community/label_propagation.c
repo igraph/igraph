@@ -324,7 +324,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             if (igraph_vector_int_size(&dominant_labels) > 0) {
                 if (control_iteration) {
                     /* Check if the _current_ label of the node is also dominant */
-                    if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
+                    if (VECTOR(label_counters)[VECTOR(*membership)[v1]] != max_count) {
                         /* Nope, we need at least one more iteration */
                         running = 1;
                     }
@@ -344,7 +344,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         }
         RNG_END();
 
-        control_iteration = 1 - control_iteration;
+        control_iteration = !control_iteration;
     }
 
     if (weights) {

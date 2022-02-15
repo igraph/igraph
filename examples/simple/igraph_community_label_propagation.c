@@ -25,7 +25,6 @@ int main() {
     igraph_t graph;
     igraph_vector_int_t membership;
     igraph_real_t modularity;
-    igraph_integer_t i;
 
     igraph_famous(&graph, "Zachary"); /* We use Zachary's karate club network. */
 
