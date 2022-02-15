@@ -26,13 +26,12 @@
 #include "igraph_lapack.h"
 
 
-
 /**
  * \function igraph_layout_umap
  * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
  *
- * UMAP is a commonly used technique used to embed high-dimensional vectors in 
- * 2D in a nonlinear fashion (unlike e.g. PCA), similar to T-distributed Stochastic Neighbor 
+ * UMAP is a commonly used technique used to embed high-dimensional vectors in
+ * 2D in a nonlinear fashion (unlike e.g. PCA), similar to T-distributed Stochastic Neighbor
  * Embedding (t-SNE). The first step of that procedure is to reduce the list of high-dimensional
  * vectors into a similarity graph, with each vertex signifying a vector/observation and edges
  * drawn between vectors that are "similar" in some metric, most commonly Pearson correlation.
@@ -72,7 +71,7 @@
  *   this graph object are currently ignored.
  * \param distances Pointer to a vector of "distances" between vertices. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is 
+ *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
  *   fine here too. If this argument is an empty pointer (NULL), connected vertices are assumed
  *   to be very similar.
  * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D
@@ -87,7 +86,7 @@
  * \return Error code.
  *
  */
-igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances, 
+igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances,
     igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs);
 
 
@@ -96,7 +95,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances,
  * distances */
 
 /* Find sigma for this vertex by binary search */
-static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph, 
+static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph,
         const igraph_vector_t *distances, igraph_integer_t i, igraph_vector_int_t *eids,
         igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
 
@@ -118,8 +117,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph,
         }
 
 #ifdef UMAP_DEBUG
-        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %f,
-                target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
+        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %f, "
+               "target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
 #endif
 
         /* TODO: this seems fine, but is probably a little off for some corner cases */
@@ -251,8 +250,8 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
 }
 
 /* Helper function to compute a and b parameters (smoothing probability metric in embedding space) */
-static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals, 
-        igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a, 
+static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals,
+        igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a,
         igraph_real_t b, igraph_vector_t *powb, igraph_vector_t *x, igraph_real_t min_dist)
 {
     igraph_real_t tmp;
