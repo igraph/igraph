@@ -73,7 +73,6 @@ int main() {
             0.1, 0.1, 0.1, 0.1, 0.05, 0.1
             );
 
-	igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_matrix_init(&layout, 0, 0);
 
 #ifdef UMAP_DEBUG
@@ -81,7 +80,6 @@ int main() {
     IGRAPH_CHECK(igraph_i_umap_fit_ab(0.1, &a, &b));
     IGRAPH_CHECK(igraph_i_umap_fit_ab(5, &a, &b));
 #endif
-    
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, -1, -1, -1) == IGRAPH_SUCCESS);
@@ -89,6 +87,7 @@ int main() {
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
+    igraph_vector_destroy(&distances);
 
     printf("Same graph, no weights:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.4) == IGRAPH_SUCCESS);
@@ -96,13 +95,14 @@ int main() {
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
+    igraph_destroy(&graph);
 
     printf("Empty graph:\n");
+	igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
     IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);
+    igraph_destroy(&empty_graph);
 
-
-    igraph_destroy(&graph);
     igraph_matrix_destroy(&layout);
     VERIFY_FINALLY_STACK();
     return 0;
