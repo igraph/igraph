@@ -20,6 +20,40 @@
 #include "igraph_umap.h"
 #include "test_utilities.inc"
 
+
+int check_graph_twoclusters(igraph_matrix_t *layout, igraph_real_t distmax) {
+    /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
+    igraph_real_t xm, ym, dx, dy, dist;
+    int nerr = 0;
+
+    for (int iclu = 0; iclu < 7; iclu+= 6) {
+        xm = 0;
+        ym = 0;
+        for (int i = iclu; i < iclu + 4; i++) {
+            xm += MATRIX(*layout, i, 0);
+            ym += MATRIX(*layout, i, 1);
+        }
+        xm /= 4;
+        ym /= 4;
+        for (int i = iclu; i < iclu + 4; i++) {
+            dx = MATRIX(*layout, i, 0) - xm;
+            dy = MATRIX(*layout, i, 1) - ym;
+            dist = sqrt((dx * dx) + (dy * dy));
+
+            if (dist > distmax) {
+                printf("ERROR: UMAP cluster not compact!\n");
+                printf("Vertex %d: distance from cluster center: %f", i, dist);
+                nerr++;
+            }
+        }
+    }
+
+    if (nerr == 0) {
+        printf("UMAP layout seems fine.\n");
+    }
+}
+
+
 int main() {
     igraph_t graph, empty_graph;
     igraph_vector_t distances;
@@ -36,7 +70,7 @@ int main() {
             igraph_ecount(&graph),
             0.1, 0.15, 0.12, 0.09, 0.1, 0.1,
             0.9, 0.9, 0.9,
-            0.1, 0.1, 0.1, 0.1, 0.1, 0.1
+            0.1, 0.1, 0.1, 0.1, 0.05, 0.1
             );
 
 	igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
@@ -51,11 +85,17 @@ int main() {
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout, 1.5);
+#ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
+#endif
 
     printf("Same graph, no weights:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout, 0.5);
+#ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
+#endif
 
     printf("Empty graph:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500) == IGRAPH_SUCCESS);
