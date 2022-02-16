@@ -42,7 +42,7 @@ int check_graph_twoclusters(igraph_matrix_t *layout, igraph_real_t distmax) {
 
             if (dist > distmax) {
                 printf("ERROR: UMAP cluster not compact!\n");
-                printf("Vertex %d: distance from cluster center: %f", i, dist);
+                printf("Vertex %d: distance from cluster center: %f\n", i, dist);
                 nerr++;
             }
         }

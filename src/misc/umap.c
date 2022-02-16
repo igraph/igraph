@@ -691,8 +691,11 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t
        igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
        igraph_matrix_t *layout, igraph_integer_t epochs, igraph_real_t sampling_prob) {
 
-    igraph_real_t cross_entropy, cross_entropy_old;
     igraph_real_t learning_rate = 1;
+
+#ifdef UMAP_DEBUG
+    igraph_real_t cross_entropy, cross_entropy_old;
+#endif
 
     /* Explicit avoidance of neighbor repulsion, only useful in small graphs
      * which are never very sparse */
