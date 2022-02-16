@@ -531,14 +531,14 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
             for (i = 0; i < component_size; i++) {
                 l = VECTOR(new2old_vertex_ids)[i];
                 MATRIX(*res, l, 0) = MATRIX(layout, i, 0) + dx;
-                MATRIX(*res, l, 1) = VECTOR(layer_to_y)[(long)MATRIX(layout, i, 1)];
+                MATRIX(*res, l, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
                 if (dx2 < MATRIX(*res, l, 0)) {
                     dx2 = MATRIX(*res, l, 0);
                 }
             }
             for (i = component_size; i < next_new_vertex_id; i++) {
                 MATRIX(*res, k, 0) = MATRIX(layout, i, 0) + dx;
-                MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(long)MATRIX(layout, i, 1)];
+                MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
                 if (dx2 < MATRIX(*res, k, 0)) {
                     dx2 = MATRIX(*res, k, 0);
                 }
@@ -721,7 +721,7 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
             VECTOR(*barycenters)[i] = MATRIX(*layout, i, 0);
         } else {
             for (j = 0; j < m; j++) {
-                VECTOR(*barycenters)[i] += MATRIX(*layout, (long)VECTOR(neis)[j], 0);
+                VECTOR(*barycenters)[i] += MATRIX(*layout, (igraph_integer_t) VECTOR(neis)[j], 0);
             }
             VECTOR(*barycenters)[i] /= m;
         }

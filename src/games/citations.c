@@ -320,8 +320,8 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     return IGRAPH_SUCCESS;
 
 err_pref_too_short:
-    IGRAPH_ERRORF("Preference vector should have length at least %ld with the given types.", IGRAPH_EINVAL,
-                  (long) igraph_vector_int_max(types) + 1);
+    IGRAPH_ERRORF("Preference vector should have length at least %" IGRAPH_PRId " with the given types.", IGRAPH_EINVAL,
+                  igraph_vector_int_max(types) + 1);
 
 err_pref_neg:
     IGRAPH_ERRORF("Preferences should be non-negative, but found %g.", IGRAPH_EINVAL,
