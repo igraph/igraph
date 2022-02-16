@@ -910,6 +910,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
  * The contents of the two matrices will be swapped.
  * \param m1 The first matrix.
  * \param m2 The second matrix.
+ * \return Error code.
  *
  * Time complexity: O(1).
  */

@@ -2440,6 +2440,7 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
  *
  * \param v1 The first vector.
  * \param v2 The second vector.
+ * \return Error code.
  *
  * Time complexity: O(1).
  */
