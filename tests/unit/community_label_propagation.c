@@ -44,11 +44,8 @@ int main() {
 
         igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
 
-        for (i = 0; i < 3; i++) {
-            if (VECTOR(membership)[i] != VECTOR(membership)[0]) {
-                return 3;
-            }
-        }
+        for (i = 0; i < 3; i++)
+            IGRAPH_ASSERT(VECTOR(membership)[i] == VECTOR(membership)[0]);
     }
 
     igraph_destroy(&g);
@@ -93,15 +90,12 @@ int main() {
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
                                        &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
-        if (VECTOR(membership)[i] != (i < 2 ? 0 : 1)) {
-            return 3;
-        }
+        IGRAPH_ASSERT(VECTOR(membership)[i] == (i < 2 ? 0 : 1));
+
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0,
                                        &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
-        if (VECTOR(membership)[i] != 0) {
-            return 4;
-        }
+        IGRAPH_ASSERT(VECTOR(membership)[i] == 0);
 
     /* Check whether it works with no fixed vertices at all
      * while an initial configuration is given -- see bug
