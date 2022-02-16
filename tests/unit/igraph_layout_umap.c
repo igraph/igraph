@@ -70,7 +70,7 @@ int main() {
             igraph_ecount(&graph),
             0.1, 0.15, 0.12, 0.09, 0.1, 0.1,
             0.9, 0.9, 0.9,
-            0.1, 0.1, 0.1, 0.1, 0.05, 0.1
+            0.2, 0.1, 0.1, 0.1, 0.1, 0.1
             );
 
     igraph_matrix_init(&layout, 0, 0);
@@ -90,8 +90,8 @@ int main() {
     igraph_vector_destroy(&distances);
 
     printf("Same graph, no weights:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.4) == IGRAPH_SUCCESS);
-    check_graph_twoclusters(&layout, 0.5);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout, 1.5);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
