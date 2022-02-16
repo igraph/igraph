@@ -9,10 +9,10 @@ mkdir build && cd build
 cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None
 make -j$(nproc)
 
-# Build ICU for linking statically.
-cd $SRC/icu/source
+# Build ICU for linking statically. 
+cd $SRC/icu/source 
 ./configure --disable-shared --enable-static --disable-layoutex \
-   --disable-tests --disable-samples --with-data-packaging=static --prefix=$DEPS_PATH
+   --disable-tests --disable-samples --with-data-packaging=static --prefix=$DEPS_PATH 
 make install -j$(nproc)
 
 # Ugly hack to get static linking to work for ICU.
