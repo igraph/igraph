@@ -2448,17 +2448,9 @@ igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igrap
 
     TYPE(igraph_vector) tmp;
 
-    tmp.stor_begin = (*v1).stor_begin;
-    tmp.stor_end = (*v1).stor_end;
-    tmp.end = (*v1).end;
-
-    (*v1).stor_begin = (*v2).stor_begin;
-    (*v1).stor_end = (*v2).stor_end;
-    (*v1).end = (*v2).end;
-
-    (*v2).stor_begin = tmp.stor_begin;
-    (*v2).stor_end = tmp.stor_end;
-    (*v2).end = tmp.end;
+    tmp = *v1;
+    *v1 = *v2;
+    *v2 = tmp;
 
     return IGRAPH_SUCCESS;
 }
