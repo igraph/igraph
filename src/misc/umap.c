@@ -30,36 +30,52 @@
  * \function igraph_layout_umap
  * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
  *
- * UMAP is a commonly used technique used to embed high-dimensional vectors in
- * 2D in a nonlinear fashion (unlike e.g. PCA), similar to T-distributed Stochastic Neighbor
- * Embedding (t-SNE). The first step of that procedure is to reduce the list of high-dimensional
- * vectors into a similarity graph, with each vertex signifying a vector/observation and edges
- * drawn between vectors that are "similar" in some metric, most commonly Pearson correlation.
- * This function aligns with the original description of the algorithm in requiring not a
- * similarity metric between vertices but a "distance" metric. For correlation similarity, the
- * associated distance is often defined as:
+ * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
+ * (most commonly by far, 2D). The algorithm is probabilistic and introduces
+ * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
+ * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
+ * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
+ * in PCA).
  *
- * d(v1, v2) = max(0, 1 - corr(v1, v2))
+ * However, UMAP uses a graph with distances associated to the edges as a key
+ * intermediate representation of the high-dimensional space, so it is also useful as
+ * a general graph layouting algorithm, hence its inclusion in igraph.
  *
- * This implementation can also work with unweighted similarity graphs, in which case the distance
- * parameter should be a null pointer.
+ * Importantly, the edge-associated distances are derived from a similarity metric
+ * between the high-dimensional vectors, often Pearson correlation:
  *
- * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient descent
- * really shines when the graph is sparse. In practice, most people feed a k-nearest neighbor
- * (either exact or approximated) similarity graph with some additional cutoff to exclude
- * "quasi-neighbors" that lie beyond a certain distance (e.g. correlation <0.2).
+ * corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]
  *
- * Therefore, if you are trying to use this function to embed high-dimensional vectors, the steps
- * are:
+ * In this case, the associated distance is usually defined as:
  *
- * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors, weighted
- * or unweighted
- * 2. If you keep the weights, convert them into distances (e.g. see above for correlation)
- * 3. Feed graph (and weights, if you have them) into this function.
+ * d(v1, v2) = 1 - corr(v1, v2)
  *
- * Note that step 1 above involves deciding if two high-dimensional vectors "look similar" which,
- * because of the curse of dimensionality, is in many cases a highly subjective and potentially
- * controversial operation: thread with care and at your own risk.
+ * This implementation can also work with unweighted similarity graphs, in which case
+ * the distance parameter should be a null pointer and all edges beget a similarity
+ * score of 1 (a distance of 0).
+ *
+ * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
+ * descent approach really shines when the graph is sparse. In practice, most people
+ * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
+ * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
+ * distance (e.g. correlation <0.2).
+ *
+ * Therefore, if you are trying to use this function to embed high-dimensional vectors,
+ * the steps are:
+ *
+ * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
+ *    weighted or unweighted. If unsure, compute a knn.
+ * 2. If you keep the weights, convert them into distances or store them as a "weight"
+ *    edge attribute and use a null pointer for the distances. If using similarity
+ *    weights instead of distances, make sure they do not exceed 1.
+ * 3. Feed the graph (and distances, if you have them) into this function.
+ *
+ * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
+ *       which, because of the curse of dimensionality, is in many cases a highly
+ *       subjective and potentially controversial operation: thread with care and at
+ *       your own risk. Two high-dimensional vectors might look similar or extremely
+ *       different depending on the point of view/angle, and there are a lot of
+ *       viewpoints when the dimensionality ramps up.
  *
  * </para><para>
  * References:
@@ -155,6 +171,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
         const igraph_vector_t *distances, igraph_vector_t *umap_weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_neis, eid;
     igraph_vector_int_t eids, weight_seen;
     igraph_real_t rho, dist_max, dist, sigma, weight, weight_inv, sigma_target;
@@ -162,7 +179,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
     /* if the original graph is unweighted, probabilities are 1 throughout */
     if (distances == NULL) {
         no_of_neis = igraph_vector_size(umap_weights);
-        for (int j = 0; j < no_of_neis; j++) {
+        for (int j = 0; j < no_of_edges; j++) {
             VECTOR(*umap_weights)[j] = 1;
         }
         return (IGRAPH_SUCCESS);
@@ -171,7 +188,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
 
     /* Initialize vectors and matrices */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&weight_seen, igraph_vector_size(distances));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&weight_seen, no_of_edges);
 
     /* Iterate over vertices x, like in the paper */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
