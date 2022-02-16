@@ -251,6 +251,10 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
     }
 
+    /* There are two alternating types of iterations, one for changing labels and
+    the other one for checking the end condition - every vertex in the graph has
+    a label to which the maximum number of its neighbors belongs. If control_iteration
+    is true, we are just checking the end condition and not relabeling nodes. */
     control_iteration = 1;
     running = 1;
     while (running) {
