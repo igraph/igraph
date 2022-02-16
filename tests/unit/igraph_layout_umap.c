@@ -84,21 +84,21 @@ int main() {
     
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, -1, -1, -1) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout, 1.5);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
 
     printf("Same graph, no weights:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.4) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout, 0.5);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
 
     printf("Empty graph:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);
 
 

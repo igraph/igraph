@@ -98,12 +98,13 @@
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. If negative or zero, 500 epochs are used if the graph is the graph is small
  *   (less than 50k edges), 50 epochs are used for larger graphs.
+ * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower. Vice versa, a too low number will converge very slowly, possibly too slowly. If negative of zero, a value of 0.5 is assumed.
  *
  * \return Error code.
  *
  */
 igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances,
-    igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs);
+    igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob);
 
 
 /* rho is just the size of the distance from each vertex and its closest neighbor */
@@ -475,14 +476,14 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, float *a_p, float *b
 }
 
 /* cross-entropy */
-static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph,
+static igraph_error_t igraph_compute_cross_entropy(igraph_t *graph,
        igraph_vector_t *umap_weights, igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b,
        igraph_real_t *cross_entropy) {
 
     igraph_real_t mu, nu, xd, yd, sqd;
     igraph_integer_t from, to;
-    igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
-    igraph_integer_t no_of_nodes = igraph_vcount(umap_graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t edge_seen;
 
     IGRAPH_MATRIX_INIT_FINALLY(&edge_seen, no_of_nodes, no_of_nodes);
@@ -499,7 +500,7 @@ static igraph_error_t igraph_compute_cross_entropy(igraph_t *umap_graph,
         mu = VECTOR(*umap_weights)[eid];
 
         /* Find vertices */
-        IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
+        IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
         /* Find distance in layout space */
         xd = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
         yd = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1));
@@ -592,22 +593,24 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
     return (IGRAPH_SUCCESS);
 }
 
-static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t *umap_weights,
+static igraph_error_t igraph_apply_forces(igraph_t *graph,  igraph_vector_t *umap_weights,
        igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob,
-       igraph_real_t learning_rate)
+       igraph_real_t learning_rate, int avoid_neighbor_repulsion)
 {
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
-    igraph_integer_t no_of_edges = igraph_ecount(umap_graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t from, to;
     igraph_real_t from_x, from_y, to_x, to_y, x_diff, y_diff, fx, fy;
-
-    // FIXME
-    igraph_vector_int_t neis;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-
-    /* TODO: what should we use for the number of random vertices?
-     * might/should change at every iteration?
+    /* The following is only used for small graphs, to avoid repelling your neighbors
+     * For large sparse graphs, it's not necessary. For large dense graphs, you should
+     * not be doing UMAP.
      * */
+    igraph_vector_int_t neis;
+
+    if (avoid_neighbor_repulsion > 0) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+    }
+
     igraph_integer_t n_random_vertices = sqrt(no_of_nodes);
 
     /* iterate over a random subsample of edges */
@@ -616,7 +619,7 @@ static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t
             continue;
         }
 
-        IGRAPH_CHECK(igraph_edge(umap_graph, eid, &from, &to));
+        IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
 
         /* Current coordinates of both vertices */
         from_x = MATRIX(*layout, from, 0);
@@ -642,15 +645,15 @@ static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t
             }
             /* do not repel neighbors for small graphs, for big graphs this
              * does not matter as long as the k in knn << number of vertices */
-            if (no_of_nodes < 1000) {
-                /* FIXME: This is terribly inefficient, try to improve using adjacency lists or
-                 * somethingbut just for testing anyway */
+            if (avoid_neighbor_repulsion > 0) {
+                /* FIXME: This algo terribly inefficient, try to improve using
+                 * adjacency lists or something but just for testing anyway */
                 int skip = 0;
-                igraph_incident(umap_graph, &neis, from, IGRAPH_ALL);
+                igraph_incident(graph, &neis, from, IGRAPH_ALL);
                 for (int k = 0; k < igraph_vector_int_size(&neis); k++) {
                     igraph_integer_t eid2 = VECTOR(neis)[k];
                     igraph_integer_t from2, to2;
-                    igraph_edge(umap_graph, eid2, &from2, &to2);
+                    igraph_edge(graph, eid2, &from2, &to2);
                     if (((from2 == from) && (to2 == to)) || ((from2 == to) && (from == to2))) {
                         skip = 1;
                         break;
@@ -676,20 +679,27 @@ static igraph_error_t igraph_apply_forces(igraph_t *umap_graph,  igraph_vector_t
         }
     }
 
-    igraph_vector_int_destroy(&neis);
-    IGRAPH_FINALLY_CLEAN(1);
+    if (avoid_neighbor_repulsion > 0) {
+        igraph_vector_int_destroy(&neis);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     return (IGRAPH_SUCCESS);
 }
 
-static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t *umap_graph,
+static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t *graph,
        igraph_vector_t *umap_weights, igraph_real_t a, igraph_real_t b,
-       igraph_matrix_t *layout, igraph_integer_t epochs) {
-    igraph_real_t learning_rate = 1;
-    /* between 0 and 1, fraction of edges sampled for gradient at each epoch */
-    igraph_real_t sampling_prob = 0.5;
-    igraph_real_t cross_entropy, cross_entropy_old;
+       igraph_matrix_t *layout, igraph_integer_t epochs, igraph_real_t sampling_prob) {
 
+    igraph_real_t cross_entropy, cross_entropy_old;
+    igraph_real_t learning_rate = 1;
+
+    /* Explicit avoidance of neighbor repulsion, only useful in small graphs
+     * which are never very sparse */
+    int avoid_neighbor_repulsion = 0;
+    if (igraph_vcount(graph) < 100) {
+        avoid_neighbor_repulsion = 1;
+    }
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
      * 1. - sum_edge_e mu(e) * log(nu(e))
@@ -701,17 +711,17 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(igraph_t
      * function Phi.
      * */
 #ifdef UMAP_DEBUG
-    igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
+    igraph_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
 #endif
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
         /* Apply (stochastic) forces */
-        igraph_apply_forces(umap_graph, umap_weights, layout, a, b, sampling_prob, learning_rate);
+        igraph_apply_forces(graph, umap_weights, layout, a, b, sampling_prob, learning_rate, avoid_neighbor_repulsion);
 
 #ifdef UMAP_DEBUG
         /* Recompute CE and check how it's going*/
         cross_entropy_old = cross_entropy;
-        igraph_compute_cross_entropy(umap_graph, umap_weights, layout, a, b, &cross_entropy);
+        igraph_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
 
         printf("Cross-entropy before shift: %f, after shift: %f\n", cross_entropy_old, cross_entropy);
 #endif
@@ -749,25 +759,31 @@ igraph_error_t igraph_i_umap_center_layout(igraph_matrix_t *layout) {
 
 
 igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances,
-        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs) {
+        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
 
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t umap_weights; /* probabilities of each edge being a real connection */
     float a, b; /* The smoothing parameters given min_dist */
 
-    /* Default parameters */
+
+    /* Default min_dist */
     if (min_dist <= 0) {
         min_dist = 0.01; /* This is empyrical */
     }
 
-    /* This could be improved, but roughly */
+    /* Default epochs: this could be improved, but roughly */
     if (epochs <= 0) {
         if (no_of_edges < 50000) {
             epochs = 500; /* This is reasonable usually */
         } else {
             epochs = 50;
         }
+    }
+
+    /* Default sampling_prob */
+    if (sampling_prob <= 0) {
+        sampling_prob = 0.5;
     }
 
     /* UMAP is sometimes used on unweighted graphs, that means
@@ -793,7 +809,7 @@ igraph_error_t igraph_layout_umap(igraph_t *graph, igraph_vector_t *distances,
 
     /* Algorithm 5 */
     IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b,
-                layout, epochs));
+                layout, epochs, sampling_prob));
 
     /* Center layout */
     IGRAPH_CHECK(igraph_i_umap_center_layout(layout));
