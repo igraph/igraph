@@ -21,10 +21,21 @@
 #include "test_utilities.inc"
 
 
-int check_graph_twoclusters(igraph_matrix_t *layout, igraph_real_t distmax) {
+int check_graph_twoclusters(igraph_matrix_t *layout) {
     /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
-    igraph_real_t xm, ym, dx, dy, dist;
+    igraph_real_t xm, ym, dx, dy, dist, xmin, xmax, ymin, ymax, distmax;
     int nerr = 0;
+
+    xmin = xmax = ymin = ymax = 0;
+    for (int i = 0; i < 10; i++) {
+        xmin = fmin(xmin, MATRIX(*layout, i, 0));
+        xmax = fmax(xmax, MATRIX(*layout, i, 0));
+        ymin = fmin(ymin, MATRIX(*layout, i, 1));
+        ymax = fmax(ymax, MATRIX(*layout, i, 1));
+    }
+    /* 20% of the total span of the layout is the max distance
+     * between strong neighbors */
+    distmax = 0.2 * fmax((xmax - xmin), (ymax - ymin));
 
     for (int iclu = 0; iclu < 7; iclu+= 6) {
         xm = 0;
@@ -83,7 +94,7 @@ int main() {
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, -1, -1, -1) == IGRAPH_SUCCESS);
-    check_graph_twoclusters(&layout, 1.5);
+    check_graph_twoclusters(&layout);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
@@ -91,7 +102,7 @@ int main() {
 
     printf("Same graph, no weights:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
-    check_graph_twoclusters(&layout, 1.5);
+    check_graph_twoclusters(&layout);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
 #endif
