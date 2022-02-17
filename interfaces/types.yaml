@@ -506,6 +506,11 @@ TREEMODE:
     CTYPE: igraph_tree_mode_t
     FLAGS: ENUM
 
+LPA_VARIANT:
+    # Enum that describes how a tree graph should be constructed
+    CTYPE: igraph_lpa_variant_t
+    FLAGS: ENUM
+
 ###############################################################################
 # Switches / flags / bits
 ###############################################################################
