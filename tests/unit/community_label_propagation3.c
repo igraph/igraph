@@ -50,7 +50,7 @@ int main() {
     igraph_vector_init(&membership, 0);
 
     igraph_community_label_propagation(&g, &membership, 0, &initial, &fixed,
-                                       /*modularity=*/ 0);
+                                       /*modularity=*/ 0, IGRAPH_LPA_DOMINANCE);
 
     for (i = 0; i < igraph_vcount(&g); i++) {
         /* Check that the "fixed" vector has not been changed */

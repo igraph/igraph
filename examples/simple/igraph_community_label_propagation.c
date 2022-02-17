@@ -37,7 +37,7 @@ int main() {
     igraph_community_label_propagation(
                 &graph, &membership,
                 /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
-                &modularity);
+                &modularity, IGRAPH_LPA_DOMINANCE);
 
     printf("%ld communities found; modularity score is %g.\n",
            (long int) (igraph_vector_max(&membership) + 1),

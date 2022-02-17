@@ -212,12 +212,28 @@ IGRAPH_EXPORT int igraph_community_fluid_communities(const igraph_t *graph,
                                                      igraph_vector_t *membership,
                                                      igraph_real_t *modularity);
 
+/**
+ * \typedef igraph_lpa_variant_t
+ * \brief Label propagation algorithm variants of implementation
+ *
+ * Algorithms to run the label propagation algorithm.
+ * \enumval IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after each iteration
+ * \enumval IGRAPH_LPA_RETENTION Keep current label if among dominant labels, only check if labels changed
+ * \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
+ */
+typedef enum {
+    IGRAPH_LPA_DOMINANCE = 0, // Sample from dominant labels, check for dominance after each iteration
+    IGRAPH_LPA_RETENTION = 1, // Keep current label if among dominant labels, only check if labels changed
+    IGRAPH_LPA_FAST = 2       // Sample from dominant labels, only check neighbors
+} igraph_lpa_variant_t;
+
 IGRAPH_EXPORT int igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_t *membership,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_t *initial,
                                                      const igraph_vector_bool_t *fixed,
-                                                     igraph_real_t *modularity);
+                                                     igraph_real_t *modularity,
+                                                     igraph_lpa_variant_t variant);
 
 IGRAPH_EXPORT int igraph_community_multilevel(const igraph_t *graph,
                                               const igraph_vector_t *weights,
