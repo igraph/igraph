@@ -2438,30 +2438,21 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
  * \function igraph_vector_swap
  * \brief Swap elements of two vectors.
  *
- * The two vectors must have the same length, otherwise an error
- * happens.
  * \param v1 The first vector.
  * \param v2 The second vector.
  * \return Error code.
  *
- * Time complexity: O(n), the length of the vectors.
+ * Time complexity: O(1).
  */
 
 igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
 
-    igraph_integer_t i, n1 = FUNCTION(igraph_vector, size)(v1);
-    igraph_integer_t n2 = FUNCTION(igraph_vector, size)(v2);
-    if (n1 != n2) {
-        IGRAPH_ERROR("Vectors must have the same number of elements for swapping.",
-                     IGRAPH_EINVAL);
-    }
+    TYPE(igraph_vector) tmp;
 
-    for (i = 0; i < n1; i++) {
-        BASE tmp;
-        tmp = VECTOR(*v1)[i];
-        VECTOR(*v1)[i] = VECTOR(*v2)[i];
-        VECTOR(*v2)[i] = tmp;
-    }
+    tmp = *v1;
+    *v1 = *v2;
+    *v2 = tmp;
+
     return IGRAPH_SUCCESS;
 }
 
