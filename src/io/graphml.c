@@ -521,7 +521,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     }
 
     IGRAPH_CHECK(igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr));
-    IGRAPH_CHECK(igraph_add_vertices(state->g, (igraph_integer_t) igraph_trie_size(&state->node_trie), &vattr));
+    IGRAPH_CHECK(igraph_add_vertices(state->g, igraph_trie_size(&state->node_trie), &vattr));
     IGRAPH_CHECK(igraph_add_edges(state->g, &state->edgelist, &eattr));
 
     igraph_vector_ptr_destroy(&vattr);
