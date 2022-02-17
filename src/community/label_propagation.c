@@ -73,6 +73,8 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
   }
 
+  RNG_BEGIN();
+
   /* There are two alternating types of iterations, one for changing labels and
   the other one for checking the end condition - every vertex in the graph has
   a label to which the maximum number of its neighbors belongs. If control_iteration
@@ -96,7 +98,6 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
       IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
     }
 
-    RNG_BEGIN();
     /* In the prescribed order, loop over the vertices and reassign labels */
     for (i = 0; i < no_of_not_fixed_nodes; i++) {
       v1 = (long int) VECTOR(node_order)[i];
@@ -172,11 +173,12 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
         VECTOR(label_counters)[(long int)VECTOR(nonzero_labels)[j]] = 0;
       }
     }
-    RNG_END();
 
     /* Alternating between control iterations and label updating iterations */
     control_iteration = !control_iteration;
   }
+
+  RNG_END();
 
   if (weights) {
     igraph_inclist_destroy(&il);
