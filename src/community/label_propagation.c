@@ -26,7 +26,7 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 
-int igraph_i_community_label_propagation(const igraph_t *graph,
+igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_vector_int_t *membership,
     igraph_neimode_t mode,
     const igraph_vector_t *weights,
@@ -193,9 +193,11 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_vector_int_destroy(&dominant_labels);
     igraph_vector_destroy(&label_counters);
     IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_i_community_fast_label_propagation(const igraph_t *graph,
+igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     igraph_vector_int_t *membership,
     igraph_neimode_t mode,
     const igraph_vector_t *weights,
@@ -358,7 +360,7 @@ int igraph_i_community_fast_label_propagation(const igraph_t *graph,
     igraph_vector_int_destroy(&nonzero_labels);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -546,7 +548,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     switch(lpa_variant)
     {
       case IGRAPH_LPA_FAST:
-        igraph_i_community_fast_label_propagation(graph, membership, mode, weights, fixed_copy);
+        IGRAPH_CHECK(igraph_i_community_fast_label_propagation(graph, membership, mode, weights, fixed_copy));
         break;
 
       case IGRAPH_LPA_RETENTION:
@@ -555,7 +557,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
 
       case IGRAPH_LPA_DOMINANCE:
       default:
-        igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy);
+        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy));
     }
 
 
