@@ -49,7 +49,7 @@ int main(void) {
 
     igraph_vector_int_init(&membership, 0);
 
-    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, 0, &initial, &fixed);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, 0, &initial, &fixed, IGRAPH_LPA_DOMINANCE);
 
     for (i = 0; i < igraph_vcount(&g); i++) {
         /* Check that the "fixed" vector has not been changed */

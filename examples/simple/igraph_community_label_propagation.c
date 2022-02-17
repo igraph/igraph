@@ -36,8 +36,8 @@ int main(void) {
     igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(
         &graph, &membership, /* mode = */ IGRAPH_ALL,
-        /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL
-        );
+        /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
+        IGRAPH_LPA_DOMINANCE);
 
     /* Also calculate the modularity of the partition */
     igraph_modularity(

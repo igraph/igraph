@@ -40,7 +40,7 @@ int main(void) {
     VECTOR(initial_labels)[2] = -1;
     VECTOR(initial_labels)[3] = -1;
 
-    igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, NULL, &initial_labels, NULL);
+    igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, NULL, &initial_labels, NULL, IGRAPH_LPA_DOMINANCE);
     print_vector_int(&membership);
 
     igraph_destroy(&graph);
@@ -61,7 +61,7 @@ int main(void) {
     VECTOR(initial_labels)[6] = -1;
     VECTOR(initial_labels)[7] = -1;
 
-    igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, &initial_labels, NULL);
+    igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, &initial_labels, NULL, IGRAPH_LPA_DOMINANCE);
     print_vector_int(&membership);
 
     igraph_destroy(&graph);
@@ -72,7 +72,7 @@ int main(void) {
     igraph_vector_int_resize(&initial_labels, igraph_vcount(&graph));
     igraph_vector_int_fill(&initial_labels, -1);
 
-    igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, &initial_labels, NULL);
+    igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, &initial_labels, NULL, IGRAPH_LPA_DOMINANCE);
     print_vector_int(&membership);
 
     igraph_destroy(&graph);
