@@ -6,6 +6,7 @@
 
  - `igraph_get_all_shortest_paths_dijsktra()` now uses tolerances when comparing path
    lengths, and is thus robust to numerical roundoff errors.
+ - `igraph_vector_*_swap` and `igraph_matrix_swap` now take O(1) instead of O(n) and accept all sizes.
 
 ### Fixed
 
