@@ -21,7 +21,7 @@
 #include "test_utilities.inc"
 
 
-int check_graph_twoclusters(igraph_matrix_t *layout) {
+int check_graph_twoclusters(const igraph_matrix_t *layout) {
     /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
     igraph_real_t xm, ym, dx, dy, dist, xmin, xmax, ymin, ymax, distmax;
     int nerr = 0;
@@ -33,9 +33,8 @@ int check_graph_twoclusters(igraph_matrix_t *layout) {
         ymin = fmin(ymin, MATRIX(*layout, i, 1));
         ymax = fmax(ymax, MATRIX(*layout, i, 1));
     }
-    /* 20% of the total span of the layout is the max distance
-     * between strong neighbors */
-    distmax = 0.2 * fmax((xmax - xmin), (ymax - ymin));
+    /* total span of the layout */
+    distmax = fmax((xmax - xmin), (ymax - ymin));
 
     for (int iclu = 0; iclu < 7; iclu+= 6) {
         xm = 0;
@@ -51,9 +50,9 @@ int check_graph_twoclusters(igraph_matrix_t *layout) {
             dy = MATRIX(*layout, i, 1) - ym;
             dist = sqrt((dx * dx) + (dy * dy));
 
-            if (dist > distmax) {
+            if (dist > 0.2 * distmax) {
                 printf("ERROR: UMAP cluster not compact!\n");
-                printf("Vertex %d: distance from cluster center: %f\n", i, dist);
+                printf("Vertex %d, dx: %f, dy: %f, dist: %f, distmax: %f, d/dmax: %e\n", i, dx, dy, dist, distmax, dist / distmax);
                 nerr++;
             }
         }
