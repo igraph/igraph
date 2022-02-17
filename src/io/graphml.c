@@ -362,7 +362,7 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     state->ignore_namespaces = 0;
 }
 
-static int igraph_i_graphml_parser_state_finish_parsing(struct igraph_i_graphml_parser_state *state) {
+static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph_i_graphml_parser_state *state) {
     igraph_integer_t i, l;
     igraph_attribute_record_t idrec, eidrec;
     const char *idstr = "id";
