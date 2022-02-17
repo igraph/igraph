@@ -1507,14 +1507,14 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     IGRAPH_UNUSED(instream);
     IGRAPH_UNUSED(index);
 
-    IGRAPH_ERROR("GraphML support is disabled", IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ERROR("GraphML support is disabled.", IGRAPH_UNIMPLEMENTED);
 #endif
 }
 
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_graphml
- * \brief Writes the graph to a file in GraphML format
+ * \brief Writes the graph to a file in GraphML format.
  *
  * </para><para>
  * GraphML is an XML-based file format for representing various types of
@@ -1555,34 +1555,34 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     /* set standard C locale lest we sometimes get commas instead of dots */
     char *saved_locale = strdup(setlocale(LC_NUMERIC, NULL));
     if (saved_locale == NULL) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Not enough memory.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, saved_locale);
     setlocale(LC_NUMERIC, "C");
 
     ret = fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
     ret = fprintf(outstream, "<graphml xmlns=\"%s\"\n", GRAPHML_NAMESPACE_URI);
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
     ret = fprintf(outstream, "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
     ret = fprintf(outstream, "         xsi:schemaLocation=\"%s\n", GRAPHML_NAMESPACE_URI);
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
     ret = fprintf(outstream, "         %s/1.0/graphml.xsd\">\n", GRAPHML_NAMESPACE_URI);
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
     ret = fprintf(outstream, "<!-- Created by igraph -->\n");
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
 
     /* dump the <key> elements if any */
@@ -1610,17 +1610,17 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"string\"/>\n", gprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"double\"/>\n", gprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"boolean\"/>\n", gprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         }
         IGRAPH_FREE(name_escaped);
@@ -1634,17 +1634,17 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"node\" attr.name=\"%s\" attr.type=\"string\"/>\n", vprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"node\" attr.name=\"%s\" attr.type=\"double\"/>\n", vprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"node\" attr.name=\"%s\" attr.type=\"boolean\"/>\n", vprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         }
         IGRAPH_FREE(name_escaped);
@@ -1658,17 +1658,17 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"string\"/>\n", eprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"double\"/>\n", eprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"boolean\"/>\n", eprefix, name_escaped, name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         }
         IGRAPH_FREE(name_escaped);
@@ -1676,7 +1676,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
 
     ret = fprintf(outstream, "  <graph id=\"G\" edgedefault=\"%s\">\n", (igraph_is_directed(graph) ? "directed" : "undirected"));
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
 
     /* Write the graph atributes before anything else */
@@ -1691,15 +1691,15 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "    <data key=\"%s%s\">", gprefix, name_escaped);
                 IGRAPH_FREE(name_escaped);
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
                 ret = igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
                 ret = fprintf(outstream, "</data>\n");
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
             }
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
@@ -1715,11 +1715,11 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             ret = fprintf(outstream, "%s", s_escaped);
             IGRAPH_FREE(s_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
             ret = fprintf(outstream, "</data>\n");
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
             igraph_strvector_get(&gnames, i, &name);
@@ -1729,7 +1729,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                           gprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
             IGRAPH_FREE(name_escaped);
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
             }
         }
     }
@@ -1741,7 +1741,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         ret = fprintf(outstream, "    <node id=\"n%" IGRAPH_PRId "\">\n", l);
 
         if (ret < 0) {
-            IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+            IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
         }
 
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
@@ -1754,15 +1754,15 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                     ret = fprintf(outstream, "      <data key=\"%s%s\">", vprefix, name_escaped);
                     IGRAPH_FREE(name_escaped);
                     if (ret < 0) {
-                        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                     }
                     ret = igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                     if (ret < 0) {
-                        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                     }
                     ret = fprintf(outstream, "</data>\n");
                     if (ret < 0) {
-                        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                     }
                 }
             } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
@@ -1779,11 +1779,11 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "%s", s_escaped);
                 IGRAPH_FREE(s_escaped);
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
                 ret = fprintf(outstream, "</data>\n");
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
             } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 igraph_strvector_get(&vnames, i, &name);
@@ -1794,14 +1794,14 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                               vprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
                 IGRAPH_FREE(name_escaped);
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
             }
         }
 
         ret = fprintf(outstream, "    </node>\n");
         if (ret < 0) {
-            IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+            IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
         }
     }
 
@@ -1816,7 +1816,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         ret = fprintf(outstream, "    <edge source=\"n%" IGRAPH_PRId "\" target=\"n%" IGRAPH_PRId "\">\n",
                       from, to);
         if (ret < 0) {
-            IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+            IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
         }
 
         for (i = 0; i < igraph_vector_int_size(&etypes); i++) {
@@ -1829,15 +1829,15 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                     ret = fprintf(outstream, "      <data key=\"%s%s\">", eprefix, name_escaped);
                     IGRAPH_FREE(name_escaped);
                     if (ret < 0) {
-                        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                     }
                     ret = igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                     if (ret < 0) {
-                        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                     }
                     ret = fprintf(outstream, "</data>\n");
                     if (ret < 0) {
-                        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                     }
                 }
             } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
@@ -1854,11 +1854,11 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "%s", s_escaped);
                 IGRAPH_FREE(s_escaped);
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
                 ret = fprintf(outstream, "</data>\n");
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
             } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 igraph_strvector_get(&enames, i, &name);
@@ -1869,14 +1869,14 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                               eprefix, name_escaped, VECTOR(boolv)[0] ? "true" : "false");
                 IGRAPH_FREE(name_escaped);
                 if (ret < 0) {
-                    IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
                 }
             }
         }
 
         ret = fprintf(outstream, "    </edge>\n");
         if (ret < 0) {
-            IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+            IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
         }
         IGRAPH_EIT_NEXT(it);
     }
@@ -1885,11 +1885,11 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
 
     ret = fprintf(outstream, "  </graph>\n");
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
     fprintf(outstream, "</graphml>\n");
     if (ret < 0) {
-        IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
     }
 
     /* reset locale to whatever was before this function */
