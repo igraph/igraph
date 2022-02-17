@@ -521,14 +521,15 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     }
 
     IGRAPH_CHECK(igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr));
-    IGRAPH_FINALLY(igraph_destroy, state->g); /* because the next two line may fail as well */
+    IGRAPH_FINALLY(igraph_destroy, state->g); /* because the next two lines may fail as well */
     IGRAPH_CHECK(igraph_add_vertices(state->g, igraph_trie_size(&state->node_trie), &vattr));
     IGRAPH_CHECK(igraph_add_edges(state->g, &state->edgelist, &eattr));
+    IGRAPH_FINALLY_CLEAN(1); /* graph construction completed successfully */
 
     igraph_vector_ptr_destroy(&vattr);
     igraph_vector_ptr_destroy(&eattr);
     igraph_vector_ptr_destroy(&gattr);
-    IGRAPH_FINALLY_CLEAN(4); /* +1 for state->g */
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
