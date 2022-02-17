@@ -905,7 +905,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
 
 /**
  * \function igraph_matrix_swap
- * Swap two matrices.
+ * \brief Swap two matrices.
  *
  * The contents of the two matrices will be swapped.
  * \param m1 The first matrix.
@@ -916,7 +916,19 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
  */
 
 igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
-    return FUNCTION(igraph_vector, swap)(&m1->data, &m2->data);
+    igraph_integer_t tmp;
+
+    tmp = m1->nrow;
+    m1->nrow = m2->nrow;
+    m2->nrow = tmp;
+
+    tmp = m1->ncol;
+    m1->ncol = m2->ncol;
+    m2->ncol = tmp;
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, swap)(&m1->data, &m2->data));
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
