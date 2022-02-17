@@ -192,6 +192,8 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
   igraph_vector_destroy(&dominant_labels);
   igraph_vector_destroy(&nonzero_labels);
   IGRAPH_FINALLY_CLEAN(4);
+
+  return IGRAPH_SUCCESS;
 }
 
 
@@ -347,7 +349,7 @@ int igraph_i_community_fast_label_propagation(const igraph_t *graph,
   igraph_vector_destroy(&nonzero_labels);
   IGRAPH_FINALLY_CLEAN(5);
 
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 /**
@@ -524,7 +526,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     switch(lpa_variant)
     {
       case IGRAPH_LPA_FAST:
-        igraph_i_community_fast_label_propagation(graph, membership, weights, fixed_copy);
+        IGRAPH_CHECK(igraph_i_community_fast_label_propagation(graph, membership, weights, fixed_copy));
         break;
 
       case IGRAPH_LPA_RETENTION:
@@ -533,7 +535,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
       case IGRAPH_LPA_DOMINANCE:
       default:
-        igraph_i_community_label_propagation(graph, membership, weights, fixed_copy);
+        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, weights, fixed_copy));
     }
 
 
