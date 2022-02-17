@@ -566,6 +566,7 @@
  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
     and edge-switching MCMC sampler.
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
+ - `igraph_vector_*_swap` and `igraph_matrix_swap` now take O(1) instead of O(n) and accept all sizes. 
 
 ### Fixed
 
