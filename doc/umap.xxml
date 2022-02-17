@@ -8,7 +8,7 @@
 <title>Dimension reduction of data</title>
 
 <section id="umap"><title>UMAP</title>
-<!-- doxrox-include igraph_umap -->
+<!-- doxrox-include igraph_layout_umap -->
 </section>
 
 </chapter>

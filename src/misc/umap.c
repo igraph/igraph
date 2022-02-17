@@ -58,7 +58,7 @@
  * descent approach really shines when the graph is sparse. In practice, most people
  * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
  * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
- * distance (e.g. correlation <0.2).
+ * distance (e.g. correlation less than 0.2).
  *
  * Therefore, if you are trying to use this function to embed high-dimensional vectors,
  * the steps are:
@@ -140,9 +140,12 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph,
 
         /* TODO: this seems fine, but is probably a little off for some corner cases */
         if (sum < target) {
+            /* going back up after having seen an upper bound */
             if (seen_max == 1) {
                 step /= 2;
-            /* first iteration we want to increase by sigma, else double */
+            /* we need to go up but have not seen an upper bound yet
+             * first iteration we want to increase by sigma, else we must come from
+             * below, so we are sitting at 2 * step, we want to move to 4 * step */
             } else if (iter > 0) {
                 step *= 2;
             }
