@@ -109,7 +109,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     igraph_integer_t no_of_nodes;
     igraph_integer_t no_predefined = 0;
     igraph_vector_ptr_t name, weight;
-    igraph_vector_ptr_t *pname = 0, *pweight = 0;
+    igraph_vector_ptr_t *pname = NULL, *pweight = NULL;
     igraph_attribute_record_t namerec, weightrec;
     const char *namestr = "name", *weightstr = "weight";
     igraph_i_ncol_parsedata_t context;
@@ -182,6 +182,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     if (names) {
         const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
         pname = &name;
         IGRAPH_CHECK(igraph_trie_getkeys(&trie, &namevec)); /* dirty */
         namerec.name = namestr;
@@ -192,7 +193,9 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     if (weights == IGRAPH_ADD_WEIGHTS_YES ||
         (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && context.has_weights)) {
+
         IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
         pweight = &weight;
         weightrec.name = weightstr;
         weightrec.type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -211,15 +214,17 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     if (pname) {
         igraph_vector_ptr_destroy(pname);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     if (pweight) {
         igraph_vector_ptr_destroy(pweight);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_vector_destroy(&ws);
     igraph_trie_destroy(&trie);
     igraph_vector_int_destroy(&edges);
     igraph_ncol_yylex_destroy(context.scanner);
-    IGRAPH_FINALLY_CLEAN(5);
+    IGRAPH_FINALLY_CLEAN(5); /* +1 for 'graph' */
 
     return IGRAPH_SUCCESS;
 }

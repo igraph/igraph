@@ -241,7 +241,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_i_pajek_destroy_attr_vector(&vattrs);
     igraph_trie_destroy(&vattrnames);
     igraph_pajek_yylex_destroy(context.scanner);
-    IGRAPH_FINALLY_CLEAN(7);
+    IGRAPH_FINALLY_CLEAN(7); /* +1 for 'graph' */
 
     return IGRAPH_SUCCESS;
 }
