@@ -29,6 +29,170 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 
+int igraph_i_community_label_propagation(const igraph_t *graph,
+    igraph_vector_t *membership,
+    const igraph_vector_t *weights,
+    igraph_vector_bool_t *fixed)
+{
+  long int no_of_nodes = igraph_vcount(graph);
+  long int no_of_not_fixed_nodes = no_of_nodes;
+  long int i, j, k;
+  igraph_adjlist_t al;
+  igraph_inclist_t il;
+  igraph_bool_t running, control_iteration;
+  igraph_vector_t label_counters, dominant_labels, nonzero_labels, node_order;
+
+  /* Create an adjacency/incidence list representation for efficiency.
+   * For the unweighted case, the adjacency list is enough. For the
+   * weighted case, we need the incidence list */
+  if (weights) {
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &il);
+  } else {
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+  }
+
+  /* Create storage space for counting distinct labels and dominant ones */
+  IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
+  IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, 2));
+
+  /* Initialize node ordering vector with only the not fixed nodes */
+  if (fixed) {
+    IGRAPH_VECTOR_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
+    for (i = 0, j = 0; i < no_of_nodes; i++) {
+      if (!VECTOR(*fixed)[i]) {
+        VECTOR(node_order)[j] = i;
+        j++;
+      }
+    }
+  } else {
+    IGRAPH_CHECK(igraph_vector_init_seq(&node_order, 0, no_of_nodes - 1));
+    IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
+  }
+
+  /* There are two alternating types of iterations, one for changing labels and
+  the other one for checking the end condition - every vertex in the graph has
+  a label to which the maximum number of its neighbors belongs. If control_iteration
+  is true, we are just checking the end condition and not relabeling nodes. */
+  control_iteration = 1;
+  running = 1;
+  while (running) {
+    long int v1, num_neis;
+    igraph_real_t max_count;
+    igraph_vector_int_t *neis;
+    igraph_vector_int_t *ineis;
+    igraph_bool_t was_zero;
+
+    if (control_iteration) {
+      /* If we are in the control iteration, we expect in the begining of
+      the iterationthat all vertices meet the end condition, so running is false.
+      If some of them does not, running is set to true later in the code. */
+      running = 0;
+    } else {
+      /* Shuffle the node ordering vector if we are in the label updating iteration */
+      IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+    }
+
+    RNG_BEGIN();
+    /* In the prescribed order, loop over the vertices and reassign labels */
+    for (i = 0; i < no_of_not_fixed_nodes; i++) {
+      v1 = (long int) VECTOR(node_order)[i];
+
+      /* Count the weights corresponding to different labels */
+      igraph_vector_clear(&dominant_labels);
+      igraph_vector_clear(&nonzero_labels);
+      max_count = 0.0;
+      if (weights) {
+        ineis = igraph_inclist_get(&il, v1);
+        num_neis = igraph_vector_int_size(ineis);
+        for (j = 0; j < num_neis; j++) {
+          k = (long int) VECTOR(*membership)[
+              (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];
+          if (k == 0) {
+            continue;    /* skip if it has no label yet */
+          }
+          was_zero = (VECTOR(label_counters)[k] == 0);
+          VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*ineis)[j]];
+          if (was_zero && VECTOR(label_counters)[k] != 0) {
+            /* counter just became nonzero */
+            IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
+          }
+          if (max_count < VECTOR(label_counters)[k]) {
+            max_count = VECTOR(label_counters)[k];
+            IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
+            VECTOR(dominant_labels)[0] = k;
+          } else if (max_count == VECTOR(label_counters)[k]) {
+            IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
+          }
+        }
+      } else {
+        neis = igraph_adjlist_get(&al, v1);
+        num_neis = igraph_vector_int_size(neis);
+        for (j = 0; j < num_neis; j++) {
+          k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+          if (k == 0) {
+            continue;    /* skip if it has no label yet */
+          }
+          VECTOR(label_counters)[k]++;
+          if (VECTOR(label_counters)[k] == 1) {
+            /* counter just became nonzero */
+            IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
+          }
+          if (max_count < VECTOR(label_counters)[k]) {
+            max_count = VECTOR(label_counters)[k];
+            IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
+            VECTOR(dominant_labels)[0] = k;
+          } else if (max_count == VECTOR(label_counters)[k]) {
+            IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
+          }
+        }
+      }
+
+      if (igraph_vector_size(&dominant_labels) > 0) {
+        if (control_iteration) {
+          /* Check if the _current_ label of the node is also dominant */
+          if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
+            /* Nope, we need at least one more iteration */
+            running = 1;
+          }
+        }
+        else {
+          /* Select randomly from the dominant labels */
+          k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
+          VECTOR(*membership)[v1] = VECTOR(dominant_labels)[(long int)k];
+        }
+      }
+
+      /* Clear the nonzero elements in label_counters */
+      num_neis = igraph_vector_size(&nonzero_labels);
+      for (j = 0; j < num_neis; j++) {
+        VECTOR(label_counters)[(long int)VECTOR(nonzero_labels)[j]] = 0;
+      }
+    }
+    RNG_END();
+
+    /* Alternating between control iterations and label updating iterations */
+    control_iteration = !control_iteration;
+  }
+
+  if (weights) {
+    igraph_inclist_destroy(&il);
+  } else {
+    igraph_adjlist_destroy(&al);
+  }
+  IGRAPH_FINALLY_CLEAN(1);
+
+  igraph_vector_destroy(&node_order);
+  igraph_vector_destroy(&label_counters);
+  igraph_vector_destroy(&dominant_labels);
+  igraph_vector_destroy(&nonzero_labels);
+  IGRAPH_FINALLY_CLEAN(4);
+}
+
+
 /**
  * \ingroup communities
  * \function igraph_community_label_propagation
@@ -97,12 +261,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
     long int no_of_edges = igraph_ecount(graph);
     long int no_of_not_fixed_nodes = no_of_nodes;
     long int i, j, k;
-    igraph_adjlist_t al;
-    igraph_inclist_t il;
-    igraph_bool_t running, control_iteration;
     igraph_bool_t unlabelled_left;
-
-    igraph_vector_t label_counters, dominant_labels, nonzero_labels, node_order;
+    igraph_vector_t label_counters, node_order;
 
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
      * away the constness, and promise ourselves that we will make a proper
@@ -189,23 +349,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     }
 
     /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
-
-    /* Create an adjacency/incidence list representation for efficiency.
-     * For the unweighted case, the adjacency list is enough. For the
-     * weighted case, we need the incidence list */
-    if (weights) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
-        IGRAPH_FINALLY(igraph_inclist_destroy, &il);
-    } else {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
-        IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-    }
-
-    /* Create storage space for counting distinct labels and dominant ones */
     IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, 2));
 
     /* Initialize node ordering vector with only the not fixed nodes */
     if (fixed_copy) {
@@ -221,117 +365,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
     }
 
-    /* There are two alternating types of iterations, one for changing labels and
-    the other one for checking the end condition - every vertex in the graph has
-    a label to which the maximum number of its neighbors belongs. If control_iteration
-    is true, we are just checking the end condition and not relabeling nodes. */
-    control_iteration = 1;
-    running = 1;
-    while (running) {
-        long int v1, num_neis;
-        igraph_real_t max_count;
-        igraph_vector_int_t *neis;
-        igraph_vector_int_t *ineis;
-        igraph_bool_t was_zero;
-
-        if (control_iteration) {
-            /* If we are in the control iteration, we expect in the begining of
-            the iterationthat all vertices meet the end condition, so running is false.
-            If some of them does not, running is set to true later in the code. */
-            running = 0;
-        } else {
-            /* Shuffle the node ordering vector if we are in the label updating iteration */
-            IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
-        }
-
-        RNG_BEGIN();
-        /* In the prescribed order, loop over the vertices and reassign labels */
-        for (i = 0; i < no_of_not_fixed_nodes; i++) {
-            v1 = (long int) VECTOR(node_order)[i];
-
-            /* Count the weights corresponding to different labels */
-            igraph_vector_clear(&dominant_labels);
-            igraph_vector_clear(&nonzero_labels);
-            max_count = 0.0;
-            if (weights) {
-                ineis = igraph_inclist_get(&il, v1);
-                num_neis = igraph_vector_int_size(ineis);
-                for (j = 0; j < num_neis; j++) {
-                    k = (long int) VECTOR(*membership)[
-                    (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];
-                    if (k == 0) {
-                        continue;    /* skip if it has no label yet */
-                    }
-                    was_zero = (VECTOR(label_counters)[k] == 0);
-                    VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*ineis)[j]];
-                    if (was_zero && VECTOR(label_counters)[k] != 0) {
-                        /* counter just became nonzero */
-                        IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
-                    }
-                    if (max_count < VECTOR(label_counters)[k]) {
-                        max_count = VECTOR(label_counters)[k];
-                        IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
-                        VECTOR(dominant_labels)[0] = k;
-                    } else if (max_count == VECTOR(label_counters)[k]) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
-                    }
-                }
-            } else {
-                neis = igraph_adjlist_get(&al, v1);
-                num_neis = igraph_vector_int_size(neis);
-                for (j = 0; j < num_neis; j++) {
-                    k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
-                    if (k == 0) {
-                        continue;    /* skip if it has no label yet */
-                    }
-                    VECTOR(label_counters)[k]++;
-                    if (VECTOR(label_counters)[k] == 1) {
-                        /* counter just became nonzero */
-                        IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
-                    }
-                    if (max_count < VECTOR(label_counters)[k]) {
-                        max_count = VECTOR(label_counters)[k];
-                        IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
-                        VECTOR(dominant_labels)[0] = k;
-                    } else if (max_count == VECTOR(label_counters)[k]) {
-                        IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
-                    }
-                }
-            }
-
-            if (igraph_vector_size(&dominant_labels) > 0) {
-                if (control_iteration) {
-                    /* Check if the _current_ label of the node is also dominant */
-                    if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
-                        /* Nope, we need at least one more iteration */
-                        running = 1;
-                    }
-                }
-                else {
-                    /* Select randomly from the dominant labels */
-                    k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
-                    VECTOR(*membership)[v1] = VECTOR(dominant_labels)[(long int)k];
-                }
-            }
-
-            /* Clear the nonzero elements in label_counters */
-            num_neis = igraph_vector_size(&nonzero_labels);
-            for (j = 0; j < num_neis; j++) {
-                VECTOR(label_counters)[(long int)VECTOR(nonzero_labels)[j]] = 0;
-            }
-        }
-        RNG_END();
-
-        /* Alternating between control iterations and label updating iterations */
-        control_iteration = !control_iteration;
-    }
-
-    if (weights) {
-        igraph_inclist_destroy(&il);
-    } else {
-        igraph_adjlist_destroy(&al);
-    }
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_i_community_label_propagation(graph, membership, weights, fixed_copy);
 
     /* Shift back the membership vector, permute labels in increasing order */
     /* We recycle label_counters here :) */
@@ -421,10 +455,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
     igraph_vector_destroy(&node_order);
     igraph_vector_destroy(&label_counters);
-    igraph_vector_destroy(&dominant_labels);
-    igraph_vector_destroy(&nonzero_labels);
-    IGRAPH_FINALLY_CLEAN(4);
-
+    IGRAPH_FINALLY_CLEAN(2);
     if (fixed != fixed_copy) {
         igraph_vector_bool_destroy(fixed_copy);
         igraph_Free(fixed_copy);
