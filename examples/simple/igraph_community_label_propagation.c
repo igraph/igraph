@@ -51,7 +51,7 @@ int main() {
     igraph_vector_int_print(&membership);
 
     printf("Communities membership: ");
-    igraph_vector_print(&membership);
+    igraph_vector_int_print(&membership);
 
     /* Destroy data structures at the end. */
     igraph_vector_int_destroy(&membership);
