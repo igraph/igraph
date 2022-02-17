@@ -47,6 +47,9 @@ int main() {
     printf("%" IGRAPH_PRId " communities found; modularity score is %g.\n",
            igraph_vector_int_max(&membership) + 1, modularity);
 
+    printf("Communities membership: ");
+    igraph_vector_int_print(&membership);
+
     /* Destroy data structures at the end. */
     igraph_vector_int_destroy(&membership);
     igraph_destroy(&graph);

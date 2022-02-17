@@ -54,19 +54,13 @@ int main() {
     for (i = 0; i < igraph_vcount(&g); i++) {
         /* Check that the "fixed" vector has not been changed */
         if (i == 7 || i == 13) {
-            if (!VECTOR(fixed)[i]) {
-                return 1;
-            }
+            IGRAPH_ASSERT(VECTOR(fixed)[i]);
         } else {
-            if (VECTOR(fixed)[i]) {
-                return 1;
-            }
+            IGRAPH_ASSERT(!VECTOR(fixed)[i]);
         }
 
         /* Check that no vertex remained unlabeled */
-        if (VECTOR(membership)[i] < 0) {
-            return 2;
-        }
+        IGRAPH_ASSERT(VECTOR(membership)[i] >= 0);
     }
 
     igraph_vector_bool_destroy(&fixed);

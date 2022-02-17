@@ -126,7 +126,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_integer_t i, j, k;
     igraph_adjlist_t al;
     igraph_inclist_t il;
-    igraph_bool_t running;
+    igraph_bool_t running, control_iteration;
     igraph_bool_t unlabelled_left;
     igraph_neimode_t reversed_mode;
 
@@ -251,6 +251,11 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
     }
 
+    /* There are two alternating types of iterations, one for changing labels and
+    the other one for checking the end condition - every vertex in the graph has
+    a label to which the maximum number of its neighbors belongs. If control_iteration
+    is true, we are just checking the end condition and not relabeling nodes. */
+    control_iteration = 1;
     running = 1;
     while (running) {
         igraph_integer_t v1, num_neis;
@@ -259,10 +264,15 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         igraph_vector_int_t *ineis;
         igraph_bool_t was_zero;
 
-        running = 0;
-
-        /* Shuffle the node ordering vector */
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+        if (control_iteration) {
+            /* If we are in the control iteration, we expect in the begining of
+            the iterationthat all vertices meet the end condition, so running is false.
+            If some of them does not, running is set to true later in the code. */
+            running = 0;
+        } else {
+            /* Shuffle the node ordering vector if we are in the label updating iteration */
+            IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+        }
 
         RNG_BEGIN();
         /* In the prescribed order, loop over the vertices and reassign labels */
@@ -319,15 +329,18 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             }
 
             if (igraph_vector_int_size(&dominant_labels) > 0) {
-                /* Select randomly from the dominant labels */
-                k = RNG_INTEGER(0, igraph_vector_int_size(&dominant_labels) - 1);
-                k = VECTOR(dominant_labels)[k];
-                /* Check if the _current_ label of the node is also dominant */
-                if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
-                    /* Nope, we need at least one more iteration */
-                    running = 1;
+                if (control_iteration) {
+                    /* Check if the _current_ label of the node is also dominant */
+                    if (VECTOR(label_counters)[VECTOR(*membership)[v1]] != max_count) {
+                        /* Nope, we need at least one more iteration */
+                        running = 1;
+                    }
                 }
-                VECTOR(*membership)[v1] = k;
+                else {
+                    /* Select randomly from the dominant labels */
+                    k = RNG_INTEGER(0, igraph_vector_int_size(&dominant_labels) - 1);
+                    VECTOR(*membership)[v1] = VECTOR(dominant_labels)[k];
+                }
             }
 
             /* Clear the nonzero elements in label_counters */
@@ -337,6 +350,9 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             }
         }
         RNG_END();
+
+        /* Alternating between control iterations and label updating iterations */
+        control_iteration = !control_iteration;
     }
 
     if (weights) {
