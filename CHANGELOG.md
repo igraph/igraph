@@ -574,6 +574,7 @@
    errors and other error conditions originating from the underlying `libxml2`
    library.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+ - Label propagation now ensures that all labels are dominant.
 
 ### Deprecated
 
