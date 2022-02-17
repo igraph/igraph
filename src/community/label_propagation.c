@@ -56,7 +56,7 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
     }
 
     /* Create storage space for counting distinct labels and dominant ones */
-    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dominant_labels, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&dominant_labels, 2));
@@ -103,54 +103,54 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
         for (i = 0; i < no_of_not_fixed_nodes; i++) {
             v1 = VECTOR(node_order)[i];
 
-            /* Count the weights corresponding to different labels */
-            igraph_vector_int_clear(&dominant_labels);
-            igraph_vector_int_clear(&nonzero_labels);
-            max_count = 0.0;
-            if (weights) {
-                ineis = igraph_inclist_get(&il, v1);
-                num_neis = igraph_vector_int_size(ineis);
-                for (j = 0; j < num_neis; j++) {
-                    k = VECTOR(*membership)[IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1)];
-                    if (k == 0) {
-                        continue;    /* skip if it has no label yet */
-                    }
-                    was_zero = (VECTOR(label_counters)[k] == 0);
-                    VECTOR(label_counters)[k] += VECTOR(*weights)[VECTOR(*ineis)[j]];
-                    if (was_zero && VECTOR(label_counters)[k] != 0) {
-                        /* counter just became nonzero */
-                        IGRAPH_CHECK(igraph_vector_int_push_back(&nonzero_labels, k));
-                    }
-                    if (max_count < VECTOR(label_counters)[k]) {
-                        max_count = VECTOR(label_counters)[k];
-                        IGRAPH_CHECK(igraph_vector_int_resize(&dominant_labels, 1));
-                        VECTOR(dominant_labels)[0] = k;
-                    } else if (max_count == VECTOR(label_counters)[k]) {
-                        IGRAPH_CHECK(igraph_vector_int_push_back(&dominant_labels, k));
-                    }
-                }
-            } else {
-                neis = igraph_adjlist_get(&al, v1);
-                num_neis = igraph_vector_int_size(neis);
-                for (j = 0; j < num_neis; j++) {
-                    k = VECTOR(*membership)[VECTOR(*neis)[j]];
-                    if (k == 0) {
-                        continue;    /* skip if it has no label yet */
-                    }
-                    VECTOR(label_counters)[k]++;
-                    if (VECTOR(label_counters)[k] == 1) {
-                        /* counter just became nonzero */
-                        IGRAPH_CHECK(igraph_vector_int_push_back(&nonzero_labels, k));
-                    }
-                    if (max_count < VECTOR(label_counters)[k]) {
-                        max_count = VECTOR(label_counters)[k];
-                        IGRAPH_CHECK(igraph_vector_int_resize(&dominant_labels, 1));
-                        VECTOR(dominant_labels)[0] = k;
-                    } else if (max_count == VECTOR(label_counters)[k]) {
-                        IGRAPH_CHECK(igraph_vector_int_push_back(&dominant_labels, k));
-                    }
-                }
-            }
+      /* Count the weights corresponding to different labels */
+      igraph_vector_int_clear(&dominant_labels);
+      igraph_vector_int_clear(&nonzero_labels);
+      max_count = 0.0;
+      if (weights) {
+        ineis = igraph_inclist_get(&il, v1);
+        num_neis = igraph_vector_int_size(ineis);
+        for (j = 0; j < num_neis; j++) {
+          k = VECTOR(*membership)[IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1)];
+          if (k < 0) {
+            continue;    /* skip if it has no label yet */
+          }
+          was_zero = (VECTOR(label_counters)[k] == 0);
+          VECTOR(label_counters)[k] += VECTOR(*weights)[VECTOR(*ineis)[j]];
+          if (was_zero && VECTOR(label_counters)[k] != 0) {
+            /* counter just became nonzero */
+            IGRAPH_CHECK(igraph_vector_int_push_back(&nonzero_labels, k));
+          }
+          if (max_count < VECTOR(label_counters)[k]) {
+            max_count = VECTOR(label_counters)[k];
+            IGRAPH_CHECK(igraph_vector_int_resize(&dominant_labels, 1));
+            VECTOR(dominant_labels)[0] = k;
+          } else if (max_count == VECTOR(label_counters)[k]) {
+            IGRAPH_CHECK(igraph_vector_int_push_back(&dominant_labels, k));
+          }
+        }
+      } else {
+        neis = igraph_adjlist_get(&al, v1);
+        num_neis = igraph_vector_int_size(neis);
+        for (j = 0; j < num_neis; j++) {
+          k = VECTOR(*membership)[VECTOR(*neis)[j]];
+          if (k < 0) {
+            continue;    /* skip if it has no label yet */
+          }
+          VECTOR(label_counters)[k]++;
+          if (VECTOR(label_counters)[k] == 1) {
+            /* counter just became nonzero */
+            IGRAPH_CHECK(igraph_vector_int_push_back(&nonzero_labels, k));
+          }
+          if (max_count < VECTOR(label_counters)[k]) {
+            max_count = VECTOR(label_counters)[k];
+            IGRAPH_CHECK(igraph_vector_int_resize(&dominant_labels, 1));
+            VECTOR(dominant_labels)[0] = k;
+          } else if (max_count == VECTOR(label_counters)[k]) {
+            IGRAPH_CHECK(igraph_vector_int_push_back(&dominant_labels, k));
+          }
+        }
+      }
 
             if (igraph_vector_int_size(&dominant_labels) > 0) {
                 if (control_iteration) {
@@ -301,11 +301,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
      * copy of 'fixed' into 'fixed_copy' as soon as we start mutating it */
     igraph_vector_bool_t *fixed_copy = (igraph_vector_bool_t *) fixed;
 
-    /* The implementation uses a trick to avoid negative array indexing:
-     * elements of the membership vector are increased by 1 at the start
-     * of the algorithm; this to allow us to denote unlabeled vertices
-     * (if any) by zeroes. The membership vector is shifted back in the end
-     */
+    /* Unlabelled nodes are represented with -1. */
+#define IS_UNLABELLED(x) (VECTOR(*membership)[x] < 0)
 
     /* Do some initial checks */
     if (fixed && igraph_vector_bool_size(fixed) != no_of_nodes) {
@@ -338,15 +335,15 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         /* Check if the labels used are valid, initialize membership vector */
         for (i = 0; i < no_of_nodes; i++) {
             if (VECTOR(*initial)[i] < 0) {
-                VECTOR(*membership)[i] = 0;
+                VECTOR(*membership)[i] = -1;
             } else {
-                VECTOR(*membership)[i] = VECTOR(*initial)[i] + 1;
+                VECTOR(*membership)[i] = VECTOR(*initial)[i];
             }
         }
         if (fixed) {
             for (i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*fixed)[i]) {
-                    if (VECTOR(*membership)[i] == 0) {
+                    if (IS_UNLABELLED(i)) {
                         IGRAPH_WARNING("Fixed nodes cannot be unlabeled, ignoring them.");
 
                         /* We cannot modify 'fixed' because it is const, so we make a copy and
@@ -376,12 +373,12 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         }
     } else {
         for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(*membership)[i] = i + 1;
+            VECTOR(*membership)[i] = i;
         }
     }
 
     /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
-    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes);
 
     igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy);
 
@@ -391,7 +388,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     j = 0;
     unlabelled_left = false;
     for (i = 0; i < no_of_nodes; i++) {
-        k = VECTOR(*membership)[i] - 1;
+        k = VECTOR(*membership)[i];
         if (k >= 0) {
             if (VECTOR(label_counters)[k] == -1) {
                 /* We have seen this label for the first time */
@@ -407,9 +404,6 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         }
         VECTOR(*membership)[i] = k;
     }
-
-    /* From this point on, unlabelled nodes are represented with -1 (no longer 0). */
-#define IS_UNLABELLED(x) (VECTOR(*membership)[x] < 0)
 
     /* If any nodes are left unlabelled, we assign the remaining labels to them,
      * as well as to all unlabelled nodes reachable from them.
