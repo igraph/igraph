@@ -909,19 +909,15 @@ int FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
  * \function igraph_matrix_swap
  * Swap two matrices.
  *
- * The contents of the two matrices will be swapped. They must have the
- * same dimensions.
+ * The contents of the two matrices will be swapped.
  * \param m1 The first matrix.
  * \param m2 The second matrix.
  * \return Error code.
  *
- * Time complexity: O(mn), the number of elements in the matrices.
+ * Time complexity: O(1).
  */
 
 int FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
-    if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
-        IGRAPH_ERROR("Cannot swap non-conformant matrices", IGRAPH_EINVAL);
-    }
     return FUNCTION(igraph_vector, swap)(&m1->data, &m2->data);
 }
 
