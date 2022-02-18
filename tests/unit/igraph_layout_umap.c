@@ -20,7 +20,7 @@
 #include "test_utilities.inc"
 
 
-int check_graph_twoclusters(const igraph_matrix_t *layout) {
+void check_graph_twoclusters(const igraph_matrix_t *layout) {
     /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
     igraph_real_t xm, ym, dx, dy, dist, xmin, xmax, ymin, ymax, distmax;
     int nerr = 0;
@@ -59,10 +59,8 @@ int check_graph_twoclusters(const igraph_matrix_t *layout) {
 
     if (nerr == 0) {
         printf("UMAP layout seems fine.\n");
-        return 0;
     } else {
         igraph_matrix_print(layout);
-        return nerr;
     }
 }
 
@@ -76,7 +74,7 @@ int main() {
 #endif
 
     igraph_rng_seed(igraph_rng_default(), 42);
-    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, // 4?
+    igraph_small(&graph, 12, IGRAPH_UNDIRECTED,
             0,1, 0,2, 0,3, 1,2, 1,3, 2,3,
             3,4, 4,5, 5,6,
             6,7, 7,8, 6,8, 7,9, 6,9, 8,9, 7,10, 8,10, 9,10, 10,11, 9,11, 8,11, 7,11,
