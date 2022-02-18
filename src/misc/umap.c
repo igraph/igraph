@@ -45,11 +45,11 @@
  * Importantly, the edge-associated distances are derived from a similarity metric
  * between the high-dimensional vectors, often Pearson correlation:
  *
- * corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]
+ * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
  *
  * In this case, the associated distance is usually defined as:
  *
- * d(v1, v2) = 1 - corr(v1, v2)
+ * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
  *
  * This implementation can also work with unweighted similarity graphs, in which case
  * the distance parameter should be a null pointer and all edges beget a similarity
