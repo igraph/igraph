@@ -32,6 +32,7 @@
 <!-- doxrox-include igraph_layout_reingold_tilford -->
 <!-- doxrox-include igraph_layout_reingold_tilford_circular -->
 <!-- doxrox-include igraph_layout_sugiyama -->
+<!-- doxrox-include igraph_layout_umap -->
 </section>
 
 <section id="three-d-layout-generators"><title>3D layout generators</title>

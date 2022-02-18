@@ -53,7 +53,6 @@ set(
   structural.xxml
   strvector.xxml
   threading.xxml
-  umap.xxml
   vector.xxml
   visitors.xxml
 )
