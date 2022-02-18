@@ -82,7 +82,8 @@
  * References:
  *
  * </para><para>
- * Leland McInnes, John Healy, and James Melville, arXiv:1802.03426v3
+ * Leland McInnes, John Healy, and James Melville, https://doi.org/10.21105/joss.00861,
+ * https://arxiv.org/abs/1802.03426
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed). Weights in
  *   this graph object are currently ignored.
