@@ -761,8 +761,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  * </para><para>
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
  *
- * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed). Weights in
- *   this graph object are currently ignored.
+ * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
  * \param distances Pointer to a vector of "distances" between vertices. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
  *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
