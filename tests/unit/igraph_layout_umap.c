@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include "igraph_umap.h"
 #include "test_utilities.inc"
 
 
