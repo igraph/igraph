@@ -769,8 +769,8 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D
  *   embedding are currently supported, as they are by far more common than any higher dimensions.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
- *   embedding before feeling a repulsive force. Typically, 0.01 is a good number. If this is
- *   negative or zero, 0.01 is assumed.
+ *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
+ *   number.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. If negative or zero, 500 epochs are used if the graph is the graph is small
  *   (less than 50k edges), 50 epochs are used for larger graphs.
@@ -792,7 +792,8 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
 
     /* Default min_dist */
     if (min_dist <= 0) {
-        min_dist = 0.01; /* This is empyrical */
+        IGRAPH_ERRORF("Minimum distance should be positive, but found %f.",
+                IGRAPH_EINVAL, min_dist);
     }
 
     /* Default epochs: this could be improved, but roughly */

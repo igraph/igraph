@@ -97,7 +97,7 @@ int main() {
 #endif
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, -1, -1, -1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, -1, -1) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
@@ -113,11 +113,14 @@ int main() {
     igraph_destroy(&graph);
 
     printf("Empty graph:\n");
-	igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
     IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);
-    igraph_destroy(&empty_graph);
 
+    printf("Check error for negative min_dist.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, -1), IGRAPH_EINVAL);
+
+    igraph_destroy(&empty_graph);
     igraph_matrix_destroy(&layout);
     VERIFY_FINALLY_STACK();
     return 0;
