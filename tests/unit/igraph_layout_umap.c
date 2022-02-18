@@ -27,7 +27,7 @@ int check_graph_twoclusters(const igraph_matrix_t *layout) {
     int nerr = 0;
 
     xmin = xmax = ymin = ymax = 0;
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
         xmin = fmin(xmin, MATRIX(*layout, i, 0));
         xmax = fmax(xmax, MATRIX(*layout, i, 0));
         ymin = fmin(ymin, MATRIX(*layout, i, 1));
@@ -60,6 +60,8 @@ int check_graph_twoclusters(const igraph_matrix_t *layout) {
 
     if (nerr == 0) {
         printf("UMAP layout seems fine.\n");
+    } else {
+        igraph_matrix_print(layout);
     }
 }
 
@@ -74,13 +76,13 @@ int main() {
     igraph_small(&graph, 4, IGRAPH_UNDIRECTED,
             0,1, 0,2, 0,3, 1,2, 1,3, 2,3,
             3,4, 4,5, 5,6,
-            6,7, 7,8, 6,8, 7,9, 6,9, 8,9, 7,10, 8,10, 9,10,
+            6,7, 7,8, 6,8, 7,9, 6,9, 8,9, 7,10, 8,10, 9,10, 10,11, 9,11, 8,11, 7,11,
             -1);
     igraph_vector_init_real(&distances,
             igraph_ecount(&graph),
-            0.1, 0.15, 0.12, 0.09, 0.1, 0.1,
+            0.1, 0.05, 0.12, 0.09, 0.1, 0.1,
             0.9, 0.9, 0.9,
-            0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.08, 0.05, 0.1
+            0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.08, 0.05, 0.1, 0.08, 0.12, 0.09, 0.11
             );
 
     igraph_matrix_init(&layout, 0, 0);

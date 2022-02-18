@@ -786,6 +786,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
         igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
 
 
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     /* probabilities of each edge being a real connection */
     igraph_vector_t umap_weights;
@@ -809,7 +810,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
     /* Default sampling_prob */
     if (sampling_prob <= 0) {
         /* FIXME: the stability seems extremely dependent on this */
-        sampling_prob = 0.3;
+        sampling_prob = 1.0 / sqrt(no_of_nodes);
     }
 
     /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
