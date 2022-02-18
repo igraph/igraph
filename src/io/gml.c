@@ -516,7 +516,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_destroy(&eattrnames);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, 0)); /* TODO */
+    IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, 0)); /* TODO https://github.com/igraph/igraph/issues/174 */
     IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, &vattrs));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));

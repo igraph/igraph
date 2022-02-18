@@ -266,8 +266,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
 
         if (control_iteration) {
             /* If we are in the control iteration, we expect in the begining of
-            the iterationthat all vertices meet the end condition, so running is false.
-            If some of them does not, running is set to true later in the code. */
+            the iterationthat all vertices meet the end condition, so 'running' is false.
+            If some of them does not, 'running' is set to true later in the code. */
             running = 0;
         } else {
             /* Shuffle the node ordering vector if we are in the label updating iteration */
