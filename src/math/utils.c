@@ -267,8 +267,8 @@ int igraph_is_neginf(double x) {
  *         error is defined as <code>abs(a-b) / (abs(a) + abs(b))</code>. The
  *         two numbers are considered equal if this is less than \c eps.
  *
- * \return Nonzero if the two floats are nearly equal to each other within
- *         the given level of tolerance, zero otherwise.
+ * \return True if the two floats are nearly equal to each other within
+ *         the given level of tolerance, false otherwise.
  */
 igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
