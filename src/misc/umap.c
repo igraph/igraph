@@ -772,7 +772,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
- *   cross-entropy. If negative or zero, 500 epochs are used if the graph is the graph is small
+ *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
  *   (less than 50k edges), 50 epochs are used for larger graphs.
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower. Vice versa, a too low number will converge very slowly, possibly too slowly. If negative of zero, a value of 0.3 is assumed.
  *
@@ -790,19 +790,15 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
     /* The smoothing parameters given min_dist */
     igraph_real_t a, b;
 
-    /* Default min_dist */
     if (min_dist <= 0) {
         IGRAPH_ERRORF("Minimum distance should be positive, but found %f.",
                 IGRAPH_EINVAL, min_dist);
     }
 
-    /* Default epochs: this could be improved, but roughly */
-    if (epochs <= 0) {
-        if (no_of_edges < 50000) {
-            epochs = 500; /* This is reasonable usually */
-        } else {
-            epochs = 50;
-        }
+    if (epochs < 0) {
+        IGRAPH_ERRORF("Number of epochs should be non-negative, but found %"
+                IGRAPH_PRId ".",
+                IGRAPH_EINVAL, epochs);
     }
 
     /* Default sampling_prob */
