@@ -399,6 +399,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
 }
 
 /* cross-entropy */
+#ifdef UMAP_DEBUG
 static igraph_error_t igraph_compute_cross_entropy(const igraph_t *graph,
        const igraph_vector_t *umap_weights, const igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b,
        igraph_real_t *cross_entropy) {
@@ -467,6 +468,7 @@ static igraph_error_t igraph_compute_cross_entropy(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+#endif /* UMAP_DEBUG */
 
 /*xd is difference in x direction, mu is a weight */
 /* NOTE: mu is the probability of a true edge in high dimensions, not affected
