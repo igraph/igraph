@@ -759,8 +759,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  * References:
  *
  * </para><para>
- * Leland McInnes, John Healy, and James Melville, https://doi.org/10.21105/joss.00861,
- * https://arxiv.org/abs/1802.03426
+ * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed). Weights in
  *   this graph object are currently ignored.
