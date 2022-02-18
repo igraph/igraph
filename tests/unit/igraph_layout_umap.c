@@ -70,7 +70,9 @@ int main() {
     igraph_t graph, empty_graph;
     igraph_vector_t distances;
     igraph_matrix_t layout;
-    float a, b;
+#ifdef UMAP_DEBUG
+    igraph_real_t a, b;
+#endif
 
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_small(&graph, 4, IGRAPH_UNDIRECTED,
