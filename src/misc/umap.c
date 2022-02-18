@@ -17,13 +17,14 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
    */
 
-#include "igraph_matrix.h"
-#include "igraph_interface.h"
 #include "igraph_umap.h"
+
 #include "igraph_constructors.h"
-#include "igraph_layout.h"
-#include "igraph_random.h"
+#include "igraph_interface.h"
 #include "igraph_lapack.h"
+#include "igraph_layout.h"
+#include "igraph_matrix.h"
+#include "igraph_random.h"
 
 
 /**
