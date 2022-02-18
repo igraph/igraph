@@ -774,7 +774,9 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
  *   (less than 50k edges), 50 epochs are used for larger graphs.
- * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower. Vice versa, a too low number will converge very slowly, possibly too slowly. If negative of zero, a value of 0.3 is assumed.
+ * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
+ *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
+ *   Vice versa, a too low number will converge very slowly, possibly too slowly.
  *
  * \return Error code.
  *
@@ -783,7 +785,6 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
         igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
 
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     /* probabilities of each edge being a real connection */
     igraph_vector_t umap_weights;
@@ -801,10 +802,9 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
                 IGRAPH_EINVAL, epochs);
     }
 
-    /* Default sampling_prob */
     if (sampling_prob <= 0) {
-        /* FIXME: the stability seems extremely dependent on this */
-        sampling_prob = 1.0 / sqrt(no_of_nodes);
+        IGRAPH_ERRORF("Sampling probability should be positive, but found %f.",
+                IGRAPH_EINVAL, sampling_prob);
     }
 
     /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */

@@ -76,7 +76,7 @@ int main() {
 #endif
 
     igraph_rng_seed(igraph_rng_default(), 42);
-    igraph_small(&graph, 4, IGRAPH_UNDIRECTED,
+    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, // 4?
             0,1, 0,2, 0,3, 1,2, 1,3, 2,3,
             3,4, 4,5, 5,6,
             6,7, 7,8, 6,8, 7,9, 6,9, 8,9, 7,10, 8,10, 9,10, 10,11, 9,11, 8,11, 7,11,
@@ -97,7 +97,7 @@ int main() {
 #endif
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, -1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.3) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 #ifdef UMAP_DEBUG
     igraph_matrix_print(&layout);
@@ -114,14 +114,17 @@ int main() {
 
     printf("Empty graph:\n");
     igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
-    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);
 
     printf("Check error for negative min_dist.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, -1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, 1), IGRAPH_EINVAL);
 
     printf("Check error for negative epochs.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, -1, -1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, -1, 1), IGRAPH_EINVAL);
+
+    printf("Check error for negative sampling probability.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1), IGRAPH_EINVAL);
 
     igraph_destroy(&empty_graph);
     igraph_matrix_destroy(&layout);
