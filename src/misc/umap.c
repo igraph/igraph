@@ -692,12 +692,12 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
     }
 
     if (igraph_vector_size(distances) != no_of_edges) {
-        IGRAPH_ERROR("Distances must be the same number as the edges in the graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
     }
 
     for (igraph_integer_t eid = 0; eid != no_of_edges; eid++) {
         if (VECTOR(*distances)[eid] < 0) {
-            IGRAPH_ERROR("Distances cannot be negative", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Distances cannot be negative.", IGRAPH_EINVAL);
         }
     }
 
@@ -762,11 +762,10 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
- * \param distances Pointer to a vector of "distances" between vertices. Similarity graphs for
+ * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
  *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
- *   fine here too. If this argument is an empty pointer (NULL), connected vertices are assumed
- *   to be very similar.
+ *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
  * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D
  *   embedding are currently supported, as they are by far more common than any higher dimensions.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
