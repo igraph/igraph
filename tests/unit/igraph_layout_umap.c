@@ -60,8 +60,10 @@ int check_graph_twoclusters(const igraph_matrix_t *layout) {
 
     if (nerr == 0) {
         printf("UMAP layout seems fine.\n");
+        return 0;
     } else {
         igraph_matrix_print(layout);
+        return nerr;
     }
 }
 
