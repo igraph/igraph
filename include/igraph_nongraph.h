@@ -32,6 +32,14 @@
 
 __BEGIN_DECLS
 
+/**
+ * \def IGRAPH_SHORTEST_PATH_EPSILON
+ *
+ * Relative error threshold used in weighted shortest path calculations
+ * to decide whether two shortest paths are of equal length.
+ */
+#define IGRAPH_SHORTEST_PATH_EPSILON 1e-10
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
         const igraph_vector_t *par,
         void* extra);
@@ -93,6 +101,8 @@ IGRAPH_EXPORT igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin
                               igraph_integer_t *fncount, igraph_integer_t *grcount);
 IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
                                        igraph_real_t xmin, igraph_bool_t force_continuous);
+IGRAPH_EXPORT igraph_bool_t igraph_almost_equals(double a, double b, double eps);
+IGRAPH_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
 
 __END_DECLS
 

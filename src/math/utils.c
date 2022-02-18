@@ -22,6 +22,7 @@
 */
 
 #include "igraph_types.h"
+#include "igraph_nongraph.h"
 
 #include "core/math.h"
 
@@ -255,21 +256,21 @@ int igraph_is_neginf(double x) {
 
 /**
  * \function igraph_almost_equals
- * Compare two double-precision floats with a tolerance
+ * \brief Compare two double-precision floats with a tolerance.
  *
  * Determines whether two double-precision floats are "almost equal"
  * to each other with a given level of tolerance on the relative error.
  *
- * \param  a  the first float
- * \param  b  the second float
- * \param  eps  the level of tolerance on the relative error. The relative
- *         error is defined as \c "abs(a-b) / (abs(a) + abs(b))". The
+ * \param  a  The first float.
+ * \param  b  The second float.
+ * \param  eps  The level of tolerance on the relative error. The relative
+ *         error is defined as <code>abs(a-b) / (abs(a) + abs(b))</code>. The
  *         two numbers are considered equal if this is less than \c eps.
  *
- * \return nonzero if the two floats are nearly equal to each other within
- *         the given level of tolerance, zero otherwise
+ * \return True if the two floats are nearly equal to each other within
+ *         the given level of tolerance, false otherwise.
  */
-int igraph_almost_equals(double a, double b, double eps) {
+igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
 }
 
@@ -291,20 +292,20 @@ int igraph_almost_equals(double a, double b, double eps) {
 
 /**
  * \function igraph_cmp_epsilon
- * Compare two double-precision floats with a tolerance
+ * \brief Compare two double-precision floats with a tolerance.
  *
  * Determines whether two double-precision floats are "almost equal"
  * to each other with a given level of tolerance on the relative error.
  *
- * \param  a  the first float
- * \param  b  the second float
- * \param  eps  the level of tolerance on the relative error. The relative
- *         error is defined as \c "abs(a-b) / (abs(a) + abs(b))". The
+ * \param  a  The first float.
+ * \param  b  The second float.
+ * \param  eps  The level of tolerance on the relative error. The relative
+ *         error is defined as <code>abs(a-b) / (abs(a) + abs(b))</code>. The
  *         two numbers are considered equal if this is less than \c eps.
  *
- * \return zero if the two floats are nearly equal to each other within
+ * \return Zero if the two floats are nearly equal to each other within
  *         the given level of tolerance, positive number if the first float is
- *         larger, negative number if the second float is larger
+ *         larger, negative number if the second float is larger.
  */
 int igraph_cmp_epsilon(double a, double b, double eps) {
     double diff;

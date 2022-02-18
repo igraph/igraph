@@ -18,8 +18,6 @@
 
 #include <float.h>
 
-#include "core/math.h"
-
 #include "test_utilities.inc"
 
 /* This file is ported from Java; the original source is here:

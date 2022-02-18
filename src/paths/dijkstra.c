@@ -27,13 +27,13 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_nongraph.h"
 #include "igraph_stack.h"
 #include "igraph_qsort.h"
 #include "igraph_vector_ptr.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 #include <string.h>   /* memset */
 

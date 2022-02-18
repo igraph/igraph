@@ -34,4 +34,9 @@
 <!-- doxrox-include igraph_power_law_fit -->
 </section>
 
+<section id="compare-floats-with-tolerance"><title>Comparing floats with a tolerance</title>
+<!-- doxrox-include igraph_almost_equals -->
+<!-- doxrox-include igraph_cmp_epsilon -->
+</section>
+
 </chapter>
