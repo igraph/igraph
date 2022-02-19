@@ -121,28 +121,44 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
     return IGRAPH_SUCCESS;
 }
 
-int main() {
-    igraph_t g;
-    igraph_vector_int_list_t result1;
-    igraph_vector_int_list_t result2;
-    igraph_vs_t vids;
+void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t order, igraph_integer_t repeat)
+{
+    igraph_vector_int_list_t result_orig;
+    igraph_vector_int_list_t result_adj;
 
-    igraph_vector_int_list_init(&result1, 0);
-    igraph_vector_int_list_init(&result2, 0);
-    igraph_vs_all(&vids);
-    igraph_integer_t order = 2;
+    igraph_vector_int_list_init(&result_orig, 0);
+    igraph_vector_int_list_init(&result_adj, 0);
+    BENCH("Original function:",
+          REPEAT(igraph_neighborhood(g, &result_orig, vids, order,
+                  /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
 
-    igraph_full(&g, 500, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-
-    BENCH("Original function:\n",
-          REPEAT(igraph_neighborhood(&g, &result1, vids, order,
-                  /*mode*/ IGRAPH_ALL, /*mindist*/ 0), 1));
-
-    BENCH("Using adjlist:\n",
-          REPEAT(igraph_neighborhood_adj(&g, &result2, vids, order,
-                  /*mode*/ IGRAPH_ALL, /*mindist*/ 0), 1));
-
-    for (igraph_integer_t i = 0; i <= 2; i++) {
-        IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result1)[i], &VECTOR(result2)[i]));
+    BENCH("Using adjlist:",
+          REPEAT(igraph_neighborhood_adj(g, &result_adj, vids, order,
+                  /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
+    for (igraph_integer_t i = 0; i <= order; i++) {
+        IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_orig)[i], &VECTOR(result_adj)[i]));
     }
+    igraph_vector_int_list_destroy(&result_orig);
+    igraph_vector_int_list_destroy(&result_adj);
+}
+
+int main() {
+    igraph_t g_full, g_ring, g_er;
+    igraph_vs_t vids_all;
+
+    igraph_vs_all(&vids_all);
+
+    igraph_full(&g_full, 500, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_ring(&g_ring, 50000, IGRAPH_UNDIRECTED, /* mutual */ 0, /*circular*/ 0);
+    igraph_erdos_renyi_game(&g_er, IGRAPH_ERDOS_RENYI_GNM, 2000, 20000, IGRAPH_UNDIRECTED, /*loops*/ 0);
+
+    printf("Full graph:\n");
+    do_benchmark(&g_full, vids_all, 2, 1);
+    printf("Ring graph:\n");
+    do_benchmark(&g_ring, vids_all, 2, 1);
+    printf("Random graph:\n");
+    do_benchmark(&g_er, vids_all, 2, 1);
+
+    igraph_destroy(&g_full);
+    igraph_destroy(&g_ring);
 }
