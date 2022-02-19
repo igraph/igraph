@@ -831,6 +831,7 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_maximal_cliques
+  igraph_neighborhood
   igraph_pagerank
   igraph_pagerank_weighted
   igraph_power_law_fit
