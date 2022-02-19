@@ -35,8 +35,9 @@ __BEGIN_DECLS
  */
 
 typedef struct s_igraph_strvector {
-    char **data;
-    igraph_integer_t len;
+    char **stor_begin;
+    char **stor_end;
+    char **end;
 } igraph_strvector_t;
 
 /**
@@ -52,9 +53,9 @@ typedef struct s_igraph_strvector {
  *
  * Time complexity: O(1).
  */
-#define STR(sv,i) ((const char *)((sv).data[(i)]))
+#define STR(sv,i) ((const char *)((sv).stor_begin[(i)]))
 
-#define IGRAPH_STRVECTOR_NULL { 0,0 }
+#define IGRAPH_STRVECTOR_NULL { 0,0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \
         IGRAPH_FINALLY( igraph_strvector_destroy, v); } while (0)
