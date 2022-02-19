@@ -134,6 +134,11 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
     igraph_integer_t alloc_size;
     IGRAPH_ASSERT(size >= 0);
     alloc_size = size > 0 ? size : 1;
+
+    /* When this function fails, it should leave stor_begin set to NULL,
+     * so that vector_destroy() is still safe to call on the vector.
+     * This simplifies freeing partially initialized data structures,
+     * such as adjacency lists, when an error occurs mid-initialization. */
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == NULL) {
         IGRAPH_ERROR("Cannot initialize vector.", IGRAPH_ENOMEM);
@@ -383,6 +388,8 @@ igraph_error_t FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector) *v, int
 
 void FUNCTION(igraph_vector, destroy)   (TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
+    /* vector_init() will leave stor_begin set to NULL when it fails.
+     * We handle these cases gracefully. */
     if (v->stor_begin != NULL) {
         IGRAPH_FREE(v->stor_begin);
         v->stor_begin = NULL;
