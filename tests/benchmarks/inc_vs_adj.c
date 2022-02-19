@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2013-2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2013-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -259,12 +259,16 @@ igraph_integer_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
     return dummy;
 }
 
+/* Used to prevent optimizing away the result.
+ * This must be a global variable to prevent "variable set but not used"
+ * warnings from some compilers. */
+volatile igraph_integer_t result;
+
 void do_benchmarks(char *name, igraph_t *g, int repeat) {
     igraph_adjlist_t adj;
     igraph_inclist_t inc;
     igraph_incadjlist_inter_t incadj_inter;
     igraph_incadjlist_sep_t incadj_sep;
-    volatile igraph_integer_t result;
 
     printf("%s", name);
     BENCH("1 initialize adjlist.",
