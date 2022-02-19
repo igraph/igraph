@@ -543,7 +543,12 @@ static igraph_error_t igraph_apply_forces(const igraph_t *graph,  const igraph_v
             continue;
         }
 
-        IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+        /* half the time, swap the from/to, otherwise some vertices are never moved */
+        if (RNG_UNIF01() > 0.5) {
+            IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+        } else {
+            IGRAPH_CHECK(igraph_edge(graph, eid, &to, &from));
+        }
 
         /* Current coordinates of both vertices */
         from_x = MATRIX(*layout, from, 0);
@@ -685,6 +690,8 @@ static igraph_error_t igraph_i_umap_center_layout(igraph_matrix_t *layout) {
     return IGRAPH_SUCCESS;
 }
 
+
+/* Check the distances argument, which should be NULL or a vector of nonnegative numbers */
 static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *distances, igraph_integer_t no_of_edges) {
 
     if (distances == NULL) {

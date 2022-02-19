@@ -51,7 +51,7 @@ void check_graph_twoclusters(const igraph_matrix_t *layout) {
 
             if (dist > 0.2 * distmax) {
                 printf("ERROR: UMAP cluster not compact!\n");
-                printf("Vertex %d, dx: %f, dy: %f, dist: %f, distmax: %f, d/dmax: %e\n", i, dx, dy, dist, distmax, dist / distmax);
+                printf("Cluster %d of 2, vertex %d, dx: %f, dy: %f, dist: %f, distmax: %f, d/dmax: %e\n", 1 + iclu / 7, i, dx, dy, dist, distmax, dist / distmax);
                 nerr++;
             }
         }
@@ -60,6 +60,7 @@ void check_graph_twoclusters(const igraph_matrix_t *layout) {
     if (nerr == 0) {
         printf("UMAP layout seems fine.\n");
     } else {
+        printf("UMAP layout inconsistent:\nx\ty\n");
         igraph_matrix_print(layout);
     }
 }
@@ -81,7 +82,7 @@ int main() {
             -1);
     igraph_vector_init_real(&distances,
             igraph_ecount(&graph),
-            0.1, 0.05, 0.12, 0.09, 0.1, 0.1,
+            0.1, 0.09, 0.12, 0.09, 0.1, 0.1,
             0.9, 0.9, 0.9,
             0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.08, 0.05, 0.1, 0.08, 0.12, 0.09, 0.11
             );
@@ -97,17 +98,17 @@ int main() {
     printf("layout of two clusters of vertices with 2 articulation points:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.3) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
-#ifdef UMAP_DEBUG
-    igraph_matrix_print(&layout);
-#endif
+
+    printf("same graph, different negative sampling probability:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout);
+
+    /* No need for distances anymore */
     igraph_vector_destroy(&distances);
 
     printf("Same graph, no weights:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
-#ifdef UMAP_DEBUG
-    igraph_matrix_print(&layout);
-#endif
     igraph_destroy(&graph);
 
     printf("Empty graph:\n");
