@@ -1,5 +1,12 @@
 layout of two clusters of vertices with 2 articulation points:
 UMAP layout seems fine.
+same graph, different negative sampling probability:
+UMAP layout seems fine.
+same graph, different epochs:
+UMAP layout seems fine.
 Same graph, no weights:
 UMAP layout seems fine.
 Empty graph:
+Check error for negative min_dist.
+Check error for negative epochs.
+Check error for negative sampling probability.

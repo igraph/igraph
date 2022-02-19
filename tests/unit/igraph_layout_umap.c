@@ -103,6 +103,10 @@ int main() {
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
+    printf("same graph, different epochs:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 5000, 0.8) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout);
+
     /* No need for distances anymore */
     igraph_vector_destroy(&distances);
 
