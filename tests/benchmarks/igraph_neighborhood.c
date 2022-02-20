@@ -400,11 +400,13 @@ void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
 {
     igraph_vector_int_list_t result_orig;
     igraph_vector_int_list_t result_adj;
-    igraph_vector_int_list_t result_adj2;
+    igraph_vector_int_list_t result_adjl;
+    igraph_vector_int_list_t result_adjl2;
 
     igraph_vector_int_list_init(&result_orig, 0);
     igraph_vector_int_list_init(&result_adj, 0);
-    igraph_vector_int_list_init(&result_adj2, 0);
+    igraph_vector_int_list_init(&result_adjl, 0);
+    igraph_vector_int_list_init(&result_adjl2, 0);
 
     for (igraph_integer_t order = 1; order <= 3; order++) {
         printf("order %" IGRAPH_PRId ":\n", order);
@@ -413,23 +415,26 @@ void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
                         /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
 
         BENCH("Using a lazy adjlist:",
-                REPEAT(igraph_neighborhood_adjl(g, &result_adj, vids, order,
+                REPEAT(igraph_neighborhood_adjl(g, &result_adjl, vids, order,
                         /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
 
         BENCH("Using lazy adjlist 2:",
-                REPEAT(igraph_neighborhood_adjl2(g, &result_adj2, vids, order,
+                REPEAT(igraph_neighborhood_adjl2(g, &result_adjl2, vids, order,
                         /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
 
         BENCH("Using adjlist:",
-                REPEAT(igraph_neighborhood_adj(g, &result_adj2, vids, order,
+                REPEAT(igraph_neighborhood_adj(g, &result_adj, vids, order,
                         /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
         for (igraph_integer_t i = 0; i <= order; i++) {
             IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_orig)[i], &VECTOR(result_adj)[i]));
-            IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_adj)[i], &VECTOR(result_adj2)[i]));
+            IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_adj)[i], &VECTOR(result_adjl)[i]));
+            IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_adjl)[i], &VECTOR(result_adjl2)[i]));
         }
     }
     igraph_vector_int_list_destroy(&result_orig);
     igraph_vector_int_list_destroy(&result_adj);
+    igraph_vector_int_list_destroy(&result_adjl);
+    igraph_vector_int_list_destroy(&result_adjl2);
 }
 
 int main() {
@@ -463,4 +468,9 @@ int main() {
 
     igraph_destroy(&g_full);
     igraph_destroy(&g_ring);
+    igraph_destroy(&g_er);
+    igraph_vs_destroy(&vids_all);
+    igraph_vs_destroy(&vids_50);
+    igraph_vs_destroy(&vids_5000);
+    igraph_vs_destroy(&vids_200);
 }
