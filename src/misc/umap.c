@@ -470,11 +470,20 @@ static igraph_error_t igraph_compute_cross_entropy(const igraph_t *graph,
 }
 #endif /* UMAP_DEBUG */
 
+
+/* clip forces to avoid too rapid shifts */
+static igraph_error_t igraph_i_umap_clip_force(igraph_real_t *force, igraph_real_t limit) {
+
+    *force  = fmax(fmin(*force, limit), -limit);
+
+    return IGRAPH_SUCCESS;
+}
+
 /*xd is difference in x direction, mu is a weight */
 /* NOTE: mu is the probability of a true edge in high dimensions, not affected
  * by the embedding (in particular, xd and yd), so it's a constant for the
  * derivative/force. Same applies for the repulsion */
-static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
+static igraph_error_t igraph_i_umap_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
        igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t dsq, phi, force;
@@ -486,6 +495,10 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
     *force_x = force * xd;
     *force_y = force * yd;
 
+    /* clip force to avoid too rapid change */
+    igraph_i_umap_clip_force(force_x, 3);
+    igraph_i_umap_clip_force(force_y, 3);
+
 #ifdef UMAP_DEBUG
     printf("force attractive: xd = %f, fx = %f\n", xd, *force_x);
     printf("force attractive: yd = %f, fy = %f\n", yd, *force_y);
@@ -495,7 +508,7 @@ static igraph_error_t igraph_attract(igraph_real_t xd, igraph_real_t yd, igraph_
 }
 
 /*xd is difference in x direction, mu is a weight */
-static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
+static igraph_error_t igraph_i_umap_repel(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
        igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
 {
     igraph_real_t dsq, force;
@@ -508,6 +521,10 @@ static igraph_error_t igraph_repulse(igraph_real_t xd, igraph_real_t yd, igraph_
     force = (1 - mu) * (2 * b) / dsq / (1 + a * pow(dsq, b));
     *force_x = force * xd;
     *force_y = force * yd;
+
+    /* clip force to avoid too rapid change */
+    igraph_i_umap_clip_force(force_x, 3);
+    igraph_i_umap_clip_force(force_y, 3);
 
 #ifdef UMAP_DEBUG
     printf("force repulsive: xd = %f, fx = %f\n", xd, *force_x);
@@ -561,7 +578,7 @@ static igraph_error_t igraph_apply_forces(const igraph_t *graph,  const igraph_v
         y_diff = from_y - to_y;
 
         /* Apply attractive force since they are neighbors */
-        IGRAPH_CHECK(igraph_attract(x_diff, y_diff, VECTOR(*umap_weights)[eid], a, b, &fx, &fy));
+        IGRAPH_CHECK(igraph_i_umap_attract(x_diff, y_diff, VECTOR(*umap_weights)[eid], a, b, &fx, &fy));
         MATRIX(*layout, from, 0) += learning_rate * fx;
         MATRIX(*layout, from, 1) += learning_rate * fy;
 
@@ -601,7 +618,7 @@ static igraph_error_t igraph_apply_forces(const igraph_t *graph,  const igraph_v
 
             /* This repels the other vertex assuming it's a negative example
              * that is no weight, no edge */
-            IGRAPH_CHECK(igraph_repulse(x_diff, y_diff, 0, a, b, &fx, &fy));
+            IGRAPH_CHECK(igraph_i_umap_repel(x_diff, y_diff, 0, a, b, &fx, &fy));
             /* The repulsive force is already *away* from the other (non-neighbor) vertex */
             MATRIX(*layout, from, 0) += learning_rate * fx;
             MATRIX(*layout, from, 1) += learning_rate * fy;
