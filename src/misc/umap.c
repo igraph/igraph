@@ -54,8 +54,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_t *graph,
         }
 
 #ifdef UMAP_DEBUG
-        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %f, "
-               "target: %f, rho: %f, sigma: %f\n", i, no_of_neis, sum, target, rho, sigma);
+        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %g, "
+               "target: %g, rho: %g, sigma: %g\n", i, no_of_neis, sum, target, rho, sigma);
 #endif
 
         /* TODO: this seems fine, but is probably a little off for some corner cases */
@@ -174,8 +174,8 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
             }
 
 #ifdef UMAP_DEBUG
-            printf("distance: %f\n", VECTOR(*distances)[eid]);
-            printf("weight: %f\n", weight);
+            printf("distance: %g\n", VECTOR(*distances)[eid]);
+            printf("weight: %g\n", weight);
 #endif
             VECTOR(*umap_weights)[eid] = weight;
             VECTOR(weight_seen)[eid] += 1;
@@ -346,7 +346,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
                     b + db, &powb, &x, min_dist));
 
 #ifdef UMAP_DEBUG
-        printf("start line search, SSR before delta: %f, current SSR:, %f\n", squared_sum_res_old,
+        printf("start line search, SSR before delta: %g, current SSR:, %g\n", squared_sum_res_old,
                 squared_sum_res);
 #endif
         for (igraph_integer_t k = 0; k < 30; k++) {
@@ -359,7 +359,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
 
             /* Compare and if we are going back uphill, undo last step and break */
 #ifdef UMAP_DEBUG
-            printf("during line search, k = %d, old SSR:, %f, new SSR (half a,b):, %f\n", k,
+            printf("during line search, k = %d, old SSR:, %g, new SSR (half a,b):, %g\n", k,
                     squared_sum_res_tmp, squared_sum_res);
 #endif
             if (squared_sum_res > squared_sum_res_tmp - tol) {
@@ -369,7 +369,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
             }
         }
 #ifdef UMAP_DEBUG
-        printf("end of line search and iteration, squared_sum_res: %f \n\n", squared_sum_res_tmp);
+        printf("end of line search and iteration, squared_sum_res: %g \n\n", squared_sum_res_tmp);
 #endif
 
         /* assign a, b*/
@@ -388,7 +388,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
     IGRAPH_FINALLY_CLEAN(6);
 
 #ifdef UMAP_DEBUG
-    printf("a, b: %f %f\n", a, b);
+    printf("a, b: %g %g\n", a, b);
 #endif
 
     *a_p = a;
@@ -424,7 +424,8 @@ static igraph_error_t igraph_i_umap_compute_cross_entropy(const igraph_t *graph,
         mu = VECTOR(*umap_weights)[eid];
 
         /* Find vertices */
-        IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+        from = IGRAPH_FROM(graph, eid);
+        to = IGRAPH_TO(graph, eid);
         /* Find distance in layout space */
         xd = (MATRIX(*layout, from, 0) - MATRIX(*layout, to, 0));
         yd = (MATRIX(*layout, from, 1) - MATRIX(*layout, to, 1));
@@ -500,8 +501,8 @@ static igraph_error_t igraph_i_umap_attract(igraph_real_t xd, igraph_real_t yd, 
     igraph_i_umap_clip_force(force_y, 3);
 
 #ifdef UMAP_DEBUG
-    printf("force attractive: xd = %f, fx = %f\n", xd, *force_x);
-    printf("force attractive: yd = %f, fy = %f\n", yd, *force_y);
+    printf("force attractive: xd = %g, fx = %g\n", xd, *force_x);
+    printf("force attractive: yd = %g, fy = %g\n", yd, *force_y);
 #endif
 
     return IGRAPH_SUCCESS;
@@ -527,8 +528,8 @@ static igraph_error_t igraph_i_umap_repel(igraph_real_t xd, igraph_real_t yd, ig
     igraph_i_umap_clip_force(force_y, 3);
 
 #ifdef UMAP_DEBUG
-    printf("force repulsive: xd = %f, fx = %f\n", xd, *force_x);
-    printf("force repulsive: yd = %f, fy = %f\n", yd, *force_y);
+    printf("force repulsive: xd = %g, fx = %g\n", xd, *force_x);
+    printf("force repulsive: yd = %g, fy = %g\n", yd, *force_y);
 #endif
 
     return IGRAPH_SUCCESS;
@@ -546,11 +547,12 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
      * For large sparse graphs, it's not necessary. For large dense graphs, you should
      * not be doing UMAP.
      * */
-    igraph_vector_int_t neis;
+    igraph_vector_int_t neis, negative_vertices;
 
     if (avoid_neighbor_repulsion) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&negative_vertices, 0);
 
     igraph_integer_t n_random_vertices = sqrt(no_of_nodes);
 
@@ -562,9 +564,11 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
 
         /* half the time, swap the from/to, otherwise some vertices are never moved */
         if (RNG_UNIF01() > 0.5) {
-            IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+            from = IGRAPH_FROM(graph, eid);
+            to = IGRAPH_TO(graph, eid);
         } else {
-            IGRAPH_CHECK(igraph_edge(graph, eid, &to, &from));
+            to = IGRAPH_FROM(graph, eid);
+            from = IGRAPH_TO(graph, eid);
         }
 
         /* Current coordinates of both vertices */
@@ -583,9 +587,11 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
         MATRIX(*layout, from, 1) += learning_rate * fy;
 
         /* Random other nodes are repelled from one (the first) vertex */
+        IGRAPH_CHECK(igraph_random_sample(&negative_vertices, 0, no_of_nodes - 2, n_random_vertices));
         for (igraph_integer_t j = 0; j < n_random_vertices; j++) {
-            /* Get random neighbor, obviously you cannot repel yourself */
-            to = RNG_INTEGER(0, no_of_nodes - 2);
+            /* Get random neighbor */
+            to = VECTOR(negative_vertices)[j];
+            /* obviously you cannot repel yourself */
             if (to >= from) {
                 to++;
             }
@@ -599,7 +605,8 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
                 for (igraph_integer_t k = 0; k < igraph_vector_int_size(&neis); k++) {
                     igraph_integer_t eid2 = VECTOR(neis)[k];
                     igraph_integer_t from2, to2;
-                    igraph_edge(graph, eid2, &from2, &to2);
+                    from2 = IGRAPH_FROM(graph, eid2);
+                    to2 = IGRAPH_TO(graph, eid2);
                     if (((from2 == from) && (to2 == to)) || ((from2 == to) && (from == to2))) {
                         skip = 1;
                         break;
@@ -625,6 +632,11 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
         }
     }
 
+    /* Free vector of negative vertices */
+    igraph_vector_int_destroy(&negative_vertices);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* Free vector of neighbors if needed */
     if (avoid_neighbor_repulsion) {
         igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
@@ -673,7 +685,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(const ig
         cross_entropy_old = cross_entropy;
         igraph_i_umap_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
 
-        printf("Cross-entropy before shift: %f, after shift: %f\n", cross_entropy_old, cross_entropy);
+        printf("Cross-entropy before shift: %g, after shift: %g\n", cross_entropy_old, cross_entropy);
 #endif
 
          /* Adjust learning rate */
@@ -810,13 +822,15 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
 
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     /* probabilities of each edge being a real connection */
     igraph_vector_t umap_weights;
     /* The smoothing parameters given min_dist */
     igraph_real_t a, b;
 
+    /* Check input arguments */
     if (min_dist <= 0) {
-        IGRAPH_ERRORF("Minimum distance should be positive, but found %f.",
+        IGRAPH_ERRORF("Minimum distance should be positive, but found %g.",
                 IGRAPH_EINVAL, min_dist);
     }
 
@@ -827,12 +841,21 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
     }
 
     if (sampling_prob <= 0) {
-        IGRAPH_ERRORF("Sampling probability should be positive, but found %f.",
+        IGRAPH_ERRORF("Sampling probability should be positive, but found %g.",
                 IGRAPH_EINVAL, sampling_prob);
     }
 
     /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
     IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
+
+    /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
+    if (no_of_nodes <= 1) {
+        IGRAPH_CHECK(igraph_matrix_resize(layout, no_of_nodes, 2));
+        if (no_of_nodes == 1) {
+            MATRIX(*layout, 0, 0) = MATRIX(*layout, 0, 1) = 0;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     RNG_BEGIN();
     IGRAPH_VECTOR_INIT_FINALLY(&umap_weights, no_of_edges);

@@ -51,7 +51,7 @@ void check_graph_twoclusters(const igraph_matrix_t *layout) {
 
             if (dist > 0.2 * distmax) {
                 printf("ERROR: UMAP cluster not compact!\n");
-                printf("Cluster %d of 2, vertex %d, dx: %f, dy: %f, dist: %f, distmax: %f, d/dmax: %e\n", 1 + iclu / 7, i, dx, dy, dist, distmax, dist / distmax);
+                printf("Cluster %d of 2, vertex %d, dx: %g, dy: %g, dist: %g, distmax: %g, d/dmax: %e\n", 1 + iclu / 7, i, dx, dy, dist, distmax, dist / distmax);
                 nerr++;
             }
         }
@@ -66,8 +66,31 @@ void check_graph_twoclusters(const igraph_matrix_t *layout) {
 }
 
 
+void check_graph_singleton(const igraph_matrix_t *layout) {
+    igraph_integer_t nrows = igraph_matrix_nrow(layout);
+    igraph_integer_t ncols = igraph_matrix_ncol(layout);
+    igraph_integer_t nerr = 0;
+
+    if (nrows != 1) {
+        printf("Singleton graph layout has %d rows instead of 1.\n", nrows);
+        nerr++;
+    }
+    if (ncols != 2) {
+        printf("Singleton graph layout has %d cols instead of 2.\n", ncols);
+        nerr++;
+    }
+    if ((fabs(MATRIX(*layout, 0, 0)) > 0.001) || (fabs(MATRIX(*layout, 0, 1)) > 0.001)) {
+        printf("Singleton graph layout is not (0,0): (%g,%g)\n", MATRIX(*layout, 0, 0), MATRIX(*layout, 0, 1));
+        nerr++;
+    }
+    if (nerr == 0) {
+        printf("UMAP layout seems fine.\n");
+    }
+}
+
+
 int main() {
-    igraph_t graph, empty_graph;
+    igraph_t graph, empty_graph, singleton_graph;
     igraph_vector_t distances;
     igraph_matrix_t layout;
 #ifdef UMAP_DEBUG
@@ -75,6 +98,11 @@ int main() {
 #endif
 
     igraph_rng_seed(igraph_rng_default(), 42);
+
+    igraph_matrix_init(&layout, 0, 0);
+
+    igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&singleton_graph, 1, IGRAPH_UNDIRECTED, -1);
     igraph_small(&graph, 12, IGRAPH_UNDIRECTED,
             0,1, 0,2, 0,3, 1,2, 1,3, 2,3,
             3,4, 4,5, 5,6,
@@ -87,13 +115,30 @@ int main() {
             0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.08, 0.05, 0.1, 0.08, 0.12, 0.09, 0.11
             );
 
-    igraph_matrix_init(&layout, 0, 0);
-
 #ifdef UMAP_DEBUG
     IGRAPH_CHECK(igraph_i_umap_fit_ab(1, &a, &b));
     IGRAPH_CHECK(igraph_i_umap_fit_ab(0.1, &a, &b));
     IGRAPH_CHECK(igraph_i_umap_fit_ab(5, &a, &b));
 #endif
+
+    printf("Check error for negative min_dist.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, 1), IGRAPH_EINVAL);
+
+    printf("Check error for negative epochs.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, -1, 1), IGRAPH_EINVAL);
+
+    printf("Check error for negative sampling probability.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1), IGRAPH_EINVAL);
+
+    printf("Empty graph:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1) == IGRAPH_SUCCESS);
+    igraph_matrix_print(&layout);
+    igraph_destroy(&empty_graph);
+
+    printf("Singleton graph:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, NULL, &layout, 0.01, 500, 0.2) == IGRAPH_SUCCESS);
+    check_graph_singleton(&layout);
+    igraph_destroy(&singleton_graph);
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.3) == IGRAPH_SUCCESS);
@@ -115,22 +160,8 @@ int main() {
     check_graph_twoclusters(&layout);
     igraph_destroy(&graph);
 
-    printf("Empty graph:\n");
-    igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
-    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1) == IGRAPH_SUCCESS);
-    igraph_matrix_print(&layout);
-
-    printf("Check error for negative min_dist.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, 1), IGRAPH_EINVAL);
-
-    printf("Check error for negative epochs.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, -1, 1), IGRAPH_EINVAL);
-
-    printf("Check error for negative sampling probability.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1), IGRAPH_EINVAL);
-
-    igraph_destroy(&empty_graph);
     igraph_matrix_destroy(&layout);
     VERIFY_FINALLY_STACK();
+
     return 0;
 }
