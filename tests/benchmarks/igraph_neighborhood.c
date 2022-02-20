@@ -334,9 +334,9 @@ int main() {
     printf("Full graph:\n");
     do_benchmark(&g_full, vids_all, 1);
     printf("\nRing graph:\n");
-    do_benchmark(&g_ring, vids_all, 1);
+    do_benchmark(&g_ring, vids_all, 40);
     printf("\nRandom graph:\n");
-    do_benchmark(&g_er, vids_all, 1);
+    do_benchmark(&g_er, vids_all, 15);
 
     igraph_destroy(&g_full);
     igraph_destroy(&g_ring);
