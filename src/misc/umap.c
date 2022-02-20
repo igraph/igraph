@@ -400,7 +400,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
 
 /* cross-entropy */
 #ifdef UMAP_DEBUG
-static igraph_error_t igraph_compute_cross_entropy(const igraph_t *graph,
+static igraph_error_t igraph_i_umap_compute_cross_entropy(const igraph_t *graph,
        const igraph_vector_t *umap_weights, const igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b,
        igraph_real_t *cross_entropy) {
 
@@ -534,7 +534,7 @@ static igraph_error_t igraph_i_umap_repel(igraph_real_t xd, igraph_real_t yd, ig
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_apply_forces(const igraph_t *graph,  const igraph_vector_t *umap_weights,
+static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const igraph_vector_t *umap_weights,
        igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob,
        igraph_real_t learning_rate, igraph_bool_t avoid_neighbor_repulsion)
 {
@@ -660,18 +660,18 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(const ig
      * function Phi.
      * */
 #ifdef UMAP_DEBUG
-    igraph_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
+    igraph_i_umap_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
 #endif
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
         /* Apply (stochastic) forces */
-        igraph_apply_forces(graph, umap_weights, layout, a, b, sampling_prob, learning_rate,
+        igraph_i_umap_apply_forces(graph, umap_weights, layout, a, b, sampling_prob, learning_rate,
                 avoid_neighbor_repulsion);
 
 #ifdef UMAP_DEBUG
         /* Recompute CE and check how it's going*/
         cross_entropy_old = cross_entropy;
-        igraph_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
+        igraph_i_umap_compute_cross_entropy(graph, umap_weights, layout, a, b, &cross_entropy);
 
         printf("Cross-entropy before shift: %f, after shift: %f\n", cross_entropy_old, cross_entropy);
 #endif
