@@ -25,6 +25,7 @@
 #include "igraph_layout.h"
 #include "igraph_matrix.h"
 #include "igraph_random.h"
+#include "igraph_nongraph.h"
 
 
 /* rho is just the size of the distance from each vertex and its closest neighbor */
