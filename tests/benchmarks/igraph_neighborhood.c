@@ -434,20 +434,32 @@ void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
 
 int main() {
     igraph_t g_full, g_ring, g_er;
-    igraph_vs_t vids_all;
+    igraph_vs_t vids_all, vids_50, vids_5000, vids_200;
 
     igraph_vs_all(&vids_all);
+    igraph_vs_seq(&vids_50, 0, 50);
+    igraph_vs_seq(&vids_5000, 0, 5000);
+    igraph_vs_seq(&vids_200, 0, 200);
 
     igraph_full(&g_full, 500, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_ring(&g_ring, 50000, IGRAPH_UNDIRECTED, /* mutual */ 0, /*circular*/ 0);
     igraph_erdos_renyi_game(&g_er, IGRAPH_ERDOS_RENYI_GNM, 2000, 20000, IGRAPH_UNDIRECTED, /*loops*/ 0);
 
+    printf("Select all vertices:\n\n");
     printf("Full graph:\n");
-    do_benchmark(&g_full, vids_all, 1);
+    do_benchmark(&g_full, vids_all, 10);
     printf("\nRing graph:\n");
     do_benchmark(&g_ring, vids_all, 40);
     printf("\nRandom graph:\n");
     do_benchmark(&g_er, vids_all, 15);
+
+    printf("\n\nSelect 10%% of vertices:\n\n");
+    printf("Full graph:\n");
+    do_benchmark(&g_full, vids_50, 100);
+    printf("\nRing graph:\n");
+    do_benchmark(&g_ring, vids_5000, 400);
+    printf("\nRandom graph:\n");
+    do_benchmark(&g_er, vids_200, 150);
 
     igraph_destroy(&g_full);
     igraph_destroy(&g_ring);
