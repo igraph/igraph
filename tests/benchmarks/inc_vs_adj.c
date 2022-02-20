@@ -131,21 +131,26 @@ igraph_error_t igraph_incadjlist_sep_init(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/* In the below tests, the 'dummy' variable is used to prevent the compilers
+ * from optimizing away the entire side-effects-free function. We use XOR
+ * instead of e.g. addition in order to prevent triggering undefined behaviour. */
+
 igraph_integer_t test_direct(igraph_t *g)
 {
     igraph_integer_t dummy = 0;
+    igraph_integer_t vcount = igraph_vcount(g);
 
     int ei = 0;
     int eo = 0;
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         while (VECTOR(g->from)[VECTOR(g->oi)[ei]] == i) {
             igraph_integer_t neighbor = VECTOR(g->to)[VECTOR(g->oi)[ei]];
-            dummy += neighbor + VECTOR(g->oi)[ei];
+            dummy ^= neighbor ^ VECTOR(g->oi)[ei];
             ei++;
         }
         while (VECTOR(g->to)[VECTOR(g->ii)[eo]] == i) {
             igraph_integer_t neighbor = VECTOR(g->from)[VECTOR(g->ii)[eo]];
-            dummy += neighbor + VECTOR(g->ii)[eo] ;
+            dummy ^= neighbor ^ VECTOR(g->ii)[eo] ;
             eo++;
         }
     }
@@ -155,13 +160,14 @@ igraph_integer_t test_direct(igraph_t *g)
 igraph_integer_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
 {
     igraph_integer_t dummy = 0;
+    igraph_integer_t vcount = igraph_vcount(g);
 
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_adjlist_get(adj, i);
         igraph_integer_t nneis = igraph_vector_int_size(neis);
         for (int j = 0; j < nneis; j++) {
             igraph_integer_t neighbor = VECTOR(*neis)[j];
-            dummy += neighbor;
+            dummy ^= neighbor;
         }
     }
     return dummy;
@@ -170,15 +176,16 @@ igraph_integer_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
 igraph_integer_t test_inc_adj(igraph_t *g, igraph_inclist_t *inc, igraph_adjlist_t *adj)
 {
     igraph_integer_t dummy = 0;
+    igraph_integer_t vcount = igraph_vcount(g);
 
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *adjs = igraph_adjlist_get(adj, i);
         igraph_vector_int_t *incs = igraph_inclist_get(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(adjs);
         for (int j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
             igraph_integer_t neighbor = VECTOR(*adjs)[j];
-            dummy += neighbor + edge;
+            dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
@@ -187,13 +194,15 @@ igraph_integer_t test_inc_adj(igraph_t *g, igraph_inclist_t *inc, igraph_adjlist
 igraph_integer_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
 {
     igraph_integer_t dummy = 0;
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    igraph_integer_t vcount = igraph_vcount(g);
+
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(neis);
-        for (int j = 0; j < nneis; j++) {
+        for (igraph_integer_t j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*neis)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(g, edge, i);
-            dummy += neighbor + edge;
+            dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
@@ -202,14 +211,16 @@ igraph_integer_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
 igraph_integer_t test_incadj_sep(igraph_t *g, igraph_incadjlist_sep_t *inc)
 {
     igraph_integer_t dummy = 0;
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    igraph_integer_t vcount = igraph_vcount(g);
+
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *incs = igraph_incadjlist_sep_get_inc(inc, i);
         igraph_vector_int_t *adjs = igraph_incadjlist_sep_get_adj(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(incs);
-        for (int j = 0; j < nneis; j++) {
+        for (igraph_integer_t j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*incs)[j];
             igraph_integer_t neighbor = VECTOR(*adjs)[j];
-            dummy += neighbor + edge;
+            dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
@@ -218,13 +229,15 @@ igraph_integer_t test_incadj_sep(igraph_t *g, igraph_incadjlist_sep_t *inc)
 igraph_integer_t test_incadj_inter(igraph_t *g, igraph_incadjlist_inter_t *inc)
 {
     igraph_integer_t dummy = 0;
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    igraph_integer_t vcount = igraph_vcount(g);
+
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *ias = igraph_incadjlist_inter_get(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(ias) / 2;
-        for (int j = 0; j < nneis; j++) {
+        for (igraph_integer_t j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*ias)[j * 2];
             igraph_integer_t neighbor = VECTOR(*ias)[j * 2 + 1];
-            dummy += neighbor + edge;
+            dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
@@ -233,13 +246,15 @@ igraph_integer_t test_incadj_inter(igraph_t *g, igraph_incadjlist_inter_t *inc)
 igraph_integer_t test_inc_to(igraph_t *g, igraph_inclist_t *inc)
 {
     igraph_integer_t dummy = 0;
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    igraph_integer_t vcount = igraph_vcount(g);
+
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(neis);
-        for (int j = 0; j < nneis; j++) {
+        for (igraph_integer_t j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*neis)[j];
             igraph_integer_t neighbor = IGRAPH_TO(g, edge);
-            dummy += neighbor + edge;
+            dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
@@ -248,12 +263,14 @@ igraph_integer_t test_inc_to(igraph_t *g, igraph_inclist_t *inc)
 igraph_integer_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
 {
     igraph_integer_t dummy = 0;
-    for (int i = 0; i < igraph_vcount(g); i++) {
+    igraph_integer_t vcount = igraph_vcount(g);
+
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
         igraph_integer_t nneis = igraph_vector_int_size(neis);
-        for (int j = 0; j < nneis; j++) {
+        for (igraph_integer_t j = 0; j < nneis; j++) {
             igraph_integer_t edge = VECTOR(*neis)[j];
-            dummy += edge;
+            dummy ^= edge;
         }
     }
     return dummy;
@@ -270,52 +287,75 @@ void do_benchmarks(char *name, igraph_t *g, int repeat) {
     igraph_incadjlist_inter_t incadj_inter;
     igraph_incadjlist_sep_t incadj_sep;
 
+    /* The init() call is in a REPEAT loop, so we include destroy() as well to avoid a memory leak.
+     * This is representative of real use cases, where init/destroy should always come in pairs. */
     printf("%s", name);
-    BENCH("1 initialize adjlist.",
-            REPEAT(igraph_adjlist_init(g, &adj, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE), repeat);
+    BENCH("1 init/destroy adjlist.",
+            REPEAT(
+              do {
+                  igraph_adjlist_init(g, &adj, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+                  igraph_adjlist_destroy(&adj);
+              } while (0),
+              repeat);
          );
 
     printf("%s", name);
-    BENCH("2 initialize inclist.",
-            REPEAT(igraph_inclist_init(g, &inc, IGRAPH_ALL, IGRAPH_NO_LOOPS), repeat);
+    BENCH("2 init/destroy inclist.",
+            REPEAT(
+              do {
+                  igraph_inclist_init(g, &inc, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+                  igraph_inclist_destroy(&inc);
+              } while (0),
+              repeat);
          );
 
     printf("%s", name);
-    BENCH("3 go over vertices (multiple times) using adjlist.",
+    BENCH("3 init/destroy adjlist, remove loops and multiple (which aren't present).",
+            REPEAT(
+              do {
+                  igraph_adjlist_init(g, &adj, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+                  igraph_adjlist_destroy(&adj);
+              } while (0),
+              repeat);
+         );
+
+    printf("%s", name);
+    BENCH("4 init/destroy inclist, remove loops (which aren't present).",
+            REPEAT(
+              do {
+                  igraph_inclist_init(g, &inc, IGRAPH_ALL, IGRAPH_NO_LOOPS);
+                  igraph_inclist_destroy(&inc);
+              } while (0),
+              repeat);
+         );
+
+    /* Initialize adjlist  / inclist for the following benchmarks. */
+    igraph_adjlist_init(g, &adj, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+    igraph_inclist_init(g, &inc, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+
+    printf("%s", name);
+    BENCH("5 go over vertices (multiple times) using adjlist.",
             REPEAT(result = test_adj(g, &adj), repeat);
          );
 
     printf("%s", name);
-    BENCH("4 go over vertices (multiple times) using inclist, IGRAPH_OTHER.",
+    BENCH("6 go over vertices (multiple times) using inclist, IGRAPH_OTHER.",
             REPEAT(result = test_inc_other(g, &inc), repeat);
          );
 
     printf("%s", name);
-    BENCH("5 go over vertices (multiple times) using inclist, IGRAPH_TO.",
+    BENCH("7 go over vertices (multiple times) using inclist, IGRAPH_TO.",
             REPEAT(result = test_inc_to(g, &inc), repeat);
          );
 
     printf("%s", name);
-    BENCH("6 go over edges using inclist, don't retrieve vertex.",
+    BENCH("8 go over edges using inclist, don't retrieve vertex.",
             REPEAT(result = test_inc_nop(g, &inc), repeat);
          );
 
     printf("%s", name);
-    BENCH("7 go over edges and vertices using adjlist and inclist.",
+    BENCH("9 go over edges and vertices using adjlist and inclist.",
             REPEAT(result = test_inc_adj(g, &inc, &adj), repeat);
-         );
-
-    igraph_adjlist_destroy(&adj);
-    igraph_inclist_destroy(&inc);
-
-    printf("%s", name);
-    BENCH("8 initialize adjlist, include loops and multiple (which aren't present).",
-            REPEAT(igraph_adjlist_init(g, &adj, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE), repeat);
-         );
-
-    printf("%s", name);
-    BENCH("9 initialize inclist, include loops (which aren't present).",
-            REPEAT(igraph_inclist_init(g, &inc, IGRAPH_ALL, IGRAPH_LOOPS), repeat);
          );
 
     igraph_adjlist_destroy(&adj);
@@ -367,7 +407,6 @@ int main() {
     igraph_full(&g, 1000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     do_benchmarks(" sg - ", &g, 100);
     igraph_destroy(&g);
-
 
     return 0;
 }
