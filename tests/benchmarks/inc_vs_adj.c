@@ -165,16 +165,17 @@ igraph_integer_t test_direct(igraph_t *g)
 {
     igraph_integer_t dummy = 0;
     igraph_integer_t vcount = igraph_vcount(g);
+    igraph_integer_t ecount = igraph_ecount(g);
 
-    int ei = 0;
-    int eo = 0;
+    igraph_integer_t ei = 0;
+    igraph_integer_t eo = 0;
     for (igraph_integer_t i = 0; i < vcount; i++) {
-        while (VECTOR(g->from)[VECTOR(g->oi)[ei]] == i) {
+        while (ei < ecount && VECTOR(g->from)[VECTOR(g->oi)[ei]] == i) {
             igraph_integer_t neighbor = VECTOR(g->to)[VECTOR(g->oi)[ei]];
             dummy ^= neighbor ^ VECTOR(g->oi)[ei];
             ei++;
         }
-        while (VECTOR(g->to)[VECTOR(g->ii)[eo]] == i) {
+        while (eo < ecount && VECTOR(g->to)[VECTOR(g->ii)[eo]] == i) {
             igraph_integer_t neighbor = VECTOR(g->from)[VECTOR(g->ii)[eo]];
             dummy ^= neighbor ^ VECTOR(g->ii)[eo] ;
             eo++;
