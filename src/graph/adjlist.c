@@ -127,7 +127,8 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
 igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode, igraph_loops_t loops,
                         igraph_multiple_t multiple) {
-    igraph_integer_t i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t degrees;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
@@ -137,7 +138,11 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         mode = IGRAPH_ALL;
     }
 
-    al->length = igraph_vcount(graph);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    /* igraph_degrees() is fast when loops=true */
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, /* loops= */ 1));
+
+    al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
     if (al->adjs == 0) {
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_ENOMEM);
@@ -145,10 +150,10 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
-    for (i = 0; i < al->length; i++) {
+    for (igraph_integer_t i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], VECTOR(degrees)[i]));
         IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
 
         IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
@@ -156,7 +161,8 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         ));
     }
 
-    IGRAPH_FINALLY_CLEAN(1); /* igraph_adjlist_destroy */
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(2); /* + igraph_adjlist_destroy */
 
     return IGRAPH_SUCCESS;
 }
@@ -700,7 +706,8 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_inclist_t *il,
                         igraph_neimode_t mode,
                         igraph_loops_t loops) {
-    igraph_integer_t i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t degrees;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_EINVMODE);
@@ -710,17 +717,21 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
-    il->length = igraph_vcount(graph);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    /* igraph_degrees() is fast when loops=true */
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, /* loops= */ 1));
+
+    il->length = no_of_nodes;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
         IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_ENOMEM);
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
-    for (i = 0; i < il->length; i++) {
+    for (igraph_integer_t i = 0; i < il->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], 0));
+        IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], VECTOR(degrees)[i]));
         IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode));
 
         if (loops != IGRAPH_LOOPS_TWICE) {
@@ -730,7 +741,8 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
         }
     }
 
-    IGRAPH_FINALLY_CLEAN(1); /* igraph_inclist_destroy */
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(2); /* + igraph_inclist_destroy */
 
     return IGRAPH_SUCCESS;
 }
