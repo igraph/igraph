@@ -369,12 +369,6 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
     for (i = 0; i < n; i++) {
         IGRAPH_FREE(sv->stor_begin[i]);
     }
-    /* try to give back some memory */
-    tmp = IGRAPH_REALLOC(sv->stor_begin, 1, char*);
-    if (tmp != 0) {
-        sv->stor_begin = tmp;
-        sv->stor_end = sv->stor_begin + 1;
-    }
     sv->end = sv->stor_begin;
 }
 
