@@ -72,11 +72,11 @@ void check_graph_singleton(const igraph_matrix_t *layout) {
     igraph_integer_t nerr = 0;
 
     if (nrows != 1) {
-        printf("Singleton graph layout has %d rows instead of 1.\n", nrows);
+        printf("Singleton graph layout has %d rows instead of 1.\n", (int)nrows);
         nerr++;
     }
     if (ncols != 2) {
-        printf("Singleton graph layout has %d cols instead of 2.\n", ncols);
+        printf("Singleton graph layout has %d cols instead of 2.\n", (int)ncols);
         nerr++;
     }
     if ((fabs(MATRIX(*layout, 0, 0)) > 0.001) || (fabs(MATRIX(*layout, 0, 1)) > 0.001)) {
@@ -93,9 +93,6 @@ int main() {
     igraph_t graph, empty_graph, singleton_graph;
     igraph_vector_t distances;
     igraph_matrix_t layout;
-#ifdef UMAP_DEBUG
-    igraph_real_t a, b;
-#endif
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -114,12 +111,6 @@ int main() {
             0.9, 0.9, 0.9,
             0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.08, 0.05, 0.1, 0.08, 0.12, 0.09, 0.11
             );
-
-#ifdef UMAP_DEBUG
-    IGRAPH_CHECK(igraph_i_umap_fit_ab(1, &a, &b));
-    IGRAPH_CHECK(igraph_i_umap_fit_ab(0.1, &a, &b));
-    IGRAPH_CHECK(igraph_i_umap_fit_ab(5, &a, &b));
-#endif
 
     printf("Check error for negative min_dist.\n");
     CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, 1), IGRAPH_EINVAL);
@@ -151,11 +142,9 @@ int main() {
     printf("same graph, different epochs:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 5000, 0.8) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
-
-    /* No need for distances anymore */
     igraph_vector_destroy(&distances);
 
-    printf("Same graph, no weights:\n");
+    printf("Same graph, no distances:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
     igraph_destroy(&graph);

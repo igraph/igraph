@@ -209,18 +209,47 @@ static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals,
     return IGRAPH_SUCCESS;
 }
 
-#ifndef UMAP_DEBUG
-static
-#endif
-igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, igraph_real_t *b_p)
+/* UMAP minimizes the cross-entropy between probability of being a true edge in
+ * high and low dimensions. For the low-dimensional computation, it uses a smooth
+ * function of the Euclidean distance between two vertices:
+ *
+ * P(d) = (1 + a*d^2b)^-1
+ *
+ * where d is the distance and a and b are hyperparameters that basically determine
+ * the cutoff distance at which the probability starts to decrease.
+ *
+ * We fit these two parameters using nonlinear least squares (Gauss-Newton + line search)
+ * on a grid of artificial distances. There is only one user-chosen input argument that
+ * determines this fit, called min_dist, which is approximately the cutoff distance we
+ * are trying to achieve.
+ *
+ * ADVANCED NOTE:
+ * In a way, the whole UMAP layout is invariant upon scaling transformations, of course,
+ * so min_dist is basically meaningless. Another way to see this is that for any pair
+ * (a,b) that minimize the least squares for dist_min, we can easily find a solution for
+ * a new dist_min2 := alpha * dist_min:
+ *
+ * P(d, a, b) = (1 + a*d^2b)^-1
+ *
+ * P(alpha * d, a', b') = (1 + a'*(alpha * d)^2b' )^-1
+ *
+ * that is:
+ *
+ * a*d^2b = a'*alpha^2b'*d^2b'   for each  d >= 0.
+ *
+ * So for d = 1        ->  a = a'*alpha^2b'
+ * and for d = sqrt(2) ->  a*2^b = a'*alpha^2b'*2^b'
+ *
+ * which solves as:
+ *
+ * b' = b
+ * a' = a / alpha^2b
+ *
+ * For instance, if b = 1, a -> 0.01*a moves the fit a decade towards larger min_dist,
+ * and a -> 100*a moves the fit a decade towards smaller min_dist.
+ * */
+static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, igraph_real_t *b_p)
 {
-    /*We're fitting a and b, such that
-     * (1 + a*d^2b)^-1
-     * has the minimum least-squares error compared to
-     * the fuzzy ball with min-dist ball size and
-     * plain e^-d fuzzyness
-     * */
-
     /* Grid points */
     igraph_vector_t x;
      /* Make a lattice from 0 to this distance */

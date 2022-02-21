@@ -10,5 +10,5 @@ same graph, different negative sampling probability:
 UMAP layout seems fine.
 same graph, different epochs:
 UMAP layout seems fine.
-Same graph, no weights:
+Same graph, no distances:
 UMAP layout seems fine.
