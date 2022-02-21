@@ -456,15 +456,19 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
  */
 
 igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
-    igraph_integer_t old_size = igraph_strvector_size(v);
+    igraph_integer_t old_size;
     igraph_integer_t value_len = strlen(value);
-    igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+    igraph_integer_t new_size;
 
+    IGRAPH_ASSERT(v != 0);
+    IGRAPH_ASSERT(v->stor_begin != 0);
+
+    old_size = igraph_strvector_size(v);
+    new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
     if (old_size == IGRAPH_INTEGER_MAX) {
         IGRAPH_ERROR("Cannot add to strvector, already at maximum size.", IGRAPH_EOVERFLOW);
     }
-    IGRAPH_ASSERT(v != 0);
-    IGRAPH_ASSERT(v->stor_begin != 0);
+
     if (v->end == v->stor_end) {
         if (new_size == 0) {
             new_size = 1;
