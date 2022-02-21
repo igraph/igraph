@@ -212,13 +212,11 @@ igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_integer_t id
  * \ingroup strvector
  * \function igraph_strvector_remove_section
  * \brief Removes a section from a string vector.
- * \todo repair realloc
  */
 
 void igraph_strvector_remove_section(
         igraph_strvector_t *v, igraph_integer_t from, igraph_integer_t to) {
     igraph_integer_t i;
-    /*   char **tmp; */
 
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
@@ -228,17 +226,11 @@ void igraph_strvector_remove_section(
             IGRAPH_FREE(v->stor_begin[i]);
         }
     }
-    for (i = 0; i < v->end - v->stor_begin - to; i++) {
-        v->stor_begin[from + i] = v->stor_begin[to + i];
+    for (char **p = v->stor_begin; p < v->end - to; p++) {
+        p[from] = p[to];
     }
 
     v->end -= (to - from);
-
-    /* try to make it smaller */
-    /*   tmp=IGRAPH_REALLOC(v->stor_begin, igraph_strvector_size(v), char*); */
-    /*   if (tmp!=0) { */
-    /*     v->stor_begin=tmp; */
-    /*   } */
 }
 
 /**
@@ -409,14 +401,12 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
 
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
-    /*   printf("resize %li to %li\n", igraph_strvector_size(v), newsize); */
     if (newsize < oldsize) {
         for (i = newsize; i < oldsize; i++) {
             IGRAPH_FREE(v->stor_begin[i]);
         }
         /* try to give back some space */
         tmp = IGRAPH_REALLOC(v->stor_begin, newsize, char*);
-        /*     printf("resize %li to %li, %p\n", igraph_strvector_size(v), newsize, tmp); */
         if (tmp != 0) {
             v->stor_begin = tmp;
             v->stor_end = v->stor_begin + newsize;
