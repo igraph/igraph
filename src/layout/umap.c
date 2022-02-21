@@ -199,7 +199,7 @@ static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals,
     *squared_sum_res = 0;
     for (igraph_integer_t i = 0; i < nr_points; i++) {
         /* The ideal probability is:
-         * 
+         *
          *     P(d) = d < min_dist ? 1 : e^{-(d - min_dist)}
          *
          * which is the same as the high-dimensional probability, except
@@ -899,22 +899,36 @@ igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_vector_t
  * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
  * in PCA).
  *
+ * </para><para>
+ *
  * However, UMAP uses a graph with distances associated to the edges as a key
  * intermediate representation of the high-dimensional space, so it is also useful as
  * a general graph layouting algorithm, hence its inclusion in igraph.
  *
+ * </para><para>
+ *
  * Importantly, the edge-associated distances are derived from a similarity metric
  * between the high-dimensional vectors, often Pearson correlation:
  *
+ * </para><para>
+ *
  * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
+ *
+ * </para><para>
  *
  * In this case, the associated distance is usually defined as:
  *
+ * </para><para>
+ *
  * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
+ *
+ * </para><para>
  *
  * This implementation can also work with unweighted similarity graphs, in which case
  * the distance parameter should be a null pointer and all edges beget a similarity
  * score of 1 (a distance of 0).
+ *
+ * </para><para>
  *
  * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
  * descent approach really shines when the graph is sparse. In practice, most people
@@ -922,15 +936,27 @@ igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_vector_t
  * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
  * distance (e.g. correlation less than 0.2).
  *
+ * </para><para>
+ *
  * Therefore, if you are trying to use this function to embed high-dimensional vectors,
  * the steps are:
  *
+ * </para><para>
+ *
  * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
  *    weighted or unweighted. If unsure, compute a knn.
+ *
+ * </para><para>
+ *
  * 2. If you keep the weights, convert them into distances or store them as a "weight"
  *    edge attribute and use a null pointer for the distances. If using similarity
  *    weights instead of distances, make sure they do not exceed 1.
+ *
+ * </para><para>
+ *
  * 3. Feed the graph (and distances, if you have them) into this function.
+ *
+ * </para><para>
  *
  * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
  *       which, because of the curse of dimensionality, is in many cases a highly
@@ -964,8 +990,12 @@ igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_vector_t
  * \return Error code.
  *
  */
-igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *distances,
-        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
+igraph_error_t igraph_layout_umap(const igraph_t *graph,
+                                  const igraph_vector_t *distances,
+                                  igraph_matrix_t *layout,
+                                  igraph_real_t min_dist,
+                                  igraph_integer_t epochs,
+                                  igraph_real_t sampling_prob) {
     IGRAPH_CHECK(igraph_i_layout_umap(graph, distances, layout, min_dist, epochs, sampling_prob, 2));
     return IGRAPH_SUCCESS;
 }
@@ -997,8 +1027,12 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
  * \return Error code.
  *
  */
-igraph_error_t igraph_layout_umap_3d(const igraph_t *graph, const igraph_vector_t *distances,
-        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
+igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
+                                     const igraph_vector_t *distances,
+                                     igraph_matrix_t *layout,
+                                     igraph_real_t min_dist,
+                                     igraph_integer_t epochs,
+                                     igraph_real_t sampling_prob) {
     IGRAPH_CHECK(igraph_i_layout_umap(graph, distances, layout, min_dist, epochs, sampling_prob, 3));
     return IGRAPH_SUCCESS;
 }

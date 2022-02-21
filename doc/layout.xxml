@@ -41,6 +41,7 @@
 <!-- doxrox-include igraph_layout_grid_3d -->
 <!-- doxrox-include igraph_layout_fruchterman_reingold_3d -->
 <!-- doxrox-include igraph_layout_kamada_kawai_3d -->
+<!-- doxrox-include igraph_layout_umap_3d -->
 </section>
 
 <section id="merging-layouts"><title>Merging layouts</title>
