@@ -194,12 +194,34 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
 /* Helper function to compute a and b parameters (smoothing probability metric in embedding space) */
 static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals,
         igraph_real_t *squared_sum_res, igraph_integer_t nr_points, igraph_real_t a,
-        igraph_real_t b, const igraph_vector_t *powb, const igraph_vector_t *x, igraph_real_t min_dist)
+        igraph_real_t b, igraph_vector_t *powb, const igraph_vector_t *x, igraph_real_t min_dist)
 {
     igraph_real_t tmp;
 
     *squared_sum_res = 0;
     for (igraph_integer_t i = 0; i < nr_points; i++) {
+        /* The ideal probability is:
+         * 
+         *     P(d) = d < min_dist ? 1 : e^{-(d - min_dist)}
+         *
+         * which is the same as the high-dimensional probability, except
+         * min_dist plays the role of rho and sigma is fixed at 1. However,
+         * this function has a kink at min_dist (first derivative is not
+         * continuous). So we smoothen it with:
+         *
+         *     Q(d) = ( 1 + a*d^2b )^-1
+         *
+         * which is quite similar throughout for appropriate a and b. Notice
+         * that we do not need to smoothen the high-dimensional probability
+         * function because the vertices are not moved in the high-dimensional
+         * space, so there is no need for differentiating that function.
+         *
+         * The residual is of course:
+         *
+         *    Q(d) - P(d) = ( 1 + a*d^2b )^-1 - [ d < min_dist ? 1 : e^{-(d - min_dist)} ]
+         *
+         * This function also sets the auxiliary vector powb.
+         * */
         VECTOR(*powb)[i] = powf(VECTOR(*x)[i], 2 * b);
         tmp = 1 / (1 + a * VECTOR(*powb)[i]);
         tmp -= VECTOR(*x)[i] <= min_dist ? 1 : exp(-(VECTOR(*x)[i] - min_dist));
