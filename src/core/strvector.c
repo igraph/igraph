@@ -456,10 +456,13 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
  */
 
 igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
-    igraph_integer_t s = igraph_strvector_size(v);
+    igraph_integer_t old_size = igraph_strvector_size(v);
     igraph_integer_t value_len = strlen(value);
-    igraph_integer_t new_size = s * 2;
+    igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
 
+    if (old_size == IGRAPH_INTEGER_MAX) {
+        IGRAPH_ERROR("Cannot add to strvector, already at maximum size.", IGRAPH_EOVERFLOW);
+    }
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
     if (v->end == v->stor_end) {
@@ -468,12 +471,12 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
         }
         igraph_strvector_resize(v, new_size);
     }
-    v->stor_begin[s] = IGRAPH_CALLOC(value_len + 1, char);
-    if (v->stor_begin[s] == 0) {
+    v->stor_begin[old_size] = IGRAPH_CALLOC(value_len + 1, char);
+    if (v->stor_begin[old_size] == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
-    strcpy(v->stor_begin[s], value);
-    v->end = v->stor_begin + s + 1;
+    strcpy(v->stor_begin[old_size], value);
+    v->end = v->stor_begin + old_size + 1;
 
     return IGRAPH_SUCCESS;
 }
