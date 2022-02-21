@@ -204,6 +204,7 @@ add_library(
   layout/merge_grid.c
   layout/reingold_tilford.c
   layout/sugiyama.c
+  layout/umap.c
 
   operators/add_edge.c
   operators/complementer.c
@@ -272,7 +273,6 @@ add_library(
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
-  misc/umap.c
 
   internal/glpk_support.c
   internal/hacks.c

@@ -17,8 +17,6 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
    */
 
-#include "igraph_umap.h"
-
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_lapack.h"
@@ -808,86 +806,10 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_layout_umap
- * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
- *
- * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
- * (most commonly by far, 2D). The algorithm is probabilistic and introduces
- * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
- * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
- * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
- * in PCA).
- *
- * However, UMAP uses a graph with distances associated to the edges as a key
- * intermediate representation of the high-dimensional space, so it is also useful as
- * a general graph layouting algorithm, hence its inclusion in igraph.
- *
- * Importantly, the edge-associated distances are derived from a similarity metric
- * between the high-dimensional vectors, often Pearson correlation:
- *
- * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
- *
- * In this case, the associated distance is usually defined as:
- *
- * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
- *
- * This implementation can also work with unweighted similarity graphs, in which case
- * the distance parameter should be a null pointer and all edges beget a similarity
- * score of 1 (a distance of 0).
- *
- * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
- * descent approach really shines when the graph is sparse. In practice, most people
- * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
- * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
- * distance (e.g. correlation less than 0.2).
- *
- * Therefore, if you are trying to use this function to embed high-dimensional vectors,
- * the steps are:
- *
- * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
- *    weighted or unweighted. If unsure, compute a knn.
- * 2. If you keep the weights, convert them into distances or store them as a "weight"
- *    edge attribute and use a null pointer for the distances. If using similarity
- *    weights instead of distances, make sure they do not exceed 1.
- * 3. Feed the graph (and distances, if you have them) into this function.
- *
- * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
- *       which, because of the curse of dimensionality, is in many cases a highly
- *       subjective and potentially controversial operation: thread with care and at
- *       your own risk. Two high-dimensional vectors might look similar or extremely
- *       different depending on the point of view/angle, and there are a lot of
- *       viewpoints when the dimensionality ramps up.
- *
- * </para><para>
- * References:
- *
- * </para><para>
- * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
- *
- * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
- * \param distances Pointer to a vector of edge lengths. Similarity graphs for
- *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
- *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
- * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored. Only 2D
- *   embedding are currently supported, as they are by far more common than any higher dimensions.
- * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
- *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
- *   number.
- * \param epochs Number of iterations of the main stochastic gradient descent loop on the
- *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50k edges), 50 epochs are used for larger graphs.
- * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
- *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
- *   Vice versa, a too low number will converge very slowly, possibly too slowly.
- *
- * \return Error code.
- *
- */
-igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *distances,
-        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob, igraph_integer_t ndim) {
 
+/* This is the main function that works for any dimensionality of the embedding (currently hard-constrained to 2 or 3 ONLY in the initialization) */
+igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_vector_t *distances,
+        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob, igraph_integer_t ndim) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -963,5 +885,170 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
     /* Center layout */
     IGRAPH_CHECK(igraph_i_umap_center_layout(layout));
 
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_layout_umap
+ * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
+ *
+ * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
+ * (most commonly by far, 2D). The algorithm is probabilistic and introduces
+ * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
+ * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
+ * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
+ * in PCA).
+ *
+ * However, UMAP uses a graph with distances associated to the edges as a key
+ * intermediate representation of the high-dimensional space, so it is also useful as
+ * a general graph layouting algorithm, hence its inclusion in igraph.
+ *
+ * Importantly, the edge-associated distances are derived from a similarity metric
+ * between the high-dimensional vectors, often Pearson correlation:
+ *
+ * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
+ *
+ * In this case, the associated distance is usually defined as:
+ *
+ * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
+ *
+ * This implementation can also work with unweighted similarity graphs, in which case
+ * the distance parameter should be a null pointer and all edges beget a similarity
+ * score of 1 (a distance of 0).
+ *
+ * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
+ * descent approach really shines when the graph is sparse. In practice, most people
+ * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
+ * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
+ * distance (e.g. correlation less than 0.2).
+ *
+ * Therefore, if you are trying to use this function to embed high-dimensional vectors,
+ * the steps are:
+ *
+ * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
+ *    weighted or unweighted. If unsure, compute a knn.
+ * 2. If you keep the weights, convert them into distances or store them as a "weight"
+ *    edge attribute and use a null pointer for the distances. If using similarity
+ *    weights instead of distances, make sure they do not exceed 1.
+ * 3. Feed the graph (and distances, if you have them) into this function.
+ *
+ * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
+ *       which, because of the curse of dimensionality, is in many cases a highly
+ *       subjective and potentially controversial operation: thread with care and at
+ *       your own risk. Two high-dimensional vectors might look similar or extremely
+ *       different depending on the point of view/angle, and there are a lot of
+ *       viewpoints when the dimensionality ramps up.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
+ *
+ * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
+ * \param distances Pointer to a vector of edge lengths. Similarity graphs for
+ *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
+ *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
+ *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
+ * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored.
+ * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
+ *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
+ *   number.
+ * \param epochs Number of iterations of the main stochastic gradient descent loop on the
+ *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
+ *   (less than 50k edges), 50 epochs are used for larger graphs.
+ * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
+ *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
+ *   Vice versa, a too low number will converge very slowly, possibly too slowly.
+ *
+ * \return Error code.
+ *
+ */
+igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *distances,
+        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
+    IGRAPH_CHECK(igraph_i_layout_umap(graph, distances, layout, min_dist, epochs, sampling_prob, 2));
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_layout_umap_3d
+ * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
+ *
+ * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
+ * (in this case, 3D). The algorithm is probabilistic and introduces
+ * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
+ * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
+ * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
+ * in PCA).
+ *
+ * However, UMAP uses a graph with distances associated to the edges as a key
+ * intermediate representation of the high-dimensional space, so it is also useful as
+ * a general graph layouting algorithm, hence its inclusion in igraph.
+ *
+ * Importantly, the edge-associated distances are derived from a similarity metric
+ * between the high-dimensional vectors, often Pearson correlation:
+ *
+ * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
+ *
+ * In this case, the associated distance is usually defined as:
+ *
+ * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
+ *
+ * This implementation can also work with unweighted similarity graphs, in which case
+ * the distance parameter should be a null pointer and all edges beget a similarity
+ * score of 1 (a distance of 0).
+ *
+ * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
+ * descent approach really shines when the graph is sparse. In practice, most people
+ * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
+ * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
+ * distance (e.g. correlation less than 0.2).
+ *
+ * Therefore, if you are trying to use this function to embed high-dimensional vectors,
+ * the steps are:
+ *
+ * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
+ *    weighted or unweighted. If unsure, compute a knn.
+ * 2. If you keep the weights, convert them into distances or store them as a "weight"
+ *    edge attribute and use a null pointer for the distances. If using similarity
+ *    weights instead of distances, make sure they do not exceed 1.
+ * 3. Feed the graph (and distances, if you have them) into this function.
+ *
+ * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
+ *       which, because of the curse of dimensionality, is in many cases a highly
+ *       subjective and potentially controversial operation: thread with care and at
+ *       your own risk. Two high-dimensional vectors might look similar or extremely
+ *       different depending on the point of view/angle, and there are a lot of
+ *       viewpoints when the dimensionality ramps up.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
+ *
+ * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
+ * \param distances Pointer to a vector of edge lengths. Similarity graphs for
+ *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
+ *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
+ *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
+ * \param layout Pointer to the n x 3 matrix where the layout coordinates will be stored.
+ * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
+ *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
+ *   number.
+ * \param epochs Number of iterations of the main stochastic gradient descent loop on the
+ *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
+ *   (less than 50k edges), 50 epochs are used for larger graphs.
+ * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
+ *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
+ *   Vice versa, a too low number will converge very slowly, possibly too slowly.
+ *
+ * \return Error code.
+ *
+ */
+igraph_error_t igraph_layout_umap_3d(const igraph_t *graph, const igraph_vector_t *distances,
+        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
+    IGRAPH_CHECK(igraph_i_layout_umap(graph, distances, layout, min_dist, epochs, sampling_prob, 3));
     return IGRAPH_SUCCESS;
 }
