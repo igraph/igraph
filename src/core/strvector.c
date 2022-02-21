@@ -399,13 +399,6 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
         for (i = newsize; i < oldsize; i++) {
             IGRAPH_FREE(v->stor_begin[i]);
         }
-        /* try to give back some space */
-        tmp = IGRAPH_REALLOC(v->stor_begin, newsize, char*);
-        if (tmp != 0) {
-            v->stor_begin = tmp;
-            v->stor_end = v->stor_begin + newsize;
-            v->end = v->stor_end;
-        }
     } else if (newsize > oldsize) {
         igraph_bool_t error = 0;
         tmp = IGRAPH_REALLOC(v->stor_begin, newsize, char*);
@@ -419,26 +412,14 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
         for (i = 0; i < toadd; i++) {
             v->stor_begin[oldsize + i] = IGRAPH_CALLOC(1, char);
             if (v->stor_begin[oldsize + i] == 0) {
-                error = 1;
-                break;
+                for (j = 0; j < i; j++) {
+                    if (v->stor_begin[oldsize + i] != 0) {
+                        IGRAPH_FREE(v->stor_begin[oldsize + i]);
+                    }
+                }
+                IGRAPH_ERROR("Cannot resize string vector", IGRAPH_ENOMEM);
             }
             v->stor_begin[oldsize + i][0] = '\0';
-        }
-        if (error) {
-            /* There was an error, free everything we've allocated so far */
-            for (j = 0; j < i; j++) {
-                if (v->stor_begin[oldsize + i] != 0) {
-                    IGRAPH_FREE(v->stor_begin[oldsize + i]);
-                }
-            }
-            /* Try to give back space */
-            tmp = IGRAPH_REALLOC(v->stor_begin, oldsize, char*);
-            if (tmp != 0) {
-                v->stor_begin = tmp;
-                v->stor_end = v->stor_begin + oldsize;
-                v->end = v->stor_end;
-            }
-            IGRAPH_ERROR("Cannot resize string vector", IGRAPH_ENOMEM);
         }
     }
 
