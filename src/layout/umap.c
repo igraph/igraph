@@ -976,7 +976,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
  * \brief 3D layout using UMAP.
  *
  * This is the 3D version of the UMAP algorithm (see \ref
- * igraph_layout_umap for the 2D version).
+ * igraph_layout_umap() for the 2D version).
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
