@@ -973,60 +973,10 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
 
 /**
  * \function igraph_layout_umap_3d
- * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
+ * \brief 3D layout using UMAP.
  *
- * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
- * (in this case, 3D). The algorithm is probabilistic and introduces
- * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
- * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
- * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
- * in PCA).
- *
- * However, UMAP uses a graph with distances associated to the edges as a key
- * intermediate representation of the high-dimensional space, so it is also useful as
- * a general graph layouting algorithm, hence its inclusion in igraph.
- *
- * Importantly, the edge-associated distances are derived from a similarity metric
- * between the high-dimensional vectors, often Pearson correlation:
- *
- * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
- *
- * In this case, the associated distance is usually defined as:
- *
- * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
- *
- * This implementation can also work with unweighted similarity graphs, in which case
- * the distance parameter should be a null pointer and all edges beget a similarity
- * score of 1 (a distance of 0).
- *
- * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
- * descent approach really shines when the graph is sparse. In practice, most people
- * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
- * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
- * distance (e.g. correlation less than 0.2).
- *
- * Therefore, if you are trying to use this function to embed high-dimensional vectors,
- * the steps are:
- *
- * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
- *    weighted or unweighted. If unsure, compute a knn.
- * 2. If you keep the weights, convert them into distances or store them as a "weight"
- *    edge attribute and use a null pointer for the distances. If using similarity
- *    weights instead of distances, make sure they do not exceed 1.
- * 3. Feed the graph (and distances, if you have them) into this function.
- *
- * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
- *       which, because of the curse of dimensionality, is in many cases a highly
- *       subjective and potentially controversial operation: thread with care and at
- *       your own risk. Two high-dimensional vectors might look similar or extremely
- *       different depending on the point of view/angle, and there are a lot of
- *       viewpoints when the dimensionality ramps up.
- *
- * </para><para>
- * References:
- *
- * </para><para>
- * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
+ * This is the 3D version of the UMAP algorithm (see \ref
+ * igraph_layout_umap for the 2D version).
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
