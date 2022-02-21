@@ -1,6 +1,7 @@
 Check error for negative min_dist.
 Check error for negative epochs.
 Check error for negative sampling probability.
+Check error for wrong number of dimensions.
 Empty graph:
 Singleton graph:
 UMAP layout seems fine.

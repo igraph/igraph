@@ -22,32 +22,52 @@
 
 void check_graph_twoclusters(const igraph_matrix_t *layout) {
     /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
-    igraph_real_t xm, ym, dx, dy, dist, xmin, xmax, ymin, ymax, distmax;
+    igraph_real_t xm, ym, zm, dx, dy, dz, dist, xmin, xmax, ymin, ymax, zmin, zmax, distmax;
+    igraph_integer_t ndim = igraph_matrix_ncol(layout);
     int nerr = 0;
 
-    xmin = xmax = ymin = ymax = 0;
+    xmin = xmax = ymin = ymax = zmin = zmax = 0;
     for (int i = 0; i < 12; i++) {
         xmin = fmin(xmin, MATRIX(*layout, i, 0));
         xmax = fmax(xmax, MATRIX(*layout, i, 0));
         ymin = fmin(ymin, MATRIX(*layout, i, 1));
         ymax = fmax(ymax, MATRIX(*layout, i, 1));
+        if (ndim == 3) {
+            zmin = fmin(zmin, MATRIX(*layout, i, 2));
+            zmax = fmax(zmax, MATRIX(*layout, i, 2));
+        }
     }
     /* total span of the layout */
     distmax = fmax((xmax - xmin), (ymax - ymin));
+    if (ndim == 3) {
+        distmax = fmax((zmax - zmin), distmax);
+    }
 
     for (int iclu = 0; iclu < 8; iclu+= 7) {
         xm = 0;
         ym = 0;
+        zm = 0;
         for (int i = iclu; i < iclu + 4; i++) {
             xm += MATRIX(*layout, i, 0);
             ym += MATRIX(*layout, i, 1);
+            if (ndim == 3) {
+                zm += MATRIX(*layout, i, 2);
+            }
         }
         xm /= 4;
         ym /= 4;
+        zm /= 4;
         for (int i = iclu; i < iclu + 4; i++) {
             dx = MATRIX(*layout, i, 0) - xm;
             dy = MATRIX(*layout, i, 1) - ym;
-            dist = sqrt((dx * dx) + (dy * dy));
+            if (ndim == 3) {
+                dz = MATRIX(*layout, i, 2) - zm;
+            }
+            dist = (dx * dx) + (dy * dy);
+            if (ndim == 3) {
+                dist += (dz * dz);
+            }
+            dist = sqrt(dist);
 
             if (dist > 0.2 * distmax) {
                 printf("ERROR: UMAP cluster not compact!\n");
@@ -113,43 +133,51 @@ int main() {
             );
 
     printf("Check error for negative min_dist.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, 1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, -0.01, 500, 1, 2), IGRAPH_EINVAL);
 
     printf("Check error for negative epochs.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, -1, 1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, -1, 1, 2), IGRAPH_EINVAL);
 
     printf("Check error for negative sampling probability.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1, 2), IGRAPH_EINVAL);
+
+    printf("Check error for wrong number of dimensions.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1, 1), IGRAPH_EINVAL);
 
     printf("Empty graph:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1, 2) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);
     igraph_destroy(&empty_graph);
 
     printf("Singleton graph:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, NULL, &layout, 0.01, 500, 0.2) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, NULL, &layout, 0.01, 500, 0.2, 2) == IGRAPH_SUCCESS);
     check_graph_singleton(&layout);
     igraph_destroy(&singleton_graph);
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.3) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.3, 2) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("same graph, different negative sampling probability:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 500, 0.8, 2) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("same graph, different epochs:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 5000, 0.8) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &distances, &layout, 0.01, 5000, 0.8, 2) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
     igraph_vector_destroy(&distances);
 
     printf("Same graph, no distances:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8, 2) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
-    igraph_destroy(&graph);
+    igraph_matrix_resize(&layout, 0, 0);
+
+    printf("Same graph, 3D layout:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, NULL, &layout, 0.01, 500, 0.8, 3) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout);
 
     igraph_matrix_destroy(&layout);
+    igraph_destroy(&graph);
     VERIFY_FINALLY_STACK();
 
     return 0;

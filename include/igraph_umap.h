@@ -35,7 +35,8 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                                 igraph_matrix_t *layout,
                                                 igraph_real_t min_dist,
                                                 igraph_integer_t epochs,
-                                                igraph_real_t sampling_prob);
+                                                igraph_real_t sampling_prob,
+                                                igraph_integer_t ndim);
 
 __END_DECLS
 

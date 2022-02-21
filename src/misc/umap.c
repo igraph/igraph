@@ -536,53 +536,59 @@ static igraph_error_t igraph_i_umap_clip_force(igraph_real_t *force, igraph_real
 /* NOTE: mu is the probability of a true edge in high dimensions, not affected
  * by the embedding (in particular, xd and yd), so it's a constant for the
  * derivative/force. Same applies for the repulsion */
-static igraph_error_t igraph_i_umap_attract(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
-       igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
+static igraph_error_t igraph_i_umap_attract(igraph_vector_t *delta, igraph_real_t mu,
+       igraph_real_t a, igraph_real_t b, igraph_vector_t *forces)
 {
     igraph_real_t dsq, phi, force;
+    igraph_integer_t ndim = igraph_vector_size(delta);
 
-    dsq = xd * xd + yd * yd;
+    dsq = 0;
+    for (int d = 0; d != ndim; d++) {
+        dsq += VECTOR(*delta)[d] * VECTOR(*delta)[d];
+    }
 
     phi = 1. / (1. + a * pow(dsq, b));
     force = - mu * (2 * a * b * pow(dsq, b - 1)) * phi;
-    *force_x = force * xd;
-    *force_y = force * yd;
-
-    /* clip force to avoid too rapid change */
-    igraph_i_umap_clip_force(force_x, 3);
-    igraph_i_umap_clip_force(force_y, 3);
+    for (int d = 0; d != ndim; d++) {
+        VECTOR(*forces)[d] = force * VECTOR(*delta)[d];
+        /* clip force to avoid too rapid change */
+        igraph_i_umap_clip_force(&(VECTOR(*forces)[d]), 3);
 
 #ifdef UMAP_DEBUG
-    printf("force attractive: xd = %g, fx = %g\n", xd, *force_x);
-    printf("force attractive: yd = %g, fy = %g\n", yd, *force_y);
+        printf("force attractive: delta[%d] = %g, forces[%d] = %g\n", d, VECTOR(*delta)[d], d, VECTOR(*forces)[d]);
 #endif
+    }
 
     return IGRAPH_SUCCESS;
 }
 
 /*xd is difference in x direction, mu is a weight */
-static igraph_error_t igraph_i_umap_repel(igraph_real_t xd, igraph_real_t yd, igraph_real_t mu,
-       igraph_real_t a, igraph_real_t b, igraph_real_t *force_x, igraph_real_t *force_y)
+static igraph_error_t igraph_i_umap_repel(igraph_vector_t *delta, igraph_real_t mu,
+       igraph_real_t a, igraph_real_t b, igraph_vector_t *forces)
 {
     igraph_real_t dsq, force;
     igraph_real_t min_dist = 0.01;
+    igraph_integer_t ndim = igraph_vector_size(delta);
 
-    dsq = fmax(min_dist * min_dist, xd * xd + yd * yd);
+    dsq = 0;
+    for (int d = 0; d != ndim; d++) {
+        dsq += VECTOR(*delta)[d] * VECTOR(*delta)[d];
+    }
+    dsq = fmax(min_dist * min_dist, dsq);
 
     /* NOTE: in practice, in negative sampling mu is always zero because we
      * *assume* the sample to be negative i.e. never a true edge */
     force = (1 - mu) * (2 * b) / dsq / (1 + a * pow(dsq, b));
-    *force_x = force * xd;
-    *force_y = force * yd;
+    for (int d = 0; d != ndim; d++) {
+        VECTOR(*forces)[d] = force * VECTOR(*delta)[d];
 
-    /* clip force to avoid too rapid change */
-    igraph_i_umap_clip_force(force_x, 3);
-    igraph_i_umap_clip_force(force_y, 3);
+        /* clip force to avoid too rapid change */
+        igraph_i_umap_clip_force(&(VECTOR(*forces)[d]), 3);
 
 #ifdef UMAP_DEBUG
-    printf("force repulsive: xd = %g, fx = %g\n", xd, *force_x);
-    printf("force repulsive: yd = %g, fy = %g\n", yd, *force_y);
+        printf("force repulsive: delta[%d] = %g, forces[%d] = %g\n", d, VECTOR(*delta)[d], d, VECTOR(*forces)[d]);
 #endif
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -592,14 +598,21 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
        igraph_real_t learning_rate, igraph_bool_t avoid_neighbor_repulsion)
 {
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
+    igraph_integer_t ndim = igraph_matrix_ncol(layout);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t from, to;
-    igraph_real_t from_x, from_y, to_x, to_y, x_diff, y_diff, fx, fy;
+    igraph_vector_t from_emb, to_emb, delta, forces;
     /* The following is only used for small graphs, to avoid repelling your neighbors
      * For large sparse graphs, it's not necessary. For large dense graphs, you should
      * not be doing UMAP.
      * */
     igraph_vector_int_t neis, negative_vertices;
+
+    /* Initialize vectors */
+    IGRAPH_VECTOR_INIT_FINALLY(&from_emb, ndim);
+    IGRAPH_VECTOR_INIT_FINALLY(&to_emb, ndim);
+    IGRAPH_VECTOR_INIT_FINALLY(&delta, ndim);
+    IGRAPH_VECTOR_INIT_FINALLY(&forces, ndim);
 
     if (avoid_neighbor_repulsion) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
@@ -624,19 +637,17 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
         }
 
         /* Current coordinates of both vertices */
-        from_x = MATRIX(*layout, from, 0);
-        from_y = MATRIX(*layout, from, 1);
-        to_x = MATRIX(*layout, to, 0) ;
-        to_y = MATRIX(*layout, to, 1) ;
-
-        /* Distance in embedding space */
-        x_diff = from_x - to_x;
-        y_diff = from_y - to_y;
+        for (int d = 0; d != ndim; d++) {
+            VECTOR(from_emb)[d] = MATRIX(*layout, from, d);
+            VECTOR(to_emb)[d] = MATRIX(*layout, to, d);
+            VECTOR(delta)[d] = MATRIX(*layout, from, d) - MATRIX(*layout, to, d);
+        }
 
         /* Apply attractive force since they are neighbors */
-        IGRAPH_CHECK(igraph_i_umap_attract(x_diff, y_diff, VECTOR(*umap_weights)[eid], a, b, &fx, &fy));
-        MATRIX(*layout, from, 0) += learning_rate * fx;
-        MATRIX(*layout, from, 1) += learning_rate * fy;
+        IGRAPH_CHECK(igraph_i_umap_attract(&delta, VECTOR(*umap_weights)[eid], a, b, &forces));
+        for (int d = 0; d != ndim; d++) {
+            MATRIX(*layout, from, d) += learning_rate * VECTOR(forces)[d];
+        }
 
         /* Random other nodes are repelled from one (the first) vertex */
         IGRAPH_CHECK(igraph_random_sample(&negative_vertices, 0, no_of_nodes - 2, n_random_vertices));
@@ -670,23 +681,28 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
             }
 
             /* Get layout of random neighbor and gradient in embedding */
-            to_x = MATRIX(*layout, to, 0) ;
-            to_y = MATRIX(*layout, to, 1) ;
-            x_diff = from_x - to_x;
-            y_diff = from_y - to_y;
+            for (int d = 0; d != ndim; d++) {
+                VECTOR(to_emb)[d] = MATRIX(*layout, to, d);
+                VECTOR(delta)[d] = MATRIX(*layout, from, d) - MATRIX(*layout, to, d);
+            }
 
             /* This repels the other vertex assuming it's a negative example
              * that is no weight, no edge */
-            IGRAPH_CHECK(igraph_i_umap_repel(x_diff, y_diff, 0, a, b, &fx, &fy));
+            IGRAPH_CHECK(igraph_i_umap_repel(&delta, 0, a, b, &forces));
             /* The repulsive force is already *away* from the other (non-neighbor) vertex */
-            MATRIX(*layout, from, 0) += learning_rate * fx;
-            MATRIX(*layout, from, 1) += learning_rate * fy;
+            for (int d = 0; d != ndim; d++) {
+                MATRIX(*layout, from, d) += learning_rate * VECTOR(forces)[d];
+            }
         }
     }
 
-    /* Free vector of negative vertices */
+    /* Free vectors */
     igraph_vector_int_destroy(&negative_vertices);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_destroy(&from_emb);
+    igraph_vector_destroy(&to_emb);
+    igraph_vector_destroy(&delta);
+    igraph_vector_destroy(&forces);
+    IGRAPH_FINALLY_CLEAN(5);
 
     /* Free vector of neighbors if needed */
     if (avoid_neighbor_repulsion) {
@@ -870,7 +886,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  *
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *distances,
-        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob) {
+        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob, igraph_integer_t ndim) {
 
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -897,14 +913,22 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
                 IGRAPH_EINVAL, sampling_prob);
     }
 
+    if ((ndim != 2) && (ndim != 3)) {
+        IGRAPH_ERRORF("Number of dimensions should be 2 or 3, found %d.",
+                IGRAPH_EINVAL, (int)ndim);
+
+    }
+
     /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
     IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
 
     /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
     if (no_of_nodes <= 1) {
-        IGRAPH_CHECK(igraph_matrix_resize(layout, no_of_nodes, 2));
+        IGRAPH_CHECK(igraph_matrix_resize(layout, no_of_nodes, ndim));
         if (no_of_nodes == 1) {
-            MATRIX(*layout, 0, 0) = MATRIX(*layout, 0, 1) = 0;
+            for (int d = 0; d != ndim; d++) {
+                MATRIX(*layout, 0, d) = 0;
+            }
         }
         return IGRAPH_SUCCESS;
     }
@@ -919,7 +943,11 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph, const igraph_vector_t *
      * the original graph was weighted/distanced or unweighted */
 
     /* Skip spectral embedding for now, initialize at random */
-    igraph_layout_random(graph, layout);
+    if (ndim == 2) {
+        igraph_layout_random(graph, layout);
+    } else {
+        igraph_layout_random_3d(graph, layout);
+    }
 
     /* Definition 11 */
     IGRAPH_CHECK(igraph_i_umap_fit_ab(min_dist, &a, &b));
