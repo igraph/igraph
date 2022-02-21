@@ -283,6 +283,14 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
 }
 
 void IGRAPH_FINALLY_ENTER(void) {
+    int no = igraph_i_finally_stack_size;
+    /* Level indices must always be in increasing order in the finally stack */
+    if (no > 0 && igraph_i_finally_stack[no-1].level > igraph_i_finally_stack_level) {
+        /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
+        igraph_i_finally_stack_size = 0;
+        igraph_i_finally_stack_level = 0;
+        IGRAPH_FATAL("Corrupt finally stack: cannot create new finally stack level before last one is freed.");
+    }
     igraph_i_finally_stack_level++;
 }
 
@@ -292,7 +300,7 @@ void IGRAPH_FINALLY_EXIT(void) {
         /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
         igraph_i_finally_stack_size = 0;
         igraph_i_finally_stack_level = 0;
-        IGRAPH_FATAL("Corrupt finally stack: trying to decrement level below zero.");
+        IGRAPH_FATAL("Corrupt finally stack: trying to exit outermost finally stack level.");
     }
 }
 
