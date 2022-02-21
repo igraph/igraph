@@ -26,7 +26,7 @@ typedef struct igraph_lazy_adjlist2_t {
     igraph_integer_t data_length;
     igraph_vector_int_t *adjs;
     igraph_integer_t *data;
-    igraph_integer_t *next_data;
+    igraph_integer_t next_data;
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_multiple_t multiple;
@@ -53,7 +53,7 @@ igraph_error_t igraph_lazy_adjlist2_init(const igraph_t *graph,
     al->data_length = igraph_ecount(graph) * 2;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
     al->data = IGRAPH_CALLOC(al->data_length, igraph_integer_t);
-    al->next_data = al->data;
+    al->next_data = 0;
 
     if (al->adjs == NULL || al->data == NULL) {
         IGRAPH_ERROR("Cannot create lazy adjacency list view", IGRAPH_ENOMEM);
@@ -73,9 +73,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(igraph_lazy_adjlist2_t *al,
     igraph_error_t ret;
 
     if (al->adjs[no].stor_begin == NULL) {
-        al->adjs[no].stor_begin = al->next_data;
-        al->adjs[no].stor_end = al->data + al->data_length;
-        al->adjs[no].end = al->data;
+        igraph_vector_int_view(&al->adjs[no], al->data + al->next_data, al->data_length - al->next_data);
         /* igraph_neighbors calls a resize. Since we're handling our own
          * vectors, we can't have our stor_begin be realloced. A realloc should only
          * happen when the vector is too small to handle the neighbors, which
@@ -87,7 +85,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(igraph_lazy_adjlist2_t *al,
             igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
             return NULL;
         }
-        al->next_data = al->adjs[no].end;
+        al->next_data += igraph_vector_int_size(&(al->adjs[no]));
     }
 
     return &al->adjs[no];
