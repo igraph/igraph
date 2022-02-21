@@ -224,7 +224,6 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
     igraph_integer_t new_no_of_edges;
     igraph_integer_t i = 0;
-    igraph_error_handler_t *oldhandler;
     igraph_error_t ret1, ret2;
     igraph_vector_int_t newoi, newii;
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -255,40 +254,38 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         }
     }
 
-    /* disable the error handler temporarily */
-    oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
-
     /* oi & ii */
+    IGRAPH_FINALLY_ENTER();
     ret1 = igraph_vector_int_init(&newoi, no_of_edges);
     ret2 = igraph_vector_int_init(&newii, no_of_edges);
-    if (ret1 != 0 || ret2 != 0) {
+    IGRAPH_FINALLY_EXIT();
+    if (ret1 != IGRAPH_SUCCESS || ret2 != IGRAPH_SUCCESS) {
         igraph_vector_int_resize(&graph->from, no_of_edges); /* gets smaller */
         igraph_vector_int_resize(&graph->to, no_of_edges);   /* gets smaller */
-        igraph_set_error_handler(oldhandler);
         IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
     }
+    IGRAPH_FINALLY_ENTER();
     ret1 = igraph_vector_int_pair_order(&graph->from, &graph->to, &newoi, graph->n);
     ret2 = igraph_vector_int_pair_order(&graph->to, &graph->from, &newii, graph->n);
-    if (ret1 != 0 || ret2 != 0) {
+    IGRAPH_FINALLY_EXIT();
+    if (ret1 != IGRAPH_SUCCESS || ret2 != IGRAPH_SUCCESS) {
         igraph_vector_int_resize(&graph->from, no_of_edges);
         igraph_vector_int_resize(&graph->to, no_of_edges);
         igraph_vector_int_destroy(&newoi);
         igraph_vector_int_destroy(&newii);
-        igraph_set_error_handler(oldhandler);
         IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
     }
 
     /* Attributes */
     if (graph->attr) {
-        igraph_set_error_handler(oldhandler);
+        IGRAPH_FINALLY_ENTER();
         ret1 = igraph_i_attribute_add_edges(graph, edges, attr);
-        igraph_set_error_handler(igraph_error_handler_ignore);
-        if (ret1 != 0) {
+        IGRAPH_FINALLY_EXIT();
+        if (ret1 != IGRAPH_SUCCESS) {
             igraph_vector_int_resize(&graph->from, no_of_edges);
             igraph_vector_int_resize(&graph->to, no_of_edges);
             igraph_vector_int_destroy(&newoi);
             igraph_vector_int_destroy(&newii);
-            igraph_set_error_handler(oldhandler);
             IGRAPH_ERROR("cannot add edges", ret1);
         }
     }
@@ -302,7 +299,6 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     igraph_vector_int_destroy(&graph->ii);
     graph->oi = newoi;
     graph->ii = newii;
-    igraph_set_error_handler(oldhandler);
 
     return IGRAPH_SUCCESS;
 }
