@@ -460,20 +460,21 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     igraph_integer_t s = igraph_strvector_size(v);
     igraph_integer_t value_len = strlen(value);
     char **tmp;
+    igraph_integer_t new_size = s * 2;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
-    tmp = IGRAPH_REALLOC(v->stor_begin, s + 1, char*);
-    if (tmp == 0) {
-        IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
+    if (v->end == v->stor_end) {
+        if (new_size = 0) {
+            new_size = 1;
+        }
+        graph_strvector_resize(v, new_size);
     }
-    v->stor_begin = tmp;
     v->stor_begin[s] = IGRAPH_CALLOC(value_len + 1, char);
     if (v->stor_begin[s] == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
     strcpy(v->stor_begin[s], value);
-    v->stor_end = v->stor_begin + s + 1;
-    v->end = v->stor_end;
+    v->end = v->stor_begin + s;
 
     return IGRAPH_SUCCESS;
 }
