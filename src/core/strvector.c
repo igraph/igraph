@@ -364,7 +364,6 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
 
 void igraph_strvector_clear(igraph_strvector_t *sv) {
     igraph_integer_t i, n = igraph_strvector_size(sv);
-    char **tmp;
 
     for (i = 0; i < n; i++) {
         IGRAPH_FREE(sv->stor_begin[i]);
@@ -399,8 +398,8 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
         for (i = newsize; i < oldsize; i++) {
             IGRAPH_FREE(v->stor_begin[i]);
         }
+        v->end = v->stor_begin + newsize;
     } else if (newsize > oldsize) {
-        igraph_bool_t error = 0;
         tmp = IGRAPH_REALLOC(v->stor_begin, newsize, char*);
         if (tmp == 0) {
             IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);
@@ -459,22 +458,22 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
 igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     igraph_integer_t s = igraph_strvector_size(v);
     igraph_integer_t value_len = strlen(value);
-    char **tmp;
     igraph_integer_t new_size = s * 2;
+
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
     if (v->end == v->stor_end) {
-        if (new_size = 0) {
+        if (new_size == 0) {
             new_size = 1;
         }
-        graph_strvector_resize(v, new_size);
+        igraph_strvector_resize(v, new_size);
     }
     v->stor_begin[s] = IGRAPH_CALLOC(value_len + 1, char);
     if (v->stor_begin[s] == 0) {
         IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
     }
     strcpy(v->stor_begin[s], value);
-    v->end = v->stor_begin + s;
+    v->end = v->stor_begin + s + 1;
 
     return IGRAPH_SUCCESS;
 }

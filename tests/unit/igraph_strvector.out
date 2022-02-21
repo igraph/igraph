@@ -1,3 +1,5 @@
+igraph_strvector_init, igraph_strvector_destroy
+igraph_strvector_get, igraph_strvector_set
 ------
 ------
 ------
@@ -10,36 +12,44 @@
 ---three---
 ---four---
 
+igraph_strvector_remove_section
+resize to 10 and then back to 5
 ---zero---
 ---one---
 ---two---
 ---three---
 ---four---
 
+resize to 0
+resize to 10 and then back to 5 again
 ---zero---
 ---one---
 ---two---
 ---three---
 ---four---
 
+igraph_strvector_move_interval
 ---three---
 ---four---
 ---two---
 ---three---
 ---four---
 
+igraph_strvector_copy
 ---three---
 ---four---
 ---two---
 ---three---
 ---four---
 
+igraph_strvector_add
 ---zeroth---
 ---first---
 ---second---
 ---third---
 ---fourth---
 
+append
 ---
 
 ---
@@ -60,6 +70,7 @@
 ---4---
 ---5---
 
+clear
 ------
 ------
 ------
@@ -69,10 +80,4 @@
 ------
 ---two---
 ------
-
----one---
----two---
----three---
----four---
----five---
 

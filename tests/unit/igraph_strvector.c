@@ -33,13 +33,13 @@ int main() {
 
     igraph_strvector_t sv1, sv2;
 
-    /* igraph_strvector_init, igraph_strvector_destroy */
+    printf("igraph_strvector_init, igraph_strvector_destroy\n");
     igraph_strvector_init(&sv1, 10);
     igraph_strvector_destroy(&sv1);
     igraph_strvector_init(&sv1, 0);
     igraph_strvector_destroy(&sv1);
 
-    /* igraph_strvector_get, igraph_strvector_set */
+    printf("igraph_strvector_get, igraph_strvector_set\n");
     igraph_strvector_init(&sv1, 5);
     strvector_print(&sv1);
     igraph_strvector_set(&sv1, 0, "zero");
@@ -49,12 +49,12 @@ int main() {
     igraph_strvector_set(&sv1, 4, "four");
     strvector_print(&sv1);
 
-    /* igraph_strvector_remove_section, igraph_strvector_remove,
-       igraph_strvector_resize, igraph_strvector_size */
+    printf("igraph_strvector_remove_section\n");
     igraph_strvector_remove_section(&sv1, 0, 5);
     if (igraph_strvector_size(&sv1) != 0) {
         return 1;
     }
+    printf("resize to 10 and then back to 5\n");
     igraph_strvector_resize(&sv1, 10);
     igraph_strvector_set(&sv1, 0, "zero");
     igraph_strvector_set(&sv1, 1, "one");
@@ -63,10 +63,12 @@ int main() {
     igraph_strvector_set(&sv1, 4, "four");
     igraph_strvector_resize(&sv1, 5);
     strvector_print(&sv1);
+    printf("resize to 0\n");
     igraph_strvector_resize(&sv1, 0);
     if (igraph_strvector_size(&sv1) != 0) {
         return 1;
     }
+    printf("resize to 10 and then back to 5 again\n");
     igraph_strvector_resize(&sv1, 10);
     igraph_strvector_set(&sv1, 0, "zero");
     igraph_strvector_set(&sv1, 1, "one");
@@ -76,11 +78,11 @@ int main() {
     igraph_strvector_resize(&sv1, 5);
     strvector_print(&sv1);
 
-    /* igraph_strvector_move_interval */
+    printf("igraph_strvector_move_interval\n");
     igraph_strvector_move_interval(&sv1, 3, 5, 0);
     strvector_print(&sv1);
 
-    /* igraph_strvector_copy */
+    printf("igraph_strvector_copy\n");
     igraph_strvector_copy(&sv2, &sv1);
     strvector_print(&sv1);
 
@@ -92,7 +94,7 @@ int main() {
     }
     igraph_strvector_destroy(&sv2);
 
-    /* igraph_strvector_add */
+    printf("igraph_strvector_add\n");
     igraph_strvector_add(&sv1, "zeroth");
     igraph_strvector_add(&sv1, "first");
     igraph_strvector_add(&sv1, "second");
@@ -100,11 +102,9 @@ int main() {
     igraph_strvector_add(&sv1, "fourth");
     strvector_print(&sv1);
 
-    /* TODO: igraph_strvector_permdelete */
-
     igraph_strvector_destroy(&sv1);
 
-    /* append */
+    printf("append\n");
     printf("---\n");
     igraph_strvector_init(&sv1, 0);
     igraph_strvector_init(&sv2, 0);
@@ -133,7 +133,7 @@ int main() {
     igraph_strvector_destroy(&sv1);
     igraph_strvector_destroy(&sv2);
 
-    /* clear */
+    printf("clear\n");
     igraph_strvector_init(&sv1, 3);
     igraph_strvector_set(&sv1, 0, "0");
     igraph_strvector_set(&sv1, 1, "1");
@@ -146,17 +146,6 @@ int main() {
     strvector_print(&sv1);
     igraph_strvector_set(&sv1, 0, "one");
     igraph_strvector_set(&sv1, 2, "two");
-    strvector_print(&sv1);
-    igraph_strvector_destroy(&sv1);
-
-    /* STR */
-
-    igraph_strvector_init(&sv1, 5);
-    igraph_strvector_set(&sv1, 0, "one");
-    igraph_strvector_set(&sv1, 1, "two");
-    igraph_strvector_set(&sv1, 2, "three");
-    igraph_strvector_set(&sv1, 3, "four");
-    igraph_strvector_set(&sv1, 4, "five");
     strvector_print(&sv1);
     igraph_strvector_destroy(&sv1);
 
