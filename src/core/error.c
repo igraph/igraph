@@ -229,47 +229,71 @@ igraph_error_handler_t *igraph_set_error_handler(igraph_error_handler_t *new_han
 /***** "Finally" stack *****/
 
 IGRAPH_THREAD_LOCAL struct igraph_i_protectedPtr igraph_i_finally_stack[100];
+IGRAPH_THREAD_LOCAL int igraph_i_finally_stack_size = 0;
+IGRAPH_THREAD_LOCAL int igraph_i_finally_stack_level = 0;
 
 /*
  * Adds another element to the free list
  */
 
 void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
-    int no = igraph_i_finally_stack[0].all;
+    int no = igraph_i_finally_stack_size;
     if (no < 0) {
+        /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
+        igraph_i_finally_stack_size = 0;
+        igraph_i_finally_stack_level = 0;
         IGRAPH_FATALF("Corrupt finally stack: it contains %d elements.", no);
     }
-    if (no >= 100) {
+    if (no >= (int) (sizeof(igraph_i_finally_stack) / sizeof(igraph_i_finally_stack[0]))) {
+        /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
+        igraph_i_finally_stack_size = 0;
+        igraph_i_finally_stack_level = 0;
         IGRAPH_FATALF("Finally stack too large: it contains %d elements.", no);
     }
     igraph_i_finally_stack[no].ptr = ptr;
     igraph_i_finally_stack[no].func = func;
-    igraph_i_finally_stack[0].all ++;
-    /* printf("--> Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
+    igraph_i_finally_stack[no].level = igraph_i_finally_stack_level;
+    igraph_i_finally_stack_size++;
 }
 
 void IGRAPH_FINALLY_CLEAN(int minus) {
-    igraph_i_finally_stack[0].all -= minus;
-    if (igraph_i_finally_stack[0].all < 0) {
-        int left = igraph_i_finally_stack[0].all + minus;
-        /* Set to zero in case fatal error handler does a longjmp instead of terminating the process: */
-        igraph_i_finally_stack[0].all = 0;
+    igraph_i_finally_stack_size -= minus;
+    if (igraph_i_finally_stack_size < 0) {
+        int left = igraph_i_finally_stack_size + minus;
+        /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
+        igraph_i_finally_stack_size = 0;
+        igraph_i_finally_stack_level = 0;
         IGRAPH_FATALF("Corrupt finally stack: trying to pop %d element(s) when only %d left.", minus, left);
     }
-    /* printf("<-- Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
 }
 
 void IGRAPH_FINALLY_FREE(void) {
-    int p;
-    /*   printf("[X] Finally stack will be cleaned (contained %d elements)\n", igraph_i_finally_stack[0].all);  */
-    for (p = igraph_i_finally_stack[0].all - 1; p >= 0; p--) {
+    for (; igraph_i_finally_stack_size > 0; igraph_i_finally_stack_size--) {
+        int p = igraph_i_finally_stack_size - 1;
+        /* Call destructors only up to the current level */
+        if (igraph_i_finally_stack[p].level < igraph_i_finally_stack_level) {
+            break;
+        }
         igraph_i_finally_stack[p].func(igraph_i_finally_stack[p].ptr);
     }
-    igraph_i_finally_stack[0].all = 0;
 }
 
 int IGRAPH_FINALLY_STACK_SIZE(void) {
-    return igraph_i_finally_stack[0].all;
+    return igraph_i_finally_stack_size;
+}
+
+void IGRAPH_FINALLY_ENTER(void) {
+    igraph_i_finally_stack_level++;
+}
+
+void IGRAPH_FINALLY_EXIT(void) {
+    igraph_i_finally_stack_level--;
+    if (igraph_i_finally_stack_level < 0) {
+        /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
+        igraph_i_finally_stack_size = 0;
+        igraph_i_finally_stack_level = 0;
+        IGRAPH_FATAL("Corrupt finally stack: trying to decrement level below zero.");
+    }
 }
 
 
