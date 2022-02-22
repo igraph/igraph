@@ -33,7 +33,7 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_vector_bool_t *fixed)
 {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_not_fixed_nodes = no_of_nodes;
+    igraph_integer_t no_of_not_fixed_nodes = 0;
     igraph_integer_t i, j, k;
     igraph_adjlist_t al;
     igraph_inclist_t il;
@@ -63,16 +63,18 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
 
     /* Initialize node ordering vector with only the not fixed nodes */
     if (fixed) {
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
-        for (i = 0, j = 0; i < no_of_nodes; i++) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_nodes);
+        for (i = 0; i < no_of_nodes; i++) {
             if (!VECTOR(*fixed)[i]) {
-                VECTOR(node_order)[j] = i;
-                j++;
+                VECTOR(node_order)[no_of_not_fixed_nodes] = i;
+                no_of_not_fixed_nodes++;
             }
         }
+        IGRAPH_CHECK(igraph_vector_resize(&node_order, no_of_not_fixed_nodes));
     } else {
         IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
+        no_of_not_fixed_nodes = no_of_nodes;
     }
 
     RNG_BEGIN();
@@ -203,7 +205,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     const igraph_vector_t *weights,
     igraph_vector_bool_t *fixed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_fixed_nodes;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_not_fixed_nodes;
     igraph_integer_t i, j, k;
     igraph_inclist_t il;
     igraph_adjlist_t al;
@@ -237,22 +239,23 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_dqueue_destroy, &queue);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&in_queue, no_of_nodes);
 
-    /* Use random node order */
+    /* Initialize node ordering vector with only the not fixed nodes */
     if (fixed) {
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
-        for (i = 0, j = 0; i < no_of_nodes; i++) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_nodes);
+        for (i = 0; i < no_of_nodes; i++) {
             if (!VECTOR(*fixed)[i]) {
-                VECTOR(node_order)[j] = i;
-                j++;
+                VECTOR(node_order)[no_of_not_fixed_nodes] = i;
+                no_of_not_fixed_nodes++;
             }
         }
+        IGRAPH_CHECK(igraph_vector_resize(&node_order, no_of_not_fixed_nodes));
     } else {
         IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
+        no_of_not_fixed_nodes = no_of_nodes;
     }
 
-    no_of_fixed_nodes = igraph_vector_int_size(&node_order);
-    for (i = 0; i < no_of_fixed_nodes; i++)
+    for (i = 0; i < no_of_not_fixed_nodes; i++)
     {
         IGRAPH_CHECK(igraph_dqueue_push(&queue, VECTOR(node_order)[i]));
         VECTOR(in_queue)[VECTOR(node_order)[i]] = 1;
@@ -282,7 +285,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
         for (j = 0; j < num_neis; j++) {
             if (weights) {
                 e = VECTOR(*neis)[j];
-                v2 = IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1);
+                v2 = IGRAPH_OTHER(graph, e, v1);
             }
             else {
                 v2 = VECTOR(*neis)[j];
@@ -319,7 +322,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
                 for (j = 0; j < num_neis; j++) {
                     if (weights) {
                         e = VECTOR(*neis)[j];
-                        v2 = IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1);
+                        v2 = IGRAPH_OTHER(graph, e, v1);
                     }
                     else {
                         v2 = VECTOR(*neis)[j];
@@ -598,16 +601,19 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         igraph_vector_int_t &node_order;
         /* Initialize node ordering vector with only the not fixed nodes */
         if (fixed) {
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
-            for (i = 0, j = 0; i < no_of_nodes; i++) {
+            no_of_not_fixed_nodes = 0;
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&node_order, no_of_nodes);
+            for (i = 0; i < no_of_nodes; i++) {
                 if (!VECTOR(*fixed)[i]) {
-                VECTOR(node_order)[j] = i;
-                j++;
+                    VECTOR(node_order)[no_of_not_fixed_nodes] = i;
+                    no_of_not_fixed_nodes++;
                 }
             }
+            IGRAPH_CHECK(igraph_vector_resize(&node_order, no_of_not_fixed_nodes));
         } else {
-            IGRAPH_CHECK(igraph_vector_init_seq(&node_order, 0, no_of_nodes - 1));
-            IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
+            IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, no_of_nodes));
+            IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
+            no_of_not_fixed_nodes = no_of_nodes;
         }
         /* Shuffle the node ordering vector if we are in the label updating iteration */
         igraph_vector_int_shuffle(&node_order);
