@@ -210,6 +210,21 @@ typedef enum { IGRAPH_ROW_MAJOR = 0,
                IGRAPH_COLUMN_MAJOR = 1
              } igraph_matrix_storage_t;
 
+/**
+ * \typedef igraph_lpa_variant_t
+ * \brief Label propagation algorithm variants of implementation
+ *
+ * Algorithms to run the label propagation algorithm.
+ * \enumval IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after each iteration
+ * \enumval IGRAPH_LPA_RETENTION Keep current label if among dominant labels, only check if labels changed
+ * \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
+ */
+typedef enum {
+    IGRAPH_LPA_DOMINANCE = 0, // Sample from dominant labels, check for dominance after each iteration
+    IGRAPH_LPA_RETENTION,     // Keep current label if among dominant labels, only check if labels changed
+    IGRAPH_LPA_FAST           // Sample from dominant labels, only check neighbors
+} igraph_lpa_variant_t;
+
 __END_DECLS
 
 #endif
