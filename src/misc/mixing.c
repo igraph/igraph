@@ -75,6 +75,12 @@ int igraph_assortativity_nominal(const igraph_t *graph,
         IGRAPH_ERROR("Invalid `types' vector length", IGRAPH_EINVAL);
     }
 
+    if (no_of_nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* 'types' length > 0 here, safe to call vector_min() */
     if (igraph_vector_min(types) < 0) {
         IGRAPH_ERROR("Invalid `types' vector", IGRAPH_EINVAL);
     }
