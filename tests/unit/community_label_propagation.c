@@ -39,9 +39,6 @@ int main() {
 
     for (variant = 0; variant < 3; variant++)
     {
-      if (variant == IGRAPH_LPA_RETENTION) // Not yet implemented
-        continue;
-
       for (j = 0; j < 100; j++)
       {
         /* label propagation is a stochastic method */
@@ -80,6 +77,7 @@ int main() {
                  -1);
 
     igraph_community_label_propagation(&g, &membership, 0, 0, 0, 0, IGRAPH_LPA_DOMINANCE);
+    igraph_community_label_propagation(&g, &membership, 0, 0, 0, 0, IGRAPH_LPA_RETENTION);
     igraph_community_label_propagation(&g, &membership, 0, 0, 0, 0, IGRAPH_LPA_FAST);
 
     igraph_destroy(&g);
@@ -97,9 +95,6 @@ int main() {
 
     for (variant = 0; variant < 3; variant++)
     {
-      if (variant == IGRAPH_LPA_RETENTION) // Not yet implemented
-        continue;
-
       igraph_community_label_propagation(&g, &membership, &weights,
           &initial, &fixed, /*modularity=*/ 0, variant);
       for (i = 0; i < igraph_vcount(&g); i++)

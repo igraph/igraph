@@ -32,7 +32,8 @@
 int igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_vector_t *membership,
     const igraph_vector_t *weights,
-    igraph_vector_bool_t *fixed)
+    igraph_vector_bool_t *fixed,
+    igraph_bool_t retention)
 {
   long int no_of_nodes = igraph_vcount(graph);
   long int no_of_not_fixed_nodes = 0;
@@ -77,10 +78,19 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
 
   RNG_BEGIN();
 
-  /* There are two alternating types of iterations, one for changing labels and
-  the other one for checking the end condition - every vertex in the graph has
-  a label to which the maximum number of its neighbors belongs. If control_iteration
-  is true, we are just checking the end condition and not relabeling nodes. */
+  /* There are two modes of operation in this implementation: retention or
+   * dominance. When using retention, we prefer to keep the current label of a node.
+   * Only if the current label is not among the dominant labels will we
+   * update the label. If a label changes, we will continue to iterate
+   * over all nodes.
+   *
+   * When not using retention we check for dominance after each iteration. This
+   * is implemented as two alternating types of iterations, one for changing
+   * labels and the other one for checking the end condition - every vertex in the
+   * graph has a label to which the maximum number of its neighbors belongs. If
+   * control_iteration is true, we are just checking the end condition and not
+   * relabeling nodes.
+   */
   control_iteration = 1;
   running = 1;
   while (running) {
@@ -90,14 +100,22 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_vector_int_t *ineis;
     igraph_bool_t was_zero;
 
-    if (control_iteration) {
-      /* If we are in the control iteration, we expect in the begining of
-      the iterationthat all vertices meet the end condition, so running is false.
-      If some of them does not, running is set to true later in the code. */
-      running = 0;
-    } else {
-      /* Shuffle the node ordering vector if we are in the label updating iteration */
-      IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+    if (retention) {
+        /* We stop in this iteration by default, unless a label changes */
+        running = 0;
+        /* Shuffle the node ordering vector */
+        IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+    }
+    else {
+        if (control_iteration) {
+            /* If we are in the control iteration, we expect in the begining of
+            the iterationthat all vertices meet the end condition, so running is false.
+            If some of them does not, running is set to true later in the code. */
+            running = 0;
+        } else {
+            /* Shuffle the node ordering vector if we are in the label updating iteration */
+            IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+        }
     }
 
     /* In the prescribed order, loop over the vertices and reassign labels */
@@ -155,18 +173,40 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
       }
 
       if (igraph_vector_size(&dominant_labels) > 0) {
-        if (control_iteration) {
-          /* Check if the _current_ label of the node is also dominant */
-          if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] != max_count) {
-            /* Nope, we need at least one more iteration */
-            running = 1;
-          }
+        if (retention) {
+            /* If we are using retention, we first check if the current label
+               is among the maximum label. */
+            j = (long)VECTOR(*membership)[v1];
+            if (VECTOR(label_counters)[j] == 0 || /* Label not present in neighbors */
+                VECTOR(label_counters)[j] < max_count /* Label not dominant */)
+            {
+                /* Select randomly from the dominant labels */
+                k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
+                k = VECTOR(dominant_labels)[(long int)k];
+                /* If label changes, we will continue running */
+                if (k != j)
+                    running = 1;
+                /* Actually change label */
+                VECTOR(*membership)[v1] = k;
+            }
         }
         else {
-          /* Select randomly from the dominant labels */
-          k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
-          VECTOR(*membership)[v1] = VECTOR(dominant_labels)[(long int)k];
+            /* We are not using retention, so check if we should do a control iteration
+               or an update iteration. */
+            if (control_iteration) {
+                /* Check if the _current_ label of the node is also dominant */
+                if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]] < max_count) {
+                    /* Nope, we need at least one more iteration */
+                    running = 1;
+                }
+            }
+            else {
+                /* Select randomly from the dominant labels */
+                k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
+                VECTOR(*membership)[v1] = VECTOR(dominant_labels)[(long int)k];
+            }
         }
+
       }
 
       /* Clear the nonzero elements in label_counters */
@@ -177,7 +217,8 @@ int igraph_i_community_label_propagation(const igraph_t *graph,
     }
 
     /* Alternating between control iterations and label updating iterations */
-    control_iteration = !control_iteration;
+    if (!retention)
+        control_iteration = !control_iteration;
   }
 
   RNG_END();
@@ -407,6 +448,13 @@ int igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * \param modularity If not a null pointer, then it must be a pointer
  *   to a real number. The modularity score of the detected community
  *   structure is stored here.
+ * \param lpa_variant Which variant of label propagation algorithm to run.
+ *   One of
+ *   \enumval IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after
+ *                                 each iteration
+ *   \enumval IGRAPH_LPA_RETENTION Keep current label if among dominant labels,
+ *                                 only check if labels changed
+ *   \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
  *
  * \return Error code.
  *
@@ -519,12 +567,12 @@ int igraph_community_label_propagation(const igraph_t *graph,
         break;
 
       case IGRAPH_LPA_RETENTION:
-        IGRAPH_ERROR("Retention variant is not yet implemented", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, weights, fixed_copy, /* retention */ 1 ));
         break;
 
       case IGRAPH_LPA_DOMINANCE:
       default:
-        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, weights, fixed_copy));
+        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, weights, fixed_copy, /* retention */ 0));
     }
 
 
