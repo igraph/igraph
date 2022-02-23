@@ -53,9 +53,10 @@ int main() {
   printf("Membership: ");
   igraph_vector_int_print(&membership);
 
+  igraph_vector_int_destroy(&membership);
+  igraph_vector_destroy(&modularity);
+  igraph_matrix_int_destroy(&merges);
   igraph_destroy(&graph);
-
-
 
   VERIFY_FINALLY_STACK();
 
