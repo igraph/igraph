@@ -178,7 +178,8 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
                 /* If we are using retention, we first check if the current label
                 is among the maximum label. */
                 j = (long)VECTOR(*membership)[v1];
-                if (VECTOR(label_counters)[j] == 0 || /* Label not present in neighbors */
+                if (j < 0 || /* Doesn't have a label yet */
+                    VECTOR(label_counters)[j] == 0 || /* Label not present in neighbors */
                     VECTOR(label_counters)[j] < max_count /* Label not dominant */)
                 {
                     /* Select randomly from the dominant labels */

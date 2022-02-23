@@ -118,6 +118,38 @@ int main(void) {
     igraph_vector_int_destroy(&initial);
     igraph_destroy(&g);
 
+    /* Test line graph with fixed and initial memberships */
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, -1);
+
+    igraph_vector_init(&weights, 3);
+    VECTOR(weights)[0] = 2;
+    VECTOR(weights)[1] = 1;
+    VECTOR(weights)[2] = 2;
+
+    igraph_vector_init(&initial, 4);
+    VECTOR(initial)[0] = 0;
+    VECTOR(initial)[1] = -1;
+    VECTOR(initial)[2] = -1;
+    VECTOR(initial)[3] = 1;
+
+    igraph_vector_bool_init(&fixed, 4);
+    VECTOR(fixed)[0] = 1;
+    VECTOR(fixed)[1] = 0;
+    VECTOR(fixed)[2] = 0;
+    VECTOR(fixed)[3] = 1;
+
+    igraph_community_label_propagation(&g, &membership, &weights,
+        &initial, &fixed, NULL, IGRAPH_LPA_DOMINANCE);
+
+    igraph_vector_int_print(&membership);
+    IGRAPH_ASSERT(VECTOR(membership)[0] == 0);
+    IGRAPH_ASSERT(VECTOR(membership)[3] == 1);
+
+    igraph_vector_bool_destroy(&fixed);
+    igraph_vector_destroy(&weights);
+    igraph_vector_int_destroy(&initial);
+    igraph_destroy(&g);
+
     igraph_vector_int_destroy(&membership);
 
     VERIFY_FINALLY_STACK();
