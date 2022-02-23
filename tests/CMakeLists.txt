@@ -558,6 +558,7 @@ add_legacy_tests(
   igraph_split_join_distance
   levc-stress
   spinglass
+  community_walktrap
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES
