@@ -19,6 +19,7 @@
  - `igraph_vector_init()` no longer accepts negative vector sizes.
  - `igraph_assortativity_nominal()` crashed on the null graph.
  - Label propagation now ensures that all labels are dominant.
+ - Fixed incorrect partition results for walktrap algorithm (issue #1927)
 
 ### Other
 
