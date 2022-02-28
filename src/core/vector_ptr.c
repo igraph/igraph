@@ -374,7 +374,7 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_integer_t
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_e
+ * \function igraph_vector_ptr_get
  * \brief Access an element of a pointer vector.
  *
  * \param v Pointer to a pointer vector.
@@ -384,10 +384,22 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_integer_t
  * Time complexity: O(1).
  */
 
-void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
+void *igraph_vector_ptr_get(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return *(v->stor_begin + pos);
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_e
+ * \brief Access an element of a pointer vector (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_ptr_get 0.10.0
+ */
+
+void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
+    return igraph_vector_ptr_get(v, pos);
 }
 
 /**

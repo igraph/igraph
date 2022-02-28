@@ -67,8 +67,9 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_append    (igraph_vector_ptr_t *t
                                                const igraph_vector_ptr_t *from);
 IGRAPH_EXPORT void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t *v, igraph_integer_t pos, void* e);
-IGRAPH_EXPORT void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, igraph_integer_t pos);
-IGRAPH_EXPORT void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, igraph_integer_t pos, void* value);
+IGRAPH_EXPORT IGRAPH_DEPRECATED void* igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos);
+IGRAPH_EXPORT void* igraph_vector_ptr_get(const igraph_vector_ptr_t* v, igraph_integer_t pos);
+IGRAPH_EXPORT void igraph_vector_ptr_set(igraph_vector_ptr_t* v, igraph_integer_t pos, void* value);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t newsize);
 IGRAPH_EXPORT void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
