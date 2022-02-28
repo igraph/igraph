@@ -69,8 +69,8 @@
 #endif
 
 static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* item);
-static igraph_error_t INTERNAL_FUNCTION(init_item_from)(const TYPE* list, ITEM_TYPE* item, const ITEM_TYPE* other);
-static void INTERNAL_FUNCTION(destroy_item)(const TYPE* list, ITEM_TYPE* item);
+static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE* dest, const ITEM_TYPE* source);
+static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item);
 
 static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end);
 static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end);
@@ -334,39 +334,6 @@ void FUNCTION(clear)(TYPE* v) {
 
 /**
  * \ingroup vector_list
- * \function igraph_vector_list_push_back
- * \brief Append an existing vector to the list, transferring ownership.
- *
- * </para><para>
- * This function resizes the list to be one element longer, and sets the very last
- * element in the list to the specified vector \p e . The list takes ownership
- * of the vector so the user is not responsible for freeing \p e any more;
- * the vector will be destroyed when the list itself is destroyed or if \p e gets
- * removed from the list without passing on the ownership to somewhere else.
- *
- * \param v The list object.
- * \param e Pointer to the vector to append to the list.
- * \return Error code:
- *         \c IGRAPH_ENOMEM: not enough memory.
- *
- * Time complexity: operating system dependent. What is important is that
- * a sequence of n subsequent calls to this function has time complexity
- * O(n), even if there hadn't been any space reserved for the new elements by
- * \ref igraph_vector_list_reserve(). This is implemented by a trick similar to
- * the C++ \type vector class: each time more memory is allocated for a
- * vector, the size of the additionally allocated memory is the same
- * as the vector's current length. (We assume here that the time
- * complexity of memory allocation is at most linear).
- */
-igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
-    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
-    *(v->end) = *e;
-    v->end += 1;
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup vector_list
  * \function igraph_vector_list_get_ptr
  * \brief Retrieve the address of a vector in the vector list.
  * \param v The list object.
@@ -403,7 +370,7 @@ ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {
  * Time complexity: O(1).
  */
 void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
-    INTERNAL_FUNCTION(destroy_item)(v, v->stor_begin + pos);
+    INTERNAL_FUNCTION(destroy_item)(v->stor_begin + pos);
     v->stor_begin[pos] = *e;
 }
 
@@ -490,7 +457,7 @@ void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
     igraph_integer_t size = FUNCTION(size)(v);
 
     if (size > 0) {
-        INTERNAL_FUNCTION(destroy_item)(v, v->stor_begin + index);
+        INTERNAL_FUNCTION(destroy_item)(v->stor_begin + index);
         memmove(v->stor_begin + index, v->stor_begin + index + 1, size - index - 1);
         v->end -= 1;
     }
@@ -511,7 +478,7 @@ void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
 void FUNCTION(discard_back)(TYPE* v) {
     igraph_integer_t size = FUNCTION(size)(v);
     if (size > 0) {
-        INTERNAL_FUNCTION(destroy_item)(v, v->end - 1);
+        INTERNAL_FUNCTION(destroy_item)(v->end - 1);
         v->end -= 1;
     }
 }
@@ -537,10 +504,43 @@ void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index) {
     igraph_integer_t size = FUNCTION(size)(v);
 
     if (size > 0) {
-        INTERNAL_FUNCTION(destroy_item)(v, v->stor_begin + index);
+        INTERNAL_FUNCTION(destroy_item)(v->stor_begin + index);
         v->end -= 1;
         v->stor_begin[index] = *(v->end);
     }
+}
+
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_push_back
+ * \brief Append an existing vector to the list, transferring ownership.
+ *
+ * </para><para>
+ * This function resizes the list to be one element longer, and sets the very last
+ * element in the list to the specified vector \p e . The list takes ownership
+ * of the vector so the user is not responsible for freeing \p e any more;
+ * the vector will be destroyed when the list itself is destroyed or if \p e gets
+ * removed from the list without passing on the ownership to somewhere else.
+ *
+ * \param v The list object.
+ * \param e Pointer to the vector to append to the list.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory.
+ *
+ * Time complexity: operating system dependent. What is important is that
+ * a sequence of n subsequent calls to this function has time complexity
+ * O(n), even if there hadn't been any space reserved for the new elements by
+ * \ref igraph_vector_list_reserve(). This is implemented by a trick similar to
+ * the C++ \type vector class: each time more memory is allocated for a
+ * vector, the size of the additionally allocated memory is the same
+ * as the vector's current length. (We assume here that the time
+ * complexity of memory allocation is at most linear).
+ */
+igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
+    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
+    *(v->end) = *e;
+    v->end += 1;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -563,9 +563,11 @@ void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index) {
  * needed to copy the vector (which is O(n) for n elements in the vector).
  */
 igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e) {
-    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
-    IGRAPH_CHECK(INTERNAL_FUNCTION(init_item_from)(v, v->end, e));
-    v->end += 1;
+    ITEM_TYPE copy;
+    IGRAPH_CHECK(INTERNAL_FUNCTION(copy_item)(&copy, e));
+    IGRAPH_FINALLY(INTERNAL_FUNCTION(destroy_item), &copy);
+    IGRAPH_CHECK(FUNCTION(push_back)(v, &copy));
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
@@ -596,6 +598,102 @@ igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
         *e = v->end;
     }
     v->end += 1;
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_insert
+ * \brief Insert an existing vector into the list, transferring ownership.
+ *
+ * </para><para>
+ * This function inserts \p e into the list at the given index, moving other
+ * items towards the end of the list as needed. The list takes ownership
+ * of the vector so the user is not responsible for freeing \p e any more;
+ * the vector will be destroyed when the list itself is destroyed or if \p e gets
+ * removed from the list without passing on the ownership to somewhere else.
+ *
+ * \param v The list object.
+ * \param pos The position where the new element is to be inserted.
+ * \param e Pointer to the vector to insert into the list.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory.
+ *
+ * Time complexity: O(n).
+ */
+igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
+    igraph_integer_t size = FUNCTION(size)(v);
+    if (pos < 0 || pos > size) {
+        return IGRAPH_EINVAL;
+    }
+    IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
+    if (pos < size) {
+        memmove(v->stor_begin + pos + 1, v->stor_begin + pos, sizeof(ITEM_TYPE) * (size - pos));
+    }
+    v->end += 1;
+    v->stor_begin[pos] = *e;
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_insert_copy
+ * \brief Insert the copy of a vector to the list.
+ *
+ * </para><para>
+ * This function inserts a copy of \p e into the list at the given index, moving
+ * other items towards the end of the list as needed. The newly added
+ * element is owned by the list, but the ownership of the original vector is
+ * retained at the caller.
+ *
+ * \param v The list object.
+ * \param pos The position where the new element is to be inserted.
+ * \param e Pointer to the vector to copy to the end of the list.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory.
+ *
+ * Time complexity: same as \ref igraph_vector_list_insert() plus the time
+ * needed to copy the vector (which is O(n) for n elements in the vector).
+ */
+igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_TYPE* e) {
+    ITEM_TYPE copy;
+    IGRAPH_CHECK(INTERNAL_FUNCTION(copy_item)(&copy, e));
+    IGRAPH_FINALLY(INTERNAL_FUNCTION(destroy_item), &copy);
+    IGRAPH_CHECK(FUNCTION(insert)(v, pos, &copy));
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_insert_new
+ * \brief Insert a new vector into the list.
+ *
+ * </para><para>
+ * This function inserts a newly created empty vector into the list at the given
+ * index, moving other items towards the end of the list as needed. The newly
+ * added vector is owned by the list. A pointer to the new element is returned
+ * in the last argument if it is not \c NULL .
+ *
+ * \param v The list object.
+ * \param pos The position where the new element is to be inserted.
+ * \param result Pointer to a vector pointer; this will be updated to point to
+ *        the newly added vector. May be \c NULL if you do not need a pointer
+ *        to the newly added vector.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory.
+ *
+ * Time complexity: same as \ref igraph_vector_list_push_back().
+ */
+igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** e) {
+    ITEM_TYPE copy;
+    IGRAPH_CHECK(INTERNAL_FUNCTION(init_item)(v, &copy));
+    IGRAPH_FINALLY(INTERNAL_FUNCTION(destroy_item), &copy);
+    IGRAPH_CHECK(FUNCTION(insert)(v, pos, &copy));
+    IGRAPH_FINALLY_CLEAN(1);
+    if (e) {
+        *e = FUNCTION(get_ptr)(v, pos);
+    }
     return IGRAPH_SUCCESS;
 }
 
@@ -850,13 +948,11 @@ static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* 
     return ITEM_FUNCTION(init)(item, 0);
 }
 
-static igraph_error_t INTERNAL_FUNCTION(init_item_from)(const TYPE* list, ITEM_TYPE* item, const ITEM_TYPE* other) {
-    IGRAPH_UNUSED(list);
-    return ITEM_FUNCTION(copy)(item, other);
+static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE* dest, const ITEM_TYPE* source) {
+    return ITEM_FUNCTION(copy)(dest, source);
 }
 
-static void INTERNAL_FUNCTION(destroy_item)(const TYPE* list, ITEM_TYPE* item) {
-    IGRAPH_UNUSED(list);
+static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item) {
     ITEM_FUNCTION(destroy)(item);
 }
 
@@ -881,7 +977,7 @@ static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE*
 
 static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end) {
     for (; start < end; start++) {
-        INTERNAL_FUNCTION(destroy_item)(list, start);
+        INTERNAL_FUNCTION(destroy_item)(start);
     }
 }
 
@@ -897,7 +993,7 @@ static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* v) {
         igraph_integer_t old_size = FUNCTION(size)(v);
         igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
         if (old_size == IGRAPH_INTEGER_MAX) {
-            IGRAPH_ERROR("Cannot push to vector, already at maximum size.", IGRAPH_EOVERFLOW);
+            IGRAPH_ERROR("Cannot add new item to vector, already at maximum size.", IGRAPH_EOVERFLOW);
         }
         if (new_size == 0) {
             new_size = 1;

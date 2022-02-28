@@ -84,6 +84,9 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size
 IGRAPH_EXPORT void FUNCTION(discard)(TYPE* v, igraph_integer_t index);
 IGRAPH_EXPORT void FUNCTION(discard_back)(TYPE* v);
 IGRAPH_EXPORT void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index);
+IGRAPH_EXPORT igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+IGRAPH_EXPORT igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_TYPE* e);
+IGRAPH_EXPORT igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** result);
 IGRAPH_EXPORT igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** result);
