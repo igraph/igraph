@@ -53,21 +53,19 @@ typedef struct {
 IGRAPH_EXPORT igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size);
 IGRAPH_EXPORT void FUNCTION(destroy)(TYPE* v);
 
-IGRAPH_EXPORT igraph_integer_t FUNCTION(capacity)(const TYPE* v);
-
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/
 
 IGRAPH_EXPORT ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos);
 IGRAPH_EXPORT void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
-IGRAPH_EXPORT void FUNCTION(swap)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
 IGRAPH_EXPORT ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v);
 
 /*-----------------*/
 /* List properties */
 /*-----------------*/
 
+IGRAPH_EXPORT igraph_integer_t FUNCTION(capacity)(const TYPE* v);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(empty)(const TYPE* v);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(size)(const TYPE* v);
 
@@ -93,12 +91,18 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 
+/*------------------*/
+/* Exchanging items */
+/*------------------*/
+
+IGRAPH_EXPORT igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t *index);
+IGRAPH_EXPORT igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2);
+IGRAPH_EXPORT void FUNCTION(swap_elements)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+
 /*-----------*/
 /* Sorting   */
 /*-----------*/
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(permute)(
-        TYPE *v, const igraph_vector_int_t *index);
 IGRAPH_EXPORT void FUNCTION(sort)(
         TYPE *v, int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*));
 IGRAPH_EXPORT igraph_error_t FUNCTION(sort_ind)(

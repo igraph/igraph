@@ -408,8 +408,29 @@ void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
 }
 
 /**
- * \ingroup vector_list
  * \function igraph_vector_list_swap
+ * \brief Swaps all elements of two vector lists.
+ *
+ * \param v1 The first list.
+ * \param v2 The second list.
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2) {
+    TYPE tmp;
+
+    tmp = *v1;
+    *v1 = *v2;
+    *v2 = tmp;
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_swap_elements
  * \brief Swaps the vector at the given index in the list with another one.
  *
  * </para><para>
@@ -427,7 +448,7 @@ void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
  *
  * Time complexity: O(1).
  */
-void FUNCTION(swap)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
+void FUNCTION(swap_elements)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
     ITEM_TYPE old_value = *(FUNCTION(get_ptr)(v, pos));
     v->stor_begin[pos] = *e;
     *e = old_value;
