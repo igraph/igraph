@@ -112,12 +112,12 @@ int main() {
     }
     igraph_strvector_destroy(&sv2);
 
-    /* igraph_strvector_add */
-    igraph_strvector_add(&sv1, "zeroth");
-    igraph_strvector_add(&sv1, "first");
-    igraph_strvector_add(&sv1, "second");
-    igraph_strvector_add(&sv1, "third");
-    igraph_strvector_add(&sv1, "fourth");
+    /* igraph_strvector_push_back */
+    igraph_strvector_push_back(&sv1, "zeroth");
+    igraph_strvector_push_back(&sv1, "first");
+    igraph_strvector_push_back(&sv1, "second");
+    igraph_strvector_push_back(&sv1, "third");
+    igraph_strvector_push_back(&sv1, "fourth");
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
         igraph_strvector_get(&sv1, i, &str1);
         printf("---%s---\n", str1);

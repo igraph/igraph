@@ -315,7 +315,7 @@ igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
   char tmp=newstr[length];
   newstr[length]='\0';
-  IGRAPH_CHECK(igraph_strvector_add(&context->labels, newstr));
+  IGRAPH_CHECK(igraph_strvector_push_back(&context->labels, newstr));
   newstr[length]=tmp;
   return IGRAPH_SUCCESS;
 }

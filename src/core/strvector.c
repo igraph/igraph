@@ -473,18 +473,18 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_add
+ * \function igraph_strvector_push_back
  * \brief Adds an element to the back of a string vector.
  *
  * \param v The string vector.
- * \param value The string to add, it will be copied.
+ * \param value The string to add; it will be copied.
  * \return Error code.
  *
  * Time complexity: O(n+l), n is the total number of strings, l is the
  * length of the new string.
  */
 
-igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v, const char *value) {
     igraph_integer_t s = igraph_strvector_size(v);
     igraph_integer_t value_len = strlen(value);
     char **tmp;
@@ -503,6 +503,18 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     v->len += 1;
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_add
+ * \brief Adds an element to the back of a string vector (deprecated alias).
+ *
+ * \deprecated-by igraph_strvector_push_back 0.10.0
+ */
+
+igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+    return igraph_strvector_push_back(v, value);
 }
 
 /**

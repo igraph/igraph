@@ -587,6 +587,10 @@
  - `igraph_spmatrix_t` and its related functions are deprecated in favour of
    `igraph_sparsemat_t`. These will be removed in 0.11.
 
+ - `igraph_strvector_add()` has been renamed to `igraph_strvector_push_back()`
+   for sake of consistency with other vector-like data structures; the old name
+   is deprecated and will be removed in 0.11.
+
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
    deprecated and will be removed in 0.11.
 

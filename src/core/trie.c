@@ -277,7 +277,7 @@ static igraph_error_t igraph_i_trie_get_node(
         IGRAPH_CHECK(igraph_vector_ptr_reserve(&t->children,
                                                igraph_vector_ptr_size(&t->children) + 1));
         IGRAPH_CHECK(igraph_vector_int_reserve(&t->values, igraph_vector_int_size(&t->values) + 1));
-        IGRAPH_CHECK(igraph_strvector_add(&t->strs, key));
+        IGRAPH_CHECK(igraph_strvector_push_back(&t->strs, key));
 
         igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
         igraph_vector_int_push_back(&t->values, newvalue); /* allocated */
@@ -305,7 +305,7 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
         igraph_error_handler_t *oldhandler;
         oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
         /* Add it to the string vector first, we can undo this later */
-        ret = igraph_strvector_add(&t->keys, key);
+        ret = igraph_strvector_push_back(&t->keys, key);
         if (ret != IGRAPH_SUCCESS) {
             igraph_set_error_handler(oldhandler);
             IGRAPH_ERROR("cannot get element from trie", ret);

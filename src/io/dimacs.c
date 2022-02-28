@@ -153,7 +153,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
             }
             if (problem) {
                 igraph_strvector_clear(problem);
-                IGRAPH_CHECK(igraph_strvector_add(problem, prob));
+                IGRAPH_CHECK(igraph_strvector_push_back(problem, prob));
             }
             IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
             break;

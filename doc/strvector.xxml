@@ -20,6 +20,11 @@
 <!-- doxrox-include igraph_strvector_clear -->
 <!-- doxrox-include igraph_strvector_resize -->
 <!-- doxrox-include igraph_strvector_size -->
+<!-- doxrox-include igraph_strvector_push_back -->
+
+<section id="igraph-Strvector-deprecated">
+<title>Deprecated functions</title>
 <!-- doxrox-include igraph_strvector_add -->
+</section>
 
 </section>
