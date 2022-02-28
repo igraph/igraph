@@ -42,7 +42,7 @@ void print_weighted_clique(const igraph_vector_int_t *clique, const igraph_vecto
     igraph_real_t clique_weight = 0.0;
     for (i = 0; i < n; i++) {
         int v = VECTOR(*clique)[i];
-        clique_weight += vertex_weights ? igraph_vector_e(vertex_weights, v) : 1;
+        clique_weight += vertex_weights ? igraph_vector_get(vertex_weights, v) : 1;
         printf(" %d", v);
     }
     printf(" w=%.1f\n", clique_weight);

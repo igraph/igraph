@@ -584,6 +584,10 @@
  - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
    the old name is deprecated and will be removed in 0.11.
 
+ - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
+   `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
+   deprecated and will be removed in 0.11.
+
  - `igraph_spmatrix_t` and its related functions are deprecated in favour of
    `igraph_sparsemat_t`. These will be removed in 0.11.
 
@@ -592,6 +596,10 @@
    is deprecated and will be removed in 0.11.
 
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
+   deprecated and will be removed in 0.11.
+
+ - `igraph_vector_e()` and `igraph_vector_e_ptr()` have been renamed to
+   `igraph_vector_get()` and `igraph_vector_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
 
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been

@@ -66,13 +66,13 @@ int main() {
     IGRAPH_ASSERT(igraph_vector_empty(&v));
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_e and igraph_vector_e_ptr\n");
+    printf("Test igraph_vector_get and igraph_vector_get_ptr\n");
     igraph_vector_init(&v, 5);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        *igraph_vector_e_ptr(&v, i) = 100 * i;
+        *igraph_vector_get_ptr(&v, i) = 100 * i;
     }
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_e(&v, i));
+        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_get(&v, i));
     }
     printf("\n");
     igraph_vector_destroy(&v);

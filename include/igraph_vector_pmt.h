@@ -66,8 +66,10 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igra
 #define VECTOR(v) ((v).stor_begin)
 #endif
 
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE value);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
 

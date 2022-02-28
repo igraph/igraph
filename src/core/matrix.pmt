@@ -731,7 +731,7 @@ igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
 }
 
 /**
- * \function igraph_matrix_e
+ * \function igraph_matrix_get
  * Extract an element from a matrix.
  *
  * Use this if you need a function for some reason and cannot use the
@@ -744,13 +744,13 @@ igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
+BASE FUNCTION(igraph_matrix, get)(const TYPE(igraph_matrix) *m,
                                 igraph_integer_t row, igraph_integer_t col) {
     return MATRIX(*m, row, col);
 }
 
 /**
- * \function igraph_matrix_e_ptr
+ * \function igraph_matrix_get_ptr
  * Pointer to an element of a matrix.
  *
  * The function returns a pointer to an element. No range checking is
@@ -763,9 +763,33 @@ BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(1).
  */
 
+BASE* FUNCTION(igraph_matrix, get_ptr)(const TYPE(igraph_matrix) *m,
+                                       igraph_integer_t row, igraph_integer_t col) {
+    return &MATRIX(*m, row, col);
+}
+
+/**
+ * \function igraph_matrix_e
+ * Extract an element from a matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_matrix_get 0.10.0
+ */
+
+BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
+                                igraph_integer_t row, igraph_integer_t col) {
+    return FUNCTION(igraph_matrix, get)(m, row, col);
+}
+
+/**
+ * \function igraph_matrix_e_ptr
+ * Pointer to an element of a matrix.
+ *
+ * \deprecated-by igraph_matrix_get_ptr 0.10.0
+ */
+
 BASE* FUNCTION(igraph_matrix, e_ptr)(const TYPE(igraph_matrix) *m,
                                      igraph_integer_t row, igraph_integer_t col) {
-    return &MATRIX(*m, row, col);
+    return FUNCTION(igraph_matrix, get_ptr)(m, row, col);
 }
 
 /**

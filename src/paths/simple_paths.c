@@ -120,7 +120,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
         igraph_integer_t curdist = igraph_vector_int_tail(&dist);
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
         igraph_integer_t n = igraph_vector_int_size(neis);
-        igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, act);
+        igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
         igraph_integer_t nei;

@@ -59,8 +59,8 @@ int main() {
     for (i = 1; i < nodes; i++) {
         /*     fprintf(stderr, "%" IGRAPH_PRId " ", i); */
         igraph_i_layout_merge_dla(&grid, i,
-                                  igraph_vector_e_ptr(&x, i),
-                                  igraph_vector_e_ptr(&y, i),
+                                  igraph_vector_get_ptr(&x, i),
+                                  igraph_vector_get_ptr(&y, i),
                                   VECTOR(r)[nodes - i - 1], 0, 0, 4, 7);
         igraph_i_layout_merge_place_sphere(&grid, VECTOR(x)[i], VECTOR(y)[i],
                                            VECTOR(r)[nodes - i - 1], i);

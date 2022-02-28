@@ -1,9 +1,9 @@
-igraph_matrix_e
+igraph_matrix_get
 0 1 2 
 3 4 5 
 6 7 8 
 9 10 11 
-igraph_matrix_e_ptr
+igraph_matrix_get_ptr
 0 1 2 
 3 4 5 
 6 7 8 

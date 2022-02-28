@@ -42,9 +42,13 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igra
 /*--------------------*/
 
 /* MATRIX */
-IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, e)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_matrix, e)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
-IGRAPH_EXPORT BASE* FUNCTION(igraph_matrix, e_ptr)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_matrix, e_ptr)(
+    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
+IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, get)(
+    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
+IGRAPH_EXPORT BASE* FUNCTION(igraph_matrix, get_ptr)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, set)(
     TYPE(igraph_matrix)* m, igraph_integer_t row, igraph_integer_t col, BASE value);

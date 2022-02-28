@@ -603,7 +603,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             igraph_integer_t actvect = igraph_stack_int_top(&stack);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             igraph_integer_t n = igraph_vector_int_size(neis);
-            igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, actvect);
+            igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, actvect);
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = 0;

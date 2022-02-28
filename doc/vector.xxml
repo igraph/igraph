@@ -28,8 +28,8 @@
 <section id="vector-accessing-elements">
 <!-- doxrox-include igraph_vector_accessing_elements -->
 <!-- doxrox-include VECTOR -->
-<!-- doxrox-include igraph_vector_e -->
-<!-- doxrox-include igraph_vector_e_ptr -->
+<!-- doxrox-include igraph_vector_get -->
+<!-- doxrox-include igraph_vector_get_ptr -->
 <!-- doxrox-include igraph_vector_set -->
 <!-- doxrox-include igraph_vector_tail -->
 </section>
@@ -124,6 +124,11 @@
 <section id="set-operations-on-sorted-vectors"><title>Set operations on sorted vectors</title>
 <!-- doxrox-include igraph_vector_intersect_sorted -->
 <!-- doxrox-include igraph_vector_difference_sorted -->
+</section>
+
+<section id="vector-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_vector_e -->
+<!-- doxrox-include igraph_vector_e_ptr -->
 </section>
 
 <section id="about-vector-ptr">

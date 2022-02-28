@@ -613,8 +613,8 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
  * <para>The simplest way to access an element of a vector is to use the
  * \ref VECTOR macro. This macro can be used both for querying and setting
  * \type igraph_vector_t elements. If you need a function, \ref
- * igraph_vector_e() queries and \ref igraph_vector_set() sets an element of a
- * vector. \ref igraph_vector_e_ptr() returns the address of an element.</para>
+ * igraph_vector_get() queries and \ref igraph_vector_set() sets an element of a
+ * vector. \ref igraph_vector_get_ptr() returns the address of an element.</para>
  *
  * <para>\ref igraph_vector_tail() returns the last element of a non-empty
  * vector. There is no <function>igraph_vector_head()</function> function
@@ -624,21 +624,52 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
 
 /**
  * \ingroup vector
- * \function igraph_vector_e
+ * \function igraph_vector_get
  * \brief Access an element of a vector.
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the index of the first
  *    element is zero.
  * \return The desired element.
- * \sa \ref igraph_vector_e_ptr() and the \ref VECTOR macro.
+ * \sa \ref igraph_vector_get_ptr() and the \ref VECTOR macro.
  *
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
+BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return * (v->stor_begin + pos);
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_get_ptr
+ * \brief Get the address of an element of a vector
+ * \param v The \type igraph_vector_t object.
+ * \param pos The position of the element, the position of the first
+ *   element is zero.
+ * \return Pointer to the desired element.
+ * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
+ *
+ * Time complexity: O(1).
+ */
+
+BASE* FUNCTION(igraph_vector, get_ptr)  (const TYPE(igraph_vector)* v, igraph_integer_t pos) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_begin + pos;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_e
+ * \brief Access an element of a vector (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_get 0.10.0
+ */
+
+BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
+    return FUNCTION(igraph_vector, get)(v, pos);
 }
 
 /**
@@ -649,15 +680,13 @@ BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t p
  * \param pos The position of the element, the position of the first
  *   element is zero.
  * \return Pointer to the desired element.
- * \sa \ref igraph_vector_e() and the \ref VECTOR macro.
+ * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
  *
  * Time complexity: O(1).
  */
 
 BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_integer_t pos) {
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    return v->stor_begin + pos;
+    return FUNCTION(igraph_vector, get_ptr)(v, pos);
 }
 
 /**
@@ -667,7 +696,7 @@ BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_inte
  * \param v The \type igraph_vector_t element.
  * \param pos Position of the element to set.
  * \param value New value of the element.
- * \sa \ref igraph_vector_e().
+ * \sa \ref igraph_vector_get().
  */
 
 void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE value) {
