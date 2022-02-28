@@ -324,6 +324,21 @@ igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_pop_back
+ * \brief Removes and returns the last element of a pointer vector.
+ *
+ * </para><para>
+ * It is an error to call this function with an empty vector.
+ *
+ * \param v The pointer vector.
+ * \return The removed last element.
+ *
+ * Time complexity: O(1).
+ */
+
 void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
