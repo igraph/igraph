@@ -429,6 +429,9 @@
  - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
 
+ - `igraph_strvector_get()` now returns strings in the return value, not in an
+   output argument.
+
  - `igraph_subcomponent()` now uses an `igraph_integer_t` for the seed vertex
    instead of an `igraph_real_t`. It also uses an `igraph_vector_int_t` to
    return the list of vertices in the same component as the seed vertex instead

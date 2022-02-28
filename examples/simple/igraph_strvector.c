@@ -45,7 +45,7 @@ int main() {
     /* igraph_strvector_get, igraph_strvector_set */
     igraph_strvector_init(&sv1, 5);
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        igraph_strvector_get(&sv1, i, &str1);
+        str1 = igraph_strvector_get(&sv1, i);
         printf("---%s---\n", str1);
     }
     igraph_strvector_set(&sv1, 0, "zero");
@@ -54,7 +54,7 @@ int main() {
     igraph_strvector_set(&sv1, 3, "three");
     igraph_strvector_set(&sv1, 4, "four");
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        igraph_strvector_get(&sv1, i, &str1);
+        str1 = igraph_strvector_get(&sv1, i);
         printf("---%s---\n", str1);
     }
 
@@ -72,7 +72,7 @@ int main() {
     igraph_strvector_set(&sv1, 4, "four");
     igraph_strvector_resize(&sv1, 5);
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        igraph_strvector_get(&sv1, i, &str1);
+        str1 = igraph_strvector_get(&sv1, i);
         printf("---%s---\n", str1);
     }
     igraph_strvector_resize(&sv1, 0);
@@ -87,21 +87,21 @@ int main() {
     igraph_strvector_set(&sv1, 4, "four");
     igraph_strvector_resize(&sv1, 5);
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        igraph_strvector_get(&sv1, i, &str1);
+        str1 = igraph_strvector_get(&sv1, i);
         printf("---%s---\n", str1);
     }
 
     /* igraph_strvector_move_interval */
     igraph_strvector_move_interval(&sv1, 3, 5, 0);
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        igraph_strvector_get(&sv1, i, &str1);
+        str1 = igraph_strvector_get(&sv1, i);
         printf("---%s---\n", str1);
     }
 
     /* igraph_strvector_copy */
     igraph_strvector_copy(&sv2, &sv1);
     for (i = 0; i < igraph_strvector_size(&sv2); i++) {
-        igraph_strvector_get(&sv2, i, &str1);
+        str1 = igraph_strvector_get(&sv2, i);
         printf("---%s---\n", str1);
     }
     igraph_strvector_resize(&sv1, 0);
@@ -119,7 +119,7 @@ int main() {
     igraph_strvector_push_back(&sv1, "third");
     igraph_strvector_push_back(&sv1, "fourth");
     for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        igraph_strvector_get(&sv1, i, &str1);
+        str1 = igraph_strvector_get(&sv1, i);
         printf("---%s---\n", str1);
     }
 

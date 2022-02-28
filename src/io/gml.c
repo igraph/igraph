@@ -655,8 +655,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     if (!id) {
         igraph_bool_t found = 0;
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
-            char *n;
-            igraph_strvector_get(&vnames, i, &n);
+            char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 found = 1; break;
             }
@@ -676,7 +675,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     /* Graph attributes first */
     for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
         char *name, *newname;
-        igraph_strvector_get(&gnames, i, &name);
+        name = igraph_strvector_get(&gnames, i);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
         IGRAPH_FINALLY(igraph_free, newname);
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -687,7 +686,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             char *s;
             IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
-            igraph_strvector_get(&strv, 0, &s);
+            s = igraph_strvector_get(&strv, 0);
             CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
             IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
@@ -710,7 +709,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(vtypes)[j];
             char *name, *newname;
-            igraph_strvector_get(&vnames, j, &name);
+            name = igraph_strvector_get(&vnames, j);
             if (!strcmp(name, "id")) {
                 continue;
             }
@@ -726,7 +725,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                              igraph_vss_1(i), &strv));
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
@@ -758,7 +757,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(etypes)[j];
             char *name, *newname;
-            igraph_strvector_get(&enames, j, &name);
+            name = igraph_strvector_get(&enames, j);
             if (!strcmp(name, "source") || !strcmp(name, "target")) {
                 continue;
             }
@@ -774,7 +773,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                              igraph_ess_1(i), &strv));
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,

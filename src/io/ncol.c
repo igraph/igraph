@@ -127,7 +127,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
-            igraph_strvector_get(predefnames, i, &key);
+            key = igraph_strvector_get(predefnames, i);
             igraph_trie_get(&trie, key, &id);
             if (id != i) {
                 IGRAPH_WARNING("Reading NCOL file, duplicate entry in predefined names.");
@@ -331,8 +331,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             int ret = 0;
             char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, from, &str1);
-            igraph_strvector_get(&nvec, to, &str2);
+            str1 = igraph_strvector_get(&nvec, from);
+            str2 = igraph_strvector_get(&nvec, to);
             ret = fprintf(outstream, "%s %s\n", str1, str2);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
@@ -382,8 +382,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             int ret = 0, ret2 = 0;
             char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, from, &str1);
-            igraph_strvector_get(&nvec, to, &str2);
+            str1 = igraph_strvector_get(&nvec, from);
+            str2 = igraph_strvector_get(&nvec, to);
             ret = fprintf(outstream, "%s %s ", str1, str2);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);

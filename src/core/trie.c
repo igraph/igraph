@@ -142,7 +142,7 @@ static igraph_error_t igraph_i_trie_get_node(
 
     for (i = 0; i < igraph_strvector_size(&t->strs); i++) {
         size_t diff;
-        igraph_strvector_get(&t->strs, i, &str);
+        str = igraph_strvector_get(&t->strs, i);
         diff = igraph_i_strdiff(str, key);
 
         if (diff == 0) {
@@ -372,8 +372,8 @@ igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integ
  * \brief Get an element of a trie based on its index.
  */
 
-void igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx, char **str) {
-    igraph_strvector_get(&t->keys, idx, str);
+char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
+    return igraph_strvector_get(&t->keys, idx);
 }
 
 /**

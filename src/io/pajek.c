@@ -604,7 +604,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_ID],
                         igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
@@ -635,7 +635,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             if (vtypes[V_SHAPE] == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_SHAPE],
                         igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
@@ -655,7 +655,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 igraph_integer_t idx = VECTOR(vx_stra)[j];
                 igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
                         igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
                 IGRAPH_FREE(escaped);
@@ -743,7 +743,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             igraph_integer_t idx = VECTOR(ex_stra)[j];
             igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
                                                     igraph_ess_1(edge), &strv);
-            igraph_strvector_get(&strv, 0, &s);
+            s = igraph_strvector_get(&strv, 0);
             IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
             fprintf(outstream, " %s %s", estrnames2[idx], escaped);
             IGRAPH_FREE(escaped);

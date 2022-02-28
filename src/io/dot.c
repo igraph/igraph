@@ -174,7 +174,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
         CHECK(fprintf(outstream, "  graph [\n"));
         for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
             char *name, *newname;
-            igraph_strvector_get(&gnames, i, &name);
+            name = igraph_strvector_get(&gnames, i);
             IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
             IGRAPH_FINALLY(igraph_free, newname);
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -189,7 +189,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
                 char *s, *news;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
                 CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                 IGRAPH_FREE(news);
@@ -212,7 +212,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " [\n", i));
             for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
                 char *name, *newname;
-                igraph_strvector_get(&vnames, j, &name);
+                name = igraph_strvector_get(&vnames, j);
                 IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -228,7 +228,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                     char *s, *news;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name, igraph_vss_1(i), &strv));
-                    igraph_strvector_get(&strv, 0, &s);
+                    s = igraph_strvector_get(&strv, 0);
                     IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
                     CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                     IGRAPH_FREE(news);
@@ -259,7 +259,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " %s %" IGRAPH_PRId " [\n", from, edgeop, to));
             for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
                 char *name, *newname;
-                igraph_strvector_get(&enames, j, &name);
+                name = igraph_strvector_get(&enames, j);
                 IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -276,7 +276,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                     char *s, *news;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph,
                                  name, igraph_ess_1(i), &strv));
-                    igraph_strvector_get(&strv, 0, &s);
+                    s = igraph_strvector_get(&strv, 0);
                     IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
                     CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                     IGRAPH_FREE(news);

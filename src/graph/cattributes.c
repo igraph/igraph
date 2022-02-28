@@ -1199,11 +1199,11 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else if (n == 1) {
-            igraph_strvector_get(oldv, 0, &tmp);
+            tmp = igraph_strvector_get(oldv, 0);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         } else {
             igraph_integer_t r = RNG_INTEGER(0, n - 1);
-            igraph_strvector_get(oldv, r, &tmp);
+            tmp = igraph_strvector_get(oldv, r);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
@@ -1237,8 +1237,7 @@ static igraph_error_t igraph_i_cattributes_sn_first(const igraph_attribute_recor
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else {
-            char *tmp;
-            igraph_strvector_get(oldv, VECTOR(*idx)[0], &tmp);
+            char *tmp = igraph_strvector_get(oldv, VECTOR(*idx)[0]);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
@@ -1270,8 +1269,7 @@ static igraph_error_t igraph_i_cattributes_sn_last(const igraph_attribute_record
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else {
-            char *tmp;
-            igraph_strvector_get(oldv, VECTOR(*idx)[n - 1], &tmp);
+            char *tmp = igraph_strvector_get(oldv, VECTOR(*idx)[n - 1]);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
@@ -1303,7 +1301,7 @@ static igraph_error_t igraph_i_cattributes_sn_concat(const igraph_attribute_reco
         size_t len = 0;
         char *tmp, *tmp2;
         for (j = 0; j < n; j++) {
-            igraph_strvector_get(oldv, j, &tmp);
+            tmp = igraph_strvector_get(oldv, j);
             len += strlen(tmp);
         }
         tmp2 = IGRAPH_CALLOC(len + 1, char);
@@ -1313,7 +1311,7 @@ static igraph_error_t igraph_i_cattributes_sn_concat(const igraph_attribute_reco
         IGRAPH_FINALLY(igraph_free, tmp2);
         len = 0;
         for (j = 0; j < n; j++) {
-            igraph_strvector_get(oldv, j, &tmp);
+            tmp = igraph_strvector_get(oldv, j);
             strcpy(tmp2 + len, tmp);
             len += strlen(tmp);
         }
@@ -1357,8 +1355,7 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
         IGRAPH_CHECK(igraph_strvector_resize(&values, n));
         for (j = 0; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
-            char *elem;
-            igraph_strvector_get(oldv, x, &elem);
+            char *elem = igraph_strvector_get(oldv, x);
             IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));
         }
         IGRAPH_CHECK(func(&values, &res));
@@ -2486,8 +2483,7 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
         IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
         for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
             igraph_integer_t v = IGRAPH_VIT_GET(it);
-            char *s;
-            igraph_strvector_get(str, v, &s);
+            char *s = igraph_strvector_get(str, v);
             IGRAPH_CHECK(igraph_strvector_set(value, i, s));
         }
         igraph_vit_destroy(&it);
@@ -2568,8 +2564,7 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(const igraph_t *g
         IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
         for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
             igraph_integer_t e = IGRAPH_EIT_GET(it);
-            char *s;
-            igraph_strvector_get(str, e, &s);
+            char *s = igraph_strvector_get(str, e);
             IGRAPH_CHECK(igraph_strvector_set(value, i, s));
         }
         igraph_eit_destroy(&it);

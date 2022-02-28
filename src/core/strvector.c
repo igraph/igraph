@@ -112,18 +112,15 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  * for an easier way.
  * \param sv The input string vector.
  * \param idx The index of the element to query.
- * \param Pointer to a <type>char*</type>, the address of the string
- *   is stored here.
  *
  * Time complexity: O(1).
  */
 
-void igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx,
-                          char **value) {
+char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
     IGRAPH_ASSERT(sv->data[idx] != 0);
-    *value = sv->data[idx];
+    return sv->data[idx];
 }
 
 /**
@@ -300,7 +297,6 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_integer_t begi
 igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
                           const igraph_strvector_t *from) {
     igraph_integer_t i;
-    char *str;
     IGRAPH_ASSERT(from != 0);
     /*   IGRAPH_ASSERT(from->data != 0); */
     to->data = IGRAPH_CALLOC(from->len, char*);
@@ -311,8 +307,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
 
     for (i = 0; i < from->len; i++) {
         igraph_error_t ret;
-        igraph_strvector_get(from, i, &str);
-        ret = igraph_strvector_set(to, i, str);
+        ret = igraph_strvector_set(to, i, igraph_strvector_get(from, i));
         if (ret != 0) {
             igraph_strvector_destroy(to);
             IGRAPH_ERROR("cannot copy string vector", ret);
@@ -577,8 +572,7 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
 
     for (i = 0; i < newlen; i++) {
         igraph_integer_t j = VECTOR(*idx)[i];
-        char *str;
-        igraph_strvector_get(v, j, &str);
+        char *str = igraph_strvector_get(v, j);
         igraph_strvector_set(newv, i, str);
     }
 

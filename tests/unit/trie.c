@@ -122,7 +122,7 @@ int main() {
     printf("alma:  %" IGRAPH_PRId "\n", id);
 
     for (i = 0; i < igraph_trie_size(&trie); i++) {
-        igraph_trie_idx(&trie, i, &str);
+        str = igraph_trie_idx(&trie, i);
         printf("%" IGRAPH_PRId ": %s\n", i, str);
     }
     igraph_trie_destroy(&trie);
