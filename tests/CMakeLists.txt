@@ -91,6 +91,7 @@ add_legacy_tests(
   vector
   vector2
   vector3
+  vector_list
   vector_ptr
   vector_ptr_sort_ind
   vector_qsort_ind
