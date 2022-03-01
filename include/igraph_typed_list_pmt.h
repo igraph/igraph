@@ -90,7 +90,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos,
 IGRAPH_EXPORT igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** result);
-IGRAPH_EXPORT igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* e);
+IGRAPH_EXPORT ITEM_TYPE FUNCTION(pop_back)(TYPE* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 

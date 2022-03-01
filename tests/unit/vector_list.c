@@ -78,7 +78,7 @@ int main() {
     }
     while (!igraph_vector_int_list_empty(&list)) {
         print_vector_int(igraph_vector_int_list_tail_ptr(&list));
-        IGRAPH_ASSERT(igraph_vector_int_list_pop_back(&list, &v) == IGRAPH_SUCCESS);
+        v = igraph_vector_int_list_pop_back(&list);
         /* v is now owned by us, not the vector_int_list */
         print_vector_int(&v);
         igraph_vector_int_destroy(&v);

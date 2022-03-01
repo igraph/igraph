@@ -743,9 +743,12 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
  *
  * </para><para>
  * This function removes the last vector from the list. The vector that was
- * removed from the list is returned in \p e and its ownership is passed back
- * to the caller; in other words, the caller becomes responsible for destroying
+ * removed from the list is returned and its ownership is passed back to the
+ * caller; in other words, the caller becomes responsible for destroying
  * the vector when it is not needed any more.
+ *
+ * </para><para>
+ * It is an error to call this function with an empty vector.
  *
  * \param v The list object.
  * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
@@ -754,15 +757,10 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
  *
  * Time complexity: O(1).
  */
-igraph_error_t FUNCTION(pop_back)(TYPE* v, ITEM_TYPE* result) {
-    igraph_integer_t size = FUNCTION(size)(v);
-    if (size > 0) {
-        v->end -= 1;
-        *result = *(v->end);
-        return IGRAPH_SUCCESS;
-    } else {
-        return IGRAPH_FAILURE;
-    }
+ITEM_TYPE FUNCTION(pop_back)(TYPE* v) {
+    IGRAPH_ASSERT(!FUNCTION(empty)(v));
+    v->end -= 1;
+    return *(v->end);
 }
 
 /**
