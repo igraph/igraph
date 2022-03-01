@@ -106,7 +106,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
 
     already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_counted == 0) {
-        IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_counted);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -304,7 +304,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
 
     father = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (father == 0) {
-        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, father);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);

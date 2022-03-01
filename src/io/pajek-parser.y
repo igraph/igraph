@@ -532,7 +532,7 @@ adjmatrixentry: number {
 
 /* -----------------------------------------------------*/
 
-longint: NUM { 
+longint: NUM {
   igraph_integer_t val;
   IGRAPH_YY_CHECK(igraph_i_parse_integer(igraph_pajek_yyget_text(scanner),
                                          igraph_pajek_yyget_leng(scanner),
@@ -659,7 +659,7 @@ igraph_error_t igraph_i_pajek_add_string_vertex_attribute(const char *name,
 
   tmp=IGRAPH_CALLOC(len+1, char);
   if (tmp==0) {
-    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
   }
   IGRAPH_FINALLY(igraph_free, tmp);
   strncpy(tmp, value, len);
@@ -686,7 +686,7 @@ igraph_error_t igraph_i_pajek_add_string_edge_attribute(const char *name,
 
   tmp=IGRAPH_CALLOC(len+1, char);
   if (tmp==0) {
-    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
   }
   IGRAPH_FINALLY(igraph_free, tmp);
   strncpy(tmp, value, len);

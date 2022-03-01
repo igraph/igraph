@@ -332,7 +332,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parents == 0) {
-        IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, parents);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);

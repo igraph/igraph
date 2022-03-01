@@ -196,7 +196,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
-        IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
@@ -599,7 +599,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (! neis) {
-        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, neis);
 

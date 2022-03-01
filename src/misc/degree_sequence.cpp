@@ -784,6 +784,6 @@ igraph_error_t igraph_realize_degree_sequence(
             return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
         }
     } catch (const std::bad_alloc &) {
-        IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 }

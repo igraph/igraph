@@ -50,7 +50,7 @@ static int igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
     remain = IGRAPH_CALLOC(no_of_nodes, char);
     if (remain == 0) {
-        IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, remain);
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
@@ -418,12 +418,12 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
     vremain = IGRAPH_CALLOC(no_of_nodes, char);
     if (vremain == 0) {
-        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vremain);
     eremain = IGRAPH_CALLOC(no_of_edges, char);
     if (eremain == 0) {
-        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, eremain);
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_edges - IGRAPH_EIT_SIZE(eit)));

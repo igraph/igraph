@@ -221,12 +221,12 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     added_edges = IGRAPH_CALLOC(no_of_edges, char);
     if (added_edges == 0) {
-        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added_edges);
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
@@ -298,12 +298,12 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
     added_edges = IGRAPH_CALLOC(no_of_edges, char);
     if (added_edges == 0) {
-        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added_edges);
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));

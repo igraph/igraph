@@ -464,7 +464,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
         i = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(i, igraph_bool_t);
         if (seen == 0) {
-            IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, seen);
 

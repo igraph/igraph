@@ -562,7 +562,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
     rec = IGRAPH_CALLOC(1, igraph_i_graphml_attribute_record_t);
     if (rec == 0) {
-        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
+        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         return 0;
     }
     IGRAPH_FINALLY(igraph_free, rec);
@@ -706,7 +706,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_BOOLEAN:
         boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (boolvec == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
+            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             return 0;
         }
         rec->record.value = boolvec;
@@ -715,7 +715,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_NUMERIC:
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vec == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
+            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             return 0;
         }
         rec->record.value = vec;
@@ -724,7 +724,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_STRING:
         strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (strvec == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
+            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             return 0;
         }
         rec->record.value = strvec;
@@ -785,7 +785,7 @@ static void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_
         state->data_char = IGRAPH_CALLOC((size_t) len + 1, char);
     }
     if (state->data_char == 0) {
-        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM);
+        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     memcpy(state->data_char + data_char_new_start, data,
            (size_t) len * sizeof(xmlChar));
@@ -1310,7 +1310,7 @@ static igraph_error_t igraph_i_xml_escape(char* src, char** dest) {
     }
     *dest = IGRAPH_CALLOC(destlen + 1, char);
     if (!*dest) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (s = src, d = *dest; *s; s++, d++) {
         ch = (unsigned char)(*s);
@@ -1557,7 +1557,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     /* set standard C locale lest we sometimes get commas instead of dots */
     char *saved_locale = strdup(setlocale(LC_NUMERIC, NULL));
     if (saved_locale == NULL) {
-        IGRAPH_ERROR("Not enough memory.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Not enough memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, saved_locale);
     setlocale(LC_NUMERIC, "C");

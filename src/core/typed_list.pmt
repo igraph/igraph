@@ -107,7 +107,7 @@ igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
     IGRAPH_ASSERT(size >= 0);
     v->stor_begin = IGRAPH_CALLOC(alloc_size, ITEM_TYPE);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("cannot initialize list", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot initialize list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -209,7 +209,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, ITEM_TYPE);
     if (tmp == 0) {
-        IGRAPH_ERROR("cannot reserve space for list", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot reserve space for list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     v->end = tmp + (v->end - v->stor_begin);
@@ -844,7 +844,7 @@ igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
 
     work = IGRAPH_CALLOC(size, ITEM_TYPE);
     if (work == 0) {
-        IGRAPH_ERROR("cannot permute list", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot permute list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < size; i++) {
@@ -916,7 +916,7 @@ igraph_error_t FUNCTION(sort_ind)(
 
     vind = IGRAPH_CALLOC(n, ITEM_TYPE*);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_list_sort_ind failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_vector_list_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < n; i++) {
         vind[i] = v->stor_begin + i;

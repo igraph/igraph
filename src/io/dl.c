@@ -102,7 +102,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison

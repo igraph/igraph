@@ -203,7 +203,7 @@ static igraph_error_t igraph_rng_glibc2_init(void **state) {
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
     if (!st) {
-        IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     (*state) = st;
 
@@ -273,7 +273,7 @@ static igraph_error_t igraph_rng_rand_init(void **state) {
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_rand_state_t);
     if (!st) {
-        IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     (*state) = st;
 
@@ -421,7 +421,7 @@ static igraph_error_t igraph_rng_mt19937_init(void **state) {
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_mt19937_state_t);
     if (!st) {
-        IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot initialize RNG", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     (*state) = st;
 

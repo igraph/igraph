@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -444,7 +444,7 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Weak connectedness check failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Weak connectedness check failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -600,7 +600,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     /* already_added keeps track of what nodes made it into a graph already */
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -1350,7 +1350,7 @@ igraph_error_t igraph_subcomponent(
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Subcomponent failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Subcomponent failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 

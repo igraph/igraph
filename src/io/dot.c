@@ -83,12 +83,12 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
     if (is_number || !need_quote) {
         *result = strdup(orig);
         if (!*result) {
-            IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     } else {
         *result = IGRAPH_CALLOC(newlen + 3, char);
         if (!*result) {
-            IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         (*result)[0] = '"';
         (*result)[newlen + 1] = '"';

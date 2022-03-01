@@ -249,7 +249,7 @@ static igraph_error_t callback_callback(set_t s, graph_t *g, clique_options *opt
 
     clique = (igraph_vector_int_t *) malloc(sizeof(igraph_vector_int_t));
     if (clique == 0) {
-        IGRAPH_ERROR("storing cliques failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("storing cliques failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_CHECK(igraph_vector_int_init(clique, set_size(s)));
 

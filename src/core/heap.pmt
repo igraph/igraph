@@ -58,7 +58,7 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
     }
     h->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (h->stor_begin == 0) {
-        IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
@@ -85,7 +85,7 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
 igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, igraph_integer_t len) {
     h->stor_begin = IGRAPH_CALLOC(len, BASE);
     if (h->stor_begin == 0) {
-        IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_end = h->stor_begin + len;
     h->end = h->stor_end;
@@ -287,7 +287,7 @@ igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integ
 
     tmp = IGRAPH_REALLOC(h->stor_begin, (size_t) size, BASE);
     if (tmp == 0) {
-        IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_begin = tmp;
     h->stor_end = h->stor_begin + size;

@@ -84,7 +84,7 @@ igraph_error_t ap_hungarian(AP *p) {
     ci = calloc(1 + n, sizeof(igraph_integer_t));
 
     if (ri == NULL || ci == NULL || p->s == NULL || p->f == NULL) {
-        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     preprocess(p);

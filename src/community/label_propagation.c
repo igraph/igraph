@@ -190,7 +190,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                         if (fixed_copy == fixed) {
                             fixed_copy = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                             if (fixed_copy == 0) {
-                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM);
+                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                             }
 
                             IGRAPH_FINALLY(igraph_free, fixed_copy);

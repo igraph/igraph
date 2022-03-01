@@ -154,7 +154,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
     } else {
         nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! nodetypes) {
-            IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, nodetypes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);

@@ -173,7 +173,7 @@ static igraph_error_t igraph_i_trie_get_node(
             } else if (add) {
                 igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
                 if (node == 0) {
-                    IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
                 IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_trie_get_node(
 
             igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
             if (node == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
             IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
@@ -212,7 +212,7 @@ static igraph_error_t igraph_i_trie_get_node(
 
             str2 = strdup(str);
             if (str2 == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
@@ -234,7 +234,7 @@ static igraph_error_t igraph_i_trie_get_node(
 
             igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
             if (node == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 2);
             IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 2);
@@ -248,7 +248,7 @@ static igraph_error_t igraph_i_trie_get_node(
 
             str2 = strdup(str);
             if (str2 == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
@@ -342,7 +342,7 @@ igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_intege
     char *tmp = IGRAPH_CALLOC(length + 1, char);
 
     if (tmp == 0) {
-        IGRAPH_ERROR("Cannot get from trie", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot get from trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     strncpy(tmp, key, length);

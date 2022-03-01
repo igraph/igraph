@@ -72,7 +72,7 @@ IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
 
 neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
 if (neis == 0) {
-    IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
 }
 IGRAPH_FINALLY(igraph_free, neis);
 

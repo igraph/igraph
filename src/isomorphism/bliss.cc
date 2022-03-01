@@ -176,7 +176,7 @@ inline igraph_error_t bliss_info_to_igraph(igraph_bliss_info_t *info, const Stat
         group_size_strlen = mpz_sizeinbase(group_size, /* base */ 10) + 2;
         info->group_size = IGRAPH_CALLOC(group_size_strlen, char);
         if (! info->group_size) {
-            IGRAPH_ERROR("Insufficient memory to retrieve automotphism group size.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory to retrieve automotphism group size.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         mpz_get_str(info->group_size, /* base */ 10, group_size);
         mpz_clear(group_size);

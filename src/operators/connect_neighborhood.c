@@ -84,7 +84,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);

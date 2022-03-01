@@ -59,7 +59,7 @@ igraph_error_t igraph_incadjlist_inter_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incadjs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incadjs == 0) {
-        IGRAPH_ERROR("Cannot create incadjlist.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incadjlist.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_incadjlist_inter_destroy, il);
 
@@ -123,13 +123,13 @@ igraph_error_t igraph_incadjlist_sep_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incadjlist.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incadjlist.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     il->adjs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->adjs == 0) {
         IGRAPH_FREE(il->incs);
-        IGRAPH_ERROR("Cannot create incadjlist.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incadjlist.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_incadjlist_sep_destroy, il);

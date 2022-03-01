@@ -358,7 +358,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_
     /* temporary storage */
     added = IGRAPH_CALLOC(no_of_nodes, char);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);

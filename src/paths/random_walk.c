@@ -254,7 +254,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
 
                 *cd = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (*cd == NULL) {
-                    IGRAPH_ERROR("Random edge walk failed.", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Random edge walk failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_vector_init(*cd, degree));
 

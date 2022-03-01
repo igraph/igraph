@@ -210,7 +210,7 @@ igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_int
 
 #define CHECKMEM(x) \
     if (!x) { \
-        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
+        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
@@ -935,7 +935,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
 #define CHECKMEM(x) \
     if (!x) { \
-        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
+        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
@@ -1196,7 +1196,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
 #define CHECKMEM(x) \
     if (!x) { \
-        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
+        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
     } \
     IGRAPH_FINALLY(igraph_free, x);
 

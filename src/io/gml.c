@@ -223,7 +223,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -300,7 +300,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
                     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, j);
                     if (!atrec) {
-                        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
                     atrec->name = strdup(name);
@@ -364,7 +364,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
                         igraph_i_gml_tree_type_t type = igraph_gml_tree_type(edge, j);
                         if (!atrec) {
-                            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                         }
                         IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
                         atrec->name = strdup(name);
@@ -548,7 +548,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
     }
     *key = IGRAPH_CALLOC(newlen + 1, char);
     if (! *key) {
-        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     memcpy(*key, strno, plen * sizeof(char));
     for (i = 0; i < len; i++) {

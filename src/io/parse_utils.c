@@ -28,7 +28,7 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
     if (dynamic_alloc) {
         tmp = IGRAPH_CALLOC(length+1, char);
         if (tmp == NULL) {
-            IGRAPH_ERROR("Failed to parse integer.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Failed to parse integer.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     } else {
         tmp = buffer;
@@ -84,7 +84,7 @@ igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t
     if (dynamic_alloc) {
         tmp = IGRAPH_CALLOC(length+1, char);
         if (tmp == NULL) {
-            IGRAPH_ERROR("Failed to parse real number.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Failed to parse real number.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     } else {
         tmp = buffer;

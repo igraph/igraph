@@ -356,7 +356,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
         igraph_vector_resize(&hrg->prob, origsize);
         igraph_vector_int_resize(&hrg->edges, origsize);
         igraph_vector_int_resize(&hrg->vertices, origsize);
-        IGRAPH_ERROR("Cannot resize HRG", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot resize HRG", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;

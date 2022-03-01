@@ -135,7 +135,7 @@ igraph_error_t igraph_sparsemat_init(igraph_sparsemat_t *A, igraph_integer_t row
     A->cs = cs_spalloc( rows, cols, nzmax, /*values=*/ 1,
                         /*triplet=*/ 1);
     if (!A->cs) {
-        IGRAPH_ERROR("Cannot allocate memory for sparse matrix", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot allocate memory for sparse matrix", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;
@@ -214,7 +214,7 @@ void igraph_sparsemat_destroy(igraph_sparsemat_t *A) {
 
 igraph_error_t igraph_sparsemat_realloc(igraph_sparsemat_t *A, igraph_integer_t nzmax) {
     if (!cs_sprealloc(A->cs, nzmax)) {
-        IGRAPH_ERROR("Could not allocate more memory for sparse matrix.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Could not allocate more memory for sparse matrix.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     return IGRAPH_SUCCESS;
 }
@@ -330,7 +330,7 @@ igraph_error_t igraph_sparsemat_permute(const igraph_sparsemat_t *A,
     /* We invert the permutation by hand */
     pinv = IGRAPH_CALLOC(nrow, CS_INT);
     if (pinv == 0) {
-        IGRAPH_ERROR("Cannot allocate index vector for permutation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot allocate index vector for permutation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, pinv);
     for (i = 0; i < nrow; i++) {
@@ -1851,7 +1851,7 @@ igraph_error_t igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
 
     workspace = IGRAPH_CALLOC(n, igraph_real_t);
     if (!workspace) {
-        IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, workspace);
 
@@ -2786,7 +2786,7 @@ igraph_error_t igraph_sparsemat_add_cols(igraph_sparsemat_t *A, igraph_integer_t
         CS_INT realloc_ok = 0, i;
         CS_INT *newp = cs_realloc(A->cs->p, (A->cs->n + n + 1), sizeof(CS_INT), &realloc_ok);
         if (!realloc_ok) {
-            IGRAPH_ERROR("Cannot add columns to sparse matrix", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add columns to sparse matrix", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         if (newp != A->cs->p) {
             A->cs->p = newp;

@@ -398,7 +398,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     mark = IGRAPH_CALLOC(no_of_edges, int);
     if (mark == 0) {
-        IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, mark);
 

@@ -98,7 +98,7 @@
         igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t); \
         igraph_error_t cliquehandler_retval; \
         if (!cl) { \
-            IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
+            IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         } \
         IGRAPH_CHECK(igraph_vector_int_copy(cl, R)); \
         cliquehandler_retval = cliquehandler_fn(cl, arg); \
@@ -128,7 +128,7 @@
                 err = igraph_vector_reserve(hist, 2*hcapacity); \
             err = igraph_vector_resize(hist, clsize); \
             if (err != IGRAPH_SUCCESS) \
-                IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); \
+                IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
             for (j=hsize; j < clsize; j++) \
                 VECTOR(*hist)[j] = 0; \
         } \

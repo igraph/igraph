@@ -56,7 +56,7 @@ static igraph_error_t igraph_i_find_k_indsets(
                                          (size_t) (size * old_count),
                                          igraph_integer_t);
     if (*new_member_storage == 0) {
-        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     new_member_storage_size = size * old_count;
     IGRAPH_FINALLY(igraph_free, *new_member_storage);
@@ -153,7 +153,7 @@ static igraph_error_t igraph_i_find_k_indsets(
                                                          (size_t) new_member_storage_size * 2,
                                                          igraph_integer_t);
                     if (*new_member_storage == 0) {
-                        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     new_member_storage_size *= 2;
                     IGRAPH_FINALLY(igraph_free, *new_member_storage);
@@ -473,14 +473,14 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     /* Will be resized later, if needed. */
     member_storage = IGRAPH_CALLOC(1, igraph_integer_t);
     if (member_storage == 0) {
-        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, member_storage);
 
     /* Find all 1-cliques: every vertex will be a clique */
     new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (new_member_storage == 0) {
-        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, new_member_storage);
 
@@ -781,7 +781,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
     clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (clqdata.IS == 0) {
-        IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
@@ -792,7 +792,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
     clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
     if (clqdata.buckets == 0) {
-        IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
@@ -860,7 +860,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 
     clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (clqdata.IS == 0) {
-        IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
@@ -871,7 +871,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 
     clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
     if (clqdata.buckets == 0) {
-        IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
@@ -1027,7 +1027,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
 
     clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (clqdata.IS == 0) {
-        IGRAPH_ERROR("igraph_i_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_i_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
@@ -1038,7 +1038,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
 
     clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
     if (clqdata.buckets == 0) {
-        IGRAPH_ERROR("igraph_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 

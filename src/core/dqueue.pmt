@@ -61,7 +61,7 @@ igraph_error_t FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, igraph_int
     }
     q->stor_begin = IGRAPH_CALLOC(size, BASE);
     if (q->stor_begin == 0) {
-        IGRAPH_ERROR("dqueue init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("dqueue init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     q->stor_end = q->stor_begin + size;
     q->begin = q->stor_begin;
@@ -300,7 +300,7 @@ igraph_error_t FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem)
 
         bigger = IGRAPH_CALLOC( 2 * (q->stor_end - q->stor_begin) + 1, BASE );
         if (bigger == 0) {
-            IGRAPH_ERROR("dqueue push failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("dqueue push failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
 
         if (q->stor_end - q->begin) {

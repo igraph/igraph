@@ -453,7 +453,7 @@ igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_re
         break;
 
     case PLFIT_ENOMEM:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_ENOMEM);
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
 
     default:

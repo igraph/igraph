@@ -139,12 +139,12 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     inneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
     if (!inneis) {
-        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, inneis);
     outneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
     if (!outneis) {
-        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, outneis);
     data.inneis = inneis;

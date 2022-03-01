@@ -83,12 +83,12 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
 
     vert = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (vert == 0) {
-        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vert);
     pos = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (pos == 0) {
-        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, pos);
 
@@ -100,7 +100,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
 
     bin = IGRAPH_CALLOC(maxdeg + 1, igraph_integer_t);
     if (bin == 0) {
-        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bin);
 

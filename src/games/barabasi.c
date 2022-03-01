@@ -98,7 +98,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
 
     bag = IGRAPH_CALLOC(bagsize, igraph_integer_t);
     if (bag == 0) {
-        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag);
 

@@ -62,13 +62,13 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t le
     igraph_integer_t i;
     sv->data = IGRAPH_CALLOC(len, char*);
     if (sv->data == 0) {
-        IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < len; i++) {
         sv->data[i] = IGRAPH_CALLOC(1, char);
         if (sv->data[i] == 0) {
             igraph_strvector_destroy(sv);
-            IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->data[i][0] = '\0';
     }
@@ -150,12 +150,12 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
     if (sv->data[idx] == 0) {
         sv->data[idx] = IGRAPH_CALLOC(value_len + 1, char);
         if (sv->data[idx] == 0) {
-            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     } else {
         char *tmp = IGRAPH_REALLOC(sv->data[idx], value_len + 1, char);
         if (tmp == 0) {
-            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->data[idx] = tmp;
     }
@@ -190,12 +190,12 @@ igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_integer_t id
     if (sv->data[idx] == 0) {
         sv->data[idx] = IGRAPH_CALLOC(len + 1, char);
         if (sv->data[idx] == 0) {
-            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     } else {
         char *tmp = IGRAPH_REALLOC(sv->data[idx], len + 1, char);
         if (tmp == 0) {
-            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->data[idx] = tmp;
     }
@@ -301,7 +301,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
     /*   IGRAPH_ASSERT(from->data != 0); */
     to->data = IGRAPH_CALLOC(from->len, char*);
     if (to->data == 0) {
-        IGRAPH_ERROR("Cannot copy string vector", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot copy string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     to->len = from->len;
 
@@ -348,7 +348,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     }
     if (error) {
         igraph_strvector_resize(to, len1);
-        IGRAPH_ERROR("Cannot append string vector", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot append string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     return IGRAPH_SUCCESS;
 }
@@ -417,7 +417,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
         igraph_bool_t error = 0;
         tmp = IGRAPH_REALLOC(v->data, reallocsize, char*);
         if (tmp == 0) {
-            IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         v->data = tmp;
 
@@ -441,7 +441,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
             if (tmp != 0) {
                 v->data = tmp;
             }
-            IGRAPH_ERROR("Cannot resize string vector", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot resize string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     }
     v->len = newsize;
@@ -487,12 +487,12 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v, const char *val
     IGRAPH_ASSERT(v->data != 0);
     tmp = IGRAPH_REALLOC(v->data, s + 1, char*);
     if (tmp == 0) {
-        IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->data = tmp;
     v->data[s] = IGRAPH_CALLOC(value_len + 1, char);
     if (v->data[s] == 0) {
-        IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     strcpy(v->data[s], value);
     v->len += 1;

@@ -141,7 +141,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
      * such as adjacency lists, when an error occurs mid-initialization. */
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == NULL) {
-        IGRAPH_ERROR("Cannot initialize vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot initialize vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -461,7 +461,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_i
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, BASE);
     if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot reserve space for vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     v->end = tmp + (v->end - v->stor_begin);
@@ -999,7 +999,7 @@ igraph_error_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     }
     vind = IGRAPH_CALLOC(n, BASE*);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < n; i++) {
         vind[i] = &VECTOR(*v)[i];
@@ -1246,7 +1246,7 @@ igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     size = (v->end - v->stor_begin);
     tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE);
     if (tmp == 0) {
-        IGRAPH_ERROR("Cannot resize vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot resize vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     } else {
         v->stor_begin = tmp;
         v->stor_end = v->end = v->stor_begin + size;
@@ -3136,7 +3136,7 @@ igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
 
     tmp = IGRAPH_CALLOC(n, BASE);
     if (!tmp) {
-        IGRAPH_ERROR("Cannot index vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot index vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < n; i++) {

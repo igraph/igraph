@@ -145,7 +145,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
     if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
@@ -186,7 +186,7 @@ igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t 
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
     if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
@@ -237,7 +237,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
     al->length = igraph_vcount(graph);
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
     if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
@@ -245,7 +245,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
     n = al->length;
     seen = IGRAPH_CALLOC(n, igraph_bool_t);
     if (seen == 0) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, seen);
 
@@ -724,7 +724,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
     il->length = no_of_nodes;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
@@ -768,7 +768,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
     il->length = n;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
@@ -979,7 +979,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t*);
 
     if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create lazy adjacency list view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create lazy adjacency list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;
@@ -1040,7 +1040,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
         al->adjs[no] = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (al->adjs[no] == NULL) {
             igraph_error("Lazy adjlist failed", IGRAPH_FILE_BASENAME, __LINE__,
-                         IGRAPH_ENOMEM);
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             return NULL;
         }
 
@@ -1129,7 +1129,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t*);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;
@@ -1192,7 +1192,7 @@ igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
         il->incs[no] = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (il->incs[no] == NULL) {
             igraph_error("Lazy incidence list query failed", IGRAPH_FILE_BASENAME, __LINE__,
-                         IGRAPH_ENOMEM);
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             return NULL;
         }
 
