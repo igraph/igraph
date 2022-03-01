@@ -458,7 +458,7 @@ void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
 
     if (size > 0) {
         INTERNAL_FUNCTION(destroy_item)(v->stor_begin + index);
-        memmove(v->stor_begin + index, v->stor_begin + index + 1, size - index - 1);
+        memmove(v->stor_begin + index, v->stor_begin + index + 1, sizeof(ITEM_TYPE) * (size - index - 1));
         v->end -= 1;
     }
 }
@@ -724,16 +724,13 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
 
     IGRAPH_ASSERT(result != 0);
 
-    if (size <= 0) {
-        IGRAPH_ERROR("list is already empty", IGRAPH_EINVAL);
-    }
     if (index < 0 || index >= size) {
         IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
     }
 
     *result = *(FUNCTION(get_ptr)(v, index));
 
-    memmove(v->stor_begin + index, v->stor_begin + index + 1, size - index - 1);
+    memmove(v->stor_begin + index, v->stor_begin + index + 1, sizeof(ITEM_TYPE) * (size - index - 1));
     v->end -= 1;
 
     return IGRAPH_SUCCESS;
