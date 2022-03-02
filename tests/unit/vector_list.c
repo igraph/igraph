@@ -152,6 +152,25 @@ int main() {
     print_vector_int_list(&list);
     igraph_vector_int_list_destroy(&list);
 
+    printf("Test errors\n");
+    igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_vector_int_list_init(&list, 10);
+    IGRAPH_ASSERT(
+        igraph_vector_int_list_remove(&list, 17, /* item = */ &v) == IGRAPH_EINVAL
+    );
+    IGRAPH_ASSERT(
+        igraph_vector_int_list_remove(&list, -2, /* item = */ &v) == IGRAPH_EINVAL
+    );
+    IGRAPH_ASSERT(
+        igraph_vector_int_list_remove_fast(&list, 17, /* item = */ &v) == IGRAPH_EINVAL
+    );
+    IGRAPH_ASSERT(
+        igraph_vector_int_list_remove_fast(&list, -2, /* item = */ &v) == IGRAPH_EINVAL
+    );
+    igraph_vector_int_list_destroy(&list);
+
+    /* TODO(ntamas): test insert, insert_copy, insert_new, swap, swap_elements */
+
     VERIFY_FINALLY_STACK();
 
     return 0;
