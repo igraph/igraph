@@ -145,4 +145,13 @@ Test igraph_vector_int_list_replace
   2: ( 3 )
 }
 ( 2 )
+Test igraph_vector_int_list_insert, igraph_vector_int_list_insert_new and igraph_vector_int_list_insert_copy
+{
+  0: ( 1 )
+  1: ( 11 -3 )
+  2: ( 77 42 317 )
+  3: ( 2 )
+  4: ( 13 61 )
+  5: ( 3 )
+}
 Test errors

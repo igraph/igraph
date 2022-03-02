@@ -28,6 +28,7 @@
 int main() {
     igraph_vector_int_list_t list, list2;
     igraph_vector_int_t v;
+    igraph_vector_int_t* v_ptr;
     igraph_integer_t i;
 
     printf("Initialise empty vector list\n");
@@ -178,6 +179,29 @@ int main() {
     print_vector_int_list(&list);
     print_vector_int(&v);
     igraph_vector_int_destroy(&v);
+    igraph_vector_int_list_destroy(&list);
+
+    printf("Test igraph_vector_int_list_insert, igraph_vector_int_list_insert_new and igraph_vector_int_list_insert_copy\n");
+    igraph_vector_int_list_init(&list, 3);
+    for (i = 0; i < 3; i++) {
+        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&list, i), i + 1);
+    }
+
+    igraph_vector_int_list_insert_new(&list, 2, &v_ptr);
+    igraph_vector_int_push_back(v_ptr, 13);
+    igraph_vector_int_push_back(v_ptr, 61);
+
+    igraph_vector_int_init(&v, 3);
+    VECTOR(v)[0] = 77; VECTOR(v)[1] = 42; VECTOR(v)[2] = 317;
+    igraph_vector_int_list_insert(&list, 1, &v);
+
+    igraph_vector_int_init(&v, 2);
+    VECTOR(v)[0] = 11; VECTOR(v)[1] = -3;
+    igraph_vector_int_list_insert_copy(&list, 1, &v);
+    igraph_vector_int_push_back(&v, -51);
+    igraph_vector_int_destroy(&v);
+
+    print_vector_int_list(&list);
     igraph_vector_int_list_destroy(&list);
 
     printf("Test errors\n");
