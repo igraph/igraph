@@ -22,6 +22,8 @@
 
 */
 
+/* LCOV_EXCL_START */
+
 #include "igraph_types.h"
 #include "igraph_spmatrix.h"
 #include "igraph_error.h"
@@ -1120,3 +1122,5 @@ igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *fil
 
     return IGRAPH_SUCCESS;
 }
+
+/* LCOV_EXCL_STOP */
