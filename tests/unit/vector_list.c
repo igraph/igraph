@@ -152,7 +152,7 @@ int main() {
     print_vector_int_list(&list);
     igraph_vector_int_list_destroy(&list);
 
-    printf("Test igraph_vector_int_list_swap\n");
+    printf("Test igraph_vector_int_list_swap and igraph_vector_int_list_swap_elements\n");
     igraph_vector_int_list_init(&list, 5);
     igraph_vector_int_list_init(&list2, 10);
     for (i = 0; i < igraph_vector_int_list_size(&list); i++) {
@@ -161,6 +161,8 @@ int main() {
         igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&list2, i * 2 + 1), 2 * i);
     }
     igraph_vector_int_list_swap(&list, &list2);
+    igraph_vector_int_list_swap_elements(&list, 9, 8);
+    igraph_vector_int_list_swap_elements(&list, 3, 6);
     print_vector_int_list(&list);
     print_vector_int_list(&list2);
     igraph_vector_int_list_destroy(&list);
