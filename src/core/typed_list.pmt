@@ -287,7 +287,6 @@ igraph_integer_t FUNCTION(size)(const TYPE* v) {
  */
 igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
     igraph_integer_t old_size;
-    igraph_error_t retval;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
@@ -296,18 +295,13 @@ igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
 
     old_size = FUNCTION(size)(v);
 
-    v->end = v->stor_begin + new_size;
-
     if (old_size < new_size) {
-        retval = INTERNAL_FUNCTION(init_slice)(v, v->stor_begin + old_size, v->end);
-        if (retval) {
-            /* undo the change in v->end */
-            v->end = v->stor_begin + old_size;
-            IGRAPH_CHECK(retval);
-        }
+        IGRAPH_CHECK(INTERNAL_FUNCTION(init_slice)(v, v->stor_begin + old_size, v->stor_begin + new_size));
     } else if (old_size > new_size) {
-        INTERNAL_FUNCTION(destroy_slice)(v, v->end, v->stor_begin + old_size);
+        INTERNAL_FUNCTION(destroy_slice)(v, v->stor_begin + new_size, v->stor_begin + old_size);
     }
+
+    v->end = v->stor_begin + new_size;
 
     return IGRAPH_SUCCESS;
 }
@@ -449,7 +443,8 @@ ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v) {
  * \param v The list object.
  * \param index Index of the item to be discarded and destroyed.
  * \sa \ref igraph_vector_list_discard_fast() if you do not care about the
- * order of the items in the list.
+ * order of the items in the list, \ref igraph_vector_list_remove() if you
+ * want to gain ownership of the item that was removed instead of destroying it.
  *
  * Time complexity: O(n), where n is the number of items in the list.
  */
@@ -496,7 +491,8 @@ void FUNCTION(discard_back)(TYPE* v) {
  * \param v The list object.
  * \param index Index of the item to be discarded and destroyed.
  * \sa \ref igraph_vector_list_discard() if you want to preserve the order of the
- * items in the list.
+ * items in the list, \ref igraph_vector_list_remove_fast() if you want to gain
+ * ownership of the item that was removed instead of destroying it.
  *
  * Time complexity: O(1).
  */
@@ -713,9 +709,10 @@ igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** e
  * \param index Index of the item to be removed.
  * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
  *        item that was removed from the list. Ownership of this vector is
- *        passed on to the caller.
- * \sa \ref igraph_vector_list_remove_fast() if you do not care about the
- * order of the items in the list.
+ *        passed on to the caller. It is an error to supply a null pointer here.
+ * \sa \ref igraph_vector_list_discard() if you are not interested in the item
+ * that was removed, \ref igraph_vector_list_remove_fast() if you do not care
+ * about the order of the items in the list.
  *
  * Time complexity: O(n), where n is the number of items in the list.
  */
@@ -776,9 +773,13 @@ ITEM_TYPE FUNCTION(pop_back)(TYPE* v) {
  * needed any more.
  *
  * \param v The list object.
- * \param index Index of the item to be discarded and destroyed.
- * \sa \ref igraph_vector_list_discard() if you want to preserve the order of the
- * items in the list.
+ * \param index Index of the item to be removed.
+ * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
+ *        item that was removed from the list. Ownership of this vector is
+ *        passed on to the caller. It is an error to supply a null pointer here.
+ * \sa \ref igraph_vector_list_remove() if you want to preserve the order of the
+ * items in the list, \ref igraph_vector_list_discard_fast() if you are not
+ * interested in the item that was removed.
  *
  * Time complexity: O(1).
  */
@@ -787,9 +788,6 @@ igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE*
 
     IGRAPH_ASSERT(result != 0);
 
-    if (size <= 0) {
-        IGRAPH_ERROR("list is already empty", IGRAPH_EINVAL);
-    }
     if (index < 0 || index >= size) {
         IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
     }
