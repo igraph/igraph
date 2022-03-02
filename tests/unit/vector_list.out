@@ -138,4 +138,11 @@ Test igraph_vector_int_list_swap and igraph_vector_int_list_swap_elements
   3: ( 60 )
   4: ( 80 )
 }
+Test igraph_vector_int_list_replace
+{
+  0: ( 1 )
+  1: ( 77 42 317 )
+  2: ( 3 )
+}
+( 2 )
 Test errors

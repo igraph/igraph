@@ -167,6 +167,19 @@ int main() {
     print_vector_int_list(&list2);
     igraph_vector_int_list_destroy(&list);
 
+    printf("Test igraph_vector_int_list_replace\n");
+    igraph_vector_int_list_init(&list, 3);
+    for (i = 0; i < 3; i++) {
+        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&list, i), i + 1);
+    }
+    igraph_vector_int_init(&v, 3);
+    VECTOR(v)[0] = 77; VECTOR(v)[1] = 42; VECTOR(v)[2] = 317;
+    igraph_vector_int_list_replace(&list, 1, &v);
+    print_vector_int_list(&list);
+    print_vector_int(&v);
+    igraph_vector_int_destroy(&v);
+    igraph_vector_int_list_destroy(&list);
+
     printf("Test errors\n");
     igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_vector_int_list_init(&list, 10);
