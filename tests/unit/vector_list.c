@@ -167,6 +167,7 @@ int main() {
     print_vector_int_list(&list);
     print_vector_int_list(&list2);
     igraph_vector_int_list_destroy(&list);
+    igraph_vector_int_list_destroy(&list2);
 
     printf("Test igraph_vector_int_list_replace\n");
     igraph_vector_int_list_init(&list, 3);
