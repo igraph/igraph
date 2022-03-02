@@ -93,6 +93,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** result
 IGRAPH_EXPORT ITEM_TYPE FUNCTION(pop_back)(TYPE* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
+IGRAPH_EXPORT void FUNCTION(replace)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
 
 /*------------------*/
 /* Exchanging items */
@@ -100,7 +101,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t ind
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t *index);
 IGRAPH_EXPORT igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2);
-IGRAPH_EXPORT void FUNCTION(swap_elements)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+IGRAPH_EXPORT igraph_error_t FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
 
 /*-----------*/
 /* Sorting   */

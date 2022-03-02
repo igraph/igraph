@@ -369,6 +369,32 @@ void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
 }
 
 /**
+ * \ingroup vector_list
+ * \function igraph_vector_list_replace
+ * \brief Replaces the vector at the given index in the list with another one.
+ *
+ * </para><para>
+ * This function replaces the vector that is already at the given index \p pos
+ * in the list with the vector pointed to by \p e. The ownership of the vector
+ * pointed to by \p e is taken by the list so the user is not responsible for
+ * destroying \p e any more. At the same time, the ownership of the vector that
+ * \em was in the list at position \p pos will be transferred to the caller and
+ * \p e will be updated to point to it, so the caller becomes responsible for
+ * destroying it when it does not need the vector any more.
+ *
+ * \param v The list object.
+ * \param pos The index to modify in the list.
+ * \param e The vector to swap with the one already in the list.
+ *
+ * Time complexity: O(1).
+ */
+void FUNCTION(replace)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
+    ITEM_TYPE old_value = *(FUNCTION(get_ptr)(v, pos));
+    v->stor_begin[pos] = *e;
+    *e = old_value;
+}
+
+/**
  * \function igraph_vector_list_swap
  * \brief Swaps all elements of two vector lists.
  *
@@ -390,29 +416,24 @@ igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2) {
 }
 
 /**
- * \ingroup vector_list
  * \function igraph_vector_list_swap_elements
- * \brief Swaps the vector at the given index in the list with another one.
+ * \brief Swap two elements in a vector list.
  *
- * </para><para>
- * This function replaces the vector that is already at the given index \p pos
- * in the list with the vector pointed to by \p e. The ownership of the vector
- * pointed to by \p e is taken by the list so the user is not responsible for
- * destroying \p e any more. At the same time, the ownership of the vector that
- * \em was in the list at position \p pos will be transferred to the caller and
- * \p e will be updated to point to it, so the caller becomes responsible for
- * destroying it when it does not need the vector any more.
- *
- * \param v The list object.
- * \param pos The index to modify in the list.
- * \param e The vector to swap with the one already in the list.
+ * Note that currently no range checking is performed.
+ * \param v The input list.
+ * \param i Index of the first element.
+ * \param j Index of the second element (may be the same as the
+ * first one).
+ * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * Time complexity: O(1).
  */
-void FUNCTION(swap_elements)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
-    ITEM_TYPE old_value = *(FUNCTION(get_ptr)(v, pos));
-    v->stor_begin[pos] = *e;
-    *e = old_value;
+
+igraph_error_t FUNCTION(swap_elements)(TYPE *v1, igraph_integer_t i, igraph_integer_t j) {
+    ITEM_TYPE tmp = v1->stor_begin[i];
+    v1->stor_begin[i] = v1->stor_begin[j];
+    v1->stor_begin[j] = tmp;
+    return IGRAPH_SUCCESS;
 }
 
 /**

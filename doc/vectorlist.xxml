@@ -20,8 +20,9 @@
 <section id="vector-list-accessing-elements">
 <!-- doxrox-include igraph_vector_list_accessing_elements -->
 <!-- doxrox-include igraph_vector_list_get_ptr -->
-<!-- doxrox-include igraph_vector_list_set -->
 <!-- doxrox-include igraph_vector_list_tail_ptr -->
+<!-- doxrox-include igraph_vector_list_set -->
+<!-- doxrox-include igraph_vector_list_replace -->
 </section>
 
 <section id="vector-list-properties"><title>Vector properties</title>
