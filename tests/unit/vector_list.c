@@ -26,7 +26,7 @@
 #include "test_utilities.inc"
 
 int main() {
-    igraph_vector_int_list_t list;
+    igraph_vector_int_list_t list, list2;
     igraph_vector_int_t v;
     igraph_integer_t i;
 
@@ -150,6 +150,19 @@ int main() {
     igraph_vector_int_list_discard_fast(&list, 0);
     igraph_vector_int_list_discard_fast(&list, 4);
     print_vector_int_list(&list);
+    igraph_vector_int_list_destroy(&list);
+
+    printf("Test igraph_vector_int_list_swap\n");
+    igraph_vector_int_list_init(&list, 5);
+    igraph_vector_int_list_init(&list2, 10);
+    for (i = 0; i < igraph_vector_int_list_size(&list); i++) {
+        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&list, i), 20 * i);
+        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&list2, i * 2), i);
+        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&list2, i * 2 + 1), 2 * i);
+    }
+    igraph_vector_int_list_swap(&list, &list2);
+    print_vector_int_list(&list);
+    print_vector_int_list(&list2);
     igraph_vector_int_list_destroy(&list);
 
     printf("Test errors\n");
