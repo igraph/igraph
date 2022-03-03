@@ -44,21 +44,20 @@
 
 */
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "config.h"
 
-#include "core/math.h"
 #include "io/gml-header.h"
 #include "io/gml-tree.h"
 #include "io/parsers/gml-parser.h"
 #include "io/parsers/gml-lexer.h"
 #include "io/parse_utils.h"
 #include "internal/hacks.h" /* strcasecmp */
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
 
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
                        const char *s);

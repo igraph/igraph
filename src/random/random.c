@@ -29,7 +29,6 @@
 #include "igraph_vector.h"
 #include "igraph_memory.h"
 
-#include "core/math.h"
 #include "random/random_internal.h"
 
 #include "config.h"
@@ -936,46 +935,6 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
         return igraph_i_rexp(rng, rate);
     }
 }
-
-
-#ifndef HAVE_EXPM1
-#ifndef USING_R         /* R provides a replacement */
-/* expm1 replacement */
-double expm1 (double x) {
-    if (fabs(x) < M_LN2) {
-        /* Compute the Taylor series S = x + (1/2!) x^2 + (1/3!) x^3 + ... */
-
-        double i = 1.0;
-        double sum = x;
-        double term = x / 1.0;
-
-        do {
-            term *= x / ++i;
-            sum += term;
-        } while (fabs(term) > fabs(sum) * 2.22e-16);
-
-        return sum;
-    }
-
-    return expl(x) - 1.0L;
-}
-#endif
-#endif
-
-#ifndef HAVE_RINT
-#ifndef USING_R         /* R provides a replacement */
-/* rint replacement */
-double rint (double x) {
-    return ( (x < 0.) ? -floor(-x + .5) : floor(x + .5) );
-}
-#endif
-#endif
-
-#ifndef HAVE_RINTF
-float rintf (float x) {
-    return ( (x < (float)0.) ? -(float)floor(-x + .5) : (float)floor(x + .5) );
-}
-#endif
 
 /*
  * \ingroup internal

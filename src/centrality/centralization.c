@@ -24,8 +24,6 @@
 #include "igraph_structural.h"
 #include "igraph_vector.h"
 
-#include "core/math.h"
-
 /**
  * \function igraph_centralization
  * Calculate the centralization score from the node level scores

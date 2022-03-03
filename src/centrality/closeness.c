@@ -27,7 +27,6 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 /***** Closeness centrality *****/
 

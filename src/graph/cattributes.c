@@ -26,8 +26,6 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-#include "core/math.h"
-
 #include <string.h>
 
 /* An attribute is either a numeric vector (vector_t) or a string

@@ -27,8 +27,6 @@
 #include "igraph_psumtree.h"
 #include "igraph_error.h"
 
-#include "core/math.h"
-
 #include <math.h>
 
 /**

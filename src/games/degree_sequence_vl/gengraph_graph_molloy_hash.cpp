@@ -30,12 +30,12 @@
 #include "gengraph_degree_sequence.h"
 #include "gengraph_graph_molloy_hash.h"
 
-#include "config.h"
-#include "core/math.h"
 #include "igraph_constructors.h"
 #include "igraph_error.h"
 #include "igraph_statusbar.h"
 #include "igraph_progress.h"
+
+#include "config.h"
 
 namespace gengraph {
 

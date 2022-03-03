@@ -26,8 +26,6 @@
 #include "igraph_operators.h"
 #include "igraph_random.h"
 
-#include "core/math.h"
-
 #include "config.h"
 
 /*

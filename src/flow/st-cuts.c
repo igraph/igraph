@@ -33,7 +33,6 @@
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
 
-#include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
 #include "flow/flow_internal.h"

@@ -44,20 +44,19 @@
 
 */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
 
-#include "core/math.h"
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
 #include "io/parsers/ncol-lexer.h"
 #include "io/parse_utils.h"
 #include "internal/hacks.h"
+
+#include <stdio.h>
+#include <string.h>
 
 int igraph_ncol_yyerror(YYLTYPE* locp,
                         igraph_i_ncol_parsedata_t *context,

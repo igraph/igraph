@@ -46,11 +46,11 @@
 #include "pottsmodel_2.h"
 
 #include "igraph_community.h"
-#include "igraph_error.h"
-#include "igraph_random.h"
-#include "core/math.h"
-#include "igraph_interface.h"
 #include "igraph_components.h"
+#include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_random.h"
+
 #include "core/interruption.h"
 #include "core/exceptions.h"
 

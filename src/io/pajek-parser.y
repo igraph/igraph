@@ -44,22 +44,21 @@
 
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_attributes.h"
 #include "config.h"
 
-#include "core/math.h"
 #include "io/pajek-header.h"
 #include "io/parsers/pajek-parser.h" /* it must come first because of YYSTYPE */
 #include "io/parsers/pajek-lexer.h"
 #include "io/parse_utils.h"
 #include "internal/hacks.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
 
 int igraph_pajek_yyerror(YYLTYPE* locp,
                          igraph_i_pajek_parsedata_t *context,
