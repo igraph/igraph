@@ -1130,7 +1130,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
         return IGRAPH_SUCCESS;
     }
     if (length == N) {
-        long int i = 0;
+        igraph_integer_t i = 0;
         IGRAPH_CHECK(igraph_vector_resize(res, length));
         for (i = 0; i < length; i++) {
             VECTOR(*res)[i] = l++;
