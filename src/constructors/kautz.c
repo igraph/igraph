@@ -63,7 +63,6 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     /* m+1 - number of symbols */
     /* n+1 - length of strings */
 
-    igraph_integer_t mm = m;
     igraph_integer_t no_of_nodes, no_of_edges;
     igraph_integer_t allstrings;
     igraph_integer_t i, j, idx = 0;
@@ -95,6 +94,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         }
         IGRAPH_SAFE_MULT(m+1, m_to_pow_n, &no_of_nodes);
     }
+    /* no_of_edges = m * no_of_nodes */
     IGRAPH_SAFE_MULT(no_of_nodes, m, &no_of_edges);
 
     {
@@ -177,8 +177,8 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     /* Now come the edges at last */
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t fromvalue = VECTOR(index2)[i];
-        igraph_integer_t lastdigit = fromvalue % (mm + 1);
-        igraph_integer_t basis = (fromvalue * (mm + 1)) % allstrings;
+        igraph_integer_t lastdigit = fromvalue % (m + 1);
+        igraph_integer_t basis = (fromvalue * (m + 1)) % allstrings;
         for (j = 0; j <= m; j++) {
             igraph_integer_t tovalue, to;
             if (j == lastdigit) {

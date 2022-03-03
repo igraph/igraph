@@ -63,7 +63,6 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     igraph_integer_t no_of_nodes, no_of_edges;
     igraph_vector_int_t edges;
     igraph_integer_t i, j;
-    igraph_integer_t mm = m;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph",
@@ -85,6 +84,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
                           m, n);
         }
     }
+    /* no_of_edges = m * no_of_nodes */
     IGRAPH_SAFE_MULT(no_of_nodes, m, &no_of_edges);
 
     {
@@ -95,7 +95,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     }
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t basis = (i * mm) % no_of_nodes;
+        igraph_integer_t basis = (i * m) % no_of_nodes;
         for (j = 0; j < m; j++) {
             igraph_vector_int_push_back(&edges, i);
             igraph_vector_int_push_back(&edges, basis + j);
