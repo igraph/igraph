@@ -56,7 +56,6 @@ add_library(
   core/psumtree.c
   core/set.c
   core/sparsemat.c
-  core/spmatrix.c
   core/stack.c
   core/statusbar.c
   core/strvector.c

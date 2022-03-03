@@ -423,6 +423,11 @@
    return the vector of edge IDs in the spanning tree instead of an
    `igraph_vector_t`.
 
+ - `igraph_spmatrix_t` and related functions were removed as they mostly
+   duplicated functionality that was already present in `igraph_sparsemat_t`.
+   Functions that used `igraph_spmatrix_t` in the library now use
+   `igraph_sparsemat_t`.
+
  - `igraph_stochastic_imitation()` now expects the list of strategies
    in an `igraph_vector_int_t` instead of an `igraph_int_t`.
 
@@ -532,11 +537,6 @@
    `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
    instead of `igraph_matrix_t()` for its memberships parameter.
 
- - Every `igraph_spmatrix_*()` function and struct now uses `igraph_integer_t`
-   instead of `long int` for the numbers of rows and columns, and row and column
-   indexes. Note that `igraph_spmatrix_t` itself has been deprecated in favour
-   of `igraph_sparsemat_t`.
-
  - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
    instead.
 
@@ -595,9 +595,6 @@
    the old name is deprecated and might be re-used as a generic DIMACS reader
    in the future. Also, the function now uses `igraph_integer_t` as the source
    and target vertex IDs instead of a `long int`.
-
- - `igraph_spmatrix_t` and its related functions are deprecated in favour of
-   `igraph_sparsemat_t`. These will be removed in 0.11.
 
  - `igraph_strvector_add()` has been renamed to `igraph_strvector_push_back()`
    for sake of consistency with other vector-like data structures; the old name
