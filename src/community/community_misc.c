@@ -46,10 +46,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef USING_R
-    #include <R.h>
-#endif
-
 /**
  * \function igraph_community_to_membership
  * \brief Create membership vector from community structure dendrogram
