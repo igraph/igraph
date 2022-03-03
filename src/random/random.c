@@ -642,11 +642,11 @@ igraph_rng_t *igraph_rng_default() {
 
 /* ------------------------------------ */
 
-static double igraph_norm_rand(igraph_rng_t *rng);
-static double igraph_rgeom(igraph_rng_t *rng, double p);
-static double igraph_rbinom(igraph_rng_t *rng, double nin, double pp);
-static double igraph_rexp(igraph_rng_t *rng, double rate);
-static double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
+static double igraph_i_norm_rand(igraph_rng_t *rng);
+static double igraph_i_rgeom(igraph_rng_t *rng, double p);
+static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp);
+static double igraph_i_rexp(igraph_rng_t *rng, double rate);
+static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
 
 /**
  * \function igraph_rng_init
@@ -796,7 +796,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
     if (type->get_norm) {
         return type->get_norm(rng->state) * s + m;
     } else {
-        return igraph_norm_rand(rng) * s + m;
+        return igraph_i_norm_rand(rng) * s + m;
     }
 }
 
@@ -866,7 +866,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
     if (type->get_geom) {
         return type->get_geom(rng->state, p);
     } else {
-        return igraph_rgeom(rng, p);
+        return igraph_i_rgeom(rng, p);
     }
 }
 
@@ -889,7 +889,7 @@ igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
     if (type->get_binom) {
         return type->get_binom(rng->state, n, p);
     } else {
-        return igraph_rbinom(rng, n, p);
+        return igraph_i_rbinom(rng, n, p);
     }
 }
 
@@ -912,7 +912,7 @@ igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
     if (type->get_gamma) {
         return type->get_gamma(rng->state, shape, scale);
     } else {
-        return igraph_rgamma(rng, shape, scale);
+        return igraph_i_rgamma(rng, shape, scale);
     }
 }
 
@@ -933,7 +933,7 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
     if (type->get_exp) {
         return type->get_exp(rng->state, rate);
     } else {
-        return igraph_rexp(rng, rate);
+        return igraph_i_rexp(rng, rate);
     }
 }
 
@@ -1587,7 +1587,7 @@ void bratio(double a, double b, double x, double y,
         return R_D__0;                  \
     }
 
-double igraph_qnorm5(double p, double mu, double sigma, int lower_tail, int log_p) {
+static double igraph_i_qnorm5(double p, double mu, double sigma, int lower_tail, int log_p) {
     double p_, q, r, val;
 
 #ifdef IEEE_754
@@ -1704,7 +1704,7 @@ static int imin2(int x, int y) {
     return (x < y) ? x : y;
 }
 
-static double igraph_norm_rand(igraph_rng_t *rng) {
+static double igraph_i_norm_rand(igraph_rng_t *rng) {
 
     double u1;
 
@@ -1712,7 +1712,7 @@ static double igraph_norm_rand(igraph_rng_t *rng) {
     /* unif_rand() alone is not of high enough precision */
     u1 = igraph_rng_get_unif01(rng);
     u1 = (int)(BIG * u1) + igraph_rng_get_unif01(rng);
-    return igraph_qnorm5(u1 / BIG, 0.0, 1.0, 1, 0);
+    return igraph_i_qnorm5(u1 / BIG, 0.0, 1.0, 1, 0);
 }
 
 /*
@@ -1751,7 +1751,7 @@ static double igraph_norm_rand(igraph_rng_t *rng) {
  *    Comm. ACM, 15, 873-882.
  */
 
-double igraph_exp_rand(igraph_rng_t *rng) {
+static double igraph_i_exp_rand(igraph_rng_t *rng) {
     /* q[k-1] = sum(log(2)^k / k!)  k=1,..,n, */
     /* The highest n (here 8) is determined by q[n-1] = 1.0 */
     /* within standard precision */
@@ -1863,7 +1863,7 @@ double igraph_exp_rand(igraph_rng_t *rng) {
 #define TRUE  1
 #define M_1_SQRT_2PI    0.398942280401432677939946059934     /* 1/sqrt(2pi) */
 
-static double igraph_rpois(igraph_rng_t *rng, double mu) {
+static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
     /* Factorial Table (0:9)! */
     const double fact[10] = {
         1., 1., 2., 6., 24., 120., 720., 5040., 40320., 362880.
@@ -1960,7 +1960,7 @@ static double igraph_rpois(igraph_rng_t *rng, double mu) {
     /* Only if mu >= 10 : ----------------------- */
 
     /* Step N. normal sample */
-    g = mu + s * igraph_norm_rand(rng);/* norm_rand() ~ N(0,1), standard normal */
+    g = mu + s * igraph_i_norm_rand(rng);/* norm_rand() ~ N(0,1), standard normal */
 
     if (g >= 0.) {
         pois = floor(g);
@@ -2008,7 +2008,7 @@ static double igraph_rpois(igraph_rng_t *rng, double mu) {
     repeat {
         /* Step E. Exponential Sample */
 
-        E = igraph_exp_rand(rng);/* ~ Exp(1) (standard exponential) */
+        E = igraph_i_exp_rand(rng);/* ~ Exp(1) (standard exponential) */
 
         /*  sample t from the laplace 'hat'
             (if t <= -0.6744 then pk < fk for all mu >= 10.) */
@@ -2069,19 +2069,19 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 #undef a6
 #undef a7
 
-static double igraph_rgeom(igraph_rng_t *rng, double p) {
+static double igraph_i_rgeom(igraph_rng_t *rng, double p) {
     if (igraph_is_nan(p) || p <= 0 || p > 1) {
         ML_ERR_return_NAN;
     }
 
-    return igraph_rpois(rng, igraph_exp_rand(rng) * ((1 - p) / p));
+    return igraph_i_rpois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
 }
 
 /* This is from nmath/rbinom.c */
 
 #define repeat for(;;)
 
-static double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
+static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp) {
     /* FIXME: These should become THREAD_specific globals : */
 
     static IGRAPH_THREAD_LOCAL double c, fm, npq, p1, p2, p3, p4, qn;
@@ -2259,7 +2259,7 @@ finis:
     return (double)ix;
 }
 
-static igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
+static igraph_real_t igraph_i_rexp(igraph_rng_t *rng, double rate) {
     igraph_real_t scale = 1.0 / rate;
     if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
         if (scale == 0.0) {
@@ -2267,7 +2267,7 @@ static igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
         }
         return IGRAPH_NAN;
     }
-    return scale * igraph_exp_rand(rng);
+    return scale * igraph_i_exp_rand(rng);
 }
 
 /*
@@ -2381,7 +2381,7 @@ double igraph_dnorm(double x, double mu, double sigma, int give_log) {
  *    Output: a variate from the gamma(a)-distribution
  */
 
-static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
+static double igraph_i_rgamma(igraph_rng_t *rng, double a, double scale) {
     /* Constants : */
     static const double sqrt32 = 5.656854;
     static const double exp_m1 = 0.36787944117144232159;/* exp(-1) = 1/e */
@@ -2430,12 +2430,12 @@ static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
             p = e * igraph_rng_get_unif01(rng);
             if (p >= 1.0) {
                 x = -log((e - p) / a);
-                if (igraph_exp_rand(rng) >= (1.0 - a) * log(x)) {
+                if (igraph_i_exp_rand(rng) >= (1.0 - a) * log(x)) {
                     break;
                 }
             } else {
                 x = exp(log(p) / a);
-                if (igraph_exp_rand(rng) >= x) {
+                if (igraph_i_exp_rand(rng) >= x) {
                     break;
                 }
             }
@@ -2456,7 +2456,7 @@ static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
                x = (s,1/2) -normal deviate. */
 
     /* immediate acceptance (i) */
-    t = igraph_norm_rand(rng);
+    t = igraph_i_norm_rand(rng);
     x = s + 0.5 * t;
     ret_val = x * x;
     if (t >= 0.0) {
@@ -2518,7 +2518,7 @@ static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
         /* Step 8: e = standard exponential deviate
          *  u =  0,1 -uniform deviate
          *  t = (b,si)-double exponential (laplace) sample */
-        e = igraph_exp_rand(rng);
+        e = igraph_i_exp_rand(rng);
         u = igraph_rng_get_unif01(rng);
         u = u + u - 1.0;
         if (u < 0.0) {
