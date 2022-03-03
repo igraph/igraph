@@ -232,6 +232,11 @@ IGRAPH_THREAD_LOCAL struct igraph_i_protectedPtr igraph_i_finally_stack[100];
 IGRAPH_THREAD_LOCAL int igraph_i_finally_stack_size = 0;
 IGRAPH_THREAD_LOCAL int igraph_i_finally_stack_level = 0;
 
+static void igraph_i_reset_finally_stack(void) {
+    igraph_i_finally_stack_size = 0;
+    igraph_i_finally_stack_level = 0;
+}
+
 /*
  * Adds another element to the free list
  */
@@ -240,14 +245,12 @@ void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
     int no = igraph_i_finally_stack_size;
     if (no < 0) {
         /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
-        igraph_i_finally_stack_size = 0;
-        igraph_i_finally_stack_level = 0;
+        igraph_i_reset_finally_stack();
         IGRAPH_FATALF("Corrupt finally stack: it contains %d elements.", no);
     }
     if (no >= (int) (sizeof(igraph_i_finally_stack) / sizeof(igraph_i_finally_stack[0]))) {
         /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
-        igraph_i_finally_stack_size = 0;
-        igraph_i_finally_stack_level = 0;
+        igraph_i_reset_finally_stack();
         IGRAPH_FATALF("Finally stack too large: it contains %d elements.", no);
     }
     igraph_i_finally_stack[no].ptr = ptr;
@@ -261,8 +264,7 @@ void IGRAPH_FINALLY_CLEAN(int minus) {
     if (igraph_i_finally_stack_size < 0) {
         int left = igraph_i_finally_stack_size + minus;
         /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
-        igraph_i_finally_stack_size = 0;
-        igraph_i_finally_stack_level = 0;
+        igraph_i_reset_finally_stack();
         IGRAPH_FATALF("Corrupt finally stack: trying to pop %d element(s) when only %d left.", minus, left);
     }
 }
@@ -287,8 +289,7 @@ void IGRAPH_FINALLY_ENTER(void) {
     /* Level indices must always be in increasing order in the finally stack */
     if (no > 0 && igraph_i_finally_stack[no-1].level > igraph_i_finally_stack_level) {
         /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
-        igraph_i_finally_stack_size = 0;
-        igraph_i_finally_stack_level = 0;
+        igraph_i_reset_finally_stack();
         IGRAPH_FATAL("Corrupt finally stack: cannot create new finally stack level before last one is freed.");
     }
     igraph_i_finally_stack_level++;
@@ -298,8 +299,7 @@ void IGRAPH_FINALLY_EXIT(void) {
     igraph_i_finally_stack_level--;
     if (igraph_i_finally_stack_level < 0) {
         /* Reset finally stack in case fatal error handler does a longjmp instead of terminating the process: */
-        igraph_i_finally_stack_size = 0;
-        igraph_i_finally_stack_level = 0;
+        igraph_i_reset_finally_stack();
         IGRAPH_FATAL("Corrupt finally stack: trying to exit outermost finally stack level.");
     }
 }
