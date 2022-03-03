@@ -1310,53 +1310,6 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 
 #define ML_ERR_return_NAN { ML_ERROR(ME_DOMAIN); return ML_NAN; }
 
-/* Wilcoxon Rank Sum Distribution */
-
-#define WILCOX_MAX 50
-
-/* Wilcoxon Signed Rank Distribution */
-
-#define SIGNRANK_MAX 50
-
-/* Formerly private part of Mathlib.h */
-
-/* always remap internal functions */
-#define bd0             Rf_bd0
-#define chebyshev_eval  Rf_chebyshev_eval
-#define chebyshev_init  Rf_chebyshev_init
-#define i1mach          Rf_i1mach
-#define gammalims       Rf_gammalims
-#define lfastchoose     Rf_lfastchoose
-#define lgammacor       Rf_lgammacor
-#define stirlerr        Rf_stirlerr
-
-/* Chebyshev Series */
-
-int chebyshev_init(double*, int, double);
-double  chebyshev_eval(double, const double *, const int);
-
-/* Gamma and Related Functions */
-
-void    gammalims(double*, double*);
-double  lgammacor(double); /* log(gamma) correction */
-double  stirlerr(double);  /* Stirling expansion "error" */
-
-double  lfastchoose(double, double);
-
-double  bd0(double, double);
-
-/* Consider adding these two to the API (Rmath.h): */
-double  dbinom_raw(double, double, double, double, int);
-double  dpois_raw (double, double, int);
-double  pnchisq_raw(double, double, double, double, double, int);
-
-int i1mach(int);
-
-/* From toms708.c */
-void bratio(double a, double b, double x, double y,
-            double *w, double *w1, int *ierr);
-
-
 #endif /* MATHLIB_PRIVATE_H */
 
 
