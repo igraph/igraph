@@ -491,8 +491,6 @@ const igraph_rng_type_t igraph_rngtype_mt19937 = {
 
 /* ------------------------------------ */
 
-#ifndef USING_R
-
 igraph_i_rng_mt19937_state_t igraph_i_rng_default_state;
 
 #define addr(a) (&a)
@@ -535,96 +533,6 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
     igraph_i_rng_default = (*rng);
 }
 
-#endif
-
-
-/* ------------------------------------ */
-
-#ifdef USING_R
-
-double  unif_rand(void);
-double  norm_rand(void);
-double  exp_rand(void);
-double  Rf_rgeom(double);
-double  Rf_rbinom(double, double);
-double  Rf_rgamma(double, double);
-
-int igraph_rng_R_init(void **state) {
-    IGRAPH_ERROR("R RNG error, unsupported function called",
-                 IGRAPH_EINTERNAL);
-    return IGRAPH_SUCCESS;
-}
-
-void igraph_rng_R_destroy(void *state) {
-    igraph_error("R RNG error, unsupported function called",
-                 __FILE__, __LINE__, IGRAPH_EINTERNAL);
-}
-
-int igraph_rng_R_seed(void *state, unsigned long int seed) {
-    IGRAPH_ERROR("R RNG error, unsupported function called",
-                 IGRAPH_EINTERNAL);
-    return IGRAPH_SUCCESS;
-}
-
-unsigned long int igraph_rng_R_get(void *state) {
-    return (unsigned long) (unif_rand() * 0x7FFFFFFFUL);
-}
-
-igraph_real_t igraph_rng_R_get_real(void *state) {
-    return unif_rand();
-}
-
-igraph_real_t igraph_rng_R_get_norm(void *state) {
-    return norm_rand();
-}
-
-igraph_real_t igraph_rng_R_get_geom(void *state, igraph_real_t p) {
-    return Rf_rgeom(p);
-}
-
-igraph_real_t igraph_rng_R_get_binom(void *state, long int n,
-                                     igraph_real_t p) {
-    return Rf_rbinom(n, p);
-}
-
-igraph_real_t igraph_rng_R_get_gamma(void *state, igraph_real_t shape,
-                                     igraph_real_t scale) {
-    return Rf_rgamma(shape, scale);
-}
-
-igraph_real_t igraph_rng_R_get_exp(void *state, igraph_real_t rate) {
-    igraph_real_t scale = 1.0 / rate;
-    if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
-        if (scale == 0.0) {
-            return 0.0;
-        }
-        return IGRAPH_NAN;
-    }
-    return scale * exp_rand();
-}
-
-igraph_rng_type_t igraph_rngtype_R = {
-    /* name= */      "GNU R",
-    /* min=  */      0,
-    /* max=  */      0x7FFFFFFFUL,
-    /* init= */      igraph_rng_R_init,
-    /* destroy= */   igraph_rng_R_destroy,
-    /* seed= */      igraph_rng_R_seed,
-    /* get= */       igraph_rng_R_get,
-    /* get_real= */  igraph_rng_R_get_real,
-    /* get_norm= */  igraph_rng_R_get_norm,
-    /* get_geom= */  igraph_rng_R_get_geom,
-    /* get_binom= */ igraph_rng_R_get_binom,
-    /* get_exp= */   igraph_rng_R_get_exp
-};
-
-IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
-    &igraph_rngtype_R,
-    0,
-    /* def= */ 1
-};
-
-#endif
 
 /* ------------------------------------ */
 
@@ -1306,39 +1214,6 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 
     return retval;
 }
-
-#ifdef USING_R
-
-/* These are never called. But they are correct, nevertheless */
-
-double igraph_norm_rand(igraph_rng_t *rng) {
-    return norm_rand();
-}
-
-double igraph_rgeom(igraph_rng_t *rng, double p) {
-    return Rf_rgeom(p);
-}
-
-double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
-    return Rf_rbinom(nin, pp);
-}
-
-double igraph_rexp(igraph_rng_t *rng, double rate) {
-    igraph_real_t scale = 1.0 / rate;
-    if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
-        if (scale == 0.0) {
-            return 0.0;
-        }
-        return IGRAPH_NAN;
-    }
-    return scale * exp_rand();
-}
-
-double igraph_rgamma(igraph_rng_t *rng, double shape, double scale) {
-    return Rf_rgamma(shape, scale);
-}
-
-#else
 
 /*
  *  Mathlib : A C Library of Special Functions
@@ -2454,8 +2329,6 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double a, double scale) {
     return scale * x * x;
 }
 
-#endif
-
 igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                              const igraph_vector_t *alpha,
                              igraph_vector_t *result) {
@@ -2489,33 +2362,3 @@ igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
 
     return IGRAPH_SUCCESS;
 }
-
-/**********************************************************
- * Testing purposes                                       *
- *********************************************************/
-
-/* int main() { */
-
-/*   int i; */
-
-/*   RNG_BEGIN(); */
-
-/*   for (i=0; i<1000; i++) { */
-/*     printf("%li ", RNG_INTEGER(1,10)); */
-/*   } */
-/*   printf("\n"); */
-
-/*   for (i=0; i<1000; i++) { */
-/*     printf("%f ", RNG_UNIF(0,1)); */
-/*   } */
-/*   printf("\n"); */
-
-/*   for (i=0; i<1000; i++) { */
-/*     printf("%f ", RNG_NORMAL(0,5)); */
-/*   } */
-/*   printf("\n"); */
-
-/*   RNG_END(); */
-
-/*   return 0; */
-/* } */
