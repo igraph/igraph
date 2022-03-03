@@ -178,6 +178,9 @@
  - `igraph_diameter()` and `igraph_diameter_dijkstra()` now use `igraph_vector_int_t`
    vectors to return the list of vertex and edge IDs in the diameter.
 
+ - `igraph_dnorm()` was removed. This is not really a breaking change as the
+   function was never documented, but it was exposed from one of the headers.
+
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
    `dom` and `leftout` arguments instead of an `igraph_vector_t`.
 
