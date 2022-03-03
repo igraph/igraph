@@ -34,8 +34,7 @@ __BEGIN_DECLS
  * https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard
  */
 
-/* TODO: re-enable implementations in terms of GCC intrinsics */
-#if /* defined(__GNUC__) */ 0
+#if defined(__GNUC__)
 
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
