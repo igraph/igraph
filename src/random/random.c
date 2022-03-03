@@ -29,9 +29,11 @@
 #include "igraph_vector.h"
 #include "igraph_memory.h"
 
+#include "core/math.h"
 #include "random/random_internal.h"
 
 #include "config.h"
+
 #include <math.h>
 #include <string.h>
 

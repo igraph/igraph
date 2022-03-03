@@ -26,6 +26,7 @@
 #include "igraph_interface.h"
 
 #include "core/interruption.h"
+#include "core/math.h"
 
 /**
  * \ingroup layout

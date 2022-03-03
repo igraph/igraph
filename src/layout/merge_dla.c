@@ -27,6 +27,7 @@
 
 #include "core/grid.h"
 #include "core/interruption.h"
+#include "core/math.h"
 #include "layout/merge_grid.h"
 #include "layout/layout_internal.h"
 
