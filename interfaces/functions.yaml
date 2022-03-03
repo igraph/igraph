@@ -1501,7 +1501,7 @@ igraph_read_graph_pajek:
 igraph_read_graph_graphml:
     PARAMS: OUT GRAPH graph, INFILE instream, INT index=0
 
-igraph_read_graph_dimacs:
+igraph_read_graph_dimacs_flow:
     PARAMS: |-
         OUT GRAPH graph, INFILE instream,
         OPTIONAL OUT STRVECTOR problem, OPTIONAL OUT VECTOR_INT label,
@@ -1537,7 +1537,7 @@ igraph_write_graph_graphml:
 igraph_write_graph_pajek:
     PARAMS: GRAPH graph, OUTFILE outstream
 
-igraph_write_graph_dimacs:
+igraph_write_graph_dimacs_flow:
     PARAMS: |-
         GRAPH graph, OUTFILE outstream, VERTEX source=0, VERTEX target=0,
         VECTOR capacity

@@ -393,7 +393,7 @@
  - `igraph_random_edge_walk()` now uses an `igraph_vector_int_t` for its
    `edgewalk` parameter.
 
- - `igraph_read_graph_dimacs()` now uses an `igraph_vector_int_t` for its
+ - `igraph_read_graph_dimacs_flow()` now uses an `igraph_vector_int_t` for its
    label parameter.
 
  - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
@@ -467,7 +467,7 @@
  - The `res` parameter of `igraph_weighted_cliques()` is now an
    `igraph_vector_int_list_t`.
 
- - `igraph_write_graph_dimacs()` now uses `igraph_integer_t` for the source and
+ - `igraph_write_graph_dimacs_flow()` now uses `igraph_integer_t` for the source and
    target vertex index instead of a `long int`.
 
  - `igraph_vector_*()`, `igraph_matrix_*()`, `igraph_stack_*()`, `igraph_array_*()`
@@ -591,6 +591,11 @@
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
 
+ - `igraph_read_graph_dimacs()` has been renamed to `igraph_read_graph_dimacs_flow()`;
+   the old name is deprecated and might be re-used as a generic DIMACS reader
+   in the future. Also, the function now uses `igraph_integer_t` as the source
+   and target vertex IDs instead of a `long int`.
+
  - `igraph_spmatrix_t` and its related functions are deprecated in favour of
    `igraph_sparsemat_t`. These will be removed in 0.11.
 
@@ -604,6 +609,11 @@
  - `igraph_vector_e()` and `igraph_vector_e_ptr()` have been renamed to
    `igraph_vector_get()` and `igraph_vector_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+ - `igraph_write_graph_dimacs()` has been renamed to `igraph_write_graph_dimacs_flow()`;
+   the old name is deprecated and might be re-used as a generic DIMACS writer
+   in the future. Also, the function now uses `igraph_integer_t` as the source
+   and target vertex IDs instead of a `long int`.
 
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`

@@ -173,8 +173,9 @@ int main() {
 
     /***************/
     infile = fopen("ak-4102.max", "r");
-    igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity,
-                             IGRAPH_DIRECTED);
+    igraph_read_graph_dimacs_flow(
+        &g, infile, 0, 0, &source, &target, &capacity, IGRAPH_DIRECTED
+    );
     fclose(infile);
 
     igraph_vector_int_init(&cut, 0);

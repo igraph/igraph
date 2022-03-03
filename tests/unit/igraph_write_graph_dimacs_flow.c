@@ -46,7 +46,7 @@ int main() {
     igraph_vector_init_int_end(&capacity, -1, 5, 2, 2, 3, 4, 1, 2, 5, -1);
 
     printf("DIMACS graph output:\n");
-    igraph_write_graph_dimacs(&g, stdout, source, target, &capacity);
+    igraph_write_graph_dimacs_flow(&g, stdout, source, target, &capacity);
 
     igraph_destroy(&g);
     igraph_vector_destroy(&capacity);
@@ -59,7 +59,7 @@ int main() {
        problem, which only makes sense if there are at least two vertices,
        a source and the target. Here we use dummy values for them. */
     printf("\nDIMACS graph output for null graph:\n");
-    igraph_write_graph_dimacs(&g, stdout, source, target, &capacity);
+    igraph_write_graph_dimacs_flow(&g, stdout, source, target, &capacity);
 
     igraph_vector_destroy(&capacity);
     igraph_destroy(&g);

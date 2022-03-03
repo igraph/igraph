@@ -439,7 +439,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_write_graph_leda
-  igraph_write_graph_dimacs
+  igraph_write_graph_dimacs_flow
   lineendings
   pajek
   pajek2

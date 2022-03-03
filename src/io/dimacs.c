@@ -32,6 +32,24 @@
 
 /**
  * \function igraph_read_graph_dimacs
+ * \brief Read a graph in DIMACS format (deprecated alias).
+ *
+ * \deprecated-by igraph_read_graph_dimacs_flow 0.10.0
+ */
+igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+                             igraph_strvector_t *problem,
+                             igraph_vector_int_t *label,
+                             igraph_integer_t *source,
+                             igraph_integer_t *target,
+                             igraph_vector_t *capacity,
+                             igraph_bool_t directed) {
+    return igraph_read_graph_dimacs_flow(
+        graph, instream, problem, label, source, target, capacity, directed
+    );
+}
+
+/**
+ * \function igraph_read_graph_dimacs_flow
  * \brief Read a graph in DIMACS format.
  *
  * This function reads the DIMACS file format, more specifically the
@@ -74,7 +92,7 @@
  *
  * \sa \ref igraph_write_graph_dimacs()
  */
-igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
                              igraph_strvector_t *problem,
                              igraph_vector_int_t *label,
                              igraph_integer_t *source,
@@ -247,6 +265,18 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 
 /**
  * \function igraph_write_graph_dimacs
+ * \brief Write a graph in DIMACS format (deprecated alias).
+ *
+ * \deprecated-by igraph_write_graph_dimacs_flow 0.10.0
+ */
+igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+                              igraph_integer_t source, igraph_integer_t target,
+                              const igraph_vector_t *capacity) {
+    return igraph_write_graph_dimacs_flow(graph, outstream, source, target, capacity);
+}
+
+/**
+ * \function igraph_write_graph_dimacs_flow
  * \brief Write a graph in DIMACS format.
  *
  * This function writes a graph to an output stream in DIMACS format,
@@ -255,7 +285,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * </para><para>
  * This file format is discussed in the documentation of \ref
- * igraph_read_graph_dimacs(), see that for more information.
+ * igraph_read_graph_dimacs_flow(), see that for more information.
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream.
@@ -268,9 +298,9 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * Time complexity: O(|E|), the number of edges in the graph.
  *
- * \sa igraph_read_graph_dimacs()
+ * \sa igraph_read_graph_dimacs_flow()
  */
-igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *graph, FILE *outstream,
                               igraph_integer_t source, igraph_integer_t target,
                               const igraph_vector_t *capacity) {
 
