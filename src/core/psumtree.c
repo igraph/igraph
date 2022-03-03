@@ -27,11 +27,9 @@
 #include "igraph_psumtree.h"
 #include "igraph_error.h"
 
-#include <math.h>
+#include "core/math.h"
 
-static double igraph_i_log2(double f) {
-    return log(f) / log(2.0);
-}
+#include <math.h>
 
 /**
  * \ingroup psumtree
@@ -91,7 +89,7 @@ static double igraph_i_log2(double f) {
  */
 igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size) {
     t->size = size;
-    t->offset = (pow(2, ceil(igraph_i_log2(size))) - 1);
+    t->offset = (pow(2, ceil(log2(size))) - 1);
     IGRAPH_CHECK(igraph_vector_init(&t->v, t->offset + t->size));
     return IGRAPH_SUCCESS;
 }
