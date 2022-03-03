@@ -36,7 +36,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
@@ -60,7 +59,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
