@@ -66,7 +66,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     } else {
 
         igraph_integer_t i;
-        double maxedges = n, last;
+        igraph_real_t maxedges = n, last;
         if (directed && loops) {
             maxedges *= n;
         } else if (directed && !loops) {
