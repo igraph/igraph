@@ -34,6 +34,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <math.h>
 #include <string.h>
 
@@ -682,6 +683,7 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 
 long int igraph_rng_get_integer(igraph_rng_t *rng,
                                 long int l, long int h) {
+    assert(h >= l);
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
         return (type->get_real(rng->state) * (h - l + 1) + l);
@@ -731,6 +733,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
 
 igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
                                   igraph_real_t l, igraph_real_t h) {
+    assert(h >= l);
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
         return type->get_real(rng->state) * (h - l) + l;
