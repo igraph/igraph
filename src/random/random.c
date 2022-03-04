@@ -680,12 +680,14 @@ const char *igraph_rng_name(igraph_rng_t *rng) {
 
 long int igraph_rng_get_integer(igraph_rng_t *rng,
                                 long int l, long int h) {
+    /* TODO: floor() is slow. Does it have a measureable impact here,
+     * do we need a fast custom implementation? */
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
-        return (long int)(type->get_real(rng->state) * (h - l + 1) + l);
+        return (long int) floor(type->get_real(rng->state) * (h - l + 1) + l);
     } else if (type->get) {
         unsigned long int max = type->max;
-        return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
+        return (long int) floor(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
     }
     IGRAPH_FATAL("Internal random generator error");
 }
