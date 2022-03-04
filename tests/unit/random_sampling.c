@@ -15,9 +15,25 @@ void sample() {
     printf("integer: %" IGRAPH_PRId "\n", i);
     IGRAPH_ASSERT(-100 <= i && i <= 100);
 
+    i = RNG_INTEGER(2, 2);
+    printf("integer: %" IGRAPH_PRId "\n", i);
+    IGRAPH_ASSERT(i == 2);
+
+    i = RNG_INTEGER(-5, -5);
+    printf("integer: %" IGRAPH_PRId "\n", i);
+    IGRAPH_ASSERT(i == -5);
+
     x = RNG_UNIF(-100, 100);
     printf("unif: %g\n", x);
     IGRAPH_ASSERT(-100 <= x && x <= 100);
+
+    x = RNG_UNIF(3, 3);
+    printf("unif: %g\n", x);
+    IGRAPH_ASSERT(x == 3);
+
+    x = RNG_UNIF(-4.5, -4.5);
+    printf("unif: %g\n", x);
+    IGRAPH_ASSERT(x == -4.5);
 
     x = RNG_UNIF01();
     printf("unif01: %g\n", x);
