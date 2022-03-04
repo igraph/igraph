@@ -622,7 +622,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
  * Time complexity: O(1).
  */
 
-unsigned long int igraph_rng_max(igraph_rng_t *rng) {
+unsigned long int igraph_rng_max(const igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
     return type->max;
 }
@@ -660,7 +660,7 @@ unsigned long int igraph_rng_min(igraph_rng_t *rng) {
  * Time complexity: O(1).
  */
 
-const char *igraph_rng_name(igraph_rng_t *rng) {
+const char *igraph_rng_name(const igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
     return type->name;
 }
