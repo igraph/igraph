@@ -137,7 +137,7 @@ int main() {
 
     for (i = 0; i < DIM; i++) {
         for (j = 0; j < DIM; j++) {
-            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), -10, 10);
+            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), -12, 12);
         }
     }
 
