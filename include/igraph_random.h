@@ -122,6 +122,9 @@ void PutRNGstate(void);
 #define RNG_UNIF01()     (igraph_rng_get_unif01(igraph_rng_default()))
 #define RNG_GEOM(p)      (igraph_rng_get_geom(igraph_rng_default(),(p)))
 #define RNG_BINOM(n,p)   (igraph_rng_get_binom(igraph_rng_default(),(n),(p)))
+#define RNG_EXP(rate)    (igraph_rng_get_exp(igraph_rng_default(),(rate)))
+#define RNG_GAMMA(shape, scale) \
+                         (igraph_rng_get_gamma(igraph_rng_default(), (shape), (scale)))
 #define RNG_INT31()      (igraph_rng_get_int31(igraph_rng_default()))
 
 __END_DECLS
