@@ -680,9 +680,20 @@ const char *igraph_rng_name(igraph_rng_t *rng) {
 
 long int igraph_rng_get_integer(igraph_rng_t *rng,
                                 long int l, long int h) {
-    /* TODO: floor() is slow. Does it have a measureable impact here,
-     * do we need a fast custom implementation? */
     const igraph_rng_type_t *type = rng->type;
+    /* We require the random integer to be in the range [l, h]. We do so by
+     * first casting (truncate toward zero) to the range [0, h - l] and then add
+     * l to arrive at the range [l, h]. That is, we calculate
+     * (long)( r * (h - l + 1) ) + l
+     * instead of
+     * (long)( r * (h - l + 1) + l),
+     * please note the difference in the parentheses.
+     *
+     * In the latter formulation, if l is negative, this would incorrectly lead
+     * to the range [l + 1, h] instead of the desired [l, h] because negative
+     * numbers are truncated towards zero when cast. For example, if l = -5, any
+     * real in the range (-5, -4] would get cast to -4, not to -5.
+     */
     if (type->get_real) {
         return (long int)(type->get_real(rng->state) * (h - l + 1)) + l;
     } else if (type->get) {
