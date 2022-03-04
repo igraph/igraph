@@ -538,7 +538,7 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_default
- * Query the default random number generator.
+ * \brief Query the default random number generator.
  *
  * \return A pointer to the default random number generator.
  *
@@ -688,7 +688,7 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
 
 /**
  * \function igraph_rng_get_normal
- * Normally distributed random numbers
+ * \brief Normally distributed random numbers.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -711,7 +711,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
 
 /**
  * \function igraph_rng_get_unif
- * Generate real, uniform random numbers from an interval
+ * \brief Generate real, uniform random numbers from an interval.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -737,7 +737,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
 
 /**
  * \function igraph_rng_get_unif01
- * Generate real, uniform random number from the unit interval
+ * \brief Generate real, uniform random number from the unit interval.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -759,7 +759,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_get_geom
- * Generate geometrically distributed random numbers
+ * \brief Generate geometrically distributed random numbers.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -781,7 +781,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
 
 /**
  * \function igraph_rng_get_binom
- * Generate binomially distributed random numbers
+ * \brief Generate binomially distributed random numbers.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -804,7 +804,7 @@ igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
 
 /**
  * \function igraph_rng_get_gamma
- * Generate sample from a Gamma distribution
+ * \brief Generate sample from a Gamma distribution.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
