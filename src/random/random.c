@@ -2297,11 +2297,11 @@ igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
     igraph_real_t sum = 0.0;
 
     if (len < 2) {
-        IGRAPH_ERROR("Dirichlet parameter vector too short, must "
-                     "have at least two entries", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Dirichlet parameter vector too short, must have at least two entries.",
+                     IGRAPH_EINVAL);
     }
     if (igraph_vector_min(alpha) <= 0) {
-        IGRAPH_ERROR("Dirichlet concentration parameters must be positive",
+        IGRAPH_ERROR("Dirichlet concentration parameters must be positive.",
                      IGRAPH_EINVAL);
     }
 
