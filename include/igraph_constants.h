@@ -24,17 +24,10 @@
 #ifndef IGRAPH_CONSTANTS_H
 #define IGRAPH_CONSTANTS_H
 
+#include "igraph_config.h"
 #include "igraph_decls.h"
 
 __BEGIN_DECLS
-
-/* GCC added support for enumerator attributes in version 6.
- * Verified that clang 3.0 also supports them. */
-#if __GNUC__ >= 6 || defined(__clang__)
-#define IGRAPH_DEPRECATED_ENUMVAL __attribute__ ((deprecated))
-#else
-#define IGRAPH_DEPRECATED_ENUMVAL
-#endif
 
 /* -------------------------------------------------- */
 /* Constants                                          */

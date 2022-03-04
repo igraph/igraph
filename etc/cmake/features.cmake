@@ -17,3 +17,16 @@ if(IGRAPH_INTEGER_SIZE STREQUAL AUTO)
     set(IGRAPH_INTEGER_SIZE 32)
   endif()
 endif()
+
+# Check if GCC-style enum value deprecation is supported
+
+include(CheckCSourceCompiles)
+
+check_c_source_compiles(
+  "enum { A __attribute__ ((deprecated)) = 0 }; int main() { return 0; }"
+  ENUMVAL_DEPRECATION_SUPPORTED
+)
+
+if(ENUMVAL_DEPRECATION_SUPPORTED)
+  set(IGRAPH_DEPRECATED_ENUMVAL "__attribute__ ((deprecated))")
+endif()
