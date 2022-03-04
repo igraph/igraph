@@ -735,6 +735,7 @@ add_legacy_tests(
   igraph_rng_get_exp
   igraph_rng_get_integer
   mt
+  random_sampling
   rng_reproducibility
   rng_init_destroy_max_min_name_set_default
 )
