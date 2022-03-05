@@ -153,7 +153,7 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     igraph_vector_int_t *H,
     igraph_integer_t min_size, igraph_integer_t max_size) {
 
-    int err;
+    igraph_error_t err;
 
     IGRAPH_CHECK(igraph_vector_int_push_back(H, -1)); /* boundary */
 

@@ -522,22 +522,24 @@ igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t fro
 
 igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
     igraph_vector_int_t *oldfromvec, *newfromvec;
-    int err1, err2;
+    igraph_bool_t found_old, found_new;
     igraph_integer_t oldpos, newpos;
     igraph_integer_t oldfrom = from, newfrom = from;
+
     ADJLIST_CANON_EDGE(oldfrom, oldto, directed);
     ADJLIST_CANON_EDGE(newfrom, newto, directed);
 
     oldfromvec = igraph_adjlist_get(al, oldfrom);
     newfromvec = igraph_adjlist_get(al, newfrom);
 
-
-    err1 = igraph_vector_int_binsearch(oldfromvec, oldto, &oldpos);
-    err2 = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
-
     /* oldfrom -> oldto should exist; newfrom -> newto should not. */
-    if ((!err1) || err2) {
-        return 1;
+    found_old = igraph_vector_int_binsearch(oldfromvec, oldto, &oldpos);
+    if (! found_old) {
+        IGRAPH_ERROR("Edge to replace does not exist.", IGRAPH_EINVAL);
+    }
+    found_new = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
+    if (found_new) {
+        IGRAPH_ERROR("New edge already exists.", IGRAPH_EINVAL).
     }
 
     igraph_vector_int_remove(oldfromvec, oldpos);
