@@ -26,10 +26,7 @@ add_dependencies(benchmark build_benchmarks)
 # LD_LIBRARY_PATH, if another version of igraph is installed somewhere it will
 # be linked to that library.
 include(CheckCCompilerFlag)
-set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
-set(CMAKE_REQUIRED_FLAGS "-Wl,--enable-new-dtags")
-check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
-set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+check_c_compiler_flag("-Wl,--enable-new-dtags" HAVE_ENABLE_NEW_DTAGS)
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
