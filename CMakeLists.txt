@@ -73,9 +73,10 @@ find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
+include(CMakePushCheckState)
 
 # First we check for some functions and symbols
-set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+cmake_push_check_state()
 if(NEED_LINKING_AGAINST_LIBM)
   list(APPEND CMAKE_REQUIRED_LIBRARIES m)
 endif()
@@ -83,7 +84,7 @@ check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
 check_symbol_exists(strdup string.h HAVE_STRDUP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+cmake_pop_check_state()
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
