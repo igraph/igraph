@@ -302,18 +302,18 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
         }
     } else {
         igraph_error_t ret;
-        igraph_error_handler_t *oldhandler;
-        oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
+
+        IGRAPH_FINALLY_ENTER();
         /* Add it to the string vector first, we can undo this later */
         ret = igraph_strvector_push_back(&t->keys, key);
         if (ret != IGRAPH_SUCCESS) {
-            igraph_set_error_handler(oldhandler);
+            IGRAPH_FINALLY_EXIT();
             IGRAPH_ERROR("cannot get element from trie", ret);
         }
         ret = igraph_i_trie_get_node((igraph_trie_node_t*) t, key, t->maxvalue + 1, id);
         if (ret != IGRAPH_SUCCESS) {
-            igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1);
-            igraph_set_error_handler(oldhandler);
+            igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1); /* shrinks, error safe */
+            IGRAPH_FINALLY_EXIT();
             IGRAPH_ERROR("cannot get element from trie", ret);
         }
 
@@ -321,9 +321,9 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
         if (*id > t->maxvalue) {
             t->maxvalue = *id;
         } else {
-            igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1);
+            igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1); /* shrinks, error safe */
         }
-        igraph_set_error_handler(oldhandler);
+        IGRAPH_FINALLY_EXIT();
     }
 
     return IGRAPH_SUCCESS;
