@@ -38,6 +38,9 @@ project(
 # Include some compiler-related helpers and set global compiler options
 include(compilers)
 
+# Detect is certain attributes are supported by the compiler
+include(attribute_support)
+
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
