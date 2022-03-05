@@ -38,18 +38,21 @@ int main() {
     igraph_t g;
     FILE *infile;
 
+    /* Turn on attribute handling. */
+    igraph_set_attribute_table(&igraph_cattribute_table);
+
     for (i = 0; i < no_files; i++) {
         printf("Doing %s\n", files[i]);
         infile = fopen(files[i], "r");
         if (!infile) {
             printf("Cannot open file: %s\n", files[i]);
-            exit(1 + i);
+            abort();
         }
         igraph_read_graph_dl(&g, infile, /*directed=*/ 1);
         ret = fclose(infile);
         if (ret) {
             printf("Cannot close file: %s\n", files[i]);
-            exit(101 + i);
+            abort();
         }
         igraph_write_graph_edgelist(&g, stdout);
         igraph_destroy(&g);
