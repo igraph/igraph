@@ -26,9 +26,6 @@
 
 #include <math.h>
 
-/* Chebyshev functions defined in math/utils.c */
-double igraph_chebyshev_eval(double x, const double *a, const int n);
-int igraph_chebyshev_init(const double *dos, int nos, double eta);
 
 /* Math constants are not part of standard C */
 #ifndef M_PI

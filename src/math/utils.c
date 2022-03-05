@@ -35,51 +35,6 @@ int igraph_finite(double x) {
     return isfinite(x);
 }
 
-int igraph_chebyshev_init(const double *dos, int nos, double eta) {
-    int i, ii;
-    double err;
-
-    if (nos < 1) {
-        return 0;
-    }
-
-    err = 0.0;
-    i = 0;          /* just to avoid compiler warnings */
-    for (ii = 1; ii <= nos; ii++) {
-        i = nos - ii;
-        err += fabs(dos[i]);
-        if (err > eta) {
-            return i;
-        }
-    }
-    return i;
-}
-
-double igraph_chebyshev_eval(double x, const double *a, const int n) {
-    double b0, b1, b2, twox;
-    int i;
-
-    if (n < 1 || n > 1000) {
-        IGRAPH_WARNING("chebyshev_eval: argument out of domain");
-        return IGRAPH_NAN;
-    }
-
-    if (x < -1.1 || x > 1.1) {
-        IGRAPH_WARNING("chebyshev_eval: argument out of domain");
-        return IGRAPH_NAN;
-    }
-
-    twox = x * 2;
-    b2 = b1 = 0;
-    b0 = 0;
-    for (i = 1; i <= n; i++) {
-        b2 = b1;
-        b1 = b0;
-        b0 = twox * b1 - b2 + a[n - i];
-    }
-    return (b0 - b2) * 0.5;
-}
-
 int igraph_is_nan(double x) {
     return isnan(x);
 }
