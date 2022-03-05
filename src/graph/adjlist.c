@@ -539,7 +539,7 @@ igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_
     }
     found_new = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
     if (found_new) {
-        IGRAPH_ERROR("New edge already exists.", IGRAPH_EINVAL).
+        IGRAPH_ERROR("New edge already exists.", IGRAPH_EINVAL);
     }
 
     igraph_vector_int_remove(oldfromvec, oldpos);

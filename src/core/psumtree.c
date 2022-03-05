@@ -216,7 +216,7 @@ igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_integer_t idx
         return IGRAPH_SUCCESS;
     } else {
         /* caters for negative values and NaN */
-        return IGRAPH_EINVAL;
+        IGRAPH_ERRORF("Trying to add invalid (negative or NaN) value to psumtree: %g.", IGRAPH_EINVAL, new_value);
     }
 }
 

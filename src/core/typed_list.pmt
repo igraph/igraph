@@ -640,9 +640,7 @@ igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
  */
 igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
     igraph_integer_t size = FUNCTION(size)(v);
-    if (pos < 0 || pos > size) {
-        return IGRAPH_EINVAL;
-    }
+    IGRAPH_ASSERT(0 <= pos && pos <= size);
     IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
     if (pos < size) {
         memmove(v->stor_begin + pos + 1, v->stor_begin + pos, sizeof(ITEM_TYPE) * (size - pos));
