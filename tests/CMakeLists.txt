@@ -311,6 +311,7 @@ add_legacy_tests(
   FOLDER tests/regression NAMES
   bug_1760
   bug_1814
+  bug_1970
 )
 
 # components.at

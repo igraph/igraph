@@ -580,7 +580,7 @@ IGRAPH_EXPORT const char* igraph_strerror(const igraph_error_t igraph_errno);
  * information. We don't use the exception handling code though.  */
 
 struct igraph_i_protectedPtr {
-    int all;
+    int level;
     void *ptr;
     void (*func)(void*);
 };
@@ -615,6 +615,9 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_CLEAN(int num);
  */
 
 IGRAPH_EXPORT void IGRAPH_FINALLY_FREE(void);
+
+IGRAPH_EXPORT void IGRAPH_FINALLY_ENTER(void);
+IGRAPH_EXPORT void IGRAPH_FINALLY_EXIT(void);
 
 /**
  * \function IGRAPH_FINALLY_STACK_SIZE

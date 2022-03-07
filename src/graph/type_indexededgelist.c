@@ -224,8 +224,6 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
     igraph_integer_t new_no_of_edges;
     igraph_integer_t i = 0;
-    igraph_error_handler_t *oldhandler;
-    igraph_error_t ret1, ret2;
     igraph_vector_int_t newoi, newii;
     igraph_bool_t directed = igraph_is_directed(graph);
 
@@ -255,54 +253,55 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         }
     }
 
-    /* disable the error handler temporarily */
-    oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
+    /* If an error occurs while the edges are being added, we make the necessary fixup
+     * to ensure that the graph is still in a consistent state when this function returns.
+     * The graph may already be on the finally stack when calling this function. We use
+     * a separate finally stack level to avoid its destructor from being called on error,
+     * so that the fixup can succeed.
+     */
+
+#define CHECK_ERR(expr) \
+    do { \
+        igraph_error_t err = (expr); \
+        if (err != IGRAPH_SUCCESS) { \
+            igraph_vector_int_resize(&graph->from, no_of_edges); /* gets smaller, error safe */ \
+            igraph_vector_int_resize(&graph->to, no_of_edges);   /* gets smaller, error safe */ \
+            IGRAPH_FINALLY_EXIT(); \
+            IGRAPH_ERROR("Cannot add edges.", err); \
+        } \
+    } while (0)
 
     /* oi & ii */
-    ret1 = igraph_vector_int_init(&newoi, no_of_edges);
-    ret2 = igraph_vector_int_init(&newii, no_of_edges);
-    if (ret1 != 0 || ret2 != 0) {
-        igraph_vector_int_resize(&graph->from, no_of_edges); /* gets smaller */
-        igraph_vector_int_resize(&graph->to, no_of_edges);   /* gets smaller */
-        igraph_set_error_handler(oldhandler);
-        IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-    }
-    ret1 = igraph_vector_int_pair_order(&graph->from, &graph->to, &newoi, graph->n);
-    ret2 = igraph_vector_int_pair_order(&graph->to, &graph->from, &newii, graph->n);
-    if (ret1 != 0 || ret2 != 0) {
-        igraph_vector_int_resize(&graph->from, no_of_edges);
-        igraph_vector_int_resize(&graph->to, no_of_edges);
-        igraph_vector_int_destroy(&newoi);
-        igraph_vector_int_destroy(&newii);
-        igraph_set_error_handler(oldhandler);
-        IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-    }
+    IGRAPH_FINALLY_ENTER();
+    {
+        CHECK_ERR(igraph_vector_int_init(&newoi, no_of_edges));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &newoi);
+        CHECK_ERR(igraph_vector_int_init(&newii, no_of_edges));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &newii);
+        CHECK_ERR(igraph_vector_int_pair_order(&graph->from, &graph->to, &newoi, graph->n));
+        CHECK_ERR(igraph_vector_int_pair_order(&graph->to, &graph->from, &newii, graph->n));
 
-    /* Attributes */
-    if (graph->attr) {
-        igraph_set_error_handler(oldhandler);
-        ret1 = igraph_i_attribute_add_edges(graph, edges, attr);
-        igraph_set_error_handler(igraph_error_handler_ignore);
-        if (ret1 != 0) {
-            igraph_vector_int_resize(&graph->from, no_of_edges);
-            igraph_vector_int_resize(&graph->to, no_of_edges);
-            igraph_vector_int_destroy(&newoi);
-            igraph_vector_int_destroy(&newii);
-            igraph_set_error_handler(oldhandler);
-            IGRAPH_ERROR("cannot add edges", ret1);
+        /* Attributes */
+        if (graph->attr) {
+            /* TODO: Does this keep the attribute table in a consistent state upon failure? */
+            CHECK_ERR(igraph_i_attribute_add_edges(graph, edges, attr));
         }
+
+        /* os & is, its length does not change, error safe */
+        igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
+        igraph_i_create_start(&graph->is, &graph->to, &newii, graph->n);
+
+        /* everything went fine  */
+        igraph_vector_int_destroy(&graph->oi);
+        igraph_vector_int_destroy(&graph->ii);
+        IGRAPH_FINALLY_CLEAN(2);
+
+        graph->oi = newoi;
+        graph->ii = newii;
     }
+    IGRAPH_FINALLY_EXIT();
 
-    /* os & is, its length does not change, error safe */
-    igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
-    igraph_i_create_start(&graph->is, &graph->to, &newii, graph->n);
-
-    /* everything went fine  */
-    igraph_vector_int_destroy(&graph->oi);
-    igraph_vector_int_destroy(&graph->ii);
-    graph->oi = newoi;
-    graph->ii = newii;
-    igraph_set_error_handler(oldhandler);
+#undef CHECK_ERR
 
     return IGRAPH_SUCCESS;
 }
