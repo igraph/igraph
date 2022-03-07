@@ -493,8 +493,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *     complex numbers when some weights are negative. In this case only
  *     the real part is reported.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    for details. Supply \c NULL here to use the defaults. Note that the
+ *    function overwrites the <code>n</code> (number of vertices) parameter and
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
@@ -513,6 +513,10 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_bool_t directed, igraph_bool_t scale,
                                   const igraph_vector_t *weights,
                                   igraph_arpack_options_t *options) {
+
+    if (!options) {
+        options = igraph_arpack_options_get_default();
+    }
 
     if (directed && igraph_is_directed(graph)) {
         return igraph_i_eigenvector_centrality_directed(graph, vector, value,

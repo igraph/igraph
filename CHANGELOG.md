@@ -593,6 +593,7 @@
  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
     and edge-switching MCMC sampler.
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
+ - igraph functions that take an ARPACK options object now also accept `NULL` in place of an options object, and they will fall back to using a default object provided by `igraph_arpack_options_get_default()`.
 
 ### Fixed
 

@@ -1552,10 +1552,10 @@ static igraph_error_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
  * \brief Eigenvalues and eigenvectors of a symmetric sparse matrix via ARPACK.
  *
  * \param The input matrix, must be column-compressed.
- * \param options It is passed to \ref igraph_arpack_rssolve(). See
- *    \ref igraph_arpack_options_t for the details. If \c mode is 1,
- *    then ARPACK uses regular mode, if \c mode is 3, then shift and
- *    invert mode is used and the \c sigma structure member defines
+ * \param options It is passed to \ref igraph_arpack_rssolve(). Supply
+ *    \c NULL here to use the defaults. See \ref igraph_arpack_options_t for the
+ *    details. If \c mode is 1, then ARPACK uses regular mode, if \c mode is 3,
+ *    then shift and invert mode is used and the \c sigma structure member defines
  *    the shift.
  * \param storage Storage for ARPACK. See \ref
  *    igraph_arpack_rssolve() and \ref igraph_arpack_storage_t for
@@ -1593,6 +1593,10 @@ igraph_error_t igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
 
     if (n > INT_MAX) {
         IGRAPH_ERROR("Matrix too large for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
     }
 
     options->n = (int) n;
@@ -1661,8 +1665,8 @@ igraph_error_t igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
  * Eigenvalues and/or eigenvectors of a nonsymmetric sparse matrix.
  * \param A The input matrix, in column-compressed mode.
  * \param options ARPACK options, it is passed to \ref
- *    igraph_arpack_rnsolve(). See also \ref igraph_arpack_options_t
- *    for details.
+ *    igraph_arpack_rnsolve(). Supply \c NULL here to use the defaults.
+ *    See also \ref igraph_arpack_options_t for details.
  * \param storage Storage for ARPACK, this is passed to \ref
  *    igraph_arpack_rnsolve(). See \ref igraph_arpack_storage_t for
  *    details.
@@ -1692,6 +1696,10 @@ igraph_error_t igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
 
     if (n != igraph_sparsemat_ncol(A)) {
         IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
+    }
+
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
     }
 
     options->n = (int) n;

@@ -64,7 +64,7 @@ int main() {
 
     igraph_community_leading_eigenvector(&g, &weights, &merges,
                                          &membership, 1,
-                                         &options, /*modularity=*/ 0,
+                                         /* options = */ 0, /*modularity=*/ 0,
                                          /*start=*/ 0, /*eigenvalues=*/ 0,
                                          /*eigenvectors=*/ 0, /*history=*/ 0,
                                          /*callback=*/ 0,
@@ -75,7 +75,7 @@ int main() {
 
     printf("\n");
 
-    /* Make all the steps */
+    /* Make all the steps, and use an explicit options object */
     igraph_community_leading_eigenvector(&g, &weights, &merges,
                                          &membership, igraph_vcount(&g),
                                          &options, /*modularity=*/ 0,

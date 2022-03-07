@@ -406,8 +406,8 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    underlying community structure and no further steps can be
  *    done. If you want as many steps as possible then supply the
  *    number of vertices in the network here.
- * \param options The options for ARPACK. \c n is always
- *    overwritten. \c ncv is set to at least 4.
+ * \param options The options for ARPACK. Supply \c NULL here to use the
+ *    defaults. \c n is always overwritten. \c ncv is set to at least 4.
  * \param modularity If not a null pointer, then it must be a pointer
  *    to a real number and the modularity score of the final division
  *    is stored here.
@@ -619,6 +619,10 @@ igraph_error_t igraph_community_leading_eigenvector(
         IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(),
                                      IGRAPH_ALL, IGRAPH_LOOPS, weights));
         sumweights = igraph_vector_sum(weights);
+    }
+
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
     }
 
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
