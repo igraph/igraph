@@ -93,9 +93,20 @@
 
  - `igraph_clique_handler_t` now uses an `igraph_vector_int_t` for its
    `clique` parameter, and must return an `igraph_error_t`. Use `IGRAPH_STOP`
-   as the return code to terminate the search prematurely.
+   as the return code to terminate the search prematurely. The vector that the
+   handler receives is owned by the clique search routine. If you want to hold
+   on to the vector for a longer period of time, you need to make a copy of it
+   in the handler. Cliques passed to the callback are marked as `const` as a
+   reminder to this change.
 
  - The `res` parameter of `igraph_cliques()` is now an `igraph_vector_int_list_t`.
+
+ - Callbacks used by `igraph_cliques_callback()` need to be updated to account
+   for the fact that the callback does not own the clique passed to it any more;
+   the callback needs to make a copy if it wants to hold on to the clique for a
+   longer period of time. If the callback does not need to store the clique, it
+   does not need to do anything any more, and it must not destroy or free the
+   clique.
 
  - `igraph_closeness()` and `igraph_closeness_cutoff()` now use an
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
@@ -357,6 +368,13 @@
 
  - The `res` parameters in `igraph_maximal_cliques()` and `igraph_maximal_cliques_subset()`
    are now of type `igraph_vector_int_list_t`.
+
+ - Callbacks used by `igraph_maximal_cliques_callback()` need to be updated to account
+   for the fact that the callback does not own the clique passed to it any more;
+   the callback needs to make a copy if it wants to hold on to the clique for a
+   longer period of time. If the callback does not need to store the clique, it
+   does not need to do anything any more, and it must not destroy or free the
+   clique.
 
  - The `res` parameter in `igraph_maximal_independent_vertex_sets()` is now
    an `igraph_vector_int_list_t`.

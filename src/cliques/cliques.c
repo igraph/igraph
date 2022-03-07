@@ -260,7 +260,7 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param cliquehandler_fn Callback function to be called for each clique.
- * See also \ref igraph_clique_handler_t.
+ *   See also \ref igraph_clique_handler_t.
  * \param arg Extra argument to supply to \p cliquehandler_fn.
  * \return Error code.
  *
@@ -901,17 +901,15 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 /* MAXIMAL CLIQUES, LARGEST CLIQUES                                      */
 /*************************************************************************/
 
-static igraph_error_t igraph_i_maximal_cliques_store_max_size(igraph_vector_int_t* clique, void* data) {
+static igraph_error_t igraph_i_maximal_cliques_store_max_size(const igraph_vector_int_t* clique, void* data) {
     igraph_integer_t* result = (igraph_integer_t*)data;
     if (*result < igraph_vector_int_size(clique)) {
         *result = igraph_vector_int_size(clique);
     }
-    igraph_vector_int_destroy(clique);
-    IGRAPH_FREE(clique);
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique, void* data) {
+static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* clique, void* data) {
     igraph_vector_int_list_t* result = (igraph_vector_int_list_t*)data;
     igraph_integer_t n;
 
@@ -922,8 +920,6 @@ static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique
         n = igraph_vector_int_size(clique);
         first = igraph_vector_int_list_get_ptr(result, 0);
         if (n < igraph_vector_int_size(first)) {
-            igraph_vector_int_destroy(clique);
-            IGRAPH_FREE(clique);
             return IGRAPH_SUCCESS;
         }
 
@@ -932,8 +928,7 @@ static igraph_error_t igraph_i_largest_cliques_store(igraph_vector_int_t* clique
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_int_list_push_back(result, clique));
-    IGRAPH_FREE(clique);
+    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(result, clique));
 
     return IGRAPH_SUCCESS;
 }
