@@ -4,6 +4,8 @@
 
 ### Breaking changes
 
+ - igraph now requires CMake 3.18 or later.
+
  - In order to facilitate the usage of graphs with more than 2 billion vertices
    and edges, we have made the size of the `igraph_integer_t` data type to be
    32 bits on 32-bit platforms and 64 bits on 64-bit platforms by default. You
