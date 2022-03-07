@@ -257,8 +257,6 @@ static igraph_error_t callback_callback(set_t s, graph_t *g, clique_options *opt
 
     retval = (*(cd->handler))(cd->clique, cd->arg);
 
-    igraph_vector_int_destroy(cd->clique);
-
     return retval;
 }
 
