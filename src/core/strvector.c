@@ -359,7 +359,6 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
 
 igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t newsize) {
     igraph_integer_t toadd = newsize - igraph_strvector_size(v), i, j;
-    char **tmp;
     igraph_integer_t oldsize = igraph_strvector_size(v);
 
     IGRAPH_ASSERT(v != 0);
@@ -370,13 +369,8 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
         }
         v->end = v->stor_begin + newsize;
     } else if (newsize > oldsize) {
-        tmp = IGRAPH_REALLOC(v->stor_begin, newsize, char*);
-        if (tmp == 0) {
-            IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
-        v->stor_begin = tmp;
+        IGRAPH_CHECK(igraph_strvector_reserve(v, newsize));
         v->stor_end = v->stor_begin + newsize;
-        v->end = v->stor_end;
 
         for (i = 0; i < toadd; i++) {
             v->stor_begin[oldsize + i] = IGRAPH_CALLOC(1, char);
@@ -393,6 +387,23 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
     }
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_capacity
+ * \brief Gives the capacity of a string vector.
+ *
+ * \param sv The string vector.
+ * \return The capacity of the string vector.
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t igraph_strvector_capacity(const igraph_strvector_t *sv) {
+    IGRAPH_ASSERT(sv != 0);
+    IGRAPH_ASSERT(sv->stor_begin != 0);
+    return sv->stor_end - sv->stor_begin;
 }
 
 /**
@@ -426,24 +437,24 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
  */
 
 igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v, const char *value) {
-    igraph_integer_t old_size;
     igraph_integer_t value_len = strlen(value);
-    igraph_integer_t new_size;
+    igraph_integer_t old_size;
 
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->stor_begin != 0);
 
     old_size = igraph_strvector_size(v);
-    new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
-    if (old_size == IGRAPH_INTEGER_MAX) {
-        IGRAPH_ERROR("Cannot add to strvector, already at maximum size.", IGRAPH_EOVERFLOW);
-    }
-
     if (v->end == v->stor_end) {
+        igraph_integer_t new_size;
+        new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot add to strvector, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
+
         if (new_size == 0) {
             new_size = 1;
         }
-        igraph_strvector_resize(v, new_size);
+        IGRAPH_CHECK(igraph_strvector_reserve(v, new_size));
     }
     v->stor_begin[old_size] = IGRAPH_CALLOC(value_len + 1, char);
     if (v->stor_begin[old_size] == 0) {
@@ -531,6 +542,58 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
         char *str = igraph_strvector_get(v, j);
         igraph_strvector_set(newv, i, str);
     }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_reserve
+ * \brief Reserves memory for a string vector.
+ *
+ * </para><para>
+ * \a igraph string vectors are flexible, they can grow and
+ * shrink. Growing
+ * however occasionally needs the data in the vector to be copied.
+ * In order to avoid this, you can call this function to reserve space for
+ * future growth of the vector.
+ *
+ * </para><para>
+ * Note that this function does \em not change the size of the
+ * string vector. Let us see a small example to clarify things: if you
+ * reserve space for 100 strings and the size of your
+ * vector was (and still is) 60, then you can surely add additional 40
+ * strings to your vector before it will be copied.
+ * \param sv The string vector object.
+ * \param capacity The new \em allocated size of the string vector.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, should be around
+ * O(n), n is the new allocated size of the vector.
+ */
+
+igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t capacity) {
+    igraph_integer_t current_capacity;
+    char **tmp;
+
+    IGRAPH_ASSERT(sv != NULL);
+    IGRAPH_ASSERT(sv->stor_begin != NULL);
+
+    current_capacity = igraph_strvector_capacity(sv);
+
+    if (capacity <= current_capacity) {
+        return IGRAPH_SUCCESS;
+    }
+
+    tmp = IGRAPH_REALLOC(sv->stor_begin, capacity, char *);
+    if (tmp == 0) {
+        IGRAPH_ERROR("Cannot reserve space for vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
+
+    sv->end = tmp + (sv->end - sv->stor_begin);
+    sv->stor_begin = tmp;
+    sv->stor_end = sv->stor_begin + capacity;
 
     return IGRAPH_SUCCESS;
 }
