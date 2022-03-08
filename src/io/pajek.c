@@ -186,7 +186,10 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_pajek_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
