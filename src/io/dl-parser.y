@@ -240,13 +240,12 @@ elabel: LABEL {
   if (igraph_strvector_size(&context->labels) != 0) {
     igraph_integer_t i, id, n=igraph_strvector_size(&context->labels);
     for (i=0; i<n; i++) {
-      igraph_trie_get(&context->trie,
-                      STR(context->labels, i), &id);
+      IGRAPH_YY_CHECK(igraph_trie_get(&context->trie, STR(context->labels, i), &id));
     }
     igraph_strvector_clear(&context->labels);
   }
-  igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
-                   igraph_dl_yyget_leng(scanner), &trie_id);
+  IGRAPH_YY_CHECK(igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
+                                   igraph_dl_yyget_leng(scanner), &trie_id));
   IGRAPH_ASSERT(0 <= trie_id && trie_id < IGRAPH_DL_MAX_VERTEX_COUNT);
   $$ = trie_id;
  };
