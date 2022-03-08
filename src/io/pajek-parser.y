@@ -578,16 +578,25 @@ igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   igraph_vector_t *na;
   igraph_attribute_record_t *rec;
 
-  igraph_trie_get(names, attrname, &id);
+  IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
     /* add a new attribute */
     rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    if (! rec) {
+        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, rec);
     na=IGRAPH_CALLOC(1, igraph_vector_t);
-    igraph_vector_init(na, count);
+    if (! na) {
+        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, na);
+    IGRAPH_CHECK(igraph_vector_init(na, count));
     rec->name=strdup(attrname);
     rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
     rec->value=na;
-    igraph_vector_ptr_push_back(attrs, rec);
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
+    IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
   }
   rec=VECTOR(*attrs)[id];
   na=(igraph_vector_t*)rec->value;
@@ -619,21 +628,26 @@ igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   igraph_integer_t id;
   igraph_strvector_t *na;
   igraph_attribute_record_t *rec;
-  igraph_integer_t i;
 
-  igraph_trie_get(names, attrname, &id);
+  IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
     /* add a new attribute */
     rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    na=IGRAPH_CALLOC(1, igraph_strvector_t);
-    igraph_strvector_init(na, count);
-    for (i=0; i<count; i++) {
-      igraph_strvector_set(na, i, "");
+    if (! rec) {
+        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
     }
+    IGRAPH_FINALLY(igraph_free, rec);
+    na=IGRAPH_CALLOC(1, igraph_strvector_t);
+    if (! na) {
+        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, na);
+    IGRAPH_CHECK(igraph_strvector_init(na, count));
     rec->name=strdup(attrname);
     rec->type=IGRAPH_ATTRIBUTE_STRING;
     rec->value=na;
-    igraph_vector_ptr_push_back(attrs, rec);
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
+    IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
   }
   rec=VECTOR(*attrs)[id];
   na=(igraph_strvector_t*)rec->value;
@@ -641,10 +655,10 @@ igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
     igraph_integer_t origsize=igraph_strvector_size(na);
     IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
     for (;origsize<count; origsize++) {
-      igraph_strvector_set(na, origsize, "");
+      IGRAPH_CHECK(igraph_strvector_set(na, origsize, ""));
     }
   }
-  igraph_strvector_set(na, vid, str);
+  IGRAPH_CHECK(igraph_strvector_set(na, vid, str));
 
   return IGRAPH_SUCCESS;
 }
