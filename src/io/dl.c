@@ -88,7 +88,10 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_dl_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_dl_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -102,7 +105,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison

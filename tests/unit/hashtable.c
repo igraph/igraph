@@ -87,8 +87,7 @@ int main() {
 
     igraph_hashtable_getkeys(&ht, &keys);
     for (i = 0; i < igraph_strvector_size(keys); i++) {
-        igraph_strvector_get(keys, i, &str);
-        printf("%s ", str);
+        printf("%s ", igraph_strvector_get(keys, i));
     }
     printf("\n");
 
@@ -120,8 +119,7 @@ int main() {
 
     igraph_hashtable_getkeys(&ht, &keys);
     for (i = 0; i < igraph_strvector_size(keys); i++) {
-        igraph_strvector_get(keys, i, &str);
-        printf("%s ", str);
+        printf("%s ", igraph_strvector_get(keys, i));
     }
     printf("\n");
 

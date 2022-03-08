@@ -150,7 +150,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
 
     vdata = IGRAPH_CALLOC(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
     if (vdata == 0) {
-        IGRAPH_ERROR("igraph_layout_reingold_tilford failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_layout_reingold_tilford failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vdata);
 

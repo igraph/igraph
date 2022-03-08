@@ -44,9 +44,11 @@ typedef struct s_igraph_strvector {
  * \define STR
  * Indexing string vectors
  *
- * This is a macro which allows to query the elements of a string vector in
- * simpler way than \ref igraph_strvector_get(). Note this macro cannot be
- * used to set an element, for that use \ref igraph_strvector_set().
+ * This is a macro that allows to query the elements of a string vector, just
+ * like \ref igraph_strvector_get(), but without the overhead of a function
+ * call. Note this macro cannot be used to set an element. Use
+ * \ref igraph_strvector_set() to set an element instead.
+ *
  * \param sv The string vector
  * \param i The the index of the element.
  * \return The element at position \p i.
@@ -63,8 +65,7 @@ typedef struct s_igraph_strvector {
 IGRAPH_EXPORT igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t len);
 IGRAPH_EXPORT void igraph_strvector_destroy(igraph_strvector_t *sv);
 IGRAPH_EXPORT igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv);
-IGRAPH_EXPORT void igraph_strvector_get(
-    const igraph_strvector_t *sv, igraph_integer_t idx, char **value);
+IGRAPH_EXPORT char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set2(
@@ -74,16 +75,14 @@ IGRAPH_EXPORT void igraph_strvector_remove_section(
     igraph_strvector_t *v, igraph_integer_t from, igraph_integer_t to);
 IGRAPH_EXPORT void igraph_strvector_remove(
     igraph_strvector_t *v, igraph_integer_t elem);
-IGRAPH_EXPORT void igraph_strvector_move_interval(
-    igraph_strvector_t *v, igraph_integer_t begin, igraph_integer_t end,
-    igraph_integer_t to);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_copy(
     igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_append(
     igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_resize(
     igraph_strvector_t* v, igraph_integer_t newsize);
-IGRAPH_EXPORT igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
+IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v, const char *value);
 IGRAPH_EXPORT void igraph_strvector_permdelete(
     igraph_strvector_t *v, const igraph_vector_int_t *index, igraph_integer_t nremove);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,

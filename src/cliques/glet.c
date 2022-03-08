@@ -158,17 +158,17 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_subclique_next_free, &freedata);
     *resultids = IGRAPH_CALLOC(nc, igraph_vector_int_t);
     if (!*resultids) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     freedata.resultids = *resultids;
     *resultweights = IGRAPH_CALLOC(nc, igraph_vector_t);
     if (!*resultweights) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     freedata.resultweights = *resultweights;
     *result = IGRAPH_CALLOC(nc, igraph_t);
     if (!*result) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     freedata.result = *result;
 
@@ -366,11 +366,11 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     for (i = 0, j = igraph_vector_ptr_size(cliques) - 1; i < nocliques; i++, j--) {
         igraph_vector_int_t *cl = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (!cl) {
-            IGRAPH_ERROR("Cannot find graphlets", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot find graphlets", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, cl);
 
-        igraph_vector_int_list_pop_back(&mycliques, cl);
+        *cl = igraph_vector_int_list_pop_back(&mycliques);
 
         /* From this point onwards, _we_ own the clique and not `mycliques'.
          * We pass on the ownership to `cliques' */

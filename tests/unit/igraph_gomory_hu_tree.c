@@ -121,7 +121,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
             if (flow_value != VECTOR(*flow)[min_weight_edge_index]) {
                 printf(
                     "Edge %" IGRAPH_PRId " -- %" IGRAPH_PRId
-					" (index %" IGRAPH_PRId ") in the Gomory-Hu tree has weight = %.2f, but "
+                    " (index %" IGRAPH_PRId ") in the Gomory-Hu tree has weight = %.2f, but "
                     "the corresponding flow in the original graph has value = %.2f\n",
                     IGRAPH_FROM(tree, min_weight_edge_index),
                     IGRAPH_TO(tree, min_weight_edge_index),

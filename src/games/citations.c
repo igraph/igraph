@@ -136,13 +136,13 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
     lastcit = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (!lastcit) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, lastcit);
 
     index = IGRAPH_CALLOC(no_of_nodes + 1, igraph_integer_t);
     if (!index) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, index);
 
@@ -423,7 +423,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
 
     str.sumtrees = sumtrees = IGRAPH_CALLOC(no_of_types, igraph_psumtree_t);
     if (!sumtrees) {
-        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_i_citing_cited_type_game_free, &str);
 

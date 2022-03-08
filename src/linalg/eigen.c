@@ -1280,29 +1280,25 @@ igraph_error_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
         IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
     }
 
-    switch (algorithm) {
-    case IGRAPH_EIGEN_AUTO:
+    if (algorithm == IGRAPH_EIGEN_AUTO) {
         if (which->howmany == n || n < 100) {
-            IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack(A, sA, fun, n,
-                         extra, which,
-                         values, vectors));
+            algorithm = IGRAPH_EIGEN_LAPACK;
         } else {
-            IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_arpack(A, sA, fun, n,
-                         extra, which,
-                         options, storage,
-                         values, vectors));
+            algorithm = IGRAPH_EIGEN_ARPACK;
         }
-        break;
+    }
+
+    switch (algorithm) {
     case IGRAPH_EIGEN_LAPACK:
         IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack(A, sA, fun, n, extra,
-                     which, values,
-                     vectors));
+                     which, values, vectors));
         break;
     case IGRAPH_EIGEN_ARPACK:
+        if (options == 0) {
+            options = igraph_arpack_options_get_default();
+        }
         IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_arpack(A, sA, fun, n, extra,
-                     which, options,
-                     storage,
-                     values, vectors));
+                     which, options, storage, values, vectors));
         break;
     default:
         IGRAPH_ERROR("Unknown 'algorithm'", IGRAPH_EINVAL);
@@ -1524,27 +1520,28 @@ igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
         IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
     }
 
+    if (algorithm == IGRAPH_EIGEN_AUTO) {
+        /* Select ARPACK unconditionally because nothing else is implemented yet */
+        algorithm = IGRAPH_EIGEN_ARPACK;
+    } else if (algorithm == IGRAPH_EIGEN_COMP_AUTO) {
+        /* Select ARPACK unconditionally because nothing else is implemented yet */
+        algorithm = IGRAPH_EIGEN_COMP_ARPACK;
+    }
+
     switch (algorithm) {
-    case IGRAPH_EIGEN_AUTO:
-        IGRAPH_ERROR("'AUTO' algorithm not implemented yet",
-                     IGRAPH_UNIMPLEMENTED);
-        /* TODO */
-        break;
     case IGRAPH_EIGEN_LAPACK:
         IGRAPH_ERROR("'LAPACK' algorithm not implemented yet",
                      IGRAPH_UNIMPLEMENTED);
         /* TODO */
         break;
     case IGRAPH_EIGEN_ARPACK:
+        if (options == 0) {
+            options = igraph_arpack_options_get_default();
+        }
         IGRAPH_CHECK(igraph_i_eigen_adjacency_arpack(graph, which, options,
                      storage, values, vectors,
                      cmplxvalues,
                      cmplxvectors));
-        break;
-    case IGRAPH_EIGEN_COMP_AUTO:
-        IGRAPH_ERROR("'COMP_AUTO' algorithm not implemented yet",
-                     IGRAPH_UNIMPLEMENTED);
-        /* TODO */
         break;
     case IGRAPH_EIGEN_COMP_LAPACK:
         IGRAPH_ERROR("'COMP_LAPACK' algorithm not implemented yet",
@@ -1552,6 +1549,9 @@ igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
         /* TODO */
         break;
     case IGRAPH_EIGEN_COMP_ARPACK:
+        if (options == 0) {
+            options = igraph_arpack_options_get_default();
+        }
         IGRAPH_ERROR("'COMP_ARPACK' algorithm not implemented yet",
                      IGRAPH_UNIMPLEMENTED);
         /* TODO */
@@ -1559,7 +1559,6 @@ igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
     default:
         IGRAPH_ERROR("Unknown `algorithm'", IGRAPH_EINVAL);
     }
-
 
     return IGRAPH_SUCCESS;
 }

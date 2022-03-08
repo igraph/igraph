@@ -4,6 +4,8 @@
 
 ### Breaking changes
 
+ - igraph now requires CMake 3.18 or later.
+
  - In order to facilitate the usage of graphs with more than 2 billion vertices
    and edges, we have made the size of the `igraph_integer_t` data type to be
    32 bits on 32-bit platforms and 64 bits on 64-bit platforms by default. You
@@ -91,9 +93,20 @@
 
  - `igraph_clique_handler_t` now uses an `igraph_vector_int_t` for its
    `clique` parameter, and must return an `igraph_error_t`. Use `IGRAPH_STOP`
-   as the return code to terminate the search prematurely.
+   as the return code to terminate the search prematurely. The vector that the
+   handler receives is owned by the clique search routine. If you want to hold
+   on to the vector for a longer period of time, you need to make a copy of it
+   in the handler. Cliques passed to the callback are marked as `const` as a
+   reminder to this change.
 
  - The `res` parameter of `igraph_cliques()` is now an `igraph_vector_int_list_t`.
+
+ - Callbacks used by `igraph_cliques_callback()` need to be updated to account
+   for the fact that the callback does not own the clique passed to it any more;
+   the callback needs to make a copy if it wants to hold on to the clique for a
+   longer period of time. If the callback does not need to store the clique, it
+   does not need to do anything any more, and it must not destroy or free the
+   clique.
 
  - `igraph_closeness()` and `igraph_closeness_cutoff()` now use an
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
@@ -177,6 +190,9 @@
 
  - `igraph_diameter()` and `igraph_diameter_dijkstra()` now use `igraph_vector_int_t`
    vectors to return the list of vertex and edge IDs in the diameter.
+
+ - `igraph_dnorm()` was removed. This is not really a breaking change as the
+   function was never documented, but it was exposed from one of the headers.
 
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
    `dom` and `leftout` arguments instead of an `igraph_vector_t`.
@@ -353,6 +369,13 @@
  - The `res` parameters in `igraph_maximal_cliques()` and `igraph_maximal_cliques_subset()`
    are now of type `igraph_vector_int_list_t`.
 
+ - Callbacks used by `igraph_maximal_cliques_callback()` need to be updated to account
+   for the fact that the callback does not own the clique passed to it any more;
+   the callback needs to make a copy if it wants to hold on to the clique for a
+   longer period of time. If the callback does not need to store the clique, it
+   does not need to do anything any more, and it must not destroy or free the
+   clique.
+
  - The `res` parameter in `igraph_maximal_independent_vertex_sets()` is now
    an `igraph_vector_int_list_t`.
 
@@ -393,7 +416,7 @@
  - `igraph_random_edge_walk()` now uses an `igraph_vector_int_t` for its
    `edgewalk` parameter.
 
- - `igraph_read_graph_dimacs()` now uses an `igraph_vector_int_t` for its
+ - `igraph_read_graph_dimacs_flow()` now uses an `igraph_vector_int_t` for its
    label parameter.
 
  - `igraph_realize_degree_sequence()` now uses an `igraph_vector_int_t` for its
@@ -423,11 +446,19 @@
    return the vector of edge IDs in the spanning tree instead of an
    `igraph_vector_t`.
 
+ - `igraph_spmatrix_t` and related functions were removed as they mostly
+   duplicated functionality that was already present in `igraph_sparsemat_t`.
+   Functions that used `igraph_spmatrix_t` in the library now use
+   `igraph_sparsemat_t`.
+
  - `igraph_stochastic_imitation()` now expects the list of strategies
    in an `igraph_vector_int_t` instead of an `igraph_int_t`.
 
  - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
+
+ - `igraph_strvector_get()` now returns strings in the return value, not in an
+   output argument.
 
  - `igraph_subcomponent()` now uses an `igraph_integer_t` for the seed vertex
    instead of an `igraph_real_t`. It also uses an `igraph_vector_int_t` to
@@ -464,7 +495,7 @@
  - The `res` parameter of `igraph_weighted_cliques()` is now an
    `igraph_vector_int_list_t`.
 
- - `igraph_write_graph_dimacs()` now uses `igraph_integer_t` for the source and
+ - `igraph_write_graph_dimacs_flow()` now uses `igraph_integer_t` for the source and
    target vertex index instead of a `long int`.
 
  - `igraph_vector_*()`, `igraph_matrix_*()`, `igraph_stack_*()`, `igraph_array_*()`
@@ -529,11 +560,6 @@
    `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
    instead of `igraph_matrix_t()` for its memberships parameter.
 
- - Every `igraph_spmatrix_*()` function and struct now uses `igraph_integer_t`
-   instead of `long int` for the numbers of rows and columns, and row and column
-   indexes. Note that `igraph_spmatrix_t` itself has been deprecated in favour
-   of `igraph_sparsemat_t`.
-
  - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
    instead.
 
@@ -567,6 +593,7 @@
  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`,
     and edge-switching MCMC sampler.
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
+ - igraph functions that take an ARPACK options object now also accept `NULL` in place of an options object, and they will fall back to using a default object provided by `igraph_arpack_options_get_default()`.
 
 ### Fixed
 
@@ -584,11 +611,30 @@
  - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
    the old name is deprecated and will be removed in 0.11.
 
- - `igraph_spmatrix_t` and its related functions are deprecated in favour of
-   `igraph_sparsemat_t`. These will be removed in 0.11.
+ - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
+   `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
+   deprecated and will be removed in 0.11.
+
+ - `igraph_read_graph_dimacs()` has been renamed to `igraph_read_graph_dimacs_flow()`;
+   the old name is deprecated and might be re-used as a generic DIMACS reader
+   in the future. Also, the function now uses `igraph_integer_t` as the source
+   and target vertex IDs instead of a `long int`.
+
+ - `igraph_strvector_add()` has been renamed to `igraph_strvector_push_back()`
+   for sake of consistency with other vector-like data structures; the old name
+   is deprecated and will be removed in 0.11.
 
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
    deprecated and will be removed in 0.11.
+
+ - `igraph_vector_e()` and `igraph_vector_e_ptr()` have been renamed to
+   `igraph_vector_get()` and `igraph_vector_get_ptr()`. The old names are
+   deprecated and will be removed in 0.11.
+
+ - `igraph_write_graph_dimacs()` has been renamed to `igraph_write_graph_dimacs_flow()`;
+   the old name is deprecated and might be re-used as a generic DIMACS writer
+   in the future. Also, the function now uses `igraph_integer_t` as the source
+   and target vertex IDs instead of a `long int`.
 
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
@@ -611,7 +657,11 @@
  - External PLFIT libraries and their headers are now detected at their standard
    installation location.
  - `igraph_vector_init()` no longer accepts negative vector sizes.
+ - `igraph_assortativity_nominal()` crashed on the null graph.
  - Label propagation now ensures that all labels are dominant.
+ - Fixed incorrect partition results for walktrap algorithm (issue #1927)
+ - Negative values returned by `igraph_rng_get_integer()` and `RNG_INTEGER()` were incorrect,
+   one larger than they should have been.
 
 ### Other
 

@@ -55,13 +55,13 @@ int main() {
     igraph_matrix_init(&m, 4, 3);
     byrow(&m);
 
-    /* igraph_matrix_e */
-    printf("igraph_matrix_e\n");
-    apply(m, printf("%i ", (int)igraph_matrix_e(&m, i, j)), printf("\n"));
+    /* igraph_matrix_get */
+    printf("igraph_matrix_get\n");
+    apply(m, printf("%i ", (int)igraph_matrix_get(&m, i, j)), printf("\n"));
 
-    /* igraph_matrix_e_ptr */
-    printf("igraph_matrix_e_ptr\n");
-    apply(m, printf("%i ", (int)igraph_matrix_e_ptr(&m, i, j)[0]), printf("\n"));
+    /* igraph_matrix_get_ptr */
+    printf("igraph_matrix_get_ptr\n");
+    apply(m, printf("%i ", (int)igraph_matrix_get_ptr(&m, i, j)[0]), printf("\n"));
 
     /* igraph_matrix_set */
     printf("igraph_matrix_set\n");

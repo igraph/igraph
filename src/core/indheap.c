@@ -57,13 +57,13 @@ igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t alloc_s
     h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
     if (h->stor_begin == 0) {
         h->index_begin = 0;
-        IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (h->index_begin == 0) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
-        IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     h->stor_end = h->stor_begin + alloc_size;
@@ -91,13 +91,13 @@ igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* dat
     h->stor_begin = IGRAPH_CALLOC(len, igraph_real_t);
     if (h->stor_begin == 0) {
         h->index_begin = 0;
-        IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->index_begin = IGRAPH_CALLOC(len, igraph_integer_t);
     if (h->index_begin == 0) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
-        IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_end = h->stor_begin + len;
     h->end = h->stor_end;
@@ -291,12 +291,12 @@ igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_integer_t size
 
     tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
     if (tmp1 == 0) {
-        IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmp1);
     tmp2 = IGRAPH_CALLOC(size, igraph_integer_t);
     if (tmp2 == 0) {
-        IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmp2);
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
@@ -435,7 +435,7 @@ igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t all
     if (h->stor_begin == 0) {
         h->index_begin = 0;
         h->index2_begin = 0;
-        IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
@@ -445,7 +445,7 @@ igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t all
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         h->index2_begin = 0;
-        IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->index2_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (h->index2_begin == 0) {
@@ -453,7 +453,7 @@ igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t all
         IGRAPH_FREE(h->index_begin);
         h->stor_begin = 0;
         h->index_begin = 0;
-        IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;
@@ -587,17 +587,17 @@ igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, igraph_integer_t 
 
     tmp1 = IGRAPH_CALLOC(size, igraph_real_t);
     if (tmp1 == 0) {
-        IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmp1);
     tmp2 = IGRAPH_CALLOC(size, igraph_integer_t);
     if (tmp2 == 0) {
-        IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmp2);
     tmp3 = IGRAPH_CALLOC(size, igraph_integer_t);
     if (tmp3 == 0) {
-        IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmp3);
 

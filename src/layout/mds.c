@@ -252,7 +252,7 @@ igraph_error_t igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
 
         seen_vertices = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
         if (seen_vertices == 0) {
-            IGRAPH_ERROR("cannot calculate MDS layout", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot calculate MDS layout", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, seen_vertices);
 

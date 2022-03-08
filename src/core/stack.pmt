@@ -49,7 +49,7 @@ igraph_error_t FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, igraph_intege
     IGRAPH_ASSERT(s != NULL);
     s->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (s->stor_begin == NULL) {
-        IGRAPH_ERROR("Cannot initialize stack.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot initialize stack.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     s->stor_end = s->stor_begin + alloc_size;
     s->end = s->stor_begin;
@@ -131,7 +131,7 @@ igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_int
 
     tmp = IGRAPH_REALLOC(s->stor_begin, capacity, BASE);
     if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for stack.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot reserve space for stack.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     s->end = tmp + (s->end - s->stor_begin);

@@ -56,7 +56,6 @@ add_library(
   core/psumtree.c
   core/set.c
   core/sparsemat.c
-  core/spmatrix.c
   core/stack.c
   core/statusbar.c
   core/strvector.c
@@ -76,6 +75,9 @@ add_library(
   linalg/lapack.c
 
   random/random.c
+  random/rng_glibc2.c
+  random/rng_rand.c
+  random/rng_mt19937.c
 
   graph/adjlist.c
   graph/attributes.c

@@ -29,6 +29,9 @@ int main() {
     igraph_t g;
     FILE *ifile;
 
+    /* turn on attribute handling */
+    igraph_set_attribute_table(&igraph_cattribute_table);
+
     ifile = fopen("pajek5.net", "r");
     if (!ifile) {
         return 1;

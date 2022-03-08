@@ -90,7 +90,7 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_integer_t s
     }
     v->stor_begin = IGRAPH_CALLOC(alloc_size, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -222,7 +222,7 @@ igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_
 
     tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, void*);
     if (tmp == 0) {
-        IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_begin = tmp;
     v->stor_end = v->stor_begin + size;
@@ -324,6 +324,21 @@ igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e) {
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_pop_back
+ * \brief Removes and returns the last element of a pointer vector.
+ *
+ * </para><para>
+ * It is an error to call this function with an empty vector.
+ *
+ * \param v The pointer vector.
+ * \return The removed last element.
+ *
+ * Time complexity: O(1).
+ */
+
 void *igraph_vector_ptr_pop_back(igraph_vector_ptr_t *v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
@@ -359,7 +374,7 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_integer_t
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_e
+ * \function igraph_vector_ptr_get
  * \brief Access an element of a pointer vector.
  *
  * \param v Pointer to a pointer vector.
@@ -369,10 +384,22 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_integer_t
  * Time complexity: O(1).
  */
 
-void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
+void *igraph_vector_ptr_get(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return *(v->stor_begin + pos);
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_e
+ * \brief Access an element of a pointer vector (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_ptr_get 0.10.0
+ */
+
+void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
+    return igraph_vector_ptr_get(v, pos);
 }
 
 /**
@@ -443,7 +470,7 @@ igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t
 igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, igraph_integer_t length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + length;
     v->end = v->stor_end;
@@ -503,7 +530,7 @@ igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vect
 
     to->stor_begin = IGRAPH_CALLOC(from_size, void*);
     if (to->stor_begin == 0) {
-        IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     to->stor_end = to->stor_begin + igraph_vector_ptr_size(from);
     to->end = to->stor_end;
@@ -667,7 +694,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
 
     vind = IGRAPH_CALLOC(n, uintptr_t);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < n; i++) {

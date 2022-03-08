@@ -46,7 +46,6 @@
 
 #include "config.h"
 
-#include "core/math.h"
 #include "internal/hacks.h"
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"
@@ -241,13 +240,12 @@ elabel: LABEL {
   if (igraph_strvector_size(&context->labels) != 0) {
     igraph_integer_t i, id, n=igraph_strvector_size(&context->labels);
     for (i=0; i<n; i++) {
-      igraph_trie_get(&context->trie,
-                      STR(context->labels, i), &id);
+      IGRAPH_YY_CHECK(igraph_trie_get(&context->trie, STR(context->labels, i), &id));
     }
     igraph_strvector_clear(&context->labels);
   }
-  igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
-                   igraph_dl_yyget_leng(scanner), &trie_id);
+  IGRAPH_YY_CHECK(igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
+                                   igraph_dl_yyget_leng(scanner), &trie_id));
   IGRAPH_ASSERT(0 <= trie_id && trie_id < IGRAPH_DL_MAX_VERTEX_COUNT);
   $$ = trie_id;
  };
@@ -315,7 +313,7 @@ igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
   char tmp=newstr[length];
   newstr[length]='\0';
-  IGRAPH_CHECK(igraph_strvector_add(&context->labels, newstr));
+  IGRAPH_CHECK(igraph_strvector_push_back(&context->labels, newstr));
   newstr[length]=tmp;
   return IGRAPH_SUCCESS;
 }

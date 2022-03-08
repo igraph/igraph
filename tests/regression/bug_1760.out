@@ -2,12 +2,16 @@ Unweighted case
 ---------------
 
 Vertices:
-( 2 1 0 )
-( )
+{
+  0: ( 2 1 0 )
+  1: ( )
+}
 
 Edges:
-( 1 0 )
-( )
+{
+  0: ( 1 0 )
+  1: ( )
+}
 
 Predecessors:
 ( 1 2 2 -1 )
@@ -21,12 +25,16 @@ Weighted case
 Algorithm: Dijkstra
 
 Vertices:
-( 2 1 0 )
-( )
+{
+  0: ( 2 1 0 )
+  1: ( )
+}
 
 Edges:
-( 1 0 )
-( )
+{
+  0: ( 1 0 )
+  1: ( )
+}
 
 Predecessors:
 ( 1 2 2 -1 )
@@ -40,12 +48,16 @@ Weighted case
 Algorithm: Bellman-Ford
 
 Vertices:
-( 2 1 0 )
-( )
+{
+  0: ( 2 1 0 )
+  1: ( )
+}
 
 Edges:
-( 1 0 )
-( )
+{
+  0: ( 1 0 )
+  1: ( )
+}
 
 Predecessors:
 ( 1 2 2 -1 )

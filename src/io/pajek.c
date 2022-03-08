@@ -186,7 +186,10 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_pajek_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -200,7 +203,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -331,7 +334,7 @@ static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
          */
         *dest = IGRAPH_CALLOC(destlen + 3, char);
         if (!*dest) {
-            IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
 
         d = *dest;
@@ -343,7 +346,7 @@ static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
 
     *dest = IGRAPH_CALLOC(destlen + 3, char);
     if (!*dest) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     d = *dest;
@@ -604,7 +607,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_ID],
                         igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
@@ -635,7 +638,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             if (vtypes[V_SHAPE] == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_SHAPE],
                         igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
@@ -655,7 +658,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 igraph_integer_t idx = VECTOR(vx_stra)[j];
                 igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
                         igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
                 IGRAPH_FREE(escaped);
@@ -743,7 +746,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             igraph_integer_t idx = VECTOR(ex_stra)[j];
             igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
                                                     igraph_ess_1(edge), &strv);
-            igraph_strvector_get(&strv, 0, &s);
+            s = igraph_strvector_get(&strv, 0);
             IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
             fprintf(outstream, " %s %s", estrnames2[idx], escaped);
             IGRAPH_FREE(escaped);

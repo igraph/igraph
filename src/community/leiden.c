@@ -1011,7 +1011,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     if (!edge_weights) {
         i_edge_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         if (i_edge_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, i_edge_weights);
         IGRAPH_CHECK(igraph_vector_init(i_edge_weights, igraph_ecount(graph)));
@@ -1025,7 +1025,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     if (!node_weights) {
         i_node_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         if (i_node_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, i_node_weights);
         IGRAPH_CHECK(igraph_vector_init(i_node_weights, n));

@@ -370,7 +370,7 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
 
         if (!rec) {
             IGRAPH_ERROR("Cannot create attribute combination data",
-                         IGRAPH_ENOMEM);
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         if (!name) {
             rec->name = NULL;

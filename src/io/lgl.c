@@ -127,7 +127,10 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 
     igraph_lgl_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_lgl_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -141,7 +144,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read LGL file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read LGL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -308,13 +311,13 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             int ret = 0;
             char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, to, &str2);
+            str2 = igraph_strvector_get(&nvec, to);
 
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s\n", str2);
             } else {
                 actvertex = from;
-                igraph_strvector_get(&nvec, from, &str1);
+                str1 = igraph_strvector_get(&nvec, from);
                 ret = fprintf(outstream, "# %s\n%s\n", str1, str2);
             }
             if (ret < 0) {
@@ -369,12 +372,12 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             int ret = 0, ret2;
             char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, to, &str2);
+            str2 = igraph_strvector_get(&nvec, to);
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s ", str2);
             } else {
                 actvertex = from;
-                igraph_strvector_get(&nvec, from, &str1);
+                str1 = igraph_strvector_get(&nvec, from);
                 ret = fprintf(outstream, "# %s\n%s ", str1, str2);
             }
             if (ret < 0) {
@@ -411,7 +414,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 } else {
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
                                  igraph_vss_1(i), &nvec));
-                    igraph_strvector_get(&nvec, 0, &str);
+                    str = igraph_strvector_get(&nvec, 0);
                     ret = fprintf(outstream, "# %s\n", str);
                 }
             }

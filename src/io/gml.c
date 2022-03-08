@@ -209,7 +209,10 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     igraph_gml_yyset_in(instream, context.scanner);
 
+    /* Protect 'context' from being destroyed before returning from yyparse() */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_gml_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -223,7 +226,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -300,7 +303,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
                     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, j);
                     if (!atrec) {
-                        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
                     atrec->name = strdup(name);
@@ -364,7 +367,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
                         igraph_i_gml_tree_type_t type = igraph_gml_tree_type(edge, j);
                         if (!atrec) {
-                            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                         }
                         IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
                         atrec->name = strdup(name);
@@ -548,7 +551,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
     }
     *key = IGRAPH_CALLOC(newlen + 1, char);
     if (! *key) {
-        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     memcpy(*key, strno, plen * sizeof(char));
     for (i = 0; i < len; i++) {
@@ -655,8 +658,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     if (!id) {
         igraph_bool_t found = 0;
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
-            char *n;
-            igraph_strvector_get(&vnames, i, &n);
+            char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 found = 1; break;
             }
@@ -676,7 +678,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     /* Graph attributes first */
     for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
         char *name, *newname;
-        igraph_strvector_get(&gnames, i, &name);
+        name = igraph_strvector_get(&gnames, i);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
         IGRAPH_FINALLY(igraph_free, newname);
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -687,7 +689,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             char *s;
             IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
-            igraph_strvector_get(&strv, 0, &s);
+            s = igraph_strvector_get(&strv, 0);
             CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
             IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
@@ -710,7 +712,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(vtypes)[j];
             char *name, *newname;
-            igraph_strvector_get(&vnames, j, &name);
+            name = igraph_strvector_get(&vnames, j);
             if (!strcmp(name, "id")) {
                 continue;
             }
@@ -726,7 +728,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                              igraph_vss_1(i), &strv));
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
@@ -758,7 +760,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(etypes)[j];
             char *name, *newname;
-            igraph_strvector_get(&enames, j, &name);
+            name = igraph_strvector_get(&enames, j);
             if (!strcmp(name, "source") || !strcmp(name, "target")) {
                 continue;
             }
@@ -774,7 +776,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                              igraph_ess_1(i), &strv));
-                igraph_strvector_get(&strv, 0, &s);
+                s = igraph_strvector_get(&strv, 0);
                 CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,

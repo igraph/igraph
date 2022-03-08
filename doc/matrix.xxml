@@ -32,8 +32,8 @@
 <section id="matrix-accessing-elements">
 <!-- doxrox-include igraph_matrix_accessing_elements -->
 <!-- doxrox-include MATRIX -->
-<!-- doxrox-include igraph_matrix_e -->
-<!-- doxrox-include igraph_matrix_e_ptr -->
+<!-- doxrox-include igraph_matrix_get -->
+<!-- doxrox-include igraph_matrix_get_ptr -->
 <!-- doxrox-include igraph_matrix_set -->
 </section>
 
@@ -108,6 +108,11 @@
 <!-- doxrox-include igraph_matrix_add_cols -->
 <!-- doxrox-include igraph_matrix_remove_row -->
 <!-- doxrox-include igraph_matrix_remove_col -->
+</section>
+
+<section id="matrix-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_matrix_e -->
+<!-- doxrox-include igraph_matrix_e_ptr -->
 </section>
 
 </section>

@@ -68,7 +68,7 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
         sv->stor_begin[i] = IGRAPH_CALLOC(1, char);
         if (sv->stor_begin[i] == 0) {
             igraph_strvector_destroy(sv);
-            IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->stor_begin[i][0] = '\0';
     }
@@ -112,14 +112,11 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  * for an easier way.
  * \param sv The input string vector.
  * \param idx The index of the element to query.
- * \param Pointer to a <type>char*</type>, the address of the string
- *   is stored here.
  *
  * Time complexity: O(1).
  */
 
-void igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx,
-                          char **value) {
+char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->stor_begin != 0);
     IGRAPH_ASSERT(sv->stor_begin[idx] != 0);
@@ -158,7 +155,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
     } else {
         char *tmp = IGRAPH_REALLOC(sv->stor_begin[idx], value_len + 1, char);
         if (tmp == 0) {
-            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->stor_begin[idx] = tmp;
     }
@@ -198,7 +195,7 @@ igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_integer_t id
     } else {
         char *tmp = IGRAPH_REALLOC(sv->stor_begin[idx], len + 1, char);
         if (tmp == 0) {
-            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->stor_begin[idx] = tmp;
     }
@@ -253,31 +250,6 @@ void igraph_strvector_remove(igraph_strvector_t *v, igraph_integer_t elem) {
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_move_interval
- * \brief Copies an interval of a string vector.
- */
-
-void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_integer_t begin,
-                                    igraph_integer_t end, igraph_integer_t to) {
-    igraph_integer_t i;
-    IGRAPH_ASSERT(v != 0);
-    IGRAPH_ASSERT(v->stor_begin != 0);
-    for (i = to; i < to + end - begin; i++) {
-        if (v->stor_begin[i] != 0) {
-            IGRAPH_FREE(v->stor_begin[i]);
-        }
-    }
-    for (i = 0; i < end - begin; i++) {
-        if (v->stor_begin[begin + i] != 0) {
-            size_t len = strlen(v->stor_begin[begin + i]) + 1;
-            v->stor_begin[to + i] = IGRAPH_CALLOC(len, char);
-            memcpy(v->stor_begin[to + i], v->stor_begin[begin + i], sizeof(char)*len);
-        }
-    }
-}
-
-/**
- * \ingroup strvector
  * \function igraph_strvector_copy
  * \brief Initialization by copying.
  *
@@ -292,7 +264,6 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_integer_t begi
 igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
                           const igraph_strvector_t *from) {
     igraph_integer_t i;
-    char *str;
     IGRAPH_ASSERT(from != 0);
     /*   IGRAPH_ASSERT(from->stor_begin != 0); */
     to->stor_begin = IGRAPH_CALLOC(igraph_strvector_size(from), char*);
@@ -304,8 +275,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
 
     for (i = 0; i < igraph_strvector_size(from); i++) {
         igraph_error_t ret;
-        igraph_strvector_get(from, i, &str);
-        ret = igraph_strvector_set(to, i, str);
+        ret = igraph_strvector_set(to, i, igraph_strvector_get(from, i));
         if (ret != 0) {
             igraph_strvector_destroy(to);
             IGRAPH_ERROR("cannot copy string vector", ret);
@@ -346,7 +316,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     }
     if (error) {
         igraph_strvector_resize(to, len1);
-        IGRAPH_ERROR("Cannot append string vector", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot append string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     return IGRAPH_SUCCESS;
 }
@@ -402,7 +372,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
     } else if (newsize > oldsize) {
         tmp = IGRAPH_REALLOC(v->stor_begin, newsize, char*);
         if (tmp == 0) {
-            IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         v->stor_begin = tmp;
         v->stor_end = v->stor_begin + newsize;
@@ -444,18 +414,18 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_add
+ * \function igraph_strvector_push_back
  * \brief Adds an element to the back of a string vector.
  *
  * \param v The string vector.
- * \param value The string to add, it will be copied.
+ * \param value The string to add; it will be copied.
  * \return Error code.
  *
  * Time complexity: O(n+l), n is the total number of strings, l is the
  * length of the new string.
  */
 
-igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v, const char *value) {
     igraph_integer_t old_size;
     igraph_integer_t value_len = strlen(value);
     igraph_integer_t new_size;
@@ -483,6 +453,18 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     v->end = v->stor_begin + old_size + 1;
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_add
+ * \brief Adds an element to the back of a string vector (deprecated alias).
+ *
+ * \deprecated-by igraph_strvector_push_back 0.10.0
+ */
+
+igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+    return igraph_strvector_push_back(v, value);
 }
 
 /**
@@ -546,8 +528,7 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
 
     for (i = 0; i < newlen; i++) {
         igraph_integer_t j = VECTOR(*idx)[i];
-        char *str;
-        igraph_strvector_get(v, j, &str);
+        char *str = igraph_strvector_get(v, j);
         igraph_strvector_set(newv, i, str);
     }
 

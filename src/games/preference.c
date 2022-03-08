@@ -151,7 +151,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     } else {
         nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (nodetypes == 0) {
-            IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, nodetypes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);
@@ -441,7 +441,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     } else {
         nodetypes_in = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (nodetypes_in == 0) {
-            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_in, nodes);
     }
@@ -452,7 +452,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     } else {
         nodetypes_out = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (nodetypes_out == 0) {
-            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_out, nodes);
     }

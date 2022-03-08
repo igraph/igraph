@@ -289,6 +289,7 @@ typedef struct igraph_arpack_storage_t {
 } igraph_arpack_storage_t;
 
 IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
+IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default();
 
 IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
                                              igraph_integer_t maxncv, igraph_integer_t maxldv, igraph_bool_t symm);

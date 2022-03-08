@@ -117,7 +117,7 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t size) {
 
     tmp = IGRAPH_REALLOC(set->stor_begin, size, igraph_integer_t);
     if (tmp == 0) {
-        IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     set->stor_begin = tmp;
     set->stor_end = set->stor_begin + size;

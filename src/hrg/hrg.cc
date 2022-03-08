@@ -338,26 +338,32 @@ igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
 
 igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     igraph_integer_t origsize = igraph_hrg_size(hrg);
-    int ret = 0;
-    igraph_error_handler_t *oldhandler =
-        igraph_set_error_handler(igraph_error_handler_ignore);
 
-    ret  = igraph_vector_int_resize(&hrg->left, newsize - 1);
-    ret |= igraph_vector_int_resize(&hrg->right, newsize - 1);
-    ret |= igraph_vector_resize(&hrg->prob, newsize - 1);
-    ret |= igraph_vector_int_resize(&hrg->edges, newsize - 1);
-    ret |= igraph_vector_int_resize(&hrg->vertices, newsize - 1);
+    /* The data structure must be left in a consistent state if resizing fails. */
 
-    igraph_set_error_handler(oldhandler);
+#define CHECK_ERR(expr) \
+    do { \
+        igraph_error_t err = (expr); \
+        if (err != IGRAPH_SUCCESS) { \
+            igraph_vector_int_resize(&hrg->left, origsize); \
+            igraph_vector_int_resize(&hrg->right, origsize); \
+            igraph_vector_resize(&hrg->prob, origsize); \
+            igraph_vector_int_resize(&hrg->edges, origsize); \
+            igraph_vector_int_resize(&hrg->vertices, origsize); \
+            IGRAPH_FINALLY_EXIT(); \
+            IGRAPH_ERROR("Cannot resize HRG.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
+        } \
+    } while (0)
 
-    if (ret) {
-        igraph_vector_int_resize(&hrg->left, origsize);
-        igraph_vector_int_resize(&hrg->right, origsize);
-        igraph_vector_resize(&hrg->prob, origsize);
-        igraph_vector_int_resize(&hrg->edges, origsize);
-        igraph_vector_int_resize(&hrg->vertices, origsize);
-        IGRAPH_ERROR("Cannot resize HRG", IGRAPH_ENOMEM);
+    IGRAPH_FINALLY_ENTER();
+    {
+        CHECK_ERR(igraph_vector_int_resize(&hrg->left, newsize - 1));
+        CHECK_ERR(igraph_vector_int_resize(&hrg->right, newsize - 1));
+        CHECK_ERR(igraph_vector_resize(&hrg->prob, newsize - 1));
+        CHECK_ERR(igraph_vector_int_resize(&hrg->edges, newsize - 1));
+        CHECK_ERR(igraph_vector_int_resize(&hrg->vertices, newsize - 1));
     }
+    IGRAPH_FINALLY_EXIT();
 
     return IGRAPH_SUCCESS;
 }

@@ -46,10 +46,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef USING_R
-    #include <R.h>
-#endif
-
 /**
  * \function igraph_community_to_membership
  * \brief Create membership vector from community structure dendrogram
@@ -535,12 +531,12 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     k2 = igraph_vector_int_max(v2) + 1;
     p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, p1);
     p2 = IGRAPH_CALLOC(k2, double);
     if (p2 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, p2);
 

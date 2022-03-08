@@ -40,7 +40,6 @@
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 #include "config.h"
 
@@ -1429,7 +1428,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         char *mark;
         mark = IGRAPH_CALLOC(no_of_nodes, char);
         if (!mark) {
-            IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, mark);
 

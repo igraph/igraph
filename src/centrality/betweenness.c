@@ -578,13 +578,13 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -786,13 +786,13 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -946,19 +946,19 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
     if (is_target == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -1153,7 +1153,7 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
 
     is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
     if (is_target == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -1174,13 +1174,13 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 

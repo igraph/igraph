@@ -757,7 +757,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     {
         igraph_integer_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_integer_t);
         if (xs == 0) {
-            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         for (i = 0; i < no_of_vertices; i++) {
             MATRIX(*layout, i, 0) = xs[(igraph_integer_t)MATRIX(*layout, i, 1)]++;

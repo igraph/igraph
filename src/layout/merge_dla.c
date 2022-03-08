@@ -103,9 +103,9 @@ igraph_error_t igraph_layout_merge_dla(
         }
 
         igraph_i_layout_sphere_2d(mat,
-                                  igraph_vector_e_ptr(&nx, i),
-                                  igraph_vector_e_ptr(&ny, i),
-                                  igraph_vector_e_ptr(&nr, i));
+                                  igraph_vector_get_ptr(&nx, i),
+                                  igraph_vector_get_ptr(&ny, i),
+                                  igraph_vector_get_ptr(&nr, i));
     }
     igraph_vector_order2(&sizes); /* largest first */
 
@@ -131,8 +131,8 @@ igraph_error_t igraph_layout_merge_dla(
         actg = VECTOR(sizes)[jpos++];
         /* 2. random walk, TODO: tune parameters */
         igraph_i_layout_merge_dla(&grid, actg,
-                                  igraph_vector_e_ptr(&x, actg),
-                                  igraph_vector_e_ptr(&y, actg),
+                                  igraph_vector_get_ptr(&x, actg),
+                                  igraph_vector_get_ptr(&y, actg),
                                   VECTOR(r)[actg], 0, 0,
                                   maxx, maxx + 5);
 

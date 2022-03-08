@@ -58,7 +58,7 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
     *res = 0;
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_added == 0) {
-        IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -742,7 +742,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
 
         already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
         if (already_counted == 0) {
-            IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, already_counted);
 
@@ -978,7 +978,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     }
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_added == 0) {
-        IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);

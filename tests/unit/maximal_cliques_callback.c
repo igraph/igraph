@@ -32,7 +32,7 @@ int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2
 }
 
 
-igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler(const igraph_vector_int_t *clique, void *arg) {
     struct userdata *ud;
     igraph_bool_t cont;
 
@@ -44,30 +44,17 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
         cont = 0; /* false */
     }
 
-    igraph_vector_int_destroy(clique);
-    igraph_free(clique);
-
     ud->i += 1;
 
     return cont ? IGRAPH_SUCCESS : IGRAPH_STOP;
 }
 
 
-igraph_error_t handler_stop(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler_stop(const igraph_vector_int_t *clique, void *arg) {
     /* Stop search as soon as a 3-clique is found. */
     /* Since there are two 3-cliques in the test graph, this will stop the search before it is complete. */
     IGRAPH_UNUSED(arg);
-    if (igraph_vector_int_size(clique) == 3) {
-        igraph_vector_int_destroy(clique);
-        igraph_free(clique);
-
-        return IGRAPH_STOP;
-    }
-
-    igraph_vector_int_destroy(clique);
-    igraph_free(clique);
-
-    return IGRAPH_SUCCESS;
+    return (igraph_vector_int_size(clique) == 3) ? IGRAPH_STOP : IGRAPH_SUCCESS;
 }
 
 

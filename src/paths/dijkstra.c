@@ -378,12 +378,12 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
     parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parents == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, parents);
     is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
     if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -741,7 +741,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         parent_vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (parent_vec == 0) {
-            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, parent_vec);
         IGRAPH_CHECK(igraph_vector_int_init(parent_vec, 0));
@@ -750,7 +750,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         parent_edge_vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (parent_edge_vec == 0) {
-            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, parent_edge_vec);
         IGRAPH_CHECK(igraph_vector_int_init(parent_edge_vec, 0));
@@ -769,7 +769,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     /* boolean array to mark whether a given vertex is a target or not */
     is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
     if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -988,7 +988,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
              * for the algorithm to work. */
             vertices = IGRAPH_CALLOC(1, igraph_vector_int_list_t);
             if (vertices == 0) {
-                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, vertices);
             IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(vertices, 0);

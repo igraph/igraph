@@ -108,7 +108,7 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
 
     geodist = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (geodist == 0) {
-        IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, geodist);
 

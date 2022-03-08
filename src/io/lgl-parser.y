@@ -44,20 +44,19 @@
 
 */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
 
-#include "core/math.h"
 #include "io/lgl-header.h"
 #include "io/parsers/lgl-parser.h"
 #include "io/parsers/lgl-lexer.h"
 #include "io/parse_utils.h"
 #include "internal/hacks.h"
+
+#include <stdio.h>
+#include <string.h>
 
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
                        const char *s);

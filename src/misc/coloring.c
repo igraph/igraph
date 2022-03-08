@@ -156,6 +156,6 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
     case IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS:
         return igraph_i_vertex_coloring_greedy_cn(graph, colors);
     default:
-        return IGRAPH_EINVAL;
+        IGRAPH_ERROR("Invalid heuristic for greedy vertex coloring.", IGRAPH_EINVAL);
     }
 }

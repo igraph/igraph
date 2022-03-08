@@ -61,7 +61,7 @@ struct userdata {
     igraph_vector_int_list_t *list;
 };
 
-igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
+igraph_error_t handler(const igraph_vector_int_t *clique, void *arg) {
     struct userdata *ud;
     igraph_bool_t cont;
 
@@ -72,9 +72,6 @@ igraph_error_t handler(igraph_vector_int_t *clique, void *arg) {
         printf("igraph_cliques() and igraph_cliques_callback() give different results.\n");
         cont = 0; /* false */
     }
-
-    igraph_vector_int_destroy(clique);
-    igraph_free(clique);
 
     ud->i += 1;
 

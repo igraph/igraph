@@ -716,17 +716,17 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     communities.no_of_communities = no_of_nodes;
     communities.e = IGRAPH_CALLOC(no_of_nodes, igraph_i_fastgreedy_community);
     if (communities.e == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, communities.e);
     communities.heap = IGRAPH_CALLOC(no_of_nodes, igraph_i_fastgreedy_community*);
     if (communities.heap == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, communities.heap);
     communities.heapindex = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (communities.heapindex == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_FINALLY(igraph_i_fastgreedy_community_list_destroy, &communities);
@@ -740,7 +740,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     debug("Allocating dq vector\n");
     dq = IGRAPH_CALLOC(no_of_edges, igraph_real_t);
     if (dq == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, dq);
     debug("Creating community pair list\n");
@@ -748,7 +748,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
     pairs = IGRAPH_CALLOC(2 * no_of_edges, igraph_i_fastgreedy_commpair);
     if (pairs == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, pairs);
     loop_weight_sum = 0;
@@ -1042,7 +1042,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         igraph_integer_t merges_nrow = igraph_matrix_int_nrow(merges);
         ivec = IGRAPH_CALLOC(merges_nrow, igraph_integer_t);
         if (ivec == 0) {
-            IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, ivec);
         for (i = 0; i < no_of_joins; i++) {

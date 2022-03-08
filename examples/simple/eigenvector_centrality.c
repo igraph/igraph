@@ -65,10 +65,11 @@ int main() {
     igraph_destroy(&g);
 
     /* Special cases: check for full graph, zero weights */
+    /* Note that it is not mandatory to supply ARPACK options */
     igraph_full(&g, 10, 0, 0);
     igraph_vector_init(&weights, 45);
     igraph_vector_fill(&weights, 0);
-    igraph_eigenvector_centrality(&g, &v, &value, 0, 0, &weights, &options);
+    igraph_eigenvector_centrality(&g, &v, &value, 0, 0, &weights, 0);
     igraph_vector_destroy(&weights);
     if (value != 0.0) {
         return 2;

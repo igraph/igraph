@@ -3,27 +3,20 @@
 export DEPS_PATH=/src/deps
 mkdir $DEPS_PATH
 
+# Build libxml2 without ICU support, https://github.com/igraph/igraph/issues/1992 
+cd $SRC/libxml2-2.9.13 
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF
+make install -j$(nproc)
+
+# Build igraph
+cd $SRC/igraph
 mkdir build && cd build
 # CMAKE_BUILD_TYPE=None is an arbitrary value that prevents the automatic Release
 # build type setting, allowing OSS-Fuzz to pass on its own optimization flags.
-cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None
+cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH
 make -j$(nproc)
 
-# Build ICU for linking statically. 
-cd $SRC/icu/source 
-./configure --disable-shared --enable-static --disable-layoutex \
-   --disable-tests --disable-samples --with-data-packaging=static --prefix=$DEPS_PATH 
-make install -j$(nproc)
-
-# Ugly hack to get static linking to work for ICU.
-# See https://github.com/google/oss-fuzz/issues/7284
-cd $DEPS_PATH/lib
-ls *.a | xargs -n1 ar x
-rm *.a
-ar r libicu.a *.{ao,o}
-ln -s libicu.a libicudata.a
-ln -s libicu.a libicuuc.a
-ln -s libicu.a libicui18n.a
 
 # Create seed corpus
 zip $OUT/read_gml_fuzzer_seed_corpus.zip \
@@ -61,7 +54,7 @@ zip $OUT/read_graphml_fuzzer_seed_corpus.zip \
 
 cd $SRC/igraph
 
-XML2_FLAGS="-L$DEPS_PATH/lib -Wl,-Bstatic -lxml2 -lz -llzma -licuuc -licui18n -licudata -Wl,-Bdynamic"
+XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 
 # disabled:  vertex_connectivity_fuzzer
 for TARGET in read_gml_fuzzer read_pajek_fuzzer read_dl_fuzzer read_lgl_fuzzer read_ncol_fuzzer read_graphml_fuzzer bliss_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer

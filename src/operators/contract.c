@@ -30,16 +30,24 @@
 
 /**
  * \function igraph_contract_vertices
- * Replace multiple vertices with a single one.
+ * \brief Replace multiple vertices with a single one.
  *
- * This function creates a new graph, by merging several
- * vertices into one. The vertices in the new graph correspond
- * to sets of vertices in the input graph.
- * \param graph The input graph, it can be directed or
- *        undirected.
+ * This function modifies the graph by merging several vertices
+ * into one. The vertices in the modified graph correspond
+ * to groups of vertices in the input graph. No edges are removed,
+ * thus the modified graph will typically have self-loops
+ * (corresponding to in-group edges) and multi-edges
+ * (corresponding to multiple connections between two groups).
+ * Use \ref igraph_simplify() to eliminate self-loops and
+ * merge multi-edges.
+ *
+ * \param graph The input graph. It will be modified in-place.
  * \param mapping A vector giving the mapping. For each
  *        vertex in the original graph, it should contain
- *        its id in the new graph.
+ *        its desired ID in the result graph. In order to create
+ *        "orphan vertices" that have no corresponding vertices
+ *        in the original graph, ensure that the IDs are consecutive
+ *        integers starting from zero.
  * \param vertex_comb What to do with the vertex attributes.
  *        \c NULL means that vertex attributes are not kept
  *        after the contraction (not even for unaffected

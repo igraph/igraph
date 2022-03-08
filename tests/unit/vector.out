@@ -5,7 +5,7 @@ Test VECTOR() and igraph_vector_size
 ( 10 9 8 7 6 5 4 3 2 1 )
 Test igraph_vector_reserve and igraph_vector_push_back
 Test igraph_vector_empty and igraph_vector_clear
-Test igraph_vector_e and igraph_vector_e_ptr
+Test igraph_vector_get and igraph_vector_get_ptr
  0 100 200 300 400
 Test igraph_vector_set
 ( 0 20 40 60 80 )

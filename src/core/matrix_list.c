@@ -35,20 +35,19 @@
 #undef BASE_IGRAPH_REAL
 
 static igraph_error_t igraph_i_matrix_list_init_item(
-   const igraph_matrix_list_t* list, igraph_matrix_t* item
+    const igraph_matrix_list_t* list, igraph_matrix_t* item
 ) {
+    IGRAPH_UNUSED(list);
     return igraph_matrix_init(item, 0, 0);
 }
 
-static igraph_error_t igraph_i_matrix_list_init_item_from(
-   const igraph_matrix_list_t* list, igraph_matrix_t* item, const igraph_matrix_t* other
+static igraph_error_t igraph_i_matrix_list_copy_item(
+    igraph_matrix_t* dest, const igraph_matrix_t* source
 ) {
-    return igraph_matrix_copy(item, other);
+    return igraph_matrix_copy(dest, source);
 }
 
-static void igraph_i_matrix_list_destroy_item(
-   const igraph_matrix_list_t* list, igraph_matrix_t* item
-) {
+static void igraph_i_matrix_list_destroy_item(igraph_matrix_t* item) {
     igraph_matrix_destroy(item);
 }
 

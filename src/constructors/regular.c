@@ -186,7 +186,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star(), 
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star(),
  * \ref igraph_kary_tree() for creating other regular structures.
  *
  */
@@ -227,11 +227,11 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
         return IGRAPH_SUCCESS;
     }
 
-    /* Register the star for deallocation in case of error flow before 
+    /* Register the star for deallocation in case of error flow before
      * the entire wheel is successfully created. */
     IGRAPH_FINALLY(igraph_destroy, graph);
 
-    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices, 
+    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices,
      * it will have n - 1 edges. For MUTUAL mode, number of edges
      * will be double. */
     if (mode == IGRAPH_WHEEL_MUTUAL) {
@@ -281,7 +281,7 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 
     /* 2 instead of 1 because the star graph is registered before. */
     IGRAPH_FINALLY_CLEAN(2);
-    
+
     return IGRAPH_SUCCESS;
 }
 
@@ -348,12 +348,12 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 
     coords = IGRAPH_CALLOC(dims, igraph_integer_t);
     if (coords == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, coords);
     weights = IGRAPH_CALLOC(dims, igraph_integer_t);
     if (weights == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, weights);
     if (dims > 0) {

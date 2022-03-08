@@ -164,8 +164,8 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \param weights A null pointer (=no edge weights), or a vector
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    for details. Supply \c NULL here to use the defaults. Note that the function
+ *    overwrites the <code>n</code> (number of vertices) parameter and
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
@@ -247,7 +247,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
     }
 
-    options->n = (int) no_of_nodes;
+    if (!options) {
+        options = igraph_arpack_options_get_default();
+    }
+
+    options->n = no_of_nodes;
     options->start = 1;   /* no random start vector */
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);

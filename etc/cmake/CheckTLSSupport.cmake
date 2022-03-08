@@ -1,7 +1,9 @@
 include(CheckCSourceCompiles)
+include(CMakePushCheckState)
 
 macro(check_tls_support VAR)
   if(NOT DEFINED "${VAR}")
+    cmake_push_check_state()
     set(CMAKE_REQUIRED_QUIET 1)
 
     check_c_source_compiles("
@@ -29,6 +31,6 @@ macro(check_tls_support VAR)
         set(${VAR} "" CACHE INTERNAL "Thread-local storage keyword in compiler")
       endif()
     endif()
-    set(CMAKE_REQUIRED_QUIET 0)
+    cmake_pop_check_state()
   endif()
 endmacro()

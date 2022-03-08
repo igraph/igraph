@@ -60,12 +60,17 @@ void print_vector_int(const igraph_vector_int_t *v) {
     printf(" )\n");
 }
 
-/* Print all vectors in an integer vector list */
+/* Print all vectors in an integer vector list. Use brackets around each vector
+ * and also use brackets around the entire list to make it clear when the list
+ * is empty */
 void print_vector_int_list(const igraph_vector_int_list_t *v) {
     igraph_integer_t i, n = igraph_vector_int_list_size(v);
-    for (i = 0; i < n; i++) {
+    printf("{\n");
+    for (i = 0; i < n; ++i) {
+        printf("  %" IGRAPH_PRId ": ", i);
         print_vector_int(igraph_vector_int_list_get_ptr(v, i));
     }
+    printf("}\n");
 }
 
 /* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */

@@ -1,7 +1,9 @@
-# Minimum CMake that we require is 3.16 because we use --ignore-eol when
-# comparing unit test results with expected outcomes (added in 3.14) and we
-# also use SKIP_REGULAR_EXPRESSION to handle skipped tests properly
-cmake_minimum_required(VERSION 3.16)
+# Minimum CMake that we require is 3.18.
+# Some of the recent features we use:
+#  * --ignore-eol when comparing unit test results with expected outcomes (3.14)
+#  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
+#  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
+cmake_minimum_required(VERSION 3.18)
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
@@ -38,6 +40,9 @@ project(
 # Include some compiler-related helpers and set global compiler options
 include(compilers)
 
+# Detect is certain attributes are supported by the compiler
+include(attribute_support)
+
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -70,26 +75,18 @@ find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
+include(CMakePushCheckState)
 
 # First we check for some functions and symbols
-set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+cmake_push_check_state()
 if(NEED_LINKING_AGAINST_LIBM)
   list(APPEND CMAKE_REQUIRED_LIBRARIES m)
 endif()
-check_symbol_exists(expm1 math.h HAVE_EXPM1)
-check_symbol_exists(fmin math.h HAVE_FMIN)
-check_symbol_exists(finite math.h HAVE_FINITE)
-check_symbol_exists(isfinite math.h HAVE_ISFINITE)
-check_symbol_exists(log2 math.h HAVE_LOG2)
-check_symbol_exists(log1p math.h HAVE_LOG1P)
-check_symbol_exists(rint math.h HAVE_RINT)
-check_symbol_exists(rintf math.h HAVE_RINTF)
-check_symbol_exists(round math.h HAVE_ROUND)
 check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
 check_symbol_exists(strdup string.h HAVE_STRDUP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+cmake_pop_check_state()
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
@@ -101,9 +98,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
     # Generated files are excluded; apparently the CodeCoverage script has some
     # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
-    # directory that somehow gets into the coverage resolts. /Applications is for
-    # macOS -- it excludes files from the macOS SDK.
-    EXCLUDE "io/*.l" "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
+    # directory that somehow gets into the coverage resolts. /Applications and
+    # /Library/Developer are for macOS -- they exclude files from the macOS SDK.
+    EXCLUDE "io/*.l" "src/io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*"
   )
 endif()
 

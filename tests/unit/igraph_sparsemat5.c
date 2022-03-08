@@ -45,7 +45,7 @@ void test_1x1(igraph_real_t value) {
     igraph_matrix_init(&values, 0, 0);
     igraph_matrix_init(&vectors, 0, 0);
     options.mode = 1;
-    igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rnsolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values, &vectors);
     printf("rnsolve:\n  - eigenvalues:\n");
     print_matrix(&values);
@@ -57,7 +57,7 @@ void test_1x1(igraph_real_t value) {
     igraph_vector_init(&values2, 0);
     igraph_matrix_init(&vectors, 0, 0);
     options.mode = 1;
-    igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rssolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values2, &vectors, IGRAPH_SPARSEMAT_SOLVE_LU);
     printf("rssolve:\n  - eigenvalues:\n");
     print_vector(&values2);
@@ -298,7 +298,7 @@ int main() {
 
     /***********************************************************************/
 
-    /* A directed tree and a directed, mutual ring */
+    /* A directed tree and a directed, mutual ring, no ARPACK options */
     printf("\n== A directed tree and a directed, mutual ring ==\n");
 #define DIM 10
     igraph_kary_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
@@ -318,7 +318,7 @@ int main() {
 
     /* Regular mode */
     options.mode = 1;
-    igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rnsolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values2, &vectors);
 
     if (MATRIX(vectors, 0, 0) < 0.0) {

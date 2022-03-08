@@ -26,8 +26,6 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-#include "core/math.h"
-
 #include <string.h>
 
 /* An attribute is either a numeric vector (vector_t) or a string
@@ -65,20 +63,20 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
 
     *newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
     if (!(*newrec)) {
-        IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, *newrec);
     (*newrec)->type = rec->type;
     (*newrec)->name = strdup(rec->name);
     if (!(*newrec)->name) {
-        IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, (void*)(*newrec)->name);
     if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
         num = (igraph_vector_t *)rec->value;
         newnum = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!newnum) {
-            IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, newnum);
         IGRAPH_CHECK(igraph_vector_copy(newnum, num));
@@ -88,7 +86,7 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
         str = (igraph_strvector_t*)rec->value;
         newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (!newstr) {
-            IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, newstr);
         IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
@@ -98,7 +96,7 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
         igraph_vector_bool_t *log = (igraph_vector_bool_t*) rec->value;
         igraph_vector_bool_t *newlog = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (!newlog) {
-            IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, newlog);
         IGRAPH_CHECK(igraph_vector_bool_copy(newlog, log));
@@ -120,7 +118,7 @@ static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_pt
 
     nattr = IGRAPH_CALLOC(1, igraph_i_cattributes_t);
     if (!nattr) {
-        IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nattr);
 
@@ -231,7 +229,7 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
     igraph_bool_t copy[3] = { ga, va, ea };
     to->attr = attrto = IGRAPH_CALLOC(1, igraph_i_cattributes_t);
     if (!attrto) {
-        IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, attrto);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&attrto->gal, 0);
@@ -297,19 +295,19 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
             igraph_attribute_record_t *newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
             igraph_attribute_type_t type = tmp->type;
             if (!newrec) {
-                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, newrec);
             newrec->type = type;
             newrec->name = strdup(tmp->name);
             if (!newrec->name) {
-                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, (char*)newrec->name);
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *newnum = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (!newnum) {
-                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, origlen);
@@ -318,7 +316,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
-                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newstr);
                 IGRAPH_STRVECTOR_INIT_FINALLY(newstr, origlen);
@@ -326,7 +324,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 igraph_vector_bool_t *newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 if (!newbool) {
-                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newbool);
                 IGRAPH_CHECK(igraph_vector_bool_init(newbool, origlen));
@@ -467,7 +465,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 num = (igraph_vector_t*) oldrec->value;
                 newnum = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (!newnum) {
-                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 igraph_vector_index(num, newnum, idx);
@@ -480,7 +478,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
                 newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 if (!newbool) {
-                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
                 IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
@@ -494,7 +492,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 str = (igraph_strvector_t*)oldrec->value;
                 newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
-                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
                 IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
@@ -537,7 +535,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
             igraph_attribute_record_t *new_rec =
                 IGRAPH_CALLOC(1, igraph_attribute_record_t);
             if (!new_rec) {
-                IGRAPH_ERROR("Cannot create vertex attributes", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot create vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             new_rec->name = strdup(oldrec->name);
             new_rec->type = oldrec->type;
@@ -549,7 +547,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 num = (igraph_vector_t*)oldrec->value;
                 newnum = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (!newnum) {
-                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 igraph_vector_index(num, newnum, idx);
@@ -560,7 +558,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 oldbool = (igraph_vector_bool_t*)oldrec->value;
                 newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 if (!newbool) {
-                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
                 IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
@@ -572,7 +570,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 str = (igraph_strvector_t*)oldrec->value;
                 newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
-                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
                 IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
@@ -608,7 +606,7 @@ static igraph_error_t igraph_i_cattributes_cn_sum(const igraph_attribute_record_
     igraph_integer_t i;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -639,7 +637,7 @@ static igraph_error_t igraph_i_cattributes_cn_prod(const igraph_attribute_record
     igraph_integer_t i;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -671,7 +669,7 @@ static igraph_error_t igraph_i_cattributes_cn_min(const igraph_attribute_record_
     igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -706,7 +704,7 @@ static igraph_error_t igraph_i_cattributes_cn_max(const igraph_attribute_record_
     igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -742,7 +740,7 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
     igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -781,7 +779,7 @@ static igraph_error_t igraph_i_cattributes_cn_first(const igraph_attribute_recor
     igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -813,7 +811,7 @@ static igraph_error_t igraph_i_cattributes_cn_last(const igraph_attribute_record
     igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -844,7 +842,7 @@ static igraph_error_t igraph_i_cattributes_cn_mean(const igraph_attribute_record
     igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -881,7 +879,7 @@ static igraph_error_t igraph_i_cattributes_cn_func(const igraph_attribute_record
     igraph_vector_t values;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
@@ -918,7 +916,7 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
     igraph_integer_t i;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -957,7 +955,7 @@ static igraph_error_t igraph_i_cattributes_cb_first(const igraph_attribute_recor
     igraph_integer_t i;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -989,7 +987,7 @@ static igraph_error_t igraph_i_cattributes_cb_last(const igraph_attribute_record
     igraph_integer_t i;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -1021,7 +1019,7 @@ static igraph_error_t igraph_i_cattributes_cb_all_is_true(const igraph_attribute
     igraph_integer_t i, j, n, x;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -1056,7 +1054,7 @@ static igraph_error_t igraph_i_cattributes_cb_any_is_true(const igraph_attribute
     igraph_integer_t i, j, n, x;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -1091,7 +1089,7 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
     igraph_integer_t i, j, n, x, num_trues;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -1143,7 +1141,7 @@ static igraph_error_t igraph_i_cattributes_cb_func(const igraph_attribute_record
     igraph_vector_bool_t values;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
@@ -1184,7 +1182,7 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_strvector_init(newv, newlen));
@@ -1199,11 +1197,11 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else if (n == 1) {
-            igraph_strvector_get(oldv, 0, &tmp);
+            tmp = igraph_strvector_get(oldv, 0);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         } else {
             igraph_integer_t r = RNG_INTEGER(0, n - 1);
-            igraph_strvector_get(oldv, r, &tmp);
+            tmp = igraph_strvector_get(oldv, r);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
@@ -1225,7 +1223,7 @@ static igraph_error_t igraph_i_cattributes_sn_first(const igraph_attribute_recor
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_strvector_init(newv, newlen));
@@ -1237,8 +1235,7 @@ static igraph_error_t igraph_i_cattributes_sn_first(const igraph_attribute_recor
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else {
-            char *tmp;
-            igraph_strvector_get(oldv, VECTOR(*idx)[0], &tmp);
+            char *tmp = igraph_strvector_get(oldv, VECTOR(*idx)[0]);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
@@ -1258,7 +1255,7 @@ static igraph_error_t igraph_i_cattributes_sn_last(const igraph_attribute_record
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_strvector_init(newv, newlen));
@@ -1270,8 +1267,7 @@ static igraph_error_t igraph_i_cattributes_sn_last(const igraph_attribute_record
         if (n == 0) {
             IGRAPH_CHECK(igraph_strvector_set(newv, i, ""));
         } else {
-            char *tmp;
-            igraph_strvector_get(oldv, VECTOR(*idx)[n - 1], &tmp);
+            char *tmp = igraph_strvector_get(oldv, VECTOR(*idx)[n - 1]);
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
@@ -1291,7 +1287,7 @@ static igraph_error_t igraph_i_cattributes_sn_concat(const igraph_attribute_reco
     igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_strvector_init(newv, newlen));
@@ -1303,17 +1299,17 @@ static igraph_error_t igraph_i_cattributes_sn_concat(const igraph_attribute_reco
         size_t len = 0;
         char *tmp, *tmp2;
         for (j = 0; j < n; j++) {
-            igraph_strvector_get(oldv, j, &tmp);
+            tmp = igraph_strvector_get(oldv, j);
             len += strlen(tmp);
         }
         tmp2 = IGRAPH_CALLOC(len + 1, char);
         if (!tmp2) {
-            IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, tmp2);
         len = 0;
         for (j = 0; j < n; j++) {
-            igraph_strvector_get(oldv, j, &tmp);
+            tmp = igraph_strvector_get(oldv, j);
             strcpy(tmp2 + len, tmp);
             len += strlen(tmp);
         }
@@ -1341,7 +1337,7 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
     igraph_strvector_t values;
 
     if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_CHECK(igraph_strvector_init(newv, newlen));
@@ -1357,8 +1353,7 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
         IGRAPH_CHECK(igraph_strvector_resize(&values, n));
         for (j = 0; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
-            char *elem;
-            igraph_strvector_get(oldv, x, &elem);
+            char *elem = igraph_strvector_get(oldv, x);
             IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));
         }
         IGRAPH_CHECK(func(&values, &res));
@@ -1393,13 +1388,13 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     TODO = IGRAPH_CALLOC(valno, int);
     if (!TODO) {
         IGRAPH_ERROR("Cannot combine vertex attributes",
-                     IGRAPH_ENOMEM);
+                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, TODO);
     funcs = IGRAPH_CALLOC(valno, igraph_function_pointer_t);
     if (!funcs) {
         IGRAPH_ERROR("Cannot combine vertex attributes",
-                     IGRAPH_ENOMEM);
+                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, funcs);
 
@@ -1440,7 +1435,7 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
         newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         if (!newrec) {
             IGRAPH_ERROR("Cannot combine vertex attributes",
-                         IGRAPH_ENOMEM);
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         newrec->name = strdup(name);
         newrec->type = type;
@@ -1688,19 +1683,19 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
             igraph_attribute_record_t *newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
             igraph_attribute_type_t type = tmp->type;
             if (!newrec) {
-                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, newrec);
             newrec->type = type;
             newrec->name = strdup(tmp->name);
             if (!newrec->name) {
-                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, (char*)newrec->name);
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *newnum = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (!newnum) {
-                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, origlen);
@@ -1709,7 +1704,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
             } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 igraph_vector_bool_t *newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 if (!newbool) {
-                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newbool);
                 IGRAPH_CHECK(igraph_vector_bool_init(newbool, origlen));
@@ -1719,7 +1714,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
-                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newstr);
                 IGRAPH_STRVECTOR_INIT_FINALLY(newstr, origlen);
@@ -1868,7 +1863,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 num = (igraph_vector_t*) oldrec->value;
                 newnum = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (!newnum) {
-                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 igraph_vector_index(num, newnum, idx);
@@ -1881,7 +1876,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
                 newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 if (!newbool) {
-                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
                 IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
@@ -1895,7 +1890,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 str = (igraph_strvector_t*)oldrec->value;
                 newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
-                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
                 IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
@@ -1935,7 +1930,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
             igraph_attribute_record_t *new_rec =
                 IGRAPH_CALLOC(1, igraph_attribute_record_t);
             if (!new_rec) {
-                IGRAPH_ERROR("Cannot create edge attributes", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot create edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             new_rec->name = strdup(oldrec->name);
             new_rec->type = oldrec->type;
@@ -1946,7 +1941,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 num = (igraph_vector_t*) oldrec->value;
                 newnum = IGRAPH_CALLOC(1, igraph_vector_t);
                 if (!newnum) {
-                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 igraph_vector_index(num, newnum, idx);
@@ -1957,7 +1952,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 str = (igraph_strvector_t*)oldrec->value;
                 newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
-                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
                 IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
@@ -1969,7 +1964,7 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
                 newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 if (!newbool) {
-                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
                 IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
@@ -2004,13 +1999,13 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
     TODO = IGRAPH_CALLOC(ealno, igraph_attribute_combination_type_t);
     if (!TODO) {
         IGRAPH_ERROR("Cannot combine edge attributes",
-                     IGRAPH_ENOMEM);
+                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, TODO);
     funcs = IGRAPH_CALLOC(ealno, igraph_function_pointer_t);
     if (!funcs) {
         IGRAPH_ERROR("Cannot combine edge attributes",
-                     IGRAPH_ENOMEM);
+                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, funcs);
 
@@ -2050,7 +2045,7 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
         newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         if (!newrec) {
             IGRAPH_ERROR("Cannot combine edge attributes",
-                         IGRAPH_ENOMEM);
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         newrec->name = strdup(name);
         newrec->type = type;
@@ -2486,8 +2481,7 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
         IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
         for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
             igraph_integer_t v = IGRAPH_VIT_GET(it);
-            char *s;
-            igraph_strvector_get(str, v, &s);
+            char *s = igraph_strvector_get(str, v);
             IGRAPH_CHECK(igraph_strvector_set(value, i, s));
         }
         igraph_vit_destroy(&it);
@@ -2568,8 +2562,7 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(const igraph_t *g
         IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
         for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
             igraph_integer_t e = IGRAPH_EIT_GET(it);
-            char *s;
-            igraph_strvector_get(str, e, &s);
+            char *s = igraph_strvector_get(str, e);
             IGRAPH_CHECK(igraph_strvector_set(value, i, s));
         }
         igraph_eit_destroy(&it);
@@ -3190,18 +3183,18 @@ igraph_error_t igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_t *num;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         num = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!num) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, num);
         IGRAPH_VECTOR_INIT_FINALLY(num, 1);
@@ -3248,18 +3241,18 @@ igraph_error_t igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_bool_t *log;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
         log = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (!log) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_CHECK(igraph_vector_bool_init(log, 1));
@@ -3308,18 +3301,18 @@ igraph_error_t igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_strvector_t *str;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_STRING;
         str = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (!str) {
-            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, str);
         IGRAPH_STRVECTOR_INIT_FINALLY(str, 1);
@@ -3370,18 +3363,18 @@ igraph_error_t igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_t *num;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         num = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!num) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, num);
         IGRAPH_VECTOR_INIT_FINALLY(num, igraph_vcount(graph));
@@ -3433,18 +3426,18 @@ igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_bool_t *log;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
         log = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (!log) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_CHECK(igraph_vector_bool_init(log, igraph_vcount(graph)));
@@ -3498,18 +3491,18 @@ igraph_error_t igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_strvector_t *str;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_STRING;
         str = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (!str) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, str);
         IGRAPH_STRVECTOR_INIT_FINALLY(str, igraph_vcount(graph));
@@ -3560,18 +3553,18 @@ igraph_error_t igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_t *num;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         num = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!num) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, num);
         IGRAPH_VECTOR_INIT_FINALLY(num, igraph_ecount(graph));
@@ -3623,18 +3616,18 @@ igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_bool_t *log;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
         log = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (!log) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_CHECK(igraph_vector_bool_init(log, igraph_ecount(graph)));
@@ -3688,18 +3681,18 @@ igraph_error_t igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_strvector_t *str;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         rec->type = IGRAPH_ATTRIBUTE_STRING;
         str = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (!str) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, str);
         IGRAPH_STRVECTOR_INIT_FINALLY(str, igraph_ecount(graph));
@@ -3754,18 +3747,18 @@ igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_t *num;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         num = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!num) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, num);
         rec->value = num;
@@ -3819,18 +3812,18 @@ igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_bool_t *log;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         log = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (!log) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, log);
         rec->value = log;
@@ -3886,18 +3879,18 @@ igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_strvector_t *str;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->type = IGRAPH_ATTRIBUTE_STRING;
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         str = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (!str) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, str);
         rec->value = str;
@@ -3952,18 +3945,18 @@ igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_t *num;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         num = IGRAPH_CALLOC(1, igraph_vector_t);
         if (!num) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, num);
         rec->value = num;
@@ -4018,18 +4011,18 @@ igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_vector_bool_t *log;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         log = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (!log) {
-            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, log);
         rec->value = log;
@@ -4085,18 +4078,18 @@ igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
         igraph_attribute_record_t *rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         igraph_strvector_t *str;
         if (!rec) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, rec);
         rec->type = IGRAPH_ATTRIBUTE_STRING;
         rec->name = strdup(name);
         if (!rec->name) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char*)rec->name);
         str = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (!str) {
-            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, str);
         rec->value = str;

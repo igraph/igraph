@@ -493,15 +493,13 @@ igraph_error_t igraph_maximal_cliques_subset(
  *
  * This function enumerates all maximal cliques within the given size range
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as a pointer to an \ref igraph_vector_int_t.  Destroying and
- * freeing this vector is left up to the user.  Use \ref igraph_vector_int_destroy()
- * to destroy it first, then free it using \ref igraph_free().
+ * callback function as a pointer to an \ref igraph_vector_int_t. The vector is
+ * owned by the maximal clique search routine so users are expected to make a
+ * copy of the vector usign \ref igraph_vector_int_copy() if they want to hold
+ * on to it.
  *
  * </para><para>
- *
  * Edge directions are ignored.
- *
- * </para><para>
  *
  * \param graph The input graph.
  * \param cliquehandler_fn Callback function to be called for each clique.
