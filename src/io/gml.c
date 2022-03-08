@@ -209,7 +209,10 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     igraph_gml_yyset_in(instream, context.scanner);
 
+    /* Protect 'context' from being destroyed before returning from yyparse() */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_gml_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
