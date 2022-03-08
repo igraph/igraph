@@ -1744,8 +1744,8 @@ void FUNCTION(igraph_vector, remove_fast)(TYPE(igraph_vector) *v, igraph_integer
  * \brief Copies a section of a vector.
  *
  * </para><para>
- * The result of this function is undefined if the source and target
- * intervals overlap.
+ * The source and the destination sections are allowed to overlap; this will
+ * be handled internally by the function.
  * \param v The vector object.
  * \param begin The position of the first element to move.
  * \param end The position of the first element \em not to move.
@@ -1760,7 +1760,7 @@ igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
         igraph_integer_t begin, igraph_integer_t end, igraph_integer_t to) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    memcpy(v->stor_begin + to, v->stor_begin + begin,
+    memmove(v->stor_begin + to, v->stor_begin + begin,
            sizeof(BASE) * (end - begin));
 
     return IGRAPH_SUCCESS;
@@ -1768,12 +1768,7 @@ igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
 
 igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
         igraph_integer_t begin, igraph_integer_t end, igraph_integer_t to) {
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    memmove(v->stor_begin + to, v->stor_begin + begin,
-            sizeof(BASE) * (end - begin));
-
-    return IGRAPH_SUCCESS;
+    return FUNCTION(igraph_vector, move_interval)(v, begin, end, to);
 }
 
 /**

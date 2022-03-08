@@ -327,7 +327,7 @@ igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_
     IGRAPH_SAFE_MULT(m->ncol, new_nrow, &new_size);
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, new_size));
     for (igraph_integer_t i = m->ncol - 1; i >= 0; i--) {
-        FUNCTION(igraph_vector, move_interval2)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
+        FUNCTION(igraph_vector, move_interval)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
                                                 new_nrow * i);
     }
     m->nrow = new_nrow;
