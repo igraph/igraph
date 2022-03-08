@@ -120,7 +120,7 @@ char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->stor_begin != 0);
     IGRAPH_ASSERT(sv->stor_begin[idx] != 0);
-    *value = sv->stor_begin[idx];
+    return sv->stor_begin[idx];
 }
 
 /**

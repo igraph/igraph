@@ -58,7 +58,7 @@ int main() {
     strvector_print(sv1);
 
     printf("Then copy the first element over the third element:\n");
-    igraph_strvector_move_interval(&sv1, 0, 1, 2);
+    igraph_strvector_set(&sv1, 2, igraph_strvector_get(&sv1, 0));
     strvector_print(sv1);
 
     printf("Make a copy of the strvector and set the last element of the copy:\n");
@@ -71,8 +71,8 @@ int main() {
     strvector_print(sv1);
 
     printf("Add two strings at the end:\n");
-    igraph_strvector_add(&sv1, "zeroth");
-    igraph_strvector_add(&sv1, "first");
+    igraph_strvector_push_back(&sv1, "zeroth");
+    igraph_strvector_push_back(&sv1, "first");
     strvector_print(sv1);
     igraph_strvector_destroy(&sv1);
 

@@ -28,21 +28,14 @@ resize to 10 and then back to 5 again
 ---three---
 ---four---
 
-igraph_strvector_move_interval
----three---
----four---
----two---
----three---
----four---
-
 igraph_strvector_copy
----three---
----four---
+---zero---
+---one---
 ---two---
 ---three---
 ---four---
 
-igraph_strvector_add
+igraph_strvector_push_back
 ---zeroth---
 ---first---
 ---second---
