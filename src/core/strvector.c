@@ -258,31 +258,6 @@ void igraph_strvector_remove(igraph_strvector_t *v, igraph_integer_t elem) {
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_move_interval
- * \brief Copies an interval of a string vector.
- */
-
-void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_integer_t begin,
-                                    igraph_integer_t end, igraph_integer_t to) {
-    igraph_integer_t i;
-    IGRAPH_ASSERT(v != 0);
-    IGRAPH_ASSERT(v->data != 0);
-    for (i = to; i < to + end - begin; i++) {
-        if (v->data[i] != 0) {
-            IGRAPH_FREE(v->data[i]);
-        }
-    }
-    for (i = 0; i < end - begin; i++) {
-        if (v->data[begin + i] != 0) {
-            size_t len = strlen(v->data[begin + i]) + 1;
-            v->data[to + i] = IGRAPH_CALLOC(len, char);
-            memcpy(v->data[to + i], v->data[begin + i], sizeof(char)*len);
-        }
-    }
-}
-
-/**
- * \ingroup strvector
  * \function igraph_strvector_copy
  * \brief Initialization by copying.
  *

@@ -74,9 +74,6 @@ IGRAPH_EXPORT void igraph_strvector_remove_section(
     igraph_strvector_t *v, igraph_integer_t from, igraph_integer_t to);
 IGRAPH_EXPORT void igraph_strvector_remove(
     igraph_strvector_t *v, igraph_integer_t elem);
-IGRAPH_EXPORT void igraph_strvector_move_interval(
-    igraph_strvector_t *v, igraph_integer_t begin, igraph_integer_t end,
-    igraph_integer_t to);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_copy(
     igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_append(

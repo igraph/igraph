@@ -91,13 +91,6 @@ int main() {
         printf("---%s---\n", str1);
     }
 
-    /* igraph_strvector_move_interval */
-    igraph_strvector_move_interval(&sv1, 3, 5, 0);
-    for (i = 0; i < igraph_strvector_size(&sv1); i++) {
-        str1 = igraph_strvector_get(&sv1, i);
-        printf("---%s---\n", str1);
-    }
-
     /* igraph_strvector_copy */
     igraph_strvector_copy(&sv2, &sv1);
     for (i = 0; i < igraph_strvector_size(&sv2); i++) {
