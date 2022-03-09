@@ -270,6 +270,7 @@ add_legacy_tests(
   igraph_count_multiple
   igraph_density
   igraph_diversity
+  igraph_distances_johnson
   igraph_eccentricity
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
@@ -295,7 +296,6 @@ add_legacy_tests(
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
-  igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat

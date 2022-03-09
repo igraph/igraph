@@ -18,10 +18,10 @@
 </section>
 
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
-<!-- doxrox-include igraph_shortest_paths -->
-<!-- doxrox-include igraph_shortest_paths_dijkstra -->
-<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
-<!-- doxrox-include igraph_shortest_paths_johnson -->
+<!-- doxrox-include igraph_distances -->
+<!-- doxrox-include igraph_distances_dijkstra -->
+<!-- doxrox-include igraph_distances_bellman_ford -->
+<!-- doxrox-include igraph_distances_johnson -->
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_shortest_path -->
 <!-- doxrox-include igraph_get_shortest_paths_dijkstra -->
@@ -221,6 +221,13 @@
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_edgelist -->
 <!-- doxrox-include igraph_is_acyclic -->
+</section>
+
+<section id="structural-properties-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_shortest_paths -->
+<!-- doxrox-include igraph_shortest_paths_dijkstra -->
+<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
+<!-- doxrox-include igraph_shortest_paths_johnson -->
 </section>
 
 </chapter>

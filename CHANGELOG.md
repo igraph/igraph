@@ -625,6 +625,11 @@
    in the future. Also, the function now uses `igraph_integer_t` as the source
    and target vertex IDs instead of a `long int`.
 
+ - `igraph_shortest_paths()` and related functions were renamed to `igraph_distances()`;
+   the old name was unfortunate because these functions calculated _path lengths_
+   only and not the paths themselves. The old names are deprecated and will be
+   removed in 0.11.
+
  - `igraph_strvector_add()` has been renamed to `igraph_strvector_push_back()`
    for sake of consistency with other vector-like data structures; the old name
    is deprecated and will be removed in 0.11.

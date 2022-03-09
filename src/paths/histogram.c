@@ -53,7 +53,7 @@
  * Time complexity: O(|V||E|), the number of vertices times the number
  * of edges.
  *
- * \sa \ref igraph_average_path_length() and \ref igraph_shortest_paths()
+ * \sa \ref igraph_average_path_length() and \ref igraph_distances()
  */
 
 igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,

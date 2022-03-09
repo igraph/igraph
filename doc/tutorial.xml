@@ -166,9 +166,8 @@ generators. Stochastic (i.e. randomized) graph generators are called
 <command>igraph</command> can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
-both. E.g. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
-which (surprisingly) calculates
-shortest paths from a vertex to other vertices can calculate
+both. E.g., <link linkend="igraph_get_shortest_paths"><function>igraph_get_shortest_paths()</function></link>,
+which calculates shortest paths from a vertex to other vertices, can calculate
 directed or undirected paths.
 </para>
 

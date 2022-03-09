@@ -383,7 +383,7 @@ igraph_closeness_cutoff:
         BOOLEAN normalized=False, REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
-igraph_shortest_paths:
+igraph_distances:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, NEIMODE mode=OUT
@@ -405,7 +405,7 @@ igraph_get_all_shortest_paths:
         VERTEX from, VERTEXSET to, NEIMODE mode=OUT
     DEPS: edges ON graph, from ON graph, to ON graph
 
-igraph_shortest_paths_dijkstra:
+igraph_distances_dijkstra:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
@@ -442,13 +442,13 @@ igraph_get_all_shortest_paths_dijkstra:
     DEPS: |-
         weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
 
-igraph_shortest_paths_bellman_ford:
+igraph_distances_bellman_ford:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
-igraph_shortest_paths_johnson:
+igraph_distances_johnson:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights
