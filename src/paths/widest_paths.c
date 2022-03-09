@@ -103,7 +103,7 @@
  *        \endclist
  *
  * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
- * vertices and |E| is the number of edges
+ * vertices in the graph and |E| is the number of edges
  *
  * \sa \ref igraph_widest_paths_dijkstra() or \ref igraph_widest_paths_floyd_warshall()
  * if you only need the path length but not the paths themselves.
@@ -435,7 +435,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  *    for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(|V|^3), where |V| is the number of vertices.
+ * Time complexity: O(|V|^3), where |V| is the number of vertices in the graph.
  *
  * \sa \ref igraph_widest_paths_dijkstra() for a variant that runs faster
  * on sparse graphs.
@@ -590,8 +590,8 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
  *    for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(s*|E|log|E|+|V|), where |V| is the number of
- * vertices, |E| the number of edges and s the number of sources.
+ * Time complexity: O(s*(|E|log|E|+|V|)), where |V| is the number of
+ * vertices in the graph, |E| the number of edges and s the number of sources.
  *
  * \sa \ref igraph_widest_paths_floyd_warshall() for a variant that runs faster
  * on dense graphs.
