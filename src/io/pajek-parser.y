@@ -54,7 +54,7 @@
 #include "io/parsers/pajek-parser.h" /* it must come first because of YYSTYPE */
 #include "io/parsers/pajek-lexer.h"
 #include "io/parse_utils.h"
-#include "internal/hacks.h"
+#include "internal/hacks.h" /* strdup */
 
 #include <stdio.h>
 #include <string.h>

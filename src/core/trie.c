@@ -27,6 +27,7 @@
 #include "igraph_error.h"
 
 #include "core/trie.h"
+#include "internal/hacks.h" /* strdup */
 
 #include "config.h"
 

@@ -28,7 +28,7 @@
 
 #include "core/trie.h"
 #include "graph/attributes.h"
-#include "internal/hacks.h" /* strcasecmp */
+#include "internal/hacks.h" /* strcasecmp & strdup */
 
 #include "config.h"
 

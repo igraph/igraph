@@ -29,6 +29,7 @@
 
 #include "core/trie.h"
 #include "graph/attributes.h"
+#include "internal/hacks.h" /* strdup */
 #include "io/gml-header.h"
 
 #include <ctype.h>

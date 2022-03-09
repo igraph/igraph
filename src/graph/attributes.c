@@ -25,6 +25,7 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
+#include "internal/hacks.h" /* strdup */
 
 #include "config.h"
 
