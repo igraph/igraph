@@ -763,10 +763,13 @@ igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *con
   }
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &attrid));
+  IGRAPH_ASSERT(attrid == attrsize);
+  /*
   if (attrid != attrsize) {
     IGRAPH_ERROR("Duplicate 'type' attribute in Pajek file, "
                  "this should not happen.", IGRAPH_EINTERNAL);
   }
+  */
 
   /* add a new attribute */
   rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
