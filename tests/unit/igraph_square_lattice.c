@@ -139,6 +139,7 @@ int check_lattice(const lat_test_t *test) {
     igraph_square_lattice(
         &graph, &dimvector, test->nei, test->directed, test->mutual, &periodic
     );
+    igraph_vector_bool_destroy(&periodic);
 
     /* Check its properties */
     if ((ret = check_lattice_properties(&graph))) {
