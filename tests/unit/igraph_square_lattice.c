@@ -126,7 +126,6 @@ int check_lattice_properties(const igraph_t *lattice) {
 int check_lattice(const lat_test_t *test) {
     igraph_t graph, othergraph;
     igraph_vector_int_t otheredges;
-    igraph_vector_int_t otheredges_real;
     igraph_vector_int_t dimvector;
     igraph_vector_bool_t periodic;
     igraph_bool_t iso;
@@ -150,15 +149,8 @@ int check_lattice(const lat_test_t *test) {
 
     /* Check that it is isomorphic to the stored graph */
     igraph_vector_int_view(&otheredges, test->dimedges + test->dim, test->m * 2);
-    // igraph_create requires a vector_t for its edges, so we switch from integer
-    // otheredges to real otheredges
-    igraph_vector_int_init(&otheredges_real, test->m * 2);
-    for (int i = 0; i < (test->m * 2); i++) {
-        VECTOR(otheredges_real)[i] = VECTOR(otheredges)[i];
-    }
-    igraph_create(&othergraph, &otheredges_real, igraph_vector_int_prod(&dimvector),
+    igraph_create(&othergraph, &otheredges, igraph_vector_int_prod(&dimvector),
                   test->directed);
-    igraph_vector_int_destroy(&otheredges_real);
     igraph_isomorphic(&graph, &othergraph, &iso);
     if (!iso) {
         printf("--\n");
