@@ -139,7 +139,6 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
-#  igraph_es_fromto
   igraph_vs_nonadj
   igraph_vs_seq
   igraph_vs_vector
