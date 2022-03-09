@@ -98,10 +98,10 @@ igraph_star:
 igraph_wheel:
     PARAMS: OUT GRAPH graph, INTEGER n, WHEEL_MODE mode=OUT, INTEGER center=0
 
-igraph_lattice:
+igraph_square_lattice:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
-        BOOLEAN directed=False, BOOLEAN mutual=False, BOOLEAN circular=False
+        BOOLEAN directed=False, BOOLEAN mutual=False, OPTIONAL VECTOR_BOOL periodic
 
 igraph_ring:
     PARAMS: |-

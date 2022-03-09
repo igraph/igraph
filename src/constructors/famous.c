@@ -416,8 +416,8 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_integer_t *d
  *     given name.
  *
  * \sa Other functions for creating graph structures:
- * \ref igraph_ring(), \ref igraph_kary_tree(), \ref igraph_lattice(), \ref
- * igraph_full().
+ * \ref igraph_ring(), \ref igraph_kary_tree(), \ref igraph_square_lattice(),
+ * \ref igraph_full().
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph.

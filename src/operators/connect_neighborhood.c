@@ -53,7 +53,7 @@
  *    considered as an undirected one.
  * \return Error code.
  *
- * \sa \ref igraph_lattice() uses this function to connect the
+ * \sa \ref igraph_square_lattice() uses this function to connect the
  * neighborhood of the vertices.
  *
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the

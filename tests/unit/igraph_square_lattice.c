@@ -29,7 +29,7 @@ typedef struct {
     int dim;
     int m;
     int nei;
-    igraph_bool_t directed, mutual, circular;
+    igraph_bool_t directed, mutual, periodic;
     igraph_integer_t *dimedges;
 } lat_test_t;
 
@@ -128,13 +128,17 @@ int check_lattice(const lat_test_t *test) {
     igraph_vector_int_t otheredges;
     igraph_vector_int_t otheredges_real;
     igraph_vector_int_t dimvector;
+    igraph_vector_bool_t periodic;
     igraph_bool_t iso;
     int ret;
 
     /* Create lattice */
     igraph_vector_int_view(&dimvector, test->dimedges, test->dim);
-    igraph_lattice(&graph, &dimvector, test->nei, test->directed,
-                   test->mutual, test->circular);
+    igraph_vector_bool_init(&periodic, test->dim);
+    igraph_vector_bool_fill(&periodic, test->periodic);
+    igraph_square_lattice(
+        &graph, &dimvector, test->nei, test->directed, test->mutual, &periodic
+    );
 
     /* Check its properties */
     if ((ret = check_lattice_properties(&graph))) {

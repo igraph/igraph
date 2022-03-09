@@ -197,7 +197,6 @@ add_legacy_tests(
   igraph_growing_random_game
   igraph_k_regular_game
   igraph_lastcit_game
-  igraph_lattice
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
@@ -207,6 +206,7 @@ add_legacy_tests(
   igraph_recent_degree_game
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
+  igraph_square_lattice
   igraph_static_power_law_game
   igraph_wheel
   kary_tree

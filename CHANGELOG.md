@@ -329,8 +329,8 @@
  - The `igraph_vector_ptr_t` res parameter in `igraph_largest_weighted_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
 
- - The dimension vector parameter for `igraph_lattice()` is now an
-   `igraph_vector_int_t` instead of `igraph_vector_t`.
+ - The dimension vector parameter for `igraph_square_lattice()` (used to be
+   `igraph_lattice()`) is now an `igraph_vector_int_t` instead of `igraph_vector_t`.
 
  - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
    instead of `long int`.
@@ -610,6 +610,11 @@
 
  - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
    the old name is deprecated and will be removed in 0.11.
+
+ - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
+   that this function generates square lattices only. The old name is deprecated
+   and will either be removed in 0.11 or will be changed to become a generic
+   lattice generator that also supports other types of lattices.
 
  - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are

@@ -72,7 +72,7 @@ int main() {
     igraph_vector_int_init(&dims, 2);
     VECTOR(dims)[0] = 4;
     VECTOR(dims)[1] = 4;
-    igraph_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+    igraph_square_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
