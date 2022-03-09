@@ -307,6 +307,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     }
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
                     atrec->name = strdup(name);
+                    if (! atrec->name) {
+                        IGRAPH_ERROR("Out of memory while reading GML file.", IGRAPH_ENOMEM);
+                    }
                     if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                         atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
                     } else {
@@ -371,6 +374,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         }
                         IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
                         atrec->name = strdup(name);
+                        if (! atrec->name) {
+                            IGRAPH_ERROR("Out of memory while reading GML file.", IGRAPH_ENOMEM);
+                        }
                         if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                             atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
                         } else {
