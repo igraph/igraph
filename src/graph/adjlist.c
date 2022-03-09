@@ -446,40 +446,6 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
-                                    igraph_adjlist_t *al) {
-    igraph_integer_t i, j, l, n, p;
-    igraph_vector_int_t *v;
-
-    IGRAPH_WARNING(
-        "igraph_adjlist_remove_duplicate() is deprecated; use the constructor "
-        "arguments of igraph_adjlist_init() to specify whether you want loop "
-        "edges to appear once or twice in the adjacency list."
-    );
-
-    IGRAPH_UNUSED(graph);
-
-    n = al->length;
-    for (i = 0; i < n; i++) {
-        v = &al->adjs[i];
-        l = igraph_vector_int_size(v);
-        if (l > 0) {
-            p = 1;
-            for (j = 1; j < l; j++) {
-                igraph_integer_t e = VECTOR(*v)[j];
-                /* Non-loop edges, and one end of loop edges are fine. */
-                /* We assume that the vector is sorted and we also keep it sorted */
-                if (e != i || VECTOR(*v)[j - 1] != e) {
-                    VECTOR(*v)[p++] = e;
-                }
-            }
-            igraph_vector_int_resize(v, p);
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 #ifndef USING_R
 igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
     igraph_integer_t i;
@@ -617,29 +583,6 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
         igraph_vector_int_destroy(seen_loops);
         IGRAPH_FREE(seen_loops);
         IGRAPH_FINALLY_CLEAN(2);
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il) {
-    igraph_integer_t i, n;
-
-    IGRAPH_WARNING(
-        "igraph_inclist_remove_duplicate() is deprecated; use the constructor "
-        "arguments of igraph_inclist_init() to specify whether you want loop "
-        "edges to appear once or twice in the incidence list."
-    );
-
-    IGRAPH_UNUSED(graph);
-
-    n = il->length;
-    for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(
-            igraph_i_remove_loops_from_incidence_vector_in_place(
-                &il->incs[i], graph, IGRAPH_LOOPS_ONCE
-            )
-        );
     }
 
     return IGRAPH_SUCCESS;
