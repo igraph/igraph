@@ -34,7 +34,7 @@
 
 /**
  * \function igraph_get_widest_paths
- * \brief Widest paths from a single vertex
+ * \brief Widest paths from a single vertex.
  *
  * Calculates the widest paths from a single node to all other specified nodes,
  * using a modified Dijkstra's algorithm.  If there is more than one path with
@@ -46,18 +46,14 @@
  *        the function, which will properly clear and/or resize them
  *        and fill the IDs of the vertices along the paths from/to
  *        the vertices. Supply a null pointer here if you don't need
- *        these vectors. Normally, either this argument, or the \c
- *        edges should be non-null, but no error or warning is given
- *        if they are both null pointers.
+ *        these vectors.
  * \param edges The result, the IDs of the edges along the paths.
  *        This is a pointer vector, each element points to a vector
  *        object. These should be initialized before passing them to
  *        the function, which will properly clear and/or resize them
  *        and fill the IDs of the vertices along the paths from/to
  *        the vertices. Supply a null pointer here if you don't need
- *        these vectors. Normally, either this argument, or the \c
- *        vertices should be non-null, but no error or warning is given
- *        if they are both null pointers.
+ *        these vectors.
  * \param from The id of the vertex from/to which the widest paths are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
@@ -66,7 +62,7 @@
  * \param weights The edge weights. Edge weights can be negative. If this
  *        is a null pointer or if any edge weight is NaN, then an error
  *        is returned.
- * \param mode The type of widest paths to be use for the
+ * \param mode The type of widest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
  *        \cli IGRAPH_OUT
@@ -166,11 +162,11 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-    if (vertices && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(vertices)) {
-        IGRAPH_ERROR("Size of `vertices' and `to' should match.", IGRAPH_EINVAL);
+    if (vertices) {
+        IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, IGRAPH_VIT_SIZE(vit)));
     }
-    if (edges && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(edges)) {
-        IGRAPH_ERROR("Size of `edges' and `to' should match.", IGRAPH_EINVAL);
+    if (edges) {
+        IGRAPH_CHECK(igraph_vector_ptr_resize(edges, IGRAPH_VIT_SIZE(vit)));
     }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -291,7 +287,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             if (edges) {
                 evec = VECTOR(*edges)[i];
                 igraph_vector_int_clear(evec);
-            };
+            }
             IGRAPH_ALLOW_INTERRUPTION();
 
             size = 0;

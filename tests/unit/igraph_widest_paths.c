@@ -306,7 +306,6 @@ int main() {
     run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 3, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
-    IGRAPH_ASSERT(MATRIX(res1, 0, 3) == IGRAPH_NEGINFINITY);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
@@ -334,9 +333,6 @@ int main() {
 
     /* Self loops should be effectively ignored, since the widest path to
        yourself is always infinity. */
-    IGRAPH_ASSERT(MATRIX(res1, 0, 0) == IGRAPH_POSINFINITY);
-    IGRAPH_ASSERT(MATRIX(res1, 1, 1) == IGRAPH_POSINFINITY);
-    IGRAPH_ASSERT(MATRIX(res1, 2, 2) == IGRAPH_POSINFINITY);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
@@ -363,7 +359,6 @@ int main() {
     run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 1, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
-    IGRAPH_ASSERT(MATRIX(res1, 0, 1) == 10.0);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
@@ -389,7 +384,6 @@ int main() {
     run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 1, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
-    IGRAPH_ASSERT(MATRIX(res1, 0, 1) == 1.0);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
@@ -417,7 +411,6 @@ int main() {
     run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 1, &to, IGRAPH_IN,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
-    IGRAPH_ASSERT(MATRIX(res1, 0, 1) == 200.0);
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
@@ -445,7 +438,6 @@ int main() {
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     check_and_print_matrices(&res1, &res2);
-    IGRAPH_ASSERT(MATRIX(res1, 0, 7) == 10.0);
 
     printf("\npath to node 7:\n");
     igraph_vector_int_t *vertex_path = VECTOR(vertices)[7];
@@ -513,9 +505,7 @@ int main() {
     run_get_widest_paths(&g, &w, /* source */ 3, /* destination */ 6, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
-
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
-    IGRAPH_ASSERT(MATRIX(res1, 0, 6) == 29);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
                 &vertices2, &edges2);
@@ -541,8 +531,7 @@ int main() {
     run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 2, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
-    IGRAPH_ASSERT(MATRIX(res1, 0, 2) == -3);
-    check_and_print_matrices(&res1, &res2);
+    print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,
                 &vertices2, &edges2);
@@ -567,6 +556,7 @@ int main() {
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
     run_get_widest_paths(&g, &w, /* source */ 0, /* destination */ 4, &to, IGRAPH_OUT,
                             &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
+
     print_results(n, &res1, &res2, &vertices, &edges, &predecessors, &inbound_edges, &vertices2, &edges2);
 
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &predecessors, &inbound_edges,

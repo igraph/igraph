@@ -182,6 +182,26 @@ edge path:     ( 3 2 4 8 10 )
 === 14. Testing Negative Weights ===
 [ Inf 2.000000 -3.000000 -5.000000 ]
 
+path to node 0:
+  vertices: ( 0 )
+  edges:    ( )
+path to node 1:
+  vertices: ( 0 1 )
+  edges:    ( 0 )
+path to node 2:
+  vertices: ( 0 3 2 )
+  edges:    ( 2 3 )
+path to node 3:
+  vertices: ( 0 3 )
+  edges:    ( 2 )
+
+predecessors:  ( 0 0 3 0 )
+inbound_edges: ( -1 0 3 2 )
+
+vertex path:   ( 0 1 2 )
+edge path:     ( 0 1 )
+
+
 === 15. Testing Disconnected Graphs ===
 [ Inf 5.000000 5.000000 -Inf -Inf
   5.000000 Inf 5.000000 -Inf -Inf
