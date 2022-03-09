@@ -463,7 +463,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 igraph_integer_t trieidx;
                 igraph_attribute_record_t *atrec;
                 igraph_attribute_type_t type;
-                igraph_trie_get(&eattrnames, n, &trieidx);
+                IGRAPH_CHECK(igraph_trie_get(&eattrnames, n, &trieidx));
                 atrec = VECTOR(eattrs)[trieidx];
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -500,12 +500,12 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             igraph_integer_t iidx = igraph_gml_tree_find(node, "id", 0);
             igraph_integer_t id = igraph_gml_tree_get_integer(node, iidx);
             snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, id);
-            igraph_trie_get(&trie, name, &id);
+            IGRAPH_CHECK(igraph_trie_get(&trie, name, &id));
             for (j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *aname = igraph_gml_tree_name(node, j);
                 igraph_attribute_record_t *atrec;
                 igraph_attribute_type_t type;
-                igraph_trie_get(&vattrnames, aname, &k);
+                IGRAPH_CHECK(igraph_trie_get(&vattrnames, aname, &k));
                 atrec = VECTOR(vattrs)[k];
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {

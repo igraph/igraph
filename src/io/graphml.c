@@ -681,7 +681,11 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     }
 
     /* add to trie, attribues */
-    igraph_trie_get(trie, rec->id, &id);
+    ret = igraph_trie_get(trie, rec->id, &id);
+    if (ret) {
+        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot read GraphML file", ret);
+        return 0;
+    }
     if (id != igraph_trie_size(trie) - 1) {
         GRAPHML_PARSE_ERROR(state, "Cannot parse GraphML file, duplicate attribute");
         return 0;
