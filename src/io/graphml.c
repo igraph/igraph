@@ -1714,6 +1714,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             ret = fprintf(outstream, "    <data key=\"%s%s\">", gprefix,
                           name_escaped);
             IGRAPH_FREE(name_escaped);
+            if (ret < 0) {
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
+            }
             IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
             s = igraph_strvector_get(&strv, 0);
             IGRAPH_CHECK(igraph_i_xml_escape(s, &s_escaped));
@@ -1777,6 +1780,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "      <data key=\"%s%s\">", vprefix,
                               name_escaped);
                 IGRAPH_FREE(name_escaped);
+                if (ret < 0) {
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
+                }
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                              igraph_vss_1(l), &strv));
                 s = igraph_strvector_get(&strv, 0);
