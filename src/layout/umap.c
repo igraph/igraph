@@ -31,9 +31,6 @@
 
 /* Find sigma for this vertex by binary search */
 static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
-#ifdef UMAP_DEBUG
-        igraph_integer_t i,
-#endif
         const igraph_vector_int_t *eids,
         igraph_real_t rho, igraph_real_t *sigma_p, igraph_real_t target) {
 
@@ -55,8 +52,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
         }
 
 #ifdef UMAP_DEBUG
-        printf("SIGMA function (i = %" IGRAPH_PRId ", no_of_neis = %" IGRAPH_PRId ")- sum: %g, "
-               "target: %g, rho: %g, sigma: %g\n", i, no_of_neis, sum, target, rho, sigma);
+        printf("SIGMA function (no_of_neis = %" IGRAPH_PRId ")- sum: %g, "
+               "target: %g, rho: %g, sigma: %g\n", no_of_neis, sum, target, rho, sigma);
 #endif
 
         if (sum < target) {
@@ -144,9 +141,6 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
         } else {
             sigma_target = log2(no_of_neis);
             IGRAPH_CHECK(igraph_i_umap_find_sigma(distances,
-#ifdef UMAP_DEBUG
-                        i,
-#endif
                         &eids, rho, &sigma,
                         sigma_target));
         }
