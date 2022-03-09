@@ -245,8 +245,8 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
         /* Now we create the subgraph from the edges above the next
            threshold, and their incident vertices. */
 
-        igraph_vector_int_init(newids, 0);
-        igraph_vector_init(neww, 0);
+        IGRAPH_CHECK(igraph_vector_int_init(newids, 0));
+        IGRAPH_CHECK(igraph_vector_init(neww, 0));
 
         /* We use mark[] to denote the vertices already mapped to
            the new graph. If this is -(c+1), then the vertex was

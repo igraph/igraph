@@ -683,8 +683,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    igraph_vector_init(&tmp, vc);
-    IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, vc);
     if (!weights) {
         IGRAPH_CHECK(igraph_adjlist_init(graph, &outlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &outlist);

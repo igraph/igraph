@@ -84,8 +84,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     }
 
     if (!toall) {
-        igraph_vector_char_init(&markto, no_nodes);
-        IGRAPH_FINALLY(igraph_vector_char_destroy, &markto);
+        IGRAPH_VECTOR_CHAR_INIT_FINALLY(&markto, no_nodes);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
