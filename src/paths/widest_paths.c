@@ -222,13 +222,13 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             igraph_integer_t tto = IGRAPH_OTHER(graph, edge, maxnei);
             igraph_real_t edgewidth = VECTOR(*weights)[edge];
             igraph_real_t altwidth = maxwidth < edgewidth ? maxwidth : edgewidth;
-            igraph_real_t curdist = VECTOR(widths)[tto];
-            if (curdist < 0) {
+            igraph_real_t curwidth = VECTOR(widths)[tto];
+            if (curwidth < 0) {
                 /* This is the first assigning a width to this vertex */
                 VECTOR(widths)[tto] = altwidth;
                 parents[tto] = edge + 1;
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, altwidth));
-            } else if (altwidth > curdist) {
+            } else if (altwidth > curwidth) {
                 /* This is a wider path */
                 VECTOR(widths)[tto] = altwidth;
                 parents[tto] = edge + 1;
