@@ -54,14 +54,14 @@
 
 int igraph_dl_yyerror(YYLTYPE* locp, igraph_i_dl_parsedata_t* context,
                       const char *s);
-igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
+static igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context);
-igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
+static igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
                          igraph_i_dl_parsedata_t *context);
-igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to,
+static igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to,
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context);
-igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
+static igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
 
 #define scanner context->scanner
 
@@ -309,7 +309,7 @@ int igraph_dl_yyerror(YYLTYPE* locp,
   return 0;
 }
 
-igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
+static igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
   char tmp=newstr[length];
   newstr[length]='\0';
@@ -318,7 +318,7 @@ igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
   return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
+static igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
                          igraph_i_dl_parsedata_t *context) {
   //IGRAPH_CHECK(igraph_i_dl_check_vid(from+1));
   //IGRAPH_CHECK(igraph_i_dl_check_vid(to+1));
@@ -327,7 +327,7 @@ igraph_error_t igraph_i_dl_add_edge(igraph_integer_t from, igraph_integer_t to,
   return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to,
+static igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to,
                            igraph_real_t weight,
                            igraph_i_dl_parsedata_t *context) {
   igraph_integer_t n=igraph_vector_size(&context->weights);
@@ -345,7 +345,7 @@ igraph_error_t igraph_i_dl_add_edge_w(igraph_integer_t from, igraph_integer_t to
 
 /* Raise an error if the vertex index is invalid in the DL file.
  * DL files use 1-based vertex indices. */
-igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid) {
+static igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid) {
     if (dl_vid < 1) {
         IGRAPH_ERRORF("Invalid vertex index in DL file: %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, dl_vid);
