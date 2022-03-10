@@ -1344,6 +1344,8 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
 
 #if HAVE_LIBXML == 1
     xmlParserCtxtPtr ctxt;
+    xmlDocPtr doc;
+
     struct igraph_i_graphml_parser_state state;
     int res;
     char buffer[4096];
@@ -1359,7 +1361,10 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
     IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
 
     /* Create a progressive parser context */
-    res = (int) fread(buffer, 1, 4096, instream);
+    res = (int) fread(buffer, 1, sizeof(buffer), instream);
+    if (res < sizeof(buffer) && !feof(instream)) {
+        IGRAPH_ERROR("IO error while reading GraphML data", IGRAPH_PARSEERROR);
+    }
     ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
                                    &state,
                                    buffer,
@@ -1392,7 +1397,7 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Do the parsing */
-    while ((res = (int) fread(buffer, 1, 4096, instream)) > 0) {
+    while ((res = (int) fread(buffer, 1, sizeof(buffer), instream)) > 0) {
         xmlParseChunk(ctxt, buffer, res, 0);
         if (!state.successful) {
             break;
@@ -1401,7 +1406,13 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
     xmlParseChunk(ctxt, buffer, res, 1);
 
     /* Free the context */
+    doc = ctxt->myDoc;
     xmlFreeParserCtxt(ctxt);
+    if (doc) {
+        /* In theory this should not be necessary, but it looks like certain malformed
+         * GraphML files leave a partially-parsed doc in memory */
+        xmlFreeDoc(doc);
+    }
 
     /* Extract the error message from the parser state (if any), and make a
      * copy so we can safely destroy the parser state before triggering the
