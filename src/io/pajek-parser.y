@@ -647,7 +647,6 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
     }
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_CHECK(igraph_strvector_init(na, count));
-    IGRAPH_ERROR("Boo!", IGRAPH_EINTERNAL);
     rec->name=strdup(attrname);
     if (! rec->name) {
       IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
