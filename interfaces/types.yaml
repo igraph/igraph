@@ -376,6 +376,11 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
+FAS_ALGORITHM:
+    # Enum representing feedback arc set algorithms
+    CTYPE: igraph_fas_algorithm_t
+    FLAGS: ENUM
+
 GETADJACENCY:
     # Enum storing how to retrieve the adjacency matrix from a graph
     CTYPE: igraph_get_adjacency_t

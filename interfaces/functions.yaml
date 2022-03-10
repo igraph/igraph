@@ -601,6 +601,10 @@ igraph_neighborhood_graphs:
 igraph_topological_sorting:
     PARAMS: GRAPH graph, OUT VECTOR res, NEIMODE mode=OUT
 
+igraph_feedback_arc_set:
+    PARAMS: GRAPH graph, OUT EDGESET result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=EXACT_IP
+    DEPS: result ON graph, weights ON graph
+
 igraph_is_loop:
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
     DEPS: es ON graph
@@ -614,6 +618,9 @@ igraph_is_simple:
 igraph_is_multiple:
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
     DEPS: es ON graph
+
+igraph_has_loop:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_has_multiple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
