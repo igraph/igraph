@@ -1429,7 +1429,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
      * encoding */
     res = (int) fread(buffer, 1, sizeof(buffer), instream);
     if (res < sizeof(buffer) && !feof(instream)) {
-        IGRAPH_ERROR("IO error while reading GraphML data", IGRAPH_PARSEERROR);
+        IGRAPH_ERROR("IO error while reading GraphML data.", IGRAPH_EFILE);
     }
     ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
                                    &state,
