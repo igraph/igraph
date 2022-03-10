@@ -1393,6 +1393,8 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     void* libxml_old_generic_error_context;
     xmlStructuredErrorFunc libxml_old_structured_error_handler;
     void* libxml_old_structured_error_context;
+    xmlDocPtr doc;
+
     struct igraph_i_graphml_parser_state state;
     int res;
     char buffer[4096];
@@ -1425,7 +1427,10 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
 
     /* Create a progressive parser context and use the first 4K to detect the
      * encoding */
-    res = (int) fread(buffer, 1, 4096, instream);
+    res = (int) fread(buffer, 1, sizeof(buffer), instream);
+    if (res < sizeof(buffer) && !feof(instream)) {
+        IGRAPH_ERROR("IO error while reading GraphML data", IGRAPH_PARSEERROR);
+    }
     ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
                                    &state,
                                    buffer,
@@ -1459,7 +1464,13 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
 
     /* Free the context */
     if (ctxt) {
+        doc = ctxt->myDoc;
         xmlFreeParserCtxt(ctxt);
+        if (doc) {
+            /* In theory this should not be necessary, but it looks like certain malformed
+             * GraphML files leave a partially-parsed doc in memory */
+            xmlFreeDoc(doc);
+        }
     } else {
         /* We could not create the context earlier so no parsing was done */
         IGRAPH_ERROR("Cannot create XML parser context", IGRAPH_FAILURE);
