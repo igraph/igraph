@@ -700,7 +700,7 @@ igraph_authority_score:
 
 igraph_hub_and_authority_scores:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY vector, OUT VERTEX_QTY vector,
+        GRAPH graph, OUT VERTEX_QTY hub_vector, OUT VERTEX_QTY authority_vector,
         OUT REAL value, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
 
