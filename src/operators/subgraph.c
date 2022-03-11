@@ -34,10 +34,10 @@
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-static int igraph_i_induced_subgraph_copy_and_delete(
-    const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
-    igraph_vector_int_t *map, igraph_vector_int_t *invmap
-) {
+static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
+        const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
+        igraph_vector_int_t *map, igraph_vector_int_t *invmap) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t delete;
     char *remain;
@@ -94,11 +94,11 @@ static int igraph_i_induced_subgraph_copy_and_delete(
  * the _original_ graph) in cases when induced_subgraph() is repeatedly
  * called on the same graph; one example is igraph_decompose().
  */
-static int igraph_i_induced_subgraph_create_from_scratch(
-    const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
-    igraph_vector_int_t *map, igraph_vector_int_t *invmap,
-    igraph_bool_t map_is_prepared
-) {
+static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
+        const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
+        igraph_vector_int_t *map, igraph_vector_int_t *invmap,
+        igraph_bool_t map_is_prepared) {
+
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_new_nodes = 0;

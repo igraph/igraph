@@ -101,7 +101,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         if (permutation) {
             newec = igraph_vector_int_size(&edges);
             for (i = 0; i < newec; i++) {
-                int tmp = VECTOR(edges)[i];
+                igraph_integer_t tmp = VECTOR(edges)[i];
                 VECTOR(edges)[i] = VECTOR(*permutation)[tmp];
             }
         }

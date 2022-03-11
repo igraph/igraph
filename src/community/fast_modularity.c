@@ -110,8 +110,7 @@ typedef struct {
 /* Scans the community neighborhood list for the new maximal dq value.
  * Returns 1 if the maximum is different from the previous one,
  * 0 otherwise. */
-static int igraph_i_fastgreedy_community_rescan_max(
-        igraph_i_fastgreedy_community* comm) {
+static igraph_bool_t igraph_i_fastgreedy_community_rescan_max(igraph_i_fastgreedy_community* comm) {
     igraph_integer_t i, n;
     igraph_i_fastgreedy_commpair *p, *best;
     igraph_real_t bestdq, currdq;
@@ -460,9 +459,10 @@ static void igraph_i_fastgreedy_community_sort_neighbors_of(
  * of the community list clist to newdq and restores the heap property
  * in community c if necessary. Returns 1 if the maximum in the row had
  * to be updated, zero otherwise */
-static int igraph_i_fastgreedy_community_update_dq(
+static igraph_bool_t igraph_i_fastgreedy_community_update_dq(
         igraph_i_fastgreedy_community_list* list,
         igraph_i_fastgreedy_commpair* p, igraph_real_t newdq) {
+
     igraph_integer_t i, j, to, from;
     igraph_real_t olddq;
     igraph_i_fastgreedy_community *comm_to, *comm_from;
