@@ -698,6 +698,12 @@ igraph_authority_score:
         INOUT ARPACKOPT options=arpack_defaults
     DEPS: weights ON graph, vector ON graph
 
+igraph_hub_and_authority_scores:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_QTY vector, OUT VERTEX_QTY vector,
+        OUT REAL value, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
+        INOUT ARPACKOPT options=arpack_defaults
+
 igraph_arpack_rssolve:
     # TODO(ntamas): this should probably not be exposed to higher-level
     # interfaces; igraph's goal is not to provide an ARPACK wrapper
@@ -836,6 +842,14 @@ igraph_pseudo_diameter:
     NAME-R: pseudo_diameter
     PARAMS: |-
         GRAPH graph, OUT REAL diameter, VERTEX start_vid,
+        OUT INTEGER from=NULL, OUT INTEGER to=NULL,
+        BOOLEAN directed=True, BOOLEAN unconnected=True
+
+igraph_pseudo_diameter_dijkstra:
+    NAME-R: pseudo_diameter
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT REAL diameter, VERTEX start_vid,
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
 
