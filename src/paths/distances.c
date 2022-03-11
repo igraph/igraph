@@ -450,7 +450,15 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
  * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
  * wil be set to infinity, and \p vid_ecc to -1;
  */
-int igraph_i_eccentricity_dijkstra(const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc, igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn, igraph_lazy_inclist_t *inclist) {
+static igraph_error_t igraph_i_eccentricity_dijkstra(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_real_t *ecc,
+        igraph_integer_t vid_start,
+        igraph_integer_t *vid_ecc,
+        igraph_bool_t unconn,
+        igraph_lazy_inclist_t *inclist) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_2wheap_t Q;
     igraph_vector_t vec_dist;
