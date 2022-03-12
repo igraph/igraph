@@ -47,7 +47,7 @@ public:
 
     ~FlowGraph();
 
-    void swap(FlowGraph * fgraph);
+    void swap(FlowGraph &fgraph);
 
     void initiate();
     void eigenvector();
@@ -56,7 +56,7 @@ public:
     void back_to(const FlowGraph &fgraph);
 
     /*************************************************************************/
-    Node **node;
+    std::vector<Node> node;
     igraph_integer_t Nnode;
 
     double alpha, beta;

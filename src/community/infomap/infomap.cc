@@ -83,12 +83,12 @@ igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
                 for (igraph_integer_t i = 0 ; i < fgraph.Nnode ; i++) {
                     // partition each non trivial module
-                    size_t sub_Nnode = fgraph.node[i]->members.size();
+                    size_t sub_Nnode = fgraph.node[i].members.size();
                     if (sub_Nnode > 1) { // If the module is not trivial
                         std::vector<igraph_integer_t> sub_members(sub_Nnode);
 
                         for (size_t j = 0 ; j < sub_Nnode ; j++) {
-                            sub_members[j] = fgraph.node[i]->members[j];
+                            sub_members[j] = fgraph.node[i].members[j];
                         }
 
                         // extraction of the subgraph
@@ -100,16 +100,16 @@ igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
                         // Record membership changes
                         for (igraph_integer_t j = 0; j < sub_fgraph.Nnode; j++) {
-                            size_t Nmembers = sub_fgraph.node[j]->members.size();
+                            size_t Nmembers = sub_fgraph.node[j].members.size();
                             for (size_t k = 0; k < Nmembers; k++) {
-                                subMoveTo[sub_members[sub_fgraph.node[j]->members[k]]] =
+                                subMoveTo[sub_members[sub_fgraph.node[j].members[k]]] =
                                     subModIndex;
                             }
                             initial_move[subModIndex] = i;
                             subModIndex++;
                         }
                     } else {
-                        subMoveTo[fgraph.node[i]->members[0]] = subModIndex;
+                        subMoveTo[fgraph.node[i].members[0]] = subModIndex;
                         initial_move[subModIndex] = i;
                         subModIndex++;
                     }
@@ -118,9 +118,9 @@ igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
                 // 1/ Single-node movements : allows each node to move (again)
                 // save current modules
                 for (igraph_integer_t i = 0; i < fgraph.Nnode; i++) { // for each module
-                    size_t Nmembers = fgraph.node[i]->members.size(); // Module size
+                    size_t Nmembers = fgraph.node[i].members.size(); // Module size
                     for (size_t j = 0; j < Nmembers; j++) { // for each vertex (of the module)
-                        initial_move[fgraph.node[i]->members[j]] = i;
+                        initial_move[fgraph.node[i].members[j]] = i;
                     }
                 }
             }
@@ -276,10 +276,10 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
             shortestCodeLength = cpy_fgraph.codeLength;
             // ... store the partition
             for (igraph_integer_t i = 0 ; i < cpy_fgraph.Nnode ; i++) {
-                size_t Nmembers = cpy_fgraph.node[i]->members.size();
+                size_t Nmembers = cpy_fgraph.node[i].members.size();
                 for (size_t k = 0; k < Nmembers; k++) {
-                    //cluster[ cpy_fgraph->node[i]->members[k] ] = i;
-                    VECTOR(*membership)[cpy_fgraph.node[i]->members[k]] = i;
+                    //cluster[ cpy_fgraph->node[i].members[k] ] = i;
+                    VECTOR(*membership)[cpy_fgraph.node[i].members[k]] = i;
                 }
             }
         }
