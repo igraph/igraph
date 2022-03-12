@@ -51,6 +51,7 @@ char *igraph_i_strndup(const char *s1, size_t n) {
     size_t i;
     /* We need to check if the string is shorter than n characters.
      * We could use strlen, but that would do more work for long s1 and small n.
+     * TODO: Maybe memchr would be nicer here.
      */
     for (i = 0; s1[i] != '\0' && i < n; i++) {}
     n = i;
