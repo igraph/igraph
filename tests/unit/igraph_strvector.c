@@ -98,6 +98,11 @@ int main() {
     igraph_strvector_push_back(&sv1, "fourth");
     strvector_print(&sv1);
 
+    printf("igraph_strvector_push_back_len\n");
+    igraph_strvector_push_back_len(&sv1, "extra zeroth", 5);
+    igraph_strvector_push_back_len(&sv1, "extra first", 100);
+    igraph_strvector_push_back_len(&sv1, "extra second", 0);
+    strvector_print(&sv1);
     igraph_strvector_destroy(&sv1);
 
     printf("append\n");

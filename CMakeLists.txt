@@ -85,6 +85,7 @@ endif()
 check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
 check_symbol_exists(strdup string.h HAVE_STRDUP)
+check_symbol_exists(strndup string.h HAVE_STRNDUP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
 cmake_pop_check_state()
 
