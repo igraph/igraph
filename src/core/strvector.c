@@ -21,15 +21,15 @@
 
 */
 
-#include <string.h>         /* memcpy & co. */
-#include <stdlib.h>
-
 #include "igraph_types.h"
 #include "igraph_strvector.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 
 #include "internal/hacks.h" /* strdup */
+
+#include <string.h>         /* memcpy & co. */
+#include <stdlib.h>
 
 /**
  * \section igraph_strvector_t
