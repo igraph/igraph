@@ -39,33 +39,3 @@ Node::Node(igraph_integer_t nodenr, double tpweight) {
     selfLink = 0.0;
     members.push_back(nodenr); // members = [nodenr]
 }
-
-void cpyNode(Node *newNode, Node *oldNode) {
-    newNode->exit = oldNode->exit;
-    newNode->size = oldNode->size;
-    newNode->teleportWeight = oldNode->teleportWeight;
-    newNode->danglingSize   = oldNode->danglingSize;
-
-    size_t Nmembers = oldNode->members.size();
-    newNode->members = vector<igraph_integer_t>(Nmembers);
-    for (size_t i = 0; i < Nmembers; i++) {
-        newNode->members[i] = oldNode->members[i];
-    }
-
-    newNode->selfLink = oldNode->selfLink;
-
-    size_t NoutLinks = oldNode->outLinks.size();
-    newNode->outLinks = vector<pair<igraph_integer_t, double> >(NoutLinks);
-    for (size_t i = 0; i < NoutLinks; i++) {
-        newNode->outLinks[i].first = oldNode->outLinks[i].first;
-        newNode->outLinks[i].second = oldNode->outLinks[i].second;
-    }
-
-    size_t NinLinks = oldNode->inLinks.size();
-    newNode->inLinks = vector<pair<igraph_integer_t, double> >(NinLinks);
-    for (size_t i = 0; i < NinLinks; i++) {
-        newNode->inLinks[i].first = oldNode->inLinks[i].first;
-        newNode->inLinks[i].second = oldNode->inLinks[i].second;
-    }
-
-}

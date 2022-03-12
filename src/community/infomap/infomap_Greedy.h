@@ -81,5 +81,4 @@ public:
     std::vector<size_t> mod_members;
 };
 
-void delete_Greedy(Greedy *greedy);
 #endif

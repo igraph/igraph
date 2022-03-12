@@ -39,14 +39,12 @@
 #include "infomap_Greedy.h"
 
 /****************************************************************************/
-igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
-    Greedy * greedy;
+igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
     // save the original graph
-    FlowGraph * cpy_fgraph = new FlowGraph(fgraph);
-    IGRAPH_FINALLY(delete_FlowGraph, cpy_fgraph);
+    FlowGraph cpy_fgraph(fgraph);
 
-    igraph_integer_t Nnode = cpy_fgraph->Nnode;
+    igraph_integer_t Nnode = cpy_fgraph.Nnode;
     // "real" number of vertex, ie. number of vertex of the graph
 
     igraph_integer_t iteration = 0;
@@ -56,7 +54,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
     bool initial_move_done = true;
 
     do { // Main loop
-        outer_oldCodeLength = fgraph->codeLength;
+        outer_oldCodeLength = fgraph.codeLength;
 
         if (iteration > 0) {
             /**********************************************************************/
@@ -72,7 +70,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
             igraph_integer_t *subMoveTo = NULL; // enventual new partitionment of original graph
 
-            if ((iteration % 2 == 0) && (fgraph->Nnode > 1)) {
+            if ((iteration % 2 == 0) && (fgraph.Nnode > 1)) {
                 // 0/ Submodule movements : partition each module of the
                 // current partition (rec. call)
 
@@ -83,43 +81,35 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
                 igraph_integer_t subModIndex = 0;
 
-                for (igraph_integer_t i = 0 ; i < fgraph->Nnode ; i++) {
+                for (igraph_integer_t i = 0 ; i < fgraph.Nnode ; i++) {
                     // partition each non trivial module
-                    size_t sub_Nnode = fgraph->node[i]->members.size();
+                    size_t sub_Nnode = fgraph.node[i]->members.size();
                     if (sub_Nnode > 1) { // If the module is not trivial
-                        igraph_integer_t *sub_members  = new igraph_integer_t[sub_Nnode];      // id_sub --> id
-                        IGRAPH_FINALLY(operator delete [], sub_members);
+                        std::vector<igraph_integer_t> sub_members(sub_Nnode);
 
                         for (size_t j = 0 ; j < sub_Nnode ; j++) {
-                            sub_members[j] = fgraph->node[i]->members[j];
+                            sub_members[j] = fgraph.node[i]->members[j];
                         }
 
                         // extraction of the subgraph
-                        FlowGraph *sub_fgraph = new FlowGraph(cpy_fgraph, sub_Nnode,
-                                                              sub_members);
-                        IGRAPH_FINALLY(delete_FlowGraph, sub_fgraph);
-                        sub_fgraph->initiate();
+                        FlowGraph sub_fgraph(cpy_fgraph, sub_members);
+                        sub_fgraph.initiate();
 
                         // recursif call of partitionment on the subgraph
                         infomap_partition(sub_fgraph, true);
 
                         // Record membership changes
-                        for (igraph_integer_t j = 0; j < sub_fgraph->Nnode; j++) {
-                            size_t Nmembers = sub_fgraph->node[j]->members.size();
+                        for (igraph_integer_t j = 0; j < sub_fgraph.Nnode; j++) {
+                            size_t Nmembers = sub_fgraph.node[j]->members.size();
                             for (size_t k = 0; k < Nmembers; k++) {
-                                subMoveTo[sub_members[sub_fgraph->node[j]->members[k]]] =
+                                subMoveTo[sub_members[sub_fgraph.node[j]->members[k]]] =
                                     subModIndex;
                             }
                             initial_move[subModIndex] = i;
                             subModIndex++;
                         }
-
-                        delete sub_fgraph;
-                        IGRAPH_FINALLY_CLEAN(1);
-                        delete [] sub_members;
-                        IGRAPH_FINALLY_CLEAN(1);
                     } else {
-                        subMoveTo[fgraph->node[i]->members[0]] = subModIndex;
+                        subMoveTo[fgraph.node[i]->members[0]] = subModIndex;
                         initial_move[subModIndex] = i;
                         subModIndex++;
                     }
@@ -127,24 +117,21 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
             } else {
                 // 1/ Single-node movements : allows each node to move (again)
                 // save current modules
-                for (igraph_integer_t i = 0; i < fgraph->Nnode; i++) { // for each module
-                    size_t Nmembers = fgraph->node[i]->members.size(); // Module size
+                for (igraph_integer_t i = 0; i < fgraph.Nnode; i++) { // for each module
+                    size_t Nmembers = fgraph.node[i]->members.size(); // Module size
                     for (size_t j = 0; j < Nmembers; j++) { // for each vertex (of the module)
-                        initial_move[fgraph->node[i]->members[j]] = i;
+                        initial_move[fgraph.node[i]->members[j]] = i;
                     }
                 }
             }
 
-            fgraph->back_to(cpy_fgraph);
+            fgraph.back_to(cpy_fgraph);
             if (subMoveTo) {
-                Greedy *cpy_greedy = new Greedy(fgraph);
-                IGRAPH_FINALLY(delete_Greedy, cpy_greedy);
+                Greedy cpy_greedy(&fgraph);
 
-                cpy_greedy->setMove(subMoveTo);
-                cpy_greedy->apply(false);
+                cpy_greedy.setMove(subMoveTo);
+                cpy_greedy.apply(false);
 
-                delete_Greedy(cpy_greedy);
-                IGRAPH_FINALLY_CLEAN(1);
                 delete [] subMoveTo;
                 IGRAPH_FINALLY_CLEAN(1);
             }
@@ -156,29 +143,28 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 
         do {
             // greedy optimizing object creation
-            greedy = new Greedy(fgraph);
-            IGRAPH_FINALLY(delete_Greedy, greedy);
+            Greedy greedy(&fgraph);
 
             // Initial move to apply ?
             if (!initial_move_done && initial_move) {
                 initial_move_done = true;
-                greedy->setMove(initial_move);
+                greedy.setMove(initial_move);
             }
 
-            oldCodeLength = greedy->codeLength;
+            oldCodeLength = greedy.codeLength;
             bool moved = true;
             igraph_integer_t Nloops = 0;
             //igraph_integer_t count = 0;
             double inner_oldCodeLength = 1000;
 
             while (moved) { // main greedy optimizing loop
-                inner_oldCodeLength = greedy->codeLength;
-                moved = greedy->optimize();
+                inner_oldCodeLength = greedy.codeLength;
+                moved = greedy.optimize();
 
                 Nloops++;
                 //count++;
 
-                if (fabs(greedy->codeLength - inner_oldCodeLength) < 1.0e-10)
+                if (fabs(greedy.codeLength - inner_oldCodeLength) < 1.0e-10)
                     // if the move does'n reduce the codelenght -> exit !
                 {
                     moved = false;
@@ -191,13 +177,8 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
             }
 
             // transform the network to network of modules:
-            greedy->apply(true);
-            newCodeLength = greedy->codeLength;
-
-            // destroy greedy object
-            delete greedy;
-            IGRAPH_FINALLY_CLEAN(1);
-
+            greedy.apply(true);
+            newCodeLength = greedy.codeLength;
         } while (oldCodeLength - newCodeLength >  1.0e-10);
         // while there is some improvement
 
@@ -212,8 +193,6 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
         }
     } while (outer_oldCodeLength - newCodeLength > 1.0e-10);
 
-    delete cpy_fgraph;
-    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
@@ -275,47 +254,38 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              igraph_vector_int_t *membership,
                              igraph_real_t *codelength) {
 
-    FlowGraph * fgraph = new FlowGraph(graph, e_weights, v_weights);
-    IGRAPH_FINALLY(delete_FlowGraph, fgraph);
+    FlowGraph fgraph(graph, e_weights, v_weights);
 
     // compute stationary distribution
-    fgraph->initiate();
+    fgraph.initiate();
 
-    FlowGraph * cpy_fgraph ;
     double shortestCodeLength = 1000.0;
 
     // create membership vector
-    igraph_integer_t Nnode = fgraph->Nnode;
+    igraph_integer_t Nnode = fgraph.Nnode;
     IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
 
     for (igraph_integer_t trial = 0; trial < nb_trials; trial++) {
-        cpy_fgraph = new FlowGraph(fgraph);
-        IGRAPH_FINALLY(delete_FlowGraph, cpy_fgraph);
+        FlowGraph cpy_fgraph(fgraph);
 
         //partition the network
         IGRAPH_CHECK(infomap_partition(cpy_fgraph, false));
 
         // if better than the better...
-        if (cpy_fgraph->codeLength < shortestCodeLength) {
-            shortestCodeLength = cpy_fgraph->codeLength;
+        if (cpy_fgraph.codeLength < shortestCodeLength) {
+            shortestCodeLength = cpy_fgraph.codeLength;
             // ... store the partition
-            for (igraph_integer_t i = 0 ; i < cpy_fgraph->Nnode ; i++) {
-                size_t Nmembers = cpy_fgraph->node[i]->members.size();
+            for (igraph_integer_t i = 0 ; i < cpy_fgraph.Nnode ; i++) {
+                size_t Nmembers = cpy_fgraph.node[i]->members.size();
                 for (size_t k = 0; k < Nmembers; k++) {
                     //cluster[ cpy_fgraph->node[i]->members[k] ] = i;
-                    VECTOR(*membership)[cpy_fgraph->node[i]->members[k]] = i;
+                    VECTOR(*membership)[cpy_fgraph.node[i]->members[k]] = i;
                 }
             }
         }
-
-        delete_FlowGraph(cpy_fgraph);
-        IGRAPH_FINALLY_CLEAN(1);
     }
 
     *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
-
-    delete fgraph;
-    IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
 

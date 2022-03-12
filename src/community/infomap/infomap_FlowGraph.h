@@ -39,10 +39,10 @@ private:
 public:
     FlowGraph(igraph_integer_t n);
     FlowGraph(igraph_integer_t n, const igraph_vector_t *nodeWeights);
-    FlowGraph(FlowGraph * fgraph);
-    FlowGraph(FlowGraph * fgraph, igraph_integer_t sub_Nnode, igraph_integer_t * sub_members);
+    FlowGraph(const FlowGraph &fgraph);
+    FlowGraph(const FlowGraph &fgraph, const std::vector<igraph_integer_t> &sub_members);
 
-    FlowGraph(const igraph_t * graph, const igraph_vector_t *e_weights,
+    FlowGraph(const igraph_t *graph, const igraph_vector_t *e_weights,
               const igraph_vector_t *v_weights);
 
     ~FlowGraph();
@@ -53,7 +53,7 @@ public:
     void eigenvector();
     void calibrate();
 
-    void back_to(FlowGraph * fgraph);
+    void back_to(const FlowGraph &fgraph);
 
     /*************************************************************************/
     Node **node;
@@ -72,7 +72,5 @@ public:
 
     double codeLength;
 };
-
-void delete_FlowGraph(FlowGraph *fgraph);
 
 #endif

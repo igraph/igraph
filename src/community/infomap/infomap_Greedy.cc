@@ -70,10 +70,6 @@ Greedy::Greedy(FlowGraph * fgraph) {
 Greedy::~Greedy() {
 }
 
-void delete_Greedy(Greedy *greedy) {
-    delete greedy;
-}
-
 
 /** Greedy optimizing (as in Blodel and Al.) :
  * for each vertex (selected in a random order) compute the best possible move within neighborhood
@@ -349,9 +345,8 @@ void Greedy::apply(bool sort) {
     //modSnode[id_when_no_empty_node] = id_in_mod_tbl
 
     // Create the new graph
-    FlowGraph * tmp_fgraph = new FlowGraph(Nmod);
-    IGRAPH_FINALLY(delete_FlowGraph, tmp_fgraph);
-    Node ** node_tmp = tmp_fgraph->node ;
+    FlowGraph tmp_fgraph(Nmod);
+    Node ** node_tmp = tmp_fgraph.node ;
 
     Node ** node = graph->node;
 
@@ -440,11 +435,8 @@ void Greedy::apply(bool sort) {
     Nempty = 0;
 
     //swap node between tmp_graph and graph, then destroy tmp_fgraph
-    graph->swap(tmp_fgraph);
+    graph->swap(&tmp_fgraph);
     Nnode = Nmod;
-
-    delete tmp_fgraph;
-    IGRAPH_FINALLY_CLEAN(1);
 }
 
 

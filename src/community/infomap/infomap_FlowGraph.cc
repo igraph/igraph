@@ -24,9 +24,11 @@
 
 #include "infomap_FlowGraph.h"
 
-#define plogp( x ) ( (x) > 0.0 ? (x)*log(x) : 0.0 )
-
 using namespace std;
+
+inline double plogp(double x) {
+    return x > 0.0 ? x*log(x) : 0.0;
+}
 
 void FlowGraph::init(igraph_integer_t n, const igraph_vector_t *v_weights) {
     alpha = 0.15;
@@ -61,7 +63,7 @@ FlowGraph::FlowGraph(const igraph_t * graph,
     igraph_integer_t n = igraph_vcount(graph);
     init(n, v_weights);
 
-    int directed = igraph_is_directed(graph) ? 1 : 0;
+    bool directed = igraph_is_directed(graph);
 
     double linkWeight = 1.0;
     igraph_integer_t from, to;
@@ -93,43 +95,43 @@ FlowGraph::FlowGraph(const igraph_t * graph,
     }
 }
 
-FlowGraph::FlowGraph(FlowGraph * fgraph) {
-    igraph_integer_t n = fgraph->Nnode;
+FlowGraph::FlowGraph(const FlowGraph &fgraph) {
+    igraph_integer_t n = fgraph.Nnode;
     init(n, NULL);
     for (igraph_integer_t i = 0; i < n; i++) {
-        cpyNode(node[i], fgraph->node[i]);
+        *node[i] = *fgraph.node[i];
     }
 
     //XXX: quid de danglings et Ndanglings?
 
-    alpha = fgraph->alpha ;
-    beta  = fgraph->beta ;
+    alpha = fgraph.alpha ;
+    beta  = fgraph.beta ;
 
-    exit = fgraph->exit;
-    exitFlow = fgraph->exitFlow;
-    exit_log_exit = fgraph->exit_log_exit;
-    size_log_size = fgraph->size_log_size ;
-    nodeSize_log_nodeSize = fgraph->nodeSize_log_nodeSize;
+    exit = fgraph.exit;
+    exitFlow = fgraph.exitFlow;
+    exit_log_exit = fgraph.exit_log_exit;
+    size_log_size = fgraph.size_log_size ;
+    nodeSize_log_nodeSize = fgraph.nodeSize_log_nodeSize;
 
-    codeLength = fgraph->codeLength;
+    codeLength = fgraph.codeLength;
 }
 
 /** construct a graph by extracting a subgraph from the given graph
  */
-FlowGraph::FlowGraph(FlowGraph * fgraph, igraph_integer_t sub_Nnode, igraph_integer_t * sub_members) {
+FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &sub_members) {
+    igraph_integer_t sub_Nnode = sub_members.size();
+
     init(sub_Nnode, NULL);
 
     //XXX: use set of integer to ensure that elements are sorted
-    set<igraph_integer_t> sub_mem;
-    for (igraph_integer_t j = 0 ; j < sub_Nnode ; j++) {
-        sub_mem.insert(sub_members[j]);
-    }
+    set<igraph_integer_t> sub_mem(sub_members.begin(), sub_members.end());
+
     set<igraph_integer_t>::iterator it_mem = sub_mem.begin();
 
-    vector<igraph_integer_t> sub_renumber = vector<igraph_integer_t>(fgraph->Nnode);
+    vector<igraph_integer_t> sub_renumber = vector<igraph_integer_t>(fgraph.Nnode);
     // id --> sub_id
 
-    for (igraph_integer_t j = 0; j < fgraph->Nnode; j++) {
+    for (igraph_integer_t j = 0; j < fgraph.Nnode; j++) {
         sub_renumber[j] = -1;
     }
 
@@ -138,19 +140,19 @@ FlowGraph::FlowGraph(FlowGraph * fgraph, igraph_integer_t sub_Nnode, igraph_inte
         //int orig_nr = sub_members[j];
         igraph_integer_t orig_nr = (*it_mem);
 
-        node[j]->teleportWeight = fgraph->node[orig_nr]->teleportWeight;
-        node[j]->selfLink       = fgraph->node[orig_nr]->selfLink;
+        node[j]->teleportWeight = fgraph.node[orig_nr]->teleportWeight;
+        node[j]->selfLink       = fgraph.node[orig_nr]->selfLink;
         // Take care of self-link
 
-        size_t orig_NoutLinks = fgraph->node[orig_nr]->outLinks.size();
-        size_t orig_NinLinks  = fgraph->node[orig_nr]->inLinks.size();
+        size_t orig_NoutLinks = fgraph.node[orig_nr]->outLinks.size();
+        size_t orig_NinLinks  = fgraph.node[orig_nr]->inLinks.size();
 
         sub_renumber[orig_nr] = j;
 
         for (size_t k = 0; k < orig_NoutLinks; k++) {
-            igraph_integer_t to = fgraph->node[orig_nr]->outLinks[k].first;
+            igraph_integer_t to = fgraph.node[orig_nr]->outLinks[k].first;
             igraph_integer_t to_newnr = sub_renumber[to];
-            double link_weight = fgraph->node[orig_nr]->outLinks[k].second;
+            double link_weight = fgraph.node[orig_nr]->outLinks[k].second;
 
             if (to < orig_nr) {
                 // we add links if the destination (to) has already be seen
@@ -167,9 +169,9 @@ FlowGraph::FlowGraph(FlowGraph * fgraph, igraph_integer_t sub_Nnode, igraph_inte
         }
 
         for (size_t k = 0; k < orig_NinLinks; k++) {
-            igraph_integer_t to = fgraph->node[orig_nr]->inLinks[k].first;
+            igraph_integer_t to = fgraph.node[orig_nr]->inLinks[k].first;
             igraph_integer_t to_newnr = sub_renumber[to];
-            double link_weight = fgraph->node[orig_nr]->inLinks[k].second;
+            double link_weight = fgraph.node[orig_nr]->inLinks[k].second;
             if (to < orig_nr) {
                 if (sub_mem.find(to) != sub_mem.end()) {
                     node[j]->inLinks.push_back(make_pair(to_newnr, link_weight));
@@ -188,10 +190,6 @@ FlowGraph::~FlowGraph() {
         delete node[i];
     }
     delete [] node;
-}
-
-void delete_FlowGraph(FlowGraph *fgraph) {
-    delete fgraph;
 }
 
 
@@ -390,31 +388,30 @@ void FlowGraph::calibrate() {
 
 /* Restore the data from the given FlowGraph object
  */
-void FlowGraph::back_to(FlowGraph * fgraph) {
+void FlowGraph::back_to(const FlowGraph &fgraph) {
     // delete current nodes
     for (igraph_integer_t i = 0 ; i < Nnode ; i++) {
         delete node[i];
     }
     delete [] node;
 
-    Nnode = fgraph->Nnode;
+    Nnode = fgraph.Nnode;
 
     // copy original ones
     node = new Node*[Nnode];
     for (igraph_integer_t i = 0; i < Nnode; i++) {
-        node[i] = new Node();
-        cpyNode(node[i], fgraph->node[i]);
+        node[i] = new Node(*fgraph.node[i]);
     }
 
     // restore atributs
-    alpha = fgraph->alpha ;
-    beta  = fgraph->beta ;
+    alpha = fgraph.alpha ;
+    beta  = fgraph.beta ;
 
-    exit = fgraph->exit;
-    exitFlow = fgraph->exitFlow;
-    exit_log_exit = fgraph->exit_log_exit;
-    size_log_size = fgraph->size_log_size ;
-    nodeSize_log_nodeSize = fgraph->nodeSize_log_nodeSize;
+    exit = fgraph.exit;
+    exitFlow = fgraph.exitFlow;
+    exit_log_exit = fgraph.exit_log_exit;
+    size_log_size = fgraph.size_log_size ;
+    nodeSize_log_nodeSize = fgraph.nodeSize_log_nodeSize;
 
-    codeLength = fgraph->codeLength;
+    codeLength = fgraph.codeLength;
 }

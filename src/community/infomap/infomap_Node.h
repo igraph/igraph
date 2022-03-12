@@ -47,6 +47,4 @@ public:
     double size;
 };
 
-void cpyNode(Node *newNode, Node *oldNode);
-
 #endif
