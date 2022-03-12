@@ -636,7 +636,9 @@ igraph_topological_sorting:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, NEIMODE mode=OUT
 
 igraph_feedback_arc_set:
-    PARAMS: GRAPH graph, OUT EDGESET result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=EXACT_IP
+    # Default algorithm is the approximate method because it is faster and the
+    # function is _not_ called igraph_minimum_feedback_arc_set
+    PARAMS: GRAPH graph, OUT EDGESET result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=APPROX_EADES
     DEPS: result ON graph, weights ON graph
 
 igraph_is_loop:
