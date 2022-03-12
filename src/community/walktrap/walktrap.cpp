@@ -89,6 +89,8 @@ using namespace igraph::walktrap;
  *     If it is a NULL pointer then all edges will have equal
  *     weights. The weights are expected to be positive.
  * \param steps Integer constant, the length of the random walks.
+ *     Typically, good results are obtained with values between
+ *     3-8 with 4-5 being a reasonable default.
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not NULL). Each merge is a
  *     row in a two-column matrix and contains the ids of the merged
