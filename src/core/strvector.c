@@ -362,13 +362,13 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t *sv, igraph_integer_t 
 
         for (i = 0; i < toadd; i++) {
             sv->stor_begin[oldsize + i] = IGRAPH_CALLOC(1, char);
-            if (sv->stor_begin[oldsize + i] == 0) {
+            if (sv->stor_begin[oldsize + i] == NULL) {
+                /* LCOV_EXCL_START */
                 for (j = 0; j < i; j++) {
-                    if (sv->stor_begin[oldsize + i] != 0) {
-                        IGRAPH_FREE(sv->stor_begin[oldsize + i]);
-                    }
+                    IGRAPH_FREE(sv->stor_begin[oldsize + i]);
                 }
-                IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+                IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM);
+                /* LCOV_EXCL_STOP */
             }
             sv->stor_begin[oldsize + i][0] = '\0';
         }
