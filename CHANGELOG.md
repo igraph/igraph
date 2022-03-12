@@ -22,6 +22,7 @@
  - Fixed incorrect partition results for walktrap algorithm (issue #1927)
  - Negative values returned by `igraph_rng_get_integer()` and `RNG_INTEGER()` were incorrect,
    one larger than they should have been.
+ - `igraph_community_walktrap()` now checks its `steps` input argument.
 
 ### Other
 
