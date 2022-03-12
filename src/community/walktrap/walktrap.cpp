@@ -59,6 +59,8 @@
 #include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
+
+#include "core/exceptions.h"
 #include "core/interruption.h"
 
 using namespace igraph::walktrap;
@@ -123,45 +125,51 @@ int igraph_community_walktrap(const igraph_t *graph,
                               igraph_vector_t *modularity,
                               igraph_vector_t *membership) {
 
-    long int no_of_nodes = (long int)igraph_vcount(graph);
-    int length = steps;
-    long max_memory = -1;
+    IGRAPH_HANDLE_EXCEPTIONS(
+        long int no_of_nodes = (long int)igraph_vcount(graph);
+        int length = steps;
+        long max_memory = -1;
 
-    if (membership && !(modularity && merges)) {
-        IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
-                     IGRAPH_EINVAL);
-    }
+        if (steps <= 0) {
+            IGRAPH_ERROR("Length of random walks must be positive for walktrap community detection.", IGRAPH_EINVAL);
+        }
 
-    Graph G;
-    if (G.convert_from_igraph(graph, weights)) {
-        IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
-    }
+        if (membership && !(modularity && merges)) {
+            IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
+                         IGRAPH_EINVAL);
+        }
 
-    if (merges) {
-        igraph_integer_t no;
-        IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
-                                     &no, IGRAPH_WEAK));
-        IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - no, 2));
-    }
-    if (modularity) {
-        IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
-        igraph_vector_null(modularity);
-    }
-    Communities C(&G, length, max_memory, merges, modularity);
+        Graph G;
+        if (G.convert_from_igraph(graph, weights)) {
+            IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
+        }
 
-    while (!C.H->is_empty()) {
-        IGRAPH_ALLOW_INTERRUPTION();
-        C.merge_nearest_communities();
-    }
+        if (merges) {
+            igraph_integer_t no;
+            IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
+                                         &no, IGRAPH_WEAK));
+            IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - no, 2));
+        }
+        if (modularity) {
+            IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
+            igraph_vector_null(modularity);
+        }
+        Communities C(&G, length, max_memory, merges, modularity);
 
-    if (membership) {
-        long int m;
-        m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
-        IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
-                     /*steps=*/ m,
-                     membership,
-                     /*csize=*/ NULL));
-    }
+        while (!C.H->is_empty()) {
+            IGRAPH_ALLOW_INTERRUPTION();
+            C.merge_nearest_communities();
+        }
 
-    return IGRAPH_SUCCESS;
+        if (membership) {
+            long int m;
+            m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
+            IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
+                         /*steps=*/ m,
+                         membership,
+                         /*csize=*/ NULL));
+        }
+
+        return IGRAPH_SUCCESS;
+    )
 }
