@@ -372,7 +372,6 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
         v->end = v->stor_begin + newsize;
     } else if (newsize > oldsize) {
         IGRAPH_CHECK(igraph_strvector_reserve(v, newsize));
-        v->stor_end = v->stor_begin + newsize;
 
         for (i = 0; i < toadd; i++) {
             v->stor_begin[oldsize + i] = IGRAPH_CALLOC(1, char);
@@ -386,6 +385,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t n
             }
             v->stor_begin[oldsize + i][0] = '\0';
         }
+        v->end = v->stor_begin + newsize;
     }
 
     return IGRAPH_SUCCESS;
