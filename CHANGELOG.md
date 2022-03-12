@@ -122,6 +122,8 @@
    `igraph_community_leading_eigenvector()` now use an `igraph_vector_int_t`
    for their `merges` parameter.
 
+ - `igraph_community_walktrap()` now uses `igraph_integer_t` for its `steps` argument.
+
  - `igraph_community_edge_betweenness()` now uses an `igraph_vector_int_t` to
    return the edge IDs in the order of their removal as well as the list of edge
    IDs whose removal broke a single component into two.

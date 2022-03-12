@@ -63,6 +63,8 @@
 #include "core/exceptions.h"
 #include "core/interruption.h"
 
+#include <climits>
+
 using namespace igraph::walktrap;
 
 /**
@@ -120,19 +122,24 @@ using namespace igraph::walktrap;
 
 igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
-                              int steps,
+                              igraph_integer_t steps,
                               igraph_matrix_int_t *merges,
                               igraph_vector_t *modularity,
                               igraph_vector_int_t *membership) {
 
     IGRAPH_HANDLE_EXCEPTIONS(
         igraph_integer_t no_of_nodes = igraph_vcount(graph);
-        int length = steps;
-        long max_memory = -1;
 
         if (steps <= 0) {
             IGRAPH_ERROR("Length of random walks must be positive for walktrap community detection.", IGRAPH_EINVAL);
         }
+
+        if (steps > INT_MAX) {
+            IGRAPH_ERROR("Length of random walks too large for walktrap community detection.", IGRAPH_EINVAL);
+        }
+
+        int length = steps;
+        long max_memory = -1;
 
         if (membership && !(modularity && merges)) {
             IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
@@ -140,9 +147,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         }
 
         Graph G;
-        if (G.convert_from_igraph(graph, weights)) {
-            IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
-        }
+        G.convert_from_igraph(graph, weights);
 
         if (merges) {
             igraph_integer_t no;
