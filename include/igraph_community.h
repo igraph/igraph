@@ -98,7 +98,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            const igraph_vector_t *e_weights,
                                            const igraph_vector_t *v_weights,
-                                           int nb_trials,
+                                           igraph_integer_t nb_trials,
                                            igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
 

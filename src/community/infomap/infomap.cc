@@ -90,7 +90,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
                         igraph_integer_t *sub_members  = new igraph_integer_t[sub_Nnode];      // id_sub --> id
                         IGRAPH_FINALLY(operator delete [], sub_members);
 
-                        for (igraph_integer_t j = 0 ; j < sub_Nnode ; j++) {
+                        for (size_t j = 0 ; j < sub_Nnode ; j++) {
                             sub_members[j] = fgraph->node[i]->members[j];
                         }
 
@@ -271,7 +271,7 @@ igraph_error_t infomap_partition(FlowGraph * fgraph, bool rcall) {
 igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              const igraph_vector_t *e_weights,
                              const igraph_vector_t *v_weights,
-                             int nb_trials,
+                             igraph_integer_t nb_trials,
                              igraph_vector_int_t *membership,
                              igraph_real_t *codelength) {
 
@@ -288,7 +288,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     igraph_integer_t Nnode = fgraph->Nnode;
     IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
 
-    for (int trial = 0; trial < nb_trials; trial++) {
+    for (igraph_integer_t trial = 0; trial < nb_trials; trial++) {
         cpy_fgraph = new FlowGraph(fgraph);
         IGRAPH_FINALLY(delete_FlowGraph, cpy_fgraph);
 

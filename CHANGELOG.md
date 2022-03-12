@@ -124,6 +124,8 @@
 
  - `igraph_community_walktrap()` now uses `igraph_integer_t` for its `steps` argument.
 
+ - `igraph_community_infomap()` now uses `igraph_integer_t` for its `nb_trials` argument.
+
  - `igraph_community_edge_betweenness()` now uses an `igraph_vector_int_t` to
    return the edge IDs in the order of their removal as well as the list of edge
    IDs whose removal broke a single component into two.

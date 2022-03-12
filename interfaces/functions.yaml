@@ -1405,7 +1405,7 @@ igraph_split_join_distance:
 igraph_community_infomap:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS e_weights=NULL,
-        VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10,
+        VERTEXWEIGHTS v_weights=NULL, INTEGERS nb_trials=10,
         OUT VECTOR_INT membership, OUT REAL codelength
     DEPS: e_weights ON graph, v_weights ON graph
 
