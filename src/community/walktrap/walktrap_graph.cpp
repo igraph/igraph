@@ -58,7 +58,7 @@
 #include "igraph_interface.h"
 
 #include <algorithm>
-#include <exception>
+#include <stdexcept>
 #include <climits>
 #include <cstring>      // strlen
 

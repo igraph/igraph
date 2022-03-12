@@ -1300,7 +1300,7 @@ igraph_community_spinglass_single:
 
 igraph_community_walktrap:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGEWEIGHTS weights, INT steps=4,
+        GRAPH graph, OPTIONAL EDGEWEIGHTS weights, INTEGER steps=4,
         OUT MATRIX_INT merges, OUT VECTOR modularity, OUT VECTOR_INT membership
 
 igraph_community_edge_betweenness:
