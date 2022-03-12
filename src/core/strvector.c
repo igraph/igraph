@@ -64,7 +64,7 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
     igraph_integer_t i;
     sv->stor_begin = IGRAPH_CALLOC(size, char*);
     if (sv->stor_begin == NULL) {
-        IGRAPH_ERROR("Strvector init failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Strvector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < size; i++) {
         sv->stor_begin[i] = IGRAPH_CALLOC(1, char);
@@ -258,7 +258,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
     /*   IGRAPH_ASSERT(from->stor_begin != 0); */
     to->stor_begin = IGRAPH_CALLOC(igraph_strvector_size(from), char*);
     if (to->stor_begin == NULL) {
-        IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     to->stor_end = to->stor_begin + igraph_strvector_size(from);
     to->end = to->stor_end;
@@ -267,7 +267,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
         to->stor_begin[i] = strdup(igraph_strvector_get(from, i));
         if (to->stor_begin[i] == NULL) {
             igraph_strvector_destroy(to);
-            IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     }
 
@@ -368,7 +368,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t *sv, igraph_integer_t 
                         IGRAPH_FREE(sv->stor_begin[oldsize + i]);
                     }
                 }
-                IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             sv->stor_begin[oldsize + i][0] = '\0';
         }
@@ -451,7 +451,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
     IGRAPH_CHECK(add_one_to_size(sv, old_size));
     sv->stor_begin[old_size] = strdup(value);
     if (sv->stor_begin[old_size] == NULL) {
-        IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     sv->end = sv->stor_begin + old_size + 1;
 
@@ -483,7 +483,7 @@ igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *sv, const char
     IGRAPH_CHECK(add_one_to_size(sv, old_size));
     sv->stor_begin[old_size] = strndup(value, len);
     if (sv->stor_begin[old_size] == NULL) {
-        IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     sv->end = sv->stor_begin + old_size + 1;
 
