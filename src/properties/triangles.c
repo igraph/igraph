@@ -588,11 +588,12 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_transitivity_barrat1(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vs_t vids,
-                                         const igraph_vector_t *weights,
-                                         igraph_transitivity_mode_t mode) {
+static igraph_error_t igraph_i_transitivity_barrat1(
+        const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vs_t vids,
+        const igraph_vector_t *weights,
+        igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
@@ -677,10 +678,11 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_transitivity_barrat4(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vector_t *weights,
-                                         igraph_transitivity_mode_t mode) {
+static igraph_error_t igraph_i_transitivity_barrat4(
+        const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vector_t *weights,
+        igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order;
