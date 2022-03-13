@@ -26,10 +26,6 @@
 
 using namespace std;
 
-inline double plogp(double x) {
-    return x > 0.0 ? x*log(x) : 0.0;
-}
-
 void FlowGraph::init(igraph_integer_t n, const igraph_vector_t *v_weights) {
     alpha = 0.15;
     beta  = 1.0 - alpha;
@@ -75,7 +71,7 @@ FlowGraph::FlowGraph(const igraph_t *graph,
     for (igraph_integer_t i = 0; i < Nlinks; i++) {
         if (!directed) { // not directed
             if (i % 2 == 0) {
-                linkWeight = e_weights ? (double)VECTOR(*e_weights)[i / 2] : 1.0;
+                linkWeight = e_weights ? VECTOR(*e_weights)[i / 2] : 1.0;
                 igraph_edge(graph, i / 2, &from, &to);
             } else {
                 igraph_edge(graph, (i - 1) / 2, &to,   &from);
@@ -128,13 +124,8 @@ FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &su
 
     set<igraph_integer_t>::iterator it_mem = sub_mem.begin();
 
-    vector<igraph_integer_t> sub_renumber = vector<igraph_integer_t>(fgraph.Nnode);
+    vector<igraph_integer_t> sub_renumber(fgraph.Nnode, -1);
     // id --> sub_id
-
-    for (igraph_integer_t j = 0; j < fgraph.Nnode; j++) {
-        sub_renumber[j] = -1;
-    }
-
 
     for (igraph_integer_t j = 0; j < sub_Nnode; j++) {
         //int orig_nr = sub_members[j];
@@ -291,7 +282,7 @@ void FlowGraph::initiate() {
  * (for all i update node[i].size)
  */
 void FlowGraph::eigenvector() {
-    vector<double> size_tmp = vector<double>(Nnode, 1.0 / Nnode);
+    vector<double> size_tmp(Nnode, 1.0 / Nnode);
 
     int Niterations = 0;
     double danglingSize;

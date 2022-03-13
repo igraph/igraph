@@ -34,6 +34,7 @@
 #include "core/interruption.h"
 
 #include "infomap_Node.h"
+#include "infomap_FlowGraph.h"
 #include "infomap_Greedy.h"
 
 #include <vector>

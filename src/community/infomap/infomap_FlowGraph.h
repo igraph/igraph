@@ -25,12 +25,17 @@
 #ifndef FLOWGRAPH_H
 #define FLOWGRAPH_H
 
-#include <vector>
-#include <set>
+#include "infomap_Node.h"
 
 #include "igraph_interface.h"
 
-#include "infomap_Node.h"
+#include <vector>
+#include <set>
+#include <cmath>
+
+inline double plogp(double x) {
+    return x > 0.0 ? x*log(x) : 0.0;
+}
 
 class FlowGraph {
 private:

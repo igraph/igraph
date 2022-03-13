@@ -25,10 +25,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include <vector>
-#include <utility>
-
 #include "igraph_interface.h"
+
+#include <vector>
 
 class Node {
 public:

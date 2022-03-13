@@ -24,7 +24,6 @@
 
 #include "infomap_Greedy.h"
 #include <iterator>
-#define plogp( x ) ( (x) > 0.0 ? (x)*log(x) : 0.0 )
 
 using namespace std;
 
@@ -63,8 +62,7 @@ Greedy::Greedy(FlowGraph * fgraph) :
 
     exit = plogp(exitFlow);
 
-    codeLength = exit - 2.0 * exit_log_exit + size_log_size -
-                 nodeSize_log_nodeSize;
+    codeLength = exit - 2.0 * exit_log_exit + size_log_size - nodeSize_log_nodeSize;
 }
 
 

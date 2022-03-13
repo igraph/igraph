@@ -25,15 +25,13 @@
 #ifndef GREEDY_H
 #define GREEDY_H
 
-#include <vector>
-#include <map>
-#include <utility>
-#include <climits>
+#include "infomap_Node.h"
+#include "infomap_FlowGraph.h"
 
 #include "igraph_random.h"
 
-#include "infomap_Node.h"
-#include "infomap_FlowGraph.h"
+#include <vector>
+#include <map>
 
 class Greedy {
 public:
