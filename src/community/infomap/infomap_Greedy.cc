@@ -436,6 +436,8 @@ void Greedy::apply(bool sort) {
  *  - codeLength
  * according to **node / node[i]->index
  */
+/* unused */
+/*
 void Greedy::tune(void) {
 
     exit_log_exit = 0.0;
@@ -486,6 +488,7 @@ void Greedy::tune(void) {
     codeLength = exit - 2.0 * exit_log_exit + size_log_size -
                  nodeSize_log_nodeSize;
 }
+*/
 
 
 /* Compute the new CodeSize if modules are merged as indicated by moveTo

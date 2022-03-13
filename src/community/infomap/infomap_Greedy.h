@@ -22,8 +22,8 @@
 
 */
 
-#ifndef GREEDY_H
-#define GREEDY_H
+#ifndef INFOMAP_GREEDY_H
+#define INFOMAP_GREEDY_H
 
 #include "infomap_Node.h"
 #include "infomap_FlowGraph.h"
@@ -46,7 +46,7 @@ public:
     void apply(bool sort);
     //virtual void level(Node ***, bool sort);
 
-    void tune(void);
+    /* void tune(void); */ /* unused */
 
     /**************************************************************************/
 
@@ -78,4 +78,4 @@ private:
     std::vector<size_t> mod_members;
 };
 
-#endif
+#endif // INFOMAP_GREEDY_H

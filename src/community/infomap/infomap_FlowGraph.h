@@ -22,8 +22,8 @@
 
 */
 
-#ifndef FLOWGRAPH_H
-#define FLOWGRAPH_H
+#ifndef INFOMAP_FLOWGRAPH_H
+#define INFOMAP_FLOWGRAPH_H
 
 #include "infomap_Node.h"
 
@@ -76,4 +76,4 @@ public:
     double codeLength;
 };
 
-#endif
+#endif // INFOMAP_FLOWGRAPH_H

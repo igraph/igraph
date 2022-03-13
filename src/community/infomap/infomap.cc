@@ -31,6 +31,8 @@
 
 #include "igraph_interface.h"
 #include "igraph_community.h"
+
+#include "core/exceptions.h"
 #include "core/interruption.h"
 
 #include "infomap_Node.h"
@@ -55,7 +57,7 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
     std::vector<igraph_integer_t> initial_move;
     bool initial_move_done = true;
 
-    // re-use vector in loop or better performance
+    // re-use vector in loop for better performance
     std::vector<igraph_integer_t> subMoveTo;
 
     do { // Main loop
@@ -241,40 +243,42 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              igraph_vector_int_t *membership,
                              igraph_real_t *codelength) {
 
-    FlowGraph fgraph(graph, e_weights, v_weights);
+    IGRAPH_HANDLE_EXCEPTIONS(
+        FlowGraph fgraph(graph, e_weights, v_weights);
 
-    // compute stationary distribution
-    fgraph.initiate();
+        // compute stationary distribution
+        fgraph.initiate();
 
-    double shortestCodeLength = 1000.0;
+        double shortestCodeLength = 1000.0;
 
-    // create membership vector
-    igraph_integer_t Nnode = fgraph.Nnode;
-    IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
+        // create membership vector
+        igraph_integer_t Nnode = fgraph.Nnode;
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
 
-    for (igraph_integer_t trial = 0; trial < nb_trials; trial++) {
-        FlowGraph cpy_fgraph(fgraph);
+        for (igraph_integer_t trial = 0; trial < nb_trials; trial++) {
+            FlowGraph cpy_fgraph(fgraph);
 
-        //partition the network
-        IGRAPH_CHECK(infomap_partition(cpy_fgraph, false));
+            //partition the network
+            IGRAPH_CHECK(infomap_partition(cpy_fgraph, false));
 
-        // if better than the better...
-        if (cpy_fgraph.codeLength < shortestCodeLength) {
-            shortestCodeLength = cpy_fgraph.codeLength;
-            // ... store the partition
-            for (igraph_integer_t i = 0 ; i < cpy_fgraph.Nnode ; i++) {
-                size_t Nmembers = cpy_fgraph.node[i].members.size();
-                for (size_t k = 0; k < Nmembers; k++) {
-                    //cluster[ cpy_fgraph->node[i].members[k] ] = i;
-                    VECTOR(*membership)[cpy_fgraph.node[i].members[k]] = i;
+            // if better than the better...
+            if (cpy_fgraph.codeLength < shortestCodeLength) {
+                shortestCodeLength = cpy_fgraph.codeLength;
+                // ... store the partition
+                for (igraph_integer_t i = 0 ; i < cpy_fgraph.Nnode ; i++) {
+                    size_t Nmembers = cpy_fgraph.node[i].members.size();
+                    for (size_t k = 0; k < Nmembers; k++) {
+                        //cluster[ cpy_fgraph->node[i].members[k] ] = i;
+                        VECTOR(*membership)[cpy_fgraph.node[i].members[k]] = i;
+                    }
                 }
             }
         }
-    }
 
-    *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
+        *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
 
-    IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+        IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
 
-    return IGRAPH_SUCCESS;
+        return IGRAPH_SUCCESS;
+    );
 }

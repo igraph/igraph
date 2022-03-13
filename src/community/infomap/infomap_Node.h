@@ -22,8 +22,8 @@
 
 */
 
-#ifndef NODE_H
-#define NODE_H
+#ifndef INFOMAP_NODE_H
+#define INFOMAP_NODE_H
 
 #include "igraph_interface.h"
 
@@ -48,4 +48,4 @@ struct Node {
     double size;
 };
 
-#endif
+#endif // INFOMAP_NODE_H
